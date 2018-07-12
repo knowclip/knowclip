@@ -18,8 +18,35 @@
   font-size: 1.5em;
 }
 
-.App-intro {
+.audioPlayer {
+  width: 30rem;
+}
+
+.form {
   font-size: large;
+  max-width: 30em;
+  margin: auto;
+}
+
+.audioFilenameMenu {
+  display: flex;
+}
+
+.audioFileName {
+  font-size: large;
+  width: 20rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fileInput {
+  pointer-events: none;
+}
+
+.formBody {
+  max-width: 20em;
+  margin: auto;
 }
 
 @keyframes App-logo-spin {
