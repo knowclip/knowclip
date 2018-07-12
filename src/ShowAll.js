@@ -12,8 +12,8 @@ const Field = ({ text }) => <span style={getFieldStyles(text)}>
   {text || 'blank'}
 </span>
 
-const FlashcardRow = ({ flashcard: { file, de, en }, index, goToFile }) =>
-  <TableRow hover onClick={() => goToFile(index)}>
+const FlashcardRow = ({ flashcard: { file, de, en }, index, goToFile, closeModal }) =>
+  <TableRow hover onClick={() => goToFile(index)} onDoubleClick={closeModal}>
     <TableCell style={{ maxWidth: '8em', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</TableCell>
     <TableCell><Field text={de} /></TableCell>
     <TableCell><Field text={en} /></TableCell>
@@ -49,6 +49,7 @@ export default class ShowAll extends Component {
             <FlashcardRow
               key={file.name}
               goToFile={goToFile}
+              closeModal={handleClose}
               flashcard={flashcardsData[file.name]}
               isCurrent={currentFileIndex === i}
               index={i}
