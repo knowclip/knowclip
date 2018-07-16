@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import ShowAll from './ShowAll'
-import { TextField, Button } from '@material-ui/core'
+import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core'
 
 const localFlashcardKey = (file) => `${file.type}_____${file.name}`
 const setLocalFlashcard = (flashcard) => {
@@ -37,11 +37,16 @@ class App extends Component {
     currentFileIndex: 0,
     flashcardsData: {},
     modalIsOpen: false,
+    loop: true,
   }
 
   setFiles = (e) => {
     const files = [...e.target.files]
-    this.setState({ files, flashcardsData: getFlashcards(files) }, () => this.germanInput.focus())
+    this.setState({
+      files,
+      flashcardsData: getFlashcards(files),
+      currentFileIndex: 0,
+    }, () => this.germanInput.focus())
     this.playAudio(e.target.files[0])
   }
 
@@ -72,7 +77,8 @@ class App extends Component {
   }
   nextFile = () => {
     const higher = this.state.currentFileIndex + 1
-    this.goToFile(higher <= this.state.files.length - 1 ? higher : 0)
+    const lastIndex = this.state.files.length - 1
+    this.goToFile(higher <= lastIndex ? higher : lastIndex)
   }
   handleFlashcardSubmit = (e) => {
     e.preventDefault()
@@ -111,10 +117,21 @@ class App extends Component {
   openModal = () => this.setState({ modalIsOpen: true })
   closeModal = () => this.setState({ modalIsOpen: false })
 
+  handleAudioEnded = (e) => {
+    this.nextFile()
+  }
+  toggleLoop = () => this.setState({ loop: !this.state.loop })
+
   render() {
     const form = this.areFilesLoaded()
       ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
-        <audio loop ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
+        <audio onEnded={this.handleAudioEnded} loop={this.state.loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
+        <FormControlLabel
+          label="Loop"
+          control={
+            <Checkbox value={this.state.loop} onClick={this.toggleLoop} />
+          }
+        />
         <p className="audioFilenameMenu">
           <Button onClick={this.prevFile} disabled={this.isPrevButtonEnabled()}>Previous</Button>
           <h2 className="audioFileName">
