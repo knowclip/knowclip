@@ -42,7 +42,7 @@ export default class ShowAll extends Component {
 
   render() {
     const { open, handleClose, flashcardsData, files, currentFileIndex, goToFile } = this.props
-    return <Dialog open={open} onClose={handleClose}>
+    return <Dialog open={open} onClose={handleClose}  style={{ width: '900px' }}>
       <Table>
         <TableBody>
           {files.map((file, i) =>

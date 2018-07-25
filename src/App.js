@@ -129,7 +129,7 @@ class App extends Component {
         <FormControlLabel
           label="Loop"
           control={
-            <Checkbox value={this.state.loop} onClick={this.toggleLoop} />
+            <Checkbox checked={this.state.loop} value={this.state.loop} onChange={this.toggleLoop} />
           }
         />
         <p className="audioFilenameMenu">
