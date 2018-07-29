@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import ShowAll from './ShowAll'
+import Waveform from './Waveform'
+import getWaveform from './getWaveform'
 import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core'
 
 const localFlashcardKey = (file) => `${file.type}_____${file.name}`
@@ -38,6 +40,7 @@ class App extends Component {
     flashcardsData: {},
     modalIsOpen: false,
     loop: true,
+    waveformPath: null,
   }
 
   setFiles = (e) => {
@@ -57,6 +60,7 @@ class App extends Component {
   fileInputRef = (el) => this.fileInput = el
   audioRef = (el) => this.audio = el
   germanInputRef = (el) => this.germanInput = el
+  svgRef = (el) => this.svg = el
 
   playAudio = (file) => {
     const reader = new FileReader()
@@ -65,6 +69,11 @@ class App extends Component {
       this.audio.play()
     }
     reader.readAsDataURL(file)
+
+    getWaveform(file)
+      .then((svgPath) => {
+        this.setState({ waveformPath: svgPath })
+      })
   }
 
   goToFile = (index) => {
@@ -125,6 +134,7 @@ class App extends Component {
   render() {
     const form = this.areFilesLoaded()
       ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
+      <Waveform path={this.state.waveformPath} />
         <audio onEnded={this.handleAudioEnded} loop={this.state.loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
         <FormControlLabel
           label="Loop"

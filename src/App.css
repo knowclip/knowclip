@@ -53,3 +53,13 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.waveform-svg,
+.waveform-g {
+  width: 100%;
+  height: 100px;
+}
+
+.waveform-path {
+  stroke: #000000;
+}
