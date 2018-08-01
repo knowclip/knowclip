@@ -95,7 +95,7 @@ class App extends Component {
 
   setFlashcardText = (key, text) => {
     const newFlashcard = {
-      ...this.getCurrentFlashcard(),
+      ...this.props.currentFlashcard,
       [key]: text,
     }
     this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
@@ -121,7 +121,7 @@ class App extends Component {
     const {
       areFilesLoaded, waveformPath, loop,
       isPrevButtonEnabled, isNextButtonEnabled,
-      currentFlashcard,
+      currentFlashcard, currentFileIndex, flashcards
     } = this.props
     const currentFile = this.getCurrentFile()
 
@@ -170,18 +170,18 @@ class App extends Component {
           </Button>
         </p>
         {form}
+        <ShowAll
+          open={this.isModalOpen()}
+          handleClose={this.closeModal}
+          flashcards={flashcards}
+          files={this.state.files}
+          currentFileIndex={currentFileIndex}
+          goToFile={this.goToFile}
+        />
       </div>
     );
   }
 }
-// <ShowAll
-//   open={this.isModalOpen()}
-//   handleClose={this.closeModal}
-//   // flashcardsData={this.state.flashcardsData}
-//   files={this.state.files}
-//   currentFileIndex={this.state.currentFileIndex}
-//   goToFile={this.goToFile}
-// />
 
 const mapStateToProps = (state) => ({
   filenames: state.filenames,
