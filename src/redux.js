@@ -9,13 +9,12 @@ const composeEnhancers = process.env.NODE_ENV === 'development'
 
 export default function getStore() {
   const epicMiddleware = createEpicMiddleware()
+
   return Promise.resolve({
     epicMiddleware,
     store: createStore(
       reducer,
-      composeEnhancers(
-        applyMiddleware(epicMiddleware)
-      )
+      composeEnhancers(applyMiddleware(epicMiddleware))
     ),
   })
 }

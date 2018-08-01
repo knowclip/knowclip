@@ -25,13 +25,15 @@ const getFlashcards = (files) => {
 }
 
 export const initializeFlashcards = (files) => ({
-  type: 'INITIALIZE_FLASHCARDS'
-  flashcards: getFlashcards(files).
+  type: 'INITIALIZE_FLASHCARDS',
+  flashcards: getFlashcards(files),
+  filenames: files.map(f => f.name),
 })
 
-export const setFlashcardField = (id, value) => ({
+export const setFlashcardField = (id, key, value) => ({
   type: 'SET_FLASHCARD_FIELD',
   id,
+  key,
   value,
 })
 

@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import logo from './logo.svg';
 import './App.css';
 import ShowAll from './ShowAll'
 import Waveform from './Waveform'
 import getWaveform from './getWaveform'
 import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core'
+import * as s from './selectors'
+import * as a from './actions'
 
 const localFlashcardKey = (file) => `${file.type}_____${file.name}`
 const setLocalFlashcard = (flashcard) => {
@@ -36,20 +39,15 @@ const getFlashcards = (files) => {
 class App extends Component {
   state = {
     files: [],
-    currentFileIndex: 0,
-    flashcardsData: {},
     modalIsOpen: false,
-    loop: true,
-    waveformPath: null,
   }
 
   setFiles = (e) => {
     const files = [...e.target.files]
     this.setState({
       files,
-      flashcardsData: getFlashcards(files),
-      currentFileIndex: 0,
     }, () => this.germanInput.focus())
+    this.props.initializeFlashcards(files)
     this.playAudio(e.target.files[0])
   }
 
@@ -72,21 +70,21 @@ class App extends Component {
 
     getWaveform(file)
       .then((svgPath) => {
-        this.setState({ waveformPath: svgPath })
+        this.props.setWaveformPath(svgPath)
       })
   }
 
   goToFile = (index) => {
-    this.setState({ currentFileIndex: index })
+    this.props.setCurrentFlashcard(index)
     this.playAudio(this.state.files[index])
   }
   prevFile = () => {
-    const lower = this.state.currentFileIndex - 1
+    const lower = this.props.currentFileIndex - 1
     this.goToFile(lower >= 0 ? lower : 0)
   }
   nextFile = () => {
-    const higher = this.state.currentFileIndex + 1
-    const lastIndex = this.state.files.length - 1
+    const higher = this.props.currentFileIndex + 1
+    const lastIndex = this.props.filenames.length - 1
     this.goToFile(higher <= lastIndex ? higher : lastIndex)
   }
   handleFlashcardSubmit = (e) => {
@@ -100,27 +98,15 @@ class App extends Component {
       ...this.getCurrentFlashcard(),
       [key]: text,
     }
-    const flashcardsData = {
-      ...this.state.flashcardsData,
-      [this.getCurrentFlashcard().file.name]: newFlashcard
-    }
-    this.setState({ flashcardsData })
+    this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
     setLocalFlashcard(newFlashcard)
   }
 
   setGerman = (e) => this.setFlashcardText('de', e.target.value)
   setEnglish = (e) => this.setFlashcardText('en', e.target.value)
 
-  getCurrentFile = () => this.state.files[this.state.currentFileIndex]
+  getCurrentFile = () => this.props.getCurrentFile(this.state.files)
 
-  getCurrentFlashcard = () => this.state.flashcardsData[this.getCurrentFile().name]
-
-  getGerman = () => this.getCurrentFlashcard().de
-  getEnglish = () => this.getCurrentFlashcard().en
-
-  areFilesLoaded = () => Boolean(this.state.files.length)
-  isNextButtonEnabled = () => this.state.currentFileIndex === this.state.files.length - 1
-  isPrevButtonEnabled = () => this.state.currentFileIndex === 0
   isModalOpen = () => this.state.modalIsOpen
 
   openModal = () => this.setState({ modalIsOpen: true })
@@ -129,33 +115,40 @@ class App extends Component {
   handleAudioEnded = (e) => {
     this.nextFile()
   }
-  toggleLoop = () => this.setState({ loop: !this.state.loop })
+  toggleLoop = () => this.props.toggleLoop()
 
   render() {
-    const form = this.areFilesLoaded()
+    const {
+      areFilesLoaded, waveformPath, loop,
+      isPrevButtonEnabled, isNextButtonEnabled,
+      currentFlashcard,
+    } = this.props
+    const currentFile = this.getCurrentFile()
+
+    const form = areFilesLoaded
       ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
-      <Waveform path={this.state.waveformPath} />
-        <audio onEnded={this.handleAudioEnded} loop={this.state.loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
+      <Waveform path={waveformPath} />
+        <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
         <FormControlLabel
           label="Loop"
           control={
-            <Checkbox checked={this.state.loop} value={this.state.loop} onChange={this.toggleLoop} />
+            <Checkbox checked={loop} value={loop} onChange={this.toggleLoop} />
           }
         />
         <p className="audioFilenameMenu">
-          <Button onClick={this.prevFile} disabled={this.isPrevButtonEnabled()}>Previous</Button>
+          <Button onClick={this.prevFile} disabled={isPrevButtonEnabled}>Previous</Button>
           <h2 className="audioFileName">
-            {this.getCurrentFlashcard().file.name}
+            {currentFile.name}
           </h2>
-          <Button onClick={this.nextFile} disabled={this.isNextButtonEnabled()}>Next</Button>
+          <Button onClick={this.nextFile} disabled={isNextButtonEnabled}>Next</Button>
         </p>
         <div className="formBody">
           <p lang="de">
-            <TextField inputRef={this.germanInputRef} onChange={this.setGerman} value={this.getGerman()} fullWidth multiline label="German" /></p>
+            <TextField inputRef={this.germanInputRef} onChange={this.setGerman} value={currentFlashcard.de} fullWidth multiline label="German" /></p>
           <p lang="en">
-            <TextField onChange={this.setEnglish} value={this.getEnglish()} fullWidth multiline label="English" />
+            <TextField onChange={this.setEnglish} value={currentFlashcard.en} fullWidth multiline label="English" />
           </p>
-          <Button type="submit" fullWidth onClick={this.submitFlashcardForm} disabled={this.isNextButtonEnabled()}>
+          <Button type="submit" fullWidth onClick={this.submitFlashcardForm} disabled={isNextButtonEnabled}>
             Continue
           </Button>
           <Button fullWidth onClick={this.openModal}>Review &amp; export</Button>
@@ -177,17 +170,39 @@ class App extends Component {
           </Button>
         </p>
         {form}
-        <ShowAll
-          open={this.isModalOpen()}
-          handleClose={this.closeModal}
-          flashcardsData={this.state.flashcardsData}
-          files={this.state.files}
-          currentFileIndex={this.state.currentFileIndex}
-          goToFile={this.goToFile}
-        />
       </div>
     );
   }
 }
+// <ShowAll
+//   open={this.isModalOpen()}
+//   handleClose={this.closeModal}
+//   // flashcardsData={this.state.flashcardsData}
+//   files={this.state.files}
+//   currentFileIndex={this.state.currentFileIndex}
+//   goToFile={this.goToFile}
+// />
 
-export default App;
+const mapStateToProps = (state) => ({
+  filenames: state.filenames,
+  flashcards: s.getFlashcards(state),
+  getCurrentFile: s.makeGetCurrentFile(state),
+  currentFileIndex: s.getCurrentFileIndex(state),
+  currentFlashcard: s.getCurrentFlashcard(state),
+  currentFlashcardId: s.getCurrentFlashcardId(state),
+  areFilesLoaded: s.areFilesLoaded(state),
+  isNextButtonEnabled: s.isNextButtonEnabled(state),
+  isPrevButtonEnabled: s.isPrevButtonEnabled(state),
+  loop: s.isLoopOn(state),
+  waveformPath: s.getWaveformPath(state),
+})
+
+const mapDispatchToProps = {
+  initializeFlashcards: a.initializeFlashcards,
+  setCurrentFlashcard: a.setCurrentFlashcard,
+  setFlashcardField: a.setFlashcardField,
+  toggleLoop: a.toggleLoop,
+  setWaveformPath: a.setWaveformPath,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

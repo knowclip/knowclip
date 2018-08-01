@@ -1,6 +1,7 @@
 const initialState = {
   currentFileIndex: 0,
   flashcards: {},
+  filenames: [],
   loop: true,
   waveformPath: null,
 }
@@ -8,23 +9,27 @@ const initialState = {
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case 'INITIALIZE_FLASHCARDS': {
-      const { flashcards } = action
+      const { flashcards, filenames } = action
 
       return {
         ...state,
         flashcards,
+        filenames,
         currentFileIndex: 0,
       }
     }
 
     case 'SET_FLASHCARD_FIELD': {
-      const { id, value } = action
+      const { id, key, value } = action
 
       return {
         ...state,
         flashcards: {
           ...state.flashcards,
-          [id]: value,
+          [id]: {
+            ...state.flashcards[id],
+            [key]: value,
+          },
         },
       }
     }
@@ -38,7 +43,7 @@ export default function reducer(state = initialState, action) {
     case 'SET_CURRENT_FLASHCARD':
       return {
         ...state,
-        currentFlashcardIndex: action.index,
+        currentFileIndex: action.index,
       }
 
     case 'TOGGLE_LOOP':
