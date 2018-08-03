@@ -4,8 +4,7 @@ import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core
 import ShowAll from './components/ShowAll'
 import Waveform from './components/Waveform'
 import logo from './logo.svg';
-import * as s from './selectors'
-import * as a from './actions'
+import * as r from './redux'
 import './App.css';
 
 class App extends Component {
@@ -41,7 +40,7 @@ class App extends Component {
   }
 
   goToFile = (index) => {
-    this.props.setCurrentFlashcard(index)
+    this.props.setCurrentFile(index)
     this.loadAudio(this.state.files[index], this.audio)
   }
   prevFile = () => {
@@ -82,7 +81,7 @@ class App extends Component {
 
   render() {
     const {
-      areFilesLoaded, waveformPath, loop,
+      areFilesLoaded, waveform, loop,
       isPrevButtonEnabled, isNextButtonEnabled,
       currentFlashcard, currentFileIndex, flashcards
     } = this.props
@@ -90,7 +89,7 @@ class App extends Component {
 
     const form = areFilesLoaded
       ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
-      <Waveform path={waveformPath} />
+      <Waveform {...waveform} />
         <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
         <FormControlLabel
           label="Loop"
@@ -147,26 +146,26 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  filenames: state.filenames,
-  flashcards: s.getFlashcards(state),
-  getCurrentFile: s.makeGetCurrentFile(state),
-  currentFileIndex: s.getCurrentFileIndex(state),
-  currentFlashcard: s.getCurrentFlashcard(state),
-  currentFlashcardId: s.getCurrentFlashcardId(state),
-  areFilesLoaded: s.areFilesLoaded(state),
-  isNextButtonEnabled: s.isNextButtonEnabled(state),
-  isPrevButtonEnabled: s.isPrevButtonEnabled(state),
-  loop: s.isLoopOn(state),
-  waveformPath: s.getWaveformPath(state),
+  filenames: r.getFilenames(state),
+  flashcards: r.getFlashcards(state),
+  getCurrentFile: r.makeGetCurrentFile(state),
+  currentFileIndex: r.getCurrentFileIndex(state),
+  currentFlashcard: r.getCurrentFlashcard(state),
+  currentFlashcardId: r.getCurrentFlashcardId(state),
+  areFilesLoaded: r.areFilesLoaded(state),
+  isNextButtonEnabled: r.isNextButtonEnabled(state),
+  isPrevButtonEnabled: r.isPrevButtonEnabled(state),
+  loop: r.isLoopOn(state),
+  waveform: r.getWaveform(state)
 })
 
 const mapDispatchToProps = {
-  initializeFlashcards: a.initializeFlashcards,
-  setCurrentFlashcard: a.setCurrentFlashcard,
-  setFlashcardField: a.setFlashcardField,
-  toggleLoop: a.toggleLoop,
-  setWaveformPath: a.setWaveformPath,
-  loadAudio: a.loadAudio,
+  initializeFlashcards: r.initializeFlashcards,
+  setCurrentFile: r.setCurrentFile,
+  setFlashcardField: r.setFlashcardField,
+  toggleLoop: r.toggleLoop,
+  setWaveformPath: r.setWaveformPath,
+  loadAudio: r.loadAudio,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

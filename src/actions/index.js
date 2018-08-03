@@ -19,16 +19,13 @@ export const loadAudio = (file, audioElement) => ({
   audioElement,
 })
 
-export const setWaveformPath = (path) => ({
-  type: 'SET_WAVEFORM_PATH',
-  path,
-})
-
-export const setCurrentFlashcard = (index) => ({
-  type: 'SET_CURRENT_FLASHCARD',
+export const setCurrentFile = (index) => ({
+  type: 'SET_CURRENT_FILE',
   index,
 })
 
 export const toggleLoop = () => ({
   type: 'TOGGLE_LOOP',
 })
+
+export * from './waveform'
