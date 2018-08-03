@@ -15,9 +15,11 @@ class App extends Component {
 
   setFiles = (e) => {
     const files = [...e.target.files]
-    this.setState({ files }, () => this.germanInput.focus())
+    this.setState({ files }, () => {
+      this.germanInput.focus()
+      this.props.loadAudio(files[0], this.audio)
+    })
     this.props.initializeFlashcards(files)
-    this.loadAudio(e.target.files[0], this.audio)
   }
 
   triggerFileInputClick = () => {
@@ -29,19 +31,9 @@ class App extends Component {
   germanInputRef = (el) => this.germanInput = el
   svgRef = (el) => this.svg = el
 
-  loadAudio = (file, audioElement) => {
-    this.props.loadAudio(file, audioElement)
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      this.audio.src = e.target.result
-      this.audio.play()
-    }
-    reader.readAsDataURL(file)
-  }
-
   goToFile = (index) => {
     this.props.setCurrentFile(index)
-    this.loadAudio(this.state.files[index], this.audio)
+    this.props.loadAudio(this.state.files[index], this.audio)
   }
   prevFile = () => {
     const lower = this.props.currentFileIndex - 1
@@ -89,7 +81,7 @@ class App extends Component {
 
     const form = areFilesLoaded
       ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
-      <Waveform {...waveform} />
+        <Waveform {...waveform} />
         <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
         <FormControlLabel
           label="Loop"

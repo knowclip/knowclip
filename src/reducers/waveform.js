@@ -17,7 +17,10 @@ export default function waveform(state = initialState, action) {
     case 'SET_CURSOR_POSITION':
       return {
         ...state,
-        cursor: action.cursor,
+        cursor: {
+          ...state.cursor,
+          x: action.x,
+        }
       }
 
     default:
