@@ -4,37 +4,9 @@ import logo from './logo.svg';
 import './App.css';
 import ShowAll from './ShowAll'
 import Waveform from './Waveform'
-import getWaveform from './getWaveform'
 import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core'
 import * as s from './selectors'
 import * as a from './actions'
-
-const localFlashcardKey = (file) => `${file.type}_____${file.name}`
-const setLocalFlashcard = (flashcard) => {
-  const { localStorage } = window
-  if (localStorage) {
-    const serializedFlashcardData = JSON.stringify({ en: flashcard.en, de: flashcard.de })
-    localStorage.setItem(localFlashcardKey(flashcard.file), serializedFlashcardData)
-  }
-}
-
-const getLocalFlashcard = (file) => {
-  const { localStorage } = window
-  if (localStorage) {
-    const local = localStorage.getItem(localFlashcardKey(file))
-    return local ? { ...JSON.parse(local), file } : null
-  }
-}
-
-const getFlashcards = (files) => {
-  const map = {};
-  files.forEach(file => {
-    const local = getLocalFlashcard(file)
-    map[file.name] = local || { de: '', en: '', file }
-  })
-  return map
-}
-
 
 class App extends Component {
   state = {
@@ -44,11 +16,9 @@ class App extends Component {
 
   setFiles = (e) => {
     const files = [...e.target.files]
-    this.setState({
-      files,
-    }, () => this.germanInput.focus())
+    this.setState({ files }, () => this.germanInput.focus())
     this.props.initializeFlashcards(files)
-    this.playAudio(e.target.files[0])
+    this.loadAudio(e.target.files[0], this.audio)
   }
 
   triggerFileInputClick = () => {
@@ -60,23 +30,19 @@ class App extends Component {
   germanInputRef = (el) => this.germanInput = el
   svgRef = (el) => this.svg = el
 
-  playAudio = (file) => {
+  loadAudio = (file, audioElement) => {
+    this.props.loadAudio(file, audioElement)
     const reader = new FileReader()
     reader.onload = (e) => {
       this.audio.src = e.target.result
       this.audio.play()
     }
     reader.readAsDataURL(file)
-
-    getWaveform(file)
-      .then((svgPath) => {
-        this.props.setWaveformPath(svgPath)
-      })
   }
 
   goToFile = (index) => {
     this.props.setCurrentFlashcard(index)
-    this.playAudio(this.state.files[index])
+    this.loadAudio(this.state.files[index], this.audio)
   }
   prevFile = () => {
     const lower = this.props.currentFileIndex - 1
@@ -99,15 +65,12 @@ class App extends Component {
       [key]: text,
     }
     this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
-    setLocalFlashcard(newFlashcard)
   }
 
   setGerman = (e) => this.setFlashcardText('de', e.target.value)
   setEnglish = (e) => this.setFlashcardText('en', e.target.value)
 
   getCurrentFile = () => this.props.getCurrentFile(this.state.files)
-
-  isModalOpen = () => this.state.modalIsOpen
 
   openModal = () => this.setState({ modalIsOpen: true })
   closeModal = () => this.setState({ modalIsOpen: false })
@@ -171,7 +134,7 @@ class App extends Component {
         </p>
         {form}
         <ShowAll
-          open={this.isModalOpen()}
+          open={this.state.modalIsOpen}
           handleClose={this.closeModal}
           flashcards={flashcards}
           files={this.state.files}
@@ -203,6 +166,7 @@ const mapDispatchToProps = {
   setFlashcardField: a.setFlashcardField,
   toggleLoop: a.toggleLoop,
   setWaveformPath: a.setWaveformPath,
+  loadAudio: a.loadAudio,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

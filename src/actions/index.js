@@ -1,32 +1,8 @@
-const localFlashcardKey = (file) => `${file.type}_____${file.name}`
-const setLocalFlashcard = (flashcard) => {
-  const { localStorage } = window
-  if (localStorage) {
-    const serializedFlashcardData = JSON.stringify({ en: flashcard.en, de: flashcard.de })
-    localStorage.setItem(localFlashcardKey(flashcard.file), serializedFlashcardData)
-  }
-}
-
-const getLocalFlashcard = (file) => {
-  const { localStorage } = window
-  if (localStorage) {
-    const local = localStorage.getItem(localFlashcardKey(file))
-    return local ? { ...JSON.parse(local), file } : null
-  }
-}
-
-const getFlashcards = (files) => {
-  const map = {};
-  files.forEach(file => {
-    const local = getLocalFlashcard(file)
-    map[file.name] = local || { de: '', en: '' }
-  })
-  return map
-}
+import { getLocalFlashcards } from '../localFlashcards'
 
 export const initializeFlashcards = (files) => ({
   type: 'INITIALIZE_FLASHCARDS',
-  flashcards: getFlashcards(files),
+  flashcards: getLocalFlashcards(files),
   filenames: files.map(f => f.name),
 })
 
@@ -35,6 +11,12 @@ export const setFlashcardField = (id, key, value) => ({
   id,
   key,
   value,
+})
+
+export const loadAudio = (file, audioElement) => ({
+  type: 'LOAD_AUDIO',
+  file,
+  audioElement,
 })
 
 export const setWaveformPath = (path) => ({
