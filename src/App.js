@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import logo from './logo.svg';
-import './App.css';
-import ShowAll from './ShowAll'
-import Waveform from './Waveform'
 import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core'
+import ShowAll from './components/ShowAll'
+import Waveform from './components/Waveform'
+import logo from './logo.svg';
 import * as s from './selectors'
 import * as a from './actions'
+import './App.css';
 
 class App extends Component {
   state = {

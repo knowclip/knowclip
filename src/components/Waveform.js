@@ -1,7 +1,9 @@
 import React from 'react'
 
+import getWaveformViewbox from '../utils/getWaveformViewbox'
+
 const Waveform = ({ path }) =>
-  <svg viewBox="0 -1 100 2" preserveAspectRatio="none" className="waveform-svg">
+  <svg viewBox={getWaveformViewbox()} preserveAspectRatio="none" className="waveform-svg">
     <g className="waveform-g">
       <path className="waveform-path" d={path}/>
     </g>

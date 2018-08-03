@@ -1,4 +1,4 @@
-import { getLocalFlashcards } from '../localFlashcards'
+import { getLocalFlashcards } from '../utils/localFlashcards'
 
 export const initializeFlashcards = (files) => ({
   type: 'INITIALIZE_FLASHCARDS',

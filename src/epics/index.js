@@ -1,10 +1,10 @@
 import { filter, map, flatMap, tap, ignoreElements } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable } from 'rxjs'
-import getWaveform from '../getWaveform'
 import { setWaveformPath } from '../actions'
 import { getFlashcard } from '../selectors'
-import { setLocalFlashcard } from '../localFlashcards'
+import getWaveform from '../utils/getWaveform'
+import { setLocalFlashcard } from '../utils/localFlashcards'
 
 const getWaveformEpic = (action$) => action$.pipe(
   ofType('LOAD_AUDIO'),

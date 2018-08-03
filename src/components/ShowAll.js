@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Dialog, DialogActions, Table, TableBody, TableRow, TableCell, Button } from '@material-ui/core'
-import { unparse } from 'papaparse'
-import { getFlashcard } from './selectors'
+
+import { getFlashcard } from '../selectors'
+import exportCsv from '../utils/exportCsv'
 
 const getFieldStyles = (string) => {
   const styles = { }
@@ -28,23 +29,7 @@ FlashcardRow = connect((state, { flashcardId }) => ({
 export default class ShowAll extends Component {
   exportCsv = () => {
     const { files, flashcards } = this.props
-    const usableFlashcards = files
-      .map(file => flashcards[file.name])
-      .filter(({ de, en }) => de.trim() || en.trim())
-      .map(({ en, de }, i) => [de, en, `[sound:${files[i].name}]`])
-    // TODO: alert if no usable
-    let csv = unparse(usableFlashcards)
-    const filename = 'export.csv';
-    console.log(csv)
-    if (!csv.match(/^data:text\/csv/i)) {
-        csv = 'data:text/csv;charset=utf-8,' + csv;
-    }
-    const data = encodeURI(csv);
-
-    const link = document.createElement('a');
-    link.setAttribute('href', data);
-    link.setAttribute('download', filename);
-    link.click();
+    exportCsv(files, flashcards)
   }
 
   render() {
