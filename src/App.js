@@ -13,11 +13,14 @@ class App extends Component {
     modalIsOpen: false,
   }
 
+  loadAudio = (file, audioElement, svgElement) =>
+    this.props.loadAudio(file, this.audio, this.svg)
+
   setFiles = (e) => {
     const files = [...e.target.files]
     this.setState({ files }, () => {
       this.germanInput.focus()
-      this.props.loadAudio(files[0], this.audio)
+      this.loadAudio(files[0])
     })
     this.props.initializeFlashcards(files)
   }
@@ -33,7 +36,7 @@ class App extends Component {
 
   goToFile = (index) => {
     this.props.setCurrentFile(index)
-    this.props.loadAudio(this.state.files[index], this.audio)
+    this.loadAudio(this.state.files[index])
   }
   prevFile = () => {
     const lower = this.props.currentFileIndex - 1
@@ -81,7 +84,7 @@ class App extends Component {
 
     const form = areFilesLoaded
       ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
-        <Waveform {...waveform} />
+        <Waveform {...waveform} svgRef={this.svgRef} />
         <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
         <FormControlLabel
           label="Loop"

@@ -13,10 +13,11 @@ export const setFlashcardField = (id, key, value) => ({
   value,
 })
 
-export const loadAudio = (file, audioElement) => ({
+export const loadAudio = (file, audioElement, svgElement) => ({
   type: 'LOAD_AUDIO',
   file,
   audioElement,
+  svgElement,
 })
 
 export const setCurrentFile = (index) => ({
