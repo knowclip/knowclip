@@ -32,22 +32,25 @@ const setLocalFlashcardEpic = (action$, state$) => action$.pipe(
   ignoreElements(),
 )
 
-const setWaveformCursorEpic = (action$, state$) => action$.pipe(
-  ofType('LOAD_AUDIO'),
-  flatMap(({ audioElement }) =>
-    fromEvent(audioElement, 'timeupdate').pipe(
+const withAudioLoaded = (getPiped) => (action$, state$) => {
+  const [first, ...rest] = getPiped(action$, state$)
+
+  return action$.pipe(
+    ofType('LOAD_AUDIO'),
+    flatMap((loadAudioAction) => first(loadAudioAction).pipe(
       takeUntil(action$.ofType('LOAD_AUDIO'))
-    )
-  ),
+    )),
+    ...rest
+  )
+}
+
+const setWaveformCursorEpic = withAudioLoaded(() => [
+  ({ audioElement }) => fromEvent(audioElement, 'timeupdate'),
   map((e) => setWaveformCursor(e.target.currentTime && 100 * (e.target.currentTime / e.target.duration)))
-)
-const waveformMouseEpic = (action$, state$) => action$.pipe(
-  ofType('LOAD_AUDIO'),
-  flatMap(({ audioElement, svgElement }) =>
-    fromEvent(svgElement, 'mousemove').pipe(
-      takeUntil(action$.ofType('LOAD_AUDIO'))
-    )
-  ),
+])
+
+const waveformMousemoveEpic = withAudioLoaded(() => [
+  ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
   map(({ target, clientX, clientY }) => {
     const svgBoundingClientRect = target.getBoundingClientRect()
     return {
@@ -56,15 +59,10 @@ const waveformMouseEpic = (action$, state$) => action$.pipe(
       y: clientY - svgBoundingClientRect.top,
     }
   })
-)
+])
 
-const waveformClickEpic = (action$, state$) => action$.pipe(
-  ofType('LOAD_AUDIO'),
-  flatMap(({ audioElement, svgElement }) =>
-    fromEvent(svgElement, 'click').pipe(
-      takeUntil(action$.ofType('LOAD_AUDIO'))
-    )
-  ),
+const waveformClickEpic = withAudioLoaded(() => [
+  ({ svgElement }) => fromEvent(svgElement, 'click'),
   map(({ target, clientX, clientY }) => {
     const svgBoundingClientRect = target.getBoundingClientRect()
     return {
@@ -73,24 +71,48 @@ const waveformClickEpic = (action$, state$) => action$.pipe(
       y: clientY - svgBoundingClientRect.top,
     }
   })
-)
+])
+const waveformMousedownEpic = withAudioLoaded(() => [
+  ({ svgElement }) => fromEvent(svgElement, 'mousedown'),
+  map(({ target, clientX, clientY }) => {
+    const svgBoundingClientRect = target.getBoundingClientRect()
+    return {
+      type: 'WAVEFORM_MOUSEDOWN',
+      x: clientX - svgBoundingClientRect.left,
+      y: clientY - svgBoundingClientRect.top,
+    }
+  })
+])
+const waveformMouseupEpic = withAudioLoaded(() => [
+  ({ svgElement }) => fromEvent(svgElement, 'mouseup'),
+  map(({ target, clientX, clientY }) => {
+    const svgBoundingClientRect = target.getBoundingClientRect()
+    return {
+      type: 'WAVEFORM_MOUSEUP',
+      x: clientX - svgBoundingClientRect.left,
+      y: clientY - svgBoundingClientRect.top,
+    }
+  })
+])
 
-const setAudioCurrentTimeEpic = (action, state) => action.pipe(
-  ofType('WAVEFORM_CLICK'),
-  withLatestFrom(action.ofType('LOAD_AUDIO')),
+const setAudioCurrentTimeEpic = withAudioLoaded((action$) => [
+  () => action$.ofType('WAVEFORM_CLICK'),
+  withLatestFrom(action$.ofType('LOAD_AUDIO')),
   tap(([{ x }, { audioElement, svgElement }]) => {
     const svgBoundingClientRect = svgElement.getBoundingClientRect()
     const ratio = x / (svgBoundingClientRect.right - svgBoundingClientRect.left)
     audioElement.currentTime = ratio * audioElement.duration
   }),
   ignoreElements(),
-)
+])
 
 export default combineEpics(
   getWaveformEpic,
   setLocalFlashcardEpic,
   setWaveformCursorEpic,
-  waveformMouseEpic,
+  waveformMousemoveEpic,
+  waveformMousedownEpic,
+  waveformMouseupEpic,
   waveformClickEpic,
   setAudioCurrentTimeEpic,
 )
