@@ -3,7 +3,9 @@ import getViewbox from '../utils/getWaveformViewbox'
 const initialState = {
   path: null,
   cursor: { x: 0, y: 0 },
-  viewbox: getViewbox()
+  viewbox: getViewbox(),
+  selections: [],
+  pendingSelection: null,
 }
 
 export default function waveform(state = initialState, action) {
@@ -21,6 +23,22 @@ export default function waveform(state = initialState, action) {
           ...state.cursor,
           x: action.x,
         }
+      }
+
+    case 'ADD_WAVEFORM_SELECTION':
+      return {
+        ...state,
+        pendingSelection: null,
+        selections: [
+          ...state.selections,
+          state.pendingSelection,
+        ]
+      }
+
+    case 'SET_WAVEFORM_PENDING_SELECTION':
+      return {
+        ...state,
+        pendingSelection: action.selection,
       }
 
     default:

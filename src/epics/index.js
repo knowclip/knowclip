@@ -1,7 +1,7 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom } from 'rxjs/operators'
+import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, mergeMap, endWith } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable, fromEvent } from 'rxjs'
-import { setWaveformPath, setWaveformCursor } from '../actions'
+import { setWaveformPath, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection } from '../actions'
 import { getFlashcard } from '../selectors'
 import getWaveform from '../utils/getWaveform'
 import { setLocalFlashcard } from '../utils/localFlashcards'
@@ -51,8 +51,8 @@ const setWaveformCursorEpic = withAudioLoaded(() => [
 
 const waveformMousemoveEpic = withAudioLoaded(() => [
   ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
-  map(({ target, clientX, clientY }) => {
-    const svgBoundingClientRect = target.getBoundingClientRect()
+  map(({ currentTarget, clientX, clientY }) => {
+    const svgBoundingClientRect = currentTarget.getBoundingClientRect()
     return {
       type: 'WAVEFORM_MOUSEMOVE',
       x: clientX - svgBoundingClientRect.left,
@@ -63,8 +63,8 @@ const waveformMousemoveEpic = withAudioLoaded(() => [
 
 const waveformClickEpic = withAudioLoaded(() => [
   ({ svgElement }) => fromEvent(svgElement, 'click'),
-  map(({ target, clientX, clientY }) => {
-    const svgBoundingClientRect = target.getBoundingClientRect()
+  map(({ currentTarget, clientX, clientY }) => {
+    const svgBoundingClientRect = currentTarget.getBoundingClientRect()
     return {
       type: 'WAVEFORM_CLICK',
       x: clientX - svgBoundingClientRect.left,
@@ -73,9 +73,12 @@ const waveformClickEpic = withAudioLoaded(() => [
   })
 ])
 const waveformMousedownEpic = withAudioLoaded(() => [
-  ({ svgElement }) => fromEvent(svgElement, 'mousedown'),
-  map(({ target, clientX, clientY }) => {
-    const svgBoundingClientRect = target.getBoundingClientRect()
+  ({ svgElement }) =>
+    fromEvent(svgElement, 'mousedown').pipe(
+      tap(e => e.preventDefault())
+    ),
+  map(({ currentTarget, clientX, clientY }) => {
+    const svgBoundingClientRect = currentTarget.getBoundingClientRect()
     return {
       type: 'WAVEFORM_MOUSEDOWN',
       x: clientX - svgBoundingClientRect.left,
@@ -85,8 +88,8 @@ const waveformMousedownEpic = withAudioLoaded(() => [
 ])
 const waveformMouseupEpic = withAudioLoaded(() => [
   ({ svgElement }) => fromEvent(svgElement, 'mouseup'),
-  map(({ target, clientX, clientY }) => {
-    const svgBoundingClientRect = target.getBoundingClientRect()
+  map(({ currentTarget, clientX, clientY }) => {
+    const svgBoundingClientRect = currentTarget.getBoundingClientRect()
     return {
       type: 'WAVEFORM_MOUSEUP',
       x: clientX - svgBoundingClientRect.left,
@@ -106,6 +109,34 @@ const setAudioCurrentTimeEpic = withAudioLoaded((action$) => [
   ignoreElements(),
 ])
 
+const fromWaveformPixelCoordinatesToSvgViewbox = (x, svgWidthPixels, viewboxWidth = 100) => {
+  if (x === 0) return 0
+  return (x / svgWidthPixels) * viewboxWidth
+}
+// endWith(addWaveformSelection())
+
+const waveformSelectionEpic = (action$) => action$.pipe(
+  ofType('WAVEFORM_MOUSEDOWN'),
+  withLatestFrom(action$.ofType('LOAD_AUDIO')),
+  flatMap(([waveformMousedown, loadAudio]) =>
+    fromEvent(window, 'mousemove').pipe(
+      map((mousemove) => {
+        mousemove.preventDefault()
+        const { svgElement } = loadAudio
+        const svgBoundingClientRect = svgElement.getBoundingClientRect()
+        const svgWidthPixels = svgBoundingClientRect.right - svgBoundingClientRect.left
+        const mousemoveX = mousemove.clientX - svgBoundingClientRect.left
+        return setWaveformPendingSelection({
+          start: fromWaveformPixelCoordinatesToSvgViewbox(waveformMousedown.x, svgWidthPixels),
+          end: fromWaveformPixelCoordinatesToSvgViewbox(mousemoveX, svgWidthPixels),
+        })
+      }),
+      takeUntil(fromEvent(window, 'mouseup')),
+      endWith(addWaveformSelection())
+    ),
+  ),
+)
+
 export default combineEpics(
   getWaveformEpic,
   setLocalFlashcardEpic,
@@ -115,4 +146,5 @@ export default combineEpics(
   waveformMouseupEpic,
   waveformClickEpic,
   setAudioCurrentTimeEpic,
+  waveformSelectionEpic,
 )
