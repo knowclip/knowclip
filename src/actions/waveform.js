@@ -1,6 +1,6 @@
-export const setWaveformPath = (path) => ({
-  type: 'SET_WAVEFORM_PATH',
-  path,
+export const setWaveformPeaks = (peaks) => ({
+  type: 'SET_WAVEFORM_PEAKS',
+  peaks,
 })
 
 export const setWaveformCursor = (x) => ({

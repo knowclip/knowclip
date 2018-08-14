@@ -1,9 +1,9 @@
 import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, mergeMap, endWith } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable, fromEvent } from 'rxjs'
-import { setWaveformPath, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection } from '../actions'
+import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection } from '../actions'
 import { getFlashcard } from '../selectors'
-import getWaveform from '../utils/getWaveform'
+import getWaveformPeaks, { getSvgPath } from '../utils/getWaveform'
 import { setLocalFlashcard } from '../utils/localFlashcards'
 
 const getWaveformEpic = (action$) => action$.pipe(
@@ -18,8 +18,8 @@ const getWaveformEpic = (action$) => action$.pipe(
       reader.readAsDataURL(file)
     }, 0)
 
-    return getWaveform(file)
-      .then((svgPath) => setWaveformPath(svgPath))
+    return getWaveformPeaks(file)
+      .then((peaks) => setWaveformPeaks(peaks))
   })
 )
 
@@ -81,6 +81,7 @@ const waveformMousedownEpic = withAudioLoaded(() => [
     const svgBoundingClientRect = currentTarget.getBoundingClientRect()
     return {
       type: 'WAVEFORM_MOUSEDOWN',
+      // should X be seconds?
       x: clientX - svgBoundingClientRect.left,
       y: clientY - svgBoundingClientRect.top,
     }
@@ -113,7 +114,6 @@ const fromWaveformPixelCoordinatesToSvgViewbox = (x, svgWidthPixels, viewboxWidt
   if (x === 0) return 0
   return (x / svgWidthPixels) * viewboxWidth
 }
-// endWith(addWaveformSelection())
 
 const waveformSelectionEpic = (action$) => action$.pipe(
   ofType('WAVEFORM_MOUSEDOWN'),

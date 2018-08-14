@@ -6,14 +6,15 @@ const initialState = {
   viewbox: getViewbox(),
   selections: [],
   pendingSelection: null,
+  peaks: null,
 }
 
 export default function waveform(state = initialState, action) {
   switch (action.type) {
-    case 'SET_WAVEFORM_PATH':
+    case 'SET_WAVEFORM_PEAKS':
       return {
         ...state,
-        path: action.path,
+        peaks: action.peaks,
       }
 
     case 'SET_CURSOR_POSITION':

@@ -53,8 +53,11 @@ function createAudioContext() {
     return window.audioContextInstance
 }
 
-function getSvgPath(buffer) {
-  const peaks = getPeaks(buffer)
+// should actually just store peaks in redux, not path
+// then getSvgPath will be a memoized? selector,
+//   taking peaks plus "camera" and "zoom"
+
+export function getSvgPath(peaks) {
   const totalPeaks = peaks.length
   let d = ''
   for (let peakNumber = 0; peakNumber < totalPeaks; peakNumber++) {
@@ -74,7 +77,8 @@ export default function getWaveform(file) {
     fileReader.onload = (e) => {
       const arrayBuffer = e.target.result // this.result?
       context.decodeAudioData(arrayBuffer, function(buffer) {
-        resolve(getSvgPath(buffer))
+        const peaks = getPeaks(buffer)
+        resolve(peaks)
       })
     }
     fileReader.readAsArrayBuffer(file)

@@ -159,7 +159,6 @@ const mapDispatchToProps = {
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
-  setWaveformPath: r.setWaveformPath,
   loadAudio: r.loadAudio,
 }
 
