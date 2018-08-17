@@ -7,13 +7,26 @@ import getStore from './redux'
 // import epic from './epics'
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
+import { AppContainer } from 'react-hot-loader';
 
-getStore().then((store) => {
-  ReactDOM.render(
+const store = getStore()
+
+registerServiceWorker()
+
+const render = Component => ReactDOM.render(
+  <AppContainer>
     <Provider store={store}>
-      <App />
-    </Provider>,
-    document.getElementById('root')
-  );
-})
-registerServiceWorker();
+      <Component />
+    </Provider>
+  </AppContainer>,
+  document.getElementById('root')
+)
+
+render(App)
+
+if (module.hot) {
+  module.hot.accept('./App', () => {
+    const NextApp = require('./App').default
+    render(NextApp)
+  })
+}

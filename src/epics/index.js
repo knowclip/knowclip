@@ -1,12 +1,12 @@
 import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, mergeMap, endWith } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { Observable, fromEvent } from 'rxjs'
-import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection } from '../actions'
+import { Observable, fromEvent, from } from 'rxjs'
+import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
 import { getFlashcard } from '../selectors'
-import getWaveformPeaks, { getSvgPath } from '../utils/getWaveform'
+import decodeAudioData, { getPeaks } from '../utils/getWaveform'
 import { setLocalFlashcard } from '../utils/localFlashcards'
 
-const getWaveformEpic = (action$) => action$.pipe(
+const getWaveformEpic = (action$, state$) => action$.pipe(
   ofType('LOAD_AUDIO'),
   flatMap(({ file, audioElement }) => {
     window.setTimeout(() => {
@@ -18,8 +18,12 @@ const getWaveformEpic = (action$) => action$.pipe(
       reader.readAsDataURL(file)
     }, 0)
 
-    return getWaveformPeaks(file)
-      .then((peaks) => setWaveformPeaks(peaks))
+    return from(decodeAudioData(file)).pipe(
+      flatMap(({ buffer }) => from([
+        setWaveformPeaks(getPeaks(buffer, state$.value.waveform.stepsPerSecond)),
+        loadAudioSuccess({ filename: file.name, bufferLength: buffer.length })
+      ]))
+    )
   })
 )
 
@@ -36,8 +40,9 @@ const withAudioLoaded = (getPiped) => (action$, state$) => {
   const [first, ...rest] = getPiped(action$, state$)
 
   return action$.pipe(
-    ofType('LOAD_AUDIO'),
-    flatMap((loadAudioAction) => first(loadAudioAction).pipe(
+    ofType('LOAD_AUDIO_SUCCESS'),
+    withLatestFrom(action$.ofType('LOAD_AUDIO')),
+    flatMap(([loadAudioSuccessAction, loadAudioAction]) => first({ ...loadAudioAction, loadAudioSuccessAction }).pipe(
       takeUntil(action$.ofType('LOAD_AUDIO'))
     )),
     ...rest
@@ -46,7 +51,7 @@ const withAudioLoaded = (getPiped) => (action$, state$) => {
 
 const setWaveformCursorEpic = withAudioLoaded(() => [
   ({ audioElement }) => fromEvent(audioElement, 'timeupdate'),
-  map((e) => setWaveformCursor(e.target.currentTime && 100 * (e.target.currentTime / e.target.duration)))
+  map((e) => setWaveformCursor(e.target.currentTime && (e.target.currentTime * 50)))
 ])
 
 const waveformMousemoveEpic = withAudioLoaded(() => [
@@ -67,6 +72,7 @@ const waveformClickEpic = withAudioLoaded(() => [
     const svgBoundingClientRect = currentTarget.getBoundingClientRect()
     return {
       type: 'WAVEFORM_CLICK',
+      // x: clientX - svgBoundingClientRect.left,
       x: clientX - svgBoundingClientRect.left,
       y: clientY - svgBoundingClientRect.top,
     }
@@ -99,13 +105,15 @@ const waveformMouseupEpic = withAudioLoaded(() => [
   })
 ])
 
-const setAudioCurrentTimeEpic = withAudioLoaded((action$) => [
+const setAudioCurrentTimeEpic = withAudioLoaded((action$, state$) => [
   () => action$.ofType('WAVEFORM_CLICK'),
   withLatestFrom(action$.ofType('LOAD_AUDIO')),
   tap(([{ x }, { audioElement, svgElement }]) => {
     const svgBoundingClientRect = svgElement.getBoundingClientRect()
     const ratio = x / (svgBoundingClientRect.right - svgBoundingClientRect.left)
-    audioElement.currentTime = ratio * audioElement.duration
+    // audioElement.currentTime = ratio * audioElement.duration
+    // audioElement.currentTime = x / (state$.value.stepLength * state$.value.stepsPerSecond)
+    audioElement.currentTime = x / (state$.value.waveform.stepLength * state$.value.waveform.stepsPerSecond)
   }),
   ignoreElements(),
 ])

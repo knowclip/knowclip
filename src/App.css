@@ -28,7 +28,7 @@
   margin: auto;
 }
 
-.audioFilenameMenu {
+.audioFilesMenu {
   display: flex;
 }
 
@@ -56,8 +56,7 @@
 
 .waveform-svg,
 .waveform-g {
-  width: 100%;
-  height: 100px;
+  background-color: aliceblue;
 }
 
 .waveform-path {

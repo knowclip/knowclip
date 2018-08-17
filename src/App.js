@@ -7,6 +7,17 @@ import logo from './logo.svg';
 import * as r from './redux'
 import './App.css';
 
+const AudioFilesMenu = ({
+  onClickPrevious, onClickNext, currentFilename, isPrevButtonEnabled, isNextButtonEnabled,
+}) =>
+  <p className="audioFilesMenu">
+    <Button onClick={this.prevFile} disabled={isPrevButtonEnabled}>Previous</Button>
+    <h2 className="audioFileName">
+      {currentFilename}
+    </h2>
+    <Button onClick={this.nextFile} disabled={isNextButtonEnabled}>Next</Button>
+  </p>
+
 class App extends Component {
   state = {
     files: [],
@@ -83,34 +94,48 @@ class App extends Component {
     const currentFile = this.getCurrentFile()
 
     const form = areFilesLoaded
-      ? <form className="form" onSubmit={this.handleFlashcardSubmit}>
+      ? <section onSubmit={this.handleFlashcardSubmit}>
         <Waveform {...waveform} svgRef={this.svgRef} />
-        <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
-        <FormControlLabel
-          label="Loop"
-          control={
-            <Checkbox checked={loop} value={loop} onChange={this.toggleLoop} />
-          }
-        />
-        <p className="audioFilenameMenu">
-          <Button onClick={this.prevFile} disabled={isPrevButtonEnabled}>Previous</Button>
-          <h2 className="audioFileName">
-            {currentFile.name}
-          </h2>
-          <Button onClick={this.nextFile} disabled={isNextButtonEnabled}>Next</Button>
-        </p>
-        <div className="formBody">
-          <p lang="de">
-            <TextField inputRef={this.germanInputRef} onChange={this.setGerman} value={currentFlashcard.de} fullWidth multiline label="German" /></p>
-          <p lang="en">
-            <TextField onChange={this.setEnglish} value={currentFlashcard.en} fullWidth multiline label="English" />
-          </p>
-          <Button type="submit" fullWidth onClick={this.submitFlashcardForm} disabled={isNextButtonEnabled}>
-            Continue
-          </Button>
-          <Button fullWidth onClick={this.openModal}>Review &amp; export</Button>
-        </div>
-      </form>
+        <form className="form">
+          <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
+          <FormControlLabel
+            label="Loop"
+            control={
+              <Checkbox checked={loop} value={loop} onChange={this.toggleLoop} />
+            }
+          />
+          <AudioFilesMenu
+            onClickPrevious={this.prevFile}
+            onClickNext={this.nextFile}
+            currentFilename={currentFile.name}
+            isPrevButtonEnabled={isPrevButtonEnabled}
+            isNextButtonEnabled={isNextButtonEnabled}
+          />
+          <div className="formBody">
+            <TextField
+              inputRef={this.germanInputRef}
+              onChange={this.setGerman}
+              value={currentFlashcard.de}
+              fullWidth
+              multiline
+              label="German"
+              inputProps={{ lang: 'de' }}
+            />
+            <TextField
+              onChange={this.setEnglish}
+              value={currentFlashcard.en}
+              fullWidth
+              multiline
+              label="English"
+              inputProps={{ lang: 'en' }}
+            />
+            <Button type="submit" fullWidth onClick={this.submitFlashcardForm} disabled={isNextButtonEnabled}>
+              Continue
+            </Button>
+            <Button fullWidth onClick={this.openModal}>Review &amp; export</Button>
+          </div>
+        </form>
+      </section>
       : <p>
         Select audio files from your <a href="https://apps.ankiweb.net/docs/manual.html#files">Anki collection.media folder</a> to start making flashcards.
       </p>

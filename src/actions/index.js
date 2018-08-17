@@ -29,4 +29,10 @@ export const toggleLoop = () => ({
   type: 'TOGGLE_LOOP',
 })
 
+export const loadAudioSuccess = ({ filename, bufferLength }) => ({
+  type: 'LOAD_AUDIO_SUCCESS',
+  filename,
+  bufferLength,
+})
+
 export * from './waveform'

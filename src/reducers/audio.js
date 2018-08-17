@@ -28,6 +28,17 @@ export default function audio(state = initialState, action) {
         currentFileIndex: action.index,
       }
 
+    case 'LOAD_AUDIO_SUCCESS':
+      return {
+        ...state,
+        fileData: {
+          ...state.fileData,
+          [action.filename]: {
+            bufferLength: action.bufferLength,
+          },
+        },
+      }
+
     default:
       return state
   }

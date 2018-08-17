@@ -16,9 +16,17 @@ export default function getStore() {
   const store = createStore(
     reducer,
     composeEnhancers(applyMiddleware(epicMiddleware))
+    // composeEnhancers(applyMiddleware())
   )
 
   epicMiddleware.run(epic)
 
-  return Promise.resolve(store)
+  // should this go before running epic middleware?
+  if (module.hot) {
+    module.hot.accept('./reducers', () => {
+      store.replaceReducer(reducer)
+    })
+  }
+
+  return store
 }

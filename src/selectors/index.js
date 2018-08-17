@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect'
-import { getSvgPath } from '../utils/getWaveform'
 
 export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
 export const getFlashcards = (state) => state.flashcards
@@ -20,8 +19,9 @@ export const makeGetCurrentFile = createSelector(
   (currentFileIndex) => (files) => files[currentFileIndex]
 )
 
-export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks.slice())
+
+// export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks)
 export const getWaveform = (state) => ({
   ...state.waveform,
-  path: getWaveformPath(state),
+  // path: getWaveformPath(state),
 })

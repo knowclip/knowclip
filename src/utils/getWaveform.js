@@ -1,35 +1,46 @@
 // peak count
-const SAMPLE_RATE = 100;
-
-function getPeaks(buffer) {
+const SAMPLE_RATE = 100
+const SAMPLE_STEP = 1
+export function getPeaks(buffer, stepsPerSecond) {
+  const SAMPLE_RATE = stepsPerSecond * buffer.duration
+  // what unit is buffer.length?
   const sampleSize = buffer.length / SAMPLE_RATE
-  const sampleStep = ~~(sampleSize / 10) || 1
+  // const sampleStep = ~~(sampleSize / 10) || 1
   const { numberOfChannels } = buffer
   const mergedPeaks = []
+  console.log('buffer')
+  console.log(buffer)
+  console.log('numberOfChannels')
+  console.log(numberOfChannels)
+  console.log('sampleSize')
+  console.log(sampleSize)
+  console.log('SAMPLE_STEP')
+  console.log(SAMPLE_STEP)
 
   for (let channelNumber = 0; channelNumber < numberOfChannels; channelNumber++) {
-    const peaks = []
     const channelData = buffer.getChannelData(channelNumber)
+    const totalPeaks = buffer.duration * stepsPerSecond
 
-    for (let peakNumber = 0; peakNumber < SAMPLE_RATE; peakNumber++) {
+    // for (let peakNumber = 0; peakNumber < SAMPLE_RATE; peakNumber++) {
+    for (let peakNumber = 0; peakNumber < totalPeaks; peakNumber++) {
       const start = ~~(peakNumber * sampleSize)
       const end = ~~(start + sampleSize)
+      // what unit is min/max from the channelData?
       let min = channelData[0]
       let max = channelData[0]
 
-      for (let sampleIndex = start; sampleIndex < end; sampleIndex += sampleStep) {
+      for (let sampleIndex = start; sampleIndex < end; sampleIndex += SAMPLE_STEP) {
         const value = channelData[sampleIndex];
         if (value > max) { max = value }
         if (value < min) { min = value }
       }
 
-      peaks[2 * peakNumber] = max
-      peaks[2 * peakNumber + 1] = min
-
+      // if (channelNumber === 0) {
       if (channelNumber === 0 || max > mergedPeaks[2 * peakNumber]) {
         mergedPeaks[2 * peakNumber] = max
       }
 
+      // if (channelNumber === 0) {
       if (channelNumber === 0 || min < mergedPeaks[2 * peakNumber + 1]) {
         mergedPeaks[2 * peakNumber + 1] = min
       }
@@ -53,32 +64,14 @@ function createAudioContext() {
     return window.audioContextInstance
 }
 
-// should actually just store peaks in redux, not path
-// then getSvgPath will be a memoized? selector,
-//   taking peaks plus "camera" and "zoom"
-
-export function getSvgPath(peaks) {
-  const totalPeaks = peaks.length
-  let d = ''
-  for (let peakNumber = 0; peakNumber < totalPeaks; peakNumber++) {
-    if (peakNumber % 2 === 0) {
-      d += ` M${~~(peakNumber / 2)}, ${peaks.shift()}`
-    } else {
-      d += ` L${~~(peakNumber / 2)}, ${peaks.shift()}`
-    }
-  }
-  return d;
-}
-
-export default function getWaveform(file) {
+export default function decodeAudioData(file) {
   return new Promise((resolve, rej) => {
     const context = createAudioContext()
     const fileReader = new FileReader() // do we need two filereaders?
     fileReader.onload = (e) => {
-      const arrayBuffer = e.target.result // this.result?
-      context.decodeAudioData(arrayBuffer, function(buffer) {
-        const peaks = getPeaks(buffer)
-        resolve(peaks)
+      const audioDataArrayBuffer = e.target.result // this.result?
+      context.decodeAudioData(audioDataArrayBuffer, function(buffer) {
+        resolve({ buffer })
       })
     }
     fileReader.readAsArrayBuffer(file)

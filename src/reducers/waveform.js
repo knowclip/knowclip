@@ -1,12 +1,14 @@
 import getViewbox from '../utils/getWaveformViewbox'
 
 const initialState = {
+  stepsPerSecond: 25,
+  stepLength: 2,
   path: null,
   cursor: { x: 0, y: 0 },
   viewbox: getViewbox(),
   selections: [],
   pendingSelection: null,
-  peaks: null,
+  peaks: [],
 }
 
 export default function waveform(state = initialState, action) {
@@ -14,7 +16,7 @@ export default function waveform(state = initialState, action) {
     case 'SET_WAVEFORM_PEAKS':
       return {
         ...state,
-        peaks: action.peaks,
+        peaks: action.peaks || [],
       }
 
     case 'SET_CURSOR_POSITION':
