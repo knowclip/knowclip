@@ -71,47 +71,49 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
   ),
 ])
 
-const toWaveformX = (mouseEvent, svgElement) =>
-  mouseEvent.clientX - svgElement.getBoundingClientRect().left
-const toWaveformCoordinates = (mouseEvent, svgElement) => {
+const toWaveformX = (mouseEvent, svgElement, xMin = 0) =>
+  mouseEvent.clientX - svgElement.getBoundingClientRect().left + xMin
+const toWaveformCoordinates = (mouseEvent, svgElement, xMin = 0) => {
   const { clientX, clientY } = mouseEvent
   const { left, top } = svgElement.getBoundingClientRect()
   return {
-    x: clientX - left,
+    x: clientX - left + xMin,
     y: clientY - top
   }
 }
 
-const waveformMousemoveEpic = withAudioLoaded(() => [
+const getWaveformViewBoxXMin = (state) => state.waveform.viewBox.xMin
+
+const waveformMousemoveEpic = withAudioLoaded((action$, state$) => [
   ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
   map(mousemove => ({
     type: 'WAVEFORM_MOUSEMOVE',
-    ...toWaveformCoordinates(mousemove, mousemove.currentTarget),
+    ...toWaveformCoordinates(mousemove, mousemove.currentTarget, getWaveformViewBoxXMin(state$.value)),
   })),
 ])
 
-const waveformClickEpic = withAudioLoaded(() => [
+const waveformClickEpic = withAudioLoaded((action$, state$) => [
   ({ svgElement }) => fromEvent(svgElement, 'click'),
   map((click) => ({
     type: 'WAVEFORM_CLICK',
-    ...toWaveformCoordinates(click, click.currentTarget),
+    ...toWaveformCoordinates(click, click.currentTarget, getWaveformViewBoxXMin(state$.value)),
   }))
 ])
-const waveformMousedownEpic = withAudioLoaded(() => [
+const waveformMousedownEpic = withAudioLoaded((action$, state$) => [
   ({ svgElement }) =>
     fromEvent(svgElement, 'mousedown').pipe(
       tap(e => e.preventDefault())
     ),
   map(mousedown => ({
     type: 'WAVEFORM_MOUSEDOWN',
-    ...toWaveformCoordinates(mousedown, mousedown.currentTarget),
+    ...toWaveformCoordinates(mousedown, mousedown.currentTarget, getWaveformViewBoxXMin(state$.value)),
   }))
 ])
-const waveformMouseupEpic = withAudioLoaded(() => [
+const waveformMouseupEpic = withAudioLoaded((action$, state$) => [
   ({ svgElement }) => fromEvent(svgElement, 'mouseup'),
   map(mouseup => ({
     type: 'WAVEFORM_MOUSEUP',
-    ...toWaveformCoordinates(mouseup, mouseup.currentTarget),
+    ...toWaveformCoordinates(mouseup, mouseup.currentTarget, getWaveformViewBoxXMin(state$.value)),
   }))
 ])
 
@@ -128,7 +130,12 @@ const setAudioCurrentTimeEpic = withAudioLoaded((action$, state$) => [
   ignoreElements(),
 ])
 
-const waveformSelectionEpic = (action$) => action$.pipe(
+
+const xToTime = (x, viewBoxXMin, stepsPerSecond, stepLength) => {
+
+}
+
+const waveformSelectionEpic = (action$, state$) => action$.pipe(
   ofType('WAVEFORM_MOUSEDOWN'),
   withLatestFrom(action$.ofType('LOAD_AUDIO')),
   flatMap(([waveformMousedown, loadAudio]) =>
@@ -137,7 +144,7 @@ const waveformSelectionEpic = (action$) => action$.pipe(
         mousemove.preventDefault()
         return setWaveformPendingSelection({
           start: waveformMousedown.x,
-          end: toWaveformX(mousemove, loadAudio.svgElement),
+          end: toWaveformX(mousemove, loadAudio.svgElement, getWaveformViewBoxXMin(state$.value)),
         })
       }),
       takeUntil(fromEvent(window, 'mouseup')),
