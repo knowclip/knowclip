@@ -22,11 +22,11 @@ export function getSvgPath(peaks, stepLength) {
 
 const Cursor = ({ x, y }) =>
   // null
-  <line stroke="black" x1={x} y1="-1" x2={x} y2="100" />
+  <line stroke="black" x1={x} y1="-1" x2={x} y2="100" shapeRendering="crispEdges" />
 
 const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
-  const start = startRaw * (stepsPerSecond / 2)
-  const end = endRaw * (stepsPerSecond / 2)
+  const start = startRaw
+  const end = endRaw
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
@@ -36,19 +36,19 @@ const Selection = ({ start, end, stepsPerSecond }) =>
 const PendingSelection = ({ start, end, stepsPerSecond }) =>
   <path className="waveform-pending-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
 
+const getViewBox = (xMin) => `0 ${xMin} 3000 100`
 
-const Waveform = ({ peaks, viewbox, cursor, svgRef, selections, pendingSelection, stepsPerSecond, stepLength }) =>
+const Waveform = ({ peaks, viewBox, cursor, svgRef, selections, pendingSelection, stepsPerSecond, stepLength }) =>
   <svg
     ref={svgRef}
-    viewBox="0 0 100% 100"
-    preserveAspectRatio="meet"
+    viewBox={getViewBox(viewBox.xMin)}
+    preserveAspectRatio="xMinYMin slice"
     className="waveform-svg"
     width="100%"
     height="100"
-    shapeRendering="optimizeSpeed"
   >
     <g className="waveform-g">
-      <path className="waveform-path" d={getSvgPath(peaks, stepLength)}/>
+      <path className="waveform-path" d={getSvgPath(peaks, stepLength)} shapeRendering="crispEdges" />
       <Cursor {...cursor} />
       {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} />)}
       {pendingSelection && <PendingSelection {...pendingSelection} stepsPerSecond={stepsPerSecond} />}

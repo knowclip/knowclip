@@ -1,11 +1,9 @@
-import getViewbox from '../utils/getWaveformViewbox'
-
 const initialState = {
   stepsPerSecond: 25,
   stepLength: 2,
   path: null,
   cursor: { x: 0, y: 0 },
-  viewbox: getViewbox(),
+  viewBox: { xMin: 0 },
   selections: [],
   pendingSelection: null,
   peaks: [],
