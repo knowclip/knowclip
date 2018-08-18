@@ -49,9 +49,26 @@ const withAudioLoaded = (getPiped) => (action$, state$) => {
   )
 }
 
-const setWaveformCursorEpic = withAudioLoaded(() => [
-  ({ audioElement }) => fromEvent(audioElement, 'timeupdate'),
-  map((e) => setWaveformCursor(Math.round(e.target.currentTime && (e.target.currentTime * 50))))
+const elementWidth = (element) => {
+  const boundingClientRect = element.getBoundingClientRect()
+  return boundingClientRect.right - boundingClientRect.left;
+}
+
+const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
+  ({ audioElement, svgElement }) => fromEvent(audioElement, 'timeupdate').pipe(
+    map((e) => {
+      const viewBox = state$.value.waveform.viewBox
+      const newX = Math.round(e.target.currentTime && (e.target.currentTime * 50))
+      const svgWidth = elementWidth(svgElement)
+      if (newX < viewBox.xMin) {
+        return setWaveformCursor(newX, { ...viewBox, xMin: Math.max(0, newX - svgWidth * .9) })
+      }
+      if (newX > svgWidth + viewBox.xMin) {
+        return setWaveformCursor(newX, { ...viewBox, xMin: newX })
+      }
+      return setWaveformCursor(newX)
+    }),
+  ),
 ])
 
 const toWaveformX = (mouseEvent, svgElement) =>

@@ -36,7 +36,7 @@ const Selection = ({ start, end, stepsPerSecond }) =>
 const PendingSelection = ({ start, end, stepsPerSecond }) =>
   <path className="waveform-pending-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
 
-const getViewBox = (xMin) => `0 ${xMin} 3000 100`
+const getViewBox = (xMin) => `${xMin} 0 3000 100`
 
 const Waveform = ({ peaks, viewBox, cursor, svgRef, selections, pendingSelection, stepsPerSecond, stepLength }) =>
   <svg

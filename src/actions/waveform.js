@@ -3,9 +3,10 @@ export const setWaveformPeaks = (peaks) => ({
   peaks,
 })
 
-export const setWaveformCursor = (x) => ({
+export const setWaveformCursor = (x, newViewBox) => ({
   type: 'SET_CURSOR_POSITION',
   x,
+  newViewBox,
 })
 
 export const addWaveformSelection = (selection) => ({

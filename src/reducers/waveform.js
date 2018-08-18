@@ -17,14 +17,16 @@ export default function waveform(state = initialState, action) {
         peaks: action.peaks || [],
       }
 
-    case 'SET_CURSOR_POSITION':
+    case 'SET_CURSOR_POSITION': {
       return {
         ...state,
         cursor: {
           ...state.cursor,
           x: action.x,
-        }
+        },
+        viewBox: action.newViewBox || state.viewBox,
       }
+    }
 
     case 'ADD_WAVEFORM_SELECTION':
       return {
