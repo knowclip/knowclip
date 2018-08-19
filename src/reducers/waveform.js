@@ -1,12 +1,15 @@
+
 const initialState = {
   stepsPerSecond: 25,
   stepLength: 2,
   path: null,
   cursor: { x: 0, y: 0 },
   viewBox: { xMin: 0 },
-  selections: [],
+  selectionsOrder: [],
+  selections: {},
   pendingSelection: null,
   peaks: [],
+  highlightedSelection: null,
 }
 
 export default function waveform(state = initialState, action) {
@@ -32,16 +35,26 @@ export default function waveform(state = initialState, action) {
       return {
         ...state,
         pendingSelection: null,
-        selections: [
+        selections: {
           ...state.selections,
-          state.pendingSelection,
-        ]
+          [action.selection.id]: action.selection,
+        },
+        selectionsOrder: [
+          ...state.selectionsOrder,
+          action.selection.id,
+        ], // wrong!!!!!
       }
 
     case 'SET_WAVEFORM_PENDING_SELECTION':
       return {
         ...state,
         pendingSelection: action.selection,
+      }
+
+    case 'HIGHLIGHT_WAVEFORM_SELECTION':
+      return {
+        ...state,
+        highlightedSelection: action.id,
       }
 
     default:

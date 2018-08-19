@@ -1,3 +1,5 @@
+import uuid from 'uuid/v4'
+
 export const setWaveformPeaks = (peaks) => ({
   type: 'SET_WAVEFORM_PEAKS',
   peaks,
@@ -17,4 +19,9 @@ export const addWaveformSelection = (selection) => ({
 export const setWaveformPendingSelection = (selection) => ({
   type: 'SET_WAVEFORM_PENDING_SELECTION',
   selection,
+})
+
+export const highlightSelection = id => ({
+  type: 'HIGHLIGHT_WAVEFORM_SELECTION',
+  id,
 })

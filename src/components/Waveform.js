@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import * as r from '../redux'
 
 // should actually just store peaks in redux, not path
 // then getSvgPath will be a memoized? selector,
@@ -30,29 +32,51 @@ const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
-const Selection = ({ start, end, stepsPerSecond }) =>
-  <path className="waveform-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
+const Selection = ({ id, start, end, stepsPerSecond }) =>
+  <path className="waveform-selection" id={id} d={getSelectionPath(start, end, stepsPerSecond)} />
 
 const PendingSelection = ({ start, end, stepsPerSecond }) =>
   <path className="waveform-pending-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
 
 const getViewBox = (xMin) => `${xMin} 0 3000 100`
 
-const Waveform = ({ peaks, viewBox, cursor, svgRef, selections, pendingSelection, stepsPerSecond, stepLength }) =>
-  <svg
-    ref={svgRef}
-    viewBox={getViewBox(viewBox.xMin)}
-    preserveAspectRatio="xMinYMin slice"
-    className="waveform-svg"
-    width="100%"
-    height="100"
-  >
-    <g className="waveform-g">
-      <path className="waveform-path" d={getSvgPath(peaks, stepLength)} shapeRendering="crispEdges" />
-      <Cursor {...cursor} />
-      {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} />)}
-      {pendingSelection && <PendingSelection {...pendingSelection} stepsPerSecond={stepsPerSecond} />}
-    </g>
-  </svg>
+const handleClick = (e) => {
+  console.log('boops')
+  if (e.target.classList.contains('waveform-selection')) console.log('balection!')
+}
 
-export default Waveform
+class Waveform extends Component {
+  handleClickSelection = (e) => {
+      console.log('balection!')
+      // this.props.highlightSelection(e.target.id)
+      // e.stopPropagation()
+  }
+
+  render() {
+    const { peaks, viewBox, cursor, svgRef, selections, pendingSelection, stepsPerSecond, stepLength } = this.props
+    return <svg
+      ref={svgRef}
+      viewBox={getViewBox(viewBox.xMin)}
+      preserveAspectRatio="xMinYMin slice"
+      className="waveform-svg"
+      width="100%"
+      height="100"
+    >
+      <g className="waveform-g">
+        <path className="waveform-path" d={getSvgPath(peaks, stepLength)} shapeRendering="crispEdges" />
+      </g>
+      <Cursor {...cursor} />
+      <g className="waveform-selections" onClick={this.handleClickSelection}>
+        {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} />)}
+      </g>
+      {pendingSelection && <PendingSelection {...pendingSelection} stepsPerSecond={stepsPerSecond} />}
+    </svg>
+  }
+}
+
+
+const mapStateToProps = state => ({
+  ...r.getWaveform(state),
+})
+
+export default connect(mapStateToProps, { highlightSelection: r.highlightSelection })(Waveform)

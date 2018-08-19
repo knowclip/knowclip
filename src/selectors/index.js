@@ -21,7 +21,10 @@ export const makeGetCurrentFile = createSelector(
 
 
 // export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks)
+export const getWaveformSelection = (state, id) => state.waveform.selections[id]
+export const getWaveformSelections = (state) => state.waveform.selectionsOrder.map(id => getWaveformSelection(state, id))
 export const getWaveform = (state) => ({
   ...state.waveform,
-  // path: getWaveformPath(state),
+  selections: getWaveformSelections(state)
 })
+export const getWaveformPendingSelection = (state) => state.waveform.pendingSelection

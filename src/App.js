@@ -95,7 +95,7 @@ class App extends Component {
 
     const form = areFilesLoaded
       ? <section onSubmit={this.handleFlashcardSubmit}>
-        <Waveform {...waveform} svgRef={this.svgRef} />
+        <Waveform svgRef={this.svgRef} />
         <form className="form">
           <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
           <FormControlLabel
@@ -176,7 +176,6 @@ const mapStateToProps = (state) => ({
   isNextButtonEnabled: r.isNextButtonEnabled(state),
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
-  waveform: r.getWaveform(state)
 })
 
 const mapDispatchToProps = {
