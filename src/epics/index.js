@@ -1,6 +1,6 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last } from 'rxjs/operators'
+import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { Observable, fromEvent, from, of, iif, merge, empty } from 'rxjs'
+import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
 import uuid from 'uuid/v4'
 import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
 import { getFlashcard } from '../selectors'
@@ -119,25 +119,8 @@ const waveformMouseupEpic = withAudioLoaded((action$, state$) => [
   }))
 ])
 
-const setAudioCurrentTimeEpic = withAudioLoaded((action$, state$) => [
-  ({ svgElement }) => fromMouseEvent(svgElement, 'click', state$.value),
-  withLatestFrom(action$.ofType('LOAD_AUDIO')),
-  flatMap(([{ target, waveformX }, { audioElement, svgElement }]) => {
-    const svgBoundingClientRect = svgElement.getBoundingClientRect()
-    const ratio = waveformX / (svgBoundingClientRect.right - svgBoundingClientRect.left)
+const xToTime = (x, { stepsPerSecond, stepLength }) => x / (stepsPerSecond * stepLength)
 
-    if (target.id in state$.value.waveform.selections) return of(r.highlightSelection(target.id))
-
-
-    const newTime = xToTime(waveformX, state$.value.waveform.stepsPerSecond,  state$.value.waveform.stepLength)
-    audioElement.currentTime = newTime
-    return empty()
-    // return r.highlightSelection(null)
-  }),
-])
-
-
-const xToTime = (x, stepsPerSecond, stepLength) => x / (stepsPerSecond * stepLength)
 const SELECTION_THRESHOLD = 40
 const pendingSelectionIsBigEnough = (state) => {
   const { pendingSelection } = state.waveform
@@ -150,9 +133,19 @@ const pendingSelectionIsBigEnough = (state) => {
 const selectionIsBigEnough =  ({ start, end }) =>
   Math.abs(end - start) >= SELECTION_THRESHOLD
 
+const sortSelectionPoints = (selection) => [selection.start, selection.end].sort()
 const getFinalSelection = (pendingSelection) => {
-  const [start, end] = [pendingSelection.start, pendingSelection.end].sort()
+  const [start, end] = sortSelectionPoints(pendingSelection)
   return { start, end, id: uuid() }
+}
+
+const getSelectionIdAt = (state, x) => {
+  const { waveform } = state
+  const { selectionsOrder, selections } = waveform
+  return selectionsOrder.find(selectionId => {
+    const { start, end } = selections[selectionId]
+    return x >= start && x <= end
+  })
 }
 
 const waveformSelectionEpic = (action$, state$) => action$.pipe(
@@ -160,6 +153,7 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
   withLatestFrom(action$.ofType('LOAD_AUDIO')),
   flatMap(([waveformMousedown, loadAudio]) => {
     const { svgElement, audioElement } = loadAudio
+    const mouseups = fromEvent(window, 'mouseup')
     const pendingSelections = fromEvent(window, 'mousemove').pipe(
       map((mousemove) => {
         mousemove.preventDefault()
@@ -168,40 +162,56 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
           end: toWaveformX(mousemove, svgElement, getWaveformViewBoxXMin(state$.value)),
         })
       }),
-      takeUntil(fromEvent(window, 'mouseup')),
+      takeUntil(mouseups),
     )
 
-    const [bigEnough, notBigEnough] = pendingSelections.pipe(
-      takeLast(1),
+    const [bigEnough, notBigEnough] = merge(
+      pendingSelections.pipe(takeLast(1)),
+      mouseups.pipe(take(1))
+    ).pipe(
       partition(() => pendingSelectionIsBigEnough(state$.value))
     )
+
     return merge(
       pendingSelections,
       bigEnough.pipe(
         map(() => addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value))))
       ),
       notBigEnough.pipe(
-        tap(({ selection }) => {
-          const newTime = xToTime(selection.end, state$.value.waveform.stepsPerSecond,  state$.value.waveform.stepLength)
+        map((val) => {
+          const { selection } = val
+          const x = selection ? sortSelectionPoints(selection)[0] : toWaveformX(val, svgElement, getWaveformViewBoxXMin(state$.value))
+          const selectionIdAtX = getSelectionIdAt(state$.value, x)
+          return { x, selectionIdAtX }
+        }),
+        tap(({ x, selectionIdAtX }) => {
+          const newTime = xToTime(selectionIdAtX ? state$.value.waveform.selections[selectionIdAtX].start : x, state$.value.waveform)
           audioElement.currentTime = newTime
         }),
-        map(() => setWaveformPendingSelection(null))
+        flatMap(({ x, selectionIdAtX }) =>
+          selectionIdAtX
+            ? from([r.highlightSelection(selectionIdAtX), setWaveformPendingSelection(null)])
+            : of(setWaveformPendingSelection(null))
+        )
       ),
     )
   }),
 )
 
-const highlightWaveformSelectionEpic = (action$, state$) => action$.pipe(
-  ofType('HIGHLIGHT_WAVEFORM_SELECTION'),
-  withLatestFrom(action$.ofType('LOAD_AUDIO')),
-  tap(([{ id }, { audioElement }]) => {
-    const newTime = xToTime(r.getWaveformSelection(state$.value, id).start, state$.value.waveform.stepsPerSecond,  state$.value.waveform.stepLength)
-    console.log(newTime)
-    audioElement.currentTime = newTime
-  }),
-  ignoreElements()
-)
 
+const highlightWaveformSelectionEpic = (action$, state$) => merge(
+  action$.pipe(
+    ofType('ADD_WAVEFORM_SELECTION'),
+    withLatestFrom(action$.ofType('LOAD_AUDIO')),
+    tap(([{ selection: { start } }, { audioElement }]) => {
+      console.log('start', start, 'audioElement', audioElement)
+      const newTime = xToTime(start, state$.value.waveform)
+      console.log('change time from ADD_WAVEFORM_SELECTION')
+      audioElement.currentTime = newTime
+    }),
+    ignoreElements(),
+  )
+)
 export default combineEpics(
   getWaveformEpic,
   setLocalFlashcardEpic,
@@ -209,7 +219,6 @@ export default combineEpics(
   waveformMousemoveEpic,
   waveformMousedownEpic,
   waveformMouseupEpic,
-  setAudioCurrentTimeEpic,
   waveformSelectionEpic,
   highlightWaveformSelectionEpic,
 )
