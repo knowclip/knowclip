@@ -57,6 +57,19 @@ export default function waveform(state = initialState, action) {
         highlightedSelection: action.id,
       }
 
+    case 'EDIT_WAVEFORM_SELECTION':
+      return {
+        ...state,
+        selections: {
+          ...state.selections,
+          [action.id]: {
+            ...state.selections[action.id],
+            // START AND END SHOULD ALWAYS BE SORTED!
+            [action.key]: action.value,
+          },
+        },
+      }
+
     default:
       return state
   }

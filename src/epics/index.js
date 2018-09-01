@@ -93,13 +93,13 @@ const fromMouseEvent = (element, eventName, state) => fromEvent(element, eventNa
 
 const getWaveformViewBoxXMin = (state) => state.waveform.viewBox.xMin
 
-const waveformMousemoveEpic = withAudioLoaded((action$, state$) => [
-  ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
-  map(mousemove => ({
-    type: 'WAVEFORM_MOUSEMOVE',
-    ...toWaveformCoordinates(mousemove, mousemove.currentTarget, getWaveformViewBoxXMin(state$.value)),
-  })),
-])
+// const waveformMousemoveEpic = withAudioLoaded((action$, state$) => [
+//   ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
+//   map(mousemove => ({
+//     type: 'WAVEFORM_MOUSEMOVE',
+//     ...toWaveformCoordinates(mousemove, mousemove.currentTarget, getWaveformViewBoxXMin(state$.value)),
+//   })),
+// ])
 
 const waveformMousedownEpic = withAudioLoaded((action$, state$) => [
   ({ svgElement }) =>
@@ -111,13 +111,13 @@ const waveformMousedownEpic = withAudioLoaded((action$, state$) => [
     ...toWaveformCoordinates(mousedown, mousedown.currentTarget, getWaveformViewBoxXMin(state$.value)),
   }))
 ])
-const waveformMouseupEpic = withAudioLoaded((action$, state$) => [
-  ({ svgElement }) => fromEvent(svgElement, 'mouseup'),
-  map(mouseup => ({
-    type: 'WAVEFORM_MOUSEUP',
-    ...toWaveformCoordinates(mouseup, mouseup.currentTarget, getWaveformViewBoxXMin(state$.value)),
-  }))
-])
+// const waveformMouseupEpic = withAudioLoaded((action$, state$) => [
+//   ({ svgElement }) => fromEvent(svgElement, 'mouseup'),
+//   map(mouseup => ({
+//     type: 'WAVEFORM_MOUSEUP',
+//     ...toWaveformCoordinates(mouseup, mouseup.currentTarget, getWaveformViewBoxXMin(state$.value)),
+//   }))
+// ])
 
 const xToTime = (x, { stepsPerSecond, stepLength }) => x / (stepsPerSecond * stepLength)
 
@@ -148,10 +148,53 @@ const getSelectionIdAt = (state, x) => {
   })
 }
 
+const SELECTION_BORDER_WIDTH = 10
+const getSelectionEdgeAt = (state, x) => {
+  const selectionIdAtX = getSelectionIdAt(state, x)
+  if (!selectionIdAtX) return null
+  const { start, end } = r.getWaveformSelection(state, selectionIdAtX)
+  if (x >= start && x <= start + SELECTION_BORDER_WIDTH) return { key: 'start', id: selectionIdAtX }
+  if (x >= end - SELECTION_BORDER_WIDTH && x <= end) return { key: 'end', id: selectionIdAtX }
+}
+
+const waveformStretchEpic = (action$, state$) => {
+  const selectionMousedowns = action$.pipe(
+    ofType('WAVEFORM_MOUSEDOWN'),
+    flatMap(({ x }) => {
+      const edge = getSelectionEdgeAt(state$.value, x)
+      return edge ? of({ x, edge }) : empty()
+    }),
+    withLatestFrom(action$.ofType('LOAD_AUDIO')),
+    flatMap(([{ x, edge: { key, id } }, loadAudio]) => {
+      return fromEvent(window, 'mousemove').pipe(
+        tap(() => console.log('moving!!')),
+        takeUntil(fromEvent(window, 'mouseup')),
+        map((mousemove) => {
+          console.log('moving!!')
+          return {
+            type: 'EDIT_WAVEFORM_SELECTION',
+            key,
+            id,
+            value: toWaveformX(mousemove, loadAudio.svgElement, getWaveformViewBoxXMin(state$.value)),
+          }
+        }),
+      )
+    })
+    // map(({ x, edge }) => ({ type: 'EDIT_WAVEFORM_SELECTION', key: edge.key, id: edge.id, value: r.getWaveformSelection(state$.value, edge.id)[edge.key] + 10 }))
+  )
+  return selectionMousedowns
+}
+
 const waveformSelectionEpic = (action$, state$) => action$.pipe(
   ofType('WAVEFORM_MOUSEDOWN'),
+  filter(({ x }) => !getSelectionEdgeAt(state$.value, x)),
   withLatestFrom(action$.ofType('LOAD_AUDIO')),
   flatMap(([waveformMousedown, loadAudio]) => {
+    // if mousedown falls on edge of selection
+    // then start stretchy epic instead of selection epic
+    // const selectionIdAtX = getSelectionIdAt(state$.value, waveformMousedown.x)
+    // if (selectionIdAtX && waveformMousedown)
+
     const { svgElement, audioElement } = loadAudio
     const mouseups = fromEvent(window, 'mouseup')
     const pendingSelections = fromEvent(window, 'mousemove').pipe(
@@ -169,6 +212,7 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
       pendingSelections.pipe(takeLast(1)),
       mouseups.pipe(take(1))
     ).pipe(
+      takeLast(1),
       partition(() => pendingSelectionIsBigEnough(state$.value))
     )
 
@@ -216,9 +260,10 @@ export default combineEpics(
   getWaveformEpic,
   setLocalFlashcardEpic,
   setWaveformCursorEpic,
-  waveformMousemoveEpic,
+  // waveformMousemoveEpic,
   waveformMousedownEpic,
-  waveformMouseupEpic,
+  // waveformMouseupEpic,
   waveformSelectionEpic,
+  waveformStretchEpic,
   highlightWaveformSelectionEpic,
 )
