@@ -11,11 +11,11 @@ const AudioFilesMenu = ({
   onClickPrevious, onClickNext, currentFilename, isPrevButtonEnabled, isNextButtonEnabled,
 }) =>
   <p className="audioFilesMenu">
-    <Button onClick={this.prevFile} disabled={isPrevButtonEnabled}>Previous</Button>
+    <Button onClick={onClickPrevious} disabled={isPrevButtonEnabled}>Previous</Button>
     <h2 className="audioFileName">
       {currentFilename}
     </h2>
-    <Button onClick={this.nextFile} disabled={isNextButtonEnabled}>Next</Button>
+    <Button onClick={onClickNext} disabled={isNextButtonEnabled}>Next</Button>
   </p>
 
 class App extends Component {
