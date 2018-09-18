@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as r from '../redux'
+import { WAVEFORM_HEIGHT } from '../selectors'
+
+const { SELECTION_BORDER_WIDTH } = r
 
 // should actually just store peaks in redux, not path
 // then getSvgPath will be a memoized? selector,
 //   taking peaks plus "camera" and "zoom"
-
-const WAVEFORM_HEIGHT = 50
 
 export function getSvgPath(peaks, stepLength) {
   const totalPeaks = peaks.length
@@ -32,11 +33,24 @@ const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
-const Selection = ({ id, start, end, stepsPerSecond }) =>
-  <path className="waveform-selection" id={id} d={getSelectionPath(start, end, stepsPerSecond)} />
+const Selection = ({ id, start, end, stepsPerSecond }) => {
+  const leftBorderInnerEdge = start + SELECTION_BORDER_WIDTH
+  const rightBorderInnerEdge = end - SELECTION_BORDER_WIDTH
+  return (
+    <g id={id}>
+      <path className="waveform-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
+      <rect className="waveform-selection-border" x={start} y="0" width={SELECTION_BORDER_WIDTH} height="100" />
+      <rect className="waveform-selection-border" x={end - SELECTION_BORDER_WIDTH} y="0" width={SELECTION_BORDER_WIDTH} height="100" />
+    </g>
+  )
+  // <path className="waveform-selection-border" d={`M${start} 0 L${leftBorderInnerEdge} 0 L`} />
+}
 
 const PendingSelection = ({ start, end, stepsPerSecond }) =>
   <path className="waveform-pending-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
+
+const PendingStretch = ({ start, end, stepsPerSecond }) =>
+  <path className="waveform-pending-stretch" d={getSelectionPath(start, end, stepsPerSecond)} />
 
 const getViewBox = (xMin) => `${xMin} 0 3000 100`
 
@@ -53,7 +67,8 @@ class Waveform extends Component {
   }
 
   render() {
-    const { peaks, viewBox, cursor, svgRef, selections, pendingSelection, stepsPerSecond, stepLength } = this.props
+    const { peaks, viewBox, cursor, svgRef, selections, pendingSelection, pendingStretch, stepsPerSecond, stepLength } = this.props
+    console.log(pendingStretch)
     return <svg
       ref={svgRef}
       viewBox={getViewBox(viewBox.xMin)}
@@ -70,6 +85,7 @@ class Waveform extends Component {
         {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} />)}
       </g>
       {pendingSelection && <PendingSelection {...pendingSelection} stepsPerSecond={stepsPerSecond} />}
+      {pendingStretch && <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />}
     </svg>
   }
 }

@@ -139,22 +139,12 @@ const getFinalSelection = (pendingSelection) => {
   return { start, end, id: uuid() }
 }
 
-const getSelectionIdAt = (state, x) => {
-  const { waveform } = state
-  const { selectionsOrder, selections } = waveform
-  return selectionsOrder.find(selectionId => {
-    const { start, end } = selections[selectionId]
-    return x >= start && x <= end
-  })
-}
-
-const SELECTION_BORDER_WIDTH = 10
 const getSelectionEdgeAt = (state, x) => {
-  const selectionIdAtX = getSelectionIdAt(state, x)
+  const selectionIdAtX = r.getSelectionIdAt(state, x)
   if (!selectionIdAtX) return null
   const { start, end } = r.getWaveformSelection(state, selectionIdAtX)
-  if (x >= start && x <= start + SELECTION_BORDER_WIDTH) return { key: 'start', id: selectionIdAtX }
-  if (x >= end - SELECTION_BORDER_WIDTH && x <= end) return { key: 'end', id: selectionIdAtX }
+  if (x >= start && x <= start + r.SELECTION_BORDER_WIDTH) return { key: 'start', id: selectionIdAtX }
+  if (x >= end - r.SELECTION_BORDER_WIDTH && x <= end) return { key: 'end', id: selectionIdAtX }
 }
 
 const waveformStretchEpic = (action$, state$) => {
@@ -165,19 +155,67 @@ const waveformStretchEpic = (action$, state$) => {
       return edge ? of({ x, edge }) : empty()
     }),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([{ x, edge: { key, id } }, loadAudio]) => {
-      return fromEvent(window, 'mousemove').pipe(
+    flatMap(([mousedownData, loadAudio]) => {
+      const { x, edge: { key, id } } = mousedownData
+      const pendingStretches = fromEvent(window, 'mousemove').pipe(
         tap(() => console.log('moving!!')),
         takeUntil(fromEvent(window, 'mouseup')),
-        map((mousemove) => {
-          console.log('moving!!')
-          return {
-            type: 'EDIT_WAVEFORM_SELECTION',
-            key,
-            id,
-            value: toWaveformX(mousemove, loadAudio.svgElement, getWaveformViewBoxXMin(state$.value)),
-          }
-        }),
+        map((mousemove) => r.setWaveformPendingStretch({
+          id,
+          // start: mousedownData.x,
+          originKey: key,
+          end: toWaveformX(mousemove, loadAudio.svgElement, getWaveformViewBoxXMin(state$.value)),
+        }))
+      )
+
+      return merge(
+        pendingStretches,
+        pendingStretches.pipe(
+          takeLast(1),
+          flatMap((lastPendingStretch) => {
+            const { stretch: { id, originKey, end } } = lastPendingStretch
+            const stretchedSelection = r.getWaveformSelection(state$.value, id)
+
+            // if pendingStretch.end is inside a selection separate from stretchedSelection,
+            // take the start from the earlier and the end from the later,
+            // use those as the new start/end of stretchedSelection,
+            // and delete the separate selection.
+
+            const previousSelectionId = r.getPreviousSelectionId(state$.value, id)
+            const previousSelection = r.getWaveformSelection(state$.value, previousSelectionId)
+            if (previousSelection && end <= previousSelection.end) {
+              return from([
+                r.mergeWaveformSelections(id, previousSelectionId),
+                r.setWaveformPendingStretch(null)
+              ])
+            }
+
+            const nextSelectionId = r.getNextSelectionId(state$.value, id)
+            const nextSelection = r.getWaveformSelection(state$.value, nextSelectionId)
+            if (nextSelection && end >= nextSelection.start) {
+              return from([
+                r.mergeWaveformSelections(id, nextSelectionId),
+                r.setWaveformPendingStretch(null)
+              ])
+            }
+
+            if (originKey === 'start' && stretchedSelection.end > end) {
+              return from([
+                r.editWaveformSelection(id, { start: Math.min(end, stretchedSelection.end - SELECTION_THRESHOLD) }),
+                r.setWaveformPendingStretch(null)
+              ])
+            }
+
+            if (originKey === 'end' && end > stretchedSelection.start) {
+              return from([
+                r.editWaveformSelection(id, { end: Math.max(end, stretchedSelection.start + SELECTION_THRESHOLD) }),
+                r.setWaveformPendingStretch(null)
+              ])
+            }
+
+            return of(r.setWaveformPendingStretch(null))
+          }),
+        )
       )
     })
     // map(({ x, edge }) => ({ type: 'EDIT_WAVEFORM_SELECTION', key: edge.key, id: edge.id, value: r.getWaveformSelection(state$.value, edge.id)[edge.key] + 10 }))
@@ -192,7 +230,7 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
   flatMap(([waveformMousedown, loadAudio]) => {
     // if mousedown falls on edge of selection
     // then start stretchy epic instead of selection epic
-    // const selectionIdAtX = getSelectionIdAt(state$.value, waveformMousedown.x)
+    // const selectionIdAtX = r.getSelectionIdAt(state$.value, waveformMousedown.x)
     // if (selectionIdAtX && waveformMousedown)
 
     const { svgElement, audioElement } = loadAudio
@@ -208,6 +246,8 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
       takeUntil(mouseups),
     )
 
+    // maybe before splitting off breakoff-worthy setPendingSelections,
+    // take out setPendingSelections that end inside an existing selection.
     const [bigEnough, notBigEnough] = merge(
       pendingSelections.pipe(takeLast(1)),
       mouseups.pipe(take(1))
@@ -225,7 +265,7 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
         map((val) => {
           const { selection } = val
           const x = selection ? sortSelectionPoints(selection)[0] : toWaveformX(val, svgElement, getWaveformViewBoxXMin(state$.value))
-          const selectionIdAtX = getSelectionIdAt(state$.value, x)
+          const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
           return { x, selectionIdAtX }
         }),
         tap(({ x, selectionIdAtX }) => {

@@ -68,7 +68,18 @@
   fill: rgba(0, 255, 0, .2);
 }
 
+.waveform-selection-border {
+  fill: rgba(0, 255, 0, .2);
+  stroke: none;
+  cursor: ew-resize;
+}
+
 .waveform-pending-selection {
   stroke: rgba(255, 255, 0, .2);
   fill: rgba(255, 255, 0, .2);
+}
+
+.waveform-pending-stretch {
+  stroke: rgba(0, 255, 255, 0.4);
+  fill: rgba(0, 255, 255, 0.4);
 }

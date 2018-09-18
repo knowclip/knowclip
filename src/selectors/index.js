@@ -1,5 +1,8 @@
 import { createSelector } from 'reselect'
 
+export const WAVEFORM_HEIGHT = 50
+export const SELECTION_BORDER_WIDTH = 10
+
 export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
 export const getFlashcards = (state) => state.flashcards
 export const getFlashcard = (state, id) => state.flashcards[id]
@@ -23,8 +26,37 @@ export const makeGetCurrentFile = createSelector(
 // export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks)
 export const getWaveformSelection = (state, id) => state.waveform.selections[id]
 export const getWaveformSelections = (state) => state.waveform.selectionsOrder.map(id => getWaveformSelection(state, id))
+export const getWaveformPendingStretch = (state) => {
+  if (!state.waveform) return
+  const { pendingStretch } = state.waveform
+  if (!pendingStretch) return
+  const stretchedSelection = getWaveformSelection(state, pendingStretch.id)
+  const [start, end] = [
+    pendingStretch.end,
+    stretchedSelection[pendingStretch.originKey],
+  ].sort()
+  return { ...pendingStretch, start, end }
+}
 export const getWaveform = (state) => ({
   ...state.waveform,
-  selections: getWaveformSelections(state)
+  selections: getWaveformSelections(state),
+  pendingStretch: getWaveformPendingStretch(state),
 })
 export const getWaveformPendingSelection = (state) => state.waveform.pendingSelection
+export const getSelectionIdAt = (state, x) => {
+  const { waveform } = state
+  const { selectionsOrder, selections } = waveform
+  return selectionsOrder.find(selectionId => {
+    const { start, end } = selections[selectionId]
+    return x >= start && x <= end
+  })
+}
+
+export const getPreviousSelectionId = (state, id) => {
+  const { selectionsOrder } = state.waveform
+  return selectionsOrder[selectionsOrder.indexOf(id) - 1]
+}
+export const getNextSelectionId = (state, id) => {
+  const { selectionsOrder } = state.waveform
+    return selectionsOrder[selectionsOrder.indexOf(id) + 1]
+}

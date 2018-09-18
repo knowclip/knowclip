@@ -1,3 +1,4 @@
+import * as s from '../selectors'
 
 const initialState = {
   stepsPerSecond: 25,
@@ -8,8 +9,15 @@ const initialState = {
   selectionsOrder: [],
   selections: {},
   pendingSelection: null,
+  pendingStretch: null,
   peaks: [],
   highlightedSelection: null,
+}
+
+const byStart = ({ start: a }, { start: b }) => {
+  if (a < b) return -1
+  if (a === b) return 0
+  if (a > b) return 1
 }
 
 export default function waveform(state = initialState, action) {
@@ -42,7 +50,7 @@ export default function waveform(state = initialState, action) {
         selectionsOrder: [
           ...state.selectionsOrder,
           action.selection.id,
-        ], // wrong!!!!!
+        ].sort(byStart),
       }
 
     case 'SET_WAVEFORM_PENDING_SELECTION':
@@ -65,10 +73,38 @@ export default function waveform(state = initialState, action) {
           [action.id]: {
             ...state.selections[action.id],
             // START AND END SHOULD ALWAYS BE SORTED!
-            [action.key]: action.value,
+            ...action.override,
           },
         },
       }
+
+    case 'SET_WAVEFORM_PENDING_STRETCH':
+      return {
+        ...state,
+        pendingStretch: action.stretch,
+      }
+
+    case 'MERGE_WAVEFORM_SELECTIONS': {
+      const { id1, id2 } = action
+      const { selections } = state
+      const selection1 = selections[id1]
+      const selection2 = selections[id2]
+
+      const { [id2]: deleted, ...rest } = selections
+      const [firstSelection, secondSelection] = [selection1, selection2].sort(byStart)
+      return {
+        ...state,
+        selectionsOrder: state.selectionsOrder.filter(id => id !== id2),
+        selections: {
+          ...rest,
+          [id1]: {
+            ...selections[id1],
+            start: firstSelection.start,
+            end: secondSelection.end,
+          }
+        }
+      }
+    }
 
     default:
       return state
