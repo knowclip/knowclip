@@ -2,6 +2,7 @@ import { createSelector } from 'reselect'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
+export const SELECTION_THRESHOLD = 40
 
 export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
 export const getFlashcards = (state) => state.flashcards
@@ -60,3 +61,16 @@ export const getNextSelectionId = (state, id) => {
   const { selectionsOrder } = state.waveform
     return selectionsOrder[selectionsOrder.indexOf(id) + 1]
 }
+
+export const getSelectionEdgeAt = (state, x) => {
+  const selectionIdAtX = getSelectionIdAt(state, x)
+  if (!selectionIdAtX) return null
+  const { start, end } = getWaveformSelection(state, selectionIdAtX)
+  if (x >= start && x <= start + SELECTION_BORDER_WIDTH) return { key: 'start', id: selectionIdAtX }
+  if (x >= end - SELECTION_BORDER_WIDTH && x <= end) return { key: 'end', id: selectionIdAtX }
+}
+
+export const getWaveformViewBoxXMin = (state) => state.waveform.viewBox.xMin
+
+// make like others
+export const getTimeAtX = (x, { stepsPerSecond, stepLength }) => x / (stepsPerSecond * stepLength)
