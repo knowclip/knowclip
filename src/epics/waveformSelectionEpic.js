@@ -17,12 +17,20 @@ const pendingSelectionIsBigEnough = (state) => {
   return Math.abs(end - start) >= r.SELECTION_THRESHOLD
 }
 
-const sortSelectionPoints = (selection) => [selection.start, selection.end].sort()
+const ascending = (a, b) => a - b
+const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
 const getFinalSelection = (pendingSelection) => {
   const [start, end] = sortSelectionPoints(pendingSelection)
   return { start, end, id: uuid() }
 }
 
+const range = (first, last) => {
+  const array = []
+  for (let i = first; i += 1; i <= last) {
+    array.push(i)
+  }
+  return array
+}
 
 const waveformSelectionEpic = (action$, state$) => action$.pipe(
   ofType('WAVEFORM_MOUSEDOWN'),
@@ -40,45 +48,73 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
       map((mousemove) => {
         mousemove.preventDefault()
         return setWaveformPendingSelection({
-          start: waveformMousedown.x,
+          start: waveformMousedown.x, // should start be called origin instead to match with stretch thing?
           end: toWaveformX(mousemove, svgElement, r.getWaveformViewBoxXMin(state$.value)),
         })
       }),
       takeUntil(mouseups),
     )
 
-    // maybe before splitting off breakoff-worthy setPendingSelections,
-    // take out setPendingSelections that end inside an existing selection.
-    const [bigEnough, notBigEnough] = merge(
+
+    const branched = merge(
       pendingSelections.pipe(takeLast(1)),
-      mouseups.pipe(take(1))
+      // mouseups.pipe(take(1)) // because click without mousemoves should count too
     ).pipe(
       takeLast(1),
-      partition(() => pendingSelectionIsBigEnough(state$.value))
+      flatMap((pendingSelectionAction) => {
+        // if there were no pendingSelections/moves before mouseup, should still set time
+        const { selection: pendingSelection } = pendingSelectionAction
+        const overlappedSelectionEnds = [
+          r.getSelectionIdAt(state$.value, pendingSelection.start),
+          r.getSelectionIdAt(state$.value, pendingSelection.end),
+        ]
+        console.log('pendingSelection', pendingSelection)
+        console.log('overlappedSelectionEnds', overlappedSelectionEnds)
+
+        const selectionsOrder = r.getWaveformSelectionsOrder(state$.value)
+        const [firstOverlappedSelectionIndex, secondOverlappedSelectionIndex] =
+          overlappedSelectionEnds
+            .map(id => selectionsOrder.indexOf(id))
+            .sort()
+
+        if (firstOverlappedSelectionIndex !== -1 && secondOverlappedSelectionIndex !== -1) {
+          return of(setWaveformPendingSelection(null))
+          // const ids = range(firstOverlappedSelectionIndex, secondOverlappedSelectionIndex)
+          //   .map(i => selectionsOrder[i])
+          // return from([
+          //   r.mergeWaveformSelections(ids),
+          //   setWaveformPendingSelection(null),
+          // ])
+        } else if (firstOverlappedSelectionIndex !== -1 || secondOverlappedSelectionIndex !== -1) {
+          // should merge all overlapped selections + expand merged selections to encompass pending selection
+          return of(setWaveformPendingSelection(null))
+        }
+
+        return pendingSelectionIsBigEnough(state$.value)
+          ? of(addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value))))
+          : of(pendingSelectionAction).pipe(
+            map((pendingSelectionAction) => {
+              const { selection } = pendingSelectionAction
+              const x = selection ? sortSelectionPoints(selection)[0] : toWaveformX(pendingSelectionAction, svgElement, r.getWaveformViewBoxXMin(state$.value))
+              const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
+              return { x, selectionIdAtX }
+            }),
+            tap(({ x, selectionIdAtX }) => {
+              const newTime = r.getTimeAtX(selectionIdAtX ? state$.value.waveform.selections[selectionIdAtX].start : x, state$.value.waveform)
+              audioElement.currentTime = newTime
+            }),
+            flatMap(({ x, selectionIdAtX }) =>
+              selectionIdAtX
+                ? from([r.highlightSelection(selectionIdAtX), setWaveformPendingSelection(null)])
+                : of(setWaveformPendingSelection(null))
+            )
+          )
+      })
     )
 
     return merge(
       pendingSelections,
-      bigEnough.pipe(
-        map(() => addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value))))
-      ),
-      notBigEnough.pipe(
-        map((val) => {
-          const { selection } = val
-          const x = selection ? sortSelectionPoints(selection)[0] : toWaveformX(val, svgElement, r.getWaveformViewBoxXMin(state$.value))
-          const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
-          return { x, selectionIdAtX }
-        }),
-        tap(({ x, selectionIdAtX }) => {
-          const newTime = r.getTimeAtX(selectionIdAtX ? state$.value.waveform.selections[selectionIdAtX].start : x, state$.value.waveform)
-          audioElement.currentTime = newTime
-        }),
-        flatMap(({ x, selectionIdAtX }) =>
-          selectionIdAtX
-            ? from([r.highlightSelection(selectionIdAtX), setWaveformPendingSelection(null)])
-            : of(setWaveformPendingSelection(null))
-        )
-      ),
+      branched
     )
   }),
 )

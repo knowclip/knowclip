@@ -34,8 +34,6 @@ const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
 }
 
 const Selection = ({ id, start, end, stepsPerSecond }) => {
-  const leftBorderInnerEdge = start + SELECTION_BORDER_WIDTH
-  const rightBorderInnerEdge = end - SELECTION_BORDER_WIDTH
   return (
     <g id={id}>
       <path className="waveform-selection" d={getSelectionPath(start, end, stepsPerSecond)} />

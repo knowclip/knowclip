@@ -112,13 +112,6 @@ const waveformMousedownEpic = withAudioLoaded((action$, state$) => [
 // ])
 
 
-
-
-const selectionIsBigEnough =  ({ start, end }) =>
-  Math.abs(end - start) >= r.SELECTION_THRESHOLD
-
-
-
 const highlightWaveformSelectionEpic = (action$, state$) => merge(
   action$.pipe(
     ofType('ADD_WAVEFORM_SELECTION'),

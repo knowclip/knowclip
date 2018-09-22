@@ -14,7 +14,9 @@ const initialState = {
   highlightedSelection: null,
 }
 
-const byStart = ({ start: a }, { start: b }) => {
+const byStart = (selections) => (aId, bId) => {
+  const { start: a } = selections[aId]
+  const { start: b } = selections[bId]
   if (a < b) return -1
   if (a === b) return 0
   if (a > b) return 1
@@ -39,19 +41,21 @@ export default function waveform(state = initialState, action) {
       }
     }
 
-    case 'ADD_WAVEFORM_SELECTION':
+    case 'ADD_WAVEFORM_SELECTION': {
+      const selections = {
+        ...state.selections,
+        [action.selection.id]: action.selection,
+      }
       return {
         ...state,
         pendingSelection: null,
-        selections: {
-          ...state.selections,
-          [action.selection.id]: action.selection,
-        },
+        selections,
         selectionsOrder: [
           ...state.selectionsOrder,
           action.selection.id,
-        ].sort(byStart),
+        ].sort(byStart(selections)),
       }
+    }
 
     case 'SET_WAVEFORM_PENDING_SELECTION':
       return {
@@ -72,7 +76,7 @@ export default function waveform(state = initialState, action) {
           ...state.selections,
           [action.id]: {
             ...state.selections[action.id],
-            // START AND END SHOULD ALWAYS BE SORTED!
+            // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
             ...action.override,
           },
         },
@@ -85,24 +89,24 @@ export default function waveform(state = initialState, action) {
       }
 
     case 'MERGE_WAVEFORM_SELECTIONS': {
-      const { id1, id2 } = action
-      const { selections } = state
-      const selection1 = selections[id1]
-      const selection2 = selections[id2]
-
-      const { [id2]: deleted, ...rest } = selections
-      const [firstSelection, secondSelection] = [selection1, selection2].sort(byStart)
+      const { ids } = action
+      const [finalId, ...idsToBeDiscarded] = ids
+      const { selections, selectionsOrder } = state
+      const newSelectionsOrder = selectionsOrder.filter(id => !idsToBeDiscarded.includes(id))
+      const newSelections = newSelectionsOrder.reduce((all, id) => {
+          all[id] = selections[id]
+        return all
+      }, {})
+      const sortedSelectionsToMerge = ids.sort(byStart(selections)).map(id => selections[id])
+      newSelections[finalId] = {
+        ...selections[finalId],
+        start: sortedSelectionsToMerge[0].start,
+        end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end
+      }
       return {
         ...state,
-        selectionsOrder: state.selectionsOrder.filter(id => id !== id2),
-        selections: {
-          ...rest,
-          [id1]: {
-            ...selections[id1],
-            start: firstSelection.start,
-            end: secondSelection.end,
-          }
-        }
+        selectionsOrder: newSelectionsOrder,
+        selections: newSelections,
       }
     }
 

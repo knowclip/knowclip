@@ -38,8 +38,7 @@ export const setWaveformPendingStretch = (stretch) => ({
 })
 
 
-export const mergeWaveformSelections = (id1, id2) => ({
+export const mergeWaveformSelections = (ids) => ({
   type: 'MERGE_WAVEFORM_SELECTIONS',
-  id1,
-  id2,
+  ids
 })

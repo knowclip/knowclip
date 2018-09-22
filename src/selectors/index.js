@@ -43,6 +43,7 @@ export const getWaveform = (state) => ({
   selections: getWaveformSelections(state),
   pendingStretch: getWaveformPendingStretch(state),
 })
+export const getWaveformSelectionsOrder = (state) => state.waveform.selectionsOrder
 export const getWaveformPendingSelection = (state) => state.waveform.pendingSelection
 export const getSelectionIdAt = (state, x) => {
   const { waveform } = state

@@ -47,7 +47,7 @@ const waveformStretchEpic = (action$, state$) => {
             const previousSelection = r.getWaveformSelection(state$.value, previousSelectionId)
             if (previousSelection && end <= previousSelection.end) {
               return from([
-                r.mergeWaveformSelections(id, previousSelectionId),
+                r.mergeWaveformSelections([id, previousSelectionId]),
                 r.setWaveformPendingStretch(null)
               ])
             }
@@ -56,7 +56,7 @@ const waveformStretchEpic = (action$, state$) => {
             const nextSelection = r.getWaveformSelection(state$.value, nextSelectionId)
             if (nextSelection && end >= nextSelection.start) {
               return from([
-                r.mergeWaveformSelections(id, nextSelectionId),
+                r.mergeWaveformSelections([id, nextSelectionId]),
                 r.setWaveformPendingStretch(null)
               ])
             }
