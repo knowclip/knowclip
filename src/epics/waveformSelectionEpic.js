@@ -120,7 +120,7 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
       concat(pendingSelections.pipe(
         startWith(null),
         takeLast(1),
-        tap(c => console.log('try setCursor now?')),
+        tap(c => console.log('try setCursor now?', pendingSelectionIsBigEnough(state$.value))),
         ignoreElements(),
       ))
     )
