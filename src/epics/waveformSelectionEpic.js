@@ -1,4 +1,4 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take } from 'rxjs/operators'
+import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take, startWith } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
 import uuid from 'uuid/v4'
@@ -114,7 +114,15 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
 
     return merge(
       pendingSelections,
-      branched
+      branched,
+      // take the last mouseup after pendingSelections ended?
+    ).pipe(
+      concat(pendingSelections.pipe(
+        startWith(null),
+        takeLast(1),
+        tap(c => console.log('try setCursor now?')),
+        ignoreElements(),
+      ))
     )
   }),
 )
