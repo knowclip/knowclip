@@ -75,6 +75,13 @@ class App extends Component {
   setGerman = (e) => this.setFlashcardText('de', e.target.value)
   setEnglish = (e) => this.setFlashcardText('en', e.target.value)
 
+  deleteCard = () => {
+    const { deleteCard, highlightedWaveformSelectionId } = this.props
+    if (highlightedWaveformSelectionId) {
+      deleteCard(highlightedWaveformSelectionId)
+    }
+  }
+
   getCurrentFile = () => this.props.getCurrentFile(this.state.files)
 
   openModal = () => this.setState({ modalIsOpen: true })
@@ -89,7 +96,7 @@ class App extends Component {
     const {
       areFilesLoaded, waveform, loop,
       isPrevButtonEnabled, isNextButtonEnabled,
-      currentFlashcard, currentFileIndex, flashcards
+      currentFlashcard, currentFileIndex, flashcards,
     } = this.props
     const currentFile = this.getCurrentFile()
 
@@ -112,6 +119,9 @@ class App extends Component {
             isNextButtonEnabled={isNextButtonEnabled}
           />
           <div className="formBody">
+            <Button type="button" onClick={this.deleteCard}>
+              Delete card
+            </Button>
             <TextField
               inputRef={this.germanInputRef}
               onChange={this.setGerman}
@@ -176,6 +186,7 @@ const mapStateToProps = (state) => ({
   isNextButtonEnabled: r.isNextButtonEnabled(state),
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
+  highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
 })
 
 const mapDispatchToProps = {
@@ -184,6 +195,7 @@ const mapDispatchToProps = {
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
   loadAudio: r.loadAudio,
+  deleteCard: r.deleteCard,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

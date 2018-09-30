@@ -35,4 +35,9 @@ export const loadAudioSuccess = ({ filename, bufferLength }) => ({
   bufferLength,
 })
 
+export const deleteCard = id => ({
+  type: 'DELETE_CARD',
+  id,
+})
+
 export * from './waveform'

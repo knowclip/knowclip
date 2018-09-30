@@ -75,3 +75,5 @@ export const getWaveformViewBoxXMin = (state) => state.waveform.viewBox.xMin
 
 // make like others
 export const getTimeAtX = (x, { stepsPerSecond, stepLength }) => x / (stepsPerSecond * stepLength)
+
+export const getHighlightedWaveformSelectionId = (state) => state.waveform.highlightedSelectionId

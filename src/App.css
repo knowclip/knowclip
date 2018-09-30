@@ -64,8 +64,8 @@
 }
 
 .waveform-selection {
-  stroke: rgba(0, 255, 0, .2);
-  fill: rgba(0, 255, 0, .2);
+  stroke: rgba(80, 200, 50, .2);
+  fill: rgba(80, 200, 50, .2);
 }
 
 .waveform-selection-border {
@@ -82,4 +82,9 @@
 .waveform-pending-stretch {
   stroke: rgba(0, 255, 255, 0.4);
   fill: rgba(0, 255, 255, 0.4);
+}
+
+.isHighlighted {
+  stroke: rgba(100, 255, 0, .5);
+  fill: rgba(0, 255, 0, .5);
 }

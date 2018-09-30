@@ -32,71 +32,84 @@ const range = (first, last) => {
   return array
 }
 
-const waveformSelectionEpic = (action$, state$) => action$.pipe(
-  ofType('WAVEFORM_MOUSEDOWN'),
-  // if mousedown falls on edge of selection
-  // then start stretchy epic instead of selection epic
-  filter(({ x }) => !r.getSelectionEdgeAt(state$.value, x)),
-  withLatestFrom(action$.ofType('LOAD_AUDIO')),
-  flatMap(([waveformMousedown, loadAudio]) => {
-    const { svgElement, audioElement } = loadAudio
-    const mouseups = fromEvent(window, 'mouseup')
-    const pendingSelections = fromEvent(window, 'mousemove').pipe(
-      map((mousemove) => {
-        mousemove.preventDefault()
-        return setWaveformPendingSelection({
-          start: waveformMousedown.x, // should start be called origin instead to match with stretch thing?
-          end: toWaveformX(mousemove, svgElement, r.getWaveformViewBoxXMin(state$.value)),
-        })
-      }),
-      takeUntil(mouseups),
-    )
-
-    const pendingSelectionEnds = pendingSelections.pipe(
-      takeLast(1),
-      map((pendingSelectionAction) => {
-        const { selection: pendingSelection } = pendingSelectionAction
-        const selectionsOrder = r.getWaveformSelectionsOrder(state$.value)
-        const pendingSelectionOverlaps = [
-          r.getSelectionIdAt(state$.value, pendingSelection.start),
-          r.getSelectionIdAt(state$.value, pendingSelection.end),
-        ].some(id => selectionsOrder.includes(id))
-
-        return pendingSelectionOverlaps || !pendingSelectionIsBigEnough(state$.value)
-          // maybe later, do stretch + merge for overlaps.
-          ? setWaveformPendingSelection(null)
-          : addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value)))
-      })
-    )
-    const highlightsAndTimeChanges = mouseups.pipe(
-      sample(pendingSelectionEnds.pipe(startWith(null), takeLast(1))),
-      map((mouseup) => {
-        const x = toWaveformX(mouseup, svgElement, r.getWaveformViewBoxXMin(state$.value))
-        const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
-        return { x, selectionIdAtX }
-      }),
-      tap(({ x, selectionIdAtX }) => {
-        const state = state$.value
-        const mousePositionOrSelectionStart = selectionIdAtX
-          ? r.getWaveformSelection(state, selectionIdAtX).start
-          : x
-        const newTime = r.getTimeAtX(mousePositionOrSelectionStart, state.waveform)
-        audioElement.currentTime = newTime
-      }),
-      flatMap(({ x, selectionIdAtX }) =>
-        selectionIdAtX
-          ? of(r.highlightSelection(selectionIdAtX))
-          : empty()
+const waveformSelectionEpic = (action$, state$) => {
+  const loadAudioActions = action$.pipe(
+    ofType('LOAD_AUDIO'),
+  )
+  const mousedowns = loadAudioActions.pipe(
+    flatMap(({ svgElement, audioElement }) =>
+      fromEvent(svgElement, 'mousedown').pipe(
+        takeUntil(loadAudioActions),
       )
     )
+  )
 
-    return merge(
-      pendingSelections,
-      pendingSelectionEnds,
-    ).pipe(
-      concat(highlightsAndTimeChanges)
-    )
-  }),
-)
+  return mousedowns.pipe(
+    map(mousedown => toWaveformCoordinates(mousedown, mousedown.currentTarget, r.getWaveformViewBoxXMin(state$.value))),
+    // if mousedown falls on edge of selection
+    // then start stretchy epic instead of selection epic
+    filter(({ x }) => !r.getSelectionEdgeAt(state$.value, x)),
+    withLatestFrom(loadAudioActions),
+    flatMap(([waveformMousedown, loadAudio]) => {
+      const { svgElement, audioElement } = loadAudio
+      const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
+      const pendingSelections = fromEvent(window, 'mousemove').pipe(
+        map((mousemove) => {
+          mousemove.preventDefault()
+          return setWaveformPendingSelection({
+            start: waveformMousedown.x, // should start be called origin instead to match with stretch thing?
+            end: toWaveformX(mousemove, svgElement, r.getWaveformViewBoxXMin(state$.value)),
+          })
+        }),
+        takeUntil(mouseups),
+      )
+
+      const pendingSelectionEnds = pendingSelections.pipe(
+        takeLast(1),
+        map((pendingSelectionAction) => {
+          const { selection: pendingSelection } = pendingSelectionAction
+          const selectionsOrder = r.getWaveformSelectionsOrder(state$.value)
+          const pendingSelectionOverlaps = [
+            r.getSelectionIdAt(state$.value, pendingSelection.start),
+            r.getSelectionIdAt(state$.value, pendingSelection.end),
+          ].some(id => selectionsOrder.includes(id))
+
+          return pendingSelectionOverlaps || !pendingSelectionIsBigEnough(state$.value)
+            // maybe later, do stretch + merge for overlaps.
+            ? setWaveformPendingSelection(null)
+            : addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value)))
+        })
+      )
+      const highlightsAndTimeChanges = mouseups.pipe(
+        map((mouseup) => {
+          const x = toWaveformX(mouseup, svgElement, r.getWaveformViewBoxXMin(state$.value))
+          const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
+          return { x, selectionIdAtX }
+        }),
+        // this should probably be done elsewhere.
+        // tapping gets repeated unexpectedly, so maybe better always at the 'end' of the epic
+        tap(({ x, selectionIdAtX }) => {
+          const state = state$.value
+          const mousePositionOrSelectionStart = selectionIdAtX
+            ? r.getWaveformSelection(state, selectionIdAtX).start
+            : x
+          const newTime = r.getTimeAtX(mousePositionOrSelectionStart, state.waveform)
+          audioElement.currentTime = newTime
+        }),
+        flatMap(({ x, selectionIdAtX }) =>
+          selectionIdAtX
+            ? of(r.highlightSelection(selectionIdAtX))
+            : empty()
+        )
+      )
+
+      return merge(
+        pendingSelections,
+        pendingSelectionEnds,
+        highlightsAndTimeChanges
+      )
+    }),
+  )
+}
 
 export default waveformSelectionEpic

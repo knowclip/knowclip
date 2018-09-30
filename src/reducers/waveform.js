@@ -11,7 +11,7 @@ const initialState = {
   pendingSelection: null,
   pendingStretch: null,
   peaks: [],
-  highlightedSelection: null,
+  highlightedSelectionId: null,
 }
 
 const byStart = (selections) => (aId, bId) => {
@@ -66,7 +66,7 @@ export default function waveform(state = initialState, action) {
     case 'HIGHLIGHT_WAVEFORM_SELECTION':
       return {
         ...state,
-        highlightedSelection: action.id,
+        highlightedSelectionId: action.id,
       }
 
     case 'EDIT_WAVEFORM_SELECTION':
@@ -107,6 +107,19 @@ export default function waveform(state = initialState, action) {
         ...state,
         selectionsOrder: newSelectionsOrder,
         selections: newSelections,
+      }
+    }
+
+    case 'DELETE_CARD': {
+      const { id } = action
+      const { selections: oldSelections, selectionsOrder, highlightedSelectionId } = state
+      const selections = { ...oldSelections }
+      delete selections[id]
+      return {
+        ...state,
+        highlightedSelectionId: highlightedSelectionId === id ? null : highlightedSelectionId,
+        selections,
+        selectionsOrder: selectionsOrder.filter(x => x !== id)
       }
     }
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
 import { WAVEFORM_HEIGHT } from '../selectors'
@@ -33,10 +34,10 @@ const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
-const Selection = ({ id, start, end, stepsPerSecond }) => {
+const Selection = ({ id, start, end, stepsPerSecond, isHighlighted }) => {
   return (
     <g id={id}>
-      <path className="waveform-selection" d={getSelectionPath(start, end, stepsPerSecond)} />
+      <path className={cn('waveform-selection', { isHighlighted })} d={getSelectionPath(start, end, stepsPerSecond)} />
       <rect className="waveform-selection-border" x={start} y="0" width={SELECTION_BORDER_WIDTH} height="100" />
       <rect className="waveform-selection-border" x={end - SELECTION_BORDER_WIDTH} y="0" width={SELECTION_BORDER_WIDTH} height="100" />
     </g>
@@ -54,7 +55,7 @@ const getViewBox = (xMin) => `${xMin} 0 3000 100`
 
 class Waveform extends Component {
   render() {
-    const { peaks, viewBox, cursor, svgRef, selections, pendingSelection, pendingStretch, stepsPerSecond, stepLength } = this.props
+    const { peaks, viewBox, cursor, svgRef, selections, pendingSelection, pendingStretch, stepsPerSecond, stepLength, highlightedSelectionId } = this.props
     return <svg
       ref={svgRef}
       viewBox={getViewBox(viewBox.xMin)}
@@ -68,7 +69,7 @@ class Waveform extends Component {
       </g>
       <Cursor {...cursor} />
       <g className="waveform-selections">
-        {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} />)}
+        {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} isHighlighted={selection.id === highlightedSelectionId}/>)}
       </g>
       {pendingSelection && <PendingSelection {...pendingSelection} stepsPerSecond={stepsPerSecond} />}
       {pendingStretch && <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />}
