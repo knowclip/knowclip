@@ -1,4 +1,4 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take, startWith } from 'rxjs/operators'
+import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take, startWith, sample } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
 import uuid from 'uuid/v4'
@@ -34,14 +34,11 @@ const range = (first, last) => {
 
 const waveformSelectionEpic = (action$, state$) => action$.pipe(
   ofType('WAVEFORM_MOUSEDOWN'),
+  // if mousedown falls on edge of selection
+  // then start stretchy epic instead of selection epic
   filter(({ x }) => !r.getSelectionEdgeAt(state$.value, x)),
   withLatestFrom(action$.ofType('LOAD_AUDIO')),
   flatMap(([waveformMousedown, loadAudio]) => {
-    // if mousedown falls on edge of selection
-    // then start stretchy epic instead of selection epic
-    // const selectionIdAtX = r.getSelectionIdAt(state$.value, waveformMousedown.x)
-    // if (selectionIdAtX && waveformMousedown)
-
     const { svgElement, audioElement } = loadAudio
     const mouseups = fromEvent(window, 'mouseup')
     const pendingSelections = fromEvent(window, 'mousemove').pipe(
@@ -55,74 +52,49 @@ const waveformSelectionEpic = (action$, state$) => action$.pipe(
       takeUntil(mouseups),
     )
 
-
-    const branched = merge(
-      pendingSelections.pipe(takeLast(1)),
-      // mouseups.pipe(take(1)) // because click without mousemoves should count too
-    ).pipe(
+    const pendingSelectionEnds = pendingSelections.pipe(
       takeLast(1),
-      flatMap((pendingSelectionAction) => {
-        // if there were no pendingSelections/moves before mouseup, should still set time
+      map((pendingSelectionAction) => {
         const { selection: pendingSelection } = pendingSelectionAction
-        const overlappedSelectionEnds = [
+        const selectionsOrder = r.getWaveformSelectionsOrder(state$.value)
+        const pendingSelectionOverlaps = [
           r.getSelectionIdAt(state$.value, pendingSelection.start),
           r.getSelectionIdAt(state$.value, pendingSelection.end),
-        ]
-        console.log('pendingSelection', pendingSelection)
-        console.log('overlappedSelectionEnds', overlappedSelectionEnds)
+        ].some(id => selectionsOrder.includes(id))
 
-        const selectionsOrder = r.getWaveformSelectionsOrder(state$.value)
-        const [firstOverlappedSelectionIndex, secondOverlappedSelectionIndex] =
-          overlappedSelectionEnds
-            .map(id => selectionsOrder.indexOf(id))
-            .sort()
-
-        if (firstOverlappedSelectionIndex !== -1 && secondOverlappedSelectionIndex !== -1) {
-          return of(setWaveformPendingSelection(null))
-          // const ids = range(firstOverlappedSelectionIndex, secondOverlappedSelectionIndex)
-          //   .map(i => selectionsOrder[i])
-          // return from([
-          //   r.mergeWaveformSelections(ids),
-          //   setWaveformPendingSelection(null),
-          // ])
-        } else if (firstOverlappedSelectionIndex !== -1 || secondOverlappedSelectionIndex !== -1) {
-          // should merge all overlapped selections + expand merged selections to encompass pending selection
-          return of(setWaveformPendingSelection(null))
-        }
-
-        return pendingSelectionIsBigEnough(state$.value)
-          ? of(addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value))))
-          : of(pendingSelectionAction).pipe(
-            map((pendingSelectionAction) => {
-              const { selection } = pendingSelectionAction
-              const x = selection ? sortSelectionPoints(selection)[0] : toWaveformX(pendingSelectionAction, svgElement, r.getWaveformViewBoxXMin(state$.value))
-              const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
-              return { x, selectionIdAtX }
-            }),
-            tap(({ x, selectionIdAtX }) => {
-              const newTime = r.getTimeAtX(selectionIdAtX ? state$.value.waveform.selections[selectionIdAtX].start : x, state$.value.waveform)
-              audioElement.currentTime = newTime
-            }),
-            flatMap(({ x, selectionIdAtX }) =>
-              selectionIdAtX
-                ? from([r.highlightSelection(selectionIdAtX), setWaveformPendingSelection(null)])
-                : of(setWaveformPendingSelection(null))
-            )
-          )
+        return pendingSelectionOverlaps || !pendingSelectionIsBigEnough(state$.value)
+          // maybe later, do stretch + merge for overlaps.
+          ? setWaveformPendingSelection(null)
+          : addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value)))
       })
+    )
+    const highlightsAndTimeChanges = mouseups.pipe(
+      sample(pendingSelectionEnds.pipe(startWith(null), takeLast(1))),
+      map((mouseup) => {
+        const x = toWaveformX(mouseup, svgElement, r.getWaveformViewBoxXMin(state$.value))
+        const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
+        return { x, selectionIdAtX }
+      }),
+      tap(({ x, selectionIdAtX }) => {
+        const state = state$.value
+        const mousePositionOrSelectionStart = selectionIdAtX
+          ? r.getWaveformSelection(state, selectionIdAtX).start
+          : x
+        const newTime = r.getTimeAtX(mousePositionOrSelectionStart, state.waveform)
+        audioElement.currentTime = newTime
+      }),
+      flatMap(({ x, selectionIdAtX }) =>
+        selectionIdAtX
+          ? of(r.highlightSelection(selectionIdAtX))
+          : empty()
+      )
     )
 
     return merge(
       pendingSelections,
-      branched,
-      // take the last mouseup after pendingSelections ended?
+      pendingSelectionEnds,
     ).pipe(
-      concat(pendingSelections.pipe(
-        startWith(null),
-        takeLast(1),
-        tap(c => console.log('try setCursor now?', pendingSelectionIsBigEnough(state$.value))),
-        ignoreElements(),
-      ))
+      concat(highlightsAndTimeChanges)
     )
   }),
 )

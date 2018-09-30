@@ -52,21 +52,9 @@ const PendingStretch = ({ start, end, stepsPerSecond }) =>
 
 const getViewBox = (xMin) => `${xMin} 0 3000 100`
 
-const handleClick = (e) => {
-  console.log('boops')
-  if (e.target.classList.contains('waveform-selection')) console.log('balection!')
-}
-
 class Waveform extends Component {
-  handleClickSelection = (e) => {
-      console.log('balection!')
-      // this.props.highlightSelection(e.target.id)
-      // e.stopPropagation()
-  }
-
   render() {
     const { peaks, viewBox, cursor, svgRef, selections, pendingSelection, pendingStretch, stepsPerSecond, stepLength } = this.props
-    console.log(pendingStretch)
     return <svg
       ref={svgRef}
       viewBox={getViewBox(viewBox.xMin)}
@@ -79,7 +67,7 @@ class Waveform extends Component {
         <path className="waveform-path" d={getSvgPath(peaks, stepLength)} shapeRendering="crispEdges" />
       </g>
       <Cursor {...cursor} />
-      <g className="waveform-selections" onClick={this.handleClickSelection}>
+      <g className="waveform-selections">
         {selections.map(selection => <Selection {...selection} stepsPerSecond={stepsPerSecond} />)}
       </g>
       {pendingSelection && <PendingSelection {...pendingSelection} stepsPerSecond={stepsPerSecond} />}

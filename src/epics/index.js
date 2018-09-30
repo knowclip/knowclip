@@ -117,9 +117,7 @@ const highlightWaveformSelectionEpic = (action$, state$) => merge(
     ofType('ADD_WAVEFORM_SELECTION'),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
     tap(([{ selection: { start } }, { audioElement }]) => {
-      console.log('start', start, 'audioElement', audioElement)
       const newTime = r.getTimeAtX(start, state$.value.waveform)
-      console.log('change time from ADD_WAVEFORM_SELECTION')
       audioElement.currentTime = newTime
     }),
     ignoreElements(),

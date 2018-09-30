@@ -20,7 +20,6 @@ const waveformStretchEpic = (action$, state$) => {
     flatMap(([mousedownData, loadAudio]) => {
       const { x, edge: { key, id } } = mousedownData
       const pendingStretches = fromEvent(window, 'mousemove').pipe(
-        tap(() => console.log('moving!!')),
         takeUntil(fromEvent(window, 'mouseup')),
         map((mousemove) => r.setWaveformPendingStretch({
           id,
@@ -80,7 +79,6 @@ const waveformStretchEpic = (action$, state$) => {
         )
       )
     })
-    // map(({ x, edge }) => ({ type: 'EDIT_WAVEFORM_SELECTION', key: edge.key, id: edge.id, value: r.getWaveformSelection(state$.value, edge.id)[edge.key] + 10 }))
   )
   return selectionMousedowns
 }
