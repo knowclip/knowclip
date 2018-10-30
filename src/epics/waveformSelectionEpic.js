@@ -2,7 +2,7 @@ import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, s
 import { ofType, combineEpics } from 'redux-observable'
 import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
 import uuid from 'uuid/v4'
-import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
+import { setWaveformPeaks, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
 import { getFlashcard } from '../selectors'
 import decodeAudioData, { getPeaks } from '../utils/getWaveform'
 import { setLocalFlashcard } from '../utils/localFlashcards'
@@ -53,12 +53,16 @@ const waveformSelectionEpic = (action$, state$) => {
     flatMap(([waveformMousedown, loadAudio]) => {
       const { svgElement, audioElement } = loadAudio
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
+      // this should be used also in stretch epic, i guess at any reference to waveform x
+      const factor = state$.value.waveform.stepsPerSecond * state$.value.waveform.stepLength
+      const withinValidTime = (x) => Math.max(0, Math.min(x, audioElement.duration * factor))
+
       const pendingSelections = fromEvent(window, 'mousemove').pipe(
         map((mousemove) => {
           mousemove.preventDefault()
           return setWaveformPendingSelection({
-            start: waveformMousedown.x, // should start be called origin instead to match with stretch thing?
-            end: toWaveformX(mousemove, svgElement, r.getWaveformViewBoxXMin(state$.value)),
+            start: withinValidTime(waveformMousedown.x), // should start be called origin instead to match with stretch thing?
+            end: withinValidTime(toWaveformX(mousemove, svgElement, r.getWaveformViewBoxXMin(state$.value))),
           })
         }),
         takeUntil(mouseups),
@@ -99,7 +103,7 @@ const waveformSelectionEpic = (action$, state$) => {
         flatMap(({ x, selectionIdAtX }) =>
           selectionIdAtX
             ? of(r.highlightSelection(selectionIdAtX))
-            : empty()
+            : of(r.highlightSelection(null))
         )
       )
 

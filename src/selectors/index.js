@@ -4,7 +4,9 @@ export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
 export const SELECTION_THRESHOLD = 40
 
-export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
+// for reference during transition to clip-based flashcards
+// export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
+export const getCurrentFlashcardId = (state) => state.waveform.highlightedSelectionId
 export const getFlashcards = (state) => state.flashcards
 export const getFlashcard = (state, id) => state.flashcards[id]
 export const getCurrentFlashcard = (state) => getFlashcard(state, getCurrentFlashcardId(state))
@@ -77,3 +79,14 @@ export const getWaveformViewBoxXMin = (state) => state.waveform.viewBox.xMin
 export const getTimeAtX = (x, { stepsPerSecond, stepLength }) => x / (stepsPerSecond * stepLength)
 
 export const getHighlightedWaveformSelectionId = (state) => state.waveform.highlightedSelectionId
+
+export const getClipTimes = (state, id) => {
+  const clip = getWaveformSelection(state, id)
+  return {
+    start: getTimeAtX(clip.start, state.waveform),
+    end: getTimeAtX(clip.end, state.waveform),
+  }
+}
+
+export const getClipsTimes = (state) => getWaveformSelectionsOrder(state)
+  .map((id) => getClipTimes(state, id))

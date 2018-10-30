@@ -5,7 +5,10 @@ import ShowAll from './components/ShowAll'
 import Waveform from './components/Waveform'
 import logo from './logo.svg';
 import * as r from './redux'
+import is from 'electron-is'
 import './App.css';
+
+const isNotMac = process.platform !== 'darwin'
 
 const AudioFilesMenu = ({
   onClickPrevious, onClickNext, currentFilename, isPrevButtonEnabled, isNextButtonEnabled,
@@ -30,7 +33,9 @@ class App extends Component {
   setFiles = (e) => {
     const files = [...e.target.files]
     this.setState({ files }, () => {
-      this.germanInput.focus()
+      // now, this line
+      // should really happen after a clip is selected.
+      // this.germanInput.focus()
       this.loadAudio(files[0])
     })
     this.props.initializeFlashcards(files)
@@ -100,11 +105,10 @@ class App extends Component {
     } = this.props
     const currentFile = this.getCurrentFile()
 
-    const form = areFilesLoaded
+    // for reference during transition to clip-based flashcards
+    const form = Boolean(currentFlashcard)
       ? <section onSubmit={this.handleFlashcardSubmit}>
-        <Waveform svgRef={this.svgRef} />
         <form className="form">
-          <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
           <FormControlLabel
             label="Loop"
             control={
@@ -147,7 +151,7 @@ class App extends Component {
         </form>
       </section>
       : <p>
-        Select audio files from your <a href="https://apps.ankiweb.net/docs/manual.html#files">Anki collection.media folder</a> to start making flashcards.
+        Select audio files from your <a href="https://apps.ankiweb.net/docs/manual.html#files">Anki collection.media folder</a> and click + drag to make audio clips and start making flashcards.
       </p>
 
     return (
@@ -155,12 +159,15 @@ class App extends Component {
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Audio Flashcard Assistant</h1>
+          {isNotMac && 'Only Mac OS is currently supported.'}
         </header>
         <p>
           <Button label="files" onClick={this.triggerFileInputClick}>
             <input className="fileInput" multiple ref={this.fileInputRef} type="file" onChange={this.setFiles} />
           </Button>
         </p>
+        <Waveform svgRef={this.svgRef} />
+        <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
         {form}
         <ShowAll
           open={this.state.modalIsOpen}
@@ -187,6 +194,7 @@ const mapStateToProps = (state) => ({
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
   highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
+  clipsTimes: r.getClipsTimes(state),
 })
 
 const mapDispatchToProps = {

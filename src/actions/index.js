@@ -2,7 +2,8 @@ import { getLocalFlashcards } from '../utils/localFlashcards'
 
 export const initializeFlashcards = (files) => ({
   type: 'INITIALIZE_FLASHCARDS',
-  flashcards: getLocalFlashcards(files),
+  flashcards: {},
+  // should read from file or database or something...
   filenames: files.map(f => f.name),
 })
 
