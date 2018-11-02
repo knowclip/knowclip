@@ -10,17 +10,66 @@ import * as r from '../redux'
 import waveformSelectionEpic from './waveformSelectionEpic'
 import waveformStretchEpic from './waveformStretchEpic'
 import { toWaveformX, toWaveformCoordinates } from '../utils/waveformCoordinates'
+import dataurl from 'dataurl'
+// import fs from 'fs'
+
+const ffmpeg = require('fluent-ffmpeg') // maybe get rid of define plugin and just get straight from lib?
+console.log('booop', process.env.FLUENTFFMPEG_COV)
+// Setting ffmpeg path to ffmpeg binary for os x so that ffmpeg can be packaged with the app.
+ffmpeg.setFfmpegPath("/usr/local/bin/ffmpeg")
+//because of the nature of ffmpeg, this can take both audio or video files as input
+const split = () => {
+  const path = '/Users/justin/Desktop/ffmpeg-test/audio.mp3'
+  const startTime = '00:00:00.000'
+  const endTime = '00:00:01.500'
+  const outputFilename = '/Users/justin/Desktop/ffmpeg-test/inElectron.mp3'
+  const duration = '01.500'
+  var aud_file = outputFilename // ?
+
+  ffmpeg(path)
+    .audioCodec('copy')
+    .seekInput(startTime)
+    .inputOptions('-to ' + endTime)
+    .output(outputFilename)
+    .on('progress', function(progress) {
+      //  progress // {"frames":null,"currentFps":null,"currentKbps":256,"targetSize":204871,"timemark":"01:49:15.90"}
+      console.log('Processing: ' + progress.timemark + ' done ' + progress.targetSize+' kilobytes');
+    })
+    .on('end',
+    //listener must be a function, so to return the callback wrapping it inside a function
+      function() {
+           console.log('Finished processing');
+        }
+    ).run()
+}
+
+// // const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+// const ffmpegPath = '/usr/local/bin/ffmpeg'
+// const split = () => {
+//   const args = '-i ~/Desktop/ffmpeg-test/audio.mp3 -acodec copy -ss 00:00:00.000 -to 00:00:01.500 ~/Desktop/ffmpeg-test/fromElectron.mp3'
+//   const spawn = require('child_process').spawn;
+//   const ffmpeg = spawn(ffmpegPath, args);
+//   ffmpeg.on('exit', (...args) => {
+//     console.log('done!!', ...args)
+//   });
+// }
+
+window.split = split
 
 const getWaveformEpic = (action$, state$) => action$.pipe(
   ofType('LOAD_AUDIO'),
   flatMap(({ file, audioElement }) => {
+    // window.setTimeout(() => {
+    //   const reader = new FileReader()
+    //   reader.onload = (e) => {
+    //     audioElement.src = e.target.result
+    //     audioElement.play()
+    //   }
+    //   reader.readAsDataURL(file)
+    // }, 0)
     window.setTimeout(() => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        audioElement.src = e.target.result
-        audioElement.play()
-      }
-      reader.readAsDataURL(file)
+      audioElement.src = dataurl.convert({ data: file, mimetype: 'audio/mp3' })
+      audioElement.play()
     }, 0)
 
     return from(decodeAudioData(file)).pipe(

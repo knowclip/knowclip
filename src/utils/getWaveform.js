@@ -64,16 +64,30 @@ function createAudioContext() {
     return window.audioContextInstance
 }
 
+function toArrayBuffer(buf) {
+    var ab = new ArrayBuffer(buf.length);
+    var view = new Uint8Array(ab);
+    for (var i = 0; i < buf.length; ++i) {
+        view[i] = buf[i];
+    }
+    return ab;
+}
+
 export default function decodeAudioData(file) {
   return new Promise((resolve, rej) => {
     const context = createAudioContext()
-    const fileReader = new FileReader() // do we need two filereaders?
-    fileReader.onload = (e) => {
-      const audioDataArrayBuffer = e.target.result // this.result?
-      context.decodeAudioData(audioDataArrayBuffer, function(buffer) {
-        resolve({ buffer })
-      })
-    }
-    fileReader.readAsArrayBuffer(file)
+    // const fileReader = new FileReader() // do we need two filereaders?
+    // fileReader.onload = (e) => {
+    //   const audioDataArrayBuffer = e.target.result // this.result?
+    //   context.decodeAudioData(audioDataArrayBuffer, function(buffer) {
+    //     resolve({ buffer })
+    //   })
+    // }
+    // fileReader.readAsArrayBuffer(file)
+
+    const arrayBuffer = toArrayBuffer(file)
+    context.decodeAudioData(arrayBuffer, function(buffer) {
+      resolve({ buffer })
+    })
   })
 }

@@ -7,6 +7,13 @@ import logo from './logo.svg';
 import * as r from './redux'
 import is from 'electron-is'
 import './App.css';
+import electron from 'electron'
+import { promisify } from 'util'
+import fs from 'fs'
+
+const { remote } = electron
+const { dialog } = remote
+const readFile = promisify(fs.readFile)
 
 const isNotMac = process.platform !== 'darwin'
 
@@ -43,6 +50,30 @@ class App extends Component {
 
   triggerFileInputClick = () => {
     this.fileInput.click()
+  }
+
+  chooseAudioFiles = () => {
+    dialog.showOpenDialog({ multiSelections: true }, async (filePaths) => {
+      if (!filePaths) {
+        console.log('No file selected')
+        return
+      }
+
+      const files = await Promise.all(filePaths.map(filePath =>
+        readFile(filePath)
+      ))
+      console.log('boop!!!')
+      console.log('files!', files)
+
+      this.setState({ files }, () => {
+        // now, this line
+        // should really happen after a clip is selected.
+        // this.germanInput.focus()
+          this.loadAudio(files[0])
+          // does initializeFlashcards really need to happen here?
+          this.props.initializeFlashcards(files)
+      })
+    })
   }
 
   fileInputRef = (el) => this.fileInput = el
@@ -162,8 +193,12 @@ class App extends Component {
           {isNotMac && 'Only Mac OS is currently supported.'}
         </header>
         <p>
-          <Button label="files" onClick={this.triggerFileInputClick}>
+          {/* <Button label="files" onClick={this.triggerFileInputClick}>
             <input className="fileInput" multiple ref={this.fileInputRef} type="file" onChange={this.setFiles} />
+            Open file
+          </Button> */}
+          <Button onClick={this.chooseAudioFiles}>
+            Choose audio files
           </Button>
         </p>
         <Waveform svgRef={this.svgRef} />
