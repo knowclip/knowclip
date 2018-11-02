@@ -17,7 +17,9 @@ const Field = ({ text }) => <span style={getFieldStyles(text)}>
 
 let FlashcardRow = ({ flashcard: { de, en }, index, goToFile, closeModal, file }) =>
   <TableRow hover onClick={() => goToFile(index)} onDoubleClick={closeModal}>
-    <TableCell style={{ maxWidth: '8em', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</TableCell>
+    {file &&
+      <TableCell style={{ maxWidth: '8em', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</TableCell>
+    }
     <TableCell><Field text={de} /></TableCell>
     <TableCell><Field text={en} /></TableCell>
   </TableRow>
@@ -28,22 +30,22 @@ FlashcardRow = connect((state, { flashcardId }) => ({
 
 export default class ShowAll extends Component {
   exportCsv = () => {
-    const { files, flashcards } = this.props
-    exportCsv(files, flashcards)
+    const { flashcards } = this.props
+    // exportCsv(files, flashcards)
   }
 
   render() {
-    const { open, handleClose, files, currentFileIndex, goToFile } = this.props
+    const { open, handleClose, flashcards, currentFileIndex, goToFile } = this.props
     return <Dialog open={open} onClose={handleClose} style={{ width: '900px' }}>
       <Table>
         <TableBody>
-          {files.map((file, i) =>
+          {flashcards.map((flashcard, i) =>
             <FlashcardRow
-              key={file.name}
+              key={flashcard.id}
               goToFile={goToFile}
               closeModal={handleClose}
-              flashcardId={file.name}
-              file={file}
+              flashcardId={flashcard.id}
+              // file={file}
               isCurrent={currentFileIndex === i}
               index={i}
             />

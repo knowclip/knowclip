@@ -1,10 +1,9 @@
 import { getLocalFlashcards } from '../utils/localFlashcards'
 
-export const initializeFlashcards = (files) => ({
-  type: 'INITIALIZE_FLASHCARDS',
-  flashcards: {},
-  // should read from file or database or something...
-  filenames: files.map(f => f.name),
+export const chooseAudioFiles = (files, filePaths) => ({
+  type: 'CHOOSE_AUDIO_FILES',
+  files,
+  filePaths,
 })
 
 export const setFlashcardField = (id, key, value) => ({

@@ -7,19 +7,20 @@ export const SELECTION_THRESHOLD = 40
 // for reference during transition to clip-based flashcards
 // export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
 export const getCurrentFlashcardId = (state) => state.waveform.highlightedSelectionId
-export const getFlashcards = (state) => state.flashcards
+export const getFlashcardsByTime = (state) => state.waveform.selectionsOrder.map(id => state.flashcards[id])
 export const getFlashcard = (state, id) => state.flashcards[id]
 export const getCurrentFlashcard = (state) => getFlashcard(state, getCurrentFlashcardId(state))
 
 // export const getGerman = (state) => getCurrentFlashcard(state).de
 // export const getEnglish = (state) => getCurrentFlashcard(state).en
 
-export const getFilenames = (state) => state.audio.filenames
+export const getFilenames = (state) => state.audio.filePaths
 export const isLoopOn = (state) => state.audio.loop
-export const areFilesLoaded = (state) => Boolean(state.audio.filenames.length)
-export const isNextButtonEnabled = (state) => state.audio.currentFileIndex === state.audio.filenames.length - 1
+export const areFilesLoaded = (state) => Boolean(state.audio.filePaths.length)
+export const isNextButtonEnabled = (state) => state.audio.currentFileIndex === state.audio.filePaths.length - 1
 export const isPrevButtonEnabled = (state) => state.audio.currentFileIndex === 0
 export const getCurrentFileIndex = (state) => state.audio.currentFileIndex
+export const getCurrentFileName = ({ audio }) => audio.filePaths[audio.currentFileIndex]
 export const makeGetCurrentFile = createSelector(
   [getCurrentFileIndex],
   (currentFileIndex) => (files) => files[currentFileIndex]

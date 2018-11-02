@@ -37,20 +37,21 @@ class App extends Component {
   loadAudio = (file, audioElement, svgElement) =>
     this.props.loadAudio(file, this.audio, this.svg)
 
-  setFiles = (e) => {
-    const files = [...e.target.files]
-    this.setState({ files }, () => {
-      // now, this line
-      // should really happen after a clip is selected.
-      // this.germanInput.focus()
-      this.loadAudio(files[0])
-    })
-    this.props.initializeFlashcards(files)
-  }
-
-  triggerFileInputClick = () => {
-    this.fileInput.click()
-  }
+  // these two methods are for browser
+  // setFiles = (e) => {
+  //   const files = [...e.target.files]
+  //   this.setState({ files }, () => {
+  //     // now, this line
+  //     // should really happen after a clip is selected.
+  //     // this.germanInput.focus()
+  //     this.loadAudio(files[0])
+  //   })
+  //   this.props.chooseAudioFiles(files)
+  // }
+  //
+  // triggerFileInputClick = () => {
+  //   this.fileInput.click()
+  // }
 
   chooseAudioFiles = () => {
     dialog.showOpenDialog({ multiSelections: true }, async (filePaths) => {
@@ -70,8 +71,8 @@ class App extends Component {
         // should really happen after a clip is selected.
         // this.germanInput.focus()
           this.loadAudio(files[0])
-          // does initializeFlashcards really need to happen here?
-          this.props.initializeFlashcards(files)
+          // does chooseAudioFiles really need to happen here?
+          this.props.chooseAudioFiles(files, filePaths)
       })
     })
   }
@@ -133,6 +134,7 @@ class App extends Component {
       areFilesLoaded, waveform, loop,
       isPrevButtonEnabled, isNextButtonEnabled,
       currentFlashcard, currentFileIndex, flashcards,
+      currentFileName,
     } = this.props
     const currentFile = this.getCurrentFile()
 
@@ -149,7 +151,7 @@ class App extends Component {
           <AudioFilesMenu
             onClickPrevious={this.prevFile}
             onClickNext={this.nextFile}
-            currentFilename={currentFile.name}
+            currentFilename={currentFileName}
             isPrevButtonEnabled={isPrevButtonEnabled}
             isNextButtonEnabled={isNextButtonEnabled}
           />
@@ -219,9 +221,10 @@ class App extends Component {
 
 const mapStateToProps = (state) => ({
   filenames: r.getFilenames(state),
-  flashcards: r.getFlashcards(state),
+  flashcards: r.getFlashcardsByTime(state),
   getCurrentFile: r.makeGetCurrentFile(state),
   currentFileIndex: r.getCurrentFileIndex(state),
+  currentFileName: r.getCurrentFileName(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   currentFlashcardId: r.getCurrentFlashcardId(state),
   areFilesLoaded: r.areFilesLoaded(state),
@@ -233,7 +236,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-  initializeFlashcards: r.initializeFlashcards,
+  chooseAudioFiles: r.chooseAudioFiles,
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
