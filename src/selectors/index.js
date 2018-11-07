@@ -1,14 +1,38 @@
 import { createSelector } from 'reselect'
+import { basename } from 'path'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
 export const SELECTION_THRESHOLD = 40
 
+export const getSecondsAtX = (state, x) => {
+  const { stepsPerSecond, stepLength } = state.waveform
+  return (x / (stepsPerSecond * stepLength))
+}
+export const getMillisecondsAtX = (state, x) => {
+  return 1000 * getSecondsAtX(state, x)
+}
+export const getXAtMilliseconds = (state, milliseconds) => {
+  const { stepsPerSecond, stepLength } = state.waveform
+  return (milliseconds / 1000) * (stepsPerSecond * stepLength)
+}
+
 // for reference during transition to clip-based flashcards
 // export const getCurrentFlashcardId = (state) => state.audio.filenames[state.audio.currentFileIndex]
 export const getCurrentFlashcardId = (state) => state.waveform.highlightedSelectionId
 export const getFlashcardsByTime = (state) => state.waveform.selectionsOrder.map(id => state.flashcards[id])
-export const getFlashcard = (state, id) => state.flashcards[id]
+export const getFlashcard = (state, id) => {
+  const flashcard = state.flashcards[id]
+  if (!flashcard) return null
+  const selection = state.waveform.selections[id]
+  return {
+    ...flashcard,
+    time: {
+      from: getSecondsAtX(state, selection.start),
+      until: getSecondsAtX(state, selection.end),
+    },
+  }
+}
 export const getCurrentFlashcard = (state) => getFlashcard(state, getCurrentFlashcardId(state))
 
 // export const getGerman = (state) => getCurrentFlashcard(state).de
@@ -17,10 +41,14 @@ export const getCurrentFlashcard = (state) => getFlashcard(state, getCurrentFlas
 export const getFilenames = (state) => state.audio.filePaths
 export const isLoopOn = (state) => state.audio.loop
 export const areFilesLoaded = (state) => Boolean(state.audio.filePaths.length)
-export const isNextButtonEnabled = (state) => state.audio.currentFileIndex === state.audio.filePaths.length - 1
-export const isPrevButtonEnabled = (state) => state.audio.currentFileIndex === 0
+export const isNextButtonEnabled = (state) => Boolean(state.audio.filePaths.length > 1) && state.audio.currentFileIndex === state.audio.filePaths.length - 1
+export const isPrevButtonEnabled = (state) => Boolean(state.audio.filePaths.length > 1) && state.audio.currentFileIndex !== 0
 export const getCurrentFileIndex = (state) => state.audio.currentFileIndex
-export const getCurrentFileName = ({ audio }) => audio.filePaths[audio.currentFileIndex]
+export const getCurrentFilePath = ({ audio }) => audio.filePaths[audio.currentFileIndex]
+export const getCurrentFileName = (state) => {
+  const filePath = getCurrentFilePath(state)
+  return filePath && basename(filePath)
+}
 export const makeGetCurrentFile = createSelector(
   [getCurrentFileIndex],
   (currentFileIndex) => (files) => files[currentFileIndex]
@@ -28,7 +56,7 @@ export const makeGetCurrentFile = createSelector(
 
 
 // export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks)
-export const getWaveformSelection = (state, id) => state.waveform.selections[id]
+export const getWaveformSelection = (state, id) => state.waveform && state.waveform.selections[id]
 export const getWaveformSelections = (state) => state.waveform.selectionsOrder.map(id => getWaveformSelection(state, id))
 export const getWaveformPendingStretch = (state) => {
   if (!state.waveform) return
@@ -76,16 +104,13 @@ export const getSelectionEdgeAt = (state, x) => {
 
 export const getWaveformViewBoxXMin = (state) => state.waveform.viewBox.xMin
 
-// make like others
-export const getTimeAtX = (x, { stepsPerSecond, stepLength }) => x / (stepsPerSecond * stepLength)
-
 export const getHighlightedWaveformSelectionId = (state) => state.waveform.highlightedSelectionId
 
 export const getClipTimes = (state, id) => {
   const clip = getWaveformSelection(state, id)
   return {
-    start: getTimeAtX(clip.start, state.waveform),
-    end: getTimeAtX(clip.end, state.waveform),
+    start: getSecondsAtX(state, clip.start),
+    end: getSecondsAtX(state, clip.end),
   }
 }
 

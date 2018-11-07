@@ -1,5 +1,5 @@
 // peak count
-const SAMPLE_RATE = 100
+// const SAMPLE_RATE = 1000
 const SAMPLE_STEP = 1
 export function getPeaks(buffer, stepsPerSecond) {
   const SAMPLE_RATE = stepsPerSecond * buffer.duration

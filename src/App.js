@@ -19,18 +19,24 @@ const isNotMac = process.platform !== 'darwin'
 
 const AudioFilesMenu = ({
   onClickPrevious, onClickNext, currentFilename, isPrevButtonEnabled, isNextButtonEnabled,
+  chooseAudioFiles,
 }) =>
   <p className="audioFilesMenu">
-    <Button onClick={onClickPrevious} disabled={isPrevButtonEnabled}>Previous</Button>
-    <h2 className="audioFileName">
-      {currentFilename}
-    </h2>
-    <Button onClick={onClickNext} disabled={isNextButtonEnabled}>Next</Button>
+    <Button onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>Previous</Button>
+    {currentFilename
+      ? <h2 className="audioFileName">
+        {currentFilename}
+      </h2>
+      : <Button onClick={chooseAudioFiles}>
+        Choose audio files
+      </Button>
+    }
+    <Button onClick={onClickNext} disabled={!isNextButtonEnabled}>Next</Button>
   </p>
 
 class App extends Component {
   state = {
-    files: [],
+    filePaths: [],
     modalIsOpen: false,
   }
 
@@ -54,25 +60,16 @@ class App extends Component {
   // }
 
   chooseAudioFiles = () => {
-    dialog.showOpenDialog({ multiSelections: true }, async (filePaths) => {
-      if (!filePaths) {
-        console.log('No file selected')
-        return
-      }
-
-      const files = await Promise.all(filePaths.map(filePath =>
-        readFile(filePath)
-      ))
-      console.log('boop!!!')
-      console.log('files!', files)
-
-      this.setState({ files }, () => {
+    dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, (filePaths) => {
+      if (!filePaths) return
+      this.setState({ filePaths }, async () => {
         // now, this line
         // should really happen after a clip is selected.
         // this.germanInput.focus()
-          this.loadAudio(files[0])
+        const file = await readFile(filePaths[0])
+          this.loadAudio(file)
           // does chooseAudioFiles really need to happen here?
-          this.props.chooseAudioFiles(files, filePaths)
+          this.props.chooseAudioFiles(filePaths)
       })
     })
   }
@@ -82,9 +79,10 @@ class App extends Component {
   germanInputRef = (el) => this.germanInput = el
   svgRef = (el) => this.svg = el
 
-  goToFile = (index) => {
+  goToFile = async (index) => {
     this.props.setCurrentFile(index)
-    this.loadAudio(this.state.files[index])
+    const file = await readFile(this.state.filePaths[index])
+    this.loadAudio(file)
   }
   prevFile = () => {
     const lower = this.props.currentFileIndex - 1
@@ -119,7 +117,6 @@ class App extends Component {
     }
   }
 
-  getCurrentFile = () => this.props.getCurrentFile(this.state.files)
 
   openModal = () => this.setState({ modalIsOpen: true })
   closeModal = () => this.setState({ modalIsOpen: false })
@@ -134,9 +131,8 @@ class App extends Component {
       areFilesLoaded, waveform, loop,
       isPrevButtonEnabled, isNextButtonEnabled,
       currentFlashcard, currentFileIndex, flashcards,
-      currentFileName,
+      currentFileName, makeClips, highlightSelection,
     } = this.props
-    const currentFile = this.getCurrentFile()
 
     // for reference during transition to clip-based flashcards
     const form = Boolean(currentFlashcard)
@@ -148,14 +144,8 @@ class App extends Component {
               <Checkbox checked={loop} value={loop} onChange={this.toggleLoop} />
             }
           />
-          <AudioFilesMenu
-            onClickPrevious={this.prevFile}
-            onClickNext={this.nextFile}
-            currentFilename={currentFileName}
-            isPrevButtonEnabled={isPrevButtonEnabled}
-            isNextButtonEnabled={isNextButtonEnabled}
-          />
           <div className="formBody">
+            <p>{currentFlashcard.time.from}-{currentFlashcard.time.until}</p>
             <Button type="button" onClick={this.deleteCard}>
               Delete card
             </Button>
@@ -199,20 +189,26 @@ class App extends Component {
             <input className="fileInput" multiple ref={this.fileInputRef} type="file" onChange={this.setFiles} />
             Open file
           </Button> */}
-          <Button onClick={this.chooseAudioFiles}>
-            Choose audio files
-          </Button>
         </p>
+        <AudioFilesMenu
+          onClickPrevious={this.prevFile}
+          onClickNext={this.nextFile}
+          currentFilename={currentFileName}
+          isPrevButtonEnabled={isPrevButtonEnabled}
+          isNextButtonEnabled={isNextButtonEnabled}
+          chooseAudioFiles={this.chooseAudioFiles}
+        />
         <Waveform svgRef={this.svgRef} />
-        <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
+        <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoPlay></audio>
         {form}
         <ShowAll
           open={this.state.modalIsOpen}
           handleClose={this.closeModal}
           flashcards={flashcards}
-          files={this.state.files}
+          files={null /* this.state.files */}
           currentFileIndex={currentFileIndex}
-          goToFile={this.goToFile}
+          highlightSelection={highlightSelection}
+          makeClips={makeClips}
         />
       </div>
     );
@@ -222,7 +218,6 @@ class App extends Component {
 const mapStateToProps = (state) => ({
   filenames: r.getFilenames(state),
   flashcards: r.getFlashcardsByTime(state),
-  getCurrentFile: r.makeGetCurrentFile(state),
   currentFileIndex: r.getCurrentFileIndex(state),
   currentFileName: r.getCurrentFileName(state),
   currentFlashcard: r.getCurrentFlashcard(state),
@@ -242,6 +237,8 @@ const mapDispatchToProps = {
   toggleLoop: r.toggleLoop,
   loadAudio: r.loadAudio,
   deleteCard: r.deleteCard,
+  makeClips: r.makeClips,
+  highlightSelection: r.highlightSelection,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

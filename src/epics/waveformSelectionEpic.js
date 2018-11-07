@@ -19,9 +19,9 @@ const pendingSelectionIsBigEnough = (state) => {
 
 const ascending = (a, b) => a - b
 const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
-const getFinalSelection = (pendingSelection) => {
+const getFinalSelection = (pendingSelection, currentFileName) => {
   const [start, end] = sortSelectionPoints(pendingSelection)
-  return { start, end, id: uuid() }
+  return { start, end, id: uuid(), filePath: currentFileName }
 }
 
 const range = (first, last) => {
@@ -81,7 +81,7 @@ const waveformSelectionEpic = (action$, state$) => {
           return pendingSelectionOverlaps || !pendingSelectionIsBigEnough(state$.value)
             // maybe later, do stretch + merge for overlaps.
             ? setWaveformPendingSelection(null)
-            : addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value)))
+            : addWaveformSelection(getFinalSelection(r.getWaveformPendingSelection(state$.value), r.getCurrentFilePath(state$.value)))
         })
       )
       const highlightsAndTimeChanges = mouseups.pipe(
@@ -97,7 +97,7 @@ const waveformSelectionEpic = (action$, state$) => {
           const mousePositionOrSelectionStart = selectionIdAtX
             ? r.getWaveformSelection(state, selectionIdAtX).start
             : x
-          const newTime = r.getTimeAtX(mousePositionOrSelectionStart, state.waveform)
+          const newTime = r.getSecondsAtX(state, mousePositionOrSelectionStart)
           audioElement.currentTime = newTime
         }),
         flatMap(({ x, selectionIdAtX }) =>

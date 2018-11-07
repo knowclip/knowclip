@@ -31,9 +31,6 @@
     "eject": "react-app-rewired eject",
     "electron": "ELECTRON_START_URL=http://localhost:3000 electron ."
   },
-  "optionalDependencies": {
-    "@ffmpeg-installer/ffmpeg": " "
-  },
   "browserslist": [
     ">0.2%",
     "not dead",

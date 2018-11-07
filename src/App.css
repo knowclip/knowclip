@@ -30,14 +30,14 @@
 
 .audioFilesMenu {
   display: flex;
+  justify-content: center;
 }
 
 .audioFileName {
   font-size: large;
-  width: 20rem;
-  overflow: hidden;
+  /* overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; */
 }
 
 .fileInput {

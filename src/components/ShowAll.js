@@ -15,8 +15,8 @@ const Field = ({ text }) => <span style={getFieldStyles(text)}>
   {text || 'blank'}
 </span>
 
-let FlashcardRow = ({ flashcard: { de, en }, index, goToFile, closeModal, file }) =>
-  <TableRow hover onClick={() => goToFile(index)} onDoubleClick={closeModal}>
+let FlashcardRow = ({ flashcard: { de, en, id }, highlightSelection, closeModal, file }) =>
+  <TableRow hover onClick={() => highlightSelection(id)} onDoubleClick={closeModal}>
     {file &&
       <TableCell style={{ maxWidth: '8em', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</TableCell>
     }
@@ -35,25 +35,25 @@ export default class ShowAll extends Component {
   }
 
   render() {
-    const { open, handleClose, flashcards, currentFileIndex, goToFile } = this.props
+    const { open, handleClose, flashcards, currentFileIndex, highlightSelection, makeClips } = this.props
     return <Dialog open={open} onClose={handleClose} style={{ width: '900px' }}>
       <Table>
         <TableBody>
           {flashcards.map((flashcard, i) =>
             <FlashcardRow
               key={flashcard.id}
-              goToFile={goToFile}
+              highlightSelection={highlightSelection}
               closeModal={handleClose}
               flashcardId={flashcard.id}
               // file={file}
               isCurrent={currentFileIndex === i}
-              index={i}
             />
           )}
         </TableBody>
       </Table>
       <DialogActions>
         <Button onClick={this.exportCsv}>Export CSV file</Button>
+        <Button onClick={makeClips}>Make audio clips</Button>
       </DialogActions>
     </Dialog>
   }

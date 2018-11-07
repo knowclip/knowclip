@@ -1,8 +1,7 @@
 import { getLocalFlashcards } from '../utils/localFlashcards'
 
-export const chooseAudioFiles = (files, filePaths) => ({
+export const chooseAudioFiles = (filePaths) => ({
   type: 'CHOOSE_AUDIO_FILES',
-  files,
   filePaths,
 })
 
@@ -38,6 +37,10 @@ export const loadAudioSuccess = ({ filename, bufferLength }) => ({
 export const deleteCard = id => ({
   type: 'DELETE_CARD',
   id,
+})
+
+export const makeClips = () => ({
+  type: 'MAKE_CLIPS',
 })
 
 export * from './waveform'
