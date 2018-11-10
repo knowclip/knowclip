@@ -13,26 +13,26 @@ import { toWaveformX, toWaveformCoordinates } from '../utils/waveformCoordinates
 import dataurl from 'dataurl'
 // import fs from 'fs'
 import electron from 'electron'
-import os from 'os'
 import { join, basename, extname } from 'path'
+import ffmpeg from '../utils/ffmpeg'
 
 const { remote } = electron
 
 const { dialog } = remote
 
 console.log('booop', process.env.FLUENTFFMPEG_COV)
-const ffmpeg = require('fluent-ffmpeg') // maybe get rid of define plugin and just get straight from lib?
-// Setting ffmpeg path to ffmpeg binary for os x so that ffmpeg can be packaged with the app.
-// console.log('ffmpeg',  require('@ffmpeg-installer/ffmpeg'))
-// const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
-const platform = os.platform() + '-' + os.arch()
-// const ffmpegPath = require('@ffmpeg-installer/' + platform + '/ffmpeg')
-const ffmpegPath = join('.', 'node_modules', '@ffmpeg-installer', platform, 'ffmpeg')
-
-console.log('ffmpegPath', ffmpegPath)
-console.log(ffmpegPath)
-ffmpeg.setFfmpegPath(ffmpegPath) // ("/usr/local/bin/ffmpeg")
-//because of the nature of ffmpeg, this can take both audio or video files as input
+// const ffmpeg = require('fluent-ffmpeg') // maybe get rid of define plugin and just get straight from lib?
+// // Setting ffmpeg path to ffmpeg binary for os x so that ffmpeg can be packaged with the app.
+// // console.log('ffmpeg',  require('@ffmpeg-installer/ffmpeg'))
+// // const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
+// const platform = os.platform() + '-' + os.arch()
+// // const ffmpegPath = require('@ffmpeg-installer/' + platform + '/ffmpeg')
+// const ffmpegPath = join('.', 'node_modules', '@ffmpeg-installer', platform, 'ffmpeg')
+//
+// console.log('ffmpegPath', ffmpegPath)
+// console.log(ffmpegPath)
+// ffmpeg.setFfmpegPath(ffmpegPath) // ("/usr/local/bin/ffmpeg")
+// //because of the nature of ffmpeg, this can take both audio or video files as input
 
 const path = '/Users/justin/Desktop/ffmpeg-test/audio.mp3'
 const startTime = '00:00:00.000'
@@ -46,9 +46,10 @@ const toTimestamp = (milliseconds) => {
   const hoursStamp = Math.floor(milliseconds / 1000 / 60 / 60)
   return `${hoursStamp}:${minutesStamp}:${secondsStamp}.${millisecondsStamp}`
 }
-const clip = (path, startTime, endTime, outputFilename) => {
-  var aud_file = outputFilename // ?
 
+
+
+const clip = (path, startTime, endTime, outputFilename) => {
   return new Promise((res, rej) => {
     ffmpeg(path)
       .audioCodec('copy')

@@ -5,15 +5,42 @@ import ShowAll from './components/ShowAll'
 import Waveform from './components/Waveform'
 import logo from './logo.svg';
 import * as r from './redux'
-import is from 'electron-is'
 import './App.css';
 import electron from 'electron'
 import { promisify } from 'util'
 import fs from 'fs'
+import ffmpeg from './utils/ffmpeg'
+import tempy from 'tempy'
 
 const { remote } = electron
 const { dialog } = remote
 const readFile = promisify(fs.readFile)
+
+const tmpFilePaths = {}
+const getTmpFilePath = (path) => {
+  const tmpPath = tmpFilePaths[path] = tmpFilePaths[path] || tempy.file()
+  return tmpPath
+}
+
+const getConstantBitrateMp3 = (path) => {
+  // should check if mp3
+  // and if possible, constant vs. variable bitrate
+  return new Promise((res, rej) => {
+    const tmpPath = getTmpFilePath(path) + '.mp3'
+    console.log(tmpPath)
+
+    // I guess by default it does CBR
+    // though maybe we should check that
+    // bitrate and buffersize defaults are ok.
+    //   .audioBitrate('64k')
+    //   .outputOptions('-bufsize 192k')
+     ffmpeg(path)
+      .on('end', () => res(tmpPath))
+      .on('error', rej)
+      .output(tmpPath)
+      .run()
+  })
+}
 
 const isNotMac = process.platform !== 'darwin'
 
@@ -66,8 +93,14 @@ class App extends Component {
         // now, this line
         // should really happen after a clip is selected.
         // this.germanInput.focus()
-        const file = await readFile(filePaths[0])
+
+        const tmpFilePath = await getConstantBitrateMp3(filePaths[0])
+        const file = await readFile(tmpFilePath)
+
           this.loadAudio(file)
+
+          // this.loadAudio(await readFile(filePaths[0]))
+
           // does chooseAudioFiles really need to happen here?
           this.props.chooseAudioFiles(filePaths)
       })
@@ -116,7 +149,6 @@ class App extends Component {
       deleteCard(highlightedWaveformSelectionId)
     }
   }
-
 
   openModal = () => this.setState({ modalIsOpen: true })
   closeModal = () => this.setState({ modalIsOpen: false })
