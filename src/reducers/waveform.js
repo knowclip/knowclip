@@ -1,5 +1,3 @@
-import * as s from '../selectors'
-
 const initialState = {
   stepsPerSecond: 25 * 4,
   stepLength: 2 / 4,

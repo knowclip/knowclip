@@ -1,11 +1,8 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take, startWith, sample } from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
-import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
+import { filter, map, flatMap, tap, takeUntil, withLatestFrom, takeLast, take } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
+import {  fromEvent, of, merge, } from 'rxjs'
 import uuid from 'uuid/v4'
-import { setWaveformPeaks, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
-import { getFlashcard } from '../selectors'
-import decodeAudioData, { getPeaks } from '../utils/getWaveform'
-import { setLocalFlashcard } from '../utils/localFlashcards'
+import { setWaveformPendingSelection, addWaveformSelection } from '../actions'
 import * as r from '../redux'
 import { toWaveformX, toWaveformCoordinates } from '../utils/waveformCoordinates'
 
@@ -22,14 +19,6 @@ const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
 const getFinalSelection = (pendingSelection, currentFileName) => {
   const [start, end] = sortSelectionPoints(pendingSelection)
   return { start, end, id: uuid(), filePath: currentFileName }
-}
-
-const range = (first, last) => {
-  const array = []
-  for (let i = first; i += 1; i <= last) {
-    array.push(i)
-  }
-  return array
 }
 
 const waveformSelectionEpic = (action$, state$) => {

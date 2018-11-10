@@ -1,43 +1,21 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take } from 'rxjs/operators'
+import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
+import { fromEvent, from } from 'rxjs'
 import uuid from 'uuid/v4'
-import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
+import { setWaveformPeaks, setWaveformCursor, loadAudioSuccess } from '../actions'
 import { getFlashcard } from '../selectors'
 import decodeAudioData, { getPeaks } from '../utils/getWaveform'
 import { setLocalFlashcard } from '../utils/localFlashcards'
 import * as r from '../redux'
 import waveformSelectionEpic from './waveformSelectionEpic'
 import waveformStretchEpic from './waveformStretchEpic'
-import { toWaveformX, toWaveformCoordinates } from '../utils/waveformCoordinates'
+import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import dataurl from 'dataurl'
-// import fs from 'fs'
 import electron from 'electron'
 import { join, basename, extname } from 'path'
 import ffmpeg from '../utils/ffmpeg'
 
-const { remote } = electron
-
-const { dialog } = remote
-
-console.log('booop', process.env.FLUENTFFMPEG_COV)
-// const ffmpeg = require('fluent-ffmpeg') // maybe get rid of define plugin and just get straight from lib?
-// // Setting ffmpeg path to ffmpeg binary for os x so that ffmpeg can be packaged with the app.
-// // console.log('ffmpeg',  require('@ffmpeg-installer/ffmpeg'))
-// // const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
-// const platform = os.platform() + '-' + os.arch()
-// // const ffmpegPath = require('@ffmpeg-installer/' + platform + '/ffmpeg')
-// const ffmpegPath = join('.', 'node_modules', '@ffmpeg-installer', platform, 'ffmpeg')
-//
-// console.log('ffmpegPath', ffmpegPath)
-// console.log(ffmpegPath)
-// ffmpeg.setFfmpegPath(ffmpegPath) // ("/usr/local/bin/ffmpeg")
-// //because of the nature of ffmpeg, this can take both audio or video files as input
-
-const path = '/Users/justin/Desktop/ffmpeg-test/audio.mp3'
-const startTime = '00:00:00.000'
-const endTime = '00:00:01.500'
-const outputFilename = '/Users/justin/Desktop/ffmpeg-test/inElectron.mp3'
+const { remote: { dialog } } = electron
 
 const toTimestamp = (milliseconds) => {
   const millisecondsStamp = Math.round(milliseconds % 1000)
@@ -46,8 +24,6 @@ const toTimestamp = (milliseconds) => {
   const hoursStamp = Math.floor(milliseconds / 1000 / 60 / 60)
   return `${hoursStamp}:${minutesStamp}:${secondsStamp}.${millisecondsStamp}`
 }
-
-
 
 const clip = (path, startTime, endTime, outputFilename) => {
   return new Promise((res, rej) => {
@@ -81,31 +57,22 @@ const detectSilence = (path, silenceDuration = 1, silenceNoiseTolerance = -60) =
     .audioFilters(`silencedetect=n=${silenceNoiseTolerance}dB:d=${silenceDuration}`)
     .outputFormat('null')
     .output('-')
-    .on('progress', function(progress) {
-      //  progress // {"frames":null,"currentFps":null,"currentKbps":256,"targetSize":204871,"timemark":"01:49:15.90"}
-      console.log('Processing: ' + progress.timemark + ' done ' + progress.targetSize+' kilobytes');
-    })
     .on('end',
     //listener must be a function, so to return the callback wrapping it inside a function
     function(_, string) {
-      // res()
       const preparedString = string.replace(/\s/g,' ')
       const regex = /silence_start:\s(\d+\.\d+|\d+).+?silence_end:\s(\d+\.\d+|\d+)/g
-      console.log('bloop!', preparedString)
       window.preparedString = preparedString
 
       const matchData = []
       let addition
-      while (addition = regex.exec(preparedString)) {
-        const [_, startStr, endStr] = addition
-        console.log('exect!')
+      while (addition = regex.exec(preparedString)) { // eslint-disable-line no-cond-assign
+        const [, startStr, endStr] = addition
         matchData.push({
           start: Number(startStr) * 1000,
           end: Number(endStr) * 1000,
         })
       }
-      console.log(preparedString, regex.exec(preparedString))
-      console.log('matchData', matchData)
       res(matchData)
     }
   )
@@ -116,24 +83,6 @@ const detectSilence = (path, silenceDuration = 1, silenceNoiseTolerance = -60) =
   .run()
 })
 Object.assign(window, { detectSilence })
-
-
-
-
-
-
- // -i audio.mp3 -af silencedetect=d=2 -f null -
-
-// // const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-// const ffmpegPath = '/usr/local/bin/ffmpeg'
-// const clip = () => {
-//   const args = '-i ~/Desktop/ffmpeg-test/audio.mp3 -acodec copy -ss 00:00:00.000 -to 00:00:01.500 ~/Desktop/ffmpeg-test/fromElectron.mp3'
-//   const spawn = require('child_process').spawn;
-//   const ffmpeg = spawn(ffmpegPath, args);
-//   ffmpeg.on('exit', (...args) => {
-//     console.log('done!!', ...args)
-//   });
-// }
 
 window.clip = clip
 
@@ -266,15 +215,6 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
   ),
 ])
 
-
-const fromMouseEvent = (element, eventName, state) => fromEvent(element, eventName).pipe(
-  map(event => ({
-    target: event.target,
-    waveformX: toWaveformX(event, event.currentTarget, r.getWaveformViewBoxXMin(state))
-  }))
-)
-
-
 // const waveformMousemoveEpic = withAudioLoaded((action$, state$) => [
 //   ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
 //   map(mousemove => ({
@@ -307,7 +247,6 @@ const highlightSelectionsOnAddEpic = (action$, state$) => action$.pipe(
   map(({ selection: { id } }) => r.highlightSelection(id)),
 )
 
-
 const playSelectionsOnHighlightEpic = (action$, state$) => action$.pipe(
   ofType('HIGHLIGHT_WAVEFORM_SELECTION'),
   filter(({ id }) => Boolean(id)),
@@ -319,7 +258,6 @@ const playSelectionsOnHighlightEpic = (action$, state$) => action$.pipe(
   }),
   ignoreElements(),
 )
-
 
 export default combineEpics(
   getWaveformEpic,

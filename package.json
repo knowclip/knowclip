@@ -22,14 +22,15 @@
     "reselect": "^3.0.1",
     "rxjs": "^6.2.2",
     "tempy": "^0.2.1",
-    "uuid": "^3.3.2",
+    "uuid": "^3.3.2"
   },
   "main": "./main.js",
   "scripts": {
     "start": "react-app-rewired start",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-app-rewired eject",
-    "electron": "ELECTRON_DEV=1 ELECTRON_START_URL=http://localhost:3000 electron ."
+    "electron": "ELECTRON_DEV=1 ELECTRON_START_URL=http://localhost:3000 electron .",
+    "lint": "eslint src"
   },
   "browserslist": [
     ">0.2%",

@@ -1,5 +1,3 @@
-import { getLocalFlashcards } from '../utils/localFlashcards'
-
 export const chooseAudioFiles = (filePaths) => ({
   type: 'CHOOSE_AUDIO_FILES',
   filePaths,

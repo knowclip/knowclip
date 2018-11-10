@@ -133,10 +133,6 @@ class App extends Component {
   }
 
   setFlashcardText = (key, text) => {
-    const newFlashcard = {
-      ...this.props.currentFlashcard,
-      [key]: text,
-    }
     this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
   }
 
@@ -160,8 +156,7 @@ class App extends Component {
 
   render() {
     const {
-      areFilesLoaded, waveform, loop,
-      isPrevButtonEnabled, isNextButtonEnabled,
+      loop, isPrevButtonEnabled, isNextButtonEnabled,
       currentFlashcard, currentFileIndex, flashcards,
       currentFileName, makeClips, highlightSelection,
     } = this.props
@@ -254,7 +249,6 @@ const mapStateToProps = (state) => ({
   currentFileName: r.getCurrentFileName(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   currentFlashcardId: r.getCurrentFlashcardId(state),
-  areFilesLoaded: r.areFilesLoaded(state),
   isNextButtonEnabled: r.isNextButtonEnabled(state),
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),

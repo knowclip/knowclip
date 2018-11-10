@@ -1,5 +1,3 @@
-import uuid from 'uuid/v4'
-
 export const setWaveformPeaks = (peaks) => ({
   type: 'SET_WAVEFORM_PEAKS',
   peaks,

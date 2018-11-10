@@ -1,13 +1,8 @@
-import { filter, map, flatMap, tap, ignoreElements, takeUntil, withLatestFrom, skipUntil, repeat, endWith, concat, partition, takeLast, last, take } from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
-import { Observable, fromEvent, from, of, iif, merge, empty, race } from 'rxjs'
-import uuid from 'uuid/v4'
-import { setWaveformPeaks, setWaveformCursor, setWaveformPendingSelection, addWaveformSelection, loadAudioSuccess } from '../actions'
-import { getFlashcard } from '../selectors'
-import decodeAudioData, { getPeaks } from '../utils/getWaveform'
-import { setLocalFlashcard } from '../utils/localFlashcards'
+import { map, flatMap, takeUntil, withLatestFrom, takeLast } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
+import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
-import { toWaveformX, toWaveformCoordinates } from '../utils/waveformCoordinates'
+import { toWaveformX } from '../utils/waveformCoordinates'
 
 const waveformStretchEpic = (action$, state$) => {
   const selectionMousedowns = action$.pipe(
@@ -18,7 +13,7 @@ const waveformStretchEpic = (action$, state$) => {
     }),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
     flatMap(([mousedownData, loadAudio]) => {
-      const { x, edge: { key, id } } = mousedownData
+      const { edge: { key, id } } = mousedownData
       const pendingStretches = fromEvent(window, 'mousemove').pipe(
         takeUntil(fromEvent(window, 'mouseup')),
         map((mousemove) => r.setWaveformPendingStretch({
