@@ -21,15 +21,15 @@
     "redux-observable": "^1.0.0",
     "reselect": "^3.0.1",
     "rxjs": "^6.2.2",
-    "uuid": "^3.3.2"
+    "tempy": "^0.2.1",
+    "uuid": "^3.3.2",
   },
   "main": "./main.js",
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-app-rewired eject",
-    "electron": "ELECTRON_START_URL=http://localhost:3000 electron ."
+    "electron": "ELECTRON_DEV=1 ELECTRON_START_URL=http://localhost:3000 electron ."
   },
   "browserslist": [
     ">0.2%",
