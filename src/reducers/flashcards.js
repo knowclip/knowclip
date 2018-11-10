@@ -22,7 +22,7 @@ export default function flashcards(state = initialState, action) {
           de: '',
           en: '',
           id: action.selection.id,
-        }
+        },
       }
 
     case 'DELETE_CARD': {

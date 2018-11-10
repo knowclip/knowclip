@@ -1,16 +1,21 @@
-const localFlashcardKey = (file) => `${file.type}_____${file.name}`
+const localFlashcardKey = file => `${file.type}_____${file.name}`
 
-export const setLocalFlashcard = (flashcard) => {
+export const setLocalFlashcard = flashcard => {
   const { localStorage } = window
   if (localStorage) {
-    if (!flashcard.file)
-      return console.log('not setting local flashcard')
-    const serializedFlashcardData = JSON.stringify({ en: flashcard.en, de: flashcard.de })
-    localStorage.setItem(localFlashcardKey(flashcard.file), serializedFlashcardData)
+    if (!flashcard.file) return console.log('not setting local flashcard')
+    const serializedFlashcardData = JSON.stringify({
+      en: flashcard.en,
+      de: flashcard.de,
+    })
+    localStorage.setItem(
+      localFlashcardKey(flashcard.file),
+      serializedFlashcardData
+    )
   }
 }
 
-const getLocalFlashcard = (file) => {
+const getLocalFlashcard = file => {
   const { localStorage } = window
   if (localStorage) {
     if (!file) {
@@ -22,8 +27,8 @@ const getLocalFlashcard = (file) => {
   }
 }
 
-export const getLocalFlashcards = (files) => {
-  const map = {};
+export const getLocalFlashcards = files => {
+  const map = {}
   files.forEach(file => {
     const local = getLocalFlashcard(file)
     map[file.name] = local || { de: '', en: '', file }

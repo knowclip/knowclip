@@ -5,7 +5,13 @@ const os = require('os')
 
 const platform = os.platform() + '-' + os.arch()
 
-const ffmpegPath = join('.', 'node_modules', '@ffmpeg-installer', platform, 'ffmpeg')
+const ffmpegPath = join(
+  '.',
+  'node_modules',
+  '@ffmpeg-installer',
+  platform,
+  'ffmpeg'
+)
 
 ffmpeg.setFfmpegPath(ffmpegPath)
 

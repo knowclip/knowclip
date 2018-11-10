@@ -1,4 +1,4 @@
-export const setWaveformPeaks = (peaks) => ({
+export const setWaveformPeaks = peaks => ({
   type: 'SET_WAVEFORM_PEAKS',
   peaks,
 })
@@ -9,12 +9,12 @@ export const setWaveformCursor = (x, newViewBox) => ({
   newViewBox,
 })
 
-export const addWaveformSelection = (selection) => ({
+export const addWaveformSelection = selection => ({
   type: 'ADD_WAVEFORM_SELECTION',
   selection,
 })
 
-export const setWaveformPendingSelection = (selection) => ({
+export const setWaveformPendingSelection = selection => ({
   type: 'SET_WAVEFORM_PENDING_SELECTION',
   selection,
 })
@@ -30,13 +30,12 @@ export const editWaveformSelection = (id, override) => ({
   override,
 })
 
-export const setWaveformPendingStretch = (stretch) => ({
+export const setWaveformPendingStretch = stretch => ({
   type: 'SET_WAVEFORM_PENDING_STRETCH',
   stretch,
 })
 
-
-export const mergeWaveformSelections = (ids) => ({
+export const mergeWaveformSelections = ids => ({
   type: 'MERGE_WAVEFORM_SELECTIONS',
-  ids
+  ids,
 })

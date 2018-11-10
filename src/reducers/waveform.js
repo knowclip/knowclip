@@ -12,7 +12,7 @@ const initialState = {
   highlightedSelectionId: null,
 }
 
-const byStart = (selections) => (aId, bId) => {
+const byStart = selections => (aId, bId) => {
   const { start: a } = selections[aId]
   const { start: b } = selections[bId]
   if (a < b) return -1
@@ -48,10 +48,9 @@ export default function waveform(state = initialState, action) {
         ...state,
         pendingSelection: null,
         selections,
-        selectionsOrder: [
-          ...state.selectionsOrder,
-          action.selection.id,
-        ].sort(byStart(selections)),
+        selectionsOrder: [...state.selectionsOrder, action.selection.id].sort(
+          byStart(selections)
+        ),
       }
     }
 
@@ -90,16 +89,20 @@ export default function waveform(state = initialState, action) {
       const { ids } = action
       const [finalId, ...idsToBeDiscarded] = ids
       const { selections, selectionsOrder } = state
-      const newSelectionsOrder = selectionsOrder.filter(id => !idsToBeDiscarded.includes(id))
+      const newSelectionsOrder = selectionsOrder.filter(
+        id => !idsToBeDiscarded.includes(id)
+      )
       const newSelections = newSelectionsOrder.reduce((all, id) => {
-          all[id] = selections[id]
+        all[id] = selections[id]
         return all
       }, {})
-      const sortedSelectionsToMerge = ids.sort(byStart(selections)).map(id => selections[id])
+      const sortedSelectionsToMerge = ids
+        .sort(byStart(selections))
+        .map(id => selections[id])
       newSelections[finalId] = {
         ...selections[finalId],
         start: sortedSelectionsToMerge[0].start,
-        end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end
+        end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end,
       }
       return {
         ...state,
@@ -110,14 +113,19 @@ export default function waveform(state = initialState, action) {
 
     case 'DELETE_CARD': {
       const { id } = action
-      const { selections: oldSelections, selectionsOrder, highlightedSelectionId } = state
+      const {
+        selections: oldSelections,
+        selectionsOrder,
+        highlightedSelectionId,
+      } = state
       const selections = { ...oldSelections }
       delete selections[id]
       return {
         ...state,
-        highlightedSelectionId: highlightedSelectionId === id ? null : highlightedSelectionId,
+        highlightedSelectionId:
+          highlightedSelectionId === id ? null : highlightedSelectionId,
         selections,
-        selectionsOrder: selectionsOrder.filter(x => x !== id)
+        selectionsOrder: selectionsOrder.filter(x => x !== id),
       }
     }
 

@@ -1,4 +1,4 @@
-export const chooseAudioFiles = (filePaths) => ({
+export const chooseAudioFiles = filePaths => ({
   type: 'CHOOSE_AUDIO_FILES',
   filePaths,
 })
@@ -17,7 +17,7 @@ export const loadAudio = (file, audioElement, svgElement) => ({
   svgElement,
 })
 
-export const setCurrentFile = (index) => ({
+export const setCurrentFile = index => ({
   type: 'SET_CURRENT_FILE',
   index,
 })
