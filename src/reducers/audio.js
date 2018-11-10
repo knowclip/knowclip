@@ -1,7 +1,7 @@
 const initialState = {
   loop: true,
   currentFileIndex: 0,
-  filenames: [],
+  filePaths: [],
 }
 
 export default function audio(state = initialState, action) {
@@ -12,12 +12,12 @@ export default function audio(state = initialState, action) {
         loop: !state.loop,
       }
 
-    case 'INITIALIZE_FLASHCARDS': {
-      const { flashcards, filenames } = action
+    case 'CHOOSE_AUDIO_FILES': {
+      const { filePaths } = action
 
       return {
         ...state,
-        filenames,
+        filePaths,
         currentFileIndex: 0,
       }
     }

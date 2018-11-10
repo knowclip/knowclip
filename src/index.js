@@ -5,22 +5,23 @@ import { Provider } from 'react-redux'
 import App from './App'
 import getStore from './redux'
 // import epic from './epics'
-import './index.css';
-import registerServiceWorker from './registerServiceWorker';
-import { AppContainer } from 'react-hot-loader';
+import './index.css'
+import registerServiceWorker from './registerServiceWorker'
+import { AppContainer } from 'react-hot-loader'
 
 const store = getStore()
 
 registerServiceWorker()
 
-const render = Component => ReactDOM.render(
-  <AppContainer>
-    <Provider store={store}>
-      <Component />
-    </Provider>
-  </AppContainer>,
-  document.getElementById('root')
-)
+const render = Component =>
+  ReactDOM.render(
+    <AppContainer>
+      <Provider store={store}>
+        <Component />
+      </Provider>
+    </AppContainer>,
+    document.getElementById('root')
+  )
 
 render(App)
 

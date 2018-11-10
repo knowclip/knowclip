@@ -1,5 +1,5 @@
 // peak count
-const SAMPLE_RATE = 100
+// const SAMPLE_RATE = 1000
 const SAMPLE_STEP = 1
 export function getPeaks(buffer, stepsPerSecond) {
   const SAMPLE_RATE = stepsPerSecond * buffer.duration
@@ -17,7 +17,11 @@ export function getPeaks(buffer, stepsPerSecond) {
   console.log('SAMPLE_STEP')
   console.log(SAMPLE_STEP)
 
-  for (let channelNumber = 0; channelNumber < numberOfChannels; channelNumber++) {
+  for (
+    let channelNumber = 0;
+    channelNumber < numberOfChannels;
+    channelNumber++
+  ) {
     const channelData = buffer.getChannelData(channelNumber)
     const totalPeaks = buffer.duration * stepsPerSecond
 
@@ -29,10 +33,18 @@ export function getPeaks(buffer, stepsPerSecond) {
       let min = channelData[0]
       let max = channelData[0]
 
-      for (let sampleIndex = start; sampleIndex < end; sampleIndex += SAMPLE_STEP) {
-        const value = channelData[sampleIndex];
-        if (value > max) { max = value }
-        if (value < min) { min = value }
+      for (
+        let sampleIndex = start;
+        sampleIndex < end;
+        sampleIndex += SAMPLE_STEP
+      ) {
+        const value = channelData[sampleIndex]
+        if (value > max) {
+          max = value
+        }
+        if (value < min) {
+          min = value
+        }
       }
 
       // if (channelNumber === 0) {
@@ -52,28 +64,42 @@ export function getPeaks(buffer, stepsPerSecond) {
 
 function createAudioContext() {
   if (!window.audioContextInstance) {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext
+    window.AudioContext = window.AudioContext || window.webkitAudioContext
 
-      if (window.AudioContext) {
-        window.audioContextInstance = new AudioContext()
-      } else {
-        alert('Web Audio API is not supported in this browser')
-      }
+    if (window.AudioContext) {
+      window.audioContextInstance = new AudioContext()
+    } else {
+      alert('Web Audio API is not supported in this browser')
     }
+  }
 
-    return window.audioContextInstance
+  return window.audioContextInstance
+}
+
+function toArrayBuffer(buf) {
+  var ab = new ArrayBuffer(buf.length)
+  var view = new Uint8Array(ab)
+  for (var i = 0; i < buf.length; ++i) {
+    view[i] = buf[i]
+  }
+  return ab
 }
 
 export default function decodeAudioData(file) {
   return new Promise((resolve, rej) => {
     const context = createAudioContext()
-    const fileReader = new FileReader() // do we need two filereaders?
-    fileReader.onload = (e) => {
-      const audioDataArrayBuffer = e.target.result // this.result?
-      context.decodeAudioData(audioDataArrayBuffer, function(buffer) {
-        resolve({ buffer })
-      })
-    }
-    fileReader.readAsArrayBuffer(file)
+    // const fileReader = new FileReader() // do we need two filereaders?
+    // fileReader.onload = (e) => {
+    //   const audioDataArrayBuffer = e.target.result // this.result?
+    //   context.decodeAudioData(audioDataArrayBuffer, function(buffer) {
+    //     resolve({ buffer })
+    //   })
+    // }
+    // fileReader.readAsArrayBuffer(file)
+
+    const arrayBuffer = toArrayBuffer(file)
+    context.decodeAudioData(arrayBuffer, function(buffer) {
+      resolve({ buffer })
+    })
   })
 }

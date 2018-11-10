@@ -7,17 +7,17 @@ const exportCsv = (files, flashcards) => {
     .map(({ en, de }, i) => [de, en, `[sound:${files[i].name}]`])
   // TODO: alert if no usable
   let csv = unparse(usableFlashcards)
-  const filename = 'export.csv';
+  const filename = 'export.csv'
   console.log(csv)
   if (!csv.match(/^data:text\/csv/i)) {
-      csv = 'data:text/csv;charset=utf-8,' + csv;
+    csv = 'data:text/csv;charset=utf-8,' + csv
   }
-  const data = encodeURI(csv);
+  const data = encodeURI(csv)
 
-  const link = document.createElement('a');
-  link.setAttribute('href', data);
-  link.setAttribute('download', filename);
-  link.click();
+  const link = document.createElement('a')
+  link.setAttribute('href', data)
+  link.setAttribute('download', filename)
+  link.click()
 }
 
 export default exportCsv

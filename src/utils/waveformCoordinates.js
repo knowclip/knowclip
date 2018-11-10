@@ -6,6 +6,6 @@ export const toWaveformCoordinates = (mouseEvent, svgElement, xMin = 0) => {
   const { left, top } = svgElement.getBoundingClientRect()
   return {
     x: clientX - left + xMin,
-    y: clientY - top
+    y: clientY - top,
   }
 }

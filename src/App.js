@@ -1,53 +1,135 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { TextField, Button, Checkbox, FormControlLabel } from '@material-ui/core'
+import {
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+} from '@material-ui/core'
 import ShowAll from './components/ShowAll'
 import Waveform from './components/Waveform'
-import logo from './logo.svg';
+import logo from './logo.svg'
 import * as r from './redux'
-import './App.css';
+import './App.css'
+import electron from 'electron'
+import { promisify } from 'util'
+import fs from 'fs'
+import ffmpeg from './utils/ffmpeg'
+import tempy from 'tempy'
+
+const { remote } = electron
+const { dialog } = remote
+const readFile = promisify(fs.readFile)
+
+const tmpFilePaths = {}
+const getTmpFilePath = path => {
+  const tmpPath = (tmpFilePaths[path] = tmpFilePaths[path] || tempy.file())
+  return tmpPath
+}
+
+const getConstantBitrateMp3 = path => {
+  // should check if mp3
+  // and if possible, constant vs. variable bitrate
+  return new Promise((res, rej) => {
+    const tmpPath = getTmpFilePath(path) + '.mp3'
+    console.log(tmpPath)
+
+    // I guess by default it does CBR
+    // though maybe we should check that
+    // bitrate and buffersize defaults are ok.
+    //   .audioBitrate('64k')
+    //   .outputOptions('-bufsize 192k')
+    ffmpeg(path)
+      .on('end', () => res(tmpPath))
+      .on('error', rej)
+      .output(tmpPath)
+      .run()
+  })
+}
+
+const isNotMac = process.platform !== 'darwin'
 
 const AudioFilesMenu = ({
-  onClickPrevious, onClickNext, currentFilename, isPrevButtonEnabled, isNextButtonEnabled,
-}) =>
+  onClickPrevious,
+  onClickNext,
+  currentFilename,
+  isPrevButtonEnabled,
+  isNextButtonEnabled,
+  chooseAudioFiles,
+}) => (
   <p className="audioFilesMenu">
-    <Button onClick={onClickPrevious} disabled={isPrevButtonEnabled}>Previous</Button>
-    <h2 className="audioFileName">
-      {currentFilename}
-    </h2>
-    <Button onClick={onClickNext} disabled={isNextButtonEnabled}>Next</Button>
+    <Button onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
+      Previous
+    </Button>
+    {currentFilename ? (
+      <h2 className="audioFileName">{currentFilename}</h2>
+    ) : (
+      <Button onClick={chooseAudioFiles}>Choose audio files</Button>
+    )}
+    <Button onClick={onClickNext} disabled={!isNextButtonEnabled}>
+      Next
+    </Button>
   </p>
+)
 
 class App extends Component {
   state = {
-    files: [],
+    filePaths: [],
     modalIsOpen: false,
   }
 
   loadAudio = (file, audioElement, svgElement) =>
     this.props.loadAudio(file, this.audio, this.svg)
 
-  setFiles = (e) => {
-    const files = [...e.target.files]
-    this.setState({ files }, () => {
-      this.germanInput.focus()
-      this.loadAudio(files[0])
-    })
-    this.props.initializeFlashcards(files)
+  // these two methods are for browser
+  // setFiles = (e) => {
+  //   const files = [...e.target.files]
+  //   this.setState({ files }, () => {
+  //     // now, this line
+  //     // should really happen after a clip is selected.
+  //     // this.germanInput.focus()
+  //     this.loadAudio(files[0])
+  //   })
+  //   this.props.chooseAudioFiles(files)
+  // }
+  //
+  // triggerFileInputClick = () => {
+  //   this.fileInput.click()
+  // }
+
+  chooseAudioFiles = () => {
+    dialog.showOpenDialog(
+      { properties: ['openFile', 'multiSelections'] },
+      filePaths => {
+        if (!filePaths) return
+        this.setState({ filePaths }, async () => {
+          // now, this line
+          // should really happen after a clip is selected.
+          // this.germanInput.focus()
+
+          const tmpFilePath = await getConstantBitrateMp3(filePaths[0])
+          const file = await readFile(tmpFilePath)
+
+          this.loadAudio(file)
+
+          // this.loadAudio(await readFile(filePaths[0]))
+
+          // does chooseAudioFiles really need to happen here?
+          this.props.chooseAudioFiles(filePaths)
+        })
+      }
+    )
   }
 
-  triggerFileInputClick = () => {
-    this.fileInput.click()
-  }
+  fileInputRef = el => (this.fileInput = el)
+  audioRef = el => (this.audio = el)
+  germanInputRef = el => (this.germanInput = el)
+  svgRef = el => (this.svg = el)
 
-  fileInputRef = (el) => this.fileInput = el
-  audioRef = (el) => this.audio = el
-  germanInputRef = (el) => this.germanInput = el
-  svgRef = (el) => this.svg = el
-
-  goToFile = (index) => {
+  goToFile = async index => {
     this.props.setCurrentFile(index)
-    this.loadAudio(this.state.files[index])
+    const file = await readFile(this.state.filePaths[index])
+    this.loadAudio(file)
   }
   prevFile = () => {
     const lower = this.props.currentFileIndex - 1
@@ -58,60 +140,68 @@ class App extends Component {
     const lastIndex = this.props.filenames.length - 1
     this.goToFile(higher <= lastIndex ? higher : lastIndex)
   }
-  handleFlashcardSubmit = (e) => {
+  handleFlashcardSubmit = e => {
     e.preventDefault()
     this.nextFile()
     this.germanInput.focus()
   }
 
   setFlashcardText = (key, text) => {
-    const newFlashcard = {
-      ...this.props.currentFlashcard,
-      [key]: text,
-    }
     this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
   }
 
-  setGerman = (e) => this.setFlashcardText('de', e.target.value)
-  setEnglish = (e) => this.setFlashcardText('en', e.target.value)
+  setGerman = e => this.setFlashcardText('de', e.target.value)
+  setEnglish = e => this.setFlashcardText('en', e.target.value)
 
-  getCurrentFile = () => this.props.getCurrentFile(this.state.files)
+  deleteCard = () => {
+    const { deleteCard, highlightedWaveformSelectionId } = this.props
+    if (highlightedWaveformSelectionId) {
+      deleteCard(highlightedWaveformSelectionId)
+    }
+  }
 
   openModal = () => this.setState({ modalIsOpen: true })
   closeModal = () => this.setState({ modalIsOpen: false })
 
-  handleAudioEnded = (e) => {
+  handleAudioEnded = e => {
     this.nextFile()
   }
   toggleLoop = () => this.props.toggleLoop()
 
   render() {
     const {
-      areFilesLoaded, waveform, loop,
-      isPrevButtonEnabled, isNextButtonEnabled,
-      currentFlashcard, currentFileIndex, flashcards
+      loop,
+      isPrevButtonEnabled,
+      isNextButtonEnabled,
+      currentFlashcard,
+      currentFileIndex,
+      flashcards,
+      currentFileName,
+      makeClips,
+      highlightSelection,
     } = this.props
-    const currentFile = this.getCurrentFile()
 
-    const form = areFilesLoaded
-      ? <section onSubmit={this.handleFlashcardSubmit}>
-        <Waveform svgRef={this.svgRef} />
+    // for reference during transition to clip-based flashcards
+    const form = Boolean(currentFlashcard) ? (
+      <section onSubmit={this.handleFlashcardSubmit}>
         <form className="form">
-          <audio onEnded={this.handleAudioEnded} loop={loop} ref={this.audioRef} controls className="audioPlayer" autoplay></audio>
           <FormControlLabel
             label="Loop"
             control={
-              <Checkbox checked={loop} value={loop} onChange={this.toggleLoop} />
+              <Checkbox
+                checked={loop}
+                value={loop}
+                onChange={this.toggleLoop}
+              />
             }
           />
-          <AudioFilesMenu
-            onClickPrevious={this.prevFile}
-            onClickNext={this.nextFile}
-            currentFilename={currentFile.name}
-            isPrevButtonEnabled={isPrevButtonEnabled}
-            isNextButtonEnabled={isNextButtonEnabled}
-          />
           <div className="formBody">
+            <p>
+              {currentFlashcard.time.from}-{currentFlashcard.time.until}
+            </p>
+            <Button type="button" onClick={this.deleteCard}>
+              Delete card
+            </Button>
             <TextField
               inputRef={this.germanInputRef}
               onChange={this.setGerman}
@@ -129,61 +219,101 @@ class App extends Component {
               label="English"
               inputProps={{ lang: 'en' }}
             />
-            <Button type="submit" fullWidth onClick={this.submitFlashcardForm} disabled={isNextButtonEnabled}>
+            <Button
+              type="submit"
+              fullWidth
+              onClick={this.submitFlashcardForm}
+              disabled={isNextButtonEnabled}
+            >
               Continue
             </Button>
-            <Button fullWidth onClick={this.openModal}>Review &amp; export</Button>
+            <Button fullWidth onClick={this.openModal}>
+              Review &amp; export
+            </Button>
           </div>
         </form>
       </section>
-      : <p>
-        Select audio files from your <a href="https://apps.ankiweb.net/docs/manual.html#files">Anki collection.media folder</a> to start making flashcards.
+    ) : (
+      <p>
+        Select audio files from your{' '}
+        <a href="https://apps.ankiweb.net/docs/manual.html#files">
+          Anki collection.media folder
+        </a>{' '}
+        and click + drag to make audio clips and start making flashcards.
       </p>
+    )
 
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Audio Flashcard Assistant</h1>
+          {isNotMac && 'Only Mac OS is currently supported.'}
         </header>
         <p>
-          <Button label="files" onClick={this.triggerFileInputClick}>
+          {/* <Button label="files" onClick={this.triggerFileInputClick}>
             <input className="fileInput" multiple ref={this.fileInputRef} type="file" onChange={this.setFiles} />
-          </Button>
+            Open file
+          </Button> */}
         </p>
+        <AudioFilesMenu
+          onClickPrevious={this.prevFile}
+          onClickNext={this.nextFile}
+          currentFilename={currentFileName}
+          isPrevButtonEnabled={isPrevButtonEnabled}
+          isNextButtonEnabled={isNextButtonEnabled}
+          chooseAudioFiles={this.chooseAudioFiles}
+        />
+        <Waveform svgRef={this.svgRef} />
+        <audio
+          onEnded={this.handleAudioEnded}
+          loop={loop}
+          ref={this.audioRef}
+          controls
+          className="audioPlayer"
+          autoPlay
+        />
         {form}
         <ShowAll
           open={this.state.modalIsOpen}
           handleClose={this.closeModal}
           flashcards={flashcards}
-          files={this.state.files}
+          files={null /* this.state.files */}
           currentFileIndex={currentFileIndex}
-          goToFile={this.goToFile}
+          highlightSelection={highlightSelection}
+          makeClips={makeClips}
         />
       </div>
-    );
+    )
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   filenames: r.getFilenames(state),
-  flashcards: r.getFlashcards(state),
-  getCurrentFile: r.makeGetCurrentFile(state),
+  flashcards: r.getFlashcardsByTime(state),
   currentFileIndex: r.getCurrentFileIndex(state),
+  currentFileName: r.getCurrentFileName(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   currentFlashcardId: r.getCurrentFlashcardId(state),
-  areFilesLoaded: r.areFilesLoaded(state),
   isNextButtonEnabled: r.isNextButtonEnabled(state),
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
+  highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
+  clipsTimes: r.getClipsTimes(state),
 })
 
 const mapDispatchToProps = {
-  initializeFlashcards: r.initializeFlashcards,
+  chooseAudioFiles: r.chooseAudioFiles,
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
   loadAudio: r.loadAudio,
+  deleteCard: r.deleteCard,
+  makeClips: r.makeClips,
+  highlightSelection: r.highlightSelection,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)

@@ -1,8 +1,6 @@
-import * as s from '../selectors'
-
 const initialState = {
-  stepsPerSecond: 25,
-  stepLength: 2,
+  stepsPerSecond: 25 * 4,
+  stepLength: 2 / 4,
   path: null,
   cursor: { x: 0, y: 0 },
   viewBox: { xMin: 0 },
@@ -11,10 +9,10 @@ const initialState = {
   pendingSelection: null,
   pendingStretch: null,
   peaks: [],
-  highlightedSelection: null,
+  highlightedSelectionId: null,
 }
 
-const byStart = (selections) => (aId, bId) => {
+const byStart = selections => (aId, bId) => {
   const { start: a } = selections[aId]
   const { start: b } = selections[bId]
   if (a < b) return -1
@@ -50,10 +48,9 @@ export default function waveform(state = initialState, action) {
         ...state,
         pendingSelection: null,
         selections,
-        selectionsOrder: [
-          ...state.selectionsOrder,
-          action.selection.id,
-        ].sort(byStart(selections)),
+        selectionsOrder: [...state.selectionsOrder, action.selection.id].sort(
+          byStart(selections)
+        ),
       }
     }
 
@@ -66,7 +63,7 @@ export default function waveform(state = initialState, action) {
     case 'HIGHLIGHT_WAVEFORM_SELECTION':
       return {
         ...state,
-        highlightedSelection: action.id,
+        highlightedSelectionId: action.id,
       }
 
     case 'EDIT_WAVEFORM_SELECTION':
@@ -92,21 +89,43 @@ export default function waveform(state = initialState, action) {
       const { ids } = action
       const [finalId, ...idsToBeDiscarded] = ids
       const { selections, selectionsOrder } = state
-      const newSelectionsOrder = selectionsOrder.filter(id => !idsToBeDiscarded.includes(id))
+      const newSelectionsOrder = selectionsOrder.filter(
+        id => !idsToBeDiscarded.includes(id)
+      )
       const newSelections = newSelectionsOrder.reduce((all, id) => {
-          all[id] = selections[id]
+        all[id] = selections[id]
         return all
       }, {})
-      const sortedSelectionsToMerge = ids.sort(byStart(selections)).map(id => selections[id])
+      const sortedSelectionsToMerge = ids
+        .sort(byStart(selections))
+        .map(id => selections[id])
       newSelections[finalId] = {
         ...selections[finalId],
         start: sortedSelectionsToMerge[0].start,
-        end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end
+        end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end,
       }
       return {
         ...state,
         selectionsOrder: newSelectionsOrder,
         selections: newSelections,
+      }
+    }
+
+    case 'DELETE_CARD': {
+      const { id } = action
+      const {
+        selections: oldSelections,
+        selectionsOrder,
+        highlightedSelectionId,
+      } = state
+      const selections = { ...oldSelections }
+      delete selections[id]
+      return {
+        ...state,
+        highlightedSelectionId:
+          highlightedSelectionId === id ? null : highlightedSelectionId,
+        selections,
+        selectionsOrder: selectionsOrder.filter(x => x !== id),
       }
     }
 

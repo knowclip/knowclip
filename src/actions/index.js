@@ -1,9 +1,6 @@
-import { getLocalFlashcards } from '../utils/localFlashcards'
-
-export const initializeFlashcards = (files) => ({
-  type: 'INITIALIZE_FLASHCARDS',
-  flashcards: getLocalFlashcards(files),
-  filenames: files.map(f => f.name),
+export const chooseAudioFiles = filePaths => ({
+  type: 'CHOOSE_AUDIO_FILES',
+  filePaths,
 })
 
 export const setFlashcardField = (id, key, value) => ({
@@ -20,7 +17,7 @@ export const loadAudio = (file, audioElement, svgElement) => ({
   svgElement,
 })
 
-export const setCurrentFile = (index) => ({
+export const setCurrentFile = index => ({
   type: 'SET_CURRENT_FILE',
   index,
 })
@@ -33,6 +30,15 @@ export const loadAudioSuccess = ({ filename, bufferLength }) => ({
   type: 'LOAD_AUDIO_SUCCESS',
   filename,
   bufferLength,
+})
+
+export const deleteCard = id => ({
+  type: 'DELETE_CARD',
+  id,
+})
+
+export const makeClips = () => ({
+  type: 'MAKE_CLIPS',
 })
 
 export * from './waveform'
