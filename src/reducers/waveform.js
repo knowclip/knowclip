@@ -8,7 +8,7 @@ const initialState: WaveformState = {
   peaks: [],
 }
 
-const waveform : Reducer<WaveformState> = (state = initialState, action) => {
+const waveform: Reducer<WaveformState> = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_WAVEFORM_PEAKS':
       return {

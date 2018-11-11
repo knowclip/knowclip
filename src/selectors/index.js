@@ -14,12 +14,15 @@ export const getSecondsAtX = (state: AppState, x: number): number => {
 export const getMillisecondsAtX = (state: AppState, x: number): number => {
   return 1000 * getSecondsAtX(state, x)
 }
-export const getXAtMilliseconds = (state: AppState, milliseconds: number): number => {
+export const getXAtMilliseconds = (
+  state: AppState,
+  milliseconds: number
+): number => {
   const { stepsPerSecond, stepLength } = state.waveform
   return (milliseconds / 1000) * (stepsPerSecond * stepLength)
 }
 
-export const getCurrentFlashcardId = (state: AppState) : ?FlashcardId =>
+export const getCurrentFlashcardId = (state: AppState): ?FlashcardId =>
   state.clips.highlightedSelectionId
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
   state.clips.selectionsOrder.map(id => state.flashcards[id])
@@ -46,14 +49,16 @@ export const getCurrentFlashcard = (state: AppState): ?Flashcard => {
 
 export const getFilePaths = (state: AppState) => state.audio.filePaths
 export const isLoopOn = (state: AppState) => state.audio.loop
-export const areFilesLoaded = (state: AppState) => Boolean(state.audio.filePaths.length)
+export const areFilesLoaded = (state: AppState) =>
+  Boolean(state.audio.filePaths.length)
 export const isNextButtonEnabled = (state: AppState) =>
   Boolean(state.audio.filePaths.length > 1) &&
   state.audio.currentFileIndex !== state.audio.filePaths.length - 1
 export const isPrevButtonEnabled = (state: AppState) =>
   Boolean(state.audio.filePaths.length > 1) &&
   state.audio.currentFileIndex !== 0
-export const getCurrentFileIndex = (state: AppState) => state.audio.currentFileIndex
+export const getCurrentFileIndex = (state: AppState) =>
+  state.audio.currentFileIndex
 export const getCurrentFilePath = ({ audio }: AppState) =>
   audio.filePaths[audio.currentFileIndex]
 export const getCurrentFileName = (state: AppState) => {
@@ -69,17 +74,21 @@ export const makeGetCurrentFile = createSelector(
 export const getWaveformSelection = (state: AppState, id: ClipId): ?Clip =>
   state.clips && state.clips.selections[id]
 export const getWaveformSelections = (state: AppState): Array<Clip> =>
-  state.clips.selectionsOrder.map((id: ClipId): Clip => {
-    const clip = getWaveformSelection(state, id)
-    if (!clip) throw new Error('Impossible')
-    return clip
-  })
+  state.clips.selectionsOrder.map(
+    (id: ClipId): Clip => {
+      const clip = getWaveformSelection(state, id)
+      if (!clip) throw new Error('Impossible')
+      return clip
+    }
+  )
 type ExpandedPendingStretch = {
   id: ClipId,
   start: WaveformX,
   end: WaveformX,
 }
-export const getWaveformPendingStretch = (state: AppState): ?ExpandedPendingStretch => {
+export const getWaveformPendingStretch = (
+  state: AppState
+): ?ExpandedPendingStretch => {
   if (!state.clips) return
   const { pendingStretch } = state.clips
   if (!pendingStretch) return
@@ -125,7 +134,7 @@ export const getNextSelectionId = (state: AppState, id: ClipId) => {
 export const getSelectionEdgeAt = (state: AppState, x: WaveformX) => {
   const selectionIdAtX = getSelectionIdAt(state, x)
   if (!selectionIdAtX) return null
-  const selection =  getWaveformSelection(state, selectionIdAtX)
+  const selection = getWaveformSelection(state, selectionIdAtX)
   if (!selection) throw new Error('Impossible')
   const { start, end } = selection
   if (x >= start && x <= start + SELECTION_BORDER_WIDTH)
@@ -134,7 +143,8 @@ export const getSelectionEdgeAt = (state: AppState, x: WaveformX) => {
     return { key: 'end', id: selectionIdAtX }
 }
 
-export const getWaveformViewBoxXMin = (state: AppState) => state.waveform.viewBox.xMin
+export const getWaveformViewBoxXMin = (state: AppState) =>
+  state.waveform.viewBox.xMin
 
 export const getHighlightedWaveformSelectionId = (state: AppState) =>
   state.clips.highlightedSelectionId

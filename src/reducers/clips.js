@@ -1,6 +1,6 @@
 // @flow
 
-const initialState : ClipsState = {
+const initialState: ClipsState = {
   selectionsOrder: [],
   selections: {},
   pendingSelection: null,
@@ -16,7 +16,10 @@ const byStart = selections => (aId, bId) => {
   return 0
 }
 
-export default function clips(state : ClipsState = initialState, action: Object): ClipsState {
+export default function clips(
+  state: ClipsState = initialState,
+  action: Object
+): ClipsState {
   switch (action.type) {
     case 'ADD_WAVEFORM_SELECTION': {
       const selections = {
@@ -68,11 +71,11 @@ export default function clips(state : ClipsState = initialState, action: Object)
       const { ids } = action
       const [finalId, ...idsToBeDiscarded] = ids
       const { selections, selectionsOrder } = state
-      const newSelectionsOrder : Array<ClipId> = selectionsOrder.filter(
+      const newSelectionsOrder: Array<ClipId> = selectionsOrder.filter(
         id => !idsToBeDiscarded.includes(id)
       )
-      const newSelections : { [ClipId]: Clip } = {}
-      newSelectionsOrder.forEach((id) => {
+      const newSelections: { [ClipId]: Clip } = {}
+      newSelectionsOrder.forEach(id => {
         const selection = selections[id]
         if (!selection) throw new Error('impossible')
         newSelections[id] = selection
