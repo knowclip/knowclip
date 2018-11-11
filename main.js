@@ -1,11 +1,8 @@
 const electron = require('electron')
 // Module to control application life.
-const app = electron.app
+const { app, ipcMain } = electron
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-
-const path = require('path')
-const url = require('url')
 
 const installDevtools = require('./devtools')
 
@@ -24,6 +21,13 @@ async function createWindow() {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
+
+  mainWindow.on('close', e => {
+    if (mainWindow) {
+      e.preventDefault()
+      mainWindow.webContents.send('app-close')
+    }
+  })
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
@@ -58,3 +62,8 @@ app.on('activate', function() {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.on('closed', function() {
+  mainWindow = null
+  app.quit()
+})

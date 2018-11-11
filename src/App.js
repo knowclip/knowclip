@@ -1,51 +1,22 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import {
   TextField,
   Button,
+  IconButton,
   Checkbox,
   FormControlLabel,
 } from '@material-ui/core'
+import { Close as CloseIcon } from '@material-ui/icons'
 import ShowAll from './components/ShowAll'
 import Waveform from './components/Waveform'
 import logo from './logo.svg'
 import * as r from './redux'
 import './App.css'
 import electron from 'electron'
-import { promisify } from 'util'
-import fs from 'fs'
-import ffmpeg from './utils/ffmpeg'
-import tempy from 'tempy'
 
 const { remote } = electron
 const { dialog } = remote
-const readFile = promisify(fs.readFile)
-
-const tmpFilePaths = {}
-const getTmpFilePath = path => {
-  const tmpPath = (tmpFilePaths[path] = tmpFilePaths[path] || tempy.file())
-  return tmpPath
-}
-
-const getConstantBitrateMp3 = path => {
-  // should check if mp3
-  // and if possible, constant vs. variable bitrate
-  return new Promise((res, rej) => {
-    const tmpPath = getTmpFilePath(path) + '.mp3'
-    console.log(tmpPath)
-
-    // I guess by default it does CBR
-    // though maybe we should check that
-    // bitrate and buffersize defaults are ok.
-    //   .audioBitrate('64k')
-    //   .outputOptions('-bufsize 192k')
-    ffmpeg(path)
-      .on('end', () => res(tmpPath))
-      .on('error', rej)
-      .output(tmpPath)
-      .run()
-  })
-}
 
 const isNotMac = process.platform !== 'darwin'
 
@@ -57,19 +28,24 @@ const AudioFilesMenu = ({
   isNextButtonEnabled,
   chooseAudioFiles,
 }) => (
-  <p className="audioFilesMenu">
-    <Button onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-      Previous
-    </Button>
-    {currentFilename ? (
-      <h2 className="audioFileName">{currentFilename}</h2>
-    ) : (
-      <Button onClick={chooseAudioFiles}>Choose audio files</Button>
-    )}
-    <Button onClick={onClickNext} disabled={!isNextButtonEnabled}>
-      Next
-    </Button>
-  </p>
+  <Fragment>
+    <p className="audioFilesMenu">
+      <Button onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
+        Previous
+      </Button>
+      {currentFilename ? (
+        <h2 className="audioFileName">
+          {currentFilename}
+          <IconButton onClick={chooseAudioFiles}><CloseIcon /></IconButton>
+        </h2>
+      ) : (
+        <Button onClick={chooseAudioFiles}>Choose audio files </Button>
+      )}
+      <Button onClick={onClickNext} disabled={!isNextButtonEnabled}>
+        Next
+      </Button>
+    </p>
+  </Fragment>
 )
 
 class App extends Component {
@@ -77,25 +53,6 @@ class App extends Component {
     filePaths: [],
     modalIsOpen: false,
   }
-
-  loadAudio = (file, audioElement, svgElement) =>
-    this.props.loadAudio(file, this.audio, this.svg)
-
-  // these two methods are for browser
-  // setFiles = (e) => {
-  //   const files = [...e.target.files]
-  //   this.setState({ files }, () => {
-  //     // now, this line
-  //     // should really happen after a clip is selected.
-  //     // this.germanInput.focus()
-  //     this.loadAudio(files[0])
-  //   })
-  //   this.props.chooseAudioFiles(files)
-  // }
-  //
-  // triggerFileInputClick = () => {
-  //   this.fileInput.click()
-  // }
 
   chooseAudioFiles = () => {
     dialog.showOpenDialog(
@@ -107,14 +64,6 @@ class App extends Component {
           // should really happen after a clip is selected.
           // this.germanInput.focus()
 
-          const tmpFilePath = await getConstantBitrateMp3(filePaths[0])
-          const file = await readFile(tmpFilePath)
-
-          this.loadAudio(file)
-
-          // this.loadAudio(await readFile(filePaths[0]))
-
-          // does chooseAudioFiles really need to happen here?
           this.props.chooseAudioFiles(filePaths)
         })
       }
@@ -126,18 +75,14 @@ class App extends Component {
   germanInputRef = el => (this.germanInput = el)
   svgRef = el => (this.svg = el)
 
-  goToFile = async index => {
-    this.props.setCurrentFile(index)
-    const file = await readFile(this.state.filePaths[index])
-    this.loadAudio(file)
-  }
+  goToFile = index => this.props.setCurrentFile(index)
   prevFile = () => {
     const lower = this.props.currentFileIndex - 1
     this.goToFile(lower >= 0 ? lower : 0)
   }
   nextFile = () => {
     const higher = this.props.currentFileIndex + 1
-    const lastIndex = this.props.filenames.length - 1
+    const lastIndex = this.props.filePaths.length - 1
     this.goToFile(higher <= lastIndex ? higher : lastIndex)
   }
   handleFlashcardSubmit = e => {
@@ -250,12 +195,6 @@ class App extends Component {
           <h1 className="App-title">Audio Flashcard Assistant</h1>
           {isNotMac && 'Only Mac OS is currently supported.'}
         </header>
-        <p>
-          {/* <Button label="files" onClick={this.triggerFileInputClick}>
-            <input className="fileInput" multiple ref={this.fileInputRef} type="file" onChange={this.setFiles} />
-            Open file
-          </Button> */}
-        </p>
         <AudioFilesMenu
           onClickPrevious={this.prevFile}
           onClickNext={this.nextFile}
@@ -270,6 +209,7 @@ class App extends Component {
           loop={loop}
           ref={this.audioRef}
           controls
+          id="audioPlayer"
           className="audioPlayer"
           autoPlay
         />
@@ -289,7 +229,7 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
-  filenames: r.getFilenames(state),
+  filePaths: r.getFilePaths(state),
   flashcards: r.getFlashcardsByTime(state),
   currentFileIndex: r.getCurrentFileIndex(state),
   currentFileName: r.getCurrentFileName(state),
@@ -307,7 +247,6 @@ const mapDispatchToProps = {
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
-  loadAudio: r.loadAudio,
   deleteCard: r.deleteCard,
   makeClips: r.makeClips,
   highlightSelection: r.highlightSelection,

@@ -8,7 +8,7 @@ const exportCsv = (files, flashcards) => {
   // TODO: alert if no usable
   let csv = unparse(usableFlashcards)
   const filename = 'export.csv'
-  console.log(csv)
+
   if (!csv.match(/^data:text\/csv/i)) {
     csv = 'data:text/csv;charset=utf-8,' + csv
   }

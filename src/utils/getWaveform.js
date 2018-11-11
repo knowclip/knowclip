@@ -4,18 +4,12 @@ const SAMPLE_STEP = 1
 export function getPeaks(buffer, stepsPerSecond) {
   const SAMPLE_RATE = stepsPerSecond * buffer.duration
   // what unit is buffer.length?
+  // const sampleSize = buffer.length / SAMPLE_RATE
   const sampleSize = buffer.length / SAMPLE_RATE
   // const sampleStep = ~~(sampleSize / 10) || 1
   const { numberOfChannels } = buffer
   const mergedPeaks = []
-  console.log('buffer')
-  console.log(buffer)
-  console.log('numberOfChannels')
-  console.log(numberOfChannels)
-  console.log('sampleSize')
-  console.log(sampleSize)
-  console.log('SAMPLE_STEP')
-  console.log(SAMPLE_STEP)
+  console.log('buffer', buffer)
 
   for (
     let channelNumber = 0;
@@ -88,14 +82,6 @@ function toArrayBuffer(buf) {
 export default function decodeAudioData(file) {
   return new Promise((resolve, rej) => {
     const context = createAudioContext()
-    // const fileReader = new FileReader() // do we need two filereaders?
-    // fileReader.onload = (e) => {
-    //   const audioDataArrayBuffer = e.target.result // this.result?
-    //   context.decodeAudioData(audioDataArrayBuffer, function(buffer) {
-    //     resolve({ buffer })
-    //   })
-    // }
-    // fileReader.readAsArrayBuffer(file)
 
     const arrayBuffer = toArrayBuffer(file)
     context.decodeAudioData(arrayBuffer, function(buffer) {

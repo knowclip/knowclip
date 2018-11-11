@@ -41,12 +41,12 @@ export const getCurrentFlashcard = state =>
 // export const getGerman = (state) => getCurrentFlashcard(state).de
 // export const getEnglish = (state) => getCurrentFlashcard(state).en
 
-export const getFilenames = state => state.audio.filePaths
+export const getFilePaths = state => state.audio.filePaths
 export const isLoopOn = state => state.audio.loop
 export const areFilesLoaded = state => Boolean(state.audio.filePaths.length)
 export const isNextButtonEnabled = state =>
   Boolean(state.audio.filePaths.length > 1) &&
-  state.audio.currentFileIndex === state.audio.filePaths.length - 1
+  state.audio.currentFileIndex !== state.audio.filePaths.length - 1
 export const isPrevButtonEnabled = state =>
   Boolean(state.audio.filePaths.length > 1) &&
   state.audio.currentFileIndex !== 0

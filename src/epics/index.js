@@ -26,6 +26,8 @@ import dataurl from 'dataurl'
 import electron from 'electron'
 import { join, basename, extname } from 'path'
 import ffmpeg from '../utils/ffmpeg'
+import persistStateEpic from './persistState'
+import loadAudio from './loadAudio'
 
 const {
   remote: { dialog },
@@ -46,16 +48,6 @@ const clip = (path, startTime, endTime, outputFilename) => {
       .seekInput(toTimestamp(startTime))
       .inputOptions('-to ' + toTimestamp(endTime))
       .output(outputFilename)
-      .on('progress', function(progress) {
-        //  progress // {"frames":null,"currentFps":null,"currentKbps":256,"targetSize":204871,"timemark":"01:49:15.90"}
-        console.log(
-          'Processing: ' +
-            progress.timemark +
-            ' done ' +
-            progress.targetSize +
-            ' kilobytes'
-        )
-      })
       .on(
         'end',
         //listener must be a function, so to return the callback wrapping it inside a function
@@ -70,8 +62,6 @@ const clip = (path, startTime, endTime, outputFilename) => {
       .run()
   })
 }
-
-console.log('boop?', 'wat')
 
 const detectSilence = (
   path,
@@ -132,7 +122,6 @@ const makeClips = (action$, state$) =>
           const filenameWithoutExtension = basename(filePath, extension)
           const outputFilename = `${filenameWithoutExtension}__${startTime}-${endTime}${extension}`
           const outputFilePath = join(directory, outputFilename)
-          console.log('clippng!', filePath, outputFilePath)
           clip(filePath, startTime, endTime, outputFilePath)
         })
       })
@@ -323,6 +312,7 @@ const playSelectionsOnHighlightEpic = (action$, state$) =>
   )
 
 export default combineEpics(
+  loadAudio,
   getWaveformEpic,
   setLocalFlashcardEpic,
   setWaveformCursorEpic,
@@ -334,5 +324,6 @@ export default combineEpics(
   highlightSelectionsOnAddEpic,
   playSelectionsOnHighlightEpic,
   makeClips,
-  detectSilenceEpic
+  detectSilenceEpic,
+  persistStateEpic
 )

@@ -103,6 +103,7 @@ class Waveform extends Component {
     } = this.props
     return (
       <svg
+        id="waveform-svg"
         ref={svgRef}
         viewBox={getViewBox(viewBox.xMin)}
         preserveAspectRatio="xMinYMin slice"

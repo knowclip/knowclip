@@ -1,6 +1,6 @@
 const initialState = {
-  stepsPerSecond: 25 * 4,
-  stepLength: 2 / 4,
+  stepsPerSecond: 25,
+  stepLength: 2,
   path: null,
   cursor: { x: 0, y: 0 },
   viewBox: { xMin: 0 },
