@@ -19,7 +19,7 @@ import {
 } from '../utils/waveformCoordinates'
 
 const pendingSelectionIsBigEnough = state => {
-  const { pendingSelection } = state.waveform
+  const { pendingSelection } = state.clips
   if (!pendingSelection) return false
 
   const { start, end } = pendingSelection

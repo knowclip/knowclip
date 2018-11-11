@@ -36,7 +36,9 @@ const AudioFilesMenu = ({
       {currentFilename ? (
         <h2 className="audioFileName">
           {currentFilename}
-          <IconButton onClick={chooseAudioFiles}><CloseIcon /></IconButton>
+          <IconButton onClick={chooseAudioFiles}>
+            <CloseIcon />
+          </IconButton>
         </h2>
       ) : (
         <Button onClick={chooseAudioFiles}>Choose audio files </Button>

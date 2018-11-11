@@ -32,8 +32,12 @@
     "eject": "react-app-rewired eject",
     "electron": "ELECTRON_DEV=1 ELECTRON_START_URL=http://localhost:3000 electron .",
     "lint": "eslint src",
-    "format": "prettier --no-semi --single-quote --trailing-comma es5 \"{src,.}/**/*.js\" --write",
-    "pre-commit": "yarn format"
+    "format": "prettier --no-semi --single-quote --trailing-comma es5  \"{src,.}/**/*.js\" --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn format"
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -43,6 +47,7 @@
   ],
   "devDependencies": {
     "electron-devtools-installer": "^2.2.4",
+    "flow-bin": "^0.86.0",
     "husky": "^1.1.3",
     "prettier": "1.15.2"
   }

@@ -1,5 +1,4 @@
-import {  flatMap
-} from 'rxjs/operators'
+import { flatMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
@@ -10,8 +9,6 @@ import fs from 'fs'
 const readFile = promisify(fs.readFile)
 
 const tmpFilePaths = {}
-const getTmpFilePath = path => {
-}
 
 const getConstantBitrateMp3 = path => {
   // should check if mp3
@@ -21,7 +18,6 @@ const getConstantBitrateMp3 = path => {
     if (tmpPath) {
       return res(tmpPath)
     }
-
 
     tmpPath = tmpFilePaths[path] = tempy.file() + '.mp3'
 
@@ -38,7 +34,7 @@ const getConstantBitrateMp3 = path => {
   })
 }
 
-const loadAudio = async (filePath) => {
+const loadAudio = async filePath => {
   const tmpFilePath = await getConstantBitrateMp3(filePath)
   const audio = await readFile(tmpFilePath)
   const audioElement = document.getElementById('audioPlayer')
@@ -64,7 +60,4 @@ const setCurrentFileEpic = (action$, state$) =>
     })
   )
 
-export default combineEpics(
-  chooseAudioFilesEpic,
-  setCurrentFileEpic,
-)
+export default combineEpics(chooseAudioFilesEpic, setCurrentFileEpic)
