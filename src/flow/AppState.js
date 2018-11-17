@@ -5,4 +5,5 @@ declare type AppState = Exact<{
   clips: ClipsState,
   flashcards: FlashcardsState,
   audio: Object,
+  user: UserState,
 }>

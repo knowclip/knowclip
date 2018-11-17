@@ -1,12 +1,5 @@
 // @flow
-
-const initialState: ClipsState = {
-  selectionsOrder: [],
-  selections: {},
-  pendingSelection: null,
-  pendingStretch: null,
-  highlightedSelectionId: null,
-}
+const initialState: ClipsState = {}
 
 const byStart = selections => (aId, bId) => {
   const { start: a } = selections[aId]
@@ -16,100 +9,58 @@ const byStart = selections => (aId, bId) => {
   return 0
 }
 
-export default function clips(
-  state: ClipsState = initialState,
-  action: Object
-): ClipsState {
+const clips: Reducer<ClipsState> = (state = initialState, action) => {
   switch (action.type) {
-    case 'ADD_WAVEFORM_SELECTION': {
-      const selections = {
-        ...state.selections,
+    case 'ADD_WAVEFORM_SELECTION':
+      return {
+        ...state,
         [action.selection.id]: action.selection,
-      }
-      return {
-        ...state,
-        pendingSelection: null,
-        selections,
-        selectionsOrder: [...state.selectionsOrder, action.selection.id].sort(
-          byStart(selections)
-        ),
-      }
-    }
-
-    case 'SET_WAVEFORM_PENDING_SELECTION':
-      return {
-        ...state,
-        pendingSelection: action.selection,
-      }
-
-    case 'HIGHLIGHT_WAVEFORM_SELECTION':
-      return {
-        ...state,
-        highlightedSelectionId: action.id,
       }
 
     case 'EDIT_WAVEFORM_SELECTION':
       return {
         ...state,
-        selections: {
-          ...state.selections,
-          [action.id]: {
-            ...state.selections[action.id],
-            // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
-            ...action.override,
-          },
+        [action.id]: {
+          ...state[action.id],
+          // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
+          ...action.override,
         },
       }
 
-    case 'SET_WAVEFORM_PENDING_STRETCH':
-      return {
-        ...state,
-        pendingStretch: action.stretch,
-      }
 
     case 'MERGE_WAVEFORM_SELECTIONS': {
       const { ids } = action
       const [finalId, ...idsToBeDiscarded] = ids
-      const { selections, selectionsOrder } = state
+      const selectionsOrder : Array<ClipId> = (Object.values(state): any)
+        .sort((a: Clip, b: Clip) => a.start - b.start)
+        .map(s => s.id)
       const newSelectionsOrder: Array<ClipId> = selectionsOrder.filter(
         id => !idsToBeDiscarded.includes(id)
       )
       const newSelections: { [ClipId]: Clip } = {}
-      newSelectionsOrder.forEach(id => {
-        const selection = selections[id]
+      newSelectionsOrder.forEach((id) => {
+        const selection = state[id]
         if (!selection) throw new Error('impossible')
         newSelections[id] = selection
       })
       const sortedSelectionsToMerge = ids
-        .sort(byStart(selections))
-        .map(id => selections[id])
+        .sort(byStart(state))
+        .map(id => state[id])
       newSelections[finalId] = {
-        ...selections[finalId],
+        ...state[finalId],
         start: sortedSelectionsToMerge[0].start,
         end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end,
       }
-      return {
-        ...state,
-        selectionsOrder: newSelectionsOrder,
-        selections: newSelections,
-      }
+      return newSelections
     }
 
     case 'DELETE_CARD': {
       const { id } = action
-      const {
-        selections: oldSelections,
-        selectionsOrder,
-        highlightedSelectionId,
-      } = state
-      const selections = { ...oldSelections }
+      const selections = { ...state }
       delete selections[id]
       return {
         ...state,
-        highlightedSelectionId:
-          highlightedSelectionId === id ? null : highlightedSelectionId,
         selections,
-        selectionsOrder: selectionsOrder.filter(x => x !== id),
       }
     }
 
@@ -117,3 +68,5 @@ export default function clips(
       return state
   }
 }
+
+export default clips

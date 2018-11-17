@@ -30,7 +30,7 @@
     "start": "react-app-rewired start",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-app-rewired eject",
-    "electron": "ELECTRON_DEV=1 ELECTRON_START_URL=http://localhost:3000 electron .",
+    "electron": "electron .",
     "lint": "eslint src",
     "format": "prettier --no-semi --single-quote --trailing-comma es5  \"{src,.}/**/*.js\" --write"
   },

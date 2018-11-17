@@ -1,5 +1,4 @@
 // @flow
-
 import { createSelector } from 'reselect'
 import { basename } from 'path'
 
@@ -22,14 +21,20 @@ export const getXAtMilliseconds = (
   return (milliseconds / 1000) * (stepsPerSecond * stepLength)
 }
 
-export const getCurrentFlashcardId = (state: AppState): ?FlashcardId =>
-  state.clips.highlightedSelectionId
-export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
-  state.clips.selectionsOrder.map(id => state.flashcards[id])
-export const getFlashcard = (state: AppState, id: FlashcardId): ?Flashcard => {
+type FlashcardWithTime = {
+  id: FlashcardId,
+  de: string,
+  en: string,
+  time: {
+    from: number,
+    until: number,
+  },
+}
+
+export const getFlashcard = (state: AppState, id: FlashcardId): ?FlashcardWithTime => {
   const flashcard = state.flashcards[id]
   if (!flashcard) return null
-  const selection = state.clips.selections[id]
+  const selection = state.clips[id]
   return {
     ...flashcard,
     time: {
@@ -38,7 +43,7 @@ export const getFlashcard = (state: AppState, id: FlashcardId): ?Flashcard => {
     },
   }
 }
-export const getCurrentFlashcard = (state: AppState): ?Flashcard => {
+export const getCurrentFlashcard = (state: AppState): ?FlashcardWithTime => {
   const flashcardId = getCurrentFlashcardId(state)
   if (!flashcardId) return null
   return getFlashcard(state, flashcardId)
@@ -71,10 +76,26 @@ export const makeGetCurrentFile = createSelector(
 )
 
 // export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks)
+
+const byStart = (selections) => (aId, bId) => {
+  const { start: a } = selections[aId]
+  const { start: b } = selections[bId]
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
+export const getWaveformSelectionsOrder: (state: AppState) => Array<ClipId> = createSelector(
+  [(state) => state.clips],
+  (clips) => {
+    const clipsArray = (Object.values(clips): any)
+    return clipsArray.sort((a: Clip, b: Clip) => a.start - b.start).map((s: Clip) => s.id)
+  },
+)
+
 export const getWaveformSelection = (state: AppState, id: ClipId): ?Clip =>
-  state.clips && state.clips.selections[id]
+  state.clips && state.clips[id]
 export const getWaveformSelections = (state: AppState): Array<Clip> =>
-  state.clips.selectionsOrder.map(
+  getWaveformSelectionsOrder(state).map(
     (id: ClipId): Clip => {
       const clip = getWaveformSelection(state, id)
       if (!clip) throw new Error('Impossible')
@@ -90,7 +111,7 @@ export const getWaveformPendingStretch = (
   state: AppState
 ): ?ExpandedPendingStretch => {
   if (!state.clips) return
-  const { pendingStretch } = state.clips
+  const { pendingStretch } = state.user
   if (!pendingStretch) return
 
   const stretchedSelection = getWaveformSelection(state, pendingStretch.id)
@@ -105,29 +126,35 @@ export const getWaveformPendingStretch = (
 }
 export const getWaveform = (state: AppState) => ({
   ...state.waveform,
-  ...state.clips,
+  ...state.user,
   selections: getWaveformSelections(state),
   pendingStretch: getWaveformPendingStretch(state),
 })
-export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> =>
-  state.clips.selectionsOrder
-export const getWaveformPendingSelection = (state: AppState): ?Clip =>
-  state.clips.pendingSelection
-export const getSelectionIdAt = (state: AppState, x: number) => {
-  const { clips } = state
-  const { selectionsOrder, selections } = clips
-  return selectionsOrder.find(selectionId => {
-    const { start, end } = selections[selectionId]
+// export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> =>
+//   state.clips.selectionsOrder
+
+
+export const getCurrentFlashcardId = (state: AppState): ?FlashcardId =>
+  state.user.highlightedSelectionId
+export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
+  getWaveformSelectionsOrder(state).map(id => state.flashcards[id])
+
+
+export const getWaveformPendingSelection = (state: AppState): ?PendingSelection =>
+  state.user.pendingSelection
+export const getSelectionIdAt = (state: AppState, x: number): ?ClipId =>
+  getWaveformSelectionsOrder(state).find(selectionId => {
+    const selection = state.clips[selectionId]
+    const { start, end } = selection
     return x >= start && x <= end
   })
-}
 
-export const getPreviousSelectionId = (state: AppState, id: ClipId) => {
-  const { selectionsOrder } = state.clips
+export const getPreviousSelectionId = (state: AppState, id: ClipId): ?ClipId => {
+  const selectionsOrder = getWaveformSelectionsOrder(state)
   return selectionsOrder[selectionsOrder.indexOf(id) - 1]
 }
-export const getNextSelectionId = (state: AppState, id: ClipId) => {
-  const { selectionsOrder } = state.clips
+export const getNextSelectionId = (state: AppState, id: ClipId): ?ClipId => {
+  const selectionsOrder = getWaveformSelectionsOrder(state)
   return selectionsOrder[selectionsOrder.indexOf(id) + 1]
 }
 
@@ -146,8 +173,8 @@ export const getSelectionEdgeAt = (state: AppState, x: WaveformX) => {
 export const getWaveformViewBoxXMin = (state: AppState) =>
   state.waveform.viewBox.xMin
 
-export const getHighlightedWaveformSelectionId = (state: AppState) =>
-  state.clips.highlightedSelectionId
+export const getHighlightedWaveformSelectionId = (state: AppState): ?ClipId =>
+  state.user.highlightedSelectionId
 
 type TimeSpan = {
   start: number,
