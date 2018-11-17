@@ -1,10 +1,15 @@
-const initialState = {
+// @flow
+const initialState: AudioState = {
   loop: true,
   currentFileIndex: 0,
-  filePaths: [],
+  files: {},
+  filesOrder: [],
 }
 
-export default function audio(state = initialState, action) {
+const audio: Reducer<AudioState> = (
+  state: AudioState = initialState,
+  action: Object
+) => {
   switch (action.type) {
     case 'TOGGLE_LOOP':
       return {
@@ -17,7 +22,11 @@ export default function audio(state = initialState, action) {
 
       return {
         ...state,
-        filePaths,
+        filesOrder: filePaths,
+        files: filePaths.reduce(
+          (files, path) => ({ ...files, [path]: { path } }),
+          {}
+        ),
         currentFileIndex: 0,
       }
     }
@@ -32,3 +41,5 @@ export default function audio(state = initialState, action) {
       return state
   }
 }
+
+export default audio
