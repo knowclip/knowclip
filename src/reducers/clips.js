@@ -27,18 +27,17 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
         },
       }
 
-
     case 'MERGE_WAVEFORM_SELECTIONS': {
       const { ids } = action
       const [finalId, ...idsToBeDiscarded] = ids
-      const selectionsOrder : Array<ClipId> = (Object.values(state): any)
+      const selectionsOrder: Array<ClipId> = (Object.values(state): any)
         .sort((a: Clip, b: Clip) => a.start - b.start)
         .map(s => s.id)
       const newSelectionsOrder: Array<ClipId> = selectionsOrder.filter(
         id => !idsToBeDiscarded.includes(id)
       )
       const newSelections: { [ClipId]: Clip } = {}
-      newSelectionsOrder.forEach((id) => {
+      newSelectionsOrder.forEach(id => {
         const selection = state[id]
         if (!selection) throw new Error('impossible')
         newSelections[id] = selection
