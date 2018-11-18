@@ -22,6 +22,7 @@ import waveformSelectionEpic from './waveformSelectionEpic'
 import waveformStretchEpic from './waveformStretchEpic'
 import detectSilenceEpic from './detectSilence'
 import makeClipsEpic from './makeClips'
+import exportFlashcardsEpic from './exportFlashcards'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import dataurl from 'dataurl'
 import persistStateEpic from './persistState'
@@ -177,5 +178,6 @@ export default combineEpics(
   playSelectionsOnHighlightEpic,
   makeClipsEpic,
   detectSilenceEpic,
-  persistStateEpic
+  persistStateEpic,
+  exportFlashcardsEpic
 )

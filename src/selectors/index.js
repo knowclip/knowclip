@@ -1,25 +1,18 @@
 // @flow
 import { createSelector } from 'reselect'
 import { basename } from 'path'
+import {
+  getSecondsAtX,
+  getMillisecondsAtX,
+  getXAtMilliseconds,
+} from './waveformTime'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
 export const SELECTION_THRESHOLD = 40
 
-export const getSecondsAtX = (state: AppState, x: number): number => {
-  const { stepsPerSecond, stepLength } = state.waveform
-  return x / (stepsPerSecond * stepLength)
-}
-export const getMillisecondsAtX = (state: AppState, x: number): number => {
-  return 1000 * getSecondsAtX(state, x)
-}
-export const getXAtMilliseconds = (
-  state: AppState,
-  milliseconds: number
-): number => {
-  const { stepsPerSecond, stepLength } = state.waveform
-  return (milliseconds / 1000) * (stepsPerSecond * stepLength)
-}
+export * from './waveformTime'
+export * from './clips'
 
 type FlashcardWithTime = {
   id: FlashcardId,

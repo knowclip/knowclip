@@ -1,6 +1,6 @@
 // @flow
 
-declare type AudioFilePath = String
+declare type AudioFilePath = string
 declare type AudioFileData = {
   path: AudioFilePath,
   // clipsOrder: Array<ClipId>,

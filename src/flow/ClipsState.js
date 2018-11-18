@@ -1,7 +1,7 @@
 // @flow
 declare type WaveformX = number
 
-declare type ClipId = String
+declare type ClipId = string
 declare type Clip = Exact<{
   id: ClipId,
   start: WaveformX,

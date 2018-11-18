@@ -125,6 +125,7 @@ class App extends Component {
       flashcards,
       currentFileName,
       makeClips,
+      exportFlashcards,
       highlightSelection,
     } = this.props
 
@@ -224,6 +225,7 @@ class App extends Component {
           currentFileIndex={currentFileIndex}
           highlightSelection={highlightSelection}
           makeClips={makeClips}
+          exportFlashcards={exportFlashcards}
         />
       </div>
     )
@@ -251,6 +253,7 @@ const mapDispatchToProps = {
   toggleLoop: r.toggleLoop,
   deleteCard: r.deleteCard,
   makeClips: r.makeClips,
+  exportFlashcards: r.exportFlashcards,
   highlightSelection: r.highlightSelection,
 }
 
