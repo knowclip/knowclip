@@ -3,6 +3,7 @@
 declare type AudioFilePath = String
 declare type AudioFileData = {
   path: AudioFilePath,
+  // clipsOrder: Array<ClipId>,
 }
 
 declare type AudioState = Exact<{

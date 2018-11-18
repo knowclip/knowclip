@@ -37,6 +37,24 @@ const audio: Reducer<AudioState> = (
         currentFileIndex: action.index,
       }
 
+    // case 'ADD_WAVEFORM_SELECTION':
+    //   return {
+    //     ...state,
+    //     files: {
+    //       [action.selection.filePath] {
+    //         ...state.files[action.selection.filePath],
+    //         clipsOrder:
+    //
+    //       }
+    //     }
+    //   }
+    //
+    // case 'EDIT_WAVEFORM_SELECTION':
+    //
+    // case 'MERGE_WAVEFORM_SELECTIONS': {
+    //
+    // case 'DELETE_CARD': {
+
     default:
       return state
   }

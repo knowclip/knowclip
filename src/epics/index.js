@@ -9,7 +9,6 @@ import {
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, from } from 'rxjs'
-import uuid from 'uuid/v4'
 import {
   setWaveformPeaks,
   setWaveformCursor,
@@ -21,159 +20,12 @@ import { setLocalFlashcard } from '../utils/localFlashcards'
 import * as r from '../redux'
 import waveformSelectionEpic from './waveformSelectionEpic'
 import waveformStretchEpic from './waveformStretchEpic'
+import detectSilenceEpic from './detectSilence'
+import makeClipsEpic from './makeClips'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import dataurl from 'dataurl'
-import electron from 'electron'
-import { join, basename, extname } from 'path'
-import ffmpeg from '../utils/ffmpeg'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
-
-const {
-  remote: { dialog },
-} = electron
-
-const toTimestamp = milliseconds => {
-  const millisecondsStamp = Math.round(milliseconds % 1000)
-  const secondsStamp = Math.floor(milliseconds / 1000) % 60
-  const minutesStamp = Math.floor(milliseconds / 1000 / 60) % 60
-  const hoursStamp = Math.floor(milliseconds / 1000 / 60 / 60)
-  return `${hoursStamp}:${minutesStamp}:${secondsStamp}.${millisecondsStamp}`
-}
-
-const clip = (path, startTime, endTime, outputFilename) => {
-  return new Promise((res, rej) => {
-    ffmpeg(path)
-      .audioCodec('copy')
-      .seekInput(toTimestamp(startTime))
-      .inputOptions('-to ' + toTimestamp(endTime))
-      .output(outputFilename)
-      .on(
-        'end',
-        //listener must be a function, so to return the callback wrapping it inside a function
-        function() {
-          console.log('Finished processing')
-          res()
-        }
-      )
-      .on('error', err => {
-        rej(err)
-      })
-      .run()
-  })
-}
-
-const detectSilence = (
-  path,
-  silenceDuration = 1,
-  silenceNoiseTolerance = -60
-) =>
-  new Promise((res, rej) => {
-    ffmpeg(path, { stdoutLines: 0 })
-      .audioFilters(
-        `silencedetect=n=${silenceNoiseTolerance}dB:d=${silenceDuration}`
-      )
-      .outputFormat('null')
-      .output('-')
-      .on(
-        'end',
-        //listener must be a function, so to return the callback wrapping it inside a function
-        function(_, string) {
-          const preparedString = string.replace(/\s/g, ' ')
-          const regex = /silence_start:\s(\d+\.\d+|\d+).+?silence_end:\s(\d+\.\d+|\d+)/g
-          window.preparedString = preparedString
-
-          const matchData = []
-          let addition
-          while ((addition = regex.exec(preparedString))) {
-            // eslint-disable-line no-cond-assign
-            const [, startStr, endStr] = addition
-            matchData.push({
-              start: Number(startStr) * 1000,
-              end: Number(endStr) * 1000,
-            })
-          }
-          res(matchData)
-        }
-      )
-      .on('error', err => {
-        rej(err)
-        console.error(err)
-      })
-      .run()
-  })
-Object.assign(window, { detectSilence })
-
-window.clip = clip
-
-const makeClips = (action$, state$) =>
-  action$.pipe(
-    ofType('MAKE_CLIPS'),
-    tap(() => {
-      const clips = r.getWaveformSelections(state$.value)
-      dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-        if (!filePaths) return
-
-        const [directory] = filePaths
-        clips.forEach(({ start, end, filePath }) => {
-          const startTime = r.getMillisecondsAtX(state$.value, start)
-          const endTime = r.getMillisecondsAtX(state$.value, end)
-          const extension = extname(filePath)
-          const filenameWithoutExtension = basename(filePath, extension)
-          const outputFilename = `${filenameWithoutExtension}__${startTime}-${endTime}${extension}`
-          const outputFilePath = join(directory, outputFilename)
-          clip(filePath, startTime, endTime, outputFilePath)
-        })
-      })
-    }),
-    ignoreElements()
-  )
-
-const ascending = (a, b) => a - b
-const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
-const getFinalSelection = (pendingSelection, currentFileName) => {
-  const [start, end] = sortSelectionPoints(pendingSelection)
-  return { start, end, id: uuid(), filePath: currentFileName }
-}
-const detectSilenceEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('DETECT_SILENCE'),
-    withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([_, { audioElement }]) => {
-      return detectSilence(r.getCurrentFilePath(state$.value)).then(
-        silences => {
-          if (!silences.length) return [{ type: 'NOOP' }]
-
-          const chunks = []
-          if (silences[0].start > 0)
-            chunks.push({ start: 0, end: silences[0].start })
-          silences.forEach(({ end: silenceEnd }, i) => {
-            const nextSilence = silences[i + 1]
-            if (nextSilence) {
-              chunks.push({ start: silenceEnd, end: nextSilence.start })
-            } else {
-              const durationMs = audioElement.duration * 1000
-              if (silenceEnd !== durationMs)
-                chunks.push({ start: silenceEnd, end: durationMs })
-            }
-          })
-
-          return chunks.map(({ start, end }) =>
-            r.addWaveformSelection(
-              getFinalSelection(
-                {
-                  start: r.getXAtMilliseconds(state$.value, start),
-                  end: r.getXAtMilliseconds(state$.value, end),
-                },
-                r.getCurrentFilePath(state$.value)
-              )
-            )
-          )
-        }
-      )
-    }),
-    flatMap(val => from(val))
-  )
 
 const getWaveformEpic = (action$, state$) =>
   action$.pipe(
@@ -323,7 +175,7 @@ export default combineEpics(
   waveformStretchEpic,
   highlightSelectionsOnAddEpic,
   playSelectionsOnHighlightEpic,
-  makeClips,
+  makeClipsEpic,
   detectSilenceEpic,
   persistStateEpic
 )

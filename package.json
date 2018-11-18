@@ -32,11 +32,12 @@
     "eject": "react-app-rewired eject",
     "electron": "electron .",
     "lint": "eslint src",
-    "format": "prettier --no-semi --single-quote --trailing-comma es5  \"{src,.}/**/*.js\" --write"
+    "format": "prettier --no-semi --single-quote --trailing-comma es5  \"{src,.}/**/*.js\"",
+    "format:write": "yarn format --write"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn format"
+      "pre-commit": "yarn format --list-different"
     }
   },
   "browserslist": [
