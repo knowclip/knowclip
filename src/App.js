@@ -28,6 +28,7 @@ const AudioFilesMenu = ({
   isPrevButtonEnabled,
   isNextButtonEnabled,
   chooseAudioFiles,
+  removeAudioFiles,
 }) => (
   <Fragment>
     <p className="audioFilesMenu">
@@ -37,7 +38,7 @@ const AudioFilesMenu = ({
       {currentFilename ? (
         <h2 className="audioFileName">
           {currentFilename}
-          <IconButton onClick={chooseAudioFiles}>
+          <IconButton onClick={removeAudioFiles}>
             <CloseIcon />
           </IconButton>
         </h2>
@@ -72,6 +73,8 @@ class App extends Component {
       }
     )
   }
+
+  removeAudioFiles = () => this.props.chooseAudioFiles([])
 
   fileInputRef = el => (this.fileInput = el)
   audioRef = el => (this.audio = el)
@@ -206,6 +209,7 @@ class App extends Component {
           isPrevButtonEnabled={isPrevButtonEnabled}
           isNextButtonEnabled={isNextButtonEnabled}
           chooseAudioFiles={this.chooseAudioFiles}
+          removeAudioFiles={this.removeAudioFiles}
         />
         <Waveform svgRef={this.svgRef} />
         <audio

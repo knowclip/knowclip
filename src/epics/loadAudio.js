@@ -1,5 +1,6 @@
 import { flatMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
+import { empty } from 'rxjs'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import tempy from 'tempy'
@@ -35,10 +36,12 @@ const getConstantBitrateMp3 = path => {
 }
 
 const loadAudio = async filePath => {
-  const tmpFilePath = await getConstantBitrateMp3(filePath)
-  const audio = await readFile(tmpFilePath)
   const audioElement = document.getElementById('audioPlayer')
   const svgElement = document.getElementById('waveform-svg')
+  if (!filePath) return r.loadAudio(null, audioElement, svgElement)
+
+  const tmpFilePath = await getConstantBitrateMp3(filePath)
+  const audio = await readFile(tmpFilePath)
 
   return r.loadAudio(audio, audioElement, svgElement)
 }
@@ -47,6 +50,9 @@ const chooseAudioFilesEpic = (action$, state$) =>
   action$.pipe(
     ofType('CHOOSE_AUDIO_FILES'),
     flatMap(async ({ filePaths }) => {
+      if (!filePaths.length) {
+        console.log('No audio file selected')
+      }
       return await loadAudio(filePaths[0])
     })
   )

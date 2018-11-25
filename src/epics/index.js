@@ -8,61 +8,20 @@ import {
   withLatestFrom,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, from } from 'rxjs'
-import {
-  setWaveformPeaks,
-  setWaveformCursor,
-  loadAudioSuccess,
-} from '../actions'
+import { fromEvent } from 'rxjs'
+import { setWaveformCursor } from '../actions'
 import { getFlashcard } from '../selectors'
-import decodeAudioData, { getPeaks } from '../utils/getWaveform'
 import { setLocalFlashcard } from '../utils/localFlashcards'
 import * as r from '../redux'
+import getWaveformEpic from './getWaveform'
 import waveformSelectionEpic from './waveformSelectionEpic'
 import waveformStretchEpic from './waveformStretchEpic'
 import detectSilenceEpic from './detectSilence'
 import makeClipsEpic from './makeClips'
 import exportFlashcardsEpic from './exportFlashcards'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
-import dataurl from 'dataurl'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
-
-const getWaveformEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('LOAD_AUDIO'),
-    flatMap(({ file, audioElement }) => {
-      // window.setTimeout(() => {
-      //   const reader = new FileReader()
-      //   reader.onload = (e) => {
-      //     audioElement.src = e.target.result
-      //     audioElement.play()
-      //   }
-      //   reader.readAsDataURL(file)
-      // }, 0)
-      window.setTimeout(() => {
-        audioElement.src = dataurl.convert({
-          data: file,
-          mimetype: 'audio/mp3',
-        })
-        audioElement.play()
-      }, 0)
-
-      return from(decodeAudioData(file)).pipe(
-        flatMap(({ buffer }) =>
-          from([
-            setWaveformPeaks(
-              getPeaks(buffer, state$.value.waveform.stepsPerSecond)
-            ),
-            loadAudioSuccess({
-              filename: file.name,
-              bufferLength: buffer.length,
-            }),
-          ])
-        )
-      )
-    })
-  )
 
 const setLocalFlashcardEpic = (action$, state$) =>
   action$.pipe(
