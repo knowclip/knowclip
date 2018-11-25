@@ -54,6 +54,7 @@ const chooseAudioFilesEpic = (action$, state$) =>
       if (!filePaths.length) {
         console.log('No audio file selected')
       }
+      console.log('chose audio files!', filePaths[0])
       return await loadAudio(filePaths[0])
     })
   )
@@ -73,7 +74,8 @@ const initEpic = (action$, state$) =>
     ofType('INITIALIZE_APP'),
     flatMap(async () => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
-      if (!currentFilePath) return empty()
+      console.log('currentFilePath', currentFilePath)
+      if (!currentFilePath) return { type: 'NOOP' }
       return await loadAudio(currentFilePath)
     })
   )
