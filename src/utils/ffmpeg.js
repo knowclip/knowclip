@@ -17,21 +17,12 @@ ffmpeg.setFfmpegPath(ffmpegPath)
 
 export default ffmpeg
 
+const zeroPad = (zeroes, value) => String(value).padStart(zeroes, '0')
+
 export const toTimestamp = (milliseconds, millisecondsSeparator = '.') => {
-  const millisecondsStamp = String(Math.round(milliseconds % 1000)).padStart(
-    3,
-    '0'
-  )
-  const secondsStamp = String(Math.floor(milliseconds / 1000) % 60).padStart(
-    2,
-    '0'
-  )
-  const minutesStamp = String(
-    Math.floor(milliseconds / 1000 / 60) % 60
-  ).padStart(2, '0')
-  const hoursStamp = String(Math.floor(milliseconds / 1000 / 60 / 60)).padStart(
-    3,
-    '0'
-  )
+  const millisecondsStamp = zeroPad(3, Math.round(milliseconds % 1000))
+  const secondsStamp = zeroPad(2, Math.floor(milliseconds / 1000) % 60)
+  const minutesStamp = zeroPad(2, Math.floor(milliseconds / 1000 / 60) % 60)
+  const hoursStamp = zeroPad(2, Math.floor(milliseconds / 1000 / 60 / 60))
   return `${hoursStamp}:${minutesStamp}:${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }

@@ -1,6 +1,11 @@
 // @flow
+import type { SnackbarAction } from './snackbar'
+
+export * from './waveform'
+export * from './snackbar'
 
 export type AppAction =
+  | SnackbarAction
   | {| type: 'CHOOSE_AUDIO_FILES', filePaths: Array<AudioFilePath> |}
   | {|
       type: 'SET_FLASHCARD_FIELD',
@@ -78,5 +83,3 @@ export const makeClips = (): AppAction => ({
 })
 
 export const exportFlashcards = (): AppAction => ({ type: 'EXPORT_FLASHCARDS' })
-
-export * from './waveform'

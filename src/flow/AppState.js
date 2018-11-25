@@ -6,4 +6,5 @@ declare type AppState = Exact<{
   flashcards: FlashcardsState,
   audio: Object,
   user: UserState,
+  snackbar: SnackbarState,
 }>

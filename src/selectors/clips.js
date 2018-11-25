@@ -4,7 +4,7 @@ import { basename, extname } from 'path'
 import { toTimestamp } from '../utils/ffmpeg'
 import { getMillisecondsAtX } from './waveformTime'
 
-const SAFE_SEPARATOR = ':'
+const SAFE_SEPARATOR = '-'
 
 export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
   const clip = state.clips[id]

@@ -10,6 +10,7 @@ import {
 import { Close as CloseIcon } from '@material-ui/icons'
 import ShowAll from './components/ShowAll'
 import Waveform from './components/Waveform'
+import Snackbar from './components/Snackbar'
 import logo from './logo.svg'
 import * as r from './redux'
 import './App.css'
@@ -227,6 +228,7 @@ class App extends Component {
           makeClips={makeClips}
           exportFlashcards={exportFlashcards}
         />
+        <Snackbar />
       </div>
     )
   }

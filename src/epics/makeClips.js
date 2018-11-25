@@ -1,4 +1,4 @@
-import { tap, ignoreElements } from 'rxjs/operators'
+import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import electron from 'electron'
@@ -8,6 +8,17 @@ import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 const {
   remote: { dialog },
 } = electron
+
+const showOpenDialog = () =>
+  new Promise((res, rej) => {
+    try {
+      dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths =>
+        res(filePaths)
+      )
+    } catch (err) {
+      rej(err)
+    }
+  })
 
 const clip = (path, startTime, endTime, outputFilename) => {
   return new Promise((res, rej) => {
@@ -21,7 +32,7 @@ const clip = (path, startTime, endTime, outputFilename) => {
         //listener must be a function, so to return the callback wrapping it inside a function
         function() {
           console.log('Finished processing')
-          res()
+          res(`${outputFilename} successfully created.`)
         }
       )
       .on('error', err => {
@@ -34,13 +45,15 @@ const clip = (path, startTime, endTime, outputFilename) => {
 const makeClips = (action$, state$) =>
   action$.pipe(
     ofType('MAKE_CLIPS'),
-    tap(() => {
-      const clipIds = Object.keys(state$.value.clips)
-      dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths => {
-        if (!filePaths) return
+    flatMap(async () => {
+      try {
+        const clipIds = Object.keys(state$.value.clips)
+        const filePaths = await showOpenDialog()
+        if (!filePaths)
+          return r.simpleMessageSnackbar('No directory selected selected')
 
         const [directory] = filePaths
-        clipIds.forEach(clipId => {
+        const clipsOperations = clipIds.map(clipId => {
           const {
             start,
             end,
@@ -48,11 +61,19 @@ const makeClips = (action$, state$) =>
             outputFilename,
           } = r.getClipOutputParameters(state$.value, clipId)
           const outputFilePath = join(directory, outputFilename)
-          clip(filePath, start, end, outputFilePath)
+          console.log('clipping: filePath, start, end, outputFilePath')
+          console.log(filePath, start, end, outputFilePath)
+          return clip(filePath, start, end, outputFilePath)
         })
-      })
-    }),
-    ignoreElements()
+        await Promise.all(clipsOperations)
+
+        return r.simpleMessageSnackbar('Clips made in ' + directory)
+      } catch (err) {
+        return r.simpleMessageSnackbar(
+          `There was a problem making clips: ${err.message}`
+        )
+      }
+    })
   )
 
 export default makeClips
