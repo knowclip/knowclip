@@ -21,6 +21,11 @@ const { dialog } = remote
 
 const isNotMac = process.platform !== 'darwin'
 
+const openInBrowser = e => {
+  e.preventDefault()
+  electron.shell.openExternal(e.target.href)
+}
+
 const AudioFilesMenu = ({
   onClickPrevious,
   onClickNext,
@@ -56,6 +61,10 @@ class App extends Component {
   state = {
     filePaths: [],
     modalIsOpen: false,
+  }
+
+  componentDidMount() {
+    this.props.initializeApp()
   }
 
   chooseAudioFiles = () => {
@@ -188,7 +197,10 @@ class App extends Component {
     ) : (
       <p>
         Select audio files from your{' '}
-        <a href="https://apps.ankiweb.net/docs/manual.html#files">
+        <a
+          href="https://apps.ankiweb.net/docs/manual.html#files"
+          onClick={openInBrowser}
+        >
           Anki collection.media folder
         </a>{' '}
         and click + drag to make audio clips and start making flashcards.
@@ -261,6 +273,7 @@ const mapDispatchToProps = {
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
   highlightSelection: r.highlightSelection,
+  initializeApp: r.initializeApp,
 }
 
 export default connect(

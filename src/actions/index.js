@@ -25,6 +25,9 @@ export type AppAction =
   | {| type: 'DELETE_CARD', id: FlashcardId |}
   | {| type: 'MAKE_CLIPS' |}
   | {| type: 'EXPORT_FLASHCARDS' |}
+  | {| type: 'INITIALIZE_APP' |}
+
+export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
 
 export const chooseAudioFiles = (
   filePaths: Array<AudioFilePath>

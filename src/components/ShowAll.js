@@ -64,27 +64,28 @@ const ShowAll = ({
   highlightSelection,
   makeClips,
   exportFlashcards,
-}) => (
-  <Dialog open={open} onClose={handleClose} style={{ width: '900px' }}>
-    <Table>
-      <TableBody>
-        {flashcards.map((flashcard, i) => (
-          <FlashcardRow
-            key={flashcard.id}
-            highlightSelection={highlightSelection}
-            closeModal={handleClose}
-            flashcardId={flashcard.id}
-            // file={file}
-            isCurrent={currentFileIndex === i}
-          />
-        ))}
-      </TableBody>
-    </Table>
-    <DialogActions>
-      <Button onClick={exportFlashcards}>Export CSV file</Button>
-      <Button onClick={makeClips}>Make audio clips</Button>
-    </DialogActions>
-  </Dialog>
-)
+}) =>
+  !open ? null : (
+    <Dialog open={open} onClose={handleClose} style={{ width: '900px' }}>
+      <Table>
+        <TableBody>
+          {flashcards.map((flashcard, i) => (
+            <FlashcardRow
+              key={flashcard.id}
+              highlightSelection={highlightSelection}
+              closeModal={handleClose}
+              flashcardId={flashcard.id}
+              // file={file}
+              isCurrent={currentFileIndex === i}
+            />
+          ))}
+        </TableBody>
+      </Table>
+      <DialogActions>
+        <Button onClick={exportFlashcards}>Export CSV file</Button>
+        <Button onClick={makeClips}>Make audio clips</Button>
+      </DialogActions>
+    </Dialog>
+  )
 
 export default ShowAll

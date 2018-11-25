@@ -57,10 +57,7 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       const { id } = action
       const selections = { ...state }
       delete selections[id]
-      return {
-        ...state,
-        selections,
-      }
+      return selections
     }
 
     default:

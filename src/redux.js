@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
 import reducer from './reducers'
 import epic from './epics'
+import { getPersistedState } from './utils/statePersistence'
 export * from './selectors'
 export * from './actions'
 
@@ -15,6 +16,7 @@ export default function getStore() {
 
   const store = createStore(
     reducer,
+    getPersistedState(),
     composeEnhancers(applyMiddleware(epicMiddleware))
     // composeEnhancers(applyMiddleware())
   )

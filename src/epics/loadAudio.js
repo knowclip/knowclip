@@ -1,6 +1,7 @@
-import { flatMap } from 'rxjs/operators'
+// import { flatMap } from 'rxjs/operators'
+import { flatMap, tap, ignoreElements } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { empty } from 'rxjs'
+import { empty, from, of } from 'rxjs'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import tempy from 'tempy'
@@ -62,8 +63,19 @@ const setCurrentFileEpic = (action$, state$) =>
     ofType('SET_CURRENT_FILE'),
     flatMap(async () => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
+      const loadAudioAction = await loadAudio(currentFilePath)
+      return loadAudioAction
+    })
+  )
+
+const initEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('INITIALIZE_APP'),
+    flatMap(async () => {
+      const currentFilePath = r.getCurrentFilePath(state$.value)
+      if (!currentFilePath) return empty()
       return await loadAudio(currentFilePath)
     })
   )
 
-export default combineEpics(chooseAudioFilesEpic, setCurrentFileEpic)
+export default combineEpics(chooseAudioFilesEpic, setCurrentFileEpic, initEpic)
