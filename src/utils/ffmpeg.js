@@ -1,6 +1,6 @@
 import { join } from 'path'
 
-const ffmpeg = require('fluent-ffmpeg') // maybe get rid of define plugin and just get straight from lib?
+const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
 const os = require('os')
 
 const platform = os.platform() + '-' + os.arch()
