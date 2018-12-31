@@ -1,17 +1,7 @@
-import { join } from 'path'
-
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
-const os = require('os')
 
-const platform = os.platform() + '-' + os.arch()
-
-const ffmpegPath = join(
-  '.',
-  'node_modules',
-  '@ffmpeg-installer',
-  platform,
-  'ffmpeg'
-)
+// have to do it this was cause of webpack
+const ffmpegPath = require('electron').remote.getGlobal('ffmpegpath')
 
 ffmpeg.setFfmpegPath(ffmpegPath)
 

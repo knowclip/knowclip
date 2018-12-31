@@ -1,8 +1,9 @@
 const electron = require('electron')
-// Module to control application life.
+const path = require('path')
+const url = require('url')
 const { app, ipcMain } = electron
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
+const { isPackaged } = app
+const { BrowserWindow } = electron
 
 const installDevtools = require('./devtools')
 
@@ -10,17 +11,33 @@ const installDevtools = require('./devtools')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+// have to do it this to access ffmpeg path from within webpack bundle
+const ffmpegStaticBasePath = require('ffmpeg-static').path
+const getFfmpegStaticPath = basePath =>
+  basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
+global.ffmpegpath = getFfmpegStaticPath(ffmpegStaticBasePath)
+
 async function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
-  mainWindow.loadURL('http://localhost:3000')
+  mainWindow.loadURL(
+    isPackaged
+      ? url.format({
+          pathname: path.join(__dirname, 'build', 'index.html'),
+          protocol: 'file',
+          slashes: 'true',
+        })
+      : 'http://localhost:3000'
+  )
 
-  await installDevtools()
+  // if (!isPackaged) {
+  if (true) {
+    await installDevtools()
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
+  }
 
   mainWindow.on('close', e => {
     if (mainWindow) {
