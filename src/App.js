@@ -225,11 +225,11 @@ class App extends Component {
           chooseAudioFiles={this.chooseAudioFiles}
           removeAudioFiles={this.removeAudioFiles}
         />
-        <div className="waveform" />
-        {audioIsLoading ? (
-          <CircularProgress />
-        ) : (
-          <Waveform svgRef={this.svgRef} />
+        <Waveform show={!audioIsLoading} svgRef={this.svgRef} />
+        {audioIsLoading && (
+          <div className="waveform-placeholder">
+            <CircularProgress />
+          </div>
         )}
         <audio
           onEnded={this.handleAudioEnded}

@@ -54,8 +54,16 @@
   to { transform: rotate(360deg); }
 }
 
+.waveform-placeholder {
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .waveform-svg,
-.waveform-g {
+.waveform-g,
+.waveform-placeholder {
   background-color: aliceblue;
 }
 

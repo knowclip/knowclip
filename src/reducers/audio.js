@@ -33,6 +33,12 @@ const audio: Reducer<AudioState> = (
       }
     }
 
+    case 'INITIALIZE_APP':
+      return {
+        ...state,
+        isLoading: Boolean(state.filesOrder.length),
+      }
+
     case 'SET_CURRENT_FILE':
       return {
         ...state,
@@ -42,7 +48,7 @@ const audio: Reducer<AudioState> = (
     case 'LOAD_AUDIO':
       return {
         ...state,
-        isLoading: Boolean(action.file),
+        isLoading: Boolean(action.filePath),
       }
 
     case 'LOAD_AUDIO_SUCCESS':

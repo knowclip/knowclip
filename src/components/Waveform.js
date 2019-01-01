@@ -100,9 +100,11 @@ class Waveform extends Component {
       stepsPerSecond,
       stepLength,
       highlightedSelectionId,
+      show,
     } = this.props
     return (
       <svg
+        style={show ? {} : { display: 'none' }}
         id="waveform-svg"
         ref={svgRef}
         viewBox={getViewBox(viewBox.xMin)}

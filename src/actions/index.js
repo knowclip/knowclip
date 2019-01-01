@@ -15,13 +15,13 @@ export type AppAction =
     |}
   | {|
       type: 'LOAD_AUDIO',
-      file: Object,
+      filePath: string,
       audioElement: Object,
       svgElement: Object,
     |}
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
-  | {| type: 'LOAD_AUDIO_SUCCESS', filename: ?string, bufferLength: number |}
+  | {| type: 'LOAD_AUDIO_SUCCESS', file: Object |}
   | {| type: 'DELETE_CARD', id: FlashcardId |}
   | {| type: 'MAKE_CLIPS' |}
   | {| type: 'EXPORT_FLASHCARDS' |}
@@ -48,12 +48,12 @@ export const setFlashcardField = (
 })
 
 export const loadAudio = (
-  file: Object,
+  filePath: string,
   audioElement: Object,
   svgElement: Object
 ): AppAction => ({
   type: 'LOAD_AUDIO',
-  file,
+  filePath,
   audioElement,
   svgElement,
 })
@@ -67,13 +67,9 @@ export const toggleLoop = (): AppAction => ({
   type: 'TOGGLE_LOOP',
 })
 
-export const loadAudioSuccess = ({
-  filename,
-  bufferLength,
-}: Object): AppAction => ({
+export const loadAudioSuccess = (file: Object): AppAction => ({
   type: 'LOAD_AUDIO_SUCCESS',
-  filename,
-  bufferLength,
+  file,
 })
 
 export const deleteCard = (id: FlashcardId): AppAction => ({
