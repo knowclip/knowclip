@@ -202,3 +202,6 @@ export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
 
 export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
   getWaveformSelectionsOrder(state).map(id => getClipTimes(state, id))
+
+export const isAudioLoading = (state: AppState): boolean =>
+  state.audio.isLoading

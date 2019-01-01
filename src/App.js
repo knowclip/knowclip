@@ -6,6 +6,7 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
+  CircularProgress,
 } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
 import ShowAll from './components/ShowAll'
@@ -140,6 +141,7 @@ class App extends Component {
       makeClips,
       exportFlashcards,
       highlightSelection,
+      audioIsLoading,
     } = this.props
 
     // for reference during transition to clip-based flashcards
@@ -223,7 +225,12 @@ class App extends Component {
           chooseAudioFiles={this.chooseAudioFiles}
           removeAudioFiles={this.removeAudioFiles}
         />
-        <Waveform svgRef={this.svgRef} />
+        <div className="waveform" />
+        {audioIsLoading ? (
+          <CircularProgress />
+        ) : (
+          <Waveform svgRef={this.svgRef} />
+        )}
         <audio
           onEnded={this.handleAudioEnded}
           loop={loop}
@@ -262,6 +269,7 @@ const mapStateToProps = state => ({
   loop: r.isLoopOn(state),
   highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
   clipsTimes: r.getClipsTimes(state),
+  audioIsLoading: r.isAudioLoading(state),
 })
 
 const mapDispatchToProps = {

@@ -4,6 +4,7 @@ const initialState: AudioState = {
   currentFileIndex: 0,
   files: {},
   filesOrder: [],
+  isLoading: false,
 }
 
 const audio: Reducer<AudioState> = (
@@ -27,6 +28,7 @@ const audio: Reducer<AudioState> = (
           (files, path) => ({ ...files, [path]: { path } }),
           {}
         ),
+        isLoading: true,
         currentFileIndex: 0,
       }
     }
@@ -37,23 +39,17 @@ const audio: Reducer<AudioState> = (
         currentFileIndex: action.index,
       }
 
-    // case 'ADD_WAVEFORM_SELECTION':
-    //   return {
-    //     ...state,
-    //     files: {
-    //       [action.selection.filePath] {
-    //         ...state.files[action.selection.filePath],
-    //         clipsOrder:
-    //
-    //       }
-    //     }
-    //   }
-    //
-    // case 'EDIT_WAVEFORM_SELECTION':
-    //
-    // case 'MERGE_WAVEFORM_SELECTIONS': {
-    //
-    // case 'DELETE_CARD': {
+    case 'LOAD_AUDIO':
+      return {
+        ...state,
+        isLoading: Boolean(action.file),
+      }
+
+    case 'LOAD_AUDIO_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+      }
 
     default:
       return state
