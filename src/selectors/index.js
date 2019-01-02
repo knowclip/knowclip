@@ -205,3 +205,6 @@ export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
 
 export const isAudioLoading = (state: AppState): boolean =>
   state.audio.isLoading
+
+export const getMediaFolderLocation = (state: AppState): ?string =>
+  state.audio.mediaFolderLocation

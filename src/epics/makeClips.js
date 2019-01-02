@@ -1,24 +1,23 @@
 import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
-import electron from 'electron'
 import { join } from 'path'
 import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 
-const {
-  remote: { dialog },
-} = electron
-
-const showOpenDialog = () =>
-  new Promise((res, rej) => {
-    try {
-      dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths =>
-        res(filePaths)
-      )
-    } catch (err) {
-      rej(err)
-    }
-  })
+// import electron from 'electron'
+// const {
+//   remote: { dialog },
+// } = electron
+// const showOpenDialog = () =>
+//   new Promise((res, rej) => {
+//     try {
+//       dialog.showOpenDialog({ properties: ['openDirectory'] }, filePaths =>
+//         res(filePaths)
+//       )
+//     } catch (err) {
+//       rej(err)
+//     }
+//   })
 
 const clip = (path, startTime, endTime, outputFilename) => {
   return new Promise((res, rej) => {
@@ -48,11 +47,7 @@ const makeClips = (action$, state$) =>
     flatMap(async () => {
       try {
         const clipIds = Object.keys(state$.value.clips)
-        const filePaths = await showOpenDialog()
-        if (!filePaths)
-          return r.simpleMessageSnackbar('No directory selected selected')
-
-        const [directory] = filePaths
+        const directory = r.getMediaFolderLocation(state$.value)
         const clipsOperations = clipIds.map(clipId => {
           const {
             start,

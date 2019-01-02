@@ -14,4 +14,5 @@ declare type AudioState = Exact<{
   filesOrder: Array<AudioFilePath>,
   currentFileIndex: number,
   isLoading: boolean,
+  mediaFolderLocation: ?string,
 }>

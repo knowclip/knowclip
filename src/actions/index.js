@@ -26,6 +26,7 @@ export type AppAction =
   | {| type: 'MAKE_CLIPS' |}
   | {| type: 'EXPORT_FLASHCARDS' |}
   | {| type: 'INITIALIZE_APP' |}
+  | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
 
 export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
 
@@ -82,3 +83,8 @@ export const makeClips = (): AppAction => ({
 })
 
 export const exportFlashcards = (): AppAction => ({ type: 'EXPORT_FLASHCARDS' })
+
+export const setMediaFolderLocation = (directoryPath: string): AppAction => ({
+  type: 'SET_MEDIA_FOLDER_LOCATION',
+  directoryPath,
+})

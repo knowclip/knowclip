@@ -5,6 +5,7 @@ const initialState: AudioState = {
   files: {},
   filesOrder: [],
   isLoading: false,
+  mediaFolderLocation: null,
 }
 
 const audio: Reducer<AudioState> = (
@@ -55,6 +56,12 @@ const audio: Reducer<AudioState> = (
       return {
         ...state,
         isLoading: false,
+      }
+
+    case 'SET_MEDIA_FOLDER_LOCATION':
+      return {
+        ...state,
+        mediaFolderLocation: action.directoryPath,
       }
 
     default:
