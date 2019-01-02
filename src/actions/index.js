@@ -1,11 +1,16 @@
 // @flow
 import type { SnackbarAction } from './snackbar'
+import type { DialogAction } from './dialog'
+import type { WaveformAction } from './waveform'
 
 export * from './waveform'
 export * from './snackbar'
+export * from './dialog'
 
 export type AppAction =
   | SnackbarAction
+  | DialogAction
+  | WaveformAction
   | {| type: 'CHOOSE_AUDIO_FILES', filePaths: Array<AudioFilePath> |}
   | {|
       type: 'SET_FLASHCARD_FIELD',
@@ -27,6 +32,10 @@ export type AppAction =
   | {| type: 'EXPORT_FLASHCARDS' |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
+  | {| type: 'DETECT_SILENCE' |}
+  | {| type: 'DETECT_SILENCE_REQUEST' |}
+  | {| type: 'DELETE_CARDS', ids: Array<FlashcardId> |}
+  | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
 
 export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
 
@@ -78,6 +87,11 @@ export const deleteCard = (id: FlashcardId): AppAction => ({
   id,
 })
 
+export const deleteCards = (ids: Array<FlashcardId>): AppAction => ({
+  type: 'DELETE_CARDS',
+  ids,
+})
+
 export const makeClips = (): AppAction => ({
   type: 'MAKE_CLIPS',
 })
@@ -87,4 +101,13 @@ export const exportFlashcards = (): AppAction => ({ type: 'EXPORT_FLASHCARDS' })
 export const setMediaFolderLocation = (directoryPath: string): AppAction => ({
   type: 'SET_MEDIA_FOLDER_LOCATION',
   directoryPath,
+})
+
+export const detectSilenceRequest = (): AppAction => ({
+  type: 'DETECT_SILENCE_REQUEST',
+})
+export const detectSilence = (): AppAction => ({ type: 'DETECT_SILENCE' })
+
+export const deleteAllCurrentFileClipsRequest = (): AppAction => ({
+  type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
 })

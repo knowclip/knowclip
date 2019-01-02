@@ -1,9 +1,8 @@
-import { flatMap, withLatestFrom } from 'rxjs/operators'
-import { from } from 'rxjs'
-import { ofType } from 'redux-observable'
+import { flatMap, map, withLatestFrom } from 'rxjs/operators'
+import { from, of } from 'rxjs'
+import { ofType, combineEpics } from 'redux-observable'
 import uuid from 'uuid/v4'
 import * as r from '../redux'
-import electron from 'electron'
 import ffmpeg from '../utils/ffmpeg'
 
 const detectSilence = (
@@ -57,39 +56,64 @@ const detectSilenceEpic = (action$, state$) =>
     ofType('DETECT_SILENCE'),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
     flatMap(([_, { audioElement }]) => {
-      return detectSilence(r.getCurrentFilePath(state$.value)).then(
-        silences => {
-          if (!silences.length) return [{ type: 'NOOP' }]
+      const currentFilePath = r.getCurrentFilePath(state$.value)
+      return detectSilence(currentFilePath).then(silences => {
+        if (!silences.length)
+          return [
+            r.simpleMessageSnackbar(
+              'There was too much noise to detect silences automatically.'
+            ),
+          ]
 
-          const chunks = []
-          if (silences[0].start > 0)
-            chunks.push({ start: 0, end: silences[0].start })
-          silences.forEach(({ end: silenceEnd }, i) => {
-            const nextSilence = silences[i + 1]
-            if (nextSilence) {
-              chunks.push({ start: silenceEnd, end: nextSilence.start })
-            } else {
-              const durationMs = audioElement.duration * 1000
-              if (silenceEnd !== durationMs)
-                chunks.push({ start: silenceEnd, end: durationMs })
-            }
-          })
+        const chunks = []
+        if (silences[0].start > 0)
+          chunks.push({ start: 0, end: silences[0].start })
+        silences.forEach(({ end: silenceEnd }, i) => {
+          const nextSilence = silences[i + 1]
+          if (nextSilence) {
+            chunks.push({ start: silenceEnd, end: nextSilence.start })
+          } else {
+            const durationMs = audioElement.duration * 1000
+            if (silenceEnd !== durationMs)
+              chunks.push({ start: silenceEnd, end: durationMs })
+          }
+        })
 
-          return chunks.map(({ start, end }) =>
-            r.addWaveformSelection(
-              getFinalSelection(
-                {
-                  start: r.getXAtMilliseconds(state$.value, start),
-                  end: r.getXAtMilliseconds(state$.value, end),
-                },
-                r.getCurrentFilePath(state$.value)
-              )
-            )
+        const newSelections = chunks.map(({ start, end }) =>
+          getFinalSelection(
+            {
+              start: r.getXAtMilliseconds(state$.value, start),
+              end: r.getXAtMilliseconds(state$.value, end),
+            },
+            r.getCurrentFilePath(state$.value)
           )
-        }
-      )
+        )
+
+        return from([
+          r.deleteCards(
+            r.getClipIdsByFilePath(
+              state$.value,
+              r.getCurrentFilePath(state$.value)
+            )
+          ),
+          r.addWaveformSelections(newSelections),
+        ])
+      })
     }),
     flatMap(val => from(val))
   )
 
-export default detectSilenceEpic
+const detectSilenceRequestEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('DETECT_SILENCE_REQUEST'),
+    map(() =>
+      r.doesCurrentFileHaveClips(state$.value)
+        ? r.confirmationDialog(
+            'This action will delete all flashcards and clips for the current file. Are you sure you want to continue?',
+            r.detectSilence()
+          )
+        : r.detectSilence()
+    )
+  )
+
+export default combineEpics(detectSilenceEpic, detectSilenceRequestEpic)

@@ -7,4 +7,5 @@ declare type AppState = Exact<{
   audio: Object,
   user: UserState,
   snackbar: SnackbarState,
+  dialog: DialogState,
 }>

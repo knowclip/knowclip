@@ -17,6 +17,15 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
         [action.selection.id]: action.selection,
       }
 
+    case 'ADD_WAVEFORM_SELECTIONS':
+      return {
+        ...state,
+        ...action.selections.reduce((all, selection) => {
+          all[selection.id] = selection
+          return all
+        }, ({}: ClipsState)),
+      }
+
     case 'EDIT_WAVEFORM_SELECTION':
       return {
         ...state,
@@ -58,6 +67,14 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       const selections = { ...state }
       delete selections[id]
       return selections
+    }
+
+    case 'DELETE_CARDS': {
+      const newState = { ...state }
+      action.ids.forEach(id => {
+        delete newState[id]
+      })
+      return newState
     }
 
     default:

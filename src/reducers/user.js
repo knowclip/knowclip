@@ -13,12 +13,11 @@ export default function user(
   action: Object
 ): UserState {
   switch (action.type) {
-    case 'ADD_WAVEFORM_SELECTION': {
+    case 'ADD_WAVEFORM_SELECTION':
       return {
         ...state,
         pendingSelection: null,
       }
-    }
 
     case 'SET_WAVEFORM_PENDING_SELECTION':
       return {

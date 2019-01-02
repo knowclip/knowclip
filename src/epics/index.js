@@ -22,6 +22,7 @@ import exportFlashcardsEpic from './exportFlashcards'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
+import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 
 const setLocalFlashcardEpic = (action$, state$) =>
   action$.pipe(
@@ -138,5 +139,6 @@ export default combineEpics(
   makeClipsEpic,
   detectSilenceEpic,
   persistStateEpic,
-  exportFlashcardsEpic
+  exportFlashcardsEpic,
+  deleteAllCurrentFileClips
 )

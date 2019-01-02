@@ -1,6 +1,8 @@
+// @flow
+
 const initialState = {}
 
-export default function flashcards(state = initialState, action) {
+const flashcards: Reducer<FlashcardsState> = (state = initialState, action) => {
   switch (action.type) {
     case 'SET_FLASHCARD_FIELD': {
       const { id, key, value } = action
@@ -25,9 +27,30 @@ export default function flashcards(state = initialState, action) {
         },
       }
 
+    case 'ADD_WAVEFORM_SELECTIONS':
+      return {
+        ...state,
+        ...action.selections.reduce((all: FlashcardsState, selection: Clip) => {
+          all[selection.id] = {
+            // should reference user-defined card schema
+            de: '',
+            en: '',
+            id: selection.id,
+          }
+          return all
+        }, ({}: FlashcardsState)),
+      }
     case 'DELETE_CARD': {
       const newState = { ...state }
       delete newState[action.id]
+      return newState
+    }
+
+    case 'DELETE_CARDS': {
+      const newState = { ...state }
+      action.ids.forEach(id => {
+        delete newState[id]
+      })
       return newState
     }
 
@@ -35,3 +58,5 @@ export default function flashcards(state = initialState, action) {
       return state
   }
 }
+
+export default flashcards

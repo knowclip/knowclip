@@ -6,6 +6,7 @@ import waveform from './waveform'
 import clips from './clips'
 import user from './user'
 import snackbar from './snackbar'
+import dialog from './dialog'
 
 export default combineReducers({
   audio,
@@ -14,4 +15,5 @@ export default combineReducers({
   clips,
   user,
   snackbar,
+  dialog,
 })

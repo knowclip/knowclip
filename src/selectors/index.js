@@ -14,6 +14,7 @@ export const SELECTION_THRESHOLD = 40
 export * from './waveformTime'
 export * from './clips'
 export * from './snackbar'
+export * from './dialog'
 
 type FlashcardWithTime = {
   id: FlashcardId,
@@ -208,3 +209,13 @@ export const isAudioLoading = (state: AppState): boolean =>
 
 export const getMediaFolderLocation = (state: AppState): ?string =>
   state.audio.mediaFolderLocation
+
+export const doesCurrentFileHaveClips = (state: AppState): boolean => {
+  const currentFilePath = getCurrentFilePath(state)
+  const clips = (Object.values(state.clips): any)
+  // console.log(currentFilePath)
+  // console.log(clips.map(c => c.filePath), clips.some((clip: Clip) => clip.filePath === currentFilePath))
+  return currentFilePath
+    ? clips.some((clip: Clip) => clip.filePath === currentFilePath)
+    : false
+}

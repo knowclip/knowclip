@@ -7,48 +7,21 @@ import {
   Checkbox,
   FormControlLabel,
   CircularProgress,
+  Tooltip,
 } from '@material-ui/core'
-import { Close as CloseIcon } from '@material-ui/icons'
+import {
+  Hearing as HearingIcon,
+  Delete as DeleteIcon,
+} from '@material-ui/icons'
 import { Link } from 'react-router-dom'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
-import Snackbar from '../components/Snackbar'
+import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
 import * as r from '../redux'
 import electron from 'electron'
 
 const { remote } = electron
 const { dialog } = remote
-
-const AudioFilesMenu = ({
-  onClickPrevious,
-  onClickNext,
-  currentFilename,
-  isPrevButtonEnabled,
-  isNextButtonEnabled,
-  chooseAudioFiles,
-  removeAudioFiles,
-}) => (
-  <Fragment>
-    <p className="audioFilesMenu">
-      <Button onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-        Previous
-      </Button>
-      {currentFilename ? (
-        <h2 className="audioFileName">
-          {currentFilename}
-          <IconButton onClick={removeAudioFiles}>
-            <CloseIcon />
-          </IconButton>
-        </h2>
-      ) : (
-        <Button onClick={chooseAudioFiles}>Choose audio files </Button>
-      )}
-      <Button onClick={onClickNext} disabled={!isNextButtonEnabled}>
-        Next
-      </Button>
-    </p>
-  </Fragment>
-)
 
 class App extends Component {
   state = {
@@ -135,9 +108,10 @@ class App extends Component {
       highlightSelection,
       audioIsLoading,
       mediaFolderLocation,
+      detectSilenceRequest,
+      deleteAllCurrentFileClipsRequest,
     } = this.props
 
-    // for reference during transition to clip-based flashcards
     const form = Boolean(currentFlashcard) ? (
       <section onSubmit={this.handleFlashcardSubmit}>
         <form className="form">
@@ -203,7 +177,7 @@ class App extends Component {
             </Link>
           </p>
         </header>
-        <AudioFilesMenu
+        <AudioFilesNavMenu
           onClickPrevious={this.prevFile}
           onClickNext={this.nextFile}
           currentFilename={currentFileName}
@@ -218,15 +192,28 @@ class App extends Component {
             <CircularProgress />
           </div>
         )}
-        <audio
-          onEnded={this.handleAudioEnded}
-          loop={loop}
-          ref={this.audioRef}
-          controls
-          id="audioPlayer"
-          className="audioPlayer"
-          autoPlay
-        />
+        <p>
+          <audio
+            onEnded={this.handleAudioEnded}
+            loop={loop}
+            ref={this.audioRef}
+            controls
+            id="audioPlayer"
+            className="audioPlayer"
+            controlsList="nodownload"
+            autoPlay
+          />
+          <Tooltip title="Detect silences">
+            <IconButton onClick={detectSilenceRequest}>
+              <HearingIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete all clips for this file">
+            <IconButton onClick={deleteAllCurrentFileClipsRequest}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        </p>
         {form}
         <ShowAll
           open={this.state.modalIsOpen}
@@ -238,7 +225,6 @@ class App extends Component {
           makeClips={makeClips}
           exportFlashcards={exportFlashcards}
         />
-        <Snackbar />
       </div>
     )
   }
@@ -270,6 +256,8 @@ const mapDispatchToProps = {
   exportFlashcards: r.exportFlashcards,
   highlightSelection: r.highlightSelection,
   initializeApp: r.initializeApp,
+  detectSilenceRequest: r.detectSilenceRequest,
+  deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
 }
 
 export default connect(
