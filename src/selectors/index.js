@@ -213,8 +213,6 @@ export const getMediaFolderLocation = (state: AppState): ?string =>
 export const doesCurrentFileHaveClips = (state: AppState): boolean => {
   const currentFilePath = getCurrentFilePath(state)
   const clips = (Object.values(state.clips): any)
-  // console.log(currentFilePath)
-  // console.log(clips.map(c => c.filePath), clips.some((clip: Clip) => clip.filePath === currentFilePath))
   return currentFilePath
     ? clips.some((clip: Clip) => clip.filePath === currentFilePath)
     : false

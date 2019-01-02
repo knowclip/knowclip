@@ -149,14 +149,6 @@ class App extends Component {
               label="English"
               inputProps={{ lang: 'en' }}
             />
-            <Button
-              type="submit"
-              fullWidth
-              onClick={this.submitFlashcardForm}
-              disabled={isNextButtonEnabled}
-            >
-              Continue
-            </Button>
             <Button fullWidth onClick={this.openModal}>
               Review &amp; export
             </Button>
