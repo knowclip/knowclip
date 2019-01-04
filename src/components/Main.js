@@ -14,6 +14,7 @@ import {
   Delete as DeleteIcon,
 } from '@material-ui/icons'
 import { Link } from 'react-router-dom'
+import formatTime from '../utils/formatTime'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
@@ -127,7 +128,8 @@ class App extends Component {
           />
           <div className="formBody">
             <p>
-              {currentFlashcard.time.from}-{currentFlashcard.time.until}
+              {formatTime(currentFlashcard.time.from)}-
+              {formatTime(currentFlashcard.time.until)}
             </p>
             <Button type="button" onClick={this.deleteCard}>
               Delete card
@@ -162,11 +164,10 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Audio Flashcard Assistant</h1>
+          <h1 className="App-title">Audio Flashcard Assistant v0.0.0</h1>
           <p>
-            <Link to="/media-folder-location">
-              audio will be saved in: {mediaFolderLocation}
-            </Link>
+            audio will be saved in:{' '}
+            <Link to="/media-folder-location">{mediaFolderLocation}</Link>
           </p>
         </header>
         <AudioFilesNavMenu
