@@ -7,7 +7,7 @@ import { getMillisecondsAtX } from './waveformTime'
 const SAFE_SEPARATOR = '-'
 
 export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
-  const clip = state.clips[id]
+  const clip = state.clips.byId[id]
   if (!clip) throw new Error('Maybe impossible')
   return {
     start: getMillisecondsAtX(state, clip.start),
@@ -16,7 +16,7 @@ export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
 }
 
 export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
-  const { start, end, filePath } = state.clips[clipId]
+  const { start, end, filePath } = state.clips.byId[clipId]
   const extension = extname(filePath)
   const filenameWithoutExtension = basename(filePath, extension)
   const startTime = getMillisecondsAtX(state, start)

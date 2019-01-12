@@ -14,7 +14,7 @@ export type AppAction =
   | {| type: 'CHOOSE_AUDIO_FILES', filePaths: Array<AudioFilePath> |}
   | {|
       type: 'SET_FLASHCARD_FIELD',
-      id: FlashcardId,
+      id: ClipId,
       key: string,
       value: string,
     |}
@@ -27,14 +27,14 @@ export type AppAction =
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
   | {| type: 'LOAD_AUDIO_SUCCESS', file: Object |}
-  | {| type: 'DELETE_CARD', id: FlashcardId |}
+  | {| type: 'DELETE_CARD', id: ClipId |}
   | {| type: 'MAKE_CLIPS' |}
   | {| type: 'EXPORT_FLASHCARDS' |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
   | {| type: 'DETECT_SILENCE' |}
   | {| type: 'DETECT_SILENCE_REQUEST' |}
-  | {| type: 'DELETE_CARDS', ids: Array<FlashcardId> |}
+  | {| type: 'DELETE_CARDS', ids: Array<ClipId> |}
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
 
 export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
@@ -47,7 +47,7 @@ export const chooseAudioFiles = (
 })
 
 export const setFlashcardField = (
-  id: FlashcardId,
+  id: ClipId,
   key: string,
   value: string
 ): AppAction => ({
@@ -82,12 +82,12 @@ export const loadAudioSuccess = (file: Object): AppAction => ({
   file,
 })
 
-export const deleteCard = (id: FlashcardId): AppAction => ({
+export const deleteCard = (id: ClipId): AppAction => ({
   type: 'DELETE_CARD',
   id,
 })
 
-export const deleteCards = (ids: Array<FlashcardId>): AppAction => ({
+export const deleteCards = (ids: Array<ClipId>): AppAction => ({
   type: 'DELETE_CARDS',
   ids,
 })

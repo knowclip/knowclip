@@ -8,6 +8,7 @@ import Snackbar from './components/Snackbar'
 import Dialog from './components/Dialog'
 import Main from './components/Main'
 import MediaFolderLocationForm from './components/MediaFolderLocationForm'
+import DefineSchemaForm from './components/DefineSchemaForm'
 
 class App extends Component {
   render() {
@@ -24,10 +25,10 @@ class App extends Component {
               }
             />
             <Route
-              exact
               path="/media-folder-location"
               component={MediaFolderLocationForm}
             />
+            <Route path="/define-schema" component={DefineSchemaForm} />
           </Switch>
         </HashRouter>
         <Snackbar />

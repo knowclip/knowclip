@@ -7,6 +7,17 @@ declare type Clip = Exact<{
   start: WaveformX,
   end: WaveformX,
   filePath: AudioFilePath,
+  flashcard: Flashcard,
 }>
 
-declare type ClipsState = { [ClipId]: Clip }
+declare type ClipsState = {
+  byId: { [ClipId]: Clip },
+  idsForFile: { [AudioFilePath]: Array<ClipId> },
+}
+
+declare type Flashcard = {
+  // make exact
+  id: ClipId,
+  de: string,
+  en: string,
+}

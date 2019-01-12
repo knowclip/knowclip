@@ -25,10 +25,10 @@ const audio: Reducer<AudioState> = (
       return {
         ...state,
         filesOrder: filePaths,
-        files: filePaths.reduce(
-          (files, path) => ({ ...files, [path]: { path } }),
-          {}
-        ),
+        files: filePaths.reduce((files, path) => {
+          const fileData: AudioFileData = { path, clipsOrder: [] }
+          return { ...files, [path]: fileData }
+        }, {}),
         isLoading: true,
         currentFileIndex: 0,
       }
@@ -64,6 +64,9 @@ const audio: Reducer<AudioState> = (
         mediaFolderLocation: action.directoryPath,
       }
 
+    // case 'ASSIGN_NOTE_TYPE':
+
+    // case 'ADD_WAVEFORM_SELECTION'
     default:
       return state
   }

@@ -10,13 +10,13 @@ import {
 } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { fromEvent, of, merge } from 'rxjs'
-import uuid from 'uuid/v4'
 import { setWaveformPendingSelection, addWaveformSelection } from '../actions'
 import * as r from '../redux'
 import {
   toWaveformX,
   toWaveformCoordinates,
 } from '../utils/waveformCoordinates'
+import newClip from '../utils/newClip'
 
 const pendingSelectionIsBigEnough = state => {
   const pendingSelection = r.getWaveformPendingSelection(state)
@@ -24,13 +24,6 @@ const pendingSelectionIsBigEnough = state => {
 
   const { start, end } = pendingSelection
   return Math.abs(end - start) >= r.SELECTION_THRESHOLD
-}
-
-const ascending = (a, b) => a - b
-const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
-const getFinalSelection = (pendingSelection, currentFileName) => {
-  const [start, end] = sortSelectionPoints(pendingSelection)
-  return { start, end, id: uuid(), filePath: currentFileName }
 }
 
 const waveformSelectionEpic = (action$, state$) => {
@@ -94,7 +87,7 @@ const waveformSelectionEpic = (action$, state$) => {
             ? // maybe later, do stretch + merge for overlaps.
               setWaveformPendingSelection(null)
             : addWaveformSelection(
-                getFinalSelection(
+                newClip(
                   r.getWaveformPendingSelection(state$.value),
                   r.getCurrentFilePath(state$.value)
                 )

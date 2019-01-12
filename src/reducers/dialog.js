@@ -4,10 +4,10 @@ const initialState: DialogState = {
   queue: [],
 }
 
-export default function dialog(
+const dialog: Reducer<DialogState> = (
   state: DialogState = initialState,
   action: Object
-): DialogState {
+) => {
   switch (action.type) {
     case 'ENQUEUE_DIALOG':
       return {
@@ -27,3 +27,5 @@ export default function dialog(
       return state
   }
 }
+
+export default dialog

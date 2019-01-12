@@ -17,7 +17,7 @@ export * from './snackbar'
 export * from './dialog'
 
 type FlashcardWithTime = {
-  id: FlashcardId,
+  id: ClipId,
   de: string,
   en: string,
   time: {
@@ -28,11 +28,11 @@ type FlashcardWithTime = {
 
 export const getFlashcard = (
   state: AppState,
-  id: FlashcardId
+  id: ClipId
 ): ?FlashcardWithTime => {
-  const flashcard = state.flashcards[id]
+  const flashcard = state.clips.byId[id].flashcard
   if (!flashcard) return null
-  const selection = state.clips[id]
+  const selection = state.clips.byId[id]
   return {
     ...flashcard,
     time: {
@@ -93,7 +93,7 @@ export const getWaveformSelectionsOrder: (
   [state => state.clips, getCurrentFilePath],
   (clips, currentFilePath) => {
     if (!currentFilePath) return []
-    const clipsArray = (Object.values(clips): any).filter(
+    const clipsArray = (Object.values(clips.byId): any).filter(
       c => c.filePath === currentFilePath
     )
     return clipsArray
@@ -103,7 +103,7 @@ export const getWaveformSelectionsOrder: (
 )
 
 export const getWaveformSelection = (state: AppState, id: ClipId): ?Clip =>
-  state.clips[id]
+  state.clips.byId[id]
 export const getWaveformSelections = (state: AppState): Array<Clip> =>
   getWaveformSelectionsOrder(state).map(
     (id: ClipId): Clip => {
@@ -143,17 +143,22 @@ export const getWaveform = (state: AppState) => ({
 // export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> =>
 //   state.clips.selectionsOrder
 
-export const getCurrentFlashcardId = (state: AppState): ?FlashcardId =>
+export const getCurrentFlashcardId = (state: AppState): ?ClipId =>
   state.user.highlightedSelectionId
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
-  getWaveformSelectionsOrder(state).map(id => state.flashcards[id])
+  getWaveformSelectionsOrder(state).map(id => {
+    const flashcard = getFlashcard(state, id)
+    if (!flashcard) throw new Error('flashcard not found')
+    delete flashcard.time
+    return flashcard
+  })
 
 export const getWaveformPendingSelection = (
   state: AppState
 ): ?PendingSelection => state.user.pendingSelection
 export const getSelectionIdAt = (state: AppState, x: number): ?ClipId =>
   getWaveformSelectionsOrder(state).find(selectionId => {
-    const selection = state.clips[selectionId]
+    const selection = state.clips.byId[selectionId]
     const { start, end } = selection
     return x >= start && x <= end
   })
@@ -212,7 +217,7 @@ export const getMediaFolderLocation = (state: AppState): ?string =>
 
 export const doesCurrentFileHaveClips = (state: AppState): boolean => {
   const currentFilePath = getCurrentFilePath(state)
-  const clips = (Object.values(state.clips): any)
+  const clips = (Object.values(state.clips.byId): any)
   return currentFilePath
     ? clips.some((clip: Clip) => clip.filePath === currentFilePath)
     : false

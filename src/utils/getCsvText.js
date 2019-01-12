@@ -5,7 +5,7 @@ const getCsvText = state => {
   const filePaths = state.audio.filesOrder
   const clipsAndCards = []
   filePaths.forEach(filePath => {
-    const currentClips = Object.values(state.clips).filter(
+    const currentClips = Object.values(state.clips.byId).filter(
       c => c.filePath === filePath
     )
     currentClips.forEach(clip => {

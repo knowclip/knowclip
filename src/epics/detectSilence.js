@@ -1,9 +1,9 @@
 import { flatMap, map, withLatestFrom } from 'rxjs/operators'
-import { from, of } from 'rxjs'
+import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
-import uuid from 'uuid/v4'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
+import newClip from '../utils/newClip'
 
 const detectSilence = (
   path,
@@ -45,12 +45,6 @@ const detectSilence = (
       .run()
   })
 
-const ascending = (a, b) => a - b
-const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
-const getFinalSelection = (pendingSelection, currentFileName) => {
-  const [start, end] = sortSelectionPoints(pendingSelection)
-  return { start, end, id: uuid(), filePath: currentFileName }
-}
 const detectSilenceEpic = (action$, state$) =>
   action$.pipe(
     ofType('DETECT_SILENCE'),
@@ -80,7 +74,7 @@ const detectSilenceEpic = (action$, state$) =>
         })
 
         const newSelections = chunks.map(({ start, end }) =>
-          getFinalSelection(
+          newClip(
             {
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),
