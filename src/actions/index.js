@@ -7,7 +7,7 @@ export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
 
-export type AppAction =
+declare type Action =
   | SnackbarAction
   | DialogAction
   | WaveformAction

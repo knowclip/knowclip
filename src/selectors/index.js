@@ -30,8 +30,9 @@ export const getFlashcard = (
   state: AppState,
   id: ClipId
 ): ?FlashcardWithTime => {
+  if (!state.clips.byId[id]) return null
+  if (!state.clips.byId[id].flashcard) return null
   const flashcard = state.clips.byId[id].flashcard
-  if (!flashcard) return null
   const selection = state.clips.byId[id]
   return {
     ...flashcard,
@@ -87,20 +88,10 @@ export const getCurrentFile = (state: AppState): ?AudioFileData => {
   const currentFilePath = getCurrentFilePath(state)
   return currentFilePath ? state.audio.files[currentFilePath] : null
 }
-export const getWaveformSelectionsOrder: (
-  state: AppState
-) => Array<ClipId> = createSelector(
-  [state => state.clips, getCurrentFilePath],
-  (clips, currentFilePath) => {
-    if (!currentFilePath) return []
-    const clipsArray = (Object.values(clips.byId): any).filter(
-      c => c.filePath === currentFilePath
-    )
-    return clipsArray
-      .sort((a: Clip, b: Clip) => a.start - b.start)
-      .map((s: Clip) => s.id)
-  }
-)
+export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> => {
+  const currentFilePath = getCurrentFilePath(state)
+  return currentFilePath ? state.clips.idsByFilePath[currentFilePath] : []
+}
 
 export const getWaveformSelection = (state: AppState, id: ClipId): ?Clip =>
   state.clips.byId[id]
@@ -125,7 +116,8 @@ export const getWaveformPendingStretch = (
   if (!pendingStretch) return
 
   const stretchedSelection = getWaveformSelection(state, pendingStretch.id)
-  if (!stretchedSelection) throw new Error('Impossible')
+  if (!stretchedSelection)
+    throw new Error('Impossible: no stretched selection ' + pendingStretch.id)
 
   const { originKey } = pendingStretch
   const [start, end] = [
@@ -140,15 +132,13 @@ export const getWaveform = (state: AppState) => ({
   selections: getWaveformSelections(state),
   pendingStretch: getWaveformPendingStretch(state),
 })
-// export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> =>
-//   state.clips.selectionsOrder
 
 export const getCurrentFlashcardId = (state: AppState): ?ClipId =>
   state.user.highlightedSelectionId
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
   getWaveformSelectionsOrder(state).map(id => {
     const flashcard = getFlashcard(state, id)
-    if (!flashcard) throw new Error('flashcard not found')
+    if (!flashcard) throw new Error('flashcard not found ' + id)
     delete flashcard.time
     return flashcard
   })

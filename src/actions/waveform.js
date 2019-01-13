@@ -3,8 +3,12 @@
 export type WaveformAction =
   | {| type: 'SET_WAVEFORM_PEAKS', peaks: Array<*> |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
-  | {| type: 'ADD_WAVEFORM_SELECTION', selection: Clip |}
-  | {| type: 'ADD_WAVEFORM_SELECTIONS', selections: Array<Clip> |}
+  | {| type: 'ADD_WAVEFORM_SELECTION', selection: Clip, filePath: FilePath |}
+  | {|
+      type: 'ADD_WAVEFORM_SELECTIONS',
+      selections: Array<Clip>,
+      filePath: FilePath,
+    |}
   | {| type: 'SET_WAVEFORM_PENDING_SELECTION', selection: Clip |}
   | {| type: 'HIGHLIGHT_WAVEFORM_SELECTION', id: ClipId |}
   | {| type: 'EDIT_WAVEFORM_SELECTION', id: ClipId, override: $Shape<Clip> |}
@@ -31,10 +35,12 @@ export const addWaveformSelection = (selection: Clip): WaveformAction => ({
 })
 
 export const addWaveformSelections = (
-  selections: Array<Clip>
+  selections: Array<Clip>,
+  filePath: FilePath
 ): WaveformAction => ({
   type: 'ADD_WAVEFORM_SELECTIONS',
   selections,
+  filePath,
 })
 
 export const setWaveformPendingSelection = (

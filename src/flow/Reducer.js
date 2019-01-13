@@ -1,5 +1,3 @@
 // @flow
 
-declare type ActionType = Object
-
-declare type Reducer<StateType> = (StateType, ActionType) => StateType
+declare type Reducer<StateType> = (StateType, Action) => StateType

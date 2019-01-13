@@ -12,7 +12,7 @@ declare type Clip = Exact<{
 
 declare type ClipsState = {
   byId: { [ClipId]: Clip },
-  idsForFile: { [AudioFilePath]: Array<ClipId> },
+  idsByFilePath: { [AudioFilePath]: Array<ClipId> },
 }
 
 declare type Flashcard = {

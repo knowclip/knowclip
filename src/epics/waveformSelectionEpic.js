@@ -16,6 +16,7 @@ import {
   toWaveformX,
   toWaveformCoordinates,
 } from '../utils/waveformCoordinates'
+import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 
 const pendingSelectionIsBigEnough = state => {
@@ -89,7 +90,8 @@ const waveformSelectionEpic = (action$, state$) => {
             : addWaveformSelection(
                 newClip(
                   r.getWaveformPendingSelection(state$.value),
-                  r.getCurrentFilePath(state$.value)
+                  r.getCurrentFilePath(state$.value),
+                  uuid()
                 )
               )
         })

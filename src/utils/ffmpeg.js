@@ -1,9 +1,14 @@
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
 
-// have to do it this was cause of webpack
-const ffmpegPath = require('electron').remote.getGlobal('ffmpegpath')
+const setFfmpegPath = () => {
+  if (process.env.JEST_WORKER_ID) return
 
-ffmpeg.setFfmpegPath(ffmpegPath)
+  // have to do it this was cause of webpack
+  const ffmpegPath = require('electron').remote.getGlobal('ffmpegpath')
+
+  ffmpeg.setFfmpegPath(ffmpegPath)
+}
+setFfmpegPath()
 
 export default ffmpeg
 

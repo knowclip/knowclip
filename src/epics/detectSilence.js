@@ -3,6 +3,7 @@ import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
+import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 
 const detectSilence = (
@@ -73,24 +74,21 @@ const detectSilenceEpic = (action$, state$) =>
           }
         })
 
+        const filePath = r.getCurrentFilePath(state$.value)
         const newSelections = chunks.map(({ start, end }) =>
           newClip(
             {
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),
             },
-            r.getCurrentFilePath(state$.value)
+            filePath,
+            uuid()
           )
         )
 
         return from([
-          r.deleteCards(
-            r.getClipIdsByFilePath(
-              state$.value,
-              r.getCurrentFilePath(state$.value)
-            )
-          ),
-          r.addWaveformSelections(newSelections),
+          r.deleteCards(r.getClipIdsByFilePath(state$.value, filePath)),
+          r.addWaveformSelections(newSelections, filePath),
         ])
       })
     }),
