@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 import formatTime from '../utils/formatTime'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
+import FlashcardForm from '../components/FlashcardForm'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
 import DefineSchemaForm from '../components/DefineSchemaForm'
 import * as r from '../redux'
@@ -45,13 +46,13 @@ class App extends Component {
           // should really happen after a clip is selected.
           // this.germanInput.focus()
 
-          this.props.chooseAudioFiles(filePaths)
+          this.props.chooseAudioFiles(filePaths, this.props.currentNoteType.id)
         })
       }
     )
   }
 
-  removeAudioFiles = () => this.props.chooseAudioFiles([])
+  removeAudioFiles = () => this.props.removeAudioFiles()
 
   fileInputRef = el => (this.fileInput = el)
   audioRef = el => (this.audio = el)
@@ -116,51 +117,8 @@ class App extends Component {
     } = this.props
 
     if (!currentNoteType) return <DefineSchemaForm />
-
     const form = Boolean(currentFlashcard) ? (
-      <section onSubmit={this.handleFlashcardSubmit}>
-        <form className="form">
-          <FormControlLabel
-            label="Loop"
-            control={
-              <Checkbox
-                checked={loop}
-                value={loop}
-                onChange={this.toggleLoop}
-              />
-            }
-          />
-          <div className="formBody">
-            <p>
-              {formatTime(currentFlashcard.time.from)}-
-              {formatTime(currentFlashcard.time.until)}
-            </p>
-            <Button type="button" onClick={this.deleteCard}>
-              Delete card
-            </Button>
-            <TextField
-              inputRef={this.germanInputRef}
-              onChange={this.setGerman}
-              value={currentFlashcard.de}
-              fullWidth
-              multiline
-              label="German"
-              inputProps={{ lang: 'de' }}
-            />
-            <TextField
-              onChange={this.setEnglish}
-              value={currentFlashcard.en}
-              fullWidth
-              multiline
-              label="English"
-              inputProps={{ lang: 'en' }}
-            />
-            <Button fullWidth onClick={this.openModal}>
-              Review &amp; export
-            </Button>
-          </div>
-        </form>
-      </section>
+      <FlashcardForm />
     ) : (
       <p>Click + drag to make audio clips and start making flashcards.</p>
     )
@@ -212,6 +170,9 @@ class App extends Component {
           </Tooltip>
         </p>
         {form}
+        <Button fullWidth onClick={this.openModal}>
+          Review &amp; export
+        </Button>
         <ShowAll
           open={this.state.modalIsOpen}
           handleClose={this.closeModal}
@@ -221,6 +182,7 @@ class App extends Component {
           highlightSelection={highlightSelection}
           makeClips={makeClips}
           exportFlashcards={exportFlashcards}
+          currentNoteType={currentNoteType}
         />
       </div>
     )
@@ -246,6 +208,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   chooseAudioFiles: r.chooseAudioFiles,
+  removeAudioFiles: r.removeAudioFiles,
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,

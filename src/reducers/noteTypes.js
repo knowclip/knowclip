@@ -1,14 +1,22 @@
 // @flow
 
 const initialState: NoteTypesState = {
-  byId: {},
-  allIds: [],
+  byId: {
+    default: {
+      id: 'default',
+      name: 'default',
+      fields: [{ name: 'Front' }, { name: 'Back' }],
+    },
+  },
+  allIds: ['default'],
+  defaultId: 'default',
 }
 
 const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_NOTE_TYPE':
       return {
+        ...state,
         byId: {
           ...state.byId,
           [action.noteType.id]: action.noteType,
@@ -32,10 +40,17 @@ const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
       const byId = { ...state.byId }
       delete byId[action.id]
       return {
+        ...state,
         byId,
         allIds: state.allIds.filter(id => id !== action.id),
       }
     }
+
+    case 'SET_DEFAULT_NOTE_TYPE':
+      return {
+        ...state,
+        defaultId: action.id,
+      }
 
     default:
       return state

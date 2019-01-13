@@ -20,7 +20,7 @@ const audio: Reducer<AudioState> = (
       }
 
     case 'CHOOSE_AUDIO_FILES': {
-      const { filePaths } = action
+      const { filePaths, noteTypeId } = action
 
       return {
         ...state,
@@ -29,7 +29,7 @@ const audio: Reducer<AudioState> = (
           const fileData: AudioFileData = {
             path,
             clipsOrder: [],
-            noteTypeId: null,
+            noteTypeId,
           }
           return { ...files, [path]: fileData }
         }, {}),
@@ -37,6 +37,15 @@ const audio: Reducer<AudioState> = (
         currentFileIndex: 0,
       }
     }
+
+    case 'REMOVE_AUDIO_FILES':
+      return {
+        ...state,
+        filesOrder: [],
+        files: {},
+        isLoading: false,
+        currentFileIndex: 0,
+      }
 
     case 'INITIALIZE_APP':
       return {

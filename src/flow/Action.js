@@ -6,7 +6,12 @@ declare type Action =
   | DialogAction
   | WaveformAction
   | NoteTypeAction
-  | {| type: 'CHOOSE_AUDIO_FILES', filePaths: Array<AudioFilePath> |}
+  | {|
+      type: 'CHOOSE_AUDIO_FILES',
+      filePaths: Array<AudioFilePath>,
+      noteTypeId: NoteTypeId,
+    |}
+  | {| type: 'REMOVE_AUDIO_FILES' |}
   | {|
       type: 'SET_FLASHCARD_FIELD',
       id: ClipId,

@@ -3,15 +3,21 @@
 export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
-export * from './noteType'
+export * from './noteTypes'
 
 export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
 
 export const chooseAudioFiles = (
-  filePaths: Array<AudioFilePath>
+  filePaths: Array<AudioFilePath>,
+  noteTypeId: NoteTypeId
 ): AppAction => ({
   type: 'CHOOSE_AUDIO_FILES',
   filePaths,
+  noteTypeId,
+})
+
+export const removeAudioFiles = (): AppAction => ({
+  type: 'REMOVE_AUDIO_FILES',
 })
 
 export const setFlashcardField = (

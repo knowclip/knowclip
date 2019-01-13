@@ -91,7 +91,8 @@ const waveformSelectionEpic = (action$, state$) => {
                 newClip(
                   r.getWaveformPendingSelection(state$.value),
                   r.getCurrentFilePath(state$.value),
-                  uuid()
+                  uuid(),
+                  r.getCurrentNoteType(state$.value)
                 )
               )
         })

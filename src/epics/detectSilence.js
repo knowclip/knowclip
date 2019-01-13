@@ -82,7 +82,8 @@ const detectSilenceEpic = (action$, state$) =>
               end: r.getXAtMilliseconds(state$.value, end),
             },
             filePath,
-            uuid()
+            uuid(),
+            r.getCurrentNoteType(state$.value)
           )
         )
 

@@ -57,6 +57,12 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
         ),
       }
 
+    case 'REMOVE_AUDIO_FILES':
+      return {
+        ...state,
+        idsByFilePath: [],
+      }
+
     case 'ADD_WAVEFORM_SELECTION': {
       const { selection } = action
       const { filePath } = selection
@@ -192,7 +198,7 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
             ...state.byId[id],
             flashcard: {
               ...state.byId[id].flashcard,
-              [key]: value,
+              fields: { ...state.byId[id].flashcard.fields, [key]: value },
             },
           },
         },

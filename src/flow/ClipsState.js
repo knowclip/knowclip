@@ -18,6 +18,10 @@ declare type ClipsState = {
 declare type Flashcard = {
   // make exact
   id: ClipId,
-  de: string,
-  en: string,
+  fields: { [NoteFieldName]: NoteField },
+}
+
+declare type NoteField = {
+  name: NoteFieldName,
+  value: string,
 }

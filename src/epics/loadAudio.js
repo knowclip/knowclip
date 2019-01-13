@@ -80,6 +80,15 @@ const chooseAudioFilesEpic = (action$, state$) =>
       return await r.loadAudio(filePaths[0], audioElement(), svgElement())
     })
   )
+const removeAudioFilesEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('REMOVE_AUDIO_FILES'),
+    flatMap(async ({ filePaths }) => {
+      console.log('No audio file selected')
+
+      return await r.loadAudio(null, audioElement(), svgElement())
+    })
+  )
 
 const setCurrentFileEpic = (action$, state$) =>
   action$.pipe(

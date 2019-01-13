@@ -23,7 +23,7 @@ const Field = ({ text }) => (
 )
 
 let FlashcardRow = ({
-  flashcard: { de, en, id },
+  flashcard: { fields, id },
   highlightSelection,
   closeModal,
   file,
@@ -33,7 +33,7 @@ let FlashcardRow = ({
     onClick={() => highlightSelection(id)}
     onDoubleClick={closeModal}
   >
-    {file && (
+    {/* {file && (
       <TableCell
         style={{
           maxWidth: '8em',
@@ -43,13 +43,12 @@ let FlashcardRow = ({
       >
         {file.name}
       </TableCell>
-    )}
-    <TableCell>
-      <Field text={de} />
-    </TableCell>
-    <TableCell>
-      <Field text={en} />
-    </TableCell>
+    )} */}
+    {Object.values(fields).map(fieldText => (
+      <TableCell>
+        <Field text={fieldText} />
+      </TableCell>
+    ))}
   </TableRow>
 )
 FlashcardRow = connect((state, { flashcardId }) => ({
@@ -64,6 +63,7 @@ const ShowAll = ({
   highlightSelection,
   makeClips,
   exportFlashcards,
+  noteType,
 }) =>
   !open ? null : (
     <Dialog open={open} onClose={handleClose} style={{ width: '900px' }}>
@@ -71,6 +71,7 @@ const ShowAll = ({
         <TableBody>
           {flashcards.map((flashcard, i) => (
             <FlashcardRow
+              flashcard={flashcard}
               key={flashcard.id}
               highlightSelection={highlightSelection}
               closeModal={handleClose}

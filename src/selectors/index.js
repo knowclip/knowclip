@@ -201,6 +201,6 @@ export const getCurrentNoteType = (state: AppState): ?NoteType => {
 
   const currentNoteTypeId = currentFile
     ? currentFile.noteTypeId
-    : state.user.defaultNoteTypeId
+    : state.noteTypes.defaultId
   return currentNoteTypeId ? state.noteTypes.byId[currentNoteTypeId] : null
 }
