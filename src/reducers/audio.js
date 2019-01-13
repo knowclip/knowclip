@@ -2,7 +2,7 @@
 const initialState: AudioState = {
   loop: true,
   currentFileIndex: 0,
-  files: {},
+  files: ({}: { [AudioFilePath]: AudioFileData }),
   filesOrder: [],
   isLoading: false,
   mediaFolderLocation: null,
@@ -26,7 +26,11 @@ const audio: Reducer<AudioState> = (
         ...state,
         filesOrder: filePaths,
         files: filePaths.reduce((files, path) => {
-          const fileData: AudioFileData = { path, clipsOrder: [] }
+          const fileData: AudioFileData = {
+            path,
+            clipsOrder: [],
+            noteTypeId: null,
+          }
           return { ...files, [path]: fileData }
         }, {}),
         isLoading: true,

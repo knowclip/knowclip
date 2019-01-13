@@ -1,11 +1,6 @@
 // @flow
-import { createSelector } from 'reselect'
 import { basename } from 'path'
-import {
-  getSecondsAtX,
-  getMillisecondsAtX,
-  getXAtMilliseconds,
-} from './waveformTime'
+import { getSecondsAtX } from './waveformTime'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
@@ -15,6 +10,7 @@ export * from './waveformTime'
 export * from './clips'
 export * from './snackbar'
 export * from './dialog'
+export * from './noteTypes'
 
 type FlashcardWithTime = {
   id: ClipId,
@@ -67,20 +63,7 @@ export const getCurrentFileName = (state: AppState) => {
   const filePath = getCurrentFilePath(state)
   return filePath && basename(filePath)
 }
-export const makeGetCurrentFile = createSelector(
-  [getCurrentFileIndex],
-  currentFileIndex => files => files[currentFileIndex]
-)
 
-// export const getWaveformPath = (state) => state.waveform.peaks && getSvgPath(state.waveform.peaks)
-
-const byStart = selections => (aId, bId) => {
-  const { start: a } = selections[aId]
-  const { start: b } = selections[bId]
-  if (a < b) return -1
-  if (a > b) return 1
-  return 0
-}
 export const getCurrentFilePath = ({ audio }: AppState) =>
   audio.filesOrder[audio.currentFileIndex]
 
@@ -211,4 +194,13 @@ export const doesCurrentFileHaveClips = (state: AppState): boolean => {
   return currentFilePath
     ? clips.some((clip: Clip) => clip.filePath === currentFilePath)
     : false
+}
+
+export const getCurrentNoteType = (state: AppState): ?NoteType => {
+  const currentFile = getCurrentFile(state)
+
+  const currentNoteTypeId = currentFile
+    ? currentFile.noteTypeId
+    : state.user.defaultNoteTypeId
+  return currentNoteTypeId ? state.noteTypes.byId[currentNoteTypeId] : null
 }

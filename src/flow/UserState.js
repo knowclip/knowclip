@@ -11,17 +11,9 @@ declare type PendingStretch = Exact<{
   end: WaveformX,
 }>
 
-declare type NoteTypeId = String
-
-declare type NoteType = Exact<{
-  id: NoteTypeId,
-  fieldNames: Array<String>,
-}>
-
 declare type UserState = Exact<{
   pendingSelection: ?PendingSelection,
   pendingStretch: ?PendingStretch,
   highlightedSelectionId: ?ClipId,
-  noteTypes: Array<NoteType>,
-  noteTypeAssignments: { [AudioFilePath]: NoteTypeId },
+  defaultNoteTypeId: ?NoteTypeId,
 }>

@@ -1,7 +1,4 @@
 // @flow
-export type DialogAction =
-  | {| type: 'ENQUEUE_DIALOG', dialog: DialogData |}
-  | {| type: 'CLOSE_DIALOG' |}
 
 export const enqueueDialog = (dialog: DialogData): DialogAction => ({
   type: 'ENQUEUE_DIALOG',

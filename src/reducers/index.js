@@ -6,6 +6,7 @@ import clips from './clips'
 import user from './user'
 import snackbar from './snackbar'
 import dialog from './dialog'
+import noteTypes from './noteTypes'
 
 export default combineReducers({
   audio,
@@ -14,4 +15,5 @@ export default combineReducers({
   user,
   snackbar,
   dialog,
+  noteTypes,
 })

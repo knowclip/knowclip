@@ -1,7 +1,4 @@
 // @flow
-export type SnackbarAction =
-  | {| type: 'ENQUEUE_SNACKBAR', snackbar: SnackbarData |}
-  | {| type: 'CLOSE_SNACKBAR' |}
 
 export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
   type: 'ENQUEUE_SNACKBAR',

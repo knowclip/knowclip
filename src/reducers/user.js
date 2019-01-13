@@ -4,8 +4,7 @@ const initialState: UserState = {
   pendingSelection: null,
   pendingStretch: null,
   highlightedSelectionId: null,
-  noteTypes: [],
-  noteTypeAssignments: {},
+  defaultNoteTypeId: null,
 }
 
 export default function user(
@@ -35,6 +34,12 @@ export default function user(
       return {
         ...state,
         pendingStretch: action.stretch,
+      }
+
+    case 'SET_DEFAULT_NOTE_TYPE':
+      return {
+        ...state,
+        defaultNoteTypeId: action.id,
       }
 
     default:

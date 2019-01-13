@@ -18,6 +18,7 @@ import formatTime from '../utils/formatTime'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
+import DefineSchemaForm from '../components/DefineSchemaForm'
 import * as r from '../redux'
 import electron from 'electron'
 
@@ -111,7 +112,10 @@ class App extends Component {
       mediaFolderLocation,
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
+      currentNoteType,
     } = this.props
+
+    if (!currentNoteType) return <DefineSchemaForm />
 
     const form = Boolean(currentFlashcard) ? (
       <section onSubmit={this.handleFlashcardSubmit}>
@@ -237,6 +241,7 @@ const mapStateToProps = state => ({
   clipsTimes: r.getClipsTimes(state),
   audioIsLoading: r.isAudioLoading(state),
   mediaFolderLocation: r.getMediaFolderLocation(state),
+  currentNoteType: r.getCurrentNoteType(state),
 })
 
 const mapDispatchToProps = {

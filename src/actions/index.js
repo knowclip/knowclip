@@ -1,41 +1,9 @@
 // @flow
-import type { SnackbarAction } from './snackbar'
-import type { DialogAction } from './dialog'
-import type { WaveformAction } from './waveform'
 
 export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
-
-declare type Action =
-  | SnackbarAction
-  | DialogAction
-  | WaveformAction
-  | {| type: 'CHOOSE_AUDIO_FILES', filePaths: Array<AudioFilePath> |}
-  | {|
-      type: 'SET_FLASHCARD_FIELD',
-      id: ClipId,
-      key: string,
-      value: string,
-    |}
-  | {|
-      type: 'LOAD_AUDIO',
-      filePath: string,
-      audioElement: Object,
-      svgElement: Object,
-    |}
-  | {| type: 'SET_CURRENT_FILE', index: number |}
-  | {| type: 'TOGGLE_LOOP' |}
-  | {| type: 'LOAD_AUDIO_SUCCESS', file: Object |}
-  | {| type: 'DELETE_CARD', id: ClipId |}
-  | {| type: 'MAKE_CLIPS' |}
-  | {| type: 'EXPORT_FLASHCARDS' |}
-  | {| type: 'INITIALIZE_APP' |}
-  | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
-  | {| type: 'DETECT_SILENCE' |}
-  | {| type: 'DETECT_SILENCE_REQUEST' |}
-  | {| type: 'DELETE_CARDS', ids: Array<ClipId> |}
-  | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
+export * from './noteType'
 
 export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
 

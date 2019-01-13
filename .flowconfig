@@ -6,7 +6,6 @@
 
 [libs]
 ./src/flow
-./src/actions/index.js
 ./flow-typed
 
 [lints]
