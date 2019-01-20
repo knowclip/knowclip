@@ -4,6 +4,7 @@ const initialState: UserState = {
   pendingSelection: null,
   pendingStretch: null,
   highlightedSelectionId: null,
+  defaultNoteTypeId: 'default',
 }
 
 export default function user(

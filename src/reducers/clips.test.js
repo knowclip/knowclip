@@ -8,7 +8,7 @@ describe('clips reducer', () => {
   const noteType: NoteType = {
     name: 'default',
     id: 'default',
-    fields: [{ name: 'Front' }, { name: 'Back' }],
+    fields: [{ id: 'asdf', name: 'Front' }, { id: 'dfjk', name: 'Back' }],
   }
   const oldState: ClipsState = clips(
     {

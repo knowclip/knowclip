@@ -5,7 +5,7 @@ const initialState: NoteTypesState = {
     default: {
       id: 'default',
       name: 'default',
-      fields: [{ name: 'Front' }, { name: 'Back' }],
+      fields: [{ id: 'front', name: 'Front' }, { id: 'back', name: 'Back' }],
     },
   },
   allIds: ['default'],

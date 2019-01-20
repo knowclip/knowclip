@@ -1,37 +1,20 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { TextField, Button, IconButton } from '@material-ui/core'
+import {
+  TextField,
+  Button,
+  IconButton,
+  MenuList,
+  MenuItem,
+} from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
-import { remote, shell } from 'electron'
 import * as r from '../redux'
 import uuid from 'uuid/v4'
 import { Add as AddIcon, Delete as DeleteIcon } from '@material-ui/icons'
 
 // import * as css from './DefineSchemaForm.module.css'
 
-const newField = (name = '') => ({ name })
-
-const getValidator = noteTypeNames => state => {
-  const errors = {}
-  const { noteType } = state
-
-  if (noteTypeNames.includes(noteType.name.trim()))
-    errors.name =
-      'You have already used this name for an existing note type. Please choose a unique name.'
-
-  if (!noteType.name.trim())
-    errors.name = 'Please enter a name for your note type.'
-
-  const fieldsErrors = {}
-  noteType.fields.forEach((field, i) => {
-    if (!field.name.trim())
-      fieldsErrors[i] = 'Please enter a name for this field.'
-  })
-
-  if (Object.keys(fieldsErrors).length) errors.fields = fieldsErrors
-
-  return errors
-}
+const newField = (name = '') => ({ id: uuid(), name })
 
 const deleteKey = (obj, key) => {
   const clone = { ...obj }
@@ -43,7 +26,7 @@ class DefineSchemaForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      noteType: {
+      noteType: props.noteType || {
         fields: [newField('Front'), newField('Back')],
         name: '',
         id: uuid(),
@@ -55,7 +38,32 @@ class DefineSchemaForm extends Component {
       submitted: false,
     }
 
-    this.validate = getValidator(props.noteTypeNames)
+    this.validate = this.getValidator(props.noteTypeNames)
+  }
+
+  getValidator = noteTypeNames => state => {
+    const errors = {}
+    const { noteType } = state
+
+    if (
+      !this.props.match.params.id &&
+      noteTypeNames.includes(noteType.name.trim())
+    )
+      errors.name =
+        'You have already used this name for an existing note type. Please choose a unique name.'
+
+    if (!noteType.name.trim())
+      errors.name = 'Please enter a name for your note type.'
+
+    const fieldsErrors = {}
+    noteType.fields.forEach((field, i) => {
+      if (!field.name.trim())
+        fieldsErrors[i] = 'Please enter a name for this field.'
+    })
+
+    if (Object.keys(fieldsErrors).length) errors.fields = fieldsErrors
+
+    return errors
   }
 
   handleSubmit = e => {
@@ -64,8 +72,12 @@ class DefineSchemaForm extends Component {
     if (Object.keys(errors).length) return this.setState({ errors })
     const { noteType } = this.state
     this.setState({ submitted: true }, () => {
-      this.props.addNoteType(noteType)
-      this.props.setDefaultNoteType(noteType.id)
+      if (this.props.match.params.id) {
+        this.props.editNoteType(noteType.id, noteType)
+      } else {
+        this.props.addNoteType(noteType)
+        this.props.setDefaultNoteType(noteType.id)
+      }
     })
   }
 
@@ -114,10 +126,16 @@ class DefineSchemaForm extends Component {
   render() {
     if (this.state.submitted) return <Redirect to="/" />
 
+    const { noteTypes } = this.props
     const { noteType, errors } = this.state
     const { handleSubmit } = this
     return (
       <section>
+        <MenuList>
+          {noteTypes.map(({ id, name }) => (
+            <MenuItem>{name}</MenuItem>
+          ))}
+        </MenuList>
         <p>What kind of flashcards are you making?</p>
         <p>Define your flashcard fields below.</p>
 
@@ -170,9 +188,11 @@ class DefineSchemaForm extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, { match: { params } }) => ({
   // noteTypeFields: r.getNoteTypeFields(state),
   // noteTypeName: r.getNoteTypeId(state),
+  noteTypes: r.getNoteTypes(state),
+  noteType: r.getNoteType(state, params.id),
   noteTypeNames: r.getNoteTypeNames(state),
 })
 
@@ -180,6 +200,7 @@ const mapDispatchToProps = {
   addNoteType: r.addNoteType,
   setDefaultNoteType: r.setDefaultNoteType,
   simpleMessageSnackbar: r.simpleMessageSnackbar,
+  editNoteType: r.editNoteType,
 }
 
 export default connect(

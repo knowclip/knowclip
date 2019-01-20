@@ -46,7 +46,7 @@ class App extends Component {
           // should really happen after a clip is selected.
           // this.germanInput.focus()
 
-          this.props.chooseAudioFiles(filePaths, this.props.currentNoteType.id)
+          this.props.chooseAudioFiles(filePaths, this.props.defaultNoteTypeId)
         })
       }
     )
@@ -54,9 +54,7 @@ class App extends Component {
 
   removeAudioFiles = () => this.props.removeAudioFiles()
 
-  fileInputRef = el => (this.fileInput = el)
   audioRef = el => (this.audio = el)
-  germanInputRef = el => (this.germanInput = el)
   svgRef = el => (this.svg = el)
 
   goToFile = index => this.props.setCurrentFile(index)
@@ -69,18 +67,6 @@ class App extends Component {
     const lastIndex = this.props.filePaths.length - 1
     this.goToFile(higher <= lastIndex ? higher : lastIndex)
   }
-  handleFlashcardSubmit = e => {
-    e.preventDefault()
-    this.nextFile()
-    this.germanInput.focus()
-  }
-
-  setFlashcardText = (key, text) => {
-    this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
-  }
-
-  setGerman = e => this.setFlashcardText('de', e.target.value)
-  setEnglish = e => this.setFlashcardText('en', e.target.value)
 
   deleteCard = () => {
     const { deleteCard, highlightedWaveformSelectionId } = this.props
@@ -116,7 +102,6 @@ class App extends Component {
       currentNoteType,
     } = this.props
 
-    if (!currentNoteType) return <DefineSchemaForm />
     const form = Boolean(currentFlashcard) ? (
       <FlashcardForm />
     ) : (
@@ -130,6 +115,12 @@ class App extends Component {
           <p>
             audio will be saved in:{' '}
             <Link to="/media-folder-location">{mediaFolderLocation}</Link>
+          </p>
+          <p>
+            using note type:{' '}
+            <Link to={`/define-schema/${currentNoteType.id}`}>
+              {currentNoteType.name}
+            </Link>
           </p>
         </header>
         <AudioFilesNavMenu
@@ -204,6 +195,7 @@ const mapStateToProps = state => ({
   audioIsLoading: r.isAudioLoading(state),
   mediaFolderLocation: r.getMediaFolderLocation(state),
   currentNoteType: r.getCurrentNoteType(state),
+  defaultNoteTypeId: r.getDefaultNoteTypeId(state),
 })
 
 const mapDispatchToProps = {

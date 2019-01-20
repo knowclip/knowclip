@@ -56,9 +56,6 @@ class FlashcardForm extends Component {
     this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
   }
 
-  setGerman = e => this.setFlashcardText('de', e.target.value)
-  setEnglish = e => this.setFlashcardText('en', e.target.value)
-
   deleteCard = () => {
     const { deleteCard, highlightedWaveformSelectionId } = this.props
     if (highlightedWaveformSelectionId) {
@@ -106,11 +103,11 @@ class FlashcardForm extends Component {
 
             {/* inputProps={{ lang: 'de' }} */}
 
-            {currentNoteType.fields.map(({ name }) => (
+            {currentNoteType.fields.map(({ name, id }) => (
               <TextField
-                inputRef={this.inputRef(name)}
-                onChange={e => this.setFlashcardText(name, e.target.value)}
-                value={currentFlashcard.fields[name]}
+                inputRef={this.inputRef(id)}
+                onChange={e => this.setFlashcardText(id, e.target.value)}
+                value={currentFlashcard.fields[id]}
                 fullWidth
                 multiline
                 label={name}

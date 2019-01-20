@@ -28,7 +28,7 @@ class App extends Component {
               path="/media-folder-location"
               component={MediaFolderLocationForm}
             />
-            <Route path="/define-schema" component={DefineSchemaForm} />
+            <Route path="/define-schema/:id" component={DefineSchemaForm} />
           </Switch>
         </HashRouter>
         <Snackbar />

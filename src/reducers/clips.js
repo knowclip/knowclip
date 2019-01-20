@@ -60,7 +60,7 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     case 'REMOVE_AUDIO_FILES':
       return {
         ...state,
-        idsByFilePath: [],
+        idsByFilePath: {},
       }
 
     case 'ADD_WAVEFORM_SELECTION': {

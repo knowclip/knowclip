@@ -12,7 +12,7 @@ export * from './snackbar'
 export * from './dialog'
 export * from './noteTypes'
 
-type FlashcardWithTime = {
+type ExpandedFlashcard = {
   id: ClipId,
   de: string,
   en: string,
@@ -25,7 +25,7 @@ type FlashcardWithTime = {
 export const getFlashcard = (
   state: AppState,
   id: ClipId
-): ?FlashcardWithTime => {
+): ?ExpandedFlashcard => {
   if (!state.clips.byId[id]) return null
   if (!state.clips.byId[id].flashcard) return null
   const flashcard = state.clips.byId[id].flashcard
@@ -38,7 +38,7 @@ export const getFlashcard = (
     },
   }
 }
-export const getCurrentFlashcard = (state: AppState): ?FlashcardWithTime => {
+export const getCurrentFlashcard = (state: AppState): ?ExpandedFlashcard => {
   const flashcardId = getCurrentFlashcardId(state)
   if (!flashcardId) return null
   return getFlashcard(state, flashcardId)

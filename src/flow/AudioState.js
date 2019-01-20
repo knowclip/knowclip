@@ -4,7 +4,7 @@ declare type AudioFilePath = string
 declare type AudioFileData = Exact<{
   path: AudioFilePath,
   clipsOrder: Array<ClipId>,
-  noteTypeId: ?NoteTypeId,
+  noteTypeId: NoteTypeId,
 }>
 
 declare type AudioState = Exact<{
