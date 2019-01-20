@@ -113,6 +113,7 @@ const initEpic = (action$, state$) =>
 export default combineEpics(
   loadAudioEpic,
   chooseAudioFilesEpic,
+  removeAudioFilesEpic,
   setCurrentFileEpic,
   initEpic
 )
