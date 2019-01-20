@@ -1,7 +1,6 @@
 // import { flatMap } from 'rxjs/operators'
-import { flatMap, tap, ignoreElements, map } from 'rxjs/operators'
+import { flatMap, map } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { empty, from, of } from 'rxjs'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import tempy from 'tempy'

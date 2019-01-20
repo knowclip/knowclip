@@ -1,11 +1,8 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  TextField,
   Button,
   IconButton,
-  Checkbox,
-  FormControlLabel,
   CircularProgress,
   Tooltip,
 } from '@material-ui/core'
@@ -14,12 +11,10 @@ import {
   Delete as DeleteIcon,
 } from '@material-ui/icons'
 import { Link } from 'react-router-dom'
-import formatTime from '../utils/formatTime'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
-import DefineSchemaForm from '../components/DefineSchemaForm'
 import * as r from '../redux'
 import electron from 'electron'
 
