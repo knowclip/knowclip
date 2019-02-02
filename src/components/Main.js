@@ -14,7 +14,6 @@ import {
   Delete as DeleteIcon,
   Layers,
 } from '@material-ui/icons'
-import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
@@ -35,7 +34,6 @@ const isVideo = filePath =>
   VIDEO_EXTENSIONS.includes(extname(filePath).toUpperCase())
 
 const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
-  // if (!filePath) return null
   const props = {
     onEnded: handleAudioEnded,
     loop: loop,
@@ -130,13 +128,8 @@ class App extends Component {
       isPrevButtonEnabled,
       isNextButtonEnabled,
       currentFlashcard,
-      currentFileIndex,
-      flashcards,
       currentFileName,
       currentFilePath,
-      makeClips,
-      exportFlashcards,
-      highlightSelection,
       audioIsLoading,
       mediaFolderLocation,
       detectSilenceRequest,

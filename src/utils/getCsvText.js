@@ -1,25 +1,32 @@
+// @flow
 import { unparse } from 'papaparse'
 import * as r from '../selectors'
 
-const getCsvText = state => {
+const getCsvText = (state: AppState) => {
   const filePaths = state.audio.filesOrder
-  const clipsAndCards = []
+  const csvData: Array<Array<string>> = []
   filePaths.forEach(filePath => {
-    const currentClips = Object.values(state.clips.byId).filter(
-      c => c.filePath === filePath
+    const currentFile: AudioFileData = state.audio.files[filePath]
+    const currentNoteType = r.getNoteType(state, currentFile.noteTypeId)
+    if (!currentNoteType) throw new Error(`No note type found for ${filePath}`)
+    const currentClips: Array<Clip> = state.clips.idsByFilePath[filePath].map(
+      clipId => {
+        const clip = r.getWaveformSelection(state, clipId)
+        if (!clip) throw new Error(`clip ${clipId} for ${filePath} not found`)
+        return clip
+      }
     )
     currentClips.forEach(clip => {
-      clipsAndCards.push({ clip, flashcard: state.flashcards[clip.id] })
+      const fieldsValues = currentNoteType.fields.map(
+        ({ id }) => clip.flashcard.fields[id]
+      )
+      console.log(fieldsValues)
+      csvData.push([
+        ...fieldsValues,
+        `[sound:${r.getClipFilename(state, clip.id)}]`,
+      ])
     })
   })
-  const csvData = clipsAndCards.reduce((rows, { clip, flashcard }) => {
-    rows.push([
-      flashcard.de,
-      flashcard.en,
-      `[sound:${r.getClipFilename(state, clip.id)}]`,
-    ])
-    return rows
-  }, [])
 
   return unparse(csvData)
 }

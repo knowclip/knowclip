@@ -80,13 +80,16 @@ const audio: Reducer<AudioState> = (
     case 'SET_AUDIO_FILE_NOTE_TYPE':
       return {
         ...state,
-        files: {
-          ...state.files,
-          [action.audioFilePath]: {
-            ...state.files[action.audioFilePath],
-            noteTypeId: action.noteTypeId,
-          },
-        },
+        files: Object.keys(state.files).reduce(
+          (all, filePath) => ({
+            ...all,
+            [filePath]: {
+              ...state.files[filePath],
+              noteTypeId: action.noteTypeId,
+            },
+          }),
+          {}
+        ),
       }
     // case 'ADD_WAVEFORM_SELECTION'
     default:

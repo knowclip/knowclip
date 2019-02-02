@@ -16,7 +16,6 @@ export default function getStore() {
     reducer,
     getPersistedState(),
     composeEnhancers(applyMiddleware(epicMiddleware))
-    // composeEnhancers(applyMiddleware())
   )
 
   epicMiddleware.run(epic)

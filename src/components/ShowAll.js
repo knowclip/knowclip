@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import {
   Dialog,
@@ -34,17 +34,6 @@ let FlashcardRow = ({
     onClick={() => highlightSelection(id)}
     onDoubleClick={closeModal}
   >
-    {/* {file && (
-      <TableCell
-        style={{
-          maxWidth: '8em',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}
-      >
-        {file.name}
-      </TableCell>
-    )} */}
     {Object.values(fields).map(fieldText => (
       <TableCell>
         <Field text={fieldText} />
@@ -77,7 +66,6 @@ const ShowAll = ({
               highlightSelection={highlightSelection}
               closeModal={closeDialog}
               flashcardId={flashcard.id}
-              // file={file}
               isCurrent={currentFileIndex === i}
             />
           ))}
@@ -92,39 +80,14 @@ const ShowAll = ({
 )
 
 const mapStateToProps = state => ({
-  filePaths: r.getFilePaths(state),
   flashcards: r.getFlashcardsByTime(state),
   currentFileIndex: r.getCurrentFileIndex(state),
-  currentFileName: r.getCurrentFileName(state),
-  currentFilePath: r.getCurrentFilePath(state),
-  currentFlashcard: r.getCurrentFlashcard(state),
-  currentFlashcardId: r.getCurrentFlashcardId(state),
-  isNextButtonEnabled: r.isNextButtonEnabled(state),
-  isPrevButtonEnabled: r.isPrevButtonEnabled(state),
-  loop: r.isLoopOn(state),
-  highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
-  clipsTimes: r.getClipsTimes(state),
-  audioIsLoading: r.isAudioLoading(state),
-  mediaFolderLocation: r.getMediaFolderLocation(state),
-  currentNoteType: r.getCurrentNoteType(state),
-  defaultNoteTypeId: r.getDefaultNoteTypeId(state),
-  clipsHaveBeenMade: r.haveClipsBeenMade(state),
 })
 
 const mapDispatchToProps = {
-  chooseAudioFiles: r.chooseAudioFiles,
-  removeAudioFiles: r.removeAudioFiles,
-  setCurrentFile: r.setCurrentFile,
-  setFlashcardField: r.setFlashcardField,
-  toggleLoop: r.toggleLoop,
-  deleteCard: r.deleteCard,
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
   highlightSelection: r.highlightSelection,
-  initializeApp: r.initializeApp,
-  detectSilenceRequest: r.detectSilenceRequest,
-  deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
-  mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
   closeDialog: r.closeDialog,
 }
 
