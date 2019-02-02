@@ -31,6 +31,11 @@ export const mediaFolderLocationFormDialog = (
     props: { action },
   })
 
+export const reviewAndExportDialog = () =>
+  enqueueDialog({
+    type: 'ReviewAndExport',
+  })
+
 export const closeDialog = (): DialogAction => ({
   type: 'CLOSE_DIALOG',
 })

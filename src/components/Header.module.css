@@ -1,16 +1,35 @@
 .container {
   background-color: #222;
   color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.menu {
-  list-style-type: none;
+.leftMenu,
+.rightMenu {
   display: flex;
+  margin: 0 .5rem;
+  padding: .5rem;
+  align-items: center;
+}
+
+.leftMenu {
+}
+
+
+.rightMenu {
+  list-style-type: none;
   justify-content: flex-end;
   padding: .5rem;
-  margin: 0;
 }
 .menuItem {
   padding: .5rem;
 
 }
+
+.menuTextItem {
+  composes: menuItem;
+  max-width: 14rem;
+}
+

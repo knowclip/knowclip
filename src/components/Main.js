@@ -1,23 +1,28 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  Button,
   IconButton,
   CircularProgress,
   Tooltip,
   Menu,
+  Card,
+  CardContent,
+  Fab,
 } from '@material-ui/core'
 import {
   Hearing as HearingIcon,
   Delete as DeleteIcon,
+  Layers,
 } from '@material-ui/icons'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
 import NoteTypeSelectionMenu from '../components/NoteTypeSelectionMenu'
+import DarkTheme from '../components/DarkTheme'
 import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
+import flashcardFormCss from '../components/FlashcardForm.module.css'
 
 import * as r from '../redux'
 import electron from 'electron'
@@ -98,8 +103,7 @@ class App extends Component {
     }
   }
 
-  openModal = () => this.setState({ modalIsOpen: true })
-  closeModal = () => this.setState({ modalIsOpen: false })
+  reviewAndExportDialog = () => this.props.reviewAndExportDialog()
 
   handleAudioEnded = e => {
     this.nextFile()
@@ -117,6 +121,8 @@ class App extends Component {
   }
   closeNoteTypeSelectionMenu = () =>
     this.setState({ noteTypeSelectionMenuAnchor: null })
+
+  toggleLoop = () => this.props.toggleLoop()
 
   render() {
     const {
@@ -136,61 +142,93 @@ class App extends Component {
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
       currentNoteType,
+      clipsHaveBeenMade,
     } = this.props
     const { noteTypeSelectionMenuAnchor } = this.state
 
     const form = Boolean(currentFlashcard) ? (
       <FlashcardForm />
     ) : (
-      <p>Click + drag to make audio clips and start making flashcards.</p>
+      <Card className={flashcardFormCss.container}>
+        <CardContent>
+          {clipsHaveBeenMade ? (
+            <p className="introText">No clip selected</p>
+          ) : (
+            <p className="introText">
+              <strong>Click and drag</strong> on the waveform to select clips
+              from your media file to turn into flashcards.
+            </p>
+          )}
+        </CardContent>
+      </Card>
     )
 
     return (
       <div className="App">
-        <header className={headerCss.container}>
-          <ul className={headerCss.menu}>
-            {mediaFolderLocation ? (
-              <li className={headerCss.menuItem}>
-                audio will be saved in:{' '}
-                <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
-                  {mediaFolderLocation}
+        <DarkTheme>
+          <header className={headerCss.container}>
+            <AudioFilesNavMenu
+              className={headerCss.leftMenu}
+              onClickPrevious={this.prevFile}
+              onClickNext={this.nextFile}
+              onClickLoop={this.toggleLoop}
+              currentFilename={currentFileName}
+              isPrevButtonEnabled={isPrevButtonEnabled}
+              isNextButtonEnabled={isNextButtonEnabled}
+              chooseAudioFiles={this.chooseAudioFiles}
+              removeAudioFiles={this.removeAudioFiles}
+              loop={loop}
+            />
+            <ul className={headerCss.rightMenu}>
+              {mediaFolderLocation ? (
+                <li className={headerCss.menuTextItem}>
+                  audio will be saved in:{' '}
+                  <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
+                    {mediaFolderLocation}
+                  </a>
+                </li>
+              ) : (
+                <li className={headerCss.menuTextItem}>
+                  <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
+                    choose media folder location
+                  </a>
+                </li>
+              )}
+              <li className={headerCss.menuTextItem}>
+                using note type:{' '}
+                <a
+                  ref={noteTypeSelectionMenuAnchor}
+                  href="/#"
+                  onClick={this.openNoteTypeSelectionMenu}
+                >
+                  {currentNoteType.name}
                 </a>
+                <Menu
+                  anchorEl={noteTypeSelectionMenuAnchor}
+                  onClose={this.closeNoteTypeSelectionMenu}
+                  open={noteTypeSelectionMenuAnchor}
+                >
+                  <NoteTypeSelectionMenu />
+                </Menu>
               </li>
-            ) : (
               <li className={headerCss.menuItem}>
-                <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
-                  choose media folder location
-                </a>
+                <Tooltip title="Detect silences">
+                  <IconButton onClick={detectSilenceRequest}>
+                    <HearingIcon />
+                  </IconButton>
+                </Tooltip>
               </li>
-            )}
-            <li className={headerCss.menuItem}>
-              using note type:{' '}
-              <a
-                ref={noteTypeSelectionMenuAnchor}
-                href="/#"
-                onClick={this.openNoteTypeSelectionMenu}
-              >
-                {currentNoteType.name}
-              </a>
-              <Menu
-                anchorEl={noteTypeSelectionMenuAnchor}
-                onClose={this.closeNoteTypeSelectionMenu}
-                open={noteTypeSelectionMenuAnchor}
-              >
-                <NoteTypeSelectionMenu />
-              </Menu>
-            </li>
-          </ul>
-        </header>
-        <AudioFilesNavMenu
-          onClickPrevious={this.prevFile}
-          onClickNext={this.nextFile}
-          currentFilename={currentFileName}
-          isPrevButtonEnabled={isPrevButtonEnabled}
-          isNextButtonEnabled={isNextButtonEnabled}
-          chooseAudioFiles={this.chooseAudioFiles}
-          removeAudioFiles={this.removeAudioFiles}
-        />
+              <li className={headerCss.menuItem}>
+                <Tooltip title="Delete all clips for this file">
+                  <IconButton onClick={deleteAllCurrentFileClipsRequest}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </li>
+            </ul>
+          </header>
+        </DarkTheme>
+
         <section className="media">
           <Media
             filePath={currentFilePath}
@@ -205,33 +243,14 @@ class App extends Component {
             <CircularProgress />
           </div>
         )}
-        <p>
-          <Tooltip title="Detect silences">
-            <IconButton onClick={detectSilenceRequest}>
-              <HearingIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete all clips for this file">
-            <IconButton onClick={deleteAllCurrentFileClipsRequest}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        </p>
         {form}
-        <Button fullWidth onClick={this.openModal}>
-          Review &amp; export
-        </Button>
-        <ShowAll
-          open={this.state.modalIsOpen}
-          handleClose={this.closeModal}
-          flashcards={flashcards}
-          files={null /* this.state.files */}
-          currentFileIndex={currentFileIndex}
-          highlightSelection={highlightSelection}
-          makeClips={makeClips}
-          exportFlashcards={exportFlashcards}
-          currentNoteType={currentNoteType}
-        />
+        <Fab
+          className="floatingActionButton"
+          onClick={this.reviewAndExportDialog}
+          color="primary"
+        >
+          <Layers />
+        </Fab>
       </div>
     )
   }
@@ -254,6 +273,7 @@ const mapStateToProps = state => ({
   mediaFolderLocation: r.getMediaFolderLocation(state),
   currentNoteType: r.getCurrentNoteType(state),
   defaultNoteTypeId: r.getDefaultNoteTypeId(state),
+  clipsHaveBeenMade: r.haveClipsBeenMade(state),
 })
 
 const mapDispatchToProps = {
@@ -270,6 +290,7 @@ const mapDispatchToProps = {
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
   mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
+  reviewAndExportDialog: r.reviewAndExportDialog,
 }
 
 export default connect(

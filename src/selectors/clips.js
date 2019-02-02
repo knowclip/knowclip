@@ -43,10 +43,7 @@ export const getClipFilename = (state: AppState, clipId: ClipId) =>
 export const getClipIdsByFilePath = (
   state: AppState,
   filePath: string
-): Array<ClipId> => {
-  const { clips } = state
-  const ids = (Object.keys(clips): any)
-  return ids.filter(
-    (id: ClipId) => clips[id] && clips[id].filePath === filePath
-  )
-}
+): Array<ClipId> => state.clips.idsByFilePath[filePath]
+
+export const haveClipsBeenMade = (state: AppState): boolean =>
+  Object.keys(state.clips.byId).length > 0

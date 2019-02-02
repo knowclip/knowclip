@@ -10,7 +10,21 @@ body,
 }
 
 .App {
+  display: flex;
+  min-height: 100%;
+  flex-flow: column nowrap;
+  background: #ececec;
+}
+
+.floatingActionButton {
+  position: absolute !important;
+  bottom: 5%;
+  right: 5%;
+}
+
+.introText {
   text-align: center;
+  padding: 10%;
 }
 
 .App-title {
@@ -31,15 +45,9 @@ body,
   max-width: 30em;
   margin: auto;
 }
-
-.audioFilesMenu {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-}
-
 .audioFileName {
   font-size: large;
+  display: inline;
   /* overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis; */

@@ -4,11 +4,13 @@ import * as r from '../../redux'
 import Confirmation from './Confirmation'
 import NoteTypeForm from './NoteTypeFormDialog'
 import MediaFolderLocationForm from './MediaFolderLocationFormDialog'
+import ReviewAndExport from '../ShowAll'
 
 const DIALOGS = {
   Confirmation,
   NoteTypeForm,
   MediaFolderLocationForm,
+  ReviewAndExport,
 }
 
 const DialogView = ({ currentDialog, closeDialog }) => {

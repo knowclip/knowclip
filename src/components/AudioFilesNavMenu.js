@@ -1,21 +1,27 @@
 import React, { Fragment } from 'react'
 import { Button, IconButton } from '@material-ui/core'
-import { Close as CloseIcon } from '@material-ui/icons'
+import {
+  Close as CloseIcon,
+  FastForward,
+  FastRewind,
+  Loop,
+} from '@material-ui/icons'
+import DarkTheme from './DarkTheme'
 
 const AudioFilesNavMenu = ({
   onClickPrevious,
   onClickNext,
+  onClickLoop,
   currentFilename,
   isPrevButtonEnabled,
   isNextButtonEnabled,
+  loop,
   chooseAudioFiles,
   removeAudioFiles,
+  className,
 }) => (
-  <Fragment>
-    <p className="audioFilesMenu">
-      <Button onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-        Previous
-      </Button>
+  <DarkTheme>
+    <p className={className}>
       {currentFilename ? (
         <h2 className="audioFileName">
           {currentFilename}
@@ -26,11 +32,17 @@ const AudioFilesNavMenu = ({
       ) : (
         <Button onClick={chooseAudioFiles}>Choose audio files </Button>
       )}
-      <Button onClick={onClickNext} disabled={!isNextButtonEnabled}>
-        Next
-      </Button>
+      <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
+        <FastRewind />
+      </IconButton>
+      <IconButton onClick={onClickNext} disabled={!isNextButtonEnabled}>
+        <FastForward />
+      </IconButton>
+      <IconButton onClick={onClickLoop} color={loop ? 'primary' : 'default'}>
+        <Loop />
+      </IconButton>{' '}
     </p>
-  </Fragment>
+  </DarkTheme>
 )
 
 export default AudioFilesNavMenu

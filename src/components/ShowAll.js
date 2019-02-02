@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import {
   Dialog,
   DialogActions,
+  DialogContent,
   Table,
   TableBody,
   TableRow,
   TableCell,
   Button,
 } from '@material-ui/core'
-
+import * as r from '../redux'
 import { getFlashcard } from '../selectors'
 
 const getFieldStyles = string => {
@@ -56,17 +57,17 @@ FlashcardRow = connect((state, { flashcardId }) => ({
 }))(FlashcardRow)
 
 const ShowAll = ({
-  open,
-  handleClose,
+  closeDialog,
   flashcards,
   currentFileIndex,
   highlightSelection,
   makeClips,
   exportFlashcards,
   noteType,
-}) =>
-  !open ? null : (
-    <Dialog open={open} onClose={handleClose} style={{ width: '900px' }}>
+  open,
+}) => (
+  <Dialog open={open} onClose={closeDialog}>
+    <DialogContent>
       <Table>
         <TableBody>
           {flashcards.map((flashcard, i) => (
@@ -74,7 +75,7 @@ const ShowAll = ({
               flashcard={flashcard}
               key={flashcard.id}
               highlightSelection={highlightSelection}
-              closeModal={handleClose}
+              closeModal={closeDialog}
               flashcardId={flashcard.id}
               // file={file}
               isCurrent={currentFileIndex === i}
@@ -82,11 +83,52 @@ const ShowAll = ({
           ))}
         </TableBody>
       </Table>
-      <DialogActions>
-        <Button onClick={exportFlashcards}>Export CSV file</Button>
-        <Button onClick={makeClips}>Make audio clips</Button>
-      </DialogActions>
-    </Dialog>
-  )
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={exportFlashcards}>Export CSV file</Button>
+      <Button onClick={makeClips}>Make audio clips</Button>
+    </DialogActions>
+  </Dialog>
+)
 
-export default ShowAll
+const mapStateToProps = state => ({
+  filePaths: r.getFilePaths(state),
+  flashcards: r.getFlashcardsByTime(state),
+  currentFileIndex: r.getCurrentFileIndex(state),
+  currentFileName: r.getCurrentFileName(state),
+  currentFilePath: r.getCurrentFilePath(state),
+  currentFlashcard: r.getCurrentFlashcard(state),
+  currentFlashcardId: r.getCurrentFlashcardId(state),
+  isNextButtonEnabled: r.isNextButtonEnabled(state),
+  isPrevButtonEnabled: r.isPrevButtonEnabled(state),
+  loop: r.isLoopOn(state),
+  highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
+  clipsTimes: r.getClipsTimes(state),
+  audioIsLoading: r.isAudioLoading(state),
+  mediaFolderLocation: r.getMediaFolderLocation(state),
+  currentNoteType: r.getCurrentNoteType(state),
+  defaultNoteTypeId: r.getDefaultNoteTypeId(state),
+  clipsHaveBeenMade: r.haveClipsBeenMade(state),
+})
+
+const mapDispatchToProps = {
+  chooseAudioFiles: r.chooseAudioFiles,
+  removeAudioFiles: r.removeAudioFiles,
+  setCurrentFile: r.setCurrentFile,
+  setFlashcardField: r.setFlashcardField,
+  toggleLoop: r.toggleLoop,
+  deleteCard: r.deleteCard,
+  makeClips: r.makeClips,
+  exportFlashcards: r.exportFlashcards,
+  highlightSelection: r.highlightSelection,
+  initializeApp: r.initializeApp,
+  detectSilenceRequest: r.detectSilenceRequest,
+  deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
+  mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
+  closeDialog: r.closeDialog,
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ShowAll)

@@ -15,7 +15,7 @@ const newClip = (pendingSelection, currentFileName, id, noteType): Clip => {
       fields: noteType.fields.reduce(
         (fields, field) => ({
           ...fields,
-          [field.name]: '',
+          [field.id]: '',
         }),
         {}
       ),

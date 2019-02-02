@@ -13,6 +13,9 @@ declare type DialogData =
       type: 'MediaFolderLocationForm',
       props: { action: ?AppAction },
     }
+  | {
+      type: 'ReviewAndExport',
+    }
 
 declare type DialogState = Exact<{
   queue: Array<DialogData>,
