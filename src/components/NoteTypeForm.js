@@ -4,15 +4,13 @@ import {
   TextField,
   Button,
   IconButton,
-  MenuList,
-  MenuItem,
+  DialogContent,
+  DialogActions,
 } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
 import * as r from '../redux'
 import uuid from 'uuid/v4'
 import { Add as AddIcon, Delete as DeleteIcon } from '@material-ui/icons'
-
-// import * as css from './DefineSchemaForm.module.css'
 
 const newField = (name = '') => ({ id: uuid(), name })
 
@@ -22,7 +20,7 @@ const deleteKey = (obj, key) => {
   return clone
 }
 
-class DefineSchemaForm extends Component {
+class NoteTypeForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -35,10 +33,13 @@ class DefineSchemaForm extends Component {
         name: null,
         fields: {},
       },
-      submitted: false,
     }
 
     this.validate = this.getValidator(props.noteTypeNames)
+  }
+
+  noteTypeAlreadySaved() {
+    return Boolean(this.props.id)
   }
 
   getValidator = noteTypeNames => state => {
@@ -46,7 +47,7 @@ class DefineSchemaForm extends Component {
     const { noteType } = state
 
     if (
-      !this.props.match.params.id &&
+      !this.noteTypeAlreadySaved() &&
       noteTypeNames.includes(noteType.name.trim())
     )
       errors.name =
@@ -71,14 +72,14 @@ class DefineSchemaForm extends Component {
 
     if (Object.keys(errors).length) return this.setState({ errors })
     const { noteType } = this.state
-    this.setState({ submitted: true }, () => {
-      if (this.props.match.params.id) {
-        this.props.editNoteType(noteType.id, noteType)
-      } else {
-        this.props.addNoteType(noteType)
-        this.props.setDefaultNoteType(noteType.id)
-      }
-    })
+
+    if (this.noteTypeAlreadySaved()) {
+      this.props.editNoteType(noteType.id, noteType)
+    } else {
+      this.props.addNoteType(noteType)
+      this.props.setDefaultNoteType(noteType.id)
+    }
+    this.props.onSubmit()
   }
 
   setNameText = text =>
@@ -124,81 +125,76 @@ class DefineSchemaForm extends Component {
   handleChangeNoteNameText = e => this.setNameText(e.target.value)
 
   render() {
-    if (this.state.submitted) return <Redirect to="/" />
-
-    const { noteTypes } = this.props
     const { noteType, errors } = this.state
     const { handleSubmit } = this
+    const { cancel } = this.props
     return (
-      <section>
-        <MenuList>
-          {noteTypes.map(({ id, name }) => (
-            <MenuItem>{name}</MenuItem>
-          ))}
-        </MenuList>
-        <p>What kind of flashcards are you making?</p>
-        <p>Define your flashcard fields below.</p>
+      <>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <p>What kind of flashcards are you making?</p>
+            <p>Define your flashcard fields below.</p>
 
-        <p>
-          <small>
-            If you already have an Anki note type in mind, it will probably make
-            things easier if these fields match those of your note type.
-          </small>
-        </p>
-        <form>
-          <ul>
-            {noteType.fields.map((field, i) => {
-              const error = errors.fields ? errors.fields[i] : null
-              return (
-                <li>
-                  <TextField
-                    value={field.name}
-                    error={Boolean(error)}
-                    helperText={error}
-                    onChange={this.handleChangeNoteFieldText(i)}
-                  />
-                  <IconButton onClick={() => this.deleteField(i)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </li>
-              )
-            })}
-          </ul>
-          <Button onClick={this.addField}>
-            Add field <AddIcon />
-          </Button>
+            <p>
+              <small>
+                If you already have an Anki note type in mind, it will probably
+                make things easier if these fields match those of your note
+                type.
+              </small>
+            </p>
 
-          <p>In case you want to reuse these fields later:</p>
-
-          <TextField
-            value={noteType.name}
-            error={Boolean(errors.name)}
-            helperText={errors.name}
-            onChange={this.handleChangeNoteNameText}
-          />
-
-          <p>
-            <Button onClick={handleSubmit} fullWidth>
-              Continue
+            <ul>
+              {noteType.fields.map((field, i) => {
+                const error = errors.fields ? errors.fields[i] : null
+                return (
+                  <li>
+                    <TextField
+                      value={field.name}
+                      error={Boolean(error)}
+                      helperText={error}
+                      onChange={this.handleChangeNoteFieldText(i)}
+                    />
+                    <IconButton onClick={() => this.deleteField(i)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </li>
+                )
+              })}
+            </ul>
+            <Button onClick={this.addField}>
+              Add field <AddIcon />
             </Button>
-          </p>
-        </form>
-      </section>
+
+            <p>In case you want to reuse these fields later:</p>
+
+            <TextField
+              value={noteType.name}
+              error={Boolean(errors.name)}
+              helperText={errors.name}
+              onChange={this.handleChangeNoteNameText}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancel}>Cancel</Button>
+          <Button onClick={handleSubmit}>Continue</Button>
+        </DialogActions>
+      </>
     )
   }
 }
 
-const mapStateToProps = (state, { match: { params } }) => ({
+const mapStateToProps = (state, { id }) => ({
   // noteTypeFields: r.getNoteTypeFields(state),
   // noteTypeName: r.getNoteTypeId(state),
-  noteTypes: r.getNoteTypes(state),
-  noteType: r.getNoteType(state, params.id),
+  noteType: r.getNoteType(state, id),
   noteTypeNames: r.getNoteTypeNames(state),
 })
 
 const mapDispatchToProps = {
   addNoteType: r.addNoteType,
   setDefaultNoteType: r.setDefaultNoteType,
+  setAudioFileNoteType: r.setAudioFileNoteType,
   simpleMessageSnackbar: r.simpleMessageSnackbar,
   editNoteType: r.editNoteType,
 }
@@ -206,4 +202,4 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(DefineSchemaForm)
+)(NoteTypeForm)

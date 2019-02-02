@@ -1,0 +1,16 @@
+.container {
+  background-color: #222;
+  color: white;
+}
+
+.menu {
+  list-style-type: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: .5rem;
+  margin: 0;
+}
+.menuItem {
+  padding: .5rem;
+
+}

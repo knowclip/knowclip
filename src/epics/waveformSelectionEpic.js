@@ -30,7 +30,7 @@ const pendingSelectionIsBigEnough = state => {
 const waveformSelectionEpic = (action$, state$) => {
   const loadAudioActions = action$.pipe(ofType('LOAD_AUDIO'))
   const mousedowns = loadAudioActions.pipe(
-    flatMap(({ svgElement, audioElement }) =>
+    flatMap(({ svgElement }) =>
       fromEvent(svgElement, 'mousedown').pipe(takeUntil(loadAudioActions))
     )
   )
@@ -48,7 +48,8 @@ const waveformSelectionEpic = (action$, state$) => {
     filter(({ x }) => !r.getSelectionEdgeAt(state$.value, x)),
     withLatestFrom(loadAudioActions),
     flatMap(([waveformMousedown, loadAudio]) => {
-      const { svgElement, audioElement } = loadAudio
+      const audioElement = document.getElementById('audioPlayer')
+      const { svgElement } = loadAudio
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =

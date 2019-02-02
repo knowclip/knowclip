@@ -50,7 +50,8 @@ const detectSilenceEpic = (action$, state$) =>
   action$.pipe(
     ofType('DETECT_SILENCE'),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([_, { audioElement }]) => {
+    flatMap(([_ /*{ audioElement }*/]) => {
+      const audioElement = document.getElementById('audioPlayer')
       const currentFilePath = r.getCurrentFilePath(state$.value)
       return detectSilence(currentFilePath).then(silences => {
         if (!silences.length)

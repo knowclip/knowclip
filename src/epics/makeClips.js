@@ -22,9 +22,10 @@ import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 const clip = (path, startTime, endTime, outputFilename) => {
   return new Promise((res, rej) => {
     ffmpeg(path)
-      .audioCodec('copy')
+      // .audioCodec('copy') // later, do this and change hardcoded '.mp3' for audio-only input
       .seekInput(toTimestamp(startTime))
       .inputOptions('-to ' + toTimestamp(endTime))
+      .outputOptions('-vn')
       .output(outputFilename)
       .on(
         'end',
@@ -45,9 +46,12 @@ const makeClips = (action$, state$) =>
   action$.pipe(
     ofType('MAKE_CLIPS'),
     flatMap(async () => {
+      const directory = r.getMediaFolderLocation(state$.value)
+
+      if (!directory) return r.mediaFolderLocationFormDialog(r.makeClips())
+
       try {
-        const clipIds = Object.keys(state$.value.clips)
-        const directory = r.getMediaFolderLocation(state$.value)
+        const clipIds = Object.keys(state$.value.clips.byId)
         const clipsOperations = clipIds.map(clipId => {
           const {
             start,

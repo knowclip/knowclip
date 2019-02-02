@@ -30,6 +30,7 @@ export const getFlashcard = (
   if (!state.clips.byId[id].flashcard) return null
   const flashcard = state.clips.byId[id].flashcard
   const selection = state.clips.byId[id]
+  if (!selection) throw new Error('Could not find selection')
   return {
     ...flashcard,
     time: {
@@ -64,7 +65,7 @@ export const getCurrentFileName = (state: AppState) => {
   return filePath && basename(filePath)
 }
 
-export const getCurrentFilePath = ({ audio }: AppState) =>
+export const getCurrentFilePath = ({ audio }: AppState): ?AudioFilePath =>
   audio.filesOrder[audio.currentFileIndex]
 
 export const getCurrentFile = (state: AppState): ?AudioFileData => {

@@ -16,7 +16,9 @@ export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
 }
 
 export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
-  const { start, end, filePath } = state.clips.byId[clipId]
+  const clip = state.clips.byId[clipId]
+  if (!clip) throw Error(`Could not find clip ${clipId}`)
+  const { start, end, filePath } = clip
   const extension = extname(filePath)
   const filenameWithoutExtension = basename(filePath, extension)
   const startTime = getMillisecondsAtX(state, start)
@@ -25,7 +27,7 @@ export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
   const outputFilename = `${filenameWithoutExtension}__${toTimestamp(
     startTime,
     SAFE_SEPARATOR
-  )}-${toTimestamp(endTime, SAFE_SEPARATOR)}${extension}`
+  )}-${toTimestamp(endTime, SAFE_SEPARATOR)}${'.mp3'}`
 
   return {
     filePath,

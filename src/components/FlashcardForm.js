@@ -7,7 +7,6 @@ import {
   FormControlLabel,
 } from '@material-ui/core'
 import formatTime from '../utils/formatTime'
-import DefineSchemaForm from '../components/DefineSchemaForm'
 import * as r from '../redux'
 
 class FlashcardForm extends Component {
@@ -61,8 +60,6 @@ class FlashcardForm extends Component {
 
   render() {
     const { loop, currentFlashcard, currentNoteType } = this.props
-
-    if (!currentNoteType) return <DefineSchemaForm />
 
     return (
       <section onSubmit={this.handleFlashcardSubmit}>

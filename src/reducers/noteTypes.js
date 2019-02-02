@@ -1,5 +1,16 @@
 // @flow
 
+// const initialState: NoteTypesState = {
+//   byId: {
+//     default: {
+//       id: 'default',
+//       name: 'default',
+//       fields: [{ id: 'front', name: 'Front' }, { id: 'back', name: 'Back' }],
+//     },
+//   },
+//   allIds: ['default'],
+//   defaultId: 'default',
+// }
 const initialState: NoteTypesState = {
   byId: {
     default: {
@@ -11,7 +22,6 @@ const initialState: NoteTypesState = {
   allIds: ['default'],
   defaultId: 'default',
 }
-
 const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_NOTE_TYPE':

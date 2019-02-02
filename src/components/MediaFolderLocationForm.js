@@ -17,7 +17,6 @@ class MediaFolderLocationForm extends Component {
     this.state = {
       locationText: props.mediaFolderLocation || '',
       errorText: '',
-      submitted: false,
     }
   }
 
@@ -36,7 +35,7 @@ class MediaFolderLocationForm extends Component {
   handleSubmit = e => {
     if (this.state.locationText) {
       this.props.setMediaFolderLocation(this.state.locationText)
-      this.setState({ submitted: true })
+      this.props.onSubmit()
     } else {
       this.showSubmitError()
     }
@@ -48,8 +47,6 @@ class MediaFolderLocationForm extends Component {
     this.setState({ errorText: 'Please choose a location to continue.' })
 
   render() {
-    if (this.state.submitted) return <Redirect to="/" />
-
     const { locationText, errorText } = this.state
     const { onLocationTextFocus, handleSubmit } = this
     return (

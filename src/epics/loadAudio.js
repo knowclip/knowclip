@@ -7,15 +7,18 @@ import tempy from 'tempy'
 import { promisify } from 'util'
 import fs from 'fs'
 import dataurl from 'dataurl'
+import { extname } from 'path'
 
 const readFile = promisify(fs.readFile)
 
 const tmpFilePaths = {}
 
-const getConstantBitrateMp3 = path => {
+const coerceMp3ToConstantBitrate = path => {
   // should check if mp3
   // and if possible, constant vs. variable bitrate
   return new Promise((res, rej) => {
+    if (extname(path) !== '.mp3') return res(path)
+
     let tmpPath = tmpFilePaths[path]
     if (tmpPath) {
       return res(tmpPath)
@@ -42,27 +45,29 @@ const svgElement = () => document.getElementById('waveform-svg')
 const loadAudioEpic = (action$, state$) =>
   action$.pipe(
     ofType('LOAD_AUDIO'),
-    flatMap(async ({ audioElement, filePath }) => {
-      audioElement.pause()
-      audioElement.src = ''
+    flatMap(async ({ /* audioElement, */ filePath }) => {
+      const mediaPlayer = audioElement()
+      mediaPlayer.pause()
+      mediaPlayer.src = ''
       if (!filePath) {
-        audioElement.currentTime = 0
+        mediaPlayer.currentTime = 0
 
         return await r.loadAudioSuccess(null) // should be failure...
       }
 
-      const tmpFilePath = await getConstantBitrateMp3(filePath)
+      const tmpFilePath = await coerceMp3ToConstantBitrate(filePath)
       const audio = await readFile(tmpFilePath)
 
       if (r.getCurrentFilePath(state$.value) !== filePath)
         return { type: 'NOOP_OLD_AUDIO_LOAD' } // really should also cancel old ones
 
       window.setTimeout(() => {
-        audioElement.src = dataurl.convert({
+        mediaPlayer.src = dataurl.convert({
           data: audio,
           mimetype: 'audio/mp3',
         })
-        audioElement.play()
+        // mediaPlayer.load()
+        mediaPlayer.play()
       }, 0)
       return await r.loadAudioSuccess(audio)
     })

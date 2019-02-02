@@ -18,3 +18,12 @@ export const setDefaultNoteType = (id: NoteTypeId): NoteTypeAction => ({
   type: 'SET_DEFAULT_NOTE_TYPE',
   id,
 })
+
+export const setAudioFileNoteType = (
+  audioFilePath: AudioFilePath,
+  noteTypeId: NoteTypeId
+): NoteTypeAction => ({
+  type: 'SET_AUDIO_FILE_NOTE_TYPE',
+  audioFilePath,
+  noteTypeId,
+})

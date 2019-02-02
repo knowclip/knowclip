@@ -77,8 +77,17 @@ const audio: Reducer<AudioState> = (
         mediaFolderLocation: action.directoryPath,
       }
 
-    // case 'ASSIGN_NOTE_TYPE':
-
+    case 'SET_AUDIO_FILE_NOTE_TYPE':
+      return {
+        ...state,
+        files: {
+          ...state.files,
+          [action.audioFilePath]: {
+            ...state.files[action.audioFilePath],
+            noteTypeId: action.noteTypeId,
+          },
+        },
+      }
     // case 'ADD_WAVEFORM_SELECTION'
     default:
       return state

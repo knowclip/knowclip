@@ -54,9 +54,11 @@ const elementWidth = element => {
   return boundingClientRect.right - boundingClientRect.left
 }
 
+const audioElement = () => document.getElementById('audioPlayer')
+
 const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
-  ({ audioElement, svgElement }) =>
-    fromEvent(audioElement, 'timeupdate').pipe(
+  ({ /*audioElement,*/ svgElement }) =>
+    fromEvent(audioElement(), 'timeupdate').pipe(
       map(e => {
         const viewBox = state$.value.waveform.viewBox
         const newX = Math.round(
@@ -116,10 +118,10 @@ const playSelectionsOnHighlightEpic = (action$, state$) =>
     ofType('HIGHLIGHT_WAVEFORM_SELECTION'),
     filter(({ id }) => Boolean(id)),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    tap(([{ id: selectionId }, { audioElement }]) => {
+    tap(([{ id: selectionId } /*, { audioElement } */]) => {
       const { start } = r.getWaveformSelection(state$.value, selectionId)
       const newTime = r.getSecondsAtX(state$.value, start)
-      audioElement.currentTime = newTime
+      audioElement().currentTime = newTime
     }),
     ignoreElements()
   )

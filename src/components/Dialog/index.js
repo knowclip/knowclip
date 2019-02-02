@@ -2,9 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as r from '../../redux'
 import Confirmation from './Confirmation'
+import NoteTypeForm from './NoteTypeFormDialog'
+import MediaFolderLocationForm from './MediaFolderLocationFormDialog'
 
 const DIALOGS = {
   Confirmation,
+  NoteTypeForm,
+  MediaFolderLocationForm,
 }
 
 const DialogView = ({ currentDialog, closeDialog }) => {

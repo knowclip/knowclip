@@ -8,7 +8,7 @@ const getWaveformEpic = (action$, state$) =>
   action$.pipe(
     ofType('LOAD_AUDIO_SUCCESS'),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([{ file }, { audioElement }]) => {
+    flatMap(([{ file } /*{ audioElement } */]) => {
       if (!file) {
         return of(setWaveformPeaks([]))
       }

@@ -5,26 +5,54 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
+  Menu,
 } from '@material-ui/core'
 import {
   Hearing as HearingIcon,
   Delete as DeleteIcon,
 } from '@material-ui/icons'
-import { Link } from 'react-router-dom'
 import ShowAll from '../components/ShowAll'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
+import NoteTypeSelectionMenu from '../components/NoteTypeSelectionMenu'
+import { extname } from 'path'
+import headerCss from '../components/Header.module.css'
+
 import * as r from '../redux'
 import electron from 'electron'
 
 const { remote } = electron
 const { dialog } = remote
 
+const VIDEO_EXTENSIONS = `.MP4 .AVI .MOV .FLV .WMV`.split(/\s/)
+const isVideo = filePath =>
+  VIDEO_EXTENSIONS.includes(extname(filePath).toUpperCase())
+
+const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
+  // if (!filePath) return null
+  const props = {
+    onEnded: handleAudioEnded,
+    loop: loop,
+    ref: audioRef,
+    controls: true,
+    id: 'audioPlayer',
+    className: 'audioPlayer',
+    controlsList: 'nodownload',
+    autoPlay: true,
+  }
+
+  return filePath && isVideo(filePath) ? (
+    <video {...props} />
+  ) : (
+    <audio {...props} />
+  )
+}
+
 class App extends Component {
   state = {
-    filePaths: [],
     modalIsOpen: false,
+    noteTypeSelectionMenuAnchor: null,
   }
 
   componentDidMount() {
@@ -78,6 +106,18 @@ class App extends Component {
   }
   toggleLoop = () => this.props.toggleLoop()
 
+  openMediaFolderLocationFormDialog = e => {
+    e.preventDefault()
+    this.props.mediaFolderLocationFormDialog()
+  }
+
+  openNoteTypeSelectionMenu = e => {
+    e.preventDefault()
+    this.setState({ noteTypeSelectionMenuAnchor: e.currentTarget })
+  }
+  closeNoteTypeSelectionMenu = () =>
+    this.setState({ noteTypeSelectionMenuAnchor: null })
+
   render() {
     const {
       loop,
@@ -87,6 +127,7 @@ class App extends Component {
       currentFileIndex,
       flashcards,
       currentFileName,
+      currentFilePath,
       makeClips,
       exportFlashcards,
       highlightSelection,
@@ -96,6 +137,7 @@ class App extends Component {
       deleteAllCurrentFileClipsRequest,
       currentNoteType,
     } = this.props
+    const { noteTypeSelectionMenuAnchor } = this.state
 
     const form = Boolean(currentFlashcard) ? (
       <FlashcardForm />
@@ -105,18 +147,40 @@ class App extends Component {
 
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Audio Flashcard Assistant v0.0.0</h1>
-          <p>
-            audio will be saved in:{' '}
-            <Link to="/media-folder-location">{mediaFolderLocation}</Link>
-          </p>
-          <p>
-            using note type:{' '}
-            <Link to={`/define-schema/${currentNoteType.id}`}>
-              {currentNoteType.name}
-            </Link>
-          </p>
+        <header className={headerCss.container}>
+          <ul className={headerCss.menu}>
+            {mediaFolderLocation ? (
+              <li className={headerCss.menuItem}>
+                audio will be saved in:{' '}
+                <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
+                  {mediaFolderLocation}
+                </a>
+              </li>
+            ) : (
+              <li className={headerCss.menuItem}>
+                <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
+                  choose media folder location
+                </a>
+              </li>
+            )}
+            <li className={headerCss.menuItem}>
+              using note type:{' '}
+              <a
+                ref={noteTypeSelectionMenuAnchor}
+                href="/#"
+                onClick={this.openNoteTypeSelectionMenu}
+              >
+                {currentNoteType.name}
+              </a>
+              <Menu
+                anchorEl={noteTypeSelectionMenuAnchor}
+                onClose={this.closeNoteTypeSelectionMenu}
+                open={noteTypeSelectionMenuAnchor}
+              >
+                <NoteTypeSelectionMenu />
+              </Menu>
+            </li>
+          </ul>
         </header>
         <AudioFilesNavMenu
           onClickPrevious={this.prevFile}
@@ -127,6 +191,14 @@ class App extends Component {
           chooseAudioFiles={this.chooseAudioFiles}
           removeAudioFiles={this.removeAudioFiles}
         />
+        <section className="media">
+          <Media
+            filePath={currentFilePath}
+            onEnded={this.handleAudioEnded}
+            ref={this.audioRef}
+            loop={loop}
+          />
+        </section>
         <Waveform show={!audioIsLoading} svgRef={this.svgRef} />
         {audioIsLoading && (
           <div className="waveform-placeholder">
@@ -134,16 +206,6 @@ class App extends Component {
           </div>
         )}
         <p>
-          <audio
-            onEnded={this.handleAudioEnded}
-            loop={loop}
-            ref={this.audioRef}
-            controls
-            id="audioPlayer"
-            className="audioPlayer"
-            controlsList="nodownload"
-            autoPlay
-          />
           <Tooltip title="Detect silences">
             <IconButton onClick={detectSilenceRequest}>
               <HearingIcon />
@@ -180,6 +242,7 @@ const mapStateToProps = state => ({
   flashcards: r.getFlashcardsByTime(state),
   currentFileIndex: r.getCurrentFileIndex(state),
   currentFileName: r.getCurrentFileName(state),
+  currentFilePath: r.getCurrentFilePath(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   currentFlashcardId: r.getCurrentFlashcardId(state),
   isNextButtonEnabled: r.isNextButtonEnabled(state),
@@ -206,6 +269,7 @@ const mapDispatchToProps = {
   initializeApp: r.initializeApp,
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
+  mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
 }
 
 export default connect(
