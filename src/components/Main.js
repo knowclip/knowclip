@@ -81,7 +81,7 @@ class App extends Component {
 
   removeAudioFiles = () =>
     this.props.confirmationDialog(
-      'Are you sure you want to close this media file? You will lose all unsaved work.',
+      'Are you sure you want to close this media file?',
       r.removeAudioFiles()
     )
 

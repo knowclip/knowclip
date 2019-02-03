@@ -24,6 +24,9 @@ export const initialState: NoteTypesState = {
 }
 const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'HYDRATE_FROM_PROJECT_FILE':
+      return action.state.noteTypes
+
     case 'ADD_NOTE_TYPE':
       return {
         ...state,
@@ -49,11 +52,15 @@ const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
     case 'DELETE_NOTE_TYPE': {
       const byId = { ...state.byId }
       delete byId[action.id]
-      return {
-        ...state,
-        byId,
-        allIds: state.allIds.filter(id => id !== action.id),
-      }
+      const leftoverIds = Object.keys(byId)
+      return leftoverIds.length
+        ? {
+            byId,
+            allIds: state.allIds.filter(id => id !== action.id),
+            defaultId:
+              state.defaultId === action.id ? leftoverIds[0] : state.defaultId,
+          }
+        : initialState
     }
 
     case 'SET_DEFAULT_NOTE_TYPE':

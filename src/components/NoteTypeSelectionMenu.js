@@ -66,18 +66,18 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   setDefaultNoteType: r.setDefaultNoteType,
-  setAudioFileNoteType: r.setAudioFileNoteType,
+  setAudioFileNoteTypeRequest: r.setAudioFileNoteTypeRequest,
   editNoteTypeDialog: r.editNoteTypeDialog,
   newNoteTypeDialog: r.newNoteTypeDialog,
 }
 
 const mergeProps = (
   { currentFilePath, ...stateProps },
-  { setDefaultNoteType, setAudioFileNoteType, ...dispatchProps },
+  { setDefaultNoteType, setAudioFileNoteTypeRequest, ...dispatchProps },
   ownProps
 ) => ({
   selectNoteType: currentFilePath
-    ? id => setAudioFileNoteType(currentFilePath, id)
+    ? id => setAudioFileNoteTypeRequest(currentFilePath, id)
     : setDefaultNoteType,
   ...stateProps,
   ...dispatchProps,

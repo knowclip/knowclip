@@ -74,7 +74,7 @@ class NoteTypeForm extends Component {
     const { noteType } = this.state
 
     if (this.noteTypeAlreadySaved()) {
-      this.props.editNoteType(noteType.id, noteType)
+      this.props.editNoteTypeRequest(noteType.id, noteType)
     } else {
       this.props.addNoteType(noteType)
       this.props.setDefaultNoteType(noteType.id)
@@ -127,7 +127,7 @@ class NoteTypeForm extends Component {
   render() {
     const { noteType, errors } = this.state
     const { handleSubmit } = this
-    const { cancel } = this.props
+    const { cancel, deleteNoteTypeRequest, id } = this.props
     return (
       <>
         <DialogContent>
@@ -176,8 +176,13 @@ class NoteTypeForm extends Component {
           </form>
         </DialogContent>
         <DialogActions>
-          <Button onClick={cancel}>Cancel</Button>
-          <Button onClick={handleSubmit}>Continue</Button>
+          {this.noteTypeAlreadySaved() && (
+            <Button onClick={() => deleteNoteTypeRequest(id)}>
+              Delete Note Type
+            </Button>
+          )}
+          <Button onClick={cancel}>Exit</Button>
+          <Button onClick={handleSubmit}>Save</Button>
         </DialogActions>
       </>
     )
@@ -194,9 +199,9 @@ const mapStateToProps = (state, { id }) => ({
 const mapDispatchToProps = {
   addNoteType: r.addNoteType,
   setDefaultNoteType: r.setDefaultNoteType,
-  setAudioFileNoteType: r.setAudioFileNoteType,
   simpleMessageSnackbar: r.simpleMessageSnackbar,
-  editNoteType: r.editNoteType,
+  editNoteTypeRequest: r.editNoteTypeRequest,
+  deleteNoteTypeRequest: r.deleteNoteTypeRequest,
 }
 
 export default connect(

@@ -30,12 +30,18 @@ export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> => {
   return currentFilePath ? state.clips.idsByFilePath[currentFilePath] : []
 }
 
+export const doesFileHaveClips = (
+  state: AppState,
+  filePath: AudioFilePath
+): boolean => {
+  return Boolean(state.clips.idsByFilePath[filePath].length)
+}
+
 export const doesCurrentFileHaveClips = (state: AppState): boolean => {
   const currentFilePath = getCurrentFilePath(state)
-  const clips = (Object.values(state.clips.byId): any)
-  return currentFilePath
-    ? clips.some((clip: Clip) => clip.filePath === currentFilePath)
-    : false
+  return Boolean(
+    currentFilePath && state.clips.idsByFilePath[currentFilePath].length
+  )
 }
 
 export const getCurrentNoteType = (state: AppState): ?NoteType => {

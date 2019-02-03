@@ -6,6 +6,7 @@ declare type Action =
   | DialogAction
   | WaveformAction
   | NoteTypeAction
+  | ClipAction
   | {|
       type: 'CHOOSE_AUDIO_FILES',
       filePaths: Array<AudioFilePath>,
@@ -27,6 +28,7 @@ declare type Action =
   | {| type: 'DETECT_SILENCE' |}
   | {| type: 'DETECT_SILENCE_REQUEST' |}
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
+  | {| type: 'HYDRATE_FROM_PROJECT_FILE', state: $Shape<AppState> |}
 
 declare type ClipAction =
   | {| type: 'DELETE_CARD', id: ClipId |}
@@ -50,10 +52,21 @@ declare type ClipAction =
 declare type NoteTypeAction =
   | { type: 'ADD_NOTE_TYPE', noteType: NoteType }
   | { type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> }
+  | {
+      type: 'EDIT_NOTE_TYPE_REQUEST',
+      id: NoteTypeId,
+      override: $Shape<NoteType>,
+    }
   | { type: 'DELETE_NOTE_TYPE', id: NoteTypeId }
+  | { type: 'DELETE_NOTE_TYPE_REQUEST', id: NoteTypeId }
   | { type: 'SET_DEFAULT_NOTE_TYPE', id: NoteTypeId }
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE',
+      audioFilePath: AudioFilePath,
+      noteTypeId: NoteTypeId,
+    }
+  | {
+      type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
       audioFilePath: AudioFilePath,
       noteTypeId: NoteTypeId,
     }

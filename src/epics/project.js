@@ -4,6 +4,7 @@ import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
+import { getProjectFilePath } from '../utils/statePersistence'
 // import electron from 'electron'
 
 const writeFile = promisify(fs.writeFile)
@@ -28,10 +29,14 @@ const saveProjectFile = (action$, state$) =>
     debounce(() => timer(TEN_SECONDS)),
     flatMap(async () => {
       try {
-        const filePath = `${r.getCurrentFilePath(state$.value)}.afca.json`
-        const json = JSON.stringify(r.getProject0_0_0(state$.value), null, 2)
-        await writeFile(filePath, json, 'utf8')
-        return { type: 'SAVE PROJECT!!' }
+        const audioFilePath = r.getCurrentFilePath(state$.value)
+        if (audioFilePath) {
+          const projectFilePath = getProjectFilePath(audioFilePath)
+          const json = JSON.stringify(r.getProject0_0_0(state$.value), null, 2)
+          await writeFile(projectFilePath, json, 'utf8')
+          return { type: 'SAVE PROJECT!!' }
+        }
+        return { type: 'NO AUDIO FILE! NOT SAVING ANY PROJECT' }
       } catch (err) {
         return r.simpleMessageSnackbar(
           `Problem saving project file: ${err.message}`

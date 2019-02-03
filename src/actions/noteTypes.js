@@ -5,11 +5,30 @@ export const addNoteType = (noteType: NoteType): NoteTypeAction => ({
   noteType,
 })
 
+export const deleteNoteType = (id: NoteTypeId): NoteTypeAction => ({
+  type: 'DELETE_NOTE_TYPE',
+  id,
+})
+
+export const deleteNoteTypeRequest = (id: NoteTypeId): NoteTypeAction => ({
+  type: 'DELETE_NOTE_TYPE_REQUEST',
+  id,
+})
+
 export const editNoteType = (
   id: NoteTypeId,
   override: $Shape<NoteType>
 ): NoteTypeAction => ({
   type: 'EDIT_NOTE_TYPE',
+  id,
+  override,
+})
+
+export const editNoteTypeRequest = (
+  id: NoteTypeId,
+  override: $Shape<NoteType>
+): NoteTypeAction => ({
+  type: 'EDIT_NOTE_TYPE_REQUEST',
   id,
   override,
 })
@@ -24,6 +43,15 @@ export const setAudioFileNoteType = (
   noteTypeId: NoteTypeId
 ): NoteTypeAction => ({
   type: 'SET_AUDIO_FILE_NOTE_TYPE',
+  audioFilePath,
+  noteTypeId,
+})
+
+export const setAudioFileNoteTypeRequest = (
+  audioFilePath: AudioFilePath,
+  noteTypeId: NoteTypeId
+): NoteTypeAction => ({
+  type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
   audioFilePath,
   noteTypeId,
 })

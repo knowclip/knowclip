@@ -1,5 +1,6 @@
 // import { flatMap } from 'rxjs/operators'
 import { flatMap, map } from 'rxjs/operators'
+import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
@@ -8,6 +9,10 @@ import { promisify } from 'util'
 import fs from 'fs'
 import dataurl from 'dataurl'
 import { extname } from 'path'
+import {
+  hydrateFromProjectFile,
+  findExistingProjectFilePath,
+} from '../utils/statePersistence'
 
 const readFile = promisify(fs.readFile)
 
@@ -55,8 +60,8 @@ const loadAudioEpic = (action$, state$) =>
         return await r.loadAudioSuccess(null) // should be failure...
       }
 
-      const tmpFilePath = await coerceMp3ToConstantBitrate(filePath)
-      const audio = await readFile(tmpFilePath)
+      const constantBitrateFilePath = await coerceMp3ToConstantBitrate(filePath)
+      const audio = await readFile(constantBitrateFilePath)
 
       if (r.getCurrentFilePath(state$.value) !== filePath)
         return { type: 'NOOP_OLD_AUDIO_LOAD' } // really should also cancel old ones
@@ -76,14 +81,67 @@ const loadAudioEpic = (action$, state$) =>
 const chooseAudioFilesEpic = (action$, state$) =>
   action$.pipe(
     ofType('CHOOSE_AUDIO_FILES'),
+    // turning this to plain map() breaks video playback (maybe audio also)
     flatMap(async ({ filePaths }) => {
       if (!filePaths.length) {
         console.log('No audio file selected')
       }
-      console.log('chose audio files!', filePaths[0])
-      return await r.loadAudio(filePaths[0], audioElement(), svgElement())
+
+      const [filePath] = filePaths
+
+      console.log('chose audio files!', filePath)
+
+      // let projectFilePath
+
+      // try {
+      //   projectFilePath = findExistingProjectFilePath(filePath)
+      // } catch(err) {
+      //   console.error(err)
+      // }
+
+      // return await from([
+      // ...(projectFilePath
+      //   ? [
+      //       r.hydrateFromProjectFile(
+      //         hydrateFromProjectFile(
+      //           projectFilePath,
+      //           filePath,
+      //           r.getMediaFolderLocation(state$.value),
+      //           state$.noteTypes
+      //         )
+      //       ),
+      //     ]
+      //   : []),
+      return await r.loadAudio(filePath, audioElement(), svgElement())
+      // ])
     })
   )
+
+const loadProjectEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('CHOOSE_AUDIO_FILES'),
+    map(({ filePaths: [filePath] }) => {
+      let projectFilePath
+
+      try {
+        projectFilePath = findExistingProjectFilePath(filePath)
+      } catch (err) {
+        console.error(err)
+      }
+
+      return projectFilePath
+        ? r.hydrateFromProjectFile(
+            hydrateFromProjectFile(
+              projectFilePath,
+              filePath,
+              r.getMediaFolderLocation(state$.value),
+              state$.noteTypes
+            )
+          )
+        : { type: 'NOOP_LOAD_PROJECT' }
+    })
+  )
+
 const removeAudioFilesEpic = (action$, state$) =>
   action$.pipe(
     ofType('REMOVE_AUDIO_FILES'),
@@ -118,6 +176,7 @@ export default combineEpics(
   loadAudioEpic,
   chooseAudioFilesEpic,
   removeAudioFilesEpic,
+  loadProjectEpic,
   setCurrentFileEpic,
   initEpic
 )

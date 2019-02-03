@@ -3,8 +3,8 @@ import fs from 'fs'
 import { promisify } from 'util'
 import { initialState as initialNoteTypeState } from '../reducers/noteTypes'
 
-export const persistState = state => {
-  const { audio, clips, noteTypes } = state
+export const persistState = (state: AppState) => {
+  const { audio, noteTypes } = state
   window.localStorage.setItem('audio', JSON.stringify(audio))
   // window.localStorage.setItem('clips', JSON.stringify(clips))
   window.localStorage.setItem('noteTypes', JSON.stringify(noteTypes))
@@ -29,12 +29,15 @@ const areNoteTypesEqual = (a: NoteType, b: NoteType): boolean =>
     (field, i) => field.id === b.fields[i].id && field.name === b.fields[i].name
   )
 
-export const hydrate = (
-  project: Project0_0_0,
+export const hydrateFromProjectFile = (
+  existingProjectFilePath: string,
   audioFilePath: AudioFilePath,
   mediaFolderLocation: ?string,
   noteTypes: ?NoteTypesState
 ): $Shape<AppState> => {
+  const jsonFileContents = fs.readFileSync(existingProjectFilePath, 'utf8')
+  const project: Project0_0_0 = JSON.parse(jsonFileContents)
+
   const localNoteType = noteTypes && noteTypes.byId[project.noteType.id]
   const noteType =
     !localNoteType || areNoteTypesEqual(localNoteType, project.noteType)
@@ -84,7 +87,15 @@ export const hydrate = (
   }
 }
 
-const getJsonPath = filePath => `${filePath}.afca.json`
+export const getProjectFilePath = (filePath: AudioFilePath): string =>
+  `${filePath}.afca`
+export const findExistingProjectFilePath = (
+  filePath: AudioFilePath
+): ?string => {
+  const jsonPath = getProjectFilePath(filePath)
+  return filePath && fs.existsSync(jsonPath) ? jsonPath : null
+}
+
 export const getPersistedState = (): $Shape<AppState> => {
   const persistedState = ({}: $Shape<{
     audio: AudioState,
@@ -106,18 +117,15 @@ export const getPersistedState = (): $Shape<AppState> => {
       persistState &&
       persistState.audio &&
       persistState.audio.mediaFolderLocation
-    const jsonPath = getJsonPath(filePath)
-    const jsonExists = filePath && fs.existsSync(jsonPath)
-    if (jsonExists) {
-      const jsonFileContents = fs.readFileSync(jsonPath, 'utf8')
-      const project = JSON.parse(jsonFileContents)
-      return hydrate(
-        project,
+    const projectFilePath = findExistingProjectFilePath(filePath)
+    if (projectFilePath) {
+      return hydrateFromProjectFile(
+        projectFilePath,
         filePath,
         mediaFolderLocation,
         persistedState.noteTypes
       )
-    }
+    } else return { noteTypes: persistedState.noteTypes }
   } catch (err) {
     console.error(err)
     return { noteTypes: persistedState.noteTypes }

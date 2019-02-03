@@ -10,9 +10,12 @@ const initialState: AudioState = {
 
 const audio: Reducer<AudioState> = (
   state: AudioState = initialState,
-  action: Object
+  action: Action
 ) => {
   switch (action.type) {
+    case 'HYDRATE_FROM_PROJECT_FILE':
+      return action.state.audio
+
     case 'TOGGLE_LOOP':
       return {
         ...state,
@@ -76,7 +79,8 @@ const audio: Reducer<AudioState> = (
         mediaFolderLocation: action.directoryPath,
       }
 
-    case 'SET_AUDIO_FILE_NOTE_TYPE':
+    case 'SET_AUDIO_FILE_NOTE_TYPE': {
+      const { noteTypeId } = action
       return {
         ...state,
         files: Object.keys(state.files).reduce(
@@ -84,12 +88,13 @@ const audio: Reducer<AudioState> = (
             ...all,
             [filePath]: {
               ...state.files[filePath],
-              noteTypeId: action.noteTypeId,
+              noteTypeId,
             },
           }),
           {}
         ),
       }
+    }
     // case 'ADD_WAVEFORM_SELECTION'
     default:
       return state

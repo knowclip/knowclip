@@ -45,6 +45,9 @@ const arrayToMapById = array =>
 
 const clips: Reducer<ClipsState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'HYDRATE_FROM_PROJECT_FILE':
+      return action.state.clips
+
     case 'CHOOSE_AUDIO_FILES':
       return {
         ...state,
@@ -61,6 +64,7 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       return {
         ...state,
         idsByFilePath: {},
+        byId: {},
       }
 
     case 'ADD_WAVEFORM_SELECTION': {

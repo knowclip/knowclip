@@ -12,4 +12,4 @@ export const getNoteType = (state: AppState, id: NoteTypeId): ?NoteType =>
 export const getDefaultNoteTypeId = (
   state: AppState,
   id: NoteTypeId
-): NoteTypeId => state.noteTypes.defaultId
+): ?NoteTypeId => state.noteTypes.defaultId

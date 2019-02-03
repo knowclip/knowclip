@@ -19,6 +19,7 @@ import waveformStretchEpic from './waveformStretchEpic'
 import detectSilenceEpic from './detectSilence'
 import makeClipsEpic from './makeClips'
 import exportFlashcardsEpic from './exportFlashcards'
+import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
@@ -144,5 +145,6 @@ export default combineEpics(
   persistStateEpic,
   exportFlashcardsEpic,
   deleteAllCurrentFileClips,
-  project
+  project,
+  noteTypesEpic
 )
