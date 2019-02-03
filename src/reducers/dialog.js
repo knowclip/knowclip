@@ -12,7 +12,9 @@ const dialog: Reducer<DialogState> = (
     case 'ENQUEUE_DIALOG':
       return {
         ...state,
-        queue: state.queue.concat(action.dialog),
+        queue: action.skipQueue
+          ? [action.dialog, ...state.queue]
+          : state.queue.concat(action.dialog),
       }
 
     case 'CLOSE_DIALOG': {

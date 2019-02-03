@@ -48,7 +48,8 @@ const makeClips = (action$, state$) =>
     flatMap(async () => {
       const directory = r.getMediaFolderLocation(state$.value)
 
-      if (!directory) return r.mediaFolderLocationFormDialog(r.makeClips())
+      if (!directory)
+        return r.mediaFolderLocationFormDialog(r.makeClips(), true)
 
       try {
         const clipIds = Object.keys(state$.value.clips.byId)
@@ -66,9 +67,9 @@ const makeClips = (action$, state$) =>
         })
         await Promise.all(clipsOperations)
 
-        return r.simpleMessageSnackbar('Clips made in ' + directory)
+        return await r.simpleMessageSnackbar('Clips made in ' + directory)
       } catch (err) {
-        return r.simpleMessageSnackbar(
+        return await r.simpleMessageSnackbar(
           `There was a problem making clips: ${err.message}`
         )
       }

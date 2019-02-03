@@ -1,8 +1,12 @@
 // @flow
 
-export const enqueueDialog = (dialog: DialogData): DialogAction => ({
+export const enqueueDialog = (
+  dialog: DialogData,
+  skipQueue: boolean = false
+): DialogAction => ({
   type: 'ENQUEUE_DIALOG',
   dialog,
+  skipQueue,
 })
 
 export const confirmationDialog = (message: string, action: AppAction) =>
@@ -24,12 +28,16 @@ export const newNoteTypeDialog = (): DialogAction =>
   })
 
 export const mediaFolderLocationFormDialog = (
-  action: ?AppAction
+  action: ?AppAction,
+  skipQueue: boolean
 ): DialogAction =>
-  enqueueDialog({
-    type: 'MediaFolderLocationForm',
-    props: { action },
-  })
+  enqueueDialog(
+    {
+      type: 'MediaFolderLocationForm',
+      props: { action },
+    },
+    skipQueue
+  )
 
 export const reviewAndExportDialog = () =>
   enqueueDialog({

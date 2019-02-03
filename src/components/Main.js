@@ -64,7 +64,8 @@ class App extends Component {
 
   chooseAudioFiles = () => {
     dialog.showOpenDialog(
-      { properties: ['openFile', 'multiSelections'] },
+      // { properties: ['openFile', 'multiSelections'] },
+      { properties: ['openFile'] },
       filePaths => {
         if (!filePaths) return
         this.setState({ filePaths }, async () => {

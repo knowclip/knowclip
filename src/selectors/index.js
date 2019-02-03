@@ -1,6 +1,6 @@
 // @flow
-import { basename } from 'path'
 import { getSecondsAtX } from './waveformTime'
+import * as audioSelectors from './audio'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
@@ -8,6 +8,7 @@ export const SELECTION_THRESHOLD = 40
 
 export * from './waveformTime'
 export * from './clips'
+export * from './audio'
 export * from './snackbar'
 export * from './dialog'
 export * from './noteTypes'
@@ -48,39 +49,10 @@ export const getCurrentFlashcard = (state: AppState): ?ExpandedFlashcard => {
 // export const getGerman = (state) => getCurrentFlashcard(state).de
 // export const getEnglish = (state) => getCurrentFlashcard(state).en
 
-export const getFilePaths = (state: AppState) => state.audio.filesOrder
-export const isLoopOn = (state: AppState) => state.audio.loop
-export const areFilesLoaded = (state: AppState) =>
-  Boolean(state.audio.filesOrder.length)
-export const isNextButtonEnabled = (state: AppState) =>
-  Boolean(state.audio.filesOrder.length > 1) &&
-  state.audio.currentFileIndex !== state.audio.filesOrder.length - 1
-export const isPrevButtonEnabled = (state: AppState) =>
-  Boolean(state.audio.filesOrder.length > 1) &&
-  state.audio.currentFileIndex !== 0
-export const getCurrentFileIndex = (state: AppState) =>
-  state.audio.currentFileIndex
-export const getCurrentFileName = (state: AppState) => {
-  const filePath = getCurrentFilePath(state)
-  return filePath && basename(filePath)
-}
-
-export const getCurrentFilePath = ({ audio }: AppState): ?AudioFilePath =>
-  audio.filesOrder[audio.currentFileIndex]
-
-export const getCurrentFile = (state: AppState): ?AudioFileData => {
-  const currentFilePath = getCurrentFilePath(state)
-  return currentFilePath ? state.audio.files[currentFilePath] : null
-}
-export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> => {
-  const currentFilePath = getCurrentFilePath(state)
-  return currentFilePath ? state.clips.idsByFilePath[currentFilePath] : []
-}
-
 export const getWaveformSelection = (state: AppState, id: ClipId): ?Clip =>
   state.clips.byId[id]
 export const getWaveformSelections = (state: AppState): Array<Clip> =>
-  getWaveformSelectionsOrder(state).map(
+  audioSelectors.getWaveformSelectionsOrder(state).map(
     (id: ClipId): Clip => {
       const clip = getWaveformSelection(state, id)
       if (!clip) throw new Error('Impossible')
@@ -120,7 +92,7 @@ export const getWaveform = (state: AppState) => ({
 export const getCurrentFlashcardId = (state: AppState): ?ClipId =>
   state.user.highlightedSelectionId
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
-  getWaveformSelectionsOrder(state).map(id => {
+  audioSelectors.getWaveformSelectionsOrder(state).map(id => {
     const flashcard = getFlashcard(state, id)
     if (!flashcard) throw new Error('flashcard not found ' + id)
     delete flashcard.time
@@ -131,7 +103,7 @@ export const getWaveformPendingSelection = (
   state: AppState
 ): ?PendingSelection => state.user.pendingSelection
 export const getSelectionIdAt = (state: AppState, x: number): ?ClipId =>
-  getWaveformSelectionsOrder(state).find(selectionId => {
+  audioSelectors.getWaveformSelectionsOrder(state).find(selectionId => {
     const selection = state.clips.byId[selectionId]
     const { start, end } = selection
     return x >= start && x <= end
@@ -141,11 +113,11 @@ export const getPreviousSelectionId = (
   state: AppState,
   id: ClipId
 ): ?ClipId => {
-  const selectionsOrder = getWaveformSelectionsOrder(state)
+  const selectionsOrder = audioSelectors.getWaveformSelectionsOrder(state)
   return selectionsOrder[selectionsOrder.indexOf(id) - 1]
 }
 export const getNextSelectionId = (state: AppState, id: ClipId): ?ClipId => {
-  const selectionsOrder = getWaveformSelectionsOrder(state)
+  const selectionsOrder = audioSelectors.getWaveformSelectionsOrder(state)
   return selectionsOrder[selectionsOrder.indexOf(id) + 1]
 }
 
@@ -181,27 +153,12 @@ export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
 }
 
 export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
-  getWaveformSelectionsOrder(state).map(id => getClipTimes(state, id))
+  audioSelectors
+    .getWaveformSelectionsOrder(state)
+    .map(id => getClipTimes(state, id))
 
 export const isAudioLoading = (state: AppState): boolean =>
   state.audio.isLoading
 
 export const getMediaFolderLocation = (state: AppState): ?string =>
   state.audio.mediaFolderLocation
-
-export const doesCurrentFileHaveClips = (state: AppState): boolean => {
-  const currentFilePath = getCurrentFilePath(state)
-  const clips = (Object.values(state.clips.byId): any)
-  return currentFilePath
-    ? clips.some((clip: Clip) => clip.filePath === currentFilePath)
-    : false
-}
-
-export const getCurrentNoteType = (state: AppState): ?NoteType => {
-  const currentFile = getCurrentFile(state)
-
-  const currentNoteTypeId = currentFile
-    ? currentFile.noteTypeId
-    : state.noteTypes.defaultId
-  return currentNoteTypeId ? state.noteTypes.byId[currentNoteTypeId] : null
-}

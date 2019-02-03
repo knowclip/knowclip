@@ -10,6 +10,13 @@ declare type Clip = Exact<{
   flashcard: Flashcard,
 }>
 
+declare type ClipWithoutFilePath = Exact<{
+  id: ClipId,
+  start: WaveformX,
+  end: WaveformX,
+  flashcard: Flashcard,
+}>
+
 declare type ClipsState = {
   byId: { [ClipId]: Clip },
   idsByFilePath: { [AudioFilePath]: Array<ClipId> },

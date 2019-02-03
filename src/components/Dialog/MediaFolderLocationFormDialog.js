@@ -11,7 +11,7 @@ const MediaFolderLocationFormDialog = ({
 }) => (
   <Dialog open={open}>
     <DialogContent>
-      <MediaFolderLocationForm id={noteTypeId} onSubmit={closeDialog} />
+      <MediaFolderLocationForm id={noteTypeId} onSubmit={dispatchAction} />
     </DialogContent>
   </Dialog>
 )
