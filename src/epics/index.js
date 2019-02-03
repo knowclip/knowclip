@@ -10,8 +10,8 @@ import {
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { setWaveformCursor } from '../actions'
-import { getFlashcard } from '../selectors'
-import { setLocalFlashcard } from '../utils/localFlashcards'
+// import { getFlashcard } from '../selectors'
+// import { setLocalFlashcard } from '../utils/localFlashcards'
 import * as r from '../redux'
 import getWaveformEpic from './getWaveform'
 import waveformSelectionEpic from './waveformSelectionEpic'
@@ -23,16 +23,17 @@ import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
+import project from './project'
 
-const setLocalFlashcardEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('SET_FLASHCARD_FIELD'),
-    tap(({ id, key, value }) => {
-      const flashcard = getFlashcard(state$.value, id)
-      setLocalFlashcard({ ...flashcard, [key]: value })
-    }),
-    ignoreElements()
-  )
+// const setLocalFlashcardEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType('SET_FLASHCARD_FIELD'),
+//     tap(({ id, key, value }) => {
+//       const flashcard = getFlashcard(state$.value, id)
+//       setLocalFlashcard({ ...flashcard, [key]: value })
+//     }),
+//     ignoreElements()
+//   )
 
 const withAudioLoaded = getPiped => (action$, state$) => {
   const [first, ...rest] = getPiped(action$, state$)
@@ -129,7 +130,7 @@ const playSelectionsOnHighlightEpic = (action$, state$) =>
 export default combineEpics(
   loadAudio,
   getWaveformEpic,
-  setLocalFlashcardEpic,
+  // setLocalFlashcardEpic,
   setWaveformCursorEpic,
   // waveformMousemoveEpic,
   waveformMousedownEpic,
@@ -142,5 +143,6 @@ export default combineEpics(
   detectSilenceEpic,
   persistStateEpic,
   exportFlashcardsEpic,
-  deleteAllCurrentFileClips
+  deleteAllCurrentFileClips,
+  project
 )

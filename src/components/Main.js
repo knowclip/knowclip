@@ -79,7 +79,11 @@ class App extends Component {
     )
   }
 
-  removeAudioFiles = () => this.props.removeAudioFiles()
+  removeAudioFiles = () =>
+    this.props.confirmationDialog(
+      'Are you sure you want to close this media file? You will lose all unsaved work.',
+      r.removeAudioFiles()
+    )
 
   audioRef = el => (this.audio = el)
   svgRef = el => (this.svg = el)
@@ -238,13 +242,17 @@ class App extends Component {
           </div>
         )}
         {form}
-        <Fab
-          className="floatingActionButton"
-          onClick={this.reviewAndExportDialog}
-          color="primary"
-        >
-          <Layers />
-        </Fab>
+        {currentFilePath && (
+          <Tooltip title="Review and export flashcards">
+            <Fab
+              className="floatingActionButton"
+              onClick={this.reviewAndExportDialog}
+              color="primary"
+            >
+              <Layers />
+            </Fab>
+          </Tooltip>
+        )}
       </div>
     )
   }
@@ -285,6 +293,7 @@ const mapDispatchToProps = {
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
   mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
   reviewAndExportDialog: r.reviewAndExportDialog,
+  confirmationDialog: r.confirmationDialog,
 }
 
 export default connect(

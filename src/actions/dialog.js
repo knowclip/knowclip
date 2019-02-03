@@ -9,7 +9,7 @@ export const enqueueDialog = (
   skipQueue,
 })
 
-export const confirmationDialog = (message: string, action: AppAction) =>
+export const confirmationDialog = (message: string, action: Action) =>
   enqueueDialog({
     type: 'Confirmation',
     props: { message, action },
@@ -28,7 +28,7 @@ export const newNoteTypeDialog = (): DialogAction =>
   })
 
 export const mediaFolderLocationFormDialog = (
-  action: ?AppAction,
+  action: ?Action,
   skipQueue: boolean
 ): DialogAction =>
   enqueueDialog(

@@ -30,14 +30,8 @@ const AudioFilesNavMenu = ({
           </IconButton>
         </h2>
       ) : (
-        <Button onClick={chooseAudioFiles}>Choose audio files </Button>
+        <Button onClick={chooseAudioFiles}>Choose source file</Button>
       )}
-      <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-        <FastRewind />
-      </IconButton>
-      <IconButton onClick={onClickNext} disabled={!isNextButtonEnabled}>
-        <FastForward />
-      </IconButton>
       <IconButton onClick={onClickLoop} color={loop ? 'primary' : 'default'}>
         <Loop />
       </IconButton>{' '}
@@ -46,3 +40,10 @@ const AudioFilesNavMenu = ({
 )
 
 export default AudioFilesNavMenu
+
+// <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
+//   <FastRewind />
+// </IconButton>
+// <IconButton onClick={onClickNext} disabled={!isNextButtonEnabled}>
+//   <FastForward />
+// </IconButton>

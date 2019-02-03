@@ -11,7 +11,7 @@
 //   allIds: ['default'],
 //   defaultId: 'default',
 // }
-const initialState: NoteTypesState = {
+export const initialState: NoteTypesState = {
   byId: {
     default: {
       id: 'default',

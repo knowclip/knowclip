@@ -3,7 +3,7 @@
 declare type DialogData =
   | {
       type: 'Confirmation',
-      props: { message: string, action: AppAction },
+      props: { message: string, action: Action },
     }
   | {
       type: 'NoteTypeForm',
@@ -11,7 +11,7 @@ declare type DialogData =
     }
   | {
       type: 'MediaFolderLocationForm',
-      props: { action: ?AppAction },
+      props: { action: ?Action },
     }
   | {
       type: 'ReviewAndExport',

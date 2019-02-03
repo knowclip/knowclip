@@ -35,7 +35,7 @@ const exportFlashcards = (action$, state$) =>
         if (!filename) return { type: 'NOOP_EXPORT_FLASHCARDS' }
 
         const csvText = getCsvText(state$.value)
-        await writeFile(filename, csvText)
+        await writeFile(filename, csvText, 'utf8')
         return r.simpleMessageSnackbar(`Flashcards saved in ${filename}`)
       } catch (err) {
         return r.simpleMessageSnackbar(

@@ -17,7 +17,7 @@ body,
 }
 
 .floatingActionButton {
-  position: absolute !important;
+  position: fixed !important;
   bottom: 5%;
   right: 5%;
 }

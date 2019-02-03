@@ -28,7 +28,6 @@ const audio: Reducer<AudioState> = (
         files: filePaths.reduce((files, path) => {
           const fileData: AudioFileData = {
             path,
-            clipsOrder: [],
             noteTypeId,
           }
           return { ...files, [path]: fileData }

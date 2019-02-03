@@ -12,6 +12,8 @@ const composeEnhancers =
 export default function getStore() {
   const epicMiddleware = createEpicMiddleware()
 
+  console.log('persisted state', getPersistedState())
+
   const store = createStore(
     reducer,
     getPersistedState(),

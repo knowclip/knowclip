@@ -5,18 +5,18 @@ export * from './snackbar'
 export * from './dialog'
 export * from './noteTypes'
 
-export const initializeApp = (): AppAction => ({ type: 'INITIALIZE_APP' })
+export const initializeApp = (): Action => ({ type: 'INITIALIZE_APP' })
 
 export const chooseAudioFiles = (
   filePaths: Array<AudioFilePath>,
   noteTypeId: NoteTypeId
-): AppAction => ({
+): Action => ({
   type: 'CHOOSE_AUDIO_FILES',
   filePaths,
   noteTypeId,
 })
 
-export const removeAudioFiles = (): AppAction => ({
+export const removeAudioFiles = (): Action => ({
   type: 'REMOVE_AUDIO_FILES',
 })
 
@@ -24,7 +24,7 @@ export const setFlashcardField = (
   id: ClipId,
   key: string,
   value: string
-): AppAction => ({
+): Action => ({
   type: 'SET_FLASHCARD_FIELD',
   id,
   key,
@@ -35,53 +35,53 @@ export const loadAudio = (
   filePath: string,
   audioElement: Object,
   svgElement: Object
-): AppAction => ({
+): Action => ({
   type: 'LOAD_AUDIO',
   filePath,
   audioElement,
   svgElement,
 })
 
-export const setCurrentFile = (index: number): AppAction => ({
+export const setCurrentFile = (index: number): Action => ({
   type: 'SET_CURRENT_FILE',
   index,
 })
 
-export const toggleLoop = (): AppAction => ({
+export const toggleLoop = (): Action => ({
   type: 'TOGGLE_LOOP',
 })
 
-export const loadAudioSuccess = (file: Object): AppAction => ({
+export const loadAudioSuccess = (file: Object): Action => ({
   type: 'LOAD_AUDIO_SUCCESS',
   file,
 })
 
-export const deleteCard = (id: ClipId): AppAction => ({
+export const deleteCard = (id: ClipId): Action => ({
   type: 'DELETE_CARD',
   id,
 })
 
-export const deleteCards = (ids: Array<ClipId>): AppAction => ({
+export const deleteCards = (ids: Array<ClipId>): Action => ({
   type: 'DELETE_CARDS',
   ids,
 })
 
-export const makeClips = (): AppAction => ({
+export const makeClips = (): Action => ({
   type: 'MAKE_CLIPS',
 })
 
-export const exportFlashcards = (): AppAction => ({ type: 'EXPORT_FLASHCARDS' })
+export const exportFlashcards = (): Action => ({ type: 'EXPORT_FLASHCARDS' })
 
-export const setMediaFolderLocation = (directoryPath: string): AppAction => ({
+export const setMediaFolderLocation = (directoryPath: string): Action => ({
   type: 'SET_MEDIA_FOLDER_LOCATION',
   directoryPath,
 })
 
-export const detectSilenceRequest = (): AppAction => ({
+export const detectSilenceRequest = (): Action => ({
   type: 'DETECT_SILENCE_REQUEST',
 })
-export const detectSilence = (): AppAction => ({ type: 'DETECT_SILENCE' })
+export const detectSilence = (): Action => ({ type: 'DETECT_SILENCE' })
 
-export const deleteAllCurrentFileClipsRequest = (): AppAction => ({
+export const deleteAllCurrentFileClipsRequest = (): Action => ({
   type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
 })

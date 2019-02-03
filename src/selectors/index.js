@@ -12,6 +12,7 @@ export * from './audio'
 export * from './snackbar'
 export * from './dialog'
 export * from './noteTypes'
+export * from './project'
 
 type ExpandedFlashcard = {
   id: ClipId,
