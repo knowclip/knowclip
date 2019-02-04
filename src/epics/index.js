@@ -190,7 +190,7 @@ const escEpic = (action$, state$) =>
 
 const lEpic = (action$, state$) =>
   fromEvent(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 76),
+    filter(({ ctrlKey, keyCode }) => keyCode === 76 && ctrlKey),
     flatMap(e => {
       //
       //
@@ -206,10 +206,12 @@ const lEpic = (action$, state$) =>
       const x =
         media && r.getXAtMilliseconds(state$.value, media.currentTime * 1000)
       const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
-      if (
-        selectionIdAtX &&
-        r.getHighlightedWaveformSelectionId(state$.value) !== selectionIdAtX
-      )
+      const highlightedId = r.getHighlightedWaveformSelectionId(state$.value)
+
+      if (r.isLoopOn(state$.value) && selectionIdAtX && !highlightedId)
+        return of(r.highlightSelection(selectionIdAtX))
+
+      if (selectionIdAtX && highlightedId !== selectionIdAtX)
         return from([r.highlightSelection(selectionIdAtX), r.toggleLoop()])
       //
       //
