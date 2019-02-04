@@ -45,13 +45,21 @@ const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
-const Selection = ({ id, start, end, stepsPerSecond, isHighlighted }) => {
+const Selection = ({
+  id,
+  start,
+  end,
+  stepsPerSecond,
+  isHighlighted,
+  flashcard,
+}) => {
   return (
     <g id={id}>
       <path
         className={cn('waveform-selection', { isHighlighted })}
         d={getSelectionPath(start, end, stepsPerSecond)}
       />
+      {/*<text x={start} y={90} width={end - start}>{Object.values(flashcard.fields)[0]}</text>*/}
       <rect
         className="waveform-selection-border"
         x={start}

@@ -48,6 +48,7 @@ export const hydrateFromProjectFile = (
           name: `${project.noteType.name}_fork`,
         }
   const noteTypesBase = noteTypes || initialNoteTypeState
+
   return {
     audio: {
       loop: true,
@@ -71,7 +72,7 @@ export const hydrateFromProjectFile = (
       byId: Object.keys(project.clips).reduce(
         (all, clipId) => ({
           ...all,
-          [clipId]: { ...project.clips[clipId], filePath: [audioFilePath] },
+          [clipId]: { ...project.clips[clipId], filePath: audioFilePath },
         }),
         ({}: { [ClipId]: Clip })
       ),

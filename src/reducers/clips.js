@@ -175,6 +175,8 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     case 'DELETE_CARDS': {
       const { ids } = action
       const byId = { ...state.byId }
+      if (!ids.length) return state
+
       const { filePath } = state.byId[ids[0]]
       action.ids.forEach(id => {
         delete byId[id]

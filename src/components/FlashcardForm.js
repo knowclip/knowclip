@@ -69,9 +69,10 @@ class FlashcardForm extends Component {
               </p>
               {currentNoteType.fields.map(({ name, id }) => (
                 <TextField
+                  key={`${id}_${currentFlashcard.id}`}
                   inputRef={this.inputRef(id)}
                   onChange={e => this.setFlashcardText(id, e.target.value)}
-                  value={currentFlashcard.fields[id]}
+                  value={currentFlashcard.fields[id] || ''}
                   fullWidth
                   multiline
                   label={name}
