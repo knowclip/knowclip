@@ -35,7 +35,7 @@ export const setWaveformPendingSelection = (
   selection,
 })
 
-export const highlightSelection = (id: ClipId): WaveformAction => ({
+export const highlightSelection = (id: ?ClipId): WaveformAction => ({
   type: 'HIGHLIGHT_WAVEFORM_SELECTION',
   id,
 })

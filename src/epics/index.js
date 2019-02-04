@@ -8,7 +8,7 @@ import {
   withLatestFrom,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent } from 'rxjs'
+import { fromEvent, from, of } from 'rxjs'
 import { setWaveformCursor } from '../actions'
 // import { getFlashcard } from '../selectors'
 // import { setLocalFlashcard } from '../utils/localFlashcards'
@@ -63,8 +63,26 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
     fromEvent(audioElement(), 'timeupdate').pipe(
       map(e => {
         const viewBox = state$.value.waveform.viewBox
+
+        const highlightedId = r.getHighlightedWaveformSelectionId(state$.value)
+        const highlightedClip =
+          highlightedId && r.getWaveformSelection(state$.value, highlightedId)
+        const timeToLoop =
+          highlightedId &&
+          r.isLoopOn(state$.value) &&
+          e.target.currentTime >=
+            r.getSecondsAtX(state$.value, highlightedClip.end)
+        if (timeToLoop) {
+          e.target.currentTime = r.getSecondsAtX(
+            state$.value,
+            highlightedClip.start
+          )
+        }
+
         const newX = Math.round(
-          e.target.currentTime && e.target.currentTime * 50
+          timeToLoop
+            ? highlightedClip.start
+            : e.target.currentTime && e.target.currentTime * 50
         )
         const svgWidth = elementWidth(svgElement)
         if (newX < viewBox.xMin) {
@@ -124,8 +142,86 @@ const playSelectionsOnHighlightEpic = (action$, state$) =>
       const { start } = r.getWaveformSelection(state$.value, selectionId)
       const newTime = r.getSecondsAtX(state$.value, start)
       audioElement().currentTime = newTime
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+
+      const input = document.querySelector('textarea:not([aria-hidden=true])')
+      input && input.focus()
+      //
+      //
+      //
+      //
+      //
+      //
     }),
     ignoreElements()
+  )
+
+const spaceEpic = (action$, state$) =>
+  fromEvent(window, 'keydown').pipe(
+    filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
+    tap(e => {
+      e.preventDefault()
+      console.log('pressed!')
+      const el = audioElement()
+      if (el.paused) el.play()
+      else el.pause()
+      return { type: 'CTRL_SPACE' }
+    }),
+    ignoreElements()
+  )
+
+const escEpic = (action$, state$) =>
+  fromEvent(window, 'keydown').pipe(
+    filter(({ ctrlKey, keyCode }) => keyCode === 27),
+    map(e => {
+      return r.getCurrentDialog(state$.value)
+        ? { type: 'NOOP_ESC_KEY' }
+        : r.highlightSelection(null)
+    })
+  )
+
+const lEpic = (action$, state$) =>
+  fromEvent(window, 'keydown').pipe(
+    filter(({ ctrlKey, keyCode }) => keyCode === 76),
+    flatMap(e => {
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+
+      const media = audioElement()
+      const x =
+        media && r.getXAtMilliseconds(state$.value, media.currentTime * 1000)
+      const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
+      if (
+        selectionIdAtX &&
+        r.getHighlightedWaveformSelectionId(state$.value) !== selectionIdAtX
+      )
+        return from([r.highlightSelection(selectionIdAtX), r.toggleLoop()])
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+      //
+
+      return of(r.toggleLoop())
+    })
   )
 
 export default combineEpics(
@@ -146,5 +242,8 @@ export default combineEpics(
   exportFlashcardsEpic,
   deleteAllCurrentFileClips,
   project,
-  noteTypesEpic
+  noteTypesEpic,
+  spaceEpic,
+  escEpic,
+  lEpic
 )

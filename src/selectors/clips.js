@@ -5,6 +5,7 @@ import { toTimestamp } from '../utils/ffmpeg'
 import { getMillisecondsAtX } from './waveformTime'
 
 const SAFE_SEPARATOR = '-'
+const SAFE_MILLISECONDS_SEPARATOR = '_'
 
 export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
   const clip = state.clips.byId[id]
@@ -24,10 +25,14 @@ export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
   const startTime = getMillisecondsAtX(state, start)
   const endTime = getMillisecondsAtX(state, end)
 
-  const outputFilename = `${filenameWithoutExtension}__${toTimestamp(
+  const outputFilename = `${filenameWithoutExtension}___${toTimestamp(
     startTime,
     SAFE_SEPARATOR
-  )}-${toTimestamp(endTime, SAFE_SEPARATOR)}${'.mp3'}`
+  )}-${toTimestamp(
+    endTime,
+    SAFE_SEPARATOR,
+    SAFE_MILLISECONDS_SEPARATOR
+  )}${'.mp3'}`
 
   return {
     filePath,
