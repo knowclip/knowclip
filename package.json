@@ -38,6 +38,7 @@
     "format:write": "yarn format --write",
     "build-electron:mac": "NODE_ENV=production electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icons/icon.icns --prune=true --out=release-builds",
     "build-electron:win": "electron-packager . audio-flashcard-assistant --asar.unpackDir=\"**/node_modules/ffmpeg-static/bin/win32*\" --overwrite --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Audio Flashcard Assistant\"",
+    "build:mac": "yarn build && yarn build-electron:mac",
     "build:win": "yarn build && yarn build-electron:win && zip -r ./release-builds/afca.zip ./release-builds/audio-flashcard-assistant-win32-ia32"
   },
   "husky": {

@@ -68,7 +68,7 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
         const highlightedClip =
           highlightedId && r.getWaveformSelection(state$.value, highlightedId)
         const timeToLoop =
-          highlightedId &&
+          highlightedClip &&
           r.isLoopOn(state$.value) &&
           e.target.currentTime >=
             r.getSecondsAtX(state$.value, highlightedClip.end)
