@@ -7,7 +7,6 @@ import ffmpeg from '../utils/ffmpeg'
 import tempy from 'tempy'
 import { promisify } from 'util'
 import fs from 'fs'
-import dataurl from 'dataurl'
 import { extname } from 'path'
 import {
   hydrateFromProjectFile,
@@ -67,10 +66,7 @@ const loadAudioEpic = (action$, state$) =>
         return { type: 'NOOP_OLD_AUDIO_LOAD' } // really should also cancel old ones
 
       window.setTimeout(() => {
-        mediaPlayer.src = dataurl.convert({
-          data: audio,
-          mimetype: 'audio/mp3',
-        })
+        mediaPlayer.src = `file:///${constantBitrateFilePath}`
         // mediaPlayer.load()
         mediaPlayer.play()
       }, 0)
