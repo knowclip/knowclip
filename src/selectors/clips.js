@@ -32,7 +32,7 @@ export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
     endTime,
     SAFE_SEPARATOR,
     SAFE_MILLISECONDS_SEPARATOR
-  )}${'.mp3'}`
+  )}___afcaId${clipId}${'.mp3'}`
 
   return {
     filePath,
