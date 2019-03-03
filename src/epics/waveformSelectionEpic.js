@@ -83,6 +83,7 @@ const waveformSelectionEpic = (action$, state$) => {
             r.getSelectionIdAt(state$.value, pendingSelection.start),
             r.getSelectionIdAt(state$.value, pendingSelection.end),
           ].some(id => selectionsOrder.includes(id))
+          const currentNoteType = r.getCurrentNoteType(state$.value)
 
           return pendingSelectionOverlaps ||
             !pendingSelectionIsBigEnough(state$.value)
@@ -93,8 +94,10 @@ const waveformSelectionEpic = (action$, state$) => {
                   r.getWaveformPendingSelection(state$.value),
                   r.getCurrentFilePath(state$.value),
                   uuid(),
-                  r.getCurrentNoteType(state$.value),
-                  r.getDefaultTags(state$.value)
+                  currentNoteType,
+                  currentNoteType.useTagsField
+                    ? r.getDefaultTags(state$.value)
+                    : []
                 )
               )
         })

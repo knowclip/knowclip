@@ -239,6 +239,7 @@ const defaultTagsEpic = (action$, state$) =>
 const defaultTagsAudioEpic = (action$, state$) =>
   action$.pipe(
     ofType('LOAD_AUDIO_SUCCESS'),
+    filter(({ file }) => file),
     map(({ id }) => ({
       type: 'SET_DEFAULT_TAGS',
       tags: [basename(r.getCurrentFileName(state$.value))],

@@ -76,6 +76,7 @@ const detectSilenceEpic = (action$, state$) =>
         })
 
         const filePath = r.getCurrentFilePath(state$.value)
+        const currentNoteType = r.getCurrentNoteType(state$.value)
         const newSelections = chunks.map(({ start, end }) =>
           newClip(
             {
@@ -84,8 +85,8 @@ const detectSilenceEpic = (action$, state$) =>
             },
             filePath,
             uuid(),
-            r.getCurrentNoteType(state$.value),
-            r.getDefaultTags(state$.value)
+            currentNoteType,
+            currentNoteType.useTagsField ? r.getDefaultTags(state$.value) : []
           )
         )
 

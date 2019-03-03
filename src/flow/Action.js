@@ -15,13 +15,13 @@ declare type Action =
   | {| type: 'REMOVE_AUDIO_FILES' |}
   | {|
       type: 'LOAD_AUDIO',
-      filePath: string,
+      filePath: ?string,
       audioElement: Object,
       svgElement: Object,
     |}
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
-  | {| type: 'LOAD_AUDIO_SUCCESS', file: Object |}
+  | {| type: 'LOAD_AUDIO_SUCCESS', file: ?Object |}
   | {| type: 'EXPORT_FLASHCARDS' |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
