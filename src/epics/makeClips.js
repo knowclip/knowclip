@@ -64,6 +64,7 @@ const makeApkg = async (
       ],
       {
         sortField: noteType.fields[0].name,
+        tags: clip.flashcard.tags || [],
       }
     )
   })

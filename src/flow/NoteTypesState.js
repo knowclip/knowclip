@@ -12,6 +12,7 @@ declare type NoteType = {
   id: NoteTypeId,
   name: string,
   fields: Array<NoteTypeField>,
+  useTagsField: boolean,
 }
 
 declare type NoteFieldId = string

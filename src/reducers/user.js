@@ -5,12 +5,10 @@ const initialState: UserState = {
   pendingStretch: null,
   highlightedSelectionId: null,
   defaultNoteTypeId: 'default',
+  defaultTags: [],
 }
 
-export default function user(
-  state: UserState = initialState,
-  action: Object
-): UserState {
+const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_WAVEFORM_SELECTION':
       return {
@@ -36,7 +34,15 @@ export default function user(
         pendingStretch: action.stretch,
       }
 
+    case 'SET_DEFAULT_TAGS':
+      return {
+        ...state,
+        defaultTags: action.tags,
+      }
+
     default:
       return state
   }
 }
+
+export default user

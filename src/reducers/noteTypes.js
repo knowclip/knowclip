@@ -17,6 +17,7 @@ export const initialState: NoteTypesState = {
       id: 'default',
       name: 'default',
       fields: [{ id: 'front', name: 'Front' }, { id: 'back', name: 'Back' }],
+      useTagsField: true,
     },
   },
   allIds: ['default'],

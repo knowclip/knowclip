@@ -6,6 +6,8 @@ import {
   IconButton,
   DialogContent,
   DialogActions,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
 import * as r from '../redux'
@@ -27,6 +29,7 @@ class NoteTypeForm extends Component {
       noteType: props.noteType || {
         fields: [newField('Front'), newField('Back')],
         name: '',
+        useTagsField: true,
         id: uuid(),
       },
       errors: {
@@ -127,6 +130,13 @@ class NoteTypeForm extends Component {
 
   handleChangeNoteFieldText = i => e => this.setFieldText(i, e.target.value)
   handleChangeNoteNameText = e => this.setNameText(e.target.value)
+  handleChangeCheckbox = e =>
+    this.setState(state => ({
+      noteType: {
+        ...state.noteType,
+        useTagsField: !state.noteType.useTagsField,
+      },
+    }))
 
   render() {
     const { noteType, errors } = this.state
@@ -169,13 +179,23 @@ class NoteTypeForm extends Component {
               Add field <AddIcon />
             </Button>
 
-            <p>In case you want to reuse these fields later:</p>
+            <p>Name this note type (for later reuse):</p>
 
             <TextField
               value={noteType.name}
               error={Boolean(errors.name)}
               helperText={errors.name}
               onChange={this.handleChangeNoteNameText}
+            />
+
+            <FormControlLabel
+              label="Include tags field"
+              control={
+                <Checkbox
+                  checked={noteType.useTagsField}
+                  onChange={this.handleChangeCheckbox}
+                />
+              }
             />
           </form>
         </DialogContent>

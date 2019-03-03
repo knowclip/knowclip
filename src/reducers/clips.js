@@ -211,6 +211,65 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       }
     }
 
+    case 'SET_FLASHCARD_TAGS_TEXT': {
+      const { id, value } = action
+
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [id]: {
+            ...state.byId[id],
+            flashcard: {
+              ...state.byId[id].flashcard,
+              tags: value,
+            },
+          },
+        },
+      }
+    }
+
+    case 'ADD_FLASHCARD_TAG': {
+      const { id, text } = action
+
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [id]: {
+            ...state.byId[id],
+            flashcard: {
+              ...state.byId[id].flashcard,
+              tags: [
+                ...(state.byId[id].flashcard.tags || []),
+                text.replace(/\s/g, '_'),
+              ],
+            },
+          },
+        },
+      }
+    }
+
+    case 'DELETE_FLASHCARD_TAG': {
+      const { id, index } = action
+      const newTags = [...state.byId[id].flashcard.tags]
+      newTags.splice(index, 1)
+
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [id]: {
+            ...state.byId[id],
+            flashcard: {
+              ...state.byId[id].flashcard,
+              tags: newTags,
+            },
+          },
+        },
+      }
+    }
+
     default:
       return state
   }

@@ -31,6 +31,24 @@ export const setFlashcardField = (
   value,
 })
 
+export const setFlashcardTagsText = (id: ClipId, value: string): Action => ({
+  type: 'SET_FLASHCARD_TAGS_TEXT',
+  id,
+  value,
+})
+
+export const addFlashcardTag = (id: ClipId, text: string): Action => ({
+  type: 'ADD_FLASHCARD_TAG',
+  id,
+  text,
+})
+
+export const deleteFlashcardTag = (id: ClipId, index: number): Action => ({
+  type: 'DELETE_FLASHCARD_TAG',
+  id,
+  index,
+})
+
 export const loadAudio = (
   filePath: string,
   audioElement: Object,

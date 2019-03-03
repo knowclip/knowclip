@@ -42,6 +42,22 @@ declare type ClipAction =
       key: string,
       value: string,
     |}
+  | {|
+      type: 'SET_FLASHCARD_TAGS_TEXT',
+      id: ClipId,
+      value: string,
+    |}
+  | {|
+      type: 'ADD_FLASHCARD_TAG',
+      id: ClipId,
+      text: string,
+    |}
+  | {|
+      type: 'DELETE_FLASHCARD_TAG',
+      id: ClipId,
+      index: number,
+    |}
+  | {| type: 'SET_DEFAULT_TAGS', tags: Array<string> |}
   | {| type: 'ADD_WAVEFORM_SELECTION', selection: Clip |}
   | {|
       type: 'ADD_WAVEFORM_SELECTIONS',

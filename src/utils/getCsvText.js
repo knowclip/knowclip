@@ -42,11 +42,15 @@ const getCsvText = (state: AppState) => {
         ({ id }) => clip.flashcard.fields[id]
       )
       console.log(fieldsValues)
-      csvData.push([
-        clip.id,
-        ...fieldsValues,
-        `[sound:${r.getClipFilename(state, clip.id)}]`,
-      ])
+      csvData.push(
+        [
+          clip.id,
+          ...fieldsValues,
+          `[sound:${r.getClipFilename(state, clip.id)}]`,
+        ].concat(
+          currentNoteType.useTagsField ? clip.flashcard.tags.join(' ') : []
+        )
+      )
     })
   })
 

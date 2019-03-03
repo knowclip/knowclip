@@ -17,6 +17,8 @@ const saveProjectFile = (action$, state$) =>
       'MAKE_CLIPS',
       'DELETE_CARDS',
       'SET_FLASHCARD_FIELD',
+      'ADD_FLASHCARD_TAG',
+      'DELETE_FLASHCARD_TAG',
       'ADD_WAVEFORM_SELECTION',
       'ADD_WAVEFORM_SELECTIONS',
       'EDIT_WAVEFORM_SELECTION',

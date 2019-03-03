@@ -93,7 +93,8 @@ const waveformSelectionEpic = (action$, state$) => {
                   r.getWaveformPendingSelection(state$.value),
                   r.getCurrentFilePath(state$.value),
                   uuid(),
-                  r.getCurrentNoteType(state$.value)
+                  r.getCurrentNoteType(state$.value),
+                  r.getDefaultTags(state$.value)
                 )
               )
         })

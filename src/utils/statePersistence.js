@@ -72,7 +72,14 @@ export const hydrateFromProjectFile = (
       byId: Object.keys(project.clips).reduce(
         (all, clipId) => ({
           ...all,
-          [clipId]: { ...project.clips[clipId], filePath: audioFilePath },
+          [clipId]: {
+            ...project.clips[clipId],
+            filePath: audioFilePath,
+            flashcard: {
+              ...project.clips[clipId].flashcard,
+              tags: project.clips[clipId].flashcard.tags || [],
+            },
+          },
         }),
         ({}: { [ClipId]: Clip })
       ),

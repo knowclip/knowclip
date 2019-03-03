@@ -26,4 +26,5 @@ declare type Flashcard = {
   // make exact
   id: ClipId,
   fields: { [NoteFieldId]: string },
+  tags: Array<string>,
 }

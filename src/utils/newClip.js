@@ -2,7 +2,13 @@ const ascending = (a, b) => a - b
 
 const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
 
-const newClip = (pendingSelection, currentFileName, id, noteType): Clip => {
+const newClip = (
+  pendingSelection,
+  currentFileName,
+  id,
+  noteType,
+  tags
+): Clip => {
   const [start, end] = sortSelectionPoints(pendingSelection)
 
   return {
@@ -12,6 +18,7 @@ const newClip = (pendingSelection, currentFileName, id, noteType): Clip => {
     filePath: currentFileName,
     flashcard: {
       id,
+      tags,
       fields: noteType.fields.reduce(
         (fields, field) => ({
           ...fields,

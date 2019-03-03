@@ -26,6 +26,8 @@ import loadAudio from './loadAudio'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import project from './project'
 
+import { basename } from 'path'
+
 // const setLocalFlashcardEpic = (action$, state$) =>
 //   action$.pipe(
 //     ofType('SET_FLASHCARD_FIELD'),
@@ -225,6 +227,24 @@ const lEpic = (action$, state$) =>
     })
   )
 
+const defaultTagsEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('ADD_FLASHCARD_TAG', 'DELETE_FLASHCARD_TAG'),
+    map(({ id }) => ({
+      type: 'SET_DEFAULT_TAGS',
+      tags: r.getWaveformSelection(state$.value, id).flashcard.tags,
+    }))
+  )
+
+const defaultTagsAudioEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('LOAD_AUDIO_SUCCESS'),
+    map(({ id }) => ({
+      type: 'SET_DEFAULT_TAGS',
+      tags: [basename(r.getCurrentFileName(state$.value))],
+    }))
+  )
+
 export default combineEpics(
   loadAudio,
   getWaveformEpic,
@@ -246,5 +266,7 @@ export default combineEpics(
   noteTypesEpic,
   spaceEpic,
   escEpic,
-  lEpic
+  lEpic,
+  defaultTagsEpic,
+  defaultTagsAudioEpic
 )

@@ -12,6 +12,7 @@
     "electron-devtools-installer": "^2.2.4",
     "ffmpeg-static": "^2.4.0",
     "fluent-ffmpeg": "^2.1.2",
+    "material-ui-chip-input": "^1.0.0-beta.14",
     "papaparse": "^4.5.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",

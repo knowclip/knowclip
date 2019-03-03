@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { TextField, IconButton, Card, CardContent } from '@material-ui/core'
 import { Delete as DeleteIcon } from '@material-ui/icons'
+import ChipInput from 'material-ui-chip-input'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardForm.module.css'
@@ -36,6 +37,13 @@ class FlashcardForm extends Component {
   setFlashcardText = (key, text) => {
     this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
   }
+  setFlashcardTagsText = text =>
+    this.props.setFlashcardTagsText(this.props.currentFlashcardId, text)
+
+  handleAddChip = text =>
+    this.props.addFlashcardTag(this.props.currentFlashcardId, text)
+  handleDeleteChip = (text, index) =>
+    this.props.deleteFlashcardTag(this.props.currentFlashcardId, index)
 
   deleteCard = () => {
     const { deleteCard, highlightedWaveformSelectionId } = this.props
@@ -79,6 +87,18 @@ class FlashcardForm extends Component {
                 />
               ))}
 
+              {currentNoteType.useTagsField && (
+                <ChipInput
+                  label="Tags"
+                  className="tagsField"
+                  inputRef={this.inputRef('tags')}
+                  value={currentFlashcard.tags || []}
+                  fullWidth
+                  onAdd={chip => this.handleAddChip(chip)}
+                  onDelete={(chip, index) => this.handleDeleteChip(chip, index)}
+                />
+              )}
+
               <IconButton
                 className={css.deleteButton}
                 onClick={this.deleteCard}
@@ -112,6 +132,9 @@ const mapDispatchToProps = {
   initializeApp: r.initializeApp,
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
+  setFlashcardTagsText: r.setFlashcardTagsText,
+  addFlashcardTag: r.addFlashcardTag,
+  deleteFlashcardTag: r.deleteFlashcardTag,
 }
 
 export default connect(
