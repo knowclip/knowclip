@@ -188,15 +188,17 @@ class NoteTypeForm extends Component {
               onChange={this.handleChangeNoteNameText}
             />
 
-            <FormControlLabel
-              label="Include tags field"
-              control={
-                <Checkbox
-                  checked={noteType.useTagsField}
-                  onChange={this.handleChangeCheckbox}
-                />
-              }
-            />
+            <p>
+              <FormControlLabel
+                label="Include tags field"
+                control={
+                  <Checkbox
+                    checked={noteType.useTagsField}
+                    onChange={this.handleChangeCheckbox}
+                  />
+                }
+              />
+            </p>
           </form>
         </DialogContent>
         <DialogActions>

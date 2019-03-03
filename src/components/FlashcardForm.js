@@ -76,21 +76,23 @@ class FlashcardForm extends Component {
                 {formatTime(currentFlashcard.time.until)}
               </p>
               {currentNoteType.fields.map(({ name, id }) => (
-                <TextField
-                  key={`${id}_${currentFlashcard.id}`}
-                  inputRef={this.inputRef(id)}
-                  onChange={e => this.setFlashcardText(id, e.target.value)}
-                  value={currentFlashcard.fields[id] || ''}
-                  fullWidth
-                  multiline
-                  label={name}
-                />
+                <p key={`${id}_${currentFlashcard.id}`}>
+                  <TextField
+                    inputRef={this.inputRef(id)}
+                    onChange={e => this.setFlashcardText(id, e.target.value)}
+                    value={currentFlashcard.fields[id] || ''}
+                    fullWidth
+                    multiline
+                    label={name}
+                  />
+                </p>
               ))}
 
               {currentNoteType.useTagsField && (
                 <ChipInput
                   label="Tags"
-                  className="tagsField"
+                  placeholder="Type your tag and press 'enter'"
+                  className={css.tagsField}
                   inputRef={this.inputRef('tags')}
                   value={currentFlashcard.tags || []}
                   fullWidth
