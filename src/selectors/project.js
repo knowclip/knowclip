@@ -3,7 +3,7 @@ import * as audioSelectors from './audio'
 
 export const getProject0_0_0 = (state: AppState): Project0_0_0 => {
   const clips: { [ClipId]: ClipWithoutFilePath } = {}
-  const clipIds = audioSelectors.getWaveformSelectionsOrder(state)
+  const clipIds = audioSelectors.getClipsOrder(state)
   clipIds.forEach(id => {
     const withFilePath = state.clips.byId[id]
     clips[id] = {

@@ -14,37 +14,37 @@ export const setWaveformCursor = (
   newViewBox,
 })
 
-export const addWaveformSelection = (selection: Clip): WaveformAction => ({
-  type: 'ADD_WAVEFORM_SELECTION',
-  selection,
+export const addClip = (clip: Clip): WaveformAction => ({
+  type: 'ADD_CLIP',
+  clip,
 })
 
-export const addWaveformSelections = (
-  selections: Array<Clip>,
+export const addClips = (
+  clips: Array<Clip>,
   filePath: AudioFilePath
 ): WaveformAction => ({
-  type: 'ADD_WAVEFORM_SELECTIONS',
-  selections,
+  type: 'ADD_CLIPS',
+  clips,
   filePath,
 })
 
-export const setWaveformPendingSelection = (
-  selection: Clip
+export const setWaveformPendingClip = (
+  clip: Clip
 ): WaveformAction => ({
   type: 'SET_WAVEFORM_PENDING_SELECTION',
-  selection,
+  clip,
 })
 
-export const highlightSelection = (id: ?ClipId): WaveformAction => ({
-  type: 'HIGHLIGHT_WAVEFORM_SELECTION',
+export const highlightClip = (id: ?ClipId): WaveformAction => ({
+  type: 'HIGHLIGHT_CLIP',
   id,
 })
 
-export const editWaveformSelection = (
+export const editClip = (
   id: ClipId,
   override: $Shape<Clip>
 ): WaveformAction => ({
-  type: 'EDIT_WAVEFORM_SELECTION',
+  type: 'EDIT_CLIP',
   id,
   override,
 })
@@ -56,9 +56,9 @@ export const setWaveformPendingStretch = (
   stretch,
 })
 
-export const mergeWaveformSelections = (
+export const mergeClips = (
   ids: Array<ClipId>
 ): WaveformAction => ({
-  type: 'MERGE_WAVEFORM_SELECTIONS',
+  type: 'MERGE_CLIPS',
   ids,
 })

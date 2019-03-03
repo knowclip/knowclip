@@ -1,6 +1,6 @@
 // @flow
 
-declare type PendingSelection = {
+declare type PendingClip = {
   start: WaveformX,
   end: WaveformX,
 }
@@ -12,9 +12,9 @@ declare type PendingStretch = Exact<{
 }>
 
 declare type UserState = Exact<{
-  pendingSelection: ?PendingSelection,
+  pendingClip: ?PendingClip,
   pendingStretch: ?PendingStretch,
-  highlightedSelectionId: ?ClipId,
+  highlightedClipId: ?ClipId,
   defaultNoteTypeId: ?NoteTypeId,
   defaultTags: Array<string>,
 }>

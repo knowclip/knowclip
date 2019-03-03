@@ -10,7 +10,7 @@ import {
 } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { fromEvent, of, merge } from 'rxjs'
-import { setWaveformPendingSelection, addWaveformSelection } from '../actions'
+import { setWaveformPendingClip, addClip } from '../actions'
 import * as r from '../redux'
 import {
   toWaveformX,
@@ -19,11 +19,11 @@ import {
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 
-const pendingSelectionIsBigEnough = state => {
-  const pendingSelection = r.getWaveformPendingSelection(state)
-  if (!pendingSelection) return false
+const pendingClipIsBigEnough = state => {
+  const pendingClip = r.getWaveformPendingClip(state)
+  if (!pendingClip) return false
 
-  const { start, end } = pendingSelection
+  const { start, end } = pendingClip
   return Math.abs(end - start) >= r.SELECTION_THRESHOLD
 }
 
@@ -43,9 +43,9 @@ const waveformSelectionEpic = (action$, state$) => {
         r.getWaveformViewBoxXMin(state$.value)
       )
     ),
-    // if mousedown falls on edge of selection
-    // then start stretchy epic instead of selection epic
-    filter(({ x }) => !r.getSelectionEdgeAt(state$.value, x)),
+    // if mousedown falls on edge of clip
+    // then start stretchy epic instead of clip epic
+    filter(({ x }) => !r.getClipEdgeAt(state$.value, x)),
     withLatestFrom(loadAudioActions),
     flatMap(([waveformMousedown, loadAudio]) => {
       const audioElement = document.getElementById('audioPlayer')
@@ -57,10 +57,10 @@ const waveformSelectionEpic = (action$, state$) => {
       const withinValidTime = x =>
         Math.max(0, Math.min(x, audioElement.duration * factor))
 
-      const pendingSelections = fromEvent(window, 'mousemove').pipe(
+      const pendingClips = fromEvent(window, 'mousemove').pipe(
         map(mousemove => {
           mousemove.preventDefault()
-          return setWaveformPendingSelection({
+          return setWaveformPendingClip({
             start: withinValidTime(waveformMousedown.x), // should start be called origin instead to match with stretch thing?
             end: withinValidTime(
               toWaveformX(
@@ -74,24 +74,24 @@ const waveformSelectionEpic = (action$, state$) => {
         takeUntil(mouseups)
       )
 
-      const pendingSelectionEnds = pendingSelections.pipe(
+      const pendingClipEnds = pendingClips.pipe(
         takeLast(1),
-        map(pendingSelectionAction => {
-          const { selection: pendingSelection } = pendingSelectionAction
-          const selectionsOrder = r.getWaveformSelectionsOrder(state$.value)
-          const pendingSelectionOverlaps = [
-            r.getSelectionIdAt(state$.value, pendingSelection.start),
-            r.getSelectionIdAt(state$.value, pendingSelection.end),
-          ].some(id => selectionsOrder.includes(id))
+        map(pendingClipAction => {
+          const { clip: pendingClip } = pendingClipAction
+          const clipsOrder = r.getClipsOrder(state$.value)
+          const pendingClipOverlaps = [
+            r.getClipIdAt(state$.value, pendingClip.start),
+            r.getClipIdAt(state$.value, pendingClip.end),
+          ].some(id => clipsOrder.includes(id))
           const currentNoteType = r.getCurrentNoteType(state$.value)
 
-          return pendingSelectionOverlaps ||
-            !pendingSelectionIsBigEnough(state$.value)
+          return pendingClipOverlaps ||
+            !pendingClipIsBigEnough(state$.value)
             ? // maybe later, do stretch + merge for overlaps.
-              setWaveformPendingSelection(null)
-            : addWaveformSelection(
+              setWaveformPendingClip(null)
+            : addClip(
                 newClip(
-                  r.getWaveformPendingSelection(state$.value),
+                  r.getWaveformPendingClip(state$.value),
                   r.getCurrentFilePath(state$.value),
                   uuid(),
                   currentNoteType,
@@ -109,29 +109,29 @@ const waveformSelectionEpic = (action$, state$) => {
             svgElement,
             r.getWaveformViewBoxXMin(state$.value)
           )
-          const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
-          return { x, selectionIdAtX }
+          const clipIdAtX = r.getClipIdAt(state$.value, x)
+          return { x, clipIdAtX }
         }),
         // this should probably be done elsewhere.
         // tapping gets repeated unexpectedly, so maybe better always at the 'end' of the epic
-        tap(({ x, selectionIdAtX }) => {
+        tap(({ x, clipIdAtX }) => {
           const state = state$.value
-          const mousePositionOrSelectionStart = selectionIdAtX
-            ? r.getWaveformSelection(state, selectionIdAtX).start
+          const mousePositionOrClipStart = clipIdAtX
+            ? r.getClip(state, clipIdAtX).start
             : x
-          const newTime = r.getSecondsAtX(state, mousePositionOrSelectionStart)
+          const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
           audioElement.currentTime = newTime
         }),
-        flatMap(({ x, selectionIdAtX }) =>
-          selectionIdAtX
-            ? of(r.highlightSelection(selectionIdAtX))
-            : of(r.highlightSelection(null))
+        flatMap(({ x, clipIdAtX }) =>
+          clipIdAtX
+            ? of(r.highlightClip(clipIdAtX))
+            : of(r.highlightClip(null))
         )
       )
 
       return merge(
-        pendingSelections,
-        pendingSelectionEnds,
+        pendingClips,
+        pendingClipEnds,
         highlightsAndTimeChanges
       )
     })

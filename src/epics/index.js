@@ -66,9 +66,9 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
       map(e => {
         const viewBox = state$.value.waveform.viewBox
 
-        const highlightedId = r.getHighlightedWaveformSelectionId(state$.value)
+        const highlightedId = r.getHighlightedClipId(state$.value)
         const highlightedClip =
-          highlightedId && r.getWaveformSelection(state$.value, highlightedId)
+          highlightedId && r.getClip(state$.value, highlightedId)
         const timeToLoop =
           highlightedClip &&
           r.isLoopOn(state$.value) &&
@@ -129,19 +129,19 @@ const waveformMousedownEpic = withAudioLoaded((action$, state$) => [
 //   }))
 // ])
 
-const highlightSelectionsOnAddEpic = (action$, state$) =>
+const highlightClipsOnAddEpic = (action$, state$) =>
   action$.pipe(
-    ofType('ADD_WAVEFORM_SELECTION'),
-    map(({ selection: { id } }) => r.highlightSelection(id))
+    ofType('ADD_CLIP'),
+    map(({ clip: { id } }) => r.highlightClip(id))
   )
 
-const playSelectionsOnHighlightEpic = (action$, state$) =>
+const playClipsOnHighlightEpic = (action$, state$) =>
   action$.pipe(
-    ofType('HIGHLIGHT_WAVEFORM_SELECTION'),
+    ofType('HIGHLIGHT_CLIP'),
     filter(({ id }) => Boolean(id)),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    tap(([{ id: selectionId } /*, { audioElement } */]) => {
-      const { start } = r.getWaveformSelection(state$.value, selectionId)
+    tap(([{ id: clipId } /*, { audioElement } */]) => {
+      const { start } = r.getClip(state$.value, clipId)
       const newTime = r.getSecondsAtX(state$.value, start)
       audioElement().currentTime = newTime
       //
@@ -185,7 +185,7 @@ const escEpic = (action$, state$) =>
     map(e => {
       return r.getCurrentDialog(state$.value)
         ? { type: 'NOOP_ESC_KEY' }
-        : r.highlightSelection(null)
+        : r.highlightClip(null)
     })
   )
 
@@ -206,14 +206,14 @@ const lEpic = (action$, state$) =>
       const media = audioElement()
       const x =
         media && r.getXAtMilliseconds(state$.value, media.currentTime * 1000)
-      const selectionIdAtX = r.getSelectionIdAt(state$.value, x)
-      const highlightedId = r.getHighlightedWaveformSelectionId(state$.value)
+      const clipIdAtX = r.getClipIdAt(state$.value, x)
+      const highlightedId = r.getHighlightedClipId(state$.value)
 
-      if (r.isLoopOn(state$.value) && selectionIdAtX && !highlightedId)
-        return of(r.highlightSelection(selectionIdAtX))
+      if (r.isLoopOn(state$.value) && clipIdAtX && !highlightedId)
+        return of(r.highlightClip(clipIdAtX))
 
-      if (selectionIdAtX && highlightedId !== selectionIdAtX)
-        return from([r.highlightSelection(selectionIdAtX), r.toggleLoop()])
+      if (clipIdAtX && highlightedId !== clipIdAtX)
+        return from([r.highlightClip(clipIdAtX), r.toggleLoop()])
       //
       //
       //
@@ -232,7 +232,7 @@ const defaultTagsEpic = (action$, state$) =>
     ofType('ADD_FLASHCARD_TAG', 'DELETE_FLASHCARD_TAG'),
     map(({ id }) => ({
       type: 'SET_DEFAULT_TAGS',
-      tags: r.getWaveformSelection(state$.value, id).flashcard.tags,
+      tags: r.getClip(state$.value, id).flashcard.tags,
     }))
   )
 
@@ -256,8 +256,8 @@ export default combineEpics(
   // waveformMouseupEpic,
   waveformSelectionEpic,
   waveformStretchEpic,
-  highlightSelectionsOnAddEpic,
-  playSelectionsOnHighlightEpic,
+  highlightClipsOnAddEpic,
+  playClipsOnHighlightEpic,
   makeClipsEpic,
   detectSilenceEpic,
   persistStateEpic,

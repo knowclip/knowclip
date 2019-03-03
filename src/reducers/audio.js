@@ -95,7 +95,7 @@ const audio: Reducer<AudioState> = (
         ),
       }
     }
-    // case 'ADD_WAVEFORM_SELECTION'
+    // case 'ADD_CLIP'
     default:
       return state
   }

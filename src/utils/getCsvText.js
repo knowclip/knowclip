@@ -11,7 +11,7 @@ export const getAllClips = (state: AppState) => {
     if (!currentNoteType) throw new Error(`No note type found for ${filePath}`)
     const currentClips: Array<Clip> = state.clips.idsByFilePath[filePath].map(
       clipId => {
-        const clip = r.getWaveformSelection(state, clipId)
+        const clip = r.getClip(state, clipId)
         if (!clip) throw new Error(`clip ${clipId} for ${filePath} not found`)
         return clip
       }
@@ -32,7 +32,7 @@ const getCsvText = (state: AppState) => {
     if (!currentNoteType) throw new Error(`No note type found for ${filePath}`)
     const currentClips: Array<Clip> = state.clips.idsByFilePath[filePath].map(
       clipId => {
-        const clip = r.getWaveformSelection(state, clipId)
+        const clip = r.getClip(state, clipId)
         if (!clip) throw new Error(`clip ${clipId} for ${filePath} not found`)
         return clip
       }

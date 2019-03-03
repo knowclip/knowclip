@@ -98,18 +98,18 @@ video::-webkit-media-controls-panel {
   stroke: #000000;
 }
 
-.waveform-selection {
+.waveform-clip {
   stroke: rgba(80, 200, 50, .2);
   fill: rgba(80, 200, 50, .2);
 }
 
-.waveform-selection-border {
+.waveform-clip-border {
   fill: rgba(0, 255, 0, .2);
   stroke: none;
   cursor: ew-resize;
 }
 
-.waveform-pending-selection {
+.waveform-pending-clip {
   stroke: rgba(255, 255, 0, .2);
   fill: rgba(255, 255, 0, .2);
 }

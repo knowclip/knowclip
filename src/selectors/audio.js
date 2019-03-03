@@ -25,7 +25,7 @@ export const getCurrentFile = (state: AppState): ?AudioFileData => {
   const currentFilePath = getCurrentFilePath(state)
   return currentFilePath ? state.audio.files[currentFilePath] : null
 }
-export const getWaveformSelectionsOrder = (state: AppState): Array<ClipId> => {
+export const getClipsOrder = (state: AppState): Array<ClipId> => {
   const currentFilePath = getCurrentFilePath(state)
   return currentFilePath ? state.clips.idsByFilePath[currentFilePath] : []
 }

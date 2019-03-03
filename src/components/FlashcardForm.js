@@ -46,9 +46,9 @@ class FlashcardForm extends Component {
     this.props.deleteFlashcardTag(this.props.currentFlashcardId, index)
 
   deleteCard = () => {
-    const { deleteCard, highlightedWaveformSelectionId } = this.props
-    if (highlightedWaveformSelectionId) {
-      deleteCard(highlightedWaveformSelectionId)
+    const { deleteCard, highlightedClipId } = this.props
+    if (highlightedClipId) {
+      deleteCard(highlightedClipId)
     }
   }
 
@@ -119,7 +119,7 @@ const mapStateToProps = state => ({
   filePaths: r.getFilePaths(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   currentFlashcardId: r.getCurrentFlashcardId(state),
-  highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
+  highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: r.getClipsTimes(state),
   currentNoteType: r.getCurrentNoteType(state),
 })
@@ -130,7 +130,7 @@ const mapDispatchToProps = {
   deleteCard: r.deleteCard,
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
-  highlightSelection: r.highlightSelection,
+  highlightClip: r.highlightClip,
   initializeApp: r.initializeApp,
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,

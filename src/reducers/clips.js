@@ -67,46 +67,46 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
         byId: {},
       }
 
-    case 'ADD_WAVEFORM_SELECTION': {
-      const { selection } = action
-      const { filePath } = selection
+    case 'ADD_CLIP': {
+      const { clip } = action
+      const { filePath } = clip
       return {
         ...state,
         byId: {
           ...state.byId,
-          [selection.id]: selection,
+          [clip.id]: clip,
         },
         idsByFilePath: {
           ...state.idsByFilePath,
           [filePath]: addIdToIdsByFilePath(
             state.byId,
             state.idsByFilePath[filePath],
-            selection
+            clip
           ),
         },
       }
     }
 
-    case 'ADD_WAVEFORM_SELECTIONS': {
-      const { selections, filePath } = action
+    case 'ADD_CLIPS': {
+      const { clips, filePath } = action
       return {
         ...state,
         byId: {
           ...state.byId,
-          ...arrayToMapById(selections),
+          ...arrayToMapById(clips),
         },
         idsByFilePath: {
           ...state.idsByFilePath,
           [filePath]: addIdstoIdsByFilePath(
             state.byId,
             state.idsByFilePath[filePath],
-            selections
+            clips
           ),
         },
       }
     }
 
-    case 'EDIT_WAVEFORM_SELECTION':
+    case 'EDIT_CLIP':
       return {
         ...state,
         byId: {
@@ -119,33 +119,33 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
         },
       }
 
-    case 'MERGE_WAVEFORM_SELECTIONS': {
+    case 'MERGE_CLIPS': {
       const { ids } = action // should all have same filepath
       const { filePath } = state.byId[ids[0]]
       const [finalId, ...idsToBeDiscarded] = ids
-      const selectionsOrder: Array<ClipId> = (Object.values(state.byId): any)
+      const clipsOrder: Array<ClipId> = (Object.values(state.byId): any)
         .sort((a: Clip, b: Clip) => a.start - b.start)
         .map(s => s.id)
-      const newSelectionsOrder: Array<ClipId> = selectionsOrder.filter(
+      const newClipsOrder: Array<ClipId> = clipsOrder.filter(
         id => !idsToBeDiscarded.includes(id)
       )
-      const newSelections: { [ClipId]: Clip } = {}
-      newSelectionsOrder.forEach(id => {
-        const selection = state.byId[id]
-        if (!selection) throw new Error('impossible')
-        newSelections[id] = selection
+      const newClips: { [ClipId]: Clip } = {}
+      newClipsOrder.forEach(id => {
+        const clip = state.byId[id]
+        if (!clip) throw new Error('impossible')
+        newClips[id] = clip
       })
-      const sortedSelectionsToMerge = ids
+      const sortedClipsToMerge = ids
         .sort(byStart(state.byId))
         .map(id => state.byId[id])
-      newSelections[finalId] = {
+      newClips[finalId] = {
         ...state.byId[finalId],
-        start: sortedSelectionsToMerge[0].start,
-        end: sortedSelectionsToMerge[sortedSelectionsToMerge.length - 1].end,
+        start: sortedClipsToMerge[0].start,
+        end: sortedClipsToMerge[sortedClipsToMerge.length - 1].end,
       }
       return {
         ...state,
-        byId: newSelections,
+        byId: newClips,
         idsByFilePath: {
           ...state.idsByFilePath,
           [filePath]: state.idsByFilePath[filePath].filter(

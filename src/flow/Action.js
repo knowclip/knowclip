@@ -58,14 +58,14 @@ declare type ClipAction =
       index: number,
     |}
   | {| type: 'SET_DEFAULT_TAGS', tags: Array<string> |}
-  | {| type: 'ADD_WAVEFORM_SELECTION', selection: Clip |}
+  | {| type: 'ADD_CLIP', clip: Clip |}
   | {|
-      type: 'ADD_WAVEFORM_SELECTIONS',
-      selections: Array<Clip>,
+      type: 'ADD_CLIPS',
+      clips: Array<Clip>,
       filePath: AudioFilePath,
     |}
-  | {| type: 'EDIT_WAVEFORM_SELECTION', id: ClipId, override: $Shape<Clip> |}
-  | {| type: 'MERGE_WAVEFORM_SELECTIONS', ids: Array<ClipId> |}
+  | {| type: 'EDIT_CLIP', id: ClipId, override: $Shape<Clip> |}
+  | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
 
 declare type NoteTypeAction =
   | { type: 'ADD_NOTE_TYPE', noteType: NoteType }
@@ -92,8 +92,8 @@ declare type NoteTypeAction =
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_PEAKS', peaks: Array<*> |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
-  | {| type: 'SET_WAVEFORM_PENDING_SELECTION', selection: Clip |}
-  | {| type: 'HIGHLIGHT_WAVEFORM_SELECTION', id: ClipId |}
+  | {| type: 'SET_WAVEFORM_PENDING_SELECTION', clip: Clip |}
+  | {| type: 'HIGHLIGHT_CLIP', id: ClipId |}
   | {| type: 'SET_WAVEFORM_PENDING_STRETCH', stretch: PendingStretch |}
 
 declare type DialogAction =

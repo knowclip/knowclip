@@ -1,15 +1,15 @@
 const ascending = (a, b) => a - b
 
-const sortSelectionPoints = ({ start, end }) => [start, end].sort(ascending)
+const sortClipPoints = ({ start, end }) => [start, end].sort(ascending)
 
 const newClip = (
-  pendingSelection,
+  pendingClip,
   currentFileName,
   id,
   noteType,
   tags
 ): Clip => {
-  const [start, end] = sortSelectionPoints(pendingSelection)
+  const [start, end] = sortClipPoints(pendingClip)
 
   return {
     start,

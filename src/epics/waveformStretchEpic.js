@@ -11,10 +11,10 @@ import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 
 const waveformStretchEpic = (action$, state$) => {
-  const selectionMousedowns = action$.pipe(
+  const clipMousedowns = action$.pipe(
     ofType('WAVEFORM_MOUSEDOWN'),
     flatMap(({ x }) => {
-      const edge = r.getSelectionEdgeAt(state$.value, x)
+      const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()
     }),
     withLatestFrom(action$.ofType('LOAD_AUDIO')),
@@ -46,58 +46,58 @@ const waveformStretchEpic = (action$, state$) => {
             const {
               stretch: { id, originKey, end },
             } = lastPendingStretch
-            const stretchedSelection = r.getWaveformSelection(state$.value, id)
+            const stretchedClip = r.getClip(state$.value, id)
 
-            // if pendingStretch.end is inside a selection separate from stretchedSelection,
+            // if pendingStretch.end is inside a clip separate from stretchedClip,
             // take the start from the earlier and the end from the later,
-            // use those as the new start/end of stretchedSelection,
-            // and delete the separate selection.
+            // use those as the new start/end of stretchedClip,
+            // and delete the separate clip.
 
-            const previousSelectionId = r.getPreviousSelectionId(
+            const previousClipId = r.getPreviousClipId(
               state$.value,
               id
             )
-            const previousSelection = r.getWaveformSelection(
+            const previousClip = r.getClip(
               state$.value,
-              previousSelectionId
+              previousClipId
             )
-            if (previousSelection && end <= previousSelection.end) {
+            if (previousClip && end <= previousClip.end) {
               return from([
-                r.mergeWaveformSelections([id, previousSelectionId]),
+                r.mergeClips([id, previousClipId]),
                 r.setWaveformPendingStretch(null),
               ])
             }
 
-            const nextSelectionId = r.getNextSelectionId(state$.value, id)
-            const nextSelection = r.getWaveformSelection(
+            const nextClipId = r.getNextClipId(state$.value, id)
+            const nextClip = r.getClip(
               state$.value,
-              nextSelectionId
+              nextClipId
             )
-            if (nextSelection && end >= nextSelection.start) {
+            if (nextClip && end >= nextClip.start) {
               return from([
-                r.mergeWaveformSelections([id, nextSelectionId]),
+                r.mergeClips([id, nextClipId]),
                 r.setWaveformPendingStretch(null),
               ])
             }
 
-            if (originKey === 'start' && stretchedSelection.end > end) {
+            if (originKey === 'start' && stretchedClip.end > end) {
               return from([
-                r.editWaveformSelection(id, {
+                r.editClip(id, {
                   start: Math.min(
                     end,
-                    stretchedSelection.end - r.SELECTION_THRESHOLD
+                    stretchedClip.end - r.SELECTION_THRESHOLD
                   ),
                 }),
                 r.setWaveformPendingStretch(null),
               ])
             }
 
-            if (originKey === 'end' && end > stretchedSelection.start) {
+            if (originKey === 'end' && end > stretchedClip.start) {
               return from([
-                r.editWaveformSelection(id, {
+                r.editClip(id, {
                   end: Math.max(
                     end,
-                    stretchedSelection.start + r.SELECTION_THRESHOLD
+                    stretchedClip.start + r.SELECTION_THRESHOLD
                   ),
                 }),
                 r.setWaveformPendingStretch(null),
@@ -110,7 +110,7 @@ const waveformStretchEpic = (action$, state$) => {
       )
     })
   )
-  return selectionMousedowns
+  return clipMousedowns
 }
 
 export default waveformStretchEpic

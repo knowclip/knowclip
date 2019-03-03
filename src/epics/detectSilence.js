@@ -77,7 +77,7 @@ const detectSilenceEpic = (action$, state$) =>
 
         const filePath = r.getCurrentFilePath(state$.value)
         const currentNoteType = r.getCurrentNoteType(state$.value)
-        const newSelections = chunks.map(({ start, end }) =>
+        const newClips = chunks.map(({ start, end }) =>
           newClip(
             {
               start: r.getXAtMilliseconds(state$.value, start),
@@ -92,7 +92,7 @@ const detectSilenceEpic = (action$, state$) =>
 
         return from([
           r.deleteCards(r.getClipIdsByFilePath(state$.value, filePath)),
-          r.addWaveformSelections(newSelections, filePath),
+          r.addClips(newClips, filePath),
         ])
       })
     }),

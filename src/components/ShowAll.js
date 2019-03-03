@@ -26,13 +26,13 @@ const Field = ({ text }) => (
 
 let FlashcardRow = ({
   flashcard: { fields, id },
-  highlightSelection,
+  highlightClip,
   closeModal,
   file,
 }) => (
   <TableRow
     hover
-    onClick={() => highlightSelection(id)}
+    onClick={() => highlightClip(id)}
     onDoubleClick={closeModal}
   >
     {Object.values(fields).map(fieldText => (
@@ -50,7 +50,7 @@ const ShowAll = ({
   closeDialog,
   flashcards,
   currentFileIndex,
-  highlightSelection,
+  highlightClip,
   makeClips,
   exportFlashcards,
   noteType,
@@ -64,7 +64,7 @@ const ShowAll = ({
             <FlashcardRow
               flashcard={flashcard}
               key={flashcard.id}
-              highlightSelection={highlightSelection}
+              highlightClip={highlightClip}
               closeModal={closeDialog}
               flashcardId={flashcard.id}
               isCurrent={currentFileIndex === i}
@@ -98,7 +98,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
-  highlightSelection: r.highlightSelection,
+  highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
 }
 

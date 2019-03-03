@@ -55,7 +55,7 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
 class App extends Component {
   state = {
     modalIsOpen: false,
-    noteTypeSelectionMenuAnchor: null,
+    noteTypeClipMenuAnchor: null,
   }
 
   componentDidMount() {
@@ -64,7 +64,7 @@ class App extends Component {
 
   chooseAudioFiles = () => {
     dialog.showOpenDialog(
-      // { properties: ['openFile', 'multiSelections'] },
+      // { properties: ['openFile', 'multiClips'] },
       { properties: ['openFile'] },
       filePaths => {
         if (!filePaths) return
@@ -100,9 +100,9 @@ class App extends Component {
   }
 
   deleteCard = () => {
-    const { deleteCard, highlightedWaveformSelectionId } = this.props
-    if (highlightedWaveformSelectionId) {
-      deleteCard(highlightedWaveformSelectionId)
+    const { deleteCard, highlightedClipId } = this.props
+    if (highlightedClipId) {
+      deleteCard(highlightedClipId)
     }
   }
 
@@ -120,10 +120,10 @@ class App extends Component {
 
   openNoteTypeSelectionMenu = e => {
     e.preventDefault()
-    this.setState({ noteTypeSelectionMenuAnchor: e.currentTarget })
+    this.setState({ noteTypeClipMenuAnchor: e.currentTarget })
   }
   closeNoteTypeSelectionMenu = () =>
-    this.setState({ noteTypeSelectionMenuAnchor: null })
+    this.setState({ noteTypeClipMenuAnchor: null })
 
   toggleLoop = () => this.props.toggleLoop()
 
@@ -142,7 +142,7 @@ class App extends Component {
       currentNoteType,
       clipsHaveBeenMade,
     } = this.props
-    const { noteTypeSelectionMenuAnchor } = this.state
+    const { noteTypeClipMenuAnchor } = this.state
 
     const form = Boolean(currentFlashcard) ? (
       <FlashcardForm />
@@ -195,16 +195,16 @@ class App extends Component {
               <li className={headerCss.menuTextItem}>
                 using note type:{' '}
                 <a
-                  ref={noteTypeSelectionMenuAnchor}
+                  ref={noteTypeClipMenuAnchor}
                   href="/#"
                   onClick={this.openNoteTypeSelectionMenu}
                 >
                   {currentNoteType.name}
                 </a>
                 <Menu
-                  anchorEl={noteTypeSelectionMenuAnchor}
+                  anchorEl={noteTypeClipMenuAnchor}
                   onClose={this.closeNoteTypeSelectionMenu}
-                  open={noteTypeSelectionMenuAnchor}
+                  open={noteTypeClipMenuAnchor}
                 >
                   <NoteTypeSelectionMenu />
                 </Menu>
@@ -269,7 +269,7 @@ const mapStateToProps = state => ({
   isNextButtonEnabled: r.isNextButtonEnabled(state),
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
-  highlightedWaveformSelectionId: r.getHighlightedWaveformSelectionId(state),
+  highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: r.getClipsTimes(state),
   audioIsLoading: r.isAudioLoading(state),
   mediaFolderLocation: r.getMediaFolderLocation(state),
@@ -287,7 +287,7 @@ const mapDispatchToProps = {
   deleteCard: r.deleteCard,
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
-  highlightSelection: r.highlightSelection,
+  highlightClip: r.highlightClip,
   initializeApp: r.initializeApp,
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,

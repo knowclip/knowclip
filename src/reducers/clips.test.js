@@ -24,9 +24,9 @@ describe('clips reducer', () => {
     { type: '@@INIT' }
   )
 
-  it('adds to byId and idsByFilepath during ADD_WAVEFORM_SELECTION', () => {
+  it('adds to byId and idsByFilepath during ADD_CLIP', () => {
     const clip = newClip({ start: 2.75, end: 3 }, filePath, 'b-c', noteType)
-    const action = r.addWaveformSelection(clip)
+    const action = r.addClip(clip)
     const newState = clips(oldState, action)
     expect(newState.idsByFilePath[filePath]).toEqual(['a', 'b', 'b-c', 'c'])
     expect(newState.byId).toEqual({
@@ -35,9 +35,9 @@ describe('clips reducer', () => {
     })
   })
 
-  it('adds to byId and idsByFilepath during ADD_WAVEFORM_SELECTION', () => {
+  it('adds to byId and idsByFilepath during ADD_CLIP', () => {
     const clip = newClip({ start: 4, end: 4.5 }, filePath, 'd', noteType)
-    const action = r.addWaveformSelection(clip)
+    const action = r.addClip(clip)
     const newState = clips(oldState, action)
     expect(newState.idsByFilePath[filePath]).toEqual(['a', 'b', 'c', 'd'])
     expect(newState.byId).toEqual({
@@ -46,12 +46,12 @@ describe('clips reducer', () => {
     })
   })
 
-  it('adds to byId and idsByFilepath during ADD_WAVEFORM_SELECTIONS', () => {
+  it('adds to byId and idsByFilepath during ADD_CLIPS', () => {
     const bC1 = newClip({ start: 2.75, end: 2.8 }, filePath, 'b-c1', noteType)
     const bC2 = newClip({ start: 2.85, end: 3 }, filePath, 'b-c2', noteType)
 
     const newClips = [bC1, bC2]
-    const action = r.addWaveformSelections(newClips, filePath)
+    const action = r.addClips(newClips, filePath)
     const newState = clips(oldState, action)
     expect(newState.idsByFilePath[filePath]).toEqual([
       'a',

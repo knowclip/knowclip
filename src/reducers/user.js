@@ -1,31 +1,31 @@
 // @flow
 
 const initialState: UserState = {
-  pendingSelection: null,
+  pendingClip: null,
   pendingStretch: null,
-  highlightedSelectionId: null,
+  highlightedClipId: null,
   defaultNoteTypeId: 'default',
   defaultTags: [],
 }
 
 const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
-    case 'ADD_WAVEFORM_SELECTION':
+    case 'ADD_CLIP':
       return {
         ...state,
-        pendingSelection: null,
+        pendingClip: null,
       }
 
     case 'SET_WAVEFORM_PENDING_SELECTION':
       return {
         ...state,
-        pendingSelection: action.selection,
+        pendingClip: action.clip,
       }
 
-    case 'HIGHLIGHT_WAVEFORM_SELECTION':
+    case 'HIGHLIGHT_CLIP':
       return {
         ...state,
-        highlightedSelectionId: action.id,
+        highlightedClipId: action.id,
       }
 
     case 'SET_WAVEFORM_PENDING_STRETCH':

@@ -39,13 +39,13 @@ const Cursor = ({ x, y }) => (
   />
 )
 
-const getSelectionPath = (startRaw, endRaw, stepsPerSecond) => {
+const getClipPath = (startRaw, endRaw, stepsPerSecond) => {
   const start = startRaw
   const end = endRaw
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
-const Selection = ({
+const Clip = ({
   id,
   start,
   end,
@@ -56,19 +56,19 @@ const Selection = ({
   return (
     <g id={id}>
       <path
-        className={cn('waveform-selection', { isHighlighted })}
-        d={getSelectionPath(start, end, stepsPerSecond)}
+        className={cn('waveform-clip', { isHighlighted })}
+        d={getClipPath(start, end, stepsPerSecond)}
       />
       {/*<text x={start} y={90} width={end - start}>{Object.values(flashcard.fields)[0]}</text>*/}
       <rect
-        className="waveform-selection-border"
+        className="waveform-clip-border"
         x={start}
         y="0"
         width={SELECTION_BORDER_WIDTH}
         height="100"
       />
       <rect
-        className="waveform-selection-border"
+        className="waveform-clip-border"
         x={end - SELECTION_BORDER_WIDTH}
         y="0"
         width={SELECTION_BORDER_WIDTH}
@@ -76,20 +76,20 @@ const Selection = ({
       />
     </g>
   )
-  // <path className="waveform-selection-border" d={`M${start} 0 L${leftBorderInnerEdge} 0 L`} />
+  // <path className="waveform-clip-border" d={`M${start} 0 L${leftBorderInnerEdge} 0 L`} />
 }
 
-const PendingSelection = ({ start, end, stepsPerSecond }) => (
+const PendingClip = ({ start, end, stepsPerSecond }) => (
   <path
-    className="waveform-pending-selection"
-    d={getSelectionPath(start, end, stepsPerSecond)}
+    className="waveform-pending-clip"
+    d={getClipPath(start, end, stepsPerSecond)}
   />
 )
 
 const PendingStretch = ({ start, end, stepsPerSecond }) => (
   <path
     className="waveform-pending-stretch"
-    d={getSelectionPath(start, end, stepsPerSecond)}
+    d={getClipPath(start, end, stepsPerSecond)}
   />
 )
 
@@ -102,12 +102,12 @@ class Waveform extends Component {
       viewBox,
       cursor,
       svgRef,
-      selections,
-      pendingSelection,
+      clips,
+      pendingClip,
       pendingStretch,
       stepsPerSecond,
       stepLength,
-      highlightedSelectionId,
+      highlightedClipId,
       show,
     } = this.props
     return (
@@ -129,18 +129,18 @@ class Waveform extends Component {
           />
         </g>
         <Cursor {...cursor} />
-        <g className="waveform-selections">
-          {selections.map(selection => (
-            <Selection
-              {...selection}
+        <g className="waveform-clips">
+          {clips.map(clip => (
+            <Clip
+              {...clip}
               stepsPerSecond={stepsPerSecond}
-              isHighlighted={selection.id === highlightedSelectionId}
+              isHighlighted={clip.id === highlightedClipId}
             />
           ))}
         </g>
-        {pendingSelection && (
-          <PendingSelection
-            {...pendingSelection}
+        {pendingClip && (
+          <PendingClip
+            {...pendingClip}
             stepsPerSecond={stepsPerSecond}
           />
         )}
@@ -158,5 +158,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { highlightSelection: r.highlightSelection }
+  { highlightClip: r.highlightClip }
 )(Waveform)
