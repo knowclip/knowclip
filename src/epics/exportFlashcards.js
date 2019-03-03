@@ -1,37 +1,19 @@
-import { flatMap, ignoreElements } from 'rxjs/operators'
+import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
-import electron from 'electron'
-import { join } from 'path'
 import getCsvText from '../utils/getCsvText'
-import fs from 'fs'
+import { showSaveDialog } from '../utils/electron'
 import { promisify } from 'util'
+import fs from 'fs'
 
-const {
-  remote: { dialog },
-} = electron
 const writeFile = promisify(fs.writeFile)
-
-const showDialog = () =>
-  new Promise((res, rej) => {
-    try {
-      dialog.showSaveDialog(
-        { filters: [{ name: 'Comma-separated values', extensions: ['csv'] }] },
-        filename => {
-          res(filename)
-        }
-      )
-    } catch (err) {
-      rej(err)
-    }
-  })
 
 const exportFlashcards = (action$, state$) =>
   action$.pipe(
     ofType('EXPORT_FLASHCARDS'),
     flatMap(async () => {
       try {
-        const filename = await showDialog()
+        const filename = await showSaveDialog('Comma-separated values', ['csv'])
         if (!filename) return { type: 'NOOP_EXPORT_FLASHCARDS' }
 
         const csvText = getCsvText(state$.value)

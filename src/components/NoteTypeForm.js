@@ -58,8 +58,12 @@ class NoteTypeForm extends Component {
 
     const fieldsErrors = {}
     noteType.fields.forEach((field, i) => {
-      if (!field.name.trim())
-        fieldsErrors[i] = 'Please enter a name for this field.'
+      const trimmedName = field.name.trim()
+      if (!trimmedName) fieldsErrors[i] = 'Please enter a name for this field.'
+      else if (
+        noteType.fields.some((f, j) => i < j && f.name.trim() === trimmedName)
+      )
+        fieldsErrors[i] = 'Please use a unique name for this field.'
     })
 
     if (Object.keys(fieldsErrors).length) errors.fields = fieldsErrors

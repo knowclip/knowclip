@@ -9,7 +9,6 @@ export function getPeaks(buffer, stepsPerSecond) {
   // const sampleStep = ~~(sampleSize / 10) || 1
   const { numberOfChannels } = buffer
   const mergedPeaks = []
-  console.log('buffer', buffer)
 
   for (
     let channelNumber = 0;

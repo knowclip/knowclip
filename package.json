@@ -6,6 +6,7 @@
   "dependencies": {
     "@material-ui/core": "^3.9.0",
     "@material-ui/icons": "^3.0.1",
+    "anki-apkg-export-multi-field": "^0.0.0",
     "asar": "0.14.3",
     "dataurl": "^0.1.0",
     "electron-devtools-installer": "^2.2.4",

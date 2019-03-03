@@ -28,7 +28,7 @@ const coerceMp3ToConstantBitrate = path => {
       return res(tmpPath)
     }
 
-    tmpPath = tmpFilePaths[path] = tempy.file() + '.mp3'
+    tmpPath = tmpFilePaths[path] = tempy.file({ extension: 'mp3' })
 
     // I guess by default it does CBR
     // though maybe we should check that

@@ -30,9 +30,11 @@ declare type Action =
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
   | {| type: 'HYDRATE_FROM_PROJECT_FILE', state: $Shape<AppState> |}
 
+declare type ExportFormat = 'CSV+MP3' | 'APKG'
+
 declare type ClipAction =
   | {| type: 'DELETE_CARD', id: ClipId |}
-  | {| type: 'MAKE_CLIPS' |}
+  | {| type: 'MAKE_CLIPS', format: ExportFormat |}
   | {| type: 'DELETE_CARDS', ids: Array<ClipId> |}
   | {|
       type: 'SET_FLASHCARD_FIELD',

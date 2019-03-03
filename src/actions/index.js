@@ -66,8 +66,9 @@ export const deleteCards = (ids: Array<ClipId>): Action => ({
   ids,
 })
 
-export const makeClips = (): Action => ({
+export const makeClips = (format: ExportFormat): Action => ({
   type: 'MAKE_CLIPS',
+  format,
 })
 
 export const exportFlashcards = (): Action => ({ type: 'EXPORT_FLASHCARDS' })

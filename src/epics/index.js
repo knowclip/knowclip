@@ -169,7 +169,6 @@ const spaceEpic = (action$, state$) =>
     filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
     tap(e => {
       e.preventDefault()
-      console.log('pressed!')
       const el = audioElement()
       if (el.paused) el.play()
       else el.pause()

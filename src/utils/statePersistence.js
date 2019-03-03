@@ -23,7 +23,7 @@ export const persistState = (state: AppState) => {
 
 const areNoteTypesEqual = (a: NoteType, b: NoteType): boolean =>
   a.id === b.id &&
-  a.name == b.name &&
+  a.name === b.name &&
   a.fields.length === b.fields.length &&
   a.fields.every(
     (field, i) => field.id === b.fields[i].id && field.name === b.fields[i].name
@@ -115,9 +115,9 @@ export const getPersistedState = (): $Shape<AppState> => {
       persistedState.audio.filesOrder &&
       persistedState.audio.filesOrder[0]
     const mediaFolderLocation =
-      persistState &&
-      persistState.audio &&
-      persistState.audio.mediaFolderLocation
+      persistedState &&
+      persistedState.audio &&
+      persistedState.audio.mediaFolderLocation
     const projectFilePath = findExistingProjectFilePath(filePath)
     if (projectFilePath) {
       return hydrateFromProjectFile(

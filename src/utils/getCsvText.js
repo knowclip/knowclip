@@ -2,6 +2,27 @@
 import { unparse } from 'papaparse'
 import * as r from '../selectors'
 
+export const getAllClips = (state: AppState) => {
+  const filePaths = state.audio.filesOrder
+  const clips: Array<Clip> = []
+  filePaths.forEach(filePath => {
+    const currentFile: AudioFileData = state.audio.files[filePath]
+    const currentNoteType = r.getNoteType(state, currentFile.noteTypeId)
+    if (!currentNoteType) throw new Error(`No note type found for ${filePath}`)
+    const currentClips: Array<Clip> = state.clips.idsByFilePath[filePath].map(
+      clipId => {
+        const clip = r.getWaveformSelection(state, clipId)
+        if (!clip) throw new Error(`clip ${clipId} for ${filePath} not found`)
+        return clip
+      }
+    )
+    currentClips.forEach(clip => {
+      clips.push(clip)
+    })
+  })
+  return clips
+}
+
 const getCsvText = (state: AppState) => {
   const filePaths = state.audio.filesOrder
   const csvData: Array<Array<string>> = []
@@ -22,6 +43,7 @@ const getCsvText = (state: AppState) => {
       )
       console.log(fieldsValues)
       csvData.push([
+        clip.id,
         ...fieldsValues,
         `[sound:${r.getClipFilename(state, clip.id)}]`,
       ])

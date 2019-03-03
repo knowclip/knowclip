@@ -9,6 +9,16 @@ body,
   height: 100%;
 }
 
+video {
+  padding-bottom: 32px; /* mess with these and then the controls could be at the bottom of the waveform. but then movie the audi oelement. */
+}
+
+video::-webkit-media-controls-panel {
+  display: flex !important;
+  opacity: 1 !important;
+  margin-top: 32px; /* mess with these and then the controls could be at the bottom of the waveform. but then movie the audi oelement. */
+}
+
 .App {
   display: flex;
   min-height: 100%;

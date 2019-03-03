@@ -9,6 +9,7 @@ import {
   TableRow,
   TableCell,
   Button,
+  Tooltip,
 } from '@material-ui/core'
 import * as r from '../redux'
 import { getFlashcard } from '../selectors'
@@ -73,8 +74,18 @@ const ShowAll = ({
       </Table>
     </DialogContent>
     <DialogActions>
-      <Button onClick={exportFlashcards}>Export CSV file</Button>
-      <Button onClick={makeClips}>Make audio clips</Button>
+      <Tooltip title="Good for updating existing deck">
+        <Button onClick={() => makeClips('CSV+MP3')}>Export CSV and MP3</Button>
+      </Tooltip>
+      <Tooltip title="Good for starting new deck">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => makeClips('APKG')}
+        >
+          Export Anki Deck
+        </Button>
+      </Tooltip>
     </DialogActions>
   </Dialog>
 )
