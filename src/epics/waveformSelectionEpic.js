@@ -20,7 +20,7 @@ import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 
 const pendingClipIsBigEnough = state => {
-  const pendingClip = r.getWaveformPendingClip(state)
+  const pendingClip = r.getPendingClip(state)
   if (!pendingClip) return false
 
   const { start, end } = pendingClip
@@ -85,13 +85,12 @@ const waveformSelectionEpic = (action$, state$) => {
           ].some(id => clipsOrder.includes(id))
           const currentNoteType = r.getCurrentNoteType(state$.value)
 
-          return pendingClipOverlaps ||
-            !pendingClipIsBigEnough(state$.value)
+          return pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
             ? // maybe later, do stretch + merge for overlaps.
               setWaveformPendingClip(null)
             : addClip(
                 newClip(
-                  r.getWaveformPendingClip(state$.value),
+                  r.getPendingClip(state$.value),
                   r.getCurrentFilePath(state$.value),
                   uuid(),
                   currentNoteType,
@@ -123,17 +122,11 @@ const waveformSelectionEpic = (action$, state$) => {
           audioElement.currentTime = newTime
         }),
         flatMap(({ x, clipIdAtX }) =>
-          clipIdAtX
-            ? of(r.highlightClip(clipIdAtX))
-            : of(r.highlightClip(null))
+          clipIdAtX ? of(r.highlightClip(clipIdAtX)) : of(r.highlightClip(null))
         )
       )
 
-      return merge(
-        pendingClips,
-        pendingClipEnds,
-        highlightsAndTimeChanges
-      )
+      return merge(pendingClips, pendingClipEnds, highlightsAndTimeChanges)
     })
   )
 }

@@ -1,5 +1,6 @@
 // @flow
 
+export * from './clips'
 export * from './waveform'
 export * from './snackbar'
 export * from './dialog'

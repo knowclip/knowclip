@@ -89,9 +89,9 @@ video::-webkit-media-controls-panel {
 }
 
 .waveform-svg,
-.waveform-g,
 .waveform-placeholder {
-  background-color: aliceblue;
+  /* background-color: aliceblue; */
+  background-color: #9ba9b5;
 }
 
 .waveform-path {

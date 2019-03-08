@@ -53,14 +53,8 @@ const waveformStretchEpic = (action$, state$) => {
             // use those as the new start/end of stretchedClip,
             // and delete the separate clip.
 
-            const previousClipId = r.getPreviousClipId(
-              state$.value,
-              id
-            )
-            const previousClip = r.getClip(
-              state$.value,
-              previousClipId
-            )
+            const previousClipId = r.getPreviousClipId(state$.value, id)
+            const previousClip = r.getClip(state$.value, previousClipId)
             if (previousClip && end <= previousClip.end) {
               return from([
                 r.mergeClips([id, previousClipId]),
@@ -69,10 +63,7 @@ const waveformStretchEpic = (action$, state$) => {
             }
 
             const nextClipId = r.getNextClipId(state$.value, id)
-            const nextClip = r.getClip(
-              state$.value,
-              nextClipId
-            )
+            const nextClip = r.getClip(state$.value, nextClipId)
             if (nextClip && end >= nextClip.start) {
               return from([
                 r.mergeClips([id, nextClipId]),

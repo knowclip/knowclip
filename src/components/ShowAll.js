@@ -30,11 +30,7 @@ let FlashcardRow = ({
   closeModal,
   file,
 }) => (
-  <TableRow
-    hover
-    onClick={() => highlightClip(id)}
-    onDoubleClick={closeModal}
-  >
+  <TableRow hover onClick={() => highlightClip(id)} onDoubleClick={closeModal}>
     {Object.values(fields).map(fieldText => (
       <TableCell>
         <Field text={fieldText} />

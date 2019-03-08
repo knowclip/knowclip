@@ -65,9 +65,7 @@ type ExpandedPendingStretch = {
   start: WaveformX,
   end: WaveformX,
 }
-export const getWaveformPendingStretch = (
-  state: AppState
-): ?ExpandedPendingStretch => {
+export const getPendingStretch = (state: AppState): ?ExpandedPendingStretch => {
   if (!state.clips) return
   const { pendingStretch } = state.user
   if (!pendingStretch) return
@@ -77,18 +75,11 @@ export const getWaveformPendingStretch = (
     throw new Error('Impossible: no stretched clip ' + pendingStretch.id)
 
   const { originKey } = pendingStretch
-  const [start, end] = [
-    pendingStretch.end,
-    stretchedClip[originKey],
-  ].sort()
+  const [start, end] = [pendingStretch.end, stretchedClip[originKey]].sort()
   return { id: pendingStretch.id, start, end }
 }
-export const getWaveform = (state: AppState) => ({
-  ...state.waveform,
-  ...state.user,
-  clips: getClips(state),
-  pendingStretch: getWaveformPendingStretch(state),
-})
+
+export const getWaveform = (state: AppState): WaveformState => state.waveform
 
 export const getCurrentFlashcardId = (state: AppState): ?ClipId =>
   state.user.highlightedClipId
@@ -100,9 +91,8 @@ export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
     return flashcard
   })
 
-export const getWaveformPendingClip = (
-  state: AppState
-): ?PendingClip => state.user.pendingClip
+export const getPendingClip = (state: AppState): ?PendingClip =>
+  state.user.pendingClip
 export const getClipIdAt = (state: AppState, x: number): ?ClipId =>
   audioSelectors.getClipsOrder(state).find(clipId => {
     const clip = state.clips.byId[clipId]
@@ -110,10 +100,7 @@ export const getClipIdAt = (state: AppState, x: number): ?ClipId =>
     return x >= start && x <= end
   })
 
-export const getPreviousClipId = (
-  state: AppState,
-  id: ClipId
-): ?ClipId => {
+export const getPreviousClipId = (state: AppState, id: ClipId): ?ClipId => {
   const clipsOrder = audioSelectors.getClipsOrder(state)
   return clipsOrder[clipsOrder.indexOf(id) - 1]
 }
@@ -154,9 +141,7 @@ export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
 }
 
 export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
-  audioSelectors
-    .getClipsOrder(state)
-    .map(id => getClipTimes(state, id))
+  audioSelectors.getClipsOrder(state).map(id => getClipTimes(state, id))
 
 export const isAudioLoading = (state: AppState): boolean =>
   state.audio.isLoading

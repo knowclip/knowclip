@@ -5,5 +5,5 @@ declare type WaveformState = Exact<{
   stepLength: number,
   cursor: { x: number, y: number },
   viewBox: { xMin: number },
-  peaks: Array<String>,
+  path: ?string,
 }>

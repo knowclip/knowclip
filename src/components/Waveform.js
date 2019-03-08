@@ -6,27 +6,6 @@ import { WAVEFORM_HEIGHT } from '../selectors'
 
 const { SELECTION_BORDER_WIDTH } = r
 
-// should actually just store peaks in redux, not path
-// then getSvgPath will be a memoized? selector,
-//   taking peaks plus "camera" and "zoom"
-
-export function getSvgPath(peaks, stepLength) {
-  const totalPeaks = peaks.length
-  let d = ''
-  for (let peakNumber = 0; peakNumber < totalPeaks; peakNumber++) {
-    if (peakNumber % 2 === 0) {
-      d += ` M${~~(peakNumber / 2) * stepLength}, ${peaks[peakNumber] *
-        WAVEFORM_HEIGHT +
-        WAVEFORM_HEIGHT}`
-    } else {
-      d += ` L${~~(peakNumber / 2) * stepLength}, ${peaks[peakNumber] *
-        WAVEFORM_HEIGHT +
-        WAVEFORM_HEIGHT}`
-    }
-  }
-  return d
-}
-
 const Cursor = ({ x, y }) => (
   // null
   <line
@@ -45,14 +24,7 @@ const getClipPath = (startRaw, endRaw, stepsPerSecond) => {
   return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
 }
 
-const Clip = ({
-  id,
-  start,
-  end,
-  stepsPerSecond,
-  isHighlighted,
-  flashcard,
-}) => {
+const Clip = ({ id, start, end, stepsPerSecond, isHighlighted, flashcard }) => {
   return (
     <g id={id}>
       <path
@@ -98,18 +70,16 @@ const getViewBox = xMin => `${xMin} 0 3000 100`
 class Waveform extends Component {
   render() {
     const {
-      peaks,
-      viewBox,
-      cursor,
+      show,
       svgRef,
       clips,
       pendingClip,
       pendingStretch,
-      stepsPerSecond,
-      stepLength,
       highlightedClipId,
-      show,
+      waveform,
     } = this.props
+    const { viewBox, cursor, stepsPerSecond, path } = waveform
+
     return (
       <svg
         style={show ? {} : { display: 'none' }}
@@ -121,13 +91,7 @@ class Waveform extends Component {
         width="100%"
         height="100"
       >
-        <g className="waveform-g">
-          <path
-            className="waveform-path"
-            d={getSvgPath(peaks, stepLength)}
-            shapeRendering="crispEdges"
-          />
-        </g>
+        {path && <image xlinkHref={`file://${path}`} />}
         <Cursor {...cursor} />
         <g className="waveform-clips">
           {clips.map(clip => (
@@ -139,10 +103,7 @@ class Waveform extends Component {
           ))}
         </g>
         {pendingClip && (
-          <PendingClip
-            {...pendingClip}
-            stepsPerSecond={stepsPerSecond}
-          />
+          <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
         )}
         {pendingStretch && (
           <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />
@@ -153,7 +114,11 @@ class Waveform extends Component {
 }
 
 const mapStateToProps = state => ({
-  ...r.getWaveform(state),
+  waveform: r.getWaveform(state),
+  clips: r.getClips(state),
+  pendingClip: r.getPendingClip(state),
+  pendingStretch: r.getPendingStretch(state),
+  highlightedClipId: r.getHighlightedClipId(state),
 })
 
 export default connect(

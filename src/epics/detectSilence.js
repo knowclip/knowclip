@@ -9,7 +9,7 @@ import newClip from '../utils/newClip'
 const detectSilence = (
   path,
   silenceDuration = 1,
-  silenceNoiseTolerance = -60
+  silenceNoiseTolerance = -40
 ) =>
   new Promise((res, rej) => {
     ffmpeg(path, { stdoutLines: 0 })
