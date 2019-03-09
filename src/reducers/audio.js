@@ -23,18 +23,18 @@ const audio: Reducer<AudioState> = (
       }
 
     case 'CHOOSE_AUDIO_FILES': {
-      const { noteTypeId, ids } = action
+      const { noteTypeId, ids, filePaths } = action
 
       return {
         ...state,
         filesOrder: ids,
-        files: ids.reduce((files, path, i) => {
+        files: ids.reduce((files, id, i) => {
           const fileData: AudioFileData = {
-            path,
+            path: filePaths[i],
             noteTypeId,
-            id: ids[i],
+            id,
           }
-          return { ...files, [path]: fileData }
+          return { ...files, [id]: fileData }
         }, {}),
         isLoading: true,
         currentFileIndex: 0,
