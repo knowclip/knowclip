@@ -1,6 +1,5 @@
 // @flow
 import fs from 'fs'
-import { promisify } from 'util'
 import { initialState as initialNoteTypeState } from '../reducers/noteTypes'
 
 export const persistState = (state: AppState) => {

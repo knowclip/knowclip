@@ -9,7 +9,6 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@material-ui/core'
-import { Redirect } from 'react-router-dom'
 import * as r from '../redux'
 import uuid from 'uuid/v4'
 import { Add as AddIcon, Delete as DeleteIcon } from '@material-ui/icons'

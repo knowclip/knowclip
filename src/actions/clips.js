@@ -1,3 +1,5 @@
+// @flow
+
 export const addClip = (clip: Clip): ClipAction => ({
   type: 'ADD_CLIP',
   clip,

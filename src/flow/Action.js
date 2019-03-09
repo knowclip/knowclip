@@ -66,7 +66,7 @@ declare type ClipAction =
     |}
   | {| type: 'EDIT_CLIP', id: ClipId, override: $Shape<Clip> |}
   | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
-  | {| type: 'HIGHLIGHT_CLIP', id: ClipId |}
+  | {| type: 'HIGHLIGHT_CLIP', id: ?ClipId |}
 
 declare type NoteTypeAction =
   | { type: 'ADD_NOTE_TYPE', noteType: NoteType }
@@ -93,8 +93,8 @@ declare type NoteTypeAction =
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
-  | {| type: 'SET_WAVEFORM_PENDING_SELECTION', clip: Clip |}
-  | {| type: 'SET_WAVEFORM_PENDING_STRETCH', stretch: PendingStretch |}
+  | {| type: 'SET_PENDING_CLIP', clip: Clip |}
+  | {| type: 'SET_PENDING_STRETCH', stretch: PendingStretch |}
 
 declare type DialogAction =
   | {| type: 'ENQUEUE_DIALOG', dialog: DialogData, skipQueue: boolean |}

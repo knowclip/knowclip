@@ -35,15 +35,15 @@ class FlashcardForm extends Component {
   }
 
   setFlashcardText = (key, text) => {
-    this.props.setFlashcardField(this.props.currentFlashcardId, key, text)
+    this.props.setFlashcardField(this.props.selectedClipId, key, text)
   }
   setFlashcardTagsText = text =>
-    this.props.setFlashcardTagsText(this.props.currentFlashcardId, text)
+    this.props.setFlashcardTagsText(this.props.selectedClipId, text)
 
   handleAddChip = text =>
-    this.props.addFlashcardTag(this.props.currentFlashcardId, text)
+    this.props.addFlashcardTag(this.props.selectedClipId, text)
   handleDeleteChip = (text, index) =>
-    this.props.deleteFlashcardTag(this.props.currentFlashcardId, index)
+    this.props.deleteFlashcardTag(this.props.selectedClipId, index)
 
   deleteCard = () => {
     const { deleteCard, highlightedClipId } = this.props
@@ -63,7 +63,7 @@ class FlashcardForm extends Component {
   inputRef = name => el => (this.inputRefs[name] = el)
 
   render() {
-    const { currentFlashcard, currentNoteType } = this.props
+    const { currentFlashcard, selectedClipTime, currentNoteType } = this.props
 
     return (
       <Card className={css.container}>
@@ -71,9 +71,9 @@ class FlashcardForm extends Component {
           <form className="form" onSubmit={this.handleFlashcardSubmit}>
             <div className="formBody">
               <p className={css.timeStamp}>
-                {formatTime(currentFlashcard.time.from)}
+                {formatTime(selectedClipTime.start)}
                 {' - '}
-                {formatTime(currentFlashcard.time.until)}
+                {formatTime(selectedClipTime.end)}
               </p>
               {currentNoteType.fields.map(({ name, id }) => (
                 <p key={`${id}_${currentFlashcard.id}`}>
@@ -118,7 +118,8 @@ class FlashcardForm extends Component {
 const mapStateToProps = state => ({
   filePaths: r.getFilePaths(state),
   currentFlashcard: r.getCurrentFlashcard(state),
-  currentFlashcardId: r.getCurrentFlashcardId(state),
+  selectedClipTime: r.getSelectedClipTime(state),
+  selectedClipId: r.getSelectedClipId(state),
   highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: r.getClipsTimes(state),
   currentNoteType: r.getCurrentNoteType(state),

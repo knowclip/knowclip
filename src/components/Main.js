@@ -265,7 +265,7 @@ const mapStateToProps = state => ({
   currentFileName: r.getCurrentFileName(state),
   currentFilePath: r.getCurrentFilePath(state),
   currentFlashcard: r.getCurrentFlashcard(state),
-  currentFlashcardId: r.getCurrentFlashcardId(state),
+  selectedClipId: r.getSelectedClipId(state),
   isNextButtonEnabled: r.isNextButtonEnabled(state),
   isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),

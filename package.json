@@ -45,7 +45,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn format --list-different"
+      "pre-commit": "yarn format --list-different && yarn lint && yarn flow"
     }
   },
   "browserslist": [

@@ -14,42 +14,6 @@ export * from './dialog'
 export * from './noteTypes'
 export * from './project'
 
-type ExpandedFlashcard = {
-  id: ClipId,
-  de: string,
-  en: string,
-  time: {
-    from: number,
-    until: number,
-  },
-}
-
-export const getFlashcard = (
-  state: AppState,
-  id: ClipId
-): ?ExpandedFlashcard => {
-  if (!state.clips.byId[id]) return null
-  if (!state.clips.byId[id].flashcard) return null
-  const flashcard = state.clips.byId[id].flashcard
-  const clip = state.clips.byId[id]
-  if (!clip) throw new Error('Could not find clip')
-  return {
-    ...flashcard,
-    time: {
-      from: getSecondsAtX(state, clip.start),
-      until: getSecondsAtX(state, clip.end),
-    },
-  }
-}
-export const getCurrentFlashcard = (state: AppState): ?ExpandedFlashcard => {
-  const flashcardId = getCurrentFlashcardId(state)
-  if (!flashcardId) return null
-  return getFlashcard(state, flashcardId)
-}
-
-// export const getGerman = (state) => getCurrentFlashcard(state).de
-// export const getEnglish = (state) => getCurrentFlashcard(state).en
-
 export const getClip = (state: AppState, id: ClipId): ?Clip =>
   state.clips.byId[id]
 export const getClips = (state: AppState): Array<Clip> =>
@@ -60,6 +24,36 @@ export const getClips = (state: AppState): Array<Clip> =>
       return clip
     }
   )
+
+type TimeSpan = {
+  start: number,
+  end: number,
+}
+
+export const getClipTime = (state: AppState, id: ClipId): ?TimeSpan => {
+  const clip = getClip(state, id)
+  if (!clip) return null
+
+  return {
+    start: getSecondsAtX(state, clip.start),
+    end: getSecondsAtX(state, clip.end),
+  }
+}
+
+export const getFlashcard = (state: AppState, id: ClipId): ?Flashcard => {
+  const clip = getClip(state, id)
+  if (!clip) return null
+  // if (!clip.flashcard) return null
+  const flashcard = clip.flashcard
+  if (!clip) throw new Error('Could not find clip')
+  return flashcard
+}
+export const getCurrentFlashcard = (state: AppState): ?Flashcard => {
+  const flashcardId = getSelectedClipId(state)
+  if (!flashcardId) return null
+  return getFlashcard(state, flashcardId)
+}
+
 type ExpandedPendingStretch = {
   id: ClipId,
   start: WaveformX,
@@ -81,13 +75,18 @@ export const getPendingStretch = (state: AppState): ?ExpandedPendingStretch => {
 
 export const getWaveform = (state: AppState): WaveformState => state.waveform
 
-export const getCurrentFlashcardId = (state: AppState): ?ClipId =>
+export const getSelectedClipId = (state: AppState): ?ClipId =>
   state.user.highlightedClipId
+
+export const getSelectedClipTime = (state: AppState): ?TimeSpan => {
+  const clipId = getSelectedClipId(state)
+  return clipId ? getClipTime(state, clipId) : null
+}
+
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
   audioSelectors.getClipsOrder(state).map(id => {
     const flashcard = getFlashcard(state, id)
     if (!flashcard) throw new Error('flashcard not found ' + id)
-    delete flashcard.time
     return flashcard
   })
 
@@ -127,10 +126,6 @@ export const getWaveformViewBoxXMin = (state: AppState) =>
 export const getHighlightedClipId = (state: AppState): ?ClipId =>
   state.user.highlightedClipId
 
-type TimeSpan = {
-  start: number,
-  end: number,
-}
 export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
   const clip = getClip(state, id)
   if (!clip) throw new Error('Maybe impossible')

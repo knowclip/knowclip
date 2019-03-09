@@ -9,6 +9,7 @@ describe('clips reducer', () => {
     name: 'default',
     id: 'default',
     fields: [{ id: 'asdf', name: 'Front' }, { id: 'dfjk', name: 'Back' }],
+    useTagsField: false,
   }
   const oldState: ClipsState = clips(
     {

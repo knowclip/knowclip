@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  List,
   MenuItem,
   ListItemText,
   ListItemSecondaryAction,
@@ -10,7 +9,6 @@ import {
 import * as r from '../redux'
 import { Edit as EditIcon, Add as AddIcon } from '@material-ui/icons'
 import css from './NoteTypeSelectionMenu.module.css'
-import { Link } from 'react-router-dom'
 
 export class NoteTypeSelectionMenu extends Component {
   render() {

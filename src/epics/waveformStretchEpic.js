@@ -25,7 +25,7 @@ const waveformStretchEpic = (action$, state$) => {
       const pendingStretches = fromEvent(window, 'mousemove').pipe(
         takeUntil(fromEvent(window, 'mouseup')),
         map(mousemove =>
-          r.setWaveformPendingStretch({
+          r.setPendingStretch({
             id,
             // start: mousedownData.x,
             originKey: key,
@@ -58,7 +58,7 @@ const waveformStretchEpic = (action$, state$) => {
             if (previousClip && end <= previousClip.end) {
               return from([
                 r.mergeClips([id, previousClipId]),
-                r.setWaveformPendingStretch(null),
+                r.setPendingStretch(null),
               ])
             }
 
@@ -67,7 +67,7 @@ const waveformStretchEpic = (action$, state$) => {
             if (nextClip && end >= nextClip.start) {
               return from([
                 r.mergeClips([id, nextClipId]),
-                r.setWaveformPendingStretch(null),
+                r.setPendingStretch(null),
               ])
             }
 
@@ -79,7 +79,7 @@ const waveformStretchEpic = (action$, state$) => {
                     stretchedClip.end - r.SELECTION_THRESHOLD
                   ),
                 }),
-                r.setWaveformPendingStretch(null),
+                r.setPendingStretch(null),
               ])
             }
 
@@ -91,11 +91,11 @@ const waveformStretchEpic = (action$, state$) => {
                     stretchedClip.start + r.SELECTION_THRESHOLD
                   ),
                 }),
-                r.setWaveformPendingStretch(null),
+                r.setPendingStretch(null),
               ])
             }
 
-            return of(r.setWaveformPendingStretch(null))
+            return of(r.setPendingStretch(null))
           })
         )
       )

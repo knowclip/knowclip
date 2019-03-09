@@ -14,14 +14,12 @@ export const setWaveformCursor = (
   newViewBox,
 })
 
-export const setWaveformPendingClip = (clip: Clip): WaveformAction => ({
-  type: 'SET_WAVEFORM_PENDING_SELECTION',
+export const setPendingClip = (clip: Clip): WaveformAction => ({
+  type: 'SET_PENDING_CLIP',
   clip,
 })
 
-export const setWaveformPendingStretch = (
-  stretch: PendingStretch
-): WaveformAction => ({
-  type: 'SET_WAVEFORM_PENDING_STRETCH',
+export const setPendingStretch = (stretch: PendingStretch): WaveformAction => ({
+  type: 'SET_PENDING_STRETCH',
   stretch,
 })

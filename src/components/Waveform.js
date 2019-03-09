@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
-import { WAVEFORM_HEIGHT } from '../selectors'
 
 const { SELECTION_BORDER_WIDTH } = r
 

@@ -1,11 +1,6 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { Button, IconButton } from '@material-ui/core'
-import {
-  Close as CloseIcon,
-  FastForward,
-  FastRewind,
-  Loop,
-} from '@material-ui/icons'
+import { Close as CloseIcon, Loop } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 
 const AudioFilesNavMenu = ({

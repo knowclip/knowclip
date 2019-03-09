@@ -10,7 +10,7 @@ import {
 } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { fromEvent, of, merge } from 'rxjs'
-import { setWaveformPendingClip, addClip } from '../actions'
+import { setPendingClip, addClip } from '../actions'
 import * as r from '../redux'
 import {
   toWaveformX,
@@ -60,7 +60,7 @@ const waveformSelectionEpic = (action$, state$) => {
       const pendingClips = fromEvent(window, 'mousemove').pipe(
         map(mousemove => {
           mousemove.preventDefault()
-          return setWaveformPendingClip({
+          return setPendingClip({
             start: withinValidTime(waveformMousedown.x), // should start be called origin instead to match with stretch thing?
             end: withinValidTime(
               toWaveformX(
@@ -87,7 +87,7 @@ const waveformSelectionEpic = (action$, state$) => {
 
           return pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
             ? // maybe later, do stretch + merge for overlaps.
-              setWaveformPendingClip(null)
+              setPendingClip(null)
             : addClip(
                 newClip(
                   r.getPendingClip(state$.value),

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { TextField, Button } from '@material-ui/core'
-import { Redirect } from 'react-router-dom'
 import { remote, shell } from 'electron'
 import * as r from '../redux'
 import * as css from './MediaFolderLocationForm.module.css'

@@ -16,7 +16,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         pendingClip: null,
       }
 
-    case 'SET_WAVEFORM_PENDING_SELECTION':
+    case 'SET_PENDING_CLIP':
       return {
         ...state,
         pendingClip: action.clip,
@@ -28,7 +28,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         highlightedClipId: action.id,
       }
 
-    case 'SET_WAVEFORM_PENDING_STRETCH':
+    case 'SET_PENDING_STRETCH':
       return {
         ...state,
         pendingStretch: action.stretch,

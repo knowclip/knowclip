@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
+import { Dialog, DialogContent } from '@material-ui/core'
 import MediaFolderLocationForm from '../MediaFolderLocationForm'
 
 const MediaFolderLocationFormDialog = ({
