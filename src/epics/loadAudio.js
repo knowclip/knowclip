@@ -11,6 +11,7 @@ import {
   hydrateFromProjectFile,
   findExistingProjectFilePath,
 } from '../utils/statePersistence'
+import { PROJECT_FILE_VERSION_MISMATCH_MESSAGE } from '../selectors/snackbar'
 
 const readFile = promisify(fs.readFile)
 
@@ -48,7 +49,7 @@ const svgElement = () => document.getElementById('waveform-svg')
 const loadAudioEpic = (action$, state$) =>
   action$.pipe(
     ofType('LOAD_AUDIO'),
-    flatMap(async ({ /* audioElement, */ filePath }) => {
+    flatMap(async ({ filePath }) => {
       const mediaPlayer = audioElement()
       mediaPlayer.pause()
       mediaPlayer.src = ''
@@ -86,29 +87,7 @@ const chooseAudioFilesEpic = (action$, state$) =>
 
       console.log('chose audio files!', filePath)
 
-      // let projectFilePath
-
-      // try {
-      //   projectFilePath = findExistingProjectFilePath(filePath)
-      // } catch(err) {
-      //   console.error(err)
-      // }
-
-      // return await from([
-      // ...(projectFilePath
-      //   ? [
-      //       r.hydrateFromProjectFile(
-      //         hydrateFromProjectFile(
-      //           projectFilePath,
-      //           filePath,
-      //           r.getMediaFolderLocation(state$.value),
-      //           state$.noteTypes
-      //         )
-      //       ),
-      //     ]
-      //   : []),
       return await r.loadAudio(filePath, audioElement(), svgElement())
-      // ])
     })
   )
 
@@ -122,18 +101,22 @@ const loadProjectEpic = (action$, state$) =>
         projectFilePath = findExistingProjectFilePath(filePath)
       } catch (err) {
         console.error(err)
+        return { type: 'NOOP_LOAD_PROJECT', err }
       }
 
-      return projectFilePath
-        ? r.hydrateFromProjectFile(
-            hydrateFromProjectFile(
-              projectFilePath,
-              filePath,
-              r.getMediaFolderLocation(state$.value),
-              state$.noteTypes
-            )
-          )
-        : { type: 'NOOP_LOAD_PROJECT' }
+      if (!projectFilePath)
+        return { type: 'NOOP_LOAD_PROJECT_NO_PROJECT_FILE_FOUND' }
+
+      const hydrated = hydrateFromProjectFile(
+        projectFilePath,
+        filePath,
+        r.getMediaFolderLocation(state$.value),
+        state$.noteTypes
+      )
+
+      return hydrated
+        ? r.hydrateFromProjectFile(hydrated)
+        : r.simpleMessageSnackbar(PROJECT_FILE_VERSION_MISMATCH_MESSAGE)
     })
   )
 

@@ -23,7 +23,7 @@ const audio: Reducer<AudioState> = (
       }
 
     case 'CHOOSE_AUDIO_FILES': {
-      const { filePaths, noteTypeId, ids } = action
+      const { noteTypeId, ids } = action
 
       return {
         ...state,

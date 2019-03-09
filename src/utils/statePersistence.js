@@ -2,6 +2,7 @@
 import fs from 'fs'
 import { initialState as initialNoteTypeState } from '../reducers/noteTypes'
 import uuid from 'uuid/v4'
+import { PROJECT_FILE_VERSION_MISMATCH_MESSAGE } from '../selectors/snackbar'
 
 const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   const { clips: oldClips } = project
@@ -74,13 +75,13 @@ export const hydrateFromProjectFile = (
   audioFilePath: AudioFilePath,
   mediaFolderLocation: ?string,
   noteTypes: ?NoteTypesState
-): $Shape<AppState> => {
+): ?$Shape<AppState> => {
   const jsonFileContents = fs.readFileSync(existingProjectFilePath, 'utf8')
   const project = getProject(jsonFileContents)
 
   console.log('project', project)
   console.log('audioFilePath', audioFilePath)
-  if (!project) throw new Error('Invalid project file')
+  if (!project) return null
 
   const localNoteType = noteTypes && noteTypes.byId[project.noteType.id]
   const noteType =
@@ -160,11 +161,22 @@ export const getPersistedState = (): $Shape<AppState> => {
       persistedState.audio.mediaFolderLocation
     const projectFilePath = findExistingProjectFilePath(filePath)
     if (projectFilePath) {
-      return hydrateFromProjectFile(
+      const hydrated = hydrateFromProjectFile(
         projectFilePath,
         filePath,
         mediaFolderLocation,
         persistedState.noteTypes
+      )
+      return (
+        hydrated || {
+          noteTypes: persistedState.noteTypes,
+          snackbar: {
+            queue: {
+              type: 'SimpleMessage',
+              props: { message: PROJECT_FILE_VERSION_MISMATCH_MESSAGE },
+            },
+          },
+        }
       )
     } else return { noteTypes: persistedState.noteTypes }
   } catch (err) {

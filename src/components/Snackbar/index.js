@@ -13,7 +13,7 @@ const SnackbarView = ({ currentSnackbar, closeSnackbar }) => {
   const CurrentSnackbarComponent = SNACKBARS[currentSnackbar.type]
   return (
     <CurrentSnackbarComponent
-      open={true}
+      key={Date.now().toString()}
       closeSnackbar={closeSnackbar}
       {...currentSnackbar.props}
     />

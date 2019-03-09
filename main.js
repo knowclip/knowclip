@@ -13,9 +13,12 @@ let mainWindow
 
 // have to do it this to access ffmpeg path from within webpack bundle
 const ffmpegStaticBasePath = require('ffmpeg-static').path
+const ffprobeStaticBasePath = require('ffprobe-static').path
 const getFfmpegStaticPath = basePath =>
   basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
+
 global.ffmpegpath = getFfmpegStaticPath(ffmpegStaticBasePath)
+global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
 
 async function createWindow() {
   // Create the browser window.
