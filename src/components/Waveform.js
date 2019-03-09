@@ -96,6 +96,7 @@ class Waveform extends Component {
           {clips.map(clip => (
             <Clip
               {...clip}
+              key={clip.id}
               stepsPerSecond={stepsPerSecond}
               isHighlighted={clip.id === highlightedClipId}
             />

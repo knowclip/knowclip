@@ -18,43 +18,43 @@ describe('clips reducer', () => {
         b: newClip({ start: 2, end: 2.5 }, filePath, 'b', noteType),
         c: newClip({ start: 3, end: 3.5 }, filePath, 'c', noteType),
       },
-      idsByFilePath: {
+      idsByAudioFileId: {
         [filePath]: ['a', 'b', 'c'],
       },
     },
     { type: '@@INIT' }
   )
 
-  it('adds to byId and idsByFilepath during ADD_CLIP', () => {
+  it('adds to byId and idsByAudioFileId during ADD_CLIP', () => {
     const clip = newClip({ start: 2.75, end: 3 }, filePath, 'b-c', noteType)
     const action = r.addClip(clip)
     const newState = clips(oldState, action)
-    expect(newState.idsByFilePath[filePath]).toEqual(['a', 'b', 'b-c', 'c'])
+    expect(newState.idsByAudioFileId[filePath]).toEqual(['a', 'b', 'b-c', 'c'])
     expect(newState.byId).toEqual({
       ...oldState.byId,
       [clip.id]: clip,
     })
   })
 
-  it('adds to byId and idsByFilepath during ADD_CLIP', () => {
+  it('adds to byId and idsByAudioFileId during ADD_CLIP', () => {
     const clip = newClip({ start: 4, end: 4.5 }, filePath, 'd', noteType)
     const action = r.addClip(clip)
     const newState = clips(oldState, action)
-    expect(newState.idsByFilePath[filePath]).toEqual(['a', 'b', 'c', 'd'])
+    expect(newState.idsByAudioFileId[filePath]).toEqual(['a', 'b', 'c', 'd'])
     expect(newState.byId).toEqual({
       ...oldState.byId,
       [clip.id]: clip,
     })
   })
 
-  it('adds to byId and idsByFilepath during ADD_CLIPS', () => {
+  it('adds to byId and idsByAudioFileId during ADD_CLIPS', () => {
     const bC1 = newClip({ start: 2.75, end: 2.8 }, filePath, 'b-c1', noteType)
     const bC2 = newClip({ start: 2.85, end: 3 }, filePath, 'b-c2', noteType)
 
     const newClips = [bC1, bC2]
     const action = r.addClips(newClips, filePath)
     const newState = clips(oldState, action)
-    expect(newState.idsByFilePath[filePath]).toEqual([
+    expect(newState.idsByAudioFileId[filePath]).toEqual([
       'a',
       'b',
       'b-c1',

@@ -10,10 +10,12 @@ export const initializeApp = (): Action => ({ type: 'INITIALIZE_APP' })
 
 export const chooseAudioFiles = (
   filePaths: Array<AudioFilePath>,
+  ids: Array<AudioFileId>,
   noteTypeId: NoteTypeId
 ): Action => ({
   type: 'CHOOSE_AUDIO_FILES',
   filePaths,
+  ids,
   noteTypeId,
 })
 

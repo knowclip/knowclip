@@ -13,34 +13,54 @@ export const isPrevButtonEnabled = (state: AppState) =>
   state.audio.currentFileIndex !== 0
 export const getCurrentFileIndex = (state: AppState) =>
   state.audio.currentFileIndex
-export const getCurrentFileName = (state: AppState) => {
+export const getCurrentFileName = (state: AppState): ?AudioFileName => {
   const filePath = getCurrentFilePath(state)
   return filePath && basename(filePath)
 }
 
-export const getCurrentFilePath = ({ audio }: AppState): ?AudioFilePath =>
+export const getAudioFile = (
+  state: AppState,
+  id: AudioFileId
+): ?AudioFileData => {
+  const file = state.audio.files[id]
+  return file || null
+}
+
+export const getAudioFilePath = (
+  state: AppState,
+  id: AudioFileId
+): ?AudioFilePath => {
+  const file = getAudioFile(state, id)
+  return file ? file.path : null
+}
+
+export const getCurrentFileId = ({ audio }: AppState): ?AudioFileId =>
   audio.filesOrder[audio.currentFileIndex]
 
 export const getCurrentFile = (state: AppState): ?AudioFileData => {
-  const currentFilePath = getCurrentFilePath(state)
-  return currentFilePath ? state.audio.files[currentFilePath] : null
+  const currentFileId = getCurrentFileId(state)
+  return currentFileId ? state.audio.files[currentFileId] : null
+}
+export const getCurrentFilePath = (state: AppState): ?AudioFilePath => {
+  const currentFile = getCurrentFile(state)
+  return currentFile ? currentFile.path : null
 }
 export const getClipsOrder = (state: AppState): Array<ClipId> => {
-  const currentFilePath = getCurrentFilePath(state)
-  return currentFilePath ? state.clips.idsByFilePath[currentFilePath] : []
+  const currentFileId = getCurrentFileId(state)
+  return currentFileId ? state.clips.idsByAudioFileId[currentFileId] : []
 }
 
 export const doesFileHaveClips = (
   state: AppState,
   filePath: AudioFilePath
 ): boolean => {
-  return Boolean(state.clips.idsByFilePath[filePath].length)
+  return Boolean(state.clips.idsByAudioFileId[filePath].length)
 }
 
 export const doesCurrentFileHaveClips = (state: AppState): boolean => {
-  const currentFilePath = getCurrentFilePath(state)
+  const currentFileId = getCurrentFileId(state)
   return Boolean(
-    currentFilePath && state.clips.idsByFilePath[currentFilePath].length
+    currentFileId && state.clips.idsByAudioFileId[currentFileId].length
   )
 }
 

@@ -1,7 +1,7 @@
 // @flow
 const initialState: ClipsState = {
   byId: {},
-  idsByFilePath: {},
+  idsByAudioFileId: {},
 }
 
 const byStart = clips => (aId, bId) => {
@@ -12,29 +12,29 @@ const byStart = clips => (aId, bId) => {
   return 0
 }
 
-const addIdToIdsByFilePath = (
+const addIdToIdsByAudioFileId = (
   oldById,
-  oldIdsByFilepath: Array<ClipId>,
+  oldIdsByAudioFileId: Array<ClipId>,
   clip
 ) => {
-  return oldIdsByFilepath
+  return oldIdsByAudioFileId
     .map(id => oldById[id])
     .concat(clip)
     .sort((a, b) => a.start - b.start)
     .map(clip => clip.id)
 }
 
-const addIdstoIdsByFilePath = (
+const addIdstoIdsByAudioFileId = (
   oldById,
-  oldIdsByFilepath: Array<ClipId>,
+  oldIdsByAudioFileId: Array<ClipId>,
   sortedClips
 ) => {
-  const newIndex = oldIdsByFilepath.findIndex(
+  const newIndex = oldIdsByAudioFileId.findIndex(
     id => oldById[id].start > sortedClips[0].start
   )
-  return (newIndex === -1 ? [] : oldIdsByFilepath.slice(0, newIndex))
+  return (newIndex === -1 ? [] : oldIdsByAudioFileId.slice(0, newIndex))
     .concat(sortedClips.map(clip => clip.id))
-    .concat(oldIdsByFilepath.slice(newIndex))
+    .concat(oldIdsByAudioFileId.slice(newIndex))
 }
 
 const arrayToMapById = array =>
@@ -51,10 +51,10 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     case 'CHOOSE_AUDIO_FILES':
       return {
         ...state,
-        idsByFilePath: action.filePaths.reduce(
-          (all, filePath) => ({
+        idsByAudioFileId: action.ids.reduce(
+          (all, id) => ({
             ...all,
-            [filePath]: [],
+            [id]: [],
           }),
           {}
         ),
@@ -63,24 +63,24 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     case 'REMOVE_AUDIO_FILES':
       return {
         ...state,
-        idsByFilePath: {},
+        idsByAudioFileId: {},
         byId: {},
       }
 
     case 'ADD_CLIP': {
       const { clip } = action
-      const { filePath } = clip
+      const { fileId } = clip
       return {
         ...state,
         byId: {
           ...state.byId,
           [clip.id]: clip,
         },
-        idsByFilePath: {
-          ...state.idsByFilePath,
-          [filePath]: addIdToIdsByFilePath(
+        idsByAudioFileId: {
+          ...state.idsByAudioFileId,
+          [fileId]: addIdToIdsByAudioFileId(
             state.byId,
-            state.idsByFilePath[filePath],
+            state.idsByAudioFileId[fileId],
             clip
           ),
         },
@@ -88,18 +88,18 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     }
 
     case 'ADD_CLIPS': {
-      const { clips, filePath } = action
+      const { clips, fileId } = action
       return {
         ...state,
         byId: {
           ...state.byId,
           ...arrayToMapById(clips),
         },
-        idsByFilePath: {
-          ...state.idsByFilePath,
-          [filePath]: addIdstoIdsByFilePath(
+        idsByAudioFileId: {
+          ...state.idsByAudioFileId,
+          [fileId]: addIdstoIdsByAudioFileId(
             state.byId,
-            state.idsByFilePath[filePath],
+            state.idsByAudioFileId[fileId],
             clips
           ),
         },
@@ -121,7 +121,7 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
 
     case 'MERGE_CLIPS': {
       const { ids } = action // should all have same filepath
-      const { filePath } = state.byId[ids[0]]
+      const { fileId } = state.byId[ids[0]]
       const [finalId, ...idsToBeDiscarded] = ids
       const clipsOrder: Array<ClipId> = (Object.values(state.byId): any)
         .sort((a: Clip, b: Clip) => a.start - b.start)
@@ -146,9 +146,9 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       return {
         ...state,
         byId: newClips,
-        idsByFilePath: {
-          ...state.idsByFilePath,
-          [filePath]: state.idsByFilePath[filePath].filter(
+        idsByAudioFileId: {
+          ...state.idsByAudioFileId,
+          [fileId]: state.idsByAudioFileId[fileId].filter(
             id => !idsToBeDiscarded.includes(id)
           ),
         },
@@ -157,15 +157,15 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
 
     case 'DELETE_CARD': {
       const { id } = action
-      const { filePath } = state.byId[id]
+      const { fileId } = state.byId[id]
       const byId = { ...state.byId }
       delete byId[id]
       return {
         ...state,
         byId,
-        idsByFilePath: {
-          ...state.idsByFilePath,
-          [filePath]: state.idsByFilePath[filePath].filter(
+        idsByAudioFileId: {
+          ...state.idsByAudioFileId,
+          [fileId]: state.idsByAudioFileId[fileId].filter(
             id => id !== action.id
           ),
         },
@@ -177,16 +177,16 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       const byId = { ...state.byId }
       if (!ids.length) return state
 
-      const { filePath } = state.byId[ids[0]]
+      const { fileId } = state.byId[ids[0]]
       action.ids.forEach(id => {
         delete byId[id]
       })
       return {
         ...state,
         byId,
-        idsByFilePath: {
-          ...state.idsByFilePath,
-          [filePath]: state.idsByFilePath[filePath].filter(
+        idsByAudioFileId: {
+          ...state.idsByAudioFileId,
+          [fileId]: state.idsByAudioFileId[fileId].filter(
             id => !ids.includes(id)
           ),
         },

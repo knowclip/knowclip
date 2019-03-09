@@ -22,6 +22,7 @@ import DarkTheme from '../components/DarkTheme'
 import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
+import uuid from 'uuid/v4'
 
 import * as r from '../redux'
 import electron from 'electron'
@@ -67,14 +68,14 @@ class App extends Component {
       // { properties: ['openFile', 'multiClips'] },
       { properties: ['openFile'] },
       filePaths => {
-        if (!filePaths) return
-        this.setState({ filePaths }, async () => {
-          // now, this line
-          // should really happen after a clip is selected.
-          // this.germanInput.focus()
-
-          this.props.chooseAudioFiles(filePaths, this.props.defaultNoteTypeId)
-        })
+        if (filePaths) {
+          const ids = filePaths.map(filePath => uuid())
+          this.props.chooseAudioFiles(
+            filePaths,
+            ids,
+            this.props.defaultNoteTypeId
+          )
+        }
       }
     )
   }
@@ -204,7 +205,7 @@ class App extends Component {
                 <Menu
                   anchorEl={noteTypeClipMenuAnchor}
                   onClose={this.closeNoteTypeSelectionMenu}
-                  open={noteTypeClipMenuAnchor}
+                  open={Boolean(noteTypeClipMenuAnchor)}
                 >
                   <NoteTypeSelectionMenu />
                 </Menu>

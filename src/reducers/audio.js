@@ -23,15 +23,16 @@ const audio: Reducer<AudioState> = (
       }
 
     case 'CHOOSE_AUDIO_FILES': {
-      const { filePaths, noteTypeId } = action
+      const { filePaths, noteTypeId, ids } = action
 
       return {
         ...state,
-        filesOrder: filePaths,
-        files: filePaths.reduce((files, path) => {
+        filesOrder: ids,
+        files: ids.reduce((files, path, i) => {
           const fileData: AudioFileData = {
             path,
             noteTypeId,
+            id: ids[i],
           }
           return { ...files, [path]: fileData }
         }, {}),
@@ -84,10 +85,10 @@ const audio: Reducer<AudioState> = (
       return {
         ...state,
         files: Object.keys(state.files).reduce(
-          (all, filePath) => ({
+          (all, id) => ({
             ...all,
-            [filePath]: {
-              ...state.files[filePath],
+            [id]: {
+              ...state.files[id],
               noteTypeId,
             },
           }),

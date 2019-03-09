@@ -34,7 +34,7 @@ const saveProjectFile = (action$, state$) =>
         const audioFilePath = r.getCurrentFilePath(state$.value)
         if (audioFilePath) {
           const projectFilePath = getProjectFilePath(audioFilePath)
-          const json = JSON.stringify(r.getProject0_0_0(state$.value), null, 2)
+          const json = JSON.stringify(r.getProject(state$.value), null, 2)
           await writeFile(projectFilePath, json, 'utf8')
           return { type: 'SAVE PROJECT!!' }
         }

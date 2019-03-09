@@ -3,11 +3,15 @@
 import { basename, extname } from 'path'
 import { toTimestamp } from '../utils/ffmpeg'
 import { getMillisecondsAtX } from './waveformTime'
+import { getAudioFilePath } from './audio'
 
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
-export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
+export const getClipMilliseconds = (
+  state: AppState,
+  id: ClipId
+): { start: number, end: number } => {
   const clip = state.clips.byId[id]
   if (!clip) throw new Error('Maybe impossible')
   return {
@@ -16,10 +20,15 @@ export const getClipMilliseconds = (state: AppState, id: ClipId): Object => {
   }
 }
 
+// export const getClipAudioFilePath = (state: AppState, clipId: ClipId): ?AudioFilePath =>
+
 export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
   const clip = state.clips.byId[clipId]
   if (!clip) throw Error(`Could not find clip ${clipId}`)
-  const { start, end, filePath } = clip
+  const { start, end, fileId } = clip
+  const filePath = getAudioFilePath(state, fileId)
+  if (!filePath) throw Error(`Could not find file path for clip ${clipId}`)
+
   const extension = extname(filePath)
   const filenameWithoutExtension = basename(filePath, extension)
   const startTime = getMillisecondsAtX(state, start)
@@ -45,10 +54,10 @@ export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
 export const getClipFilename = (state: AppState, clipId: ClipId) =>
   getClipOutputParameters(state, clipId).outputFilename
 
-export const getClipIdsByFilePath = (
+export const getClipIdsByAudioFileId = (
   state: AppState,
-  filePath: string
-): Array<ClipId> => state.clips.idsByFilePath[filePath]
+  audioFileId: string
+): Array<ClipId> => state.clips.idsByAudioFileId[audioFileId]
 
 export const haveClipsBeenMade = (state: AppState): boolean =>
   Object.keys(state.clips.byId).length > 0

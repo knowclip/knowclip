@@ -75,7 +75,7 @@ const detectSilenceEpic = (action$, state$) =>
           }
         })
 
-        const filePath = r.getCurrentFilePath(state$.value)
+        const fileId = r.getCurrentFileId(state$.value)
         const currentNoteType = r.getCurrentNoteType(state$.value)
         const newClips = chunks.map(({ start, end }) =>
           newClip(
@@ -83,7 +83,7 @@ const detectSilenceEpic = (action$, state$) =>
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),
             },
-            filePath,
+            fileId,
             uuid(),
             currentNoteType,
             currentNoteType.useTagsField ? r.getDefaultTags(state$.value) : []
@@ -91,8 +91,8 @@ const detectSilenceEpic = (action$, state$) =>
         )
 
         return from([
-          r.deleteCards(r.getClipIdsByFilePath(state$.value, filePath)),
-          r.addClips(newClips, filePath),
+          r.deleteCards(r.getClipIdsByAudioFileId(state$.value, fileId)),
+          r.addClips(newClips, fileId),
         ])
       })
     }),

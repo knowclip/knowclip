@@ -1,6 +1,47 @@
 // @flow
 import fs from 'fs'
 import { initialState as initialNoteTypeState } from '../reducers/noteTypes'
+import uuid from 'uuid/v4'
+
+const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
+  const { clips: oldClips } = project
+  const newClips: { [ClipId]: Clip } = {}
+  const fileId = uuid()
+  for (const clipId in oldClips) {
+    const clip = oldClips[clipId]
+    const { flashcard } = clip
+    newClips[clipId] = {
+      id: clip.id,
+      start: clip.start,
+      end: clip.end,
+      flashcard: {
+        id: clipId,
+        fields: flashcard.fields,
+        tags: flashcard.tags || [],
+      },
+      fileId,
+    }
+  }
+
+  return {
+    version: '1.0.0',
+    audioFileName: project.audioFileName,
+    noteType: project.noteType,
+    clips: newClips,
+    audioFileId: fileId,
+  }
+}
+const getProject = (jsonFileContents): ?Project1_0_0 => {
+  const project: Project = JSON.parse(jsonFileContents)
+  switch (project.version) {
+    case '0.0.0':
+      return convertProject0_0_0___1_0_0(project)
+    case '1.0.0':
+      return project
+    default:
+      return null
+  }
+}
 
 export const persistState = (state: AppState) => {
   const { audio, noteTypes } = state
@@ -35,7 +76,11 @@ export const hydrateFromProjectFile = (
   noteTypes: ?NoteTypesState
 ): $Shape<AppState> => {
   const jsonFileContents = fs.readFileSync(existingProjectFilePath, 'utf8')
-  const project: Project0_0_0 = JSON.parse(jsonFileContents)
+  const project = getProject(jsonFileContents)
+
+  console.log('project', project)
+  console.log('audioFilePath', audioFilePath)
+  if (!project) throw new Error('Invalid project file')
 
   const localNoteType = noteTypes && noteTypes.byId[project.noteType.id]
   const noteType =
@@ -47,41 +92,30 @@ export const hydrateFromProjectFile = (
           name: `${project.noteType.name}_fork`,
         }
   const noteTypesBase = noteTypes || initialNoteTypeState
+  const { audioFileId } = project
 
   return {
-    audio: {
+    audio: ({
       loop: true,
       files: {
-        [audioFilePath]: {
+        [audioFileId]: {
+          id: audioFileId,
           path: audioFilePath,
           noteTypeId: noteType.id,
         },
       },
-      filesOrder: [audioFilePath],
+      filesOrder: [audioFileId],
       currentFileIndex: 0,
       isLoading: false,
       mediaFolderLocation,
-    },
+    }: AudioState),
     clips: {
-      idsByFilePath: {
-        [audioFilePath]: Object.keys(project.clips).sort(
+      idsByAudioFileId: {
+        [audioFileId]: Object.keys(project.clips).sort(
           (a, b) => project.clips[a].start - project.clips[b].start
         ),
       },
-      byId: Object.keys(project.clips).reduce(
-        (all, clipId) => ({
-          ...all,
-          [clipId]: {
-            ...project.clips[clipId],
-            filePath: audioFilePath,
-            flashcard: {
-              ...project.clips[clipId].flashcard,
-              tags: project.clips[clipId].flashcard.tags || [],
-            },
-          },
-        }),
-        ({}: { [ClipId]: Clip })
-      ),
+      byId: project.clips,
     },
     noteTypes: {
       ...noteTypesBase,

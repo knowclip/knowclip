@@ -7,11 +7,11 @@ export const addClip = (clip: Clip): ClipAction => ({
 
 export const addClips = (
   clips: Array<Clip>,
-  filePath: AudioFilePath
+  fileId: AudioFileId
 ): ClipAction => ({
   type: 'ADD_CLIPS',
   clips,
-  filePath,
+  fileId,
 })
 
 export const highlightClip = (id: ?ClipId): ClipAction => ({

@@ -8,26 +8,6 @@ import * as r from '../redux'
 import css from './FlashcardForm.module.css'
 
 class FlashcardForm extends Component {
-  state = {
-    filePaths: [],
-    modalIsOpen: false,
-  }
-
-  fileInputRef = el => (this.fileInput = el)
-  audioRef = el => (this.audio = el)
-  germanInputRef = el => (this.germanInput = el)
-  svgRef = el => (this.svg = el)
-
-  goToFile = index => this.props.setCurrentFile(index)
-  prevFile = () => {
-    const lower = this.props.currentFileIndex - 1
-    this.goToFile(lower >= 0 ? lower : 0)
-  }
-  nextFile = () => {
-    const higher = this.props.currentFileIndex + 1
-    const lastIndex = this.props.filePaths.length - 1
-    this.goToFile(higher <= lastIndex ? higher : lastIndex)
-  }
   handleFlashcardSubmit = e => {
     e.preventDefault()
     this.nextFile()
@@ -52,13 +32,6 @@ class FlashcardForm extends Component {
     }
   }
 
-  openModal = () => this.setState({ modalIsOpen: true })
-  closeModal = () => this.setState({ modalIsOpen: false })
-
-  handleAudioEnded = e => {
-    this.nextFile()
-  }
-
   inputRefs = {}
   inputRef = name => el => (this.inputRefs[name] = el)
 
@@ -76,7 +49,7 @@ class FlashcardForm extends Component {
                 {formatTime(selectedClipTime.end)}
               </p>
               {currentNoteType.fields.map(({ name, id }) => (
-                <p key={`${id}_${currentFlashcard.id}`}>
+                <section key={`${id}_${currentFlashcard.id}`}>
                   <TextField
                     inputRef={this.inputRef(id)}
                     onChange={e => this.setFlashcardText(id, e.target.value)}
@@ -85,7 +58,7 @@ class FlashcardForm extends Component {
                     multiline
                     label={name}
                   />
-                </p>
+                </section>
               ))}
 
               {currentNoteType.useTagsField && (
@@ -116,7 +89,6 @@ class FlashcardForm extends Component {
 }
 
 const mapStateToProps = state => ({
-  filePaths: r.getFilePaths(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   selectedClipTime: r.getSelectedClipTime(state),
   selectedClipId: r.getSelectedClipId(state),

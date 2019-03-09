@@ -41,7 +41,8 @@ const editNoteTypeEpic = (action$, state$) =>
 const setAudioFileNoteTypeEpic = (action$, state$) =>
   action$.pipe(
     ofType('SET_AUDIO_FILE_NOTE_TYPE_REQUEST'),
-    map(({ audioFilePath, noteTypeId }) => {
+    map(({ audioFileId, noteTypeId }) => {
+      const audioFilePath = r.getAudioFilePath(state$.value, audioFileId)
       const noteType = r.getNoteType(state$.value, noteTypeId)
       if (noteTypeId === r.getCurrentNoteType(state$.value).id)
         return r.simpleMessageSnackbar(

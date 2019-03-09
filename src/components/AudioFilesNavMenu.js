@@ -16,7 +16,7 @@ const AudioFilesNavMenu = ({
   className,
 }) => (
   <DarkTheme>
-    <p className={className}>
+    <section className={className}>
       {currentFilename ? (
         <h2 className="audioFileName">
           {currentFilename}
@@ -30,7 +30,7 @@ const AudioFilesNavMenu = ({
       <IconButton onClick={onClickLoop} color={loop ? 'primary' : 'default'}>
         <Loop />
       </IconButton>{' '}
-    </p>
+    </section>
   </DarkTheme>
 )
 

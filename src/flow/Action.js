@@ -10,6 +10,7 @@ declare type Action =
   | {|
       type: 'CHOOSE_AUDIO_FILES',
       filePaths: Array<AudioFilePath>,
+      ids: Array<AudioFileId>,
       noteTypeId: NoteTypeId,
     |}
   | {| type: 'REMOVE_AUDIO_FILES' |}
@@ -62,7 +63,7 @@ declare type ClipAction =
   | {|
       type: 'ADD_CLIPS',
       clips: Array<Clip>,
-      filePath: AudioFilePath,
+      fileId: AudioFileId,
     |}
   | {| type: 'EDIT_CLIP', id: ClipId, override: $Shape<Clip> |}
   | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
@@ -81,12 +82,12 @@ declare type NoteTypeAction =
   | { type: 'SET_DEFAULT_NOTE_TYPE', id: NoteTypeId }
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE',
-      audioFilePath: AudioFilePath,
+      audioFileId: AudioFileId,
       noteTypeId: NoteTypeId,
     }
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
-      audioFilePath: AudioFilePath,
+      audioFileId: AudioFileId,
       noteTypeId: NoteTypeId,
     }
 

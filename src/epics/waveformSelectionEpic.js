@@ -91,7 +91,7 @@ const waveformSelectionEpic = (action$, state$) => {
             : addClip(
                 newClip(
                   r.getPendingClip(state$.value),
-                  r.getCurrentFilePath(state$.value),
+                  r.getCurrentFileId(state$.value),
                   uuid(),
                   currentNoteType,
                   currentNoteType.useTagsField
