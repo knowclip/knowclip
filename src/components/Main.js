@@ -183,7 +183,11 @@ class App extends Component {
               {mediaFolderLocation ? (
                 <li className={headerCss.menuTextItem}>
                   audio will be saved in:{' '}
-                  <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
+                  <a
+                    href="/#"
+                    onClick={this.openMediaFolderLocationFormDialog}
+                    title={mediaFolderLocation}
+                  >
                     {truncate(mediaFolderLocation, 30)}
                   </a>
                 </li>
