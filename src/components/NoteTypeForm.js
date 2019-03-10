@@ -22,6 +22,8 @@ const deleteKey = (obj, key) => {
 }
 
 class NoteTypeForm extends Component {
+  static defaultProps = { closeDialogOnDelete: true }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -140,7 +142,12 @@ class NoteTypeForm extends Component {
   render() {
     const { noteType, errors } = this.state
     const { handleSubmit } = this
-    const { cancel, deleteNoteTypeRequest, id } = this.props
+    const {
+      cancel,
+      deleteNoteTypeRequest,
+      id,
+      closeDialogOnDelete,
+    } = this.props
     return (
       <>
         <DialogContent>
@@ -202,7 +209,9 @@ class NoteTypeForm extends Component {
         </DialogContent>
         <DialogActions>
           {this.noteTypeAlreadySaved() && (
-            <Button onClick={() => deleteNoteTypeRequest(id)}>
+            <Button
+              onClick={() => deleteNoteTypeRequest(id, closeDialogOnDelete)}
+            >
               Delete Note Type
             </Button>
           )}

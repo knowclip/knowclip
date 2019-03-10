@@ -5,14 +5,22 @@ export const addNoteType = (noteType: NoteType): NoteTypeAction => ({
   noteType,
 })
 
-export const deleteNoteType = (id: NoteTypeId): NoteTypeAction => ({
+export const deleteNoteType = (
+  id: NoteTypeId,
+  closeDialogOnComplete: boolean = false
+): NoteTypeAction => ({
   type: 'DELETE_NOTE_TYPE',
   id,
+  closeDialogOnComplete,
 })
 
-export const deleteNoteTypeRequest = (id: NoteTypeId): NoteTypeAction => ({
+export const deleteNoteTypeRequest = (
+  id: NoteTypeId,
+  closeDialogOnComplete: boolean = false
+): NoteTypeAction => ({
   type: 'DELETE_NOTE_TYPE_REQUEST',
   id,
+  closeDialogOnComplete,
 })
 
 export const editNoteType = (

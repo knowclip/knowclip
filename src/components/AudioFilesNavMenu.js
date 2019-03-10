@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, IconButton } from '@material-ui/core'
+import { Button, IconButton, Tooltip } from '@material-ui/core'
 import { Close as CloseIcon, Loop } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 
@@ -27,9 +27,11 @@ const AudioFilesNavMenu = ({
       ) : (
         <Button onClick={chooseAudioFiles}>Choose source file</Button>
       )}
-      <IconButton onClick={onClickLoop} color={loop ? 'primary' : 'default'}>
-        <Loop />
-      </IconButton>{' '}
+      <Tooltip title="Loop audio">
+        <IconButton onClick={onClickLoop} color={loop ? 'primary' : 'default'}>
+          <Loop />
+        </IconButton>
+      </Tooltip>{' '}
     </section>
   </DarkTheme>
 )

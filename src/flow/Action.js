@@ -77,9 +77,17 @@ declare type NoteTypeAction =
       id: NoteTypeId,
       override: $Shape<NoteType>,
     }
-  | { type: 'DELETE_NOTE_TYPE', id: NoteTypeId }
-  | { type: 'DELETE_NOTE_TYPE_REQUEST', id: NoteTypeId }
-  | { type: 'SET_DEFAULT_NOTE_TYPE', id: NoteTypeId }
+  | {|
+      type: 'DELETE_NOTE_TYPE',
+      id: NoteTypeId,
+      closeDialogOnComplete: boolean,
+    |}
+  | {|
+      type: 'DELETE_NOTE_TYPE_REQUEST',
+      id: NoteTypeId,
+      closeDialogOnComplete: boolean,
+    |}
+  | {| type: 'SET_DEFAULT_NOTE_TYPE', id: NoteTypeId |}
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE',
       audioFileId: AudioFileId,
