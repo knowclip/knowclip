@@ -3,19 +3,19 @@ import { unparse } from 'papaparse'
 import * as r from '../selectors'
 
 export const getAllClips = (state: AppState) => {
-  const filePaths = state.audio.filesOrder
+  const fileIds = state.audio.filesOrder
   const clips: Array<Clip> = []
-  filePaths.forEach(filePath => {
-    const currentFile: AudioFileData = state.audio.files[filePath]
+  fileIds.forEach(fileId => {
+    const currentFile: AudioFileData = state.audio.files[fileId]
     const currentNoteType = r.getNoteType(state, currentFile.noteTypeId)
-    if (!currentNoteType) throw new Error(`No note type found for ${filePath}`)
-    const currentClips: Array<Clip> = state.clips.idsByAudioFileId[
-      filePath
-    ].map(clipId => {
-      const clip = r.getClip(state, clipId)
-      if (!clip) throw new Error(`clip ${clipId} for ${filePath} not found`)
-      return clip
-    })
+    if (!currentNoteType) throw new Error(`No note type found for ${fileId}`)
+    const currentClips: Array<Clip> = state.clips.idsByAudioFileId[fileId].map(
+      clipId => {
+        const clip = r.getClip(state, clipId)
+        if (!clip) throw new Error(`clip ${clipId} for ${fileId} not found`)
+        return clip
+      }
+    )
     currentClips.forEach(clip => {
       clips.push(clip)
     })
@@ -24,19 +24,19 @@ export const getAllClips = (state: AppState) => {
 }
 
 const getCsvText = (state: AppState) => {
-  const filePaths = state.audio.filesOrder
+  const fileIds = state.audio.filesOrder
   const csvData: Array<Array<string>> = []
-  filePaths.forEach(filePath => {
-    const currentFile: AudioFileData = state.audio.files[filePath]
+  fileIds.forEach(fileId => {
+    const currentFile: AudioFileData = state.audio.files[fileId]
     const currentNoteType = r.getNoteType(state, currentFile.noteTypeId)
-    if (!currentNoteType) throw new Error(`No note type found for ${filePath}`)
-    const currentClips: Array<Clip> = state.clips.idsByAudioFileId[
-      filePath
-    ].map(clipId => {
-      const clip = r.getClip(state, clipId)
-      if (!clip) throw new Error(`clip ${clipId} for ${filePath} not found`)
-      return clip
-    })
+    if (!currentNoteType) throw new Error(`No note type found for ${fileId}`)
+    const currentClips: Array<Clip> = state.clips.idsByAudioFileId[fileId].map(
+      clipId => {
+        const clip = r.getClip(state, clipId)
+        if (!clip) throw new Error(`clip ${clipId} for ${fileId} not found`)
+        return clip
+      }
+    )
     currentClips.forEach(clip => {
       const fieldsValues = currentNoteType.fields.map(
         ({ id }) => clip.flashcard.fields[id]

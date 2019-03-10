@@ -94,7 +94,7 @@ declare type NoteTypeAction =
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
-  | {| type: 'SET_PENDING_CLIP', clip: Clip |}
+  | {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
   | {| type: 'SET_PENDING_STRETCH', stretch: PendingStretch |}
 
 declare type DialogAction =

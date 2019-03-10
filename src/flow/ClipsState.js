@@ -22,6 +22,11 @@ declare type Flashcard = {
   tags: Array<string>,
 }
 
+declare type PendingClip = {
+  start: WaveformX,
+  end: WaveformX,
+}
+
 // project file version 0.0.0
 declare type ClipWithoutFilePath = Exact<{
   id: ClipId,

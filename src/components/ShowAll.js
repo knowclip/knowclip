@@ -31,8 +31,8 @@ let FlashcardRow = ({
   file,
 }) => (
   <TableRow hover onClick={() => highlightClip(id)} onDoubleClick={closeModal}>
-    {Object.values(fields).map(fieldText => (
-      <TableCell>
+    {Object.entries(fields).map(([fieldName, fieldText]) => (
+      <TableCell key={fieldName}>
         <Field text={fieldText} />
       </TableCell>
     ))}

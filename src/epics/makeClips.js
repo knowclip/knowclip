@@ -1,5 +1,5 @@
-import { flatMap } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
+import { flatMap, filter } from 'rxjs/operators'
+import { ofType, combineEpics } from 'redux-observable'
 import { from, of } from 'rxjs'
 import * as r from '../redux'
 import { join, basename } from 'path'
@@ -10,6 +10,9 @@ import Exporter from 'anki-apkg-export-multi-field/dist/exporter'
 import createTemplate from 'anki-apkg-export-multi-field/dist/template'
 import tempy from 'tempy'
 import { showSaveDialog } from '../utils/electron'
+
+const exportFailureSnackbar = err =>
+  r.simpleMessageSnackbar(`There was a problem making clips: ${err.message}`)
 
 const clip = (path, startTime, endTime, outputFilename) => {
   return new Promise((res, rej) => {
@@ -23,11 +26,11 @@ const clip = (path, startTime, endTime, outputFilename) => {
         'end',
         //listener must be a function, so to return the callback wrapping it inside a function
         function() {
-          console.log('Finished processing')
           res(outputFilename)
         }
       )
       .on('error', err => {
+        console.error(err)
         rej(err)
       })
       .run()
@@ -49,7 +52,7 @@ const makeApkg = async (
   })
 
   filenames.forEach(filePath => {
-    console.log('adding file', basename(filePath), filePath)
+    // console.log('adding file', basename(filePath), filePath)
     apkg.addMedia(basename(filePath), readFileSync(filePath))
   })
 
@@ -84,23 +87,15 @@ const makeApkg = async (
   return outputFilePath
 }
 
-const makeClips = (action$, state$) =>
+const exportApkg = (action$, state$) =>
   action$.pipe(
     ofType('MAKE_CLIPS'),
+    filter(({ format }) => format === 'APKG'),
     flatMap(async ({ format }) => {
-      const usingCsv = format === 'CSV+MP3'
-      const usingApkg = format === 'APKG'
-      const directory = usingCsv
-        ? r.getMediaFolderLocation(state$.value)
-        : tempy.directory()
+      const directory = tempy.directory()
+      const outputFilePath = await showSaveDialog('Anki deck file', ['apkg'])
 
-      if (usingCsv && !directory)
-        return of(r.mediaFolderLocationFormDialog(r.makeClips(format), true))
-
-      const outputFilePath =
-        usingApkg && (await showSaveDialog('Anki deck file', ['apkg']))
-
-      if (usingApkg && !outputFilePath) return from([])
+      if (!outputFilePath) return from([])
 
       try {
         const clipIds = Object.keys(state$.value.clips.byId)
@@ -118,35 +113,65 @@ const makeClips = (action$, state$) =>
         })
         const filenames = await Promise.all(clipsOperations)
 
-        if (usingApkg) {
-          const noteType = r.getCurrentNoteType(state$.value)
-          const fieldNames = noteType.fields.map(f => f.name)
+        const noteType = r.getCurrentNoteType(state$.value)
+        const fieldNames = noteType.fields.map(f => f.name)
 
-          await makeApkg(state$, {
-            fieldNames,
-            filenames,
-            directory,
-            noteType,
-            outputFilePath,
-          })
-        }
+        await makeApkg(state$, {
+          fieldNames,
+          filenames,
+          directory,
+          noteType,
+          outputFilePath,
+        })
 
-        return usingCsv
-          ? from([
-              r.simpleMessageSnackbar('Clips made in ' + directory),
-              r.exportFlashcards(),
-            ])
-          : of(r.simpleMessageSnackbar('Flashcards made in ' + outputFilePath))
+        return of(
+          r.simpleMessageSnackbar('Flashcards made in ' + outputFilePath)
+        )
       } catch (err) {
         console.error(err)
-        return of(
-          r.simpleMessageSnackbar(
-            `There was a problem making clips: ${err.message}`
-          )
-        )
+        return of(exportFailureSnackbar(err))
       }
     }),
     flatMap(x => x)
   )
 
-export default makeClips
+const exportCsvAndMp3 = (action$, state$) =>
+  action$.pipe(
+    ofType('MAKE_CLIPS'),
+    filter(({ format }) => format === 'CSV+MP3'),
+    flatMap(async ({ format }) => {
+      const directory = r.getMediaFolderLocation(state$.value)
+
+      if (!directory)
+        return of(r.mediaFolderLocationFormDialog(r.makeClips(format), true))
+
+      try {
+        const clipIds = Object.keys(state$.value.clips.byId)
+        const clipsOperations = clipIds.map(clipId => {
+          const {
+            start,
+            end,
+            filePath,
+            outputFilename,
+          } = r.getClipOutputParameters(state$.value, clipId)
+          const audioOutputFilePath = join(directory, outputFilename)
+          // console.log('clipping: filePath, start, end, audioOutputFilePath')
+          // console.log(filePath, start, end, audioOutputFilePath)
+          return clip(filePath, start, end, audioOutputFilePath)
+        })
+
+        await Promise.all(clipsOperations)
+
+        return from([
+          r.simpleMessageSnackbar('Clips made in ' + directory),
+          r.exportFlashcards(),
+        ])
+      } catch (err) {
+        console.error(err)
+        return of(exportFailureSnackbar(err))
+      }
+    }),
+    flatMap(x => x)
+  )
+
+export default combineEpics(exportApkg, exportCsvAndMp3)

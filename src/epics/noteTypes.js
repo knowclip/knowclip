@@ -42,21 +42,20 @@ const setAudioFileNoteTypeEpic = (action$, state$) =>
   action$.pipe(
     ofType('SET_AUDIO_FILE_NOTE_TYPE_REQUEST'),
     map(({ audioFileId, noteTypeId }) => {
-      const audioFilePath = r.getAudioFilePath(state$.value, audioFileId)
       const noteType = r.getNoteType(state$.value, noteTypeId)
       if (noteTypeId === r.getCurrentNoteType(state$.value).id)
         return r.simpleMessageSnackbar(
           `You're already using "${noteType.name}".`
         )
 
-      return r.doesFileHaveClips(state$.value, audioFilePath)
+      return r.doesFileHaveClips(state$.value, audioFileId)
         ? r.confirmationDialog(
             `You've already started making flashcards with this note type; discard your work and use ${
               noteType.name
             }?`,
-            r.setAudioFileNoteType(audioFilePath, noteTypeId)
+            r.setAudioFileNoteType(audioFileId, noteTypeId)
           )
-        : r.setAudioFileNoteType(audioFilePath, noteTypeId)
+        : r.setAudioFileNoteType(audioFileId, noteTypeId)
     })
   )
 

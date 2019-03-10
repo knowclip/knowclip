@@ -23,6 +23,7 @@ import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
 import uuid from 'uuid/v4'
+import truncate from '../utils/truncate'
 
 import * as r from '../redux'
 import electron from 'electron'
@@ -183,7 +184,7 @@ class App extends Component {
                 <li className={headerCss.menuTextItem}>
                   audio will be saved in:{' '}
                   <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
-                    {mediaFolderLocation}
+                    {truncate(mediaFolderLocation, 30)}
                   </a>
                 </li>
               ) : (

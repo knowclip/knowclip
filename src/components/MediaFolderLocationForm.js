@@ -21,7 +21,7 @@ class MediaFolderLocationForm extends Component {
 
   onLocationTextFocus = e => {
     remote.dialog.showOpenDialog(
-      { properties: ['openDirectory'] },
+      { properties: ['openDirectory', 'showHiddenFiles'] },
       filePaths => {
         if (!filePaths) return
 

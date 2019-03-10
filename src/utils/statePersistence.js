@@ -143,6 +143,9 @@ export const getPersistedState = (): $Shape<AppState> => {
     audio: AudioState,
     noteTypes: NoteTypesState,
   }>)
+
+  let error
+
   try {
     const stateParts = ['audio', 'noteTypes']
     stateParts.forEach(x => {
@@ -178,9 +181,19 @@ export const getPersistedState = (): $Shape<AppState> => {
           },
         }
       )
-    } else return { noteTypes: persistedState.noteTypes }
+    }
   } catch (err) {
     console.error(err)
-    return { noteTypes: persistedState.noteTypes }
+  }
+  return {
+    noteTypes: persistedState.noteTypes,
+    audio: {
+      ...persistedState.audio,
+      loop: true,
+      files: {},
+      filesOrder: [],
+      currentFileIndex: 0,
+      isLoading: false,
+    },
   }
 }

@@ -1,15 +1,23 @@
+// @flow
+
 const ascending = (a, b) => a - b
 
 const sortClipPoints = ({ start, end }) => [start, end].sort(ascending)
 
-const newClip = (pendingClip, currentFileName, id, noteType, tags): Clip => {
+const newClip = (
+  pendingClip: PendingClip,
+  fileId: AudioFileId,
+  id: ClipId,
+  noteType: NoteType,
+  tags: Array<string> = []
+): Clip => {
   const [start, end] = sortClipPoints(pendingClip)
 
   return {
     start,
     end,
     id,
-    filePath: currentFileName,
+    fileId,
     flashcard: {
       id,
       tags,

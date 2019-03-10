@@ -52,9 +52,9 @@ export const getClipsOrder = (state: AppState): Array<ClipId> => {
 
 export const doesFileHaveClips = (
   state: AppState,
-  filePath: AudioFilePath
+  fileId: AudioFileId
 ): boolean => {
-  return Boolean(state.clips.idsByAudioFileId[filePath].length)
+  return Boolean(state.clips.idsByAudioFileId[fileId].length)
 }
 
 export const doesCurrentFileHaveClips = (state: AppState): boolean => {
