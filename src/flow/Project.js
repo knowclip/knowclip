@@ -18,3 +18,11 @@ declare type Project1_0_0 = {
   noteType: NoteType,
   clips: { [ClipId]: Clip },
 }
+
+declare type Project2_0_0 = {
+  version: '2.0.0',
+  audioFilesMetadata: Array<AudioFileMetadata>,
+  noteType: NoteType,
+  clips: { [ClipId]: Clip },
+  tags: Array<string>,
+}

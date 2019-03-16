@@ -112,3 +112,9 @@ declare type DialogAction =
 declare type SnackbarAction =
   | {| type: 'ENQUEUE_SNACKBAR', snackbar: SnackbarData |}
   | {| type: 'CLOSE_SNACKBAR' |}
+
+declare type ProjectAction =
+  | {| type: 'OPEN_LISTED_PROJECT_REQUEST', id: ProjectId |}
+  | {| type: 'OPEN_UNLISTED_PROJECT_REQUEST', filePath: ProjectFilePath |}
+  | {| type: 'OPEN_PROJECT', project: Project2_0_0 |}
+  | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}

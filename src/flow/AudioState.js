@@ -5,7 +5,7 @@ declare type AudioFilePath = string
 declare type AudioFileData = Exact<{
   id: AudioFileId,
   path: AudioFilePath,
-  noteTypeId: NoteTypeId,
+  noteTypeId: NoteTypeId, // bye bye
 }>
 
 declare type AudioState = Exact<{
@@ -20,6 +20,8 @@ declare type AudioState = Exact<{
 }>
 
 declare type AudioFileMetadata = Exact<{
+  id: AudioFileId,
+  name: AudioFileName,
   durationSeconds: number,
   format: string,
 }>

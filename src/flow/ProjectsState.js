@@ -1,10 +1,14 @@
-declare type ProjectId = String
+declare type ProjectId = string
+declare type ProjectFilePath = string
 
 declare type ProjectMetadata = {
   id: ProjectId,
-  audioFilePaths: { [AudioFileId]: AudioFilePath }
+  filePath: ProjectFilePath,
+  name: string,
+  audioFilePaths: { [AudioFileId]: AudioFilePath },
 }
 
 declare type ProjectsState = {
-  byId: { [ProjectId]: ProjectMetadata }
+  byId: { [ProjectId]: ProjectMetadata },
+  allIds: Array<ProjectId>,
 }

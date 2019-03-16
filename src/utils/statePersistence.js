@@ -1,48 +1,8 @@
 // @flow
 import fs from 'fs'
 import { initialState as initialNoteTypeState } from '../reducers/noteTypes'
-import uuid from 'uuid/v4'
 import { PROJECT_FILE_VERSION_MISMATCH_MESSAGE } from '../selectors/snackbar'
-
-const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
-  const { clips: oldClips } = project
-  const newClips: { [ClipId]: Clip } = {}
-  const fileId = uuid()
-  for (const clipId in oldClips) {
-    const clip = oldClips[clipId]
-    const { flashcard } = clip
-    newClips[clipId] = {
-      id: clip.id,
-      start: clip.start,
-      end: clip.end,
-      flashcard: {
-        id: clipId,
-        fields: flashcard.fields,
-        tags: flashcard.tags || [],
-      },
-      fileId,
-    }
-  }
-
-  return {
-    version: '1.0.0',
-    audioFileName: project.audioFileName,
-    noteType: project.noteType,
-    clips: newClips,
-    audioFileId: fileId,
-  }
-}
-const getProject = (jsonFileContents): ?Project1_0_0 => {
-  const project: Project = JSON.parse(jsonFileContents)
-  switch (project.version) {
-    case '0.0.0':
-      return convertProject0_0_0___1_0_0(project)
-    case '1.0.0':
-      return project
-    default:
-      return null
-  }
-}
+import getProject from '../utils/getProject'
 
 export const persistState = (state: AppState) => {
   const { audio, noteTypes } = state
@@ -50,17 +10,6 @@ export const persistState = (state: AppState) => {
   // window.localStorage.setItem('clips', JSON.stringify(clips))
   window.localStorage.setItem('noteTypes', JSON.stringify(noteTypes))
 }
-
-// export const getPersistedState = () => {
-//   const persistedState = {}
-//   const stateParts = ['audio', 'clips', 'noteTypes']
-//   stateParts.forEach(x => {
-//     const stored = JSON.parse(window.localStorage.getItem(x))
-//     if (!stored) return
-//     persistedState[x] = stored
-//   })
-//   return persistedState
-// }
 
 const areNoteTypesEqual = (a: NoteType, b: NoteType): boolean =>
   a.id === b.id &&

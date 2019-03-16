@@ -8,7 +8,7 @@ import {
   withLatestFrom,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, from, of } from 'rxjs'
+import { fromEvent } from 'rxjs'
 import { setWaveformCursor } from '../actions'
 // import { getFlashcard } from '../selectors'
 // import { setLocalFlashcard } from '../utils/localFlashcards'
@@ -24,6 +24,7 @@ import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
+import keyboard from './keyboard'
 import project from './project'
 
 import { basename } from 'path'
@@ -166,67 +167,6 @@ const playClipsOnHighlightEpic = (action$, state$) =>
     ignoreElements()
   )
 
-const spaceEpic = (action$, state$) =>
-  fromEvent(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
-    tap(e => {
-      e.preventDefault()
-      const el = audioElement()
-      if (el.paused) el.play()
-      else el.pause()
-      return { type: 'CTRL_SPACE' }
-    }),
-    ignoreElements()
-  )
-
-const escEpic = (action$, state$) =>
-  fromEvent(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 27),
-    map(e => {
-      return r.getCurrentDialog(state$.value)
-        ? { type: 'NOOP_ESC_KEY' }
-        : r.highlightClip(null)
-    })
-  )
-
-const lEpic = (action$, state$) =>
-  fromEvent(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 76 && ctrlKey),
-    flatMap(e => {
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-
-      const media = audioElement()
-      const x =
-        media && r.getXAtMilliseconds(state$.value, media.currentTime * 1000)
-      const clipIdAtX = r.getClipIdAt(state$.value, x)
-      const highlightedId = r.getHighlightedClipId(state$.value)
-
-      if (r.isLoopOn(state$.value) && clipIdAtX && !highlightedId)
-        return of(r.highlightClip(clipIdAtX))
-
-      if (clipIdAtX && highlightedId !== clipIdAtX)
-        return from([r.highlightClip(clipIdAtX), r.toggleLoop()])
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-
-      return of(r.toggleLoop())
-    })
-  )
-
 const defaultTagsEpic = (action$, state$) =>
   action$.pipe(
     ofType('ADD_FLASHCARD_TAG', 'DELETE_FLASHCARD_TAG'),
@@ -265,9 +205,7 @@ export default combineEpics(
   deleteAllCurrentFileClips,
   project,
   noteTypesEpic,
-  spaceEpic,
-  escEpic,
-  lEpic,
   defaultTagsEpic,
-  defaultTagsAudioEpic
+  defaultTagsAudioEpic,
+  keyboard
 )

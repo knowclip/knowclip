@@ -7,6 +7,7 @@ import './App.css'
 import Snackbar from './components/Snackbar'
 import Dialog from './components/Dialog'
 import Main from './components/Main'
+import ProjectsMenu from './components/ProjectsMenu'
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
         <HashRouter>
           <Switch>
             <Route exact path="/" component={Main} />
+            <Route exact path="/projects" component={ProjectsMenu} />
           </Switch>
         </HashRouter>
         <Snackbar />
