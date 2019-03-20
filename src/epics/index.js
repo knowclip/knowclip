@@ -40,21 +40,6 @@ import { basename } from 'path'
 //     ignoreElements()
 //   )
 
-const withAudioLoaded = getPiped => (action$, state$) => {
-  const [first, ...rest] = getPiped(action$, state$)
-
-  return action$.pipe(
-    ofType('LOAD_AUDIO_SUCCESS'),
-    withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([loadAudioSuccessAction, loadAudioAction]) =>
-      first({ ...loadAudioAction, loadAudioSuccessAction }).pipe(
-        takeUntil(action$.ofType('LOAD_AUDIO'))
-      )
-    ),
-    ...rest
-  )
-}
-
 const elementWidth = element => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
@@ -62,9 +47,9 @@ const elementWidth = element => {
 
 const audioElement = () => document.getElementById('audioPlayer')
 
-const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
-  ({ /*audioElement,*/ svgElement }) =>
-    fromEvent(audioElement(), 'timeupdate').pipe(
+const setWaveformCursorEpic = (action$, state$) => action$.pipe(
+  ofType('OPEN_MEDIA_FILE_REQUEST'),
+  flatMap(() => fromEvent(audioElement(), 'timeupdate').pipe(
       map(e => {
         const viewBox = state$.value.waveform.viewBox
 
@@ -88,7 +73,7 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
             ? highlightedClip.start
             : e.target.currentTime && e.target.currentTime * 50
         )
-        const svgWidth = elementWidth(svgElement)
+        const svgWidth = elementWidth(document.getElementById('waveform-svg'))
         if (newX < viewBox.xMin) {
           return setWaveformCursor(newX, {
             ...viewBox,
@@ -100,36 +85,25 @@ const setWaveformCursorEpic = withAudioLoaded((action$, state$) => [
         }
         return setWaveformCursor(newX)
       })
-    ),
-])
+    ))
+)
 
-// const waveformMousemoveEpic = withAudioLoaded((action$, state$) => [
-//   ({ audioElement, svgElement }) => fromEvent(svgElement, 'mousemove'),
-//   map(mousemove => ({
-//     type: 'WAVEFORM_MOUSEMOVE',
-//     ...toWaveformCoordinates(mousemove, mousemove.currentTarget, r.getWaveformViewBoxXMin(state$.value)),
-//   })),
-// ])
-
-const waveformMousedownEpic = withAudioLoaded((action$, state$) => [
-  ({ svgElement }) =>
-    fromEvent(svgElement, 'mousedown').pipe(tap(e => e.preventDefault())),
-  map(mousedown => ({
-    type: 'WAVEFORM_MOUSEDOWN',
-    ...toWaveformCoordinates(
-      mousedown,
-      mousedown.currentTarget,
-      r.getWaveformViewBoxXMin(state$.value)
+const waveformMousedownEpic = (action$, state$) => action$.pipe(
+  ofType('OPEN_MEDIA_FILE_REQUEST'),
+  flatMap(() =>
+    fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+      tap(e => e.preventDefault()),
+      map(mousedown => ({
+        type: 'WAVEFORM_MOUSEDOWN',
+        ...toWaveformCoordinates(
+          mousedown,
+          mousedown.currentTarget,
+          r.getWaveformViewBoxXMin(state$.value)
+        ),
+      })),
     ),
-  })),
-])
-// const waveformMouseupEpic = withAudioLoaded((action$, state$) => [
-//   ({ svgElement }) => fromEvent(svgElement, 'mouseup'),
-//   map(mouseup => ({
-//     type: 'WAVEFORM_MOUSEUP',
-//     ...toWaveformCoordinates(mouseup, mouseup.currentTarget, r.getWaveformViewBoxXMin(state$.value)),
-//   }))
-// ])
+  )
+)
 
 const highlightClipsOnAddEpic = (action$, state$) =>
   action$.pipe(
