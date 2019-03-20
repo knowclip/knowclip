@@ -1,5 +1,6 @@
 // @flow
 import { basename } from 'path'
+import { getCurrentFilePath, getCurrentFile } from './project'
 
 export const getFilePaths = (state: AppState) => state.audio.filesOrder
 export const isLoopOn = (state: AppState) => state.audio.loop
@@ -34,17 +35,18 @@ export const getAudioFilePath = (
   return file ? file.path : null
 }
 
-export const getCurrentFileId = ({ audio }: AppState): ?AudioFileId =>
-  audio.filesOrder[audio.currentFileIndex]
+export const getCurrentFileId = ({ user }: AppState): ?AudioFileId =>
+  // audio.filesOrder[audio.currentFileIndex]
+  user.currentMediaFileId
 
-export const getCurrentFile = (state: AppState): ?AudioFileData => {
-  const currentFileId = getCurrentFileId(state)
-  return currentFileId ? state.audio.files[currentFileId] : null
-}
-export const getCurrentFilePath = (state: AppState): ?AudioFilePath => {
-  const currentFile = getCurrentFile(state)
-  return currentFile ? currentFile.path : null
-}
+// export const getCurrentFile = (state: AppState): ?AudioFileData => {
+//   const currentFileId = getCurrentFileId(state)
+//   return currentFileId ? state.audio.files[currentFileId] : null
+// }
+// export const getCurrentFilePath = (state: AppState): ?AudioFilePath => {
+//   const currentFile = getCurrentFile(state)
+//   return currentFile ? currentFile.path : null
+// }
 export const getClipsOrder = (state: AppState): Array<ClipId> => {
   const currentFileId = getCurrentFileId(state)
   return currentFileId ? state.clips.idsByAudioFileId[currentFileId] : []
@@ -65,6 +67,7 @@ export const doesCurrentFileHaveClips = (state: AppState): boolean => {
 }
 
 export const getCurrentNoteType = (state: AppState): ?NoteType => {
+  // return 
   const currentFile = getCurrentFile(state)
 
   const currentNoteTypeId = currentFile

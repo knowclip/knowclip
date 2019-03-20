@@ -2,14 +2,14 @@
 import fs from 'fs'
 import { initialState as initialNoteTypeState } from '../reducers/noteTypes'
 import { PROJECT_FILE_VERSION_MISMATCH_MESSAGE } from '../selectors/snackbar'
-import getProject from '../utils/getProject'
+import parseProject from '../utils/parseProject'
 
-export const persistState = (state: AppState) => {
-  const { audio, noteTypes } = state
-  window.localStorage.setItem('audio', JSON.stringify(audio))
-  // window.localStorage.setItem('clips', JSON.stringify(clips))
-  window.localStorage.setItem('noteTypes', JSON.stringify(noteTypes))
-}
+// export const persistState = (state: AppState) => {
+//   const { audio, noteTypes } = state
+//   window.localStorage.setItem('audio', JSON.stringify(audio))
+//   // window.localStorage.setItem('clips', JSON.stringify(clips))
+//   window.localStorage.setItem('noteTypes', JSON.stringify(noteTypes))
+// }
 
 const areNoteTypesEqual = (a: NoteType, b: NoteType): boolean =>
   a.id === b.id &&
@@ -26,7 +26,7 @@ export const hydrateFromProjectFile = (
   noteTypes: ?NoteTypesState
 ): ?$Shape<AppState> => {
   const jsonFileContents = fs.readFileSync(existingProjectFilePath, 'utf8')
-  const project = getProject(jsonFileContents)
+  const project = parseProject(jsonFileContents)
 
   console.log('project', project)
   console.log('audioFilePath', audioFilePath)
@@ -88,6 +88,18 @@ export const findExistingProjectFilePath = (
 }
 
 export const getPersistedState = (): $Shape<AppState> => {
+  const persistedState: $Shape<AppState> = {}
+  try {
+    const projects = JSON.parse(window.localStorage.getItem('projects'))
+    if (projects) persistedState.projects = projects
+  } catch (err) {
+    console.error(err)
+  }
+
+  return persistedState
+}
+
+export const getPersistedState_old = (): $Shape<AppState> => {
   const persistedState = ({}: $Shape<{
     audio: AudioState,
     noteTypes: NoteTypesState,

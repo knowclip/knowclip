@@ -14,6 +14,7 @@ import {
   Delete as DeleteIcon,
   Layers,
 } from '@material-ui/icons'
+import { Redirect } from 'react-router-dom'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
 import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
@@ -130,6 +131,8 @@ class App extends Component {
   toggleLoop = () => this.props.toggleLoop()
 
   render() {
+    if (!this.props.currentProjectId) return <Redirect to="/projects" />
+
     const {
       loop,
       isPrevButtonEnabled,
@@ -282,6 +285,7 @@ const mapStateToProps = state => ({
   currentNoteType: r.getCurrentNoteType(state),
   defaultNoteTypeId: r.getDefaultNoteTypeId(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
+  currentProjectId: r.getCurrentProjectId(state),
 })
 
 const mapDispatchToProps = {

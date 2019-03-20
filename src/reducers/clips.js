@@ -45,8 +45,20 @@ const arrayToMapById = array =>
 
 const clips: Reducer<ClipsState> = (state = initialState, action) => {
   switch (action.type) {
-    case 'HYDRATE_FROM_PROJECT_FILE':
-      return action.state.clips
+    case 'OPEN_PROJECT': {
+      const newState: ClipsState = { byId: {}, idsByAudioFileId: {} }
+      const { idsByAudioFileId, byId } = newState
+      for (const id in action.project.clips) {
+        const clip = action.project.clips[id]
+        byId[id] = clip
+        idsByAudioFileId[clip.fileId] = idsByAudioFileId[clip.fileId] || []
+        idsByAudioFileId[clip.fileId].push(clip.id)
+      }
+      for (const fileId in idsByAudioFileId) {
+        idsByAudioFileId[fileId].sort(byStart(byId))
+      }
+      return newState
+    }
 
     case 'CHOOSE_AUDIO_FILES':
       return {

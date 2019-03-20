@@ -23,6 +23,7 @@ import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import loadAudio from './loadAudio'
+import media from './media'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
@@ -188,6 +189,7 @@ const defaultTagsAudioEpic = (action$, state$) =>
 
 export default combineEpics(
   loadAudio,
+  media,
   getWaveformEpic,
   // setLocalFlashcardEpic,
   setWaveformCursorEpic,

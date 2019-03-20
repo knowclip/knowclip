@@ -5,10 +5,11 @@ declare type ProjectMetadata = {
   id: ProjectId,
   filePath: ProjectFilePath,
   name: string,
-  audioFilePaths: { [AudioFileId]: AudioFilePath },
+  audioFilePaths: Array<{ id: AudioFileId, filePath: ?AudioFilePath }>,
+  error: ?string,
 }
 
 declare type ProjectsState = {
-  byId: { [ProjectId]: ProjectMetadata },
+  byId: { [ProjectId]: ProjectMetadata }, 
   allIds: Array<ProjectId>,
 }

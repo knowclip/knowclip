@@ -7,8 +7,15 @@ const initialState: ProjectsState = {
 
 const projects: Reducer<ProjectsState> = (state = initialState, action) => {
   switch (action.type) {
-    //   case typeName:
-    //     return { ...state, ...payload }
+    case 'OPEN_PROJECT':
+      return {
+        ...state,
+        byId: { ...state.byId, [action.project.id]: action.projectMetadata },
+        allIds: [
+          action.project.id,
+          ...state.allIds.filter(id => id !== action.project.id),
+        ],
+      }
 
     default:
       return state

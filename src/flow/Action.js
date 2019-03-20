@@ -7,6 +7,8 @@ declare type Action =
   | WaveformAction
   | NoteTypeAction
   | ClipAction
+  | ProjectAction
+  | MediaAction
   | {|
       type: 'CHOOSE_AUDIO_FILES',
       filePaths: Array<AudioFilePath>,
@@ -70,8 +72,8 @@ declare type ClipAction =
   | {| type: 'HIGHLIGHT_CLIP', id: ?ClipId |}
 
 declare type NoteTypeAction =
-  | { type: 'ADD_NOTE_TYPE', noteType: NoteType }
-  | { type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> }
+  | {| type: 'ADD_NOTE_TYPE', noteType: NoteType |}
+  | {| type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> |}
   | {
       type: 'EDIT_NOTE_TYPE_REQUEST',
       id: NoteTypeId,
@@ -93,11 +95,11 @@ declare type NoteTypeAction =
       audioFileId: AudioFileId,
       noteTypeId: NoteTypeId,
     }
-  | {
+  | {|
       type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
       audioFileId: AudioFileId,
       noteTypeId: NoteTypeId,
-    }
+    |}
 
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
@@ -114,7 +116,31 @@ declare type SnackbarAction =
   | {| type: 'CLOSE_SNACKBAR' |}
 
 declare type ProjectAction =
-  | {| type: 'OPEN_LISTED_PROJECT_REQUEST', id: ProjectId |}
-  | {| type: 'OPEN_UNLISTED_PROJECT_REQUEST', filePath: ProjectFilePath |}
-  | {| type: 'OPEN_PROJECT', project: Project2_0_0 |}
-  | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}
+  // tries to load project file using stored path
+  | {| type: 'OPEN_PROJECT_REQUEST_BY_ID', id: ProjectId |}
+    // tries to load project file using path
+    | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
+    // opens project already loaded from file
+    //    syncs project metadata (in redux an local storage)
+    | {| type: 'OPEN_PROJECT', project: Project2_0_0, projectMetadata: ProjectMetadata |}
+    | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}
+    | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
+    | {| type: 'SET_PROJECT_ERROR', error: ?string |}
+    | {| type: 'SET_PROJECT_NAME', name: string |}
+    | {| type: 'CLOSE_PROJECT' |}
+
+declare type MediaAction =
+  | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: AudioFileId |}
+  | {| type: 'OPEN_MEDIA_FILE_SUCCESS', filePath: AudioFilePath |}
+  | {|
+      type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
+      projectId: ProjectId,
+      filePath: AudioFilePath,
+    |}
+  | {|
+      type: 'ADD_MEDIA_TO_PROJECT',
+      projectId: ProjectId,
+      metadata: AudioFileMetadata,
+    |}
+  | {| type: 'DELETE_MEDIA', projectId: ProjectId, mediaFileId: AudioFileId |}
+  | {| type: 'SET_MEDIA_METADATA', metadata: AudioFileMetadata |}

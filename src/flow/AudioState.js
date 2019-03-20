@@ -10,13 +10,13 @@ declare type AudioFileData = Exact<{
 
 declare type AudioState = Exact<{
   loop: boolean,
-  files: {
-    [AudioFileId]: AudioFileData,
-  },
-  filesOrder: Array<AudioFilePath>,
   currentFileIndex: number,
   isLoading: boolean,
   mediaFolderLocation: ?string,
+  filesMetadata: Exact<{
+    byId: { [AudioFileId]: AudioFileMetadata },
+    allIds: Array<AudioFileData>,
+  }>,
 }>
 
 declare type AudioFileMetadata = Exact<{
