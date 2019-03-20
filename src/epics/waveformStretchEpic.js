@@ -18,7 +18,7 @@ const waveformStretchEpic = (action$, state$) => {
       return edge ? of({ x, edge }) : empty()
     }),
     // withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap((mousedownData) => {
+    flatMap(mousedownData => {
       const {
         edge: { key, id },
       } = mousedownData

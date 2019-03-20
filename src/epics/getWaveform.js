@@ -55,7 +55,7 @@ const getWaveformEpic = (action$, state$) =>
   action$.pipe(
     // ofType('LOAD_AUDIO'),
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(async ({ filePath })  => {
+    flatMap(async ({ filePath }) => {
       try {
         if (!filePath) {
           return r.setWaveformImagePath(null)

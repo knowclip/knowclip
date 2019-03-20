@@ -36,13 +36,10 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
     id: uuid(),
     name: `Clips from ${project.audioFileName}`,
     tags: [
-      ...clips.reduce(
-        (tags, clip: Clip) => {
-          clip.flashcard.tags.forEach(tag => tags.add(tag))
-          return tags
-        },
-        new Set()
-      ),
+      ...clips.reduce((tags, clip: Clip) => {
+        clip.flashcard.tags.forEach(tag => tags.add(tag))
+        return tags
+      }, new Set()),
     ],
     mediaFilesMetadata: [
       {

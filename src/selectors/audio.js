@@ -67,7 +67,7 @@ export const doesCurrentFileHaveClips = (state: AppState): boolean => {
 }
 
 export const getCurrentNoteType = (state: AppState): ?NoteType => {
-  // return 
+  // return
   const currentFile = getCurrentFile(state)
 
   const currentNoteTypeId = currentFile

@@ -122,7 +122,11 @@ declare type ProjectAction =
     | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
     // opens project already loaded from file
     //    syncs project metadata (in redux an local storage)
-    | {| type: 'OPEN_PROJECT', project: Project2_0_0, projectMetadata: ProjectMetadata |}
+    | {|
+        type: 'OPEN_PROJECT',
+        project: Project2_0_0,
+        projectMetadata: ProjectMetadata,
+      |}
     | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}
     | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
     | {| type: 'SET_PROJECT_ERROR', error: ?string |}

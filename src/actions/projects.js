@@ -10,7 +10,10 @@ export const openProjectById = (id: ProjectId): Action => ({
   id,
 })
 
-export const openProject = (project: Project2_0_0, projectMetadata: ProjectMetadata): Action => ({
+export const openProject = (
+  project: Project2_0_0,
+  projectMetadata: ProjectMetadata
+): Action => ({
   type: 'OPEN_PROJECT',
   project,
   projectMetadata,

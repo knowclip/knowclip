@@ -31,7 +31,9 @@ const waveformSelectionEpic = (action$, state$) => {
   const loadAudioActions = action$.pipe(ofType('OPEN_MEDIA_FILE_REQUEST'))
   const mousedowns = loadAudioActions.pipe(
     flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(takeUntil(loadAudioActions))
+      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+        takeUntil(loadAudioActions)
+      )
     )
   )
 
@@ -49,7 +51,7 @@ const waveformSelectionEpic = (action$, state$) => {
     withLatestFrom(loadAudioActions),
     flatMap(([waveformMousedown, loadAudio]) => {
       const audioElement = document.getElementById('audioPlayer')
-      const svgElement  = document.getElementById('waveform-svg')
+      const svgElement = document.getElementById('waveform-svg')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =

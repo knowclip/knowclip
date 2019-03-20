@@ -9,7 +9,6 @@ import tempy from 'tempy'
 
 import { extname } from 'path'
 
-
 const tmpFilePaths = {}
 const coerceMp3ToConstantBitrate = path => {
   // should check if mp3
@@ -37,7 +36,6 @@ const coerceMp3ToConstantBitrate = path => {
   })
 }
 
-
 // import electron from 'electron'
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
@@ -51,13 +49,16 @@ const openMedia = (action$, state$) =>
       mediaPlayer.pause()
       mediaPlayer.src = ''
 
-
       const currentProject = r.getCurrentProject(state$.value)
       const filePath = r.getMediaFilePathFromCurrentProject(state$.value, id)
 
       if (!filePath) {
         // also should open dialog
-        return of(r.simpleMessageSnackbar('Since this is a shared project, and this is your first time opening this file, you\'ll first have to locate it on your filesystem.'))
+        return of(
+          r.simpleMessageSnackbar(
+            "Since this is a shared project, and this is your first time opening this file, you'll first have to locate it on your filesystem."
+          )
+        )
       }
 
       if (!fs.existsSync(filePath)) {
@@ -66,18 +67,19 @@ const openMedia = (action$, state$) =>
       }
 
       try {
+        const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
+          filePath
+        )
+        const audio = await readFile(constantBitrateFilePath)
 
-      const constantBitrateFilePath = await coerceMp3ToConstantBitrate(filePath)
-      const audio = await readFile(constantBitrateFilePath)
+        // if (r.getCurrentFilePath(state$.value) !== filePath)
+        //   return { type: 'NOOP_OLD_AUDIO_LOAD' } // really should also cancel old ones
 
-      // if (r.getCurrentFilePath(state$.value) !== filePath)
-      //   return { type: 'NOOP_OLD_AUDIO_LOAD' } // really should also cancel old ones
-
-      window.setTimeout(() => {
-        mediaPlayer.src = `file:///${constantBitrateFilePath}`
-        // mediaPlayer.load()
-        mediaPlayer.play()
-      }, 0)
+        window.setTimeout(() => {
+          mediaPlayer.src = `file:///${constantBitrateFilePath}`
+          // mediaPlayer.load()
+          mediaPlayer.play()
+        }, 0)
 
         return of(r.openMediaFileSuccess(filePath))
       } catch (err) {
@@ -88,6 +90,5 @@ const openMedia = (action$, state$) =>
     }),
     flatMap(x => x)
   )
-
 
 export default combineEpics(openMedia)

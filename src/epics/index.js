@@ -47,63 +47,67 @@ const elementWidth = element => {
 
 const audioElement = () => document.getElementById('audioPlayer')
 
-const setWaveformCursorEpic = (action$, state$) => action$.pipe(
-  ofType('OPEN_MEDIA_FILE_REQUEST'),
-  flatMap(() => fromEvent(audioElement(), 'timeupdate').pipe(
-      map(e => {
-        const viewBox = state$.value.waveform.viewBox
+const setWaveformCursorEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MEDIA_FILE_REQUEST'),
+    flatMap(() =>
+      fromEvent(audioElement(), 'timeupdate').pipe(
+        map(e => {
+          const viewBox = state$.value.waveform.viewBox
 
-        const highlightedId = r.getHighlightedClipId(state$.value)
-        const highlightedClip =
-          highlightedId && r.getClip(state$.value, highlightedId)
-        const timeToLoop =
-          highlightedClip &&
-          r.isLoopOn(state$.value) &&
-          e.target.currentTime >=
-            r.getSecondsAtX(state$.value, highlightedClip.end)
-        if (timeToLoop) {
-          e.target.currentTime = r.getSecondsAtX(
-            state$.value,
-            highlightedClip.start
+          const highlightedId = r.getHighlightedClipId(state$.value)
+          const highlightedClip =
+            highlightedId && r.getClip(state$.value, highlightedId)
+          const timeToLoop =
+            highlightedClip &&
+            r.isLoopOn(state$.value) &&
+            e.target.currentTime >=
+              r.getSecondsAtX(state$.value, highlightedClip.end)
+          if (timeToLoop) {
+            e.target.currentTime = r.getSecondsAtX(
+              state$.value,
+              highlightedClip.start
+            )
+          }
+
+          const newX = Math.round(
+            timeToLoop
+              ? highlightedClip.start
+              : e.target.currentTime && e.target.currentTime * 50
           )
-        }
-
-        const newX = Math.round(
-          timeToLoop
-            ? highlightedClip.start
-            : e.target.currentTime && e.target.currentTime * 50
-        )
-        const svgWidth = elementWidth(document.getElementById('waveform-svg'))
-        if (newX < viewBox.xMin) {
-          return setWaveformCursor(newX, {
-            ...viewBox,
-            xMin: Math.max(0, newX - svgWidth * 0.9),
-          })
-        }
-        if (newX > svgWidth + viewBox.xMin) {
-          return setWaveformCursor(newX, { ...viewBox, xMin: newX })
-        }
-        return setWaveformCursor(newX)
-      })
-    ))
-)
-
-const waveformMousedownEpic = (action$, state$) => action$.pipe(
-  ofType('OPEN_MEDIA_FILE_REQUEST'),
-  flatMap(() =>
-    fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
-      tap(e => e.preventDefault()),
-      map(mousedown => ({
-        type: 'WAVEFORM_MOUSEDOWN',
-        ...toWaveformCoordinates(
-          mousedown,
-          mousedown.currentTarget,
-          r.getWaveformViewBoxXMin(state$.value)
-        ),
-      })),
-    ),
+          const svgWidth = elementWidth(document.getElementById('waveform-svg'))
+          if (newX < viewBox.xMin) {
+            return setWaveformCursor(newX, {
+              ...viewBox,
+              xMin: Math.max(0, newX - svgWidth * 0.9),
+            })
+          }
+          if (newX > svgWidth + viewBox.xMin) {
+            return setWaveformCursor(newX, { ...viewBox, xMin: newX })
+          }
+          return setWaveformCursor(newX)
+        })
+      )
+    )
   )
-)
+
+const waveformMousedownEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MEDIA_FILE_REQUEST'),
+    flatMap(() =>
+      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+        tap(e => e.preventDefault()),
+        map(mousedown => ({
+          type: 'WAVEFORM_MOUSEDOWN',
+          ...toWaveformCoordinates(
+            mousedown,
+            mousedown.currentTarget,
+            r.getWaveformViewBoxXMin(state$.value)
+          ),
+        }))
+      )
+    )
+  )
 
 const highlightClipsOnAddEpic = (action$, state$) =>
   action$.pipe(

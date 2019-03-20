@@ -1,7 +1,7 @@
 // @flow
 declare type AudioFileName = string
 
-declare type Project = | Project0_0_0 | Project1_0_0 | Project2_0_0
+declare type Project = Project0_0_0 | Project1_0_0 | Project2_0_0
 
 declare type Project0_0_0 = {
   version: '0.0.0',

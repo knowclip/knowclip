@@ -28,22 +28,34 @@ const openProjectByFilePath = (action$, state$) =>
       try {
         const projectJson = await readFile(filePath)
         const project = parseProject(projectJson)
-        if (!project) return of(
-              r.simpleMessageSnackbar(
-                'Could not read project file. Please make sure your software is up to date and try again.'
-              )
+        if (!project)
+          return of(
+            r.simpleMessageSnackbar(
+              'Could not read project file. Please make sure your software is up to date and try again.'
             )
+          )
 
-        let originalProjectJson : ?Project
+        let originalProjectJson: ?Project
         try {
           originalProjectJson = JSON.parse(projectJson)
-        } catch(err) {
-          
-        }
-        const audioFilePaths = originalProjectJson && ['0.0.0', '1.0.0'].includes(originalProjectJson.version)
-          ? [{ id: project.mediaFilesMetadata[0].id, filePath: filePath.replace(/\.afca$/, '') }]
-          : project.mediaFilesMetadata.map(({ id }) => ({ id, filePath: null }))
-        const projectMetadata : ProjectMetadata = r.getProjectMetadata(state$.value, project.id) || {
+        } catch (err) {}
+        const audioFilePaths =
+          originalProjectJson &&
+          ['0.0.0', '1.0.0'].includes(originalProjectJson.version)
+            ? [
+                {
+                  id: project.mediaFilesMetadata[0].id,
+                  filePath: filePath.replace(/\.afca$/, ''),
+                },
+              ]
+            : project.mediaFilesMetadata.map(({ id }) => ({
+                id,
+                filePath: null,
+              }))
+        const projectMetadata: ProjectMetadata = r.getProjectMetadata(
+          state$.value,
+          project.id
+        ) || {
           id: project.id,
           filePath: filePath,
           name: project.name,
@@ -98,12 +110,17 @@ const saveProjectFile = (action$, state$) =>
     })
   )
 
-const openMediaFileRequestOnOpenProject = (action$, state$) => action$.pipe(
-  ofType('OPEN_PROJECT'),
-  map(({ projectMetadata }) => {
-    const [{ id: firstMediaFileId }] = projectMetadata.audioFilePaths
-    return r.openMediaFileRequest(firstMediaFileId)
-  }),
-)
+const openMediaFileRequestOnOpenProject = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_PROJECT'),
+    map(({ projectMetadata }) => {
+      const [{ id: firstMediaFileId }] = projectMetadata.audioFilePaths
+      return r.openMediaFileRequest(firstMediaFileId)
+    })
+  )
 
-export default combineEpics(openProjectByFilePath, saveProjectFile, openMediaFileRequestOnOpenProject)
+export default combineEpics(
+  openProjectByFilePath,
+  saveProjectFile,
+  openMediaFileRequestOnOpenProject
+)
