@@ -7,11 +7,6 @@ import tempy from 'tempy'
 import { promisify } from 'util'
 import fs from 'fs'
 import { extname } from 'path'
-import {
-  hydrateFromProjectFile,
-  findExistingProjectFilePath,
-} from '../utils/statePersistence'
-import { PROJECT_FILE_VERSION_MISMATCH_MESSAGE } from '../selectors/snackbar'
 
 const readFile = promisify(fs.readFile)
 
@@ -91,35 +86,6 @@ const chooseAudioFilesEpic = (action$, state$) =>
     })
   )
 
-const loadProjectEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('CHOOSE_AUDIO_FILES'),
-    map(({ filePaths: [filePath] }) => {
-      let projectFilePath
-
-      try {
-        projectFilePath = findExistingProjectFilePath(filePath)
-      } catch (err) {
-        console.error(err)
-        return { type: 'NOOP_LOAD_PROJECT', err }
-      }
-
-      if (!projectFilePath)
-        return { type: 'NOOP_LOAD_PROJECT_NO_PROJECT_FILE_FOUND' }
-
-      const hydrated = hydrateFromProjectFile(
-        projectFilePath,
-        filePath,
-        r.getMediaFolderLocation(state$.value),
-        state$.noteTypes
-      )
-
-      return hydrated
-        ? r.hydrateFromProjectFile(hydrated)
-        : r.simpleMessageSnackbar(PROJECT_FILE_VERSION_MISMATCH_MESSAGE)
-    })
-  )
-
 const removeAudioFilesEpic = (action$, state$) =>
   action$.pipe(
     ofType('REMOVE_AUDIO_FILES'),
@@ -154,7 +120,6 @@ export default combineEpics(
   loadAudioEpic,
   chooseAudioFilesEpic,
   removeAudioFilesEpic,
-  loadProjectEpic,
   setCurrentFileEpic,
   initEpic
 )

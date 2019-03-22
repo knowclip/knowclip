@@ -1,13 +1,33 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { TextField, IconButton, Card, CardContent } from '@material-ui/core'
-import { Delete as DeleteIcon } from '@material-ui/icons'
+import {
+  TextField,
+  IconButton,
+  Card,
+  CardContent,
+  Menu,
+  MenuItem,
+} from '@material-ui/core'
+import {
+  Delete as DeleteIcon,
+  MoreVert as MoreVertIcon,
+} from '@material-ui/icons'
 import ChipInput from 'material-ui-chip-input'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardForm.module.css'
 
 class FlashcardForm extends Component {
+  state = { moreMenuAnchorEl: null }
+
+  handleClickMoreButton = event => {
+    this.setState({ moreMenuAnchorEl: event.currentTarget })
+  }
+
+  handleCloseMoreMenu = () => {
+    this.setState({ moreMenuAnchorEl: null })
+  }
+
   handleFlashcardSubmit = e => {
     e.preventDefault()
     this.nextFile()
@@ -32,11 +52,15 @@ class FlashcardForm extends Component {
     }
   }
 
+  editCardTemplate = () =>
+    this.props.editNoteTypeDialog(this.props.currentNoteType.id)
+
   inputRefs = {}
   inputRef = name => el => (this.inputRefs[name] = el)
 
   render() {
     const { currentFlashcard, selectedClipTime, currentNoteType } = this.props
+    const { moreMenuAnchorEl } = this.state
 
     return (
       <Card className={css.container}>
@@ -74,12 +98,39 @@ class FlashcardForm extends Component {
                 />
               )}
 
-              <IconButton
+              <section className={css.bottom}>
+                <span className={css.noteTypeName}>
+                  Using note type:{' '}
+                  <span
+                    className={css.noteTypeNameLink}
+                    onClick={this.editCardTemplate}
+                  >
+                    {currentNoteType.name}
+                  </span>
+                </span>
+                <IconButton
+                  className={css.moreMenuButton}
+                  onClick={this.handleClickMoreButton}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={moreMenuAnchorEl}
+                  open={Boolean(moreMenuAnchorEl)}
+                  onClose={this.handleCloseMoreMenu}
+                >
+                  <MenuItem onClick={this.editCardTemplate}>
+                    Edit card template
+                  </MenuItem>
+                  <MenuItem onClick={this.deleteCard}>Delete card</MenuItem>
+                </Menu>
+              </section>
+              {/* <IconButton
                 className={css.deleteButton}
                 onClick={this.deleteCard}
               >
                 <DeleteIcon />
-              </IconButton>
+              </IconButton> */}
             </div>
           </form>
         </CardContent>
@@ -110,6 +161,7 @@ const mapDispatchToProps = {
   setFlashcardTagsText: r.setFlashcardTagsText,
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
+  editNoteTypeDialog: r.editNoteTypeDialog,
 }
 
 export default connect(

@@ -88,7 +88,7 @@ const ShowAll = ({
 
 const mapStateToProps = state => ({
   flashcards: r.getFlashcardsByTime(state),
-  currentFileIndex: r.getCurrentFileIndex(state),
+  // currentFileIndex: r.getCurrentFileIndex(state),
 })
 
 const mapDispatchToProps = {

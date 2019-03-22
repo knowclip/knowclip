@@ -17,6 +17,18 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
         ],
       }
 
+    case 'SET_PROJECT_NAME':
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.id]: {
+            ...state.byId[action.id],
+            name: action.name,
+          },
+        },
+      }
+
     default:
       return state
   }

@@ -39,4 +39,5 @@
 
 .recentProjectsPaper {
   height: 250px;
+  overflow-y: auto;
 }

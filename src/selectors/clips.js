@@ -3,7 +3,7 @@
 import { basename, extname } from 'path'
 import { toTimestamp } from '../utils/ffmpeg'
 import { getMillisecondsAtX } from './waveformTime'
-import { getAudioFilePath } from './audio'
+// import { getAudioFilePath } from './audio'
 
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
@@ -26,7 +26,8 @@ export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
   const clip = state.clips.byId[clipId]
   if (!clip) throw Error(`Could not find clip ${clipId}`)
   const { start, end, fileId } = clip
-  const filePath = getAudioFilePath(state, fileId)
+  // const filePath = getAudioFilePath(state, fileId)
+  const filePath = 'getAudioFilePath(state, fileId)'
   if (!filePath) throw Error(`Could not find file path for clip ${clipId}`)
 
   const extension = extname(filePath)

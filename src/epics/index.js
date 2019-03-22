@@ -52,6 +52,7 @@ const setWaveformCursorEpic = (action$, state$) =>
     ofType('OPEN_MEDIA_FILE_REQUEST'),
     flatMap(() =>
       fromEvent(audioElement(), 'timeupdate').pipe(
+        takeUntil(action$.pipe(ofType('CLOSE_PROJECT' /* CLOSE_MEDIA_FILE */))),
         map(e => {
           const viewBox = state$.value.waveform.viewBox
 
@@ -75,7 +76,9 @@ const setWaveformCursorEpic = (action$, state$) =>
               ? highlightedClip.start
               : e.target.currentTime && e.target.currentTime * 50
           )
-          const svgWidth = elementWidth(document.getElementById('waveform-svg'))
+          const svgElement = document.getElementById('waveform-svg')
+          // if (!svgElement) return { type: 'WHOOPS CaNT UPDATE CURSOR NOW' }
+          const svgWidth = elementWidth(svgElement)
           if (newX < viewBox.xMin) {
             return setWaveformCursor(newX, {
               ...viewBox,

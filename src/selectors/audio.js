@@ -1,39 +1,40 @@
 // @flow
 import { basename } from 'path'
-import { getCurrentFilePath, getCurrentFile } from './project'
+import { getCurrentFilePath } from './project'
 
-export const getFilePaths = (state: AppState) => state.audio.filesOrder
+// export const getFilePaths = (state: AppState) => state.audio.filesOrder
 export const isLoopOn = (state: AppState) => state.audio.loop
-export const areFilesLoaded = (state: AppState) =>
-  Boolean(state.audio.filesOrder.length)
-export const isNextButtonEnabled = (state: AppState) =>
-  Boolean(state.audio.filesOrder.length > 1) &&
-  state.audio.currentFileIndex !== state.audio.filesOrder.length - 1
-export const isPrevButtonEnabled = (state: AppState) =>
-  Boolean(state.audio.filesOrder.length > 1) &&
-  state.audio.currentFileIndex !== 0
-export const getCurrentFileIndex = (state: AppState) =>
-  state.audio.currentFileIndex
+// export const areFilesLoaded = (state: AppState) =>
+//   Boolean(state.audio.filesOrder.length)
+// export const isNextButtonEnabled = (state: AppState) =>
+//   Boolean(state.audio.filesOrder.length > 1) &&
+//   state.audio.currentFileIndex !== state.audio.filesOrder.length - 1
+// export const isPrevButtonEnabled = (state: AppState) =>
+//   Boolean(state.audio.filesOrder.length > 1) &&
+//   state.audio.currentFileIndex !== 0
+// export const getCurrentFileIndex = (state: AppState) =>
+//   state.audio.currentFileIndex
 export const getCurrentFileName = (state: AppState): ?AudioFileName => {
   const filePath = getCurrentFilePath(state)
   return filePath && basename(filePath)
 }
 
-export const getAudioFile = (
-  state: AppState,
-  id: AudioFileId
-): ?AudioFileData => {
-  const file = state.audio.files[id]
-  return file || null
-}
+// export const getAudioFile = (
+//   state: AppState,
+//   id: AudioFileId
+// ): ?AudioFileData => {
 
-export const getAudioFilePath = (
-  state: AppState,
-  id: AudioFileId
-): ?AudioFilePath => {
-  const file = getAudioFile(state, id)
-  return file ? file.path : null
-}
+//   const file = state.audio.files[id]
+//   return file || null
+// }
+
+// export const getAudioFilePath = (
+//   state: AppState,
+//   id: AudioFileId
+// ): ?AudioFilePath => {
+//   const file = getAudioFile(state, id)
+//   return file ? file.path : null
+// }
 
 export const getCurrentFileId = ({ user }: AppState): ?AudioFileId =>
   // audio.filesOrder[audio.currentFileIndex]
@@ -67,11 +68,6 @@ export const doesCurrentFileHaveClips = (state: AppState): boolean => {
 }
 
 export const getCurrentNoteType = (state: AppState): ?NoteType => {
-  // return
-  const currentFile = getCurrentFile(state)
-
-  const currentNoteTypeId = currentFile
-    ? currentFile.noteTypeId
-    : state.noteTypes.defaultId
+  const { currentNoteTypeId } = state.user
   return currentNoteTypeId ? state.noteTypes.byId[currentNoteTypeId] : null
 }

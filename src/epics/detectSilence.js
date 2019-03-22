@@ -79,6 +79,7 @@ const detectSilenceEpic = (action$, state$) =>
         const currentNoteType = r.getCurrentNoteType(state$.value)
         const newClips = chunks.map(({ start, end }) =>
           newClip(
+            // shoudl have fewer arguments
             {
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),

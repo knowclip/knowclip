@@ -115,6 +115,7 @@ class Waveform extends Component {
 
 const mapStateToProps = state => ({
   waveform: r.getWaveform(state),
+  // clips: [],
   clips: r.getClips(state),
   pendingClip: r.getPendingClip(state),
   pendingStretch: r.getPendingStretch(state),

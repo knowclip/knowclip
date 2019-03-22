@@ -108,8 +108,3 @@ export const detectSilence = (): Action => ({ type: 'DETECT_SILENCE' })
 export const deleteAllCurrentFileClipsRequest = (): Action => ({
   type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
 })
-
-export const hydrateFromProjectFile = (state: $Shape<AppState>): Action => ({
-  type: 'HYDRATE_FROM_PROJECT_FILE',
-  state,
-})

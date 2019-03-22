@@ -1,15 +1,20 @@
 declare type ProjectId = string
 declare type ProjectFilePath = string
 
-declare type ProjectMetadata = {
+declare type AudioMetadataAndPath = Exact<{
+  metadata: AudioFileMetadata,
+  filePath: ?AudioFilePath,
+}>
+
+declare type ProjectMetadata = Exact<{
   id: ProjectId,
   filePath: ProjectFilePath,
   name: string,
-  audioFilePaths: Array<{ id: AudioFileId, filePath: ?AudioFilePath }>,
+  audioFilePaths: Array<AudioMetadataAndPath>,
   error: ?string,
-}
+}>
 
-declare type ProjectsState = {
+declare type ProjectsState = Exact<{
   byId: { [ProjectId]: ProjectMetadata },
   allIds: Array<ProjectId>,
-}
+}>

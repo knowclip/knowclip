@@ -1,20 +1,26 @@
 // @flow
 import * as audioSelectors from './audio'
 
-export const getProject = (state: AppState): Project1_0_0 => {
+export const getProject = (state: AppState): Project2_0_0 => {
   const noteType = audioSelectors.getCurrentNoteType(state)
   if (!noteType) throw new Error('no note type found')
   const audioFileName = audioSelectors.getCurrentFileName(state)
   if (!audioFileName) throw new Error('no audio file name found')
   const audioFileId = audioSelectors.getCurrentFileId(state)
   if (!audioFileId) throw new Error('no audio file id found')
+  const projectMetadata = getCurrentProject(state)
+  if (!projectMetadata) throw new Error('no project found')
 
   return {
-    version: '1.0.0',
-    clips: state.clips.byId,
+    version: '2.0.0',
     noteType,
-    audioFileName,
-    audioFileId,
+    id: projectMetadata.id,
+    name: projectMetadata.name,
+    mediaFilesMetadata: projectMetadata.audioFilePaths.map(
+      ({ metadata }) => metadata
+    ),
+    tags: [], // FIX FIX FIX FIX FIX FIX
+    clips: state.clips.byId,
   }
 }
 
@@ -49,24 +55,14 @@ export const getMediaFilePathFromCurrentProject = (
   const currentProject = getCurrentProject(state)
   if (!currentProject) return null
   const fileMetadata = currentProject.audioFilePaths.find(
-    mediaMetadata => mediaMetadata.id === id
+    mediaMetadata => mediaMetadata.metadata.id === id
   )
   return fileMetadata ? fileMetadata.filePath : null
 }
 
-export const getCurrentFile = (state: AppState): ?AudioFileData => {
-  const id = state.user.currentMediaFileId
-  const path = id && getMediaFilePathFromCurrentProject(state, id)
-  return id && path
-    ? {
-        id,
-        noteTypeId: 'default',
-        path: path,
-      }
-    : null
-}
-
 export const getCurrentFilePath = (state: AppState): ?AudioFilePath => {
-  const file = getCurrentFile(state)
-  return file ? file.path : null
+  const currentFileId = state.user.currentMediaFileId
+  return currentFileId
+    ? getMediaFilePathFromCurrentProject(state, currentFileId)
+    : null
 }

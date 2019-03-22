@@ -68,3 +68,26 @@ const parseProject = (jsonFileContents: string): ?Project2_0_0 => {
 }
 
 export default parseProject
+
+export const getAudioFilePaths = (
+  originalProjectJson: ?Project,
+  project: Project2_0_0,
+  filePath: string
+): Array<AudioMetadataAndPath> => {
+  if (
+    originalProjectJson &&
+    (originalProjectJson.version === '0.0.0' ||
+      originalProjectJson.version === '1.0.0')
+  ) {
+    return [
+      {
+        metadata: project.mediaFilesMetadata[0],
+        filePath: filePath.replace(/\.afca$/, ''),
+      },
+    ]
+  }
+  return project.mediaFilesMetadata.map(metadata => ({
+    metadata,
+    filePath: null,
+  }))
+}

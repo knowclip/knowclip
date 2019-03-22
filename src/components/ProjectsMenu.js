@@ -24,7 +24,7 @@ export class ProjectsMenu extends Component {
       }
     )
   render() {
-    const { currentProjectId, projects } = this.props
+    const { currentProjectId, projects, openProjectById } = this.props
     if (currentProjectId) return <Redirect to="/" />
 
     return (
@@ -40,7 +40,9 @@ export class ProjectsMenu extends Component {
                   <MenuItem disabled>No recent projects.</MenuItem>
                 )}
                 {projects.map(projectMetadata => (
-                  <MenuItem>{projectMetadata.name}</MenuItem>
+                  <MenuItem onClick={() => openProjectById(projectMetadata.id)}>
+                    {projectMetadata.name}
+                  </MenuItem>
                 ))}
               </MenuList>
             </Paper>
@@ -76,6 +78,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   openProjectByFilePath: r.openProjectByFilePath,
+  openProjectById: r.openProjectById,
 }
 
 export default connect(

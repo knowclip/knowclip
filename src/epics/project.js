@@ -5,11 +5,81 @@ import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
 import { getProjectFilePath } from '../utils/statePersistence'
-import parseProject from '../utils/parseProject'
+import parseProject, { getAudioFilePaths } from '../utils/parseProject'
 
 // import electron from 'electron'
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
+
+const openProject = async (filePath, projectId, state$) => {
+  try {
+    const projectJson = await readFile(filePath)
+    const project = {
+      ...parseProject(projectJson), // why is the media metadata from here giving a random audio file id?
+      ...(projectId ? { id: projectId } : null),
+    }
+    if (!project)
+      return of(
+        r.simpleMessageSnackbar(
+          'Could not read project file. Please make sure your software is up to date and try again.'
+        )
+      )
+    let originalProjectJson = JSON.parse(projectJson)
+    // const audioFilePaths =
+    //   originalProjectJson &&
+    //   ['0.0.0', '1.0.0'].includes(originalProjectJson.version)
+    //     ? [
+    //         {
+    //           metadata: project.mediaFilesMetadata[0],
+    //           filePath: filePath.replace(/\.afca$/, ''),
+    //         },
+    //       ]
+    //     : project.mediaFilesMetadata.map((metadata) => ({
+    //         metadata,
+    //         filePath: null,
+    //       }))
+    const audioFilePaths = getAudioFilePaths(
+      originalProjectJson,
+      project,
+      filePath
+    )
+    const projectMetadata: ProjectMetadata = r.getProjectMetadata(
+      state$.value,
+      project.id
+    ) || {
+      id: project.id,
+      filePath: filePath,
+      name: project.name,
+      audioFilePaths,
+      error: null,
+    }
+    return of(r.openProject(project, projectMetadata))
+  } catch (err) {
+    console.error(err)
+    return of(
+      r.simpleMessageSnackbar(`Error opening project file: ${err.message}`)
+    )
+  }
+}
+
+const openProjectById = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_PROJECT_REQUEST_BY_ID'),
+    flatMap(async ({ id }) => {
+      const project = r.getProjectMetadata(state$.value, id)
+      if (!project)
+        return of(r.simpleMessageSnackbar(`Could not find project ${id}.`))
+
+      const { filePath } = project
+      if (!filePath)
+        return of(
+          r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
+        )
+
+      return await openProject(filePath, id, state$)
+    }),
+    flatMap(x => x)
+  )
 
 const openProjectByFilePath = (action$, state$) =>
   action$.pipe(
@@ -25,49 +95,7 @@ const openProjectByFilePath = (action$, state$) =>
       if (!fs.existsSync(filePath))
         return of(r.simpleMessageSnackbar('Could not find project file.'))
 
-      try {
-        const projectJson = await readFile(filePath)
-        const project = parseProject(projectJson)
-        if (!project)
-          return of(
-            r.simpleMessageSnackbar(
-              'Could not read project file. Please make sure your software is up to date and try again.'
-            )
-          )
-
-        let originalProjectJson: ?Project
-        try {
-          originalProjectJson = JSON.parse(projectJson)
-        } catch (err) {}
-        const audioFilePaths =
-          originalProjectJson &&
-          ['0.0.0', '1.0.0'].includes(originalProjectJson.version)
-            ? [
-                {
-                  id: project.mediaFilesMetadata[0].id,
-                  filePath: filePath.replace(/\.afca$/, ''),
-                },
-              ]
-            : project.mediaFilesMetadata.map(({ id }) => ({
-                id,
-                filePath: null,
-              }))
-        const projectMetadata: ProjectMetadata = r.getProjectMetadata(
-          state$.value,
-          project.id
-        ) || {
-          id: project.id,
-          filePath: filePath,
-          name: project.name,
-          audioFilePaths,
-          error: null,
-        }
-        return of(r.openProject(project, projectMetadata))
-      } catch (err) {
-        return of(
-          r.simpleMessageSnackbar(`Error opening project file: ${err.message}`)
-        )
-      }
+      return await openProject(filePath, null, state$)
     }),
     flatMap(x => x)
   )
@@ -88,8 +116,7 @@ const saveProjectFile = (action$, state$) =>
       'MERGE_CLIPS',
       'ADD_NOTE_TYPE',
       'EDIT_NOTE_TYPE',
-      'DELETE_NOTE_TYPE',
-      'SET_DEFAULT_NOTE_TYPE'
+      'DELETE_NOTE_TYPE'
     ),
     debounce(() => timer(TEN_SECONDS)),
     flatMap(async () => {
@@ -114,13 +141,18 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_PROJECT'),
     map(({ projectMetadata }) => {
-      const [{ id: firstMediaFileId }] = projectMetadata.audioFilePaths
+      const [
+        {
+          metadata: { id: firstMediaFileId },
+        },
+      ] = projectMetadata.audioFilePaths
       return r.openMediaFileRequest(firstMediaFileId)
     })
   )
 
 export default combineEpics(
   openProjectByFilePath,
+  openProjectById,
   saveProjectFile,
   openMediaFileRequestOnOpenProject
 )

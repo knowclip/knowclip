@@ -33,3 +33,13 @@ export const openMediaFileSuccess = (filePath: AudioFilePath): Action => ({
   type: 'OPEN_MEDIA_FILE_SUCCESS',
   filePath,
 })
+
+export const closeProject = (): Action => ({
+  type: 'CLOSE_PROJECT',
+})
+
+export const setProjectName = (id: ProjectId, name: string): Action => ({
+  type: 'SET_PROJECT_NAME',
+  id,
+  name,
+})

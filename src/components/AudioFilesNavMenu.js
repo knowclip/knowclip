@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, IconButton, Tooltip } from '@material-ui/core'
 import { Close as CloseIcon, Loop } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
+import truncate from '../utils/truncate'
 
 const AudioFilesNavMenu = ({
   onClickPrevious,
@@ -18,12 +19,12 @@ const AudioFilesNavMenu = ({
   <DarkTheme>
     <section className={className}>
       {currentFilename ? (
-        <h2 className="audioFileName">
-          {currentFilename}
-          <IconButton onClick={removeAudioFiles}>
+        <span className="audioFileName" title={currentFilename}>
+          {truncate(currentFilename, 30)}
+          {/* <IconButton onClick={removeAudioFiles}>
             <CloseIcon />
-          </IconButton>
-        </h2>
+          </IconButton> */}
+        </span>
       ) : (
         <Button onClick={chooseAudioFiles}>Choose source file</Button>
       )}

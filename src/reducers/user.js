@@ -8,6 +8,7 @@ const initialState: UserState = {
   defaultTags: [],
   currentMediaFileId: null,
   currentProjectId: null,
+  currentNoteTypeId: null,
 }
 
 const user: Reducer<UserState> = (state = initialState, action) => {
@@ -16,6 +17,13 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       return {
         ...state,
         currentProjectId: action.project.id,
+        currentNoteTypeId: action.project.noteType.id,
+      }
+
+    case 'CLOSE_PROJECT':
+      return {
+        ...state,
+        currentProjectId: null,
       }
 
     case 'OPEN_MEDIA_FILE_REQUEST':

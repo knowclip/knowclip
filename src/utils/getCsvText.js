@@ -3,11 +3,17 @@ import { unparse } from 'papaparse'
 import * as r from '../selectors'
 
 export const getAllClips = (state: AppState) => {
-  const fileIds = state.audio.filesOrder
+  // const fileIds = state.audio.filesOrder
+  const currentProject = r.getCurrentProject(state)
+  if (!currentProject) throw new Error('could not find project')
+  const fileIds = currentProject.audioFilePaths.map(
+    ({ metadata }) => metadata.id
+  )
   const clips: Array<Clip> = []
   fileIds.forEach(fileId => {
-    const currentFile: AudioFileData = state.audio.files[fileId]
-    const currentNoteType = r.getNoteType(state, currentFile.noteTypeId)
+    // const currentFile: AudioFileData = state.audio.files[fileId]
+    // const currentFile = r.getCurrentFile(state)
+    const currentNoteType = r.getCurrentNoteType(state)
     if (!currentNoteType) throw new Error(`No note type found for ${fileId}`)
     const currentClips: Array<Clip> = state.clips.idsByAudioFileId[fileId].map(
       clipId => {
@@ -24,12 +30,14 @@ export const getAllClips = (state: AppState) => {
 }
 
 const getCsvText = (state: AppState) => {
-  const fileIds = state.audio.filesOrder
+  const currentProject = r.getCurrentProject(state)
+  if (!currentProject) throw new Error('no project whoopsie poopsie')
+  const currentNoteType = r.getCurrentNoteType(state)
+  if (!currentNoteType) throw new Error('no current note type whoopsie poopsie')
+
+  const fileIds = currentProject.audioFilePaths.map(x => x.metadata.id)
   const csvData: Array<Array<string>> = []
   fileIds.forEach(fileId => {
-    const currentFile: AudioFileData = state.audio.files[fileId]
-    const currentNoteType = r.getNoteType(state, currentFile.noteTypeId)
-    if (!currentNoteType) throw new Error(`No note type found for ${fileId}`)
     const currentClips: Array<Clip> = state.clips.idsByAudioFileId[fileId].map(
       clipId => {
         const clip = r.getClip(state, clipId)

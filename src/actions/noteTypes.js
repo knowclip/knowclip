@@ -41,11 +41,6 @@ export const editNoteTypeRequest = (
   override,
 })
 
-export const setDefaultNoteType = (id: NoteTypeId): NoteTypeAction => ({
-  type: 'SET_DEFAULT_NOTE_TYPE',
-  id,
-})
-
 export const setAudioFileNoteType = (
   audioFileId: AudioFileId,
   noteTypeId: NoteTypeId

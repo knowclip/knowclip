@@ -6,10 +6,18 @@
   align-items: center;
 }
 
+.block {
+  margin: 0 .5rem;
+}
+
+.projectName {
+  display: inline;
+  padding: .5rem;
+}
+
 .leftMenu,
 .rightMenu {
   display: flex;
-  margin: 0 .5rem;
   padding: .5rem;
   align-items: center;
 }

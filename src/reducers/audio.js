@@ -1,9 +1,6 @@
 // @flow
 const initialState: AudioState = {
   loop: true,
-  currentFileIndex: 0,
-  files: ({}: { [AudioFilePath]: AudioFileData }),
-  filesOrder: [],
   isLoading: false,
   mediaFolderLocation: null,
 }
@@ -13,54 +10,51 @@ const audio: Reducer<AudioState> = (
   action: Action
 ) => {
   switch (action.type) {
-    case 'HYDRATE_FROM_PROJECT_FILE':
-      return action.state.audio
-
     case 'TOGGLE_LOOP':
       return {
         ...state,
         loop: !state.loop,
       }
 
-    case 'CHOOSE_AUDIO_FILES': {
-      const { noteTypeId, ids, filePaths } = action
+    // case 'CHOOSE_AUDIO_FILES': {
+    //   const { noteTypeId, ids, filePaths } = action
 
-      return {
-        ...state,
-        filesOrder: ids,
-        files: ids.reduce((files, id, i) => {
-          const fileData: AudioFileData = {
-            path: filePaths[i],
-            noteTypeId,
-            id,
-          }
-          return { ...files, [id]: fileData }
-        }, {}),
-        isLoading: true,
-        currentFileIndex: 0,
-      }
-    }
+    //   return {
+    //     ...state,
+    //     filesOrder: ids,
+    //     files: ids.reduce((files, id, i) => {
+    //       const fileData: AudioFileData = {
+    //         path: filePaths[i],
+    //         noteTypeId,
+    //         id,
+    //       }
+    //       return { ...files, [id]: fileData }
+    //     }, {}),
+    //     isLoading: true,
+    //     currentFileIndex: 0,
+    //   }
+    // }
 
-    case 'REMOVE_AUDIO_FILES':
-      return {
-        ...state,
-        filesOrder: [],
-        files: {},
-        isLoading: false,
-        currentFileIndex: 0,
-      }
+    // case 'REMOVE_AUDIO_FILES':
+    //   return {
+    //     ...state,
+    //     filesOrder: [],
+    //     files: {},
+    //     isLoading: false,
+    //     currentFileIndex: 0,
+    //   }
 
-    case 'INITIALIZE_APP':
-      return {
-        ...state,
-        isLoading: Boolean(state.filesOrder.length),
-      }
+    // case 'INITIALIZE_APP':
+    //   return {
+    //     ...state,
+    //     isLoading: Boolean(state.filesOrder.length),
+    //   }
 
-    case 'SET_CURRENT_FILE':
-      return {
-        ...state,
-        currentFileIndex: action.index,
-      }
+    // case 'SET_CURRENT_FILE':
+    //   return {
+    //     ...state,
+    //     currentFileIndex: action.index,
+    //   }
 
     case 'LOAD_AUDIO':
       return {
@@ -80,22 +74,22 @@ const audio: Reducer<AudioState> = (
         mediaFolderLocation: action.directoryPath,
       }
 
-    case 'SET_AUDIO_FILE_NOTE_TYPE': {
-      const { noteTypeId } = action
-      return {
-        ...state,
-        files: Object.keys(state.files).reduce(
-          (all, id) => ({
-            ...all,
-            [id]: {
-              ...state.files[id],
-              noteTypeId,
-            },
-          }),
-          {}
-        ),
-      }
-    }
+    // case 'SET_AUDIO_FILE_NOTE_TYPE': {
+    //   const { noteTypeId } = action
+    //   return {
+    //     ...state,
+    //     files: Object.keys(state.files).reduce(
+    //       (all, id) => ({
+    //         ...all,
+    //         [id]: {
+    //           ...state.files[id],
+    //           noteTypeId,
+    //         },
+    //       }),
+    //       {}
+    //     ),
+    //   }
+    // }
     // case 'ADD_CLIP'
     default:
       return state

@@ -31,7 +31,6 @@ declare type Action =
   | {| type: 'DETECT_SILENCE' |}
   | {| type: 'DETECT_SILENCE_REQUEST' |}
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
-  | {| type: 'HYDRATE_FROM_PROJECT_FILE', state: $Shape<AppState> |}
 
 declare type ExportFormat = 'CSV+MP3' | 'APKG'
 
@@ -89,7 +88,6 @@ declare type NoteTypeAction =
       id: NoteTypeId,
       closeDialogOnComplete: boolean,
     |}
-  | {| type: 'SET_DEFAULT_NOTE_TYPE', id: NoteTypeId |}
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE',
       audioFileId: AudioFileId,
@@ -130,7 +128,7 @@ declare type ProjectAction =
     | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}
     | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
     | {| type: 'SET_PROJECT_ERROR', error: ?string |}
-    | {| type: 'SET_PROJECT_NAME', name: string |}
+    | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
     | {| type: 'CLOSE_PROJECT' |}
 
 declare type MediaAction =
