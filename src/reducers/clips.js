@@ -45,6 +45,9 @@ const arrayToMapById = array =>
 
 const clips: Reducer<ClipsState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'CLOSE_PROJECT':
+      return initialState
+
     case 'OPEN_PROJECT': {
       const newState: ClipsState = { byId: {}, idsByAudioFileId: {} }
       const { idsByAudioFileId, byId } = newState

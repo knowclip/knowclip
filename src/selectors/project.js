@@ -1,15 +1,12 @@
 // @flow
 import * as audioSelectors from './audio'
 
-export const getProject = (state: AppState): Project2_0_0 => {
+export const getProject = (
+  state: AppState,
+  projectMetadata: ProjectMetadata
+): Project2_0_0 => {
   const noteType = audioSelectors.getCurrentNoteType(state)
   if (!noteType) throw new Error('no note type found')
-  const audioFileName = audioSelectors.getCurrentFileName(state)
-  if (!audioFileName) throw new Error('no audio file name found')
-  const audioFileId = audioSelectors.getCurrentFileId(state)
-  if (!audioFileId) throw new Error('no audio file id found')
-  const projectMetadata = getCurrentProject(state)
-  if (!projectMetadata) throw new Error('no project found')
 
   return {
     version: '2.0.0',

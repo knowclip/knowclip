@@ -13,6 +13,11 @@ const initialState: UserState = {
 
 const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'CREATE_PROJECT':
+      return {
+        ...state,
+        currentNoteTypeId: action.noteType.id,
+      }
     case 'OPEN_PROJECT':
       return {
         ...state,

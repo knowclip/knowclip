@@ -16,6 +16,9 @@ declare type DialogData =
   | {
       type: 'ReviewAndExport',
     }
+  | {
+      type: 'NewProjectForm',
+    }
 
 declare type DialogState = Exact<{
   queue: Array<DialogData>,

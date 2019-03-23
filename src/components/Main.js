@@ -244,7 +244,9 @@ class Main extends Component {
             loop={loop}
           />
         </section>
-        <Waveform show={!audioIsLoading} svgRef={this.svgRef} />
+        {Boolean(currentFileName) && (
+          <Waveform show={!audioIsLoading} svgRef={this.svgRef} />
+        )}
         {audioIsLoading && (
           <div className="waveform-placeholder">
             <CircularProgress />

@@ -124,7 +124,11 @@ const saveProjectFile = (action$, state$) =>
         const audioFilePath = r.getCurrentFilePath(state$.value)
         if (audioFilePath) {
           const projectFilePath = getProjectFilePath(audioFilePath)
-          const json = JSON.stringify(r.getProject(state$.value), null, 2)
+          const json = JSON.stringify(
+            r.getProject(state$.value, r.getCurrentProject(state$.value)),
+            null,
+            2
+          )
           await writeFile(projectFilePath, json, 'utf8')
           return { type: 'SAVE PROJECT!!' }
         }
@@ -141,6 +145,9 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_PROJECT'),
     map(({ projectMetadata }) => {
+      if (!projectMetadata.audioFilePaths.length)
+        return { type: 'NOOP_OPEN_PROJECT_NO_AUDIO_FILES' }
+
       const [
         {
           metadata: { id: firstMediaFileId },
@@ -150,9 +157,32 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
     })
   )
 
+const openProjectOnCreate = (action$, state$) =>
+  action$.pipe(
+    ofType('CREATE_PROJECT'),
+    flatMap(async ({ projectMetadata }) => {
+      try {
+        const json = JSON.stringify(
+          r.getProject(state$.value, projectMetadata),
+          null,
+          2
+        )
+        await writeFile(projectMetadata.filePath, json, 'utf8')
+
+        return await r.openProjectById(projectMetadata.id)
+      } catch (err) {
+        console.error(err)
+        return await r.simpleMessageSnackbar(
+          `Could not create project file: ${err.message}`
+        )
+      }
+    })
+  )
+
 export default combineEpics(
   openProjectByFilePath,
   openProjectById,
   saveProjectFile,
-  openMediaFileRequestOnOpenProject
+  openMediaFileRequestOnOpenProject,
+  openProjectOnCreate
 )

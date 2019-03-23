@@ -23,6 +23,9 @@ export class ProjectsMenu extends Component {
         }
       }
     )
+
+  newProjectFormDialog = () => this.props.newProjectFormDialog()
+
   render() {
     const { currentProjectId, projects, openProjectById } = this.props
     if (currentProjectId) return <Redirect to="/" />
@@ -52,6 +55,7 @@ export class ProjectsMenu extends Component {
                 className={css.button}
                 variant="contained"
                 color="primary"
+                onClick={this.newProjectFormDialog}
               >
                 New project
               </Button>
@@ -79,6 +83,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   openProjectByFilePath: r.openProjectByFilePath,
   openProjectById: r.openProjectById,
+  newProjectFormDialog: r.newProjectFormDialog,
 }
 
 export default connect(

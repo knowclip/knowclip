@@ -44,6 +44,9 @@ export const reviewAndExportDialog = () =>
     type: 'ReviewAndExport',
   })
 
+export const newProjectFormDialog = () =>
+  enqueueDialog({ type: 'NewProjectForm' })
+
 export const closeDialog = (): DialogAction => ({
   type: 'CLOSE_DIALOG',
 })

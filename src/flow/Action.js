@@ -125,7 +125,11 @@ declare type ProjectAction =
         project: Project2_0_0,
         projectMetadata: ProjectMetadata,
       |}
-    | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}
+    | {|
+        type: 'CREATE_PROJECT',
+        projectMetadata: ProjectMetadata,
+        noteType: NoteType,
+      |}
     | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
     | {| type: 'SET_PROJECT_ERROR', error: ?string |}
     | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}

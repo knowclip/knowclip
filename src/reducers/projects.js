@@ -29,6 +29,16 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
         },
       }
 
+    case 'CREATE_PROJECT':
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.projectMetadata.id]: action.projectMetadata,
+        },
+        allIds: [action.projectMetadata.id, ...state.allIds],
+      }
+
     default:
       return state
   }

@@ -5,12 +5,14 @@ import Confirmation from './Confirmation'
 import NoteTypeForm from './NoteTypeFormDialog'
 import MediaFolderLocationForm from './MediaFolderLocationFormDialog'
 import ReviewAndExport from '../ShowAll'
+import NewProjectForm from './NewProjectFormDialog'
 
 const DIALOGS = {
   Confirmation,
   NoteTypeForm,
   MediaFolderLocationForm,
   ReviewAndExport,
+  NewProjectForm,
 }
 
 const DialogView = ({ currentDialog, closeDialog }) => {

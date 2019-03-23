@@ -34,6 +34,7 @@ const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
         allIds: [...state.allIds, action.project.noteType.id],
       }
     case 'ADD_NOTE_TYPE':
+    case 'CREATE_PROJECT':
       return {
         ...state,
         byId: {
