@@ -55,7 +55,7 @@ const openMedia = (action$, state$) =>
       if (!filePath) {
         // also should open dialog
         return of(
-          r.simpleMessageSnackbar(
+          r.openMediaFileFailure(
             "Since this is a shared project, and this is your first time opening this file, you'll first have to locate it on your filesystem."
           )
         )
@@ -63,32 +63,38 @@ const openMedia = (action$, state$) =>
 
       if (!fs.existsSync(filePath)) {
         // should show dialog
-        return of(r.simpleMessageSnackbar('Could not find media file.'))
+        return of(r.openMediaFileFailure('Could not find media file.'))
       }
 
       try {
         const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
           filePath
         )
-        const audio = await readFile(constantBitrateFilePath)
+        // const audio = await readFile(constantBitrateFilePath)
 
         // if (r.getCurrentFilePath(state$.value) !== filePath)
         //   return { type: 'NOOP_OLD_AUDIO_LOAD' } // really should also cancel old ones
 
-        window.setTimeout(() => {
-          mediaPlayer.src = `file:///${constantBitrateFilePath}`
-          // mediaPlayer.load()
-          mediaPlayer.play()
-        }, 0)
+        // window.setTimeout(() => {
+        //   mediaPlayer.src = `file:///${constantBitrateFilePath}`
+        //   // mediaPlayer.load()
+        //   mediaPlayer.play()
+        // }, 0)
 
-        return of(r.openMediaFileSuccess(filePath))
+        return of(r.openMediaFileSuccess(filePath, constantBitrateFilePath))
       } catch (err) {
         return of(
-          r.simpleMessageSnackbar(`Error opening media file: ${err.message}`)
+          r.openMediaFileFailure(`Error opening media file: ${err.message}`)
         )
       }
     }),
     flatMap(x => x)
   )
 
-export default combineEpics(openMedia)
+const openMediaFileFailure = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MEDIA_FILE_FAILURE'),
+    map(({ errorMessage }) => r.simpleMessageSnackbar(errorMessage))
+  )
+
+export default combineEpics(openMedia, openMediaFileFailure)

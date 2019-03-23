@@ -16,15 +16,8 @@ declare type Action =
       noteTypeId: NoteTypeId,
     |}
   | {| type: 'REMOVE_AUDIO_FILES' |}
-  | {|
-      type: 'LOAD_AUDIO',
-      filePath: ?string,
-      audioElement: Object,
-      svgElement: Object,
-    |}
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
-  | {| type: 'LOAD_AUDIO_SUCCESS', file: ?Object |}
   | {| type: 'EXPORT_FLASHCARDS' |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
@@ -137,7 +130,12 @@ declare type ProjectAction =
 
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: AudioFileId |}
-  | {| type: 'OPEN_MEDIA_FILE_SUCCESS', filePath: AudioFilePath |}
+  | {|
+      type: 'OPEN_MEDIA_FILE_SUCCESS',
+      filePath: AudioFilePath,
+      constantBitrateFilePath: AudioFilePath,
+    |}
+  | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
   | {|
       type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
       projectId: ProjectId,

@@ -53,17 +53,6 @@ export const deleteFlashcardTag = (id: ClipId, index: number): Action => ({
   index,
 })
 
-export const loadAudio = (
-  filePath: string,
-  audioElement: Object,
-  svgElement: Object
-): Action => ({
-  type: 'LOAD_AUDIO',
-  filePath,
-  audioElement,
-  svgElement,
-})
-
 export const setCurrentFile = (index: number): Action => ({
   type: 'SET_CURRENT_FILE',
   index,
@@ -71,11 +60,6 @@ export const setCurrentFile = (index: number): Action => ({
 
 export const toggleLoop = (): Action => ({
   type: 'TOGGLE_LOOP',
-})
-
-export const loadAudioSuccess = (file: Object): Action => ({
-  type: 'LOAD_AUDIO_SUCCESS',
-  file,
 })
 
 export const deleteCard = (id: ClipId): Action => ({

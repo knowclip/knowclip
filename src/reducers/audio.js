@@ -3,6 +3,7 @@ const initialState: AudioState = {
   loop: true,
   isLoading: false,
   mediaFolderLocation: null,
+  constantBitrateFilePath: null,
 }
 
 const audio: Reducer<AudioState> = (
@@ -16,53 +17,29 @@ const audio: Reducer<AudioState> = (
         loop: !state.loop,
       }
 
-    // case 'CHOOSE_AUDIO_FILES': {
-    //   const { noteTypeId, ids, filePaths } = action
-
-    //   return {
-    //     ...state,
-    //     filesOrder: ids,
-    //     files: ids.reduce((files, id, i) => {
-    //       const fileData: AudioFileData = {
-    //         path: filePaths[i],
-    //         noteTypeId,
-    //         id,
-    //       }
-    //       return { ...files, [id]: fileData }
-    //     }, {}),
-    //     isLoading: true,
-    //     currentFileIndex: 0,
-    //   }
-    // }
-
-    // case 'REMOVE_AUDIO_FILES':
-    //   return {
-    //     ...state,
-    //     filesOrder: [],
-    //     files: {},
-    //     isLoading: false,
-    //     currentFileIndex: 0,
-    //   }
-
-    // case 'INITIALIZE_APP':
-    //   return {
-    //     ...state,
-    //     isLoading: Boolean(state.filesOrder.length),
-    //   }
-
-    // case 'SET_CURRENT_FILE':
-    //   return {
-    //     ...state,
-    //     currentFileIndex: action.index,
-    //   }
-
-    case 'LOAD_AUDIO':
+    case 'CLOSE_PROJECT': // maybe better as action for closed media specifically
       return {
         ...state,
-        isLoading: Boolean(action.filePath),
+        loop: true,
+        isLoading: false,
+        constantBitrateFilePath: null,
       }
 
-    case 'LOAD_AUDIO_SUCCESS':
+    case 'OPEN_MEDIA_FILE_REQUEST':
+      return {
+        ...state,
+        constantBitrateFilePath: null,
+        isLoading: true,
+      }
+
+    case 'OPEN_MEDIA_FILE_SUCCESS':
+      return {
+        ...state,
+        constantBitrateFilePath: action.constantBitrateFilePath,
+        isLoading: false,
+      }
+
+    case 'OPEN_MEDIA_FILE_FAILURE':
       return {
         ...state,
         isLoading: false,
@@ -74,23 +51,6 @@ const audio: Reducer<AudioState> = (
         mediaFolderLocation: action.directoryPath,
       }
 
-    // case 'SET_AUDIO_FILE_NOTE_TYPE': {
-    //   const { noteTypeId } = action
-    //   return {
-    //     ...state,
-    //     files: Object.keys(state.files).reduce(
-    //       (all, id) => ({
-    //         ...all,
-    //         [id]: {
-    //           ...state.files[id],
-    //           noteTypeId,
-    //         },
-    //       }),
-    //       {}
-    //     ),
-    //   }
-    // }
-    // case 'ADD_CLIP'
     default:
       return state
   }

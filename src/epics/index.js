@@ -49,7 +49,7 @@ const audioElement = () => document.getElementById('audioPlayer')
 
 const setWaveformCursorEpic = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_REQUEST'),
+    ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
       fromEvent(audioElement(), 'timeupdate').pipe(
         takeUntil(action$.pipe(ofType('CLOSE_PROJECT' /* CLOSE_MEDIA_FILE */))),
@@ -96,7 +96,7 @@ const setWaveformCursorEpic = (action$, state$) =>
 
 const waveformMousedownEpic = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_REQUEST'),
+    ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
       fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
         tap(e => e.preventDefault()),
@@ -158,15 +158,15 @@ const defaultTagsEpic = (action$, state$) =>
     }))
   )
 
-const defaultTagsAudioEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('LOAD_AUDIO_SUCCESS'),
-    filter(({ file }) => file),
-    map(({ id }) => ({
-      type: 'SET_DEFAULT_TAGS',
-      tags: [basename(r.getCurrentFileName(state$.value))],
-    }))
-  )
+// const defaultTagsAudioEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType('LOAD_AUDIO_SUCCESS'),
+//     filter(({ file }) => file),
+//     map(({ id }) => ({
+//       type: 'SET_DEFAULT_TAGS',
+//       tags: [basename(r.getCurrentFileName(state$.value))],
+//     }))
+//   )
 
 export default combineEpics(
   loadAudio,
@@ -189,6 +189,6 @@ export default combineEpics(
   project,
   noteTypesEpic,
   defaultTagsEpic,
-  defaultTagsAudioEpic,
+  // defaultTagsAudioEpic,
   keyboard
 )

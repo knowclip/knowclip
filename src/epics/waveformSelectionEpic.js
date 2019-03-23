@@ -28,7 +28,7 @@ const pendingClipIsBigEnough = state => {
 }
 
 const waveformSelectionEpic = (action$, state$) => {
-  const loadAudioActions = action$.pipe(ofType('OPEN_MEDIA_FILE_REQUEST'))
+  const loadAudioActions = action$.pipe(ofType('OPEN_MEDIA_FILE_SUCCESS'))
   const mousedowns = loadAudioActions.pipe(
     flatMap(() =>
       fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(

@@ -47,6 +47,7 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
     className: 'audioPlayer',
     controlsList: 'nodownload',
     autoPlay: true,
+    src: filePath ? `file:///${filePath}` : null,
   }
 
   return filePath && isVideo(filePath) ? (
@@ -143,6 +144,7 @@ class Main extends Component {
       deleteAllCurrentFileClipsRequest,
       // currentNoteType,
       clipsHaveBeenMade,
+      constantBitrateFilePath,
     } = this.props
     // const { noteTypeClipMenuAnchor } = this.state
 
@@ -238,7 +240,7 @@ class Main extends Component {
 
         <section className="media">
           <Media
-            filePath={currentFilePath}
+            filePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
             ref={this.audioRef}
             loop={loop}
@@ -288,6 +290,7 @@ const mapStateToProps = state => ({
   // defaultNoteTypeId: r.getDefaultNoteTypeId(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
   currentProjectId: r.getCurrentProjectId(state),
+  constantBitrateFilePath: state.audio.constantBitrateFilePath,
 })
 
 const mapDispatchToProps = {

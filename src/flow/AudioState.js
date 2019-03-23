@@ -7,6 +7,7 @@ declare type AudioState = Exact<{
   loop: boolean,
   isLoading: boolean,
   mediaFolderLocation: ?string,
+  constantBitrateFilePath: ?AudioFilePath,
   // filesMetadata: Exact<{
   //   byId: { [AudioFileId]: AudioFileMetadata },
   //   allIds: Array<AudioFileData>,
