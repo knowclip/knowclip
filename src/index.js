@@ -7,7 +7,15 @@ import getStore from './getStore'
 // import epic from './epics'
 import './index.css'
 import registerServiceWorker from './registerServiceWorker'
-import { AppContainer } from 'react-hot-loader'
+// import { AppContainer } from 'react-hot-loader'
+import { AppContainer, setConfig, cold } from 'react-hot-loader'
+
+setConfig({
+  onComponentCreate: (type, name) =>
+    (String(type).indexOf('useState') > 0 ||
+      String(type).indexOf('useEffect') > 0) &&
+    cold(type),
+})
 
 const store = getStore()
 

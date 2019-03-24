@@ -46,7 +46,24 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
           ...state.byId,
           [action.projectId]: {
             ...state.byId[action.projectId],
-            audioFilePaths: action.audioFilePaths,
+            audioFilePaths: [
+              ...state.byId[action.projectId].audioFilePaths,
+              ...action.audioFilePaths,
+            ],
+          },
+        },
+      }
+
+    case 'DELETE_MEDIA_FROM_PROJECT':
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.projectId]: {
+            ...state.byId[action.projectId],
+            audioFilePaths: state.byId[action.projectId].audioFilePaths.filter(
+              ({ metadata }) => metadata.id !== action.mediaFileId
+            ),
           },
         },
       }

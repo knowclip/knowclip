@@ -134,6 +134,7 @@ declare type MediaAction =
       type: 'OPEN_MEDIA_FILE_SUCCESS',
       filePath: AudioFilePath,
       constantBitrateFilePath: AudioFilePath,
+      id: AudioFileId,
     |}
   | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
   | {|
@@ -146,5 +147,9 @@ declare type MediaAction =
       projectId: ProjectId,
       audioFilePaths: Array<AudioMetadataAndPath>,
     |}
-  | {| type: 'DELETE_MEDIA', projectId: ProjectId, mediaFileId: AudioFileId |}
+  | {|
+      type: 'DELETE_MEDIA_FROM_PROJECT',
+      projectId: ProjectId,
+      mediaFileId: AudioFileId,
+    |}
   | {| type: 'SET_MEDIA_METADATA', metadata: AudioFileMetadata |}

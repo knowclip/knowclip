@@ -82,7 +82,7 @@ const openMedia = (action$, state$) =>
         //   mediaPlayer.play()
         // }, 0)
 
-        return of(r.openMediaFileSuccess(filePath, constantBitrateFilePath))
+        return of(r.openMediaFileSuccess(filePath, constantBitrateFilePath, id))
       } catch (err) {
         return of(
           r.openMediaFileFailure(`Error opening media file: ${err.message}`)
@@ -122,7 +122,9 @@ const addMediaToProject = (action$, state$) =>
         return r.addMediaToProject(projectId, metadatas)
       } catch (err) {
         console.log(err)
-        r.simpleMessageSnackbar(`Error adding media file: ${err.message}`)
+        return r.simpleMessageSnackbar(
+          `Error adding media file: ${err.message}`
+        )
       }
     })
   )

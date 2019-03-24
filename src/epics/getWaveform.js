@@ -50,7 +50,10 @@ const getWaveformEpic = (action$, state$) =>
           return r.setWaveformImagePath(null)
         }
 
-        const imagePath = await getWaveformPng(state$.value, filePath)
+        const imagePath = await getWaveformPng(
+          state$.value,
+          r.getConstantBitrateFilePath(state$.value)
+        )
         console.log(imagePath)
         return r.setWaveformImagePath(imagePath)
       } catch (err) {

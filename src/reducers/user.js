@@ -13,6 +13,14 @@ const initialState: UserState = {
 
 const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'DELETE_MEDIA_FROM_PROJECT':
+      return action.mediaFileId === state.currentMediaFileId
+        ? {
+            ...state,
+            currentMediaFileId: null,
+          }
+        : state
+
     case 'CREATE_PROJECT':
       return {
         ...state,

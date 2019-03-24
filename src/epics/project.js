@@ -124,7 +124,7 @@ const saveProjectFile = (action$, state$) =>
       'EDIT_NOTE_TYPE',
       'DELETE_NOTE_TYPE',
       'ADD_MEDIA_TO_PROJECT',
-      'DELETE_MEDIA',
+      'DELETE_MEDIA_FROM_PROJECT',
       'SET_MEDIA_METADATA'
     ),
     debounce(() => timer(TEN_SECONDS)),

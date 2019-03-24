@@ -65,7 +65,7 @@ export const deleteMedia = (
   projectId: ProjectId,
   mediaFileId: AudioFileId
 ): Action => ({
-  type: 'DELETE_MEDIA',
+  type: 'DELETE_MEDIA_FROM_PROJECT',
   projectId,
   mediaFileId,
 })

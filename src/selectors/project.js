@@ -64,3 +64,11 @@ export const getCurrentFilePath = (state: AppState): ?AudioFilePath => {
     ? getMediaFilePathFromCurrentProject(state, currentFileId)
     : null
 }
+
+export const getProjectMediaMetadata = (
+  state: AppState,
+  projectId: ProjectId
+): Array<AudioFileMetadata> => {
+  const project = getProjectMetadata(state, projectId)
+  return project ? project.audioFilePaths.map(({ metadata }) => metadata) : []
+}

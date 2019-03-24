@@ -5,10 +5,11 @@ import {
   tap,
   ignoreElements,
   takeUntil,
+  takeWhile,
   withLatestFrom,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent } from 'rxjs'
+import { fromEvent, merge } from 'rxjs'
 import { setWaveformCursor } from '../actions'
 // import { getFlashcard } from '../selectors'
 // import { setLocalFlashcard } from '../utils/localFlashcards'
@@ -52,7 +53,19 @@ const setWaveformCursorEpic = (action$, state$) =>
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
       fromEvent(audioElement(), 'timeupdate').pipe(
-        takeUntil(action$.pipe(ofType('CLOSE_PROJECT' /* CLOSE_MEDIA_FILE */))),
+        // takeUntil(
+        // merge(
+        //   action$.pipe(
+        //     ofType('CLOSE_PROJECT', 'OPEN_MEDIA_FILE_REQUEST' /* CLOSE_MEDIA_FILE */),
+        //   ),
+        //   action$.pipe(
+        //     ofType('DELETE_MEDIA_FROM_PROJECT'),
+        //     withLatestFrom('OPEN_MEDIA_FILE_SUCCESS'),
+        //     filter(([deleteMedia, openMediaFileSuccess]) => deleteMedia.mediaFileId === openMediaFileSuccess.id)
+        //   )
+        // ),
+        // ),
+        takeWhile(() => r.getConstantBitrateFilePath(state$.value)),
         map(e => {
           const viewBox = state$.value.waveform.viewBox
 

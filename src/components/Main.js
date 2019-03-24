@@ -25,7 +25,6 @@ import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
 import truncate from '../utils/truncate'
-import { showOpenDialog } from '../utils/electron'
 import * as r from '../redux'
 
 const VIDEO_EXTENSIONS = `.MP4 .AVI .MOV .FLV .WMV`.split(/\s/)
@@ -58,14 +57,14 @@ class Main extends Component {
     noteTypeClipMenuAnchor: null,
   }
 
-  chooseAudioFiles = async () => {
-    const filePaths = await showOpenDialog(
-      [{ name: 'Audio or video files' }],
-      true
-    )
-    const { addMediaToProjectRequest, currentProjectId } = this.props
-    if (filePaths) addMediaToProjectRequest(currentProjectId, filePaths)
-  }
+  // chooseAudioFiles = async () => {
+  //   const filePaths = await showOpenDialog(
+  //     [{ name: 'Audio or video files' }],
+  //     true
+  //   )
+  //   const { addMediaToProjectRequest, currentProjectId } = this.props
+  //   if (filePaths) addMediaToProjectRequest(currentProjectId, filePaths)
+  // }
 
   audioRef = el => (this.audio = el)
   svgRef = el => (this.svg = el)
@@ -131,10 +130,7 @@ class Main extends Component {
           <header className={headerCss.container}>
             <section className={headerCss.block}>
               <ProjectMenu />
-              <AudioFilesNavMenu
-                className={headerCss.leftMenu}
-                chooseAudioFiles={this.chooseAudioFiles}
-              />
+              <AudioFilesNavMenu className={headerCss.leftMenu} />
             </section>
             <ul className={headerCss.rightMenu}>
               {mediaFolderLocation ? (
@@ -239,7 +235,7 @@ const mapStateToProps = state => ({
   // defaultNoteTypeId: r.getDefaultNoteTypeId(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
   currentProjectId: r.getCurrentProjectId(state),
-  constantBitrateFilePath: state.audio.constantBitrateFilePath,
+  constantBitrateFilePath: r.getConstantBitrateFilePath(state),
 })
 
 const mapDispatchToProps = {
