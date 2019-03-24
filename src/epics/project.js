@@ -1,5 +1,5 @@
 import { flatMap, debounce, map } from 'rxjs/operators'
-import { timer, of } from 'rxjs'
+import { timer, of, from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
@@ -46,14 +46,20 @@ const openProject = async (filePath, projectId, state$) => {
     const projectMetadata: ProjectMetadata = r.getProjectMetadata(
       state$.value,
       project.id
-    ) || {
-      id: project.id,
-      filePath: filePath,
-      name: project.name,
-      audioFilePaths,
-      error: null,
-    }
-    return of(r.openProject(project, projectMetadata))
+    )
+
+    return projectMetadata
+      ? of(r.openProject(project, projectMetadata))
+      : from([
+          r.openProject(project, {
+            id: project.id,
+            filePath: filePath,
+            name: project.name,
+            audioFilePaths,
+            error: null,
+          }),
+          { type: 'CREATED NEW PROJECT METADATA' },
+        ])
   } catch (err) {
     console.error(err)
     return of(
@@ -116,22 +122,22 @@ const saveProjectFile = (action$, state$) =>
       'MERGE_CLIPS',
       'ADD_NOTE_TYPE',
       'EDIT_NOTE_TYPE',
-      'DELETE_NOTE_TYPE'
+      'DELETE_NOTE_TYPE',
+      'ADD_MEDIA_TO_PROJECT',
+      'DELETE_MEDIA',
+      'SET_MEDIA_METADATA'
     ),
     debounce(() => timer(TEN_SECONDS)),
     flatMap(async () => {
       try {
-        const audioFilePath = r.getCurrentFilePath(state$.value)
-        if (audioFilePath) {
-          const projectFilePath = getProjectFilePath(audioFilePath)
-          const json = JSON.stringify(
-            r.getProject(state$.value, r.getCurrentProject(state$.value)),
-            null,
-            2
-          )
-          await writeFile(projectFilePath, json, 'utf8')
-          return { type: 'SAVE PROJECT!!' }
-        }
+        const projectMetadata = r.getCurrentProject(state$.value)
+        const json = JSON.stringify(
+          r.getProject(state$.value, projectMetadata),
+          null,
+          2
+        )
+        await writeFile(projectMetadata.filePath, json, 'utf8')
+        return { type: 'SAVE PROJECT!!' }
         return { type: 'NO AUDIO FILE! NOT SAVING ANY PROJECT' }
       } catch (err) {
         return r.simpleMessageSnackbar(

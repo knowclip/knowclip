@@ -139,12 +139,12 @@ declare type MediaAction =
   | {|
       type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
       projectId: ProjectId,
-      filePath: AudioFilePath,
+      filePaths: Array<AudioFilePath>,
     |}
   | {|
       type: 'ADD_MEDIA_TO_PROJECT',
       projectId: ProjectId,
-      metadata: AudioFileMetadata,
+      audioFilePaths: Array<AudioMetadataAndPath>,
     |}
   | {| type: 'DELETE_MEDIA', projectId: ProjectId, mediaFileId: AudioFileId |}
   | {| type: 'SET_MEDIA_METADATA', metadata: AudioFileMetadata |}

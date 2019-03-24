@@ -11,14 +11,14 @@ import parseProject from '../utils/parseProject'
 //   window.localStorage.setItem('noteTypes', JSON.stringify(noteTypes))
 // }
 
-export const getProjectFilePath = (filePath: AudioFilePath): string =>
-  `${filePath}.afca`
-export const findExistingProjectFilePath = (
-  filePath: AudioFilePath
-): ?string => {
-  const jsonPath = getProjectFilePath(filePath)
-  return filePath && fs.existsSync(jsonPath) ? jsonPath : null
-}
+// export const getProjectFilePath = (filePath: AudioFilePath): string =>
+//   `${filePath}.afca`
+// export const findExistingProjectFilePath = (
+//   filePath: AudioFilePath
+// ): ?string => {
+//   const jsonPath = getProjectFilePath(filePath)
+//   return filePath && fs.existsSync(jsonPath) ? jsonPath : null
+// }
 
 export const getPersistedState = (): $Shape<AppState> => {
   const persistedState: $Shape<AppState> = {}

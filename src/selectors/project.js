@@ -1,5 +1,6 @@
 // @flow
 import * as audioSelectors from './audio'
+import getAllTags from '../utils/getAllTags'
 
 export const getProject = (
   state: AppState,
@@ -16,7 +17,7 @@ export const getProject = (
     mediaFilesMetadata: projectMetadata.audioFilePaths.map(
       ({ metadata }) => metadata
     ),
-    tags: [], // FIX FIX FIX FIX FIX FIX
+    tags: [...getAllTags(state.clips.byId)],
     clips: state.clips.byId,
   }
 }

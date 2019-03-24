@@ -51,10 +51,13 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     case 'OPEN_PROJECT': {
       const newState: ClipsState = { byId: {}, idsByAudioFileId: {} }
       const { idsByAudioFileId, byId } = newState
+      action.project.mediaFilesMetadata.forEach(({ id }) => {
+        idsByAudioFileId[id] = []
+      })
+
       for (const id in action.project.clips) {
         const clip = action.project.clips[id]
         byId[id] = clip
-        idsByAudioFileId[clip.fileId] = idsByAudioFileId[clip.fileId] || []
         idsByAudioFileId[clip.fileId].push(clip.id)
       }
       for (const fileId in idsByAudioFileId) {
@@ -282,6 +285,34 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
             },
           },
         },
+      }
+    }
+
+    case 'ADD_MEDIA_TO_PROJECT': {
+      const idsByAudioFileId = { ...state.idsByAudioFileId }
+      action.audioFilePaths.forEach(({ metadata }) => {
+        idsByAudioFileId[metadata.id] = []
+      })
+      return {
+        ...state,
+        idsByAudioFileId,
+      }
+    }
+
+    case 'DELETE_MEDIA': {
+      const byId = { ...state.byId }
+      const clipIds = state.idsByAudioFileId[action.mediaFileId]
+      clipIds.forEach(id => {
+        delete byId[id]
+      })
+
+      const idsByAudioFileId = { ...state.idsByAudioFileId }
+      delete idsByAudioFileId[action.mediaFileId]
+
+      return {
+        ...state,
+        byId,
+        idsByAudioFileId,
       }
     }
 

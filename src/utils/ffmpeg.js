@@ -26,3 +26,13 @@ export const toTimestamp = (
   const hoursStamp = zeroPad(2, Math.floor(milliseconds / 1000 / 60 / 60))
   return `${hoursStamp}${unitsSeparator}${minutesStamp}${unitsSeparator}${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }
+
+export const getMediaMetadata = path => {
+  return new Promise((res, rej) => {
+    ffmpeg.ffprobe(path, (err, metadata) => {
+      if (err) rej(err)
+
+      res(metadata)
+    })
+  })
+}

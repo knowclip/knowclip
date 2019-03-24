@@ -45,20 +45,20 @@ export const setProjectName = (id: ProjectId, name: string): Action => ({
 
 export const addMediaToProjectRequest = (
   projectId: ProjectId,
-  filePath: AudioFilePath
+  filePaths: Array<AudioFilePath>
 ): Action => ({
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
   projectId,
-  filePath,
+  filePaths,
 })
 
 export const addMediaToProject = (
   projectId: ProjectId,
-  metadata: AudioFileMetadata
+  audioFilePaths: Array<AudioMetadataAndPath>
 ): Action => ({
   type: 'ADD_MEDIA_TO_PROJECT',
   projectId,
-  metadata,
+  audioFilePaths,
 })
 
 export const deleteMedia = (

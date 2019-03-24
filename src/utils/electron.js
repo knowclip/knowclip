@@ -14,3 +14,23 @@ export const showSaveDialog = (name, extensions) =>
       rej(err)
     }
   })
+
+export const showOpenDialog = (
+  filters = [],
+  multiSelections = false
+): Promise<?Array<string>> =>
+  new Promise((res, rej) => {
+    try {
+      dialog.showOpenDialog(
+        {
+          properties: ['openFile'].concat(
+            multiSelections ? 'multiSelections' : []
+          ),
+          filters,
+        },
+        filePaths => res(filePaths)
+      )
+    } catch (err) {
+      rej(err)
+    }
+  })

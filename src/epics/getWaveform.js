@@ -2,21 +2,10 @@ import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import tempy from 'tempy'
-import ffmpeg from '../utils/ffmpeg'
+import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
-
-const getMediaMetadata = path => {
-  return new Promise((res, rej) => {
-    ffmpeg.ffprobe(path, (err, metadata) => {
-      if (err) rej(err)
-
-      console.log(metadata)
-      res(metadata)
-    })
-  })
-}
 
 const getWaveformPng = async (state: AppState, path) => {
   const {

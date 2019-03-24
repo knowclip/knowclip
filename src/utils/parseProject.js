@@ -1,5 +1,6 @@
 // @flow
 import uuid from 'uuid/v4'
+import getAllTags from '../utils/getAllTags'
 
 const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   const { clips: oldClips } = project
@@ -30,17 +31,11 @@ const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   }
 }
 const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
-  const clips: Array<Clip> = (Object.values(project.clips): any)
   return {
     version: '2.0.0',
     id: uuid(),
     name: `Clips from ${project.audioFileName}`,
-    tags: [
-      ...clips.reduce((tags, clip: Clip) => {
-        clip.flashcard.tags.forEach(tag => tags.add(tag))
-        return tags
-      }, new Set()),
-    ],
+    tags: [...getAllTags(project.clips)],
     mediaFilesMetadata: [
       {
         id: project.audioFileId,

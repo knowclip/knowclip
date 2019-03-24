@@ -39,6 +39,18 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
         allIds: [action.projectMetadata.id, ...state.allIds],
       }
 
+    case 'ADD_MEDIA_TO_PROJECT':
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.projectId]: {
+            ...state.byId[action.projectId],
+            audioFilePaths: action.audioFilePaths,
+          },
+        },
+      }
+
     default:
       return state
   }

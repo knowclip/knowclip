@@ -24,14 +24,9 @@ import DarkTheme from '../components/DarkTheme'
 import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
-import uuid from 'uuid/v4'
 import truncate from '../utils/truncate'
-
+import { showOpenDialog } from '../utils/electron'
 import * as r from '../redux'
-import electron from 'electron'
-
-const { remote } = electron
-const { dialog } = remote
 
 const VIDEO_EXTENSIONS = `.MP4 .AVI .MOV .FLV .WMV`.split(/\s/)
 const isVideo = filePath =>
@@ -63,49 +58,17 @@ class Main extends Component {
     noteTypeClipMenuAnchor: null,
   }
 
-  // chooseAudioFiles = () => {
-  //   dialog.showOpenDialog(
-  //     // { properties: ['openFile', 'multiClips'] },
-  //     { properties: ['openFile'] },
-  //     filePaths => {
-  //       if (filePaths) {
-  //         const ids = filePaths.map(filePath => uuid())
-  //         this.props.chooseAudioFiles(
-  //           filePaths,
-  //           ids,
-  //           this.props.defaultNoteTypeId
-  //         )
-  //       }
-  //     }
-  //   )
-  // }
-
-  removeAudioFiles = () =>
-    this.props.confirmationDialog(
-      'Are you sure you want to close this media file?',
-      r.removeAudioFiles()
+  chooseAudioFiles = async () => {
+    const filePaths = await showOpenDialog(
+      [{ name: 'Audio or video files' }],
+      true
     )
+    const { addMediaToProjectRequest, currentProjectId } = this.props
+    if (filePaths) addMediaToProjectRequest(currentProjectId, filePaths)
+  }
 
   audioRef = el => (this.audio = el)
   svgRef = el => (this.svg = el)
-
-  goToFile = index => this.props.setCurrentFile(index)
-  prevFile = () => {
-    const lower = this.props.currentFileIndex - 1
-    this.goToFile(lower >= 0 ? lower : 0)
-  }
-  nextFile = () => {
-    const higher = this.props.currentFileIndex + 1
-    const lastIndex = this.props.filePaths.length - 1
-    this.goToFile(higher <= lastIndex ? higher : lastIndex)
-  }
-
-  deleteCard = () => {
-    const { deleteCard, highlightedClipId } = this.props
-    if (highlightedClipId) {
-      deleteCard(highlightedClipId)
-    }
-  }
 
   reviewAndExportDialog = () => this.props.reviewAndExportDialog()
 
@@ -126,15 +89,11 @@ class Main extends Component {
   // closeNoteTypeSelectionMenu = () =>
   //   this.setState({ noteTypeClipMenuAnchor: null })
 
-  toggleLoop = () => this.props.toggleLoop()
-
   render() {
     if (!this.props.currentProjectId) return <Redirect to="/projects" />
 
     const {
       loop,
-      isPrevButtonEnabled,
-      isNextButtonEnabled,
       currentFlashcard,
       currentFileName,
       currentFilePath,
@@ -174,15 +133,7 @@ class Main extends Component {
               <ProjectMenu />
               <AudioFilesNavMenu
                 className={headerCss.leftMenu}
-                onClickPrevious={this.prevFile}
-                onClickNext={this.nextFile}
-                onClickLoop={this.toggleLoop}
-                currentFilename={currentFileName}
-                isPrevButtonEnabled={isPrevButtonEnabled}
-                isNextButtonEnabled={isNextButtonEnabled}
                 chooseAudioFiles={this.chooseAudioFiles}
-                removeAudioFiles={this.removeAudioFiles}
-                loop={loop}
               />
             </section>
             <ul className={headerCss.rightMenu}>
@@ -279,8 +230,6 @@ const mapStateToProps = state => ({
   currentFilePath: r.getCurrentFilePath(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   selectedClipId: r.getSelectedClipId(state),
-  // isNextButtonEnabled: r.isNextButtonEnabled(state),
-  // isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
   highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: [], // r.getClipsTimes(state),
@@ -295,11 +244,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   chooseAudioFiles: r.chooseAudioFiles,
-  removeAudioFiles: r.removeAudioFiles,
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
-  deleteCard: r.deleteCard,
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
   highlightClip: r.highlightClip,
@@ -309,6 +256,7 @@ const mapDispatchToProps = {
   mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
   reviewAndExportDialog: r.reviewAndExportDialog,
   confirmationDialog: r.confirmationDialog,
+  addMediaToProjectRequest: r.addMediaToProjectRequest,
 }
 
 export default connect(
