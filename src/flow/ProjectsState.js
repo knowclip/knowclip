@@ -2,15 +2,15 @@ declare type ProjectId = string
 declare type ProjectFilePath = string
 
 declare type AudioMetadataAndPath = Exact<{
-  metadata: AudioFileMetadata,
-  filePath: ?AudioFilePath,
+  metadata: MediaFileMetadata,
+  filePath: ?MediaFilePath,
 }>
 
 declare type ProjectMetadata = Exact<{
   id: ProjectId,
   filePath: ProjectFilePath,
   name: string,
-  audioFilePaths: Array<AudioMetadataAndPath>,
+  mediaFilePaths: Array<AudioMetadataAndPath>,
   error: ?string,
 }>
 

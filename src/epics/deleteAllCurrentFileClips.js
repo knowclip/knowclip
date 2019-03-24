@@ -10,7 +10,7 @@ const deleteAllCurrentFileClips = (action$, state$) =>
         ? r.confirmationDialog(
             'Are you sure you want to delete all your work for this file?',
             r.deleteCards(
-              r.getClipIdsByAudioFileId(
+              r.getClipIdsByMediaFileId(
                 state$.value,
                 r.getCurrentFileId(state$.value)
               )

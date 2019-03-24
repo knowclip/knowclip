@@ -91,7 +91,7 @@ const detectSilenceEpic = (action$, state$) =>
         )
 
         return from([
-          r.deleteCards(r.getClipIdsByAudioFileId(state$.value, fileId)),
+          r.deleteCards(r.getClipIdsByMediaFileId(state$.value, fileId)),
           r.addClips(newClips, fileId),
         ])
       })

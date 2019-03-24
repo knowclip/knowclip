@@ -64,18 +64,18 @@
 
 // const mapDispatchToProps = {
 //   setDefaultNoteType: r.setDefaultNoteType,
-//   setAudioFileNoteTypeRequest: r.setAudioFileNoteTypeRequest,
+//   setMediaFileNoteTypeRequest: r.setMediaFileNoteTypeRequest,
 //   editNoteTypeDialog: r.editNoteTypeDialog,
 //   newNoteTypeDialog: r.newNoteTypeDialog,
 // }
 
 // const mergeProps = (
 //   { currentFileId, ...stateProps },
-//   { setDefaultNoteType, setAudioFileNoteTypeRequest, ...dispatchProps },
+//   { setDefaultNoteType, setMediaFileNoteTypeRequest, ...dispatchProps },
 //   ownProps
 // ) => ({
 //   selectNoteType: currentFileId
-//     ? id => setAudioFileNoteTypeRequest(currentFileId, id)
+//     ? id => setMediaFileNoteTypeRequest(currentFileId, id)
 //     : setDefaultNoteType,
 //   ...stateProps,
 //   ...dispatchProps,

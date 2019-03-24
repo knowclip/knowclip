@@ -132,8 +132,8 @@ const addMediaToProject = (action$, state$) =>
 const openMediaOnAdd = (action$, state$) =>
   action$.pipe(
     ofType('ADD_MEDIA_TO_PROJECT'),
-    map(({ audioFilePaths }) => {
-      const [{ metadata }] = audioFilePaths
+    map(({ mediaFilePaths }) => {
+      const [{ metadata }] = mediaFilePaths
       return r.openMediaFileRequest(metadata.id)
     })
   )

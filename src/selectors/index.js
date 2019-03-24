@@ -144,5 +144,5 @@ export const isAudioLoading = (state: AppState): boolean =>
 export const getMediaFolderLocation = (state: AppState): ?string =>
   state.audio.mediaFolderLocation
 
-export const getConstantBitrateFilePath = (state: AppState): ?AudioFilePath =>
+export const getConstantBitrateFilePath = (state: AppState): ?MediaFilePath =>
   state.user.currentMediaFileId ? state.audio.constantBitrateFilePath : null

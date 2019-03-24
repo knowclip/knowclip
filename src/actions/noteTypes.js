@@ -41,20 +41,20 @@ export const editNoteTypeRequest = (
   override,
 })
 
-export const setAudioFileNoteType = (
-  audioFileId: AudioFileId,
+export const setMediaFileNoteType = (
+  mediaFileId: MediaFileId,
   noteTypeId: NoteTypeId
 ): NoteTypeAction => ({
   type: 'SET_AUDIO_FILE_NOTE_TYPE',
-  audioFileId,
+  mediaFileId,
   noteTypeId,
 })
 
-export const setAudioFileNoteTypeRequest = (
-  audioFileId: AudioFileId,
+export const setMediaFileNoteTypeRequest = (
+  mediaFileId: MediaFileId,
   noteTypeId: NoteTypeId
 ): NoteTypeAction => ({
   type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
-  audioFileId,
+  mediaFileId,
   noteTypeId,
 })

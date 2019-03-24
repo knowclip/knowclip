@@ -11,8 +11,8 @@ declare type Action =
   | MediaAction
   | {|
       type: 'CHOOSE_AUDIO_FILES',
-      filePaths: Array<AudioFilePath>,
-      ids: Array<AudioFileId>,
+      filePaths: Array<MediaFilePath>,
+      ids: Array<MediaFileId>,
       noteTypeId: NoteTypeId,
     |}
   | {| type: 'REMOVE_AUDIO_FILES' |}
@@ -57,7 +57,7 @@ declare type ClipAction =
   | {|
       type: 'ADD_CLIPS',
       clips: Array<Clip>,
-      fileId: AudioFileId,
+      fileId: MediaFileId,
     |}
   | {| type: 'EDIT_CLIP', id: ClipId, override: $Shape<Clip> |}
   | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
@@ -83,12 +83,12 @@ declare type NoteTypeAction =
     |}
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE',
-      audioFileId: AudioFileId,
+      mediaFileId: MediaFileId,
       noteTypeId: NoteTypeId,
     }
   | {|
       type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
-      audioFileId: AudioFileId,
+      mediaFileId: MediaFileId,
       noteTypeId: NoteTypeId,
     |}
 
@@ -129,27 +129,27 @@ declare type ProjectAction =
     | {| type: 'CLOSE_PROJECT' |}
 
 declare type MediaAction =
-  | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: AudioFileId |}
+  | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
   | {|
       type: 'OPEN_MEDIA_FILE_SUCCESS',
-      filePath: AudioFilePath,
-      constantBitrateFilePath: AudioFilePath,
-      id: AudioFileId,
+      filePath: MediaFilePath,
+      constantBitrateFilePath: MediaFilePath,
+      id: MediaFileId,
     |}
   | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
   | {|
       type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
       projectId: ProjectId,
-      filePaths: Array<AudioFilePath>,
+      filePaths: Array<MediaFilePath>,
     |}
   | {|
       type: 'ADD_MEDIA_TO_PROJECT',
       projectId: ProjectId,
-      audioFilePaths: Array<AudioMetadataAndPath>,
+      mediaFilePaths: Array<AudioMetadataAndPath>,
     |}
   | {|
       type: 'DELETE_MEDIA_FROM_PROJECT',
       projectId: ProjectId,
-      mediaFileId: AudioFileId,
+      mediaFileId: MediaFileId,
     |}
-  | {| type: 'SET_MEDIA_METADATA', metadata: AudioFileMetadata |}
+  | {| type: 'SET_MEDIA_METADATA', metadata: MediaFileMetadata |}

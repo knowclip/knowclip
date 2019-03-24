@@ -64,7 +64,7 @@ const parseProject = (jsonFileContents: string): ?Project2_0_0 => {
 
 export default parseProject
 
-export const getAudioFilePaths = (
+export const getMediaFilePaths = (
   originalProjectJson: ?Project,
   project: Project2_0_0,
   filePath: string

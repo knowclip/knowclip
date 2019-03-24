@@ -17,7 +17,7 @@ import {
 import { Redirect } from 'react-router-dom'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
-import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
+import MediaFilesNavMenu from '../components/MediaFilesNavMenu'
 import ProjectMenu from '../components/ProjectMenu'
 // import NoteTypeSelectionMenu from '../components/NoteTypeSelectionMenu'
 import DarkTheme from '../components/DarkTheme'
@@ -57,7 +57,7 @@ class Main extends Component {
     noteTypeClipMenuAnchor: null,
   }
 
-  // chooseAudioFiles = async () => {
+  // chooseMediaFiles = async () => {
   //   const filePaths = await showOpenDialog(
   //     [{ name: 'Audio or video files' }],
   //     true
@@ -130,7 +130,7 @@ class Main extends Component {
           <header className={headerCss.container}>
             <section className={headerCss.block}>
               <ProjectMenu />
-              <AudioFilesNavMenu className={headerCss.leftMenu} />
+              <MediaFilesNavMenu className={headerCss.leftMenu} />
             </section>
             <ul className={headerCss.rightMenu}>
               {mediaFolderLocation ? (
@@ -239,7 +239,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-  chooseAudioFiles: r.chooseAudioFiles,
+  chooseMediaFiles: r.chooseMediaFiles,
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,

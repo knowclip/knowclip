@@ -52,7 +52,7 @@ class NewProjectFormDialog extends Component {
         id: uuid(),
         filePath,
         name,
-        audioFilePaths: [],
+        mediaFilePaths: [],
         error: null,
       },
       {

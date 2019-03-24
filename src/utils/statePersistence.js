@@ -11,10 +11,10 @@ import parseProject from '../utils/parseProject'
 //   window.localStorage.setItem('noteTypes', JSON.stringify(noteTypes))
 // }
 
-// export const getProjectFilePath = (filePath: AudioFilePath): string =>
+// export const getProjectFilePath = (filePath: MediaFilePath): string =>
 //   `${filePath}.afca`
 // export const findExistingProjectFilePath = (
-//   filePath: AudioFilePath
+//   filePath: MediaFilePath
 // ): ?string => {
 //   const jsonPath = getProjectFilePath(filePath)
 //   return filePath && fs.existsSync(jsonPath) ? jsonPath : null

@@ -14,58 +14,58 @@ export const isLoopOn = (state: AppState) => state.audio.loop
 //   state.audio.currentFileIndex !== 0
 // export const getCurrentFileIndex = (state: AppState) =>
 //   state.audio.currentFileIndex
-export const getCurrentFileName = (state: AppState): ?AudioFileName => {
+export const getCurrentFileName = (state: AppState): ?MediaFileName => {
   const filePath = getCurrentFilePath(state)
   return filePath && basename(filePath)
 }
 
-// export const getAudioFile = (
+// export const getMediaFile = (
 //   state: AppState,
-//   id: AudioFileId
-// ): ?AudioFileData => {
+//   id: MediaFileId
+// ): ?MediaFileData => {
 
 //   const file = state.audio.files[id]
 //   return file || null
 // }
 
-// export const getAudioFilePath = (
+// export const getMediaFilePath = (
 //   state: AppState,
-//   id: AudioFileId
-// ): ?AudioFilePath => {
-//   const file = getAudioFile(state, id)
+//   id: MediaFileId
+// ): ?MediaFilePath => {
+//   const file = getMediaFile(state, id)
 //   return file ? file.path : null
 // }
 
-export const getCurrentFileId = ({ user }: AppState): ?AudioFileId =>
+export const getCurrentFileId = ({ user }: AppState): ?MediaFileId =>
   // audio.filesOrder[audio.currentFileIndex]
   user.currentMediaFileId
 
-// export const getCurrentFile = (state: AppState): ?AudioFileData => {
+// export const getCurrentFile = (state: AppState): ?MediaFileData => {
 //   const currentFileId = getCurrentFileId(state)
 //   return currentFileId ? state.audio.files[currentFileId] : null
 // }
-// export const getCurrentFilePath = (state: AppState): ?AudioFilePath => {
+// export const getCurrentFilePath = (state: AppState): ?MediaFilePath => {
 //   const currentFile = getCurrentFile(state)
 //   return currentFile ? currentFile.path : null
 // }
 export const getClipsOrder = (state: AppState): Array<ClipId> => {
   const currentFileId = getCurrentFileId(state)
   if (!currentFileId) return []
-  const clips = state.clips.idsByAudioFileId[currentFileId]
+  const clips = state.clips.idsByMediaFileId[currentFileId]
   return clips || []
 }
 
 export const doesFileHaveClips = (
   state: AppState,
-  fileId: AudioFileId
+  fileId: MediaFileId
 ): boolean => {
-  return Boolean(state.clips.idsByAudioFileId[fileId].length)
+  return Boolean(state.clips.idsByMediaFileId[fileId].length)
 }
 
 export const doesCurrentFileHaveClips = (state: AppState): boolean => {
   const currentFileId = getCurrentFileId(state)
   return Boolean(
-    currentFileId && state.clips.idsByAudioFileId[currentFileId].length
+    currentFileId && state.clips.idsByMediaFileId[currentFileId].length
   )
 }
 
@@ -74,10 +74,10 @@ export const getCurrentNoteType = (state: AppState): ?NoteType => {
   return currentNoteTypeId ? state.noteTypes.byId[currentNoteTypeId] : null
 }
 
-export const getAudioFilePaths = (
+export const getMediaFilePaths = (
   state: AppState,
   projectId: ProjectId
 ): Array<AudioMetadataAndPath> => {
   const projectMetadata = getProjectMetadata(state, projectId)
-  return projectMetadata ? projectMetadata.audioFilePaths : []
+  return projectMetadata ? projectMetadata.mediaFilePaths : []
 }

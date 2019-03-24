@@ -6,13 +6,13 @@ declare type Clip = Exact<{
   id: ClipId,
   start: WaveformX,
   end: WaveformX,
-  fileId: AudioFileId,
+  fileId: MediaFileId,
   flashcard: Flashcard,
 }>
 
 declare type ClipsState = {
   byId: { [ClipId]: Clip },
-  idsByAudioFileId: { [AudioFileId]: Array<ClipId> },
+  idsByMediaFileId: { [MediaFileId]: Array<ClipId> },
 }
 
 declare type Flashcard = {

@@ -29,7 +29,7 @@ setConfig({
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
 
-const AudioFilesNavMenu = ({
+const MediaFilesNavMenu = ({
   className,
   toggleLoop,
   currentFileName,
@@ -42,7 +42,7 @@ const AudioFilesNavMenu = ({
   confirmationDialog,
   deleteMedia,
 }) => {
-  const chooseAudioFiles = useCallback(
+  const chooseMediaFiles = useCallback(
     async () => {
       const filters = [{ name: 'Audio or video files' }]
       const filePaths = await showOpenDialog(filters, true)
@@ -62,7 +62,7 @@ const AudioFilesNavMenu = ({
     <DarkTheme>
       <section className={className} ref={menuAnchorEl}>
         {projectMediaMetadata.length > 0 ? (
-          <span className="audioFileName" title={currentFileName}>
+          <span className="mediaFileName" title={currentFileName}>
             <Button className={css.audioButton} onClick={openMenu}>
               {currentFileName ? truncate(currentFileName, 30) : 'Select media'}
             </Button>
@@ -96,17 +96,17 @@ const AudioFilesNavMenu = ({
                     </ListItemSecondaryAction>
                   </MenuItem>
                 ))}
-                <MenuItem onClick={chooseAudioFiles}>
+                <MenuItem onClick={chooseMediaFiles}>
                   <ListItemText>Add new media</ListItemText>
                 </MenuItem>
               </Menu>
             )}
-            {/* <IconButton onClick={removeAudioFiles}>
+            {/* <IconButton onClick={removeMediaFiles}>
                 <CloseIcon />
               </IconButton> */}
           </span>
         ) : (
-          <Button onClick={chooseAudioFiles}>Choose source file</Button>
+          <Button onClick={chooseMediaFiles}>Choose source file</Button>
         )}
         <Tooltip title="Loop audio">
           <IconButton onClick={toggleLoop} color={loop ? 'primary' : 'default'}>
@@ -140,7 +140,7 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(AudioFilesNavMenu)
+)(MediaFilesNavMenu)
 
 // <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
 //   <FastRewind />

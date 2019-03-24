@@ -17,6 +17,6 @@ declare type UserState = Exact<{
   highlightedClipId: ?ClipId,
   defaultTags: Array<string>,
   currentProjectId: ?ProjectId,
-  currentMediaFileId: ?AudioFileId,
+  currentMediaFileId: ?MediaFileId,
   currentNoteTypeId: ?NoteTypeId,
 }>

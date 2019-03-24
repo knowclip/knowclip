@@ -6,7 +6,7 @@ const sortClipPoints = ({ start, end }) => [start, end].sort(ascending)
 
 const newClip = (
   pendingClip: PendingClip,
-  fileId: AudioFileId,
+  fileId: MediaFileId,
   id: ClipId,
   noteType: NoteType,
   tags: Array<string> = []

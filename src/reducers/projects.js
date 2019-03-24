@@ -46,9 +46,9 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
           ...state.byId,
           [action.projectId]: {
             ...state.byId[action.projectId],
-            audioFilePaths: [
-              ...state.byId[action.projectId].audioFilePaths,
-              ...action.audioFilePaths,
+            mediaFilePaths: [
+              ...state.byId[action.projectId].mediaFilePaths,
+              ...action.mediaFilePaths,
             ],
           },
         },
@@ -61,7 +61,7 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
           ...state.byId,
           [action.projectId]: {
             ...state.byId[action.projectId],
-            audioFilePaths: state.byId[action.projectId].audioFilePaths.filter(
+            mediaFilePaths: state.byId[action.projectId].mediaFilePaths.filter(
               ({ metadata }) => metadata.id !== action.mediaFileId
             ),
           },

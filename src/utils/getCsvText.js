@@ -6,16 +6,16 @@ export const getAllClips = (state: AppState) => {
   // const fileIds = state.audio.filesOrder
   const currentProject = r.getCurrentProject(state)
   if (!currentProject) throw new Error('could not find project')
-  const fileIds = currentProject.audioFilePaths.map(
+  const fileIds = currentProject.mediaFilePaths.map(
     ({ metadata }) => metadata.id
   )
   const clips: Array<Clip> = []
   fileIds.forEach(fileId => {
-    // const currentFile: AudioFileData = state.audio.files[fileId]
+    // const currentFile: MediaFileData = state.audio.files[fileId]
     // const currentFile = r.getCurrentFile(state)
     const currentNoteType = r.getCurrentNoteType(state)
     if (!currentNoteType) throw new Error(`No note type found for ${fileId}`)
-    const currentClips: Array<Clip> = state.clips.idsByAudioFileId[fileId].map(
+    const currentClips: Array<Clip> = state.clips.idsByMediaFileId[fileId].map(
       clipId => {
         const clip = r.getClip(state, clipId)
         if (!clip) throw new Error(`clip ${clipId} for ${fileId} not found`)
@@ -35,10 +35,10 @@ const getCsvText = (state: AppState) => {
   const currentNoteType = r.getCurrentNoteType(state)
   if (!currentNoteType) throw new Error('no current note type whoopsie poopsie')
 
-  const fileIds = currentProject.audioFilePaths.map(x => x.metadata.id)
+  const fileIds = currentProject.mediaFilePaths.map(x => x.metadata.id)
   const csvData: Array<Array<string>> = []
   fileIds.forEach(fileId => {
-    const currentClips: Array<Clip> = state.clips.idsByAudioFileId[fileId].map(
+    const currentClips: Array<Clip> = state.clips.idsByMediaFileId[fileId].map(
       clipId => {
         const clip = r.getClip(state, clipId)
         if (!clip) throw new Error(`clip ${clipId} for ${fileId} not found`)

@@ -9,9 +9,9 @@ export * from './projects'
 
 export const initializeApp = (): Action => ({ type: 'INITIALIZE_APP' })
 
-export const chooseAudioFiles = (
-  filePaths: Array<AudioFilePath>,
-  ids: Array<AudioFileId>,
+export const chooseMediaFiles = (
+  filePaths: Array<MediaFilePath>,
+  ids: Array<MediaFileId>,
   noteTypeId: NoteTypeId
 ): Action => ({
   type: 'CHOOSE_AUDIO_FILES',
@@ -20,7 +20,7 @@ export const chooseAudioFiles = (
   noteTypeId,
 })
 
-export const removeAudioFiles = (): Action => ({
+export const removeMediaFiles = (): Action => ({
   type: 'REMOVE_AUDIO_FILES',
 })
 

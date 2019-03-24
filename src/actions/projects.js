@@ -45,7 +45,7 @@ export const setProjectName = (id: ProjectId, name: string): Action => ({
 
 export const addMediaToProjectRequest = (
   projectId: ProjectId,
-  filePaths: Array<AudioFilePath>
+  filePaths: Array<MediaFilePath>
 ): Action => ({
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
   projectId,
@@ -54,39 +54,41 @@ export const addMediaToProjectRequest = (
 
 export const addMediaToProject = (
   projectId: ProjectId,
-  audioFilePaths: Array<AudioMetadataAndPath>
+  mediaFilePaths: Array<AudioMetadataAndPath>
 ): Action => ({
   type: 'ADD_MEDIA_TO_PROJECT',
   projectId,
-  audioFilePaths,
+  mediaFilePaths,
 })
 
 export const deleteMedia = (
   projectId: ProjectId,
-  mediaFileId: AudioFileId
+  mediaFileId: MediaFileId
 ): Action => ({
   type: 'DELETE_MEDIA_FROM_PROJECT',
   projectId,
   mediaFileId,
 })
 
-export const setMediaMetadata = (metadata: AudioFileMetadata): Action => ({
+export const setMediaMetadata = (metadata: MediaFileMetadata): Action => ({
   type: 'SET_MEDIA_METADATA',
   metadata,
 })
 
-export const openMediaFileRequest = (id: AudioFileId): Action => ({
+export const openMediaFileRequest = (id: MediaFileId): Action => ({
   type: 'OPEN_MEDIA_FILE_REQUEST',
   id,
 })
 
 export const openMediaFileSuccess = (
-  filePath: AudioFilePath,
-  constantBitrateFilePath: AudioFilePath
+  filePath: MediaFilePath,
+  constantBitrateFilePath: MediaFilePath,
+  id: MediaFileId
 ): Action => ({
   type: 'OPEN_MEDIA_FILE_SUCCESS',
   filePath,
   constantBitrateFilePath,
+  id,
 })
 
 export const openMediaFileFailure = (errorMessage: string): Action => ({

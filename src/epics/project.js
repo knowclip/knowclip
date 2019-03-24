@@ -5,7 +5,7 @@ import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
 import { getProjectFilePath } from '../utils/statePersistence'
-import parseProject, { getAudioFilePaths } from '../utils/parseProject'
+import parseProject, { getMediaFilePaths } from '../utils/parseProject'
 
 // import electron from 'electron'
 const writeFile = promisify(fs.writeFile)
@@ -25,7 +25,7 @@ const openProject = async (filePath, projectId, state$) => {
         )
       )
     let originalProjectJson = JSON.parse(projectJson)
-    // const audioFilePaths =
+    // const mediaFilePaths =
     //   originalProjectJson &&
     //   ['0.0.0', '1.0.0'].includes(originalProjectJson.version)
     //     ? [
@@ -38,7 +38,7 @@ const openProject = async (filePath, projectId, state$) => {
     //         metadata,
     //         filePath: null,
     //       }))
-    const audioFilePaths = getAudioFilePaths(
+    const mediaFilePaths = getMediaFilePaths(
       originalProjectJson,
       project,
       filePath
@@ -55,7 +55,7 @@ const openProject = async (filePath, projectId, state$) => {
             id: project.id,
             filePath: filePath,
             name: project.name,
-            audioFilePaths,
+            mediaFilePaths,
             error: null,
           }),
           { type: 'CREATED NEW PROJECT METADATA' },
@@ -151,14 +151,14 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_PROJECT'),
     map(({ projectMetadata }) => {
-      if (!projectMetadata.audioFilePaths.length)
+      if (!projectMetadata.mediaFilePaths.length)
         return { type: 'NOOP_OPEN_PROJECT_NO_AUDIO_FILES' }
 
       const [
         {
           metadata: { id: firstMediaFileId },
         },
-      ] = projectMetadata.audioFilePaths
+      ] = projectMetadata.mediaFilePaths
       return r.openMediaFileRequest(firstMediaFileId)
     })
   )

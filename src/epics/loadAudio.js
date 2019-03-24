@@ -15,7 +15,7 @@ const tmpFilePaths = {}
 const audioElement = () => document.getElementById('audioPlayer')
 const svgElement = () => document.getElementById('waveform-svg')
 
-// const chooseAudioFilesEpic = (action$, state$) =>
+// const chooseMediaFilesEpic = (action$, state$) =>
 //   action$.pipe(
 //     ofType('CHOOSE_AUDIO_FILES'),
 //     // turning this to plain map() breaks video playback (maybe audio also)
@@ -32,7 +32,7 @@ const svgElement = () => document.getElementById('waveform-svg')
 //     })
 //   )
 
-// const removeAudioFilesEpic = (action$, state$) =>
+// const removeMediaFilesEpic = (action$, state$) =>
 //   action$.pipe(
 //     ofType('REMOVE_AUDIO_FILES'),
 //     flatMap(async ({ filePaths }) => {
@@ -52,6 +52,6 @@ const svgElement = () => document.getElementById('waveform-svg')
 //   )
 
 export default combineEpics()
-// chooseAudioFilesEpic,
-// removeAudioFilesEpic,
+// chooseMediaFilesEpic,
+// removeMediaFilesEpic,
 // setCurrentFileEpic,
