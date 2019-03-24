@@ -78,11 +78,13 @@ export const getMediaFilePaths = (
       {
         metadata: project.mediaFilesMetadata[0],
         filePath: filePath.replace(/\.afca$/, ''),
+        error: null,
       },
     ]
   }
   return project.mediaFilesMetadata.map(metadata => ({
     metadata,
     filePath: null,
+    error: null,
   }))
 }

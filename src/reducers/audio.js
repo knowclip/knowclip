@@ -17,6 +17,12 @@ const audio: Reducer<AudioState> = (
         loop: !state.loop,
       }
 
+    case 'SET_LOOP':
+      return {
+        ...state,
+        loop: action.loop,
+      }
+
     case 'CLOSE_PROJECT': // maybe better as action for closed media specifically
       return {
         ...state,

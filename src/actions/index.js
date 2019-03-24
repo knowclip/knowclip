@@ -62,6 +62,11 @@ export const toggleLoop = (): Action => ({
   type: 'TOGGLE_LOOP',
 })
 
+export const setLoop = (loop: boolean): Action => ({
+  type: 'SET_LOOP',
+  loop,
+})
+
 export const deleteCard = (id: ClipId): Action => ({
   type: 'DELETE_CARD',
   id,

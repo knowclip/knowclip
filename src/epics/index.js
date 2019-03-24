@@ -23,7 +23,6 @@ import exportFlashcardsEpic from './exportFlashcards'
 import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
-import loadAudio from './loadAudio'
 import media from './media'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
@@ -125,6 +124,31 @@ const waveformMousedownEpic = (action$, state$) =>
     )
   )
 
+const LOOP_BUFFER = 25
+const deselectClipOnManualChangeTime = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    flatMap(() =>
+      fromEvent(audioElement(), 'seeking').pipe(
+        takeWhile(() => r.getConstantBitrateFilePath(state$.value))
+      )
+    ),
+    filter(() => {
+      if (!r.isLoopOn(state$.value)) return false
+
+      const highlightedClipId = r.getHighlightedClipId(state$.value)
+      if (!highlightedClipId) return false
+
+      const highlightedClip = r.getClip(state$.value, highlightedClipId)
+      const x = r.getXAtMilliseconds(
+        state$.value,
+        audioElement().currentTime * 1000
+      )
+      return x < highlightedClip.start || x > highlightedClip.end + LOOP_BUFFER
+    }),
+    map(() => r.highlightClip(null))
+  )
+
 const highlightClipsOnAddEpic = (action$, state$) =>
   action$.pipe(
     ofType('ADD_CLIP'),
@@ -135,8 +159,7 @@ const playClipsOnHighlightEpic = (action$, state$) =>
   action$.pipe(
     ofType('HIGHLIGHT_CLIP'),
     filter(({ id }) => Boolean(id)),
-    withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    tap(([{ id: clipId } /*, { audioElement } */]) => {
+    tap(({ id: clipId }) => {
       const { start } = r.getClip(state$.value, clipId)
       const newTime = r.getSecondsAtX(state$.value, start)
       audioElement().currentTime = newTime
@@ -182,7 +205,6 @@ const defaultTagsEpic = (action$, state$) =>
 //   )
 
 export default combineEpics(
-  loadAudio,
   media,
   getWaveformEpic,
   // setLocalFlashcardEpic,
@@ -203,5 +225,6 @@ export default combineEpics(
   noteTypesEpic,
   defaultTagsEpic,
   // defaultTagsAudioEpic,
-  keyboard
+  keyboard,
+  deselectClipOnManualChangeTime
 )
