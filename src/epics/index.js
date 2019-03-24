@@ -9,7 +9,7 @@ import {
   withLatestFrom,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, merge } from 'rxjs'
+import { fromEvent, merge, empty, of } from 'rxjs'
 import { setWaveformCursor } from '../actions'
 // import { getFlashcard } from '../selectors'
 // import { setLocalFlashcard } from '../utils/localFlashcards'
@@ -204,6 +204,65 @@ const defaultTagsEpic = (action$, state$) =>
 //     }))
 //   )
 
+const selectClipOnStretch = (action$, state$) =>
+  action$.pipe(
+    ofType('EDIT_CLIP'),
+    filter(({ id, override }) => {
+      const isStretch =
+        override.start !== undefined || override.end !== undefined
+      return isStretch && id !== r.getHighlightedClipId(state$.value)
+    }),
+    map(({ id }) => r.highlightClip(id))
+  )
+
+const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
+const centerSelectedClip = (action$, state$) =>
+  action$.pipe(
+    ofType('HIGHLIGHT_CLIP'),
+    flatMap(({ id }) => {
+      console.log('highlight!!')
+      const clip = r.getClip(state$.value, id)
+      if (!clip) return empty()
+
+      const svgElement = document.getElementById('waveform-svg')
+      const svgWidth = elementWidth(svgElement)
+
+      const svgFits = clip.end - clip.start <= svgWidth
+      if (!svgFits) return empty()
+
+      const { xMin } = state$.value.waveform.viewBox
+
+      console.log('xMin', xMin)
+      console.log('svgWidth', svgWidth)
+      console.log('xMin + svgWidth', xMin + svgWidth)
+      console.log('clip', clip)
+
+      if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
+        return of(
+          r.setWaveformViewBox({
+            xMin: Math.max(
+              0,
+              clip.start - HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER
+            ),
+          })
+        )
+
+      if (xMin + svgWidth - clip.end < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
+        return of(
+          r.setWaveformViewBox({
+            xMin:
+              clip.end + HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER - svgWidth,
+          })
+        )
+
+      console.log('bolsfdahsdkfjhaskdfhkj')
+
+      return empty()
+    })
+  )
+
+// CENTER STRETCHED CLIP
+
 export default combineEpics(
   media,
   getWaveformEpic,
@@ -214,6 +273,7 @@ export default combineEpics(
   // waveformMouseupEpic,
   waveformSelectionEpic,
   waveformStretchEpic,
+  selectClipOnStretch,
   highlightClipsOnAddEpic,
   playClipsOnHighlightEpic,
   makeClipsEpic,
@@ -226,5 +286,6 @@ export default combineEpics(
   defaultTagsEpic,
   // defaultTagsAudioEpic,
   keyboard,
-  deselectClipOnManualChangeTime
+  deselectClipOnManualChangeTime,
+  centerSelectedClip
 )
