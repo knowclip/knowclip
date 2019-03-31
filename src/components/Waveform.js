@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Memo } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
@@ -66,6 +66,19 @@ const PendingStretch = ({ start, end, stepsPerSecond }) => (
 
 const getViewBox = xMin => `${xMin} 0 3000 100`
 
+const Clips = React.memo(({ clips, highlightedClipId, stepsPerSecond }) => (
+  <g className="waveform-clips">
+    {clips.map(clip => (
+      <Clip
+        {...clip}
+        key={clip.id}
+        stepsPerSecond={stepsPerSecond}
+        isHighlighted={clip.id === highlightedClipId}
+      />
+    ))}
+  </g>
+))
+
 class Waveform extends Component {
   render() {
     const {
@@ -90,16 +103,7 @@ class Waveform extends Component {
       >
         {path && <image xlinkHref={`file://${path}`} />}
         <Cursor {...cursor} />
-        <g className="waveform-clips">
-          {clips.map(clip => (
-            <Clip
-              {...clip}
-              key={clip.id}
-              stepsPerSecond={stepsPerSecond}
-              isHighlighted={clip.id === highlightedClipId}
-            />
-          ))}
-        </g>
+        <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
         {pendingClip && (
           <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
         )}

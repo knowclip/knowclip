@@ -3,6 +3,7 @@ import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import tempy from 'tempy'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import { existsSync } from 'fs'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
@@ -16,7 +17,13 @@ const getWaveformPng = async (state: AppState, path) => {
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 
-  const outputFilename = tempy.file({ extension: 'png' })
+  const pngId = 'waveform_png_for_' + path
+  let outputFilename = localStorage.getItem(pngId)
+  if (outputFilename && existsSync(outputFilename)) {
+    return outputFilename
+  }
+  outputFilename = tempy.file({ extension: 'png' })
+  localStorage.setItem(pngId, outputFilename)
 
   return await new Promise((res, rej) => {
     ffmpeg(path)

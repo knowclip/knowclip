@@ -48,11 +48,12 @@ export const getCurrentFileId = ({ user }: AppState): ?MediaFileId =>
 //   const currentFile = getCurrentFile(state)
 //   return currentFile ? currentFile.path : null
 // }
-export const getClipsOrder = (state: AppState): Array<ClipId> => {
+const empty: [] = Object.freeze([])
+export const getClipsOrder = (state: AppState): Array<ClipId> | [] => {
   const currentFileId = getCurrentFileId(state)
-  if (!currentFileId) return []
+  if (!currentFileId) return empty
   const clips = state.clips.idsByMediaFileId[currentFileId]
-  return clips || []
+  return clips || empty
 }
 
 export const doesFileHaveClips = (

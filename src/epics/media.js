@@ -1,5 +1,6 @@
 import { flatMap, map, switchMap, takeWhile } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
+import { of, from } from 'rxjs'
 import * as r from '../redux'
 import tempy from 'tempy'
 import fs from 'fs'
@@ -7,19 +8,17 @@ import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
 import uuid from 'uuid/v4'
 
-const tmpFilePaths = {}
 const coerceMp3ToConstantBitrate = path => {
   // should check if mp3
   // and if possible, constant vs. variable bitrate
   return new Promise((res, rej) => {
     if (extname(path) !== '.mp3') return res(path)
 
-    let tmpPath = tmpFilePaths[path]
-    if (tmpPath) {
-      return res(tmpPath)
-    }
+    const storedPath = localStorage.getItem(path)
+    if (storedPath && fs.existsSync(storedPath)) return res(storedPath)
 
-    tmpPath = tmpFilePaths[path] = tempy.file({ extension: 'mp3' })
+    const tmpPath = tempy.file({ extension: 'mp3' })
+    localStorage.setItem(path, tmpPath)
 
     // I guess by default it does CBR
     // though maybe we should check that
@@ -48,17 +47,39 @@ const openMedia = (action$, state$) =>
 
       if (!filePath) {
         // also should open dialog
-        return r.openMediaFileFailure(
-          "Since this is a shared project, and this is your first time opening this file, you'll first have to locate manually on your filesystem."
+        return of(
+          r.openMediaFileFailure(
+            "This is probably your first time opening this file. You'll first have to locate manually on your filesystem. (This is probably due to it being a shared file, or an older format.)"
+          )
         )
       }
 
       if (!fs.existsSync(filePath)) {
-        return r.openMediaFileFailure(
-          'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
+        return of(
+          r.openMediaFileFailure(
+            'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
+          )
         )
       }
 
+      if (extname(filePath) === '.mp3')
+        return from([
+          r.simpleMessageSnackbar(
+            'Due to variable bitrate, MP3 files may take a bit longer to open. Please be patient!'
+          ),
+          { type: 'OPEN_MP3_REQUEST', id, filePath },
+        ])
+
+      return of(r.openMediaFileSuccess(filePath, filePath, id))
+    }),
+    flatMap(x => x),
+    takeWhile(() => r.getCurrentProjectId(state$.value))
+  )
+
+const openMp3 = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MP3_REQUEST'),
+    flatMap(async ({ id, filePath }) => {
       try {
         const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
           filePath
@@ -72,8 +93,7 @@ const openMedia = (action$, state$) =>
           }\n\n Try to locate it manually?`
         )
       }
-    }),
-    takeWhile(() => r.getCurrentProjectId(state$.value))
+    })
   )
 
 const openMediaFileFailure = (action$, state$) =>
@@ -177,6 +197,7 @@ const openMediaOnLocate = (action$, state$) =>
 
 export default combineEpics(
   openMedia,
+  openMp3,
   openMediaFileFailure,
   addMediaToProject,
   openMediaOnAdd,

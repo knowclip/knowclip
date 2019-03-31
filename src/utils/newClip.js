@@ -14,8 +14,8 @@ const newClip = (
   const [start, end] = sortClipPoints(pendingClip)
 
   return {
-    start,
-    end,
+    start: +start.toFixed(2),
+    end: +end.toFixed(2),
     id,
     fileId,
     flashcard: {
