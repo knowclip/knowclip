@@ -9,10 +9,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import {
-  Delete as DeleteIcon,
-  MoreVert as MoreVertIcon,
-} from '@material-ui/icons'
+import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
 import ChipInput from 'material-ui-chip-input'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
@@ -68,7 +65,13 @@ class FlashcardForm extends Component {
   inputRef = name => el => (this.inputRefs[name] = el)
 
   render() {
-    const { currentFlashcard, selectedClipTime, currentNoteType } = this.props
+    const {
+      currentFlashcard,
+      selectedClipTime,
+      currentNoteType,
+      toggleLoop,
+      isLoopOn,
+    } = this.props
     const { moreMenuAnchorEl } = this.state
 
     return (
@@ -76,11 +79,19 @@ class FlashcardForm extends Component {
         <CardContent>
           <form className="form" onSubmit={this.handleFlashcardSubmit}>
             <div className="formBody">
-              <p className={css.timeStamp}>
+              <section className={css.timeStamp}>
                 {formatTime(selectedClipTime.start)}
                 {' - '}
                 {formatTime(selectedClipTime.end)}
-              </p>
+                <Tooltip title="Loop audio (Ctrl + L)">
+                  <IconButton
+                    onClick={toggleLoop}
+                    color={isLoopOn ? 'secondary' : 'default'}
+                  >
+                    <Loop />
+                  </IconButton>
+                </Tooltip>
+              </section>
               {currentNoteType.fields.map(({ name, id }) => (
                 <section key={`${id}_${currentFlashcard.id}`}>
                   <TextField
@@ -158,6 +169,7 @@ const mapStateToProps = state => ({
   highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: r.getClipsTimes(state),
   currentNoteType: r.getCurrentNoteType(state),
+  isLoopOn: r.isLoopOn(state),
 })
 
 const mapDispatchToProps = {
@@ -175,6 +187,7 @@ const mapDispatchToProps = {
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
   editNoteTypeDialog: r.editNoteTypeDialog,
+  toggleLoop: r.toggleLoop,
 }
 
 export default connect(

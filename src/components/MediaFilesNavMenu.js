@@ -106,7 +106,7 @@ const MediaFilesNavMenu = ({
         ) : (
           <Button onClick={chooseMediaFiles}>Choose source file</Button>
         )}
-        <Tooltip title="Loop audio">
+        <Tooltip title="Loop audio (Ctrl + L)">
           <IconButton onClick={toggleLoop} color={loop ? 'primary' : 'default'}>
             <Loop />
           </IconButton>
