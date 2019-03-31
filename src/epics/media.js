@@ -54,7 +54,9 @@ const openMedia = (action$, state$) =>
       }
 
       if (!fs.existsSync(filePath)) {
-        return r.openMediaFileFailure('Could not find media file.')
+        return r.openMediaFileFailure(
+          'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
+        )
       }
 
       try {
@@ -65,7 +67,9 @@ const openMedia = (action$, state$) =>
         return r.openMediaFileSuccess(filePath, constantBitrateFilePath, id)
       } catch (err) {
         return r.openMediaFileFailure(
-          `Error opening media file: ${err.message}`
+          `Error opening media file: ${
+            err.message
+          }\n\n Try to locate it manually?`
         )
       }
     }),
@@ -113,31 +117,46 @@ const openMediaOnAdd = (action$, state$) =>
     })
   )
 
+const getDifferenceMessage = (existingMetadata, newMetadata) => {
+  if (existingMetadata.id !== newMetadata.id)
+    throw new Error("Metadata IDs don't match")
+
+  if (existingMetadata.name !== newMetadata.name)
+    return `The name of this file doesn't match the one on record.`
+  if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
+    return `This duration of this media file doesn't match the one on record.`
+  if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
+    return `The format of this media file doesn't match the one on record.`
+}
+
 const locateMediaFile = (action$, state$) =>
   action$.pipe(
     ofType('LOCATE_MEDIA_FILE_REQUEST'),
     flatMap(async ({ id, filePath }) => {
       try {
         const ffprobeMetadata = await getMediaMetadata(filePath)
+        const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
 
         const currentProjectId = r.getCurrentProjectId(state$.value)
 
         const success = r.locateMediaFileSuccess(
           id,
-          convertMediaMetadata(ffprobeMetadata, filePath, id),
+          newMetadata,
           currentProjectId,
           filePath
         )
 
         const existingMetadata = r.getCurrentMediaMetadata(state$.value)
         if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
-          const differenceMessage = `This file doesn't appear to match the "${
-            existingMetadata.name
-          }" on record.`
-          return r.confirmationDialog(
-            `${differenceMessage} Do you want to try using this file anyway?`,
-            success
+          const differenceMessage = getDifferenceMessage(
+            existingMetadata,
+            newMetadata
           )
+          if (differenceMessage)
+            return r.confirmationDialog(
+              `${differenceMessage} Do you want to try using this file anyway?`,
+              success
+            )
         }
 
         return success
@@ -150,10 +169,17 @@ const locateMediaFile = (action$, state$) =>
     })
   )
 
+const openMediaOnLocate = (action$, state$) =>
+  action$.pipe(
+    ofType('LOCATE_MEDIA_FILE_SUCCESS'),
+    map(({ id }) => r.openMediaFileRequest(id))
+  )
+
 export default combineEpics(
   openMedia,
   openMediaFileFailure,
   addMediaToProject,
   openMediaOnAdd,
-  locateMediaFile
+  locateMediaFile,
+  openMediaOnLocate
 )

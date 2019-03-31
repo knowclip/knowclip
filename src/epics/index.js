@@ -49,7 +49,7 @@ const audioElement = () => document.getElementById('audioPlayer')
 
 const setWaveformCursorEpic = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    ofType('OPEN_MEDIA_FILE_REQUEST'),
     flatMap(() =>
       fromEvent(audioElement(), 'timeupdate').pipe(
         // takeUntil(
@@ -108,7 +108,7 @@ const setWaveformCursorEpic = (action$, state$) =>
 
 const waveformMousedownEpic = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    ofType('OPEN_MEDIA_FILE_REQUEST'),
     flatMap(() =>
       fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
         tap(e => e.preventDefault()),
@@ -127,7 +127,7 @@ const waveformMousedownEpic = (action$, state$) =>
 const LOOP_BUFFER = 25
 const deselectClipOnManualChangeTime = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    ofType('OPEN_MEDIA_FILE_REQUEST'),
     flatMap(() =>
       fromEvent(audioElement(), 'seeking').pipe(
         takeWhile(() => r.getConstantBitrateFilePath(state$.value))
