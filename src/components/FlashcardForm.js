@@ -7,6 +7,7 @@ import {
   CardContent,
   Menu,
   MenuItem,
+  Tooltip,
 } from '@material-ui/core'
 import {
   Delete as DeleteIcon,
@@ -26,6 +27,14 @@ class FlashcardForm extends Component {
 
   handleCloseMoreMenu = () => {
     this.setState({ moreMenuAnchorEl: null })
+  }
+
+  handleClickDeleteButton = () => {
+    const { confirmationDialog, selectedClipId } = this.props
+    confirmationDialog(
+      'Are you sure you want to delete this clip and flashcard?',
+      r.deleteCard(selectedClipId)
+    )
   }
 
   handleFlashcardSubmit = e => {
@@ -100,19 +109,22 @@ class FlashcardForm extends Component {
 
               <section className={css.bottom}>
                 <span className={css.noteTypeName}>
-                  Using note type:{' '}
-                  <span
-                    className={css.noteTypeNameLink}
-                    onClick={this.editCardTemplate}
-                  >
-                    {currentNoteType.name}
-                  </span>
+                  Using card template:{' '}
+                  <Tooltip title="Edit card template">
+                    <span
+                      className={css.noteTypeNameLink}
+                      onClick={this.editCardTemplate}
+                      tabIndex={0}
+                    >
+                      {currentNoteType.name}
+                    </span>
+                  </Tooltip>
                 </span>
                 <IconButton
                   className={css.moreMenuButton}
-                  onClick={this.handleClickMoreButton}
+                  onClick={this.handleClickDeleteButton}
                 >
-                  <MoreVertIcon />
+                  <DeleteIcon />
                 </IconButton>
                 <Menu
                   anchorEl={moreMenuAnchorEl}
@@ -152,6 +164,7 @@ const mapDispatchToProps = {
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   deleteCard: r.deleteCard,
+  confirmationDialog: r.confirmationDialog,
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
   highlightClip: r.highlightClip,

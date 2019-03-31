@@ -12,5 +12,5 @@ export const getXAtMilliseconds = (
   milliseconds: number
 ): number => {
   const { stepsPerSecond, stepLength } = state.waveform
-  return (milliseconds / 1000) * (stepsPerSecond * stepLength)
+  return +((milliseconds / 1000) * (stepsPerSecond * stepLength)).toFixed(2)
 }

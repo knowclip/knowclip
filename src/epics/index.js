@@ -220,7 +220,7 @@ const centerSelectedClip = (action$, state$) =>
   action$.pipe(
     ofType('HIGHLIGHT_CLIP'),
     flatMap(({ id }) => {
-      console.log('highlight!!')
+      // console.log('highlight!!')
       const clip = r.getClip(state$.value, id)
       if (!clip) return empty()
 
@@ -232,10 +232,10 @@ const centerSelectedClip = (action$, state$) =>
 
       const { xMin } = state$.value.waveform.viewBox
 
-      console.log('xMin', xMin)
-      console.log('svgWidth', svgWidth)
-      console.log('xMin + svgWidth', xMin + svgWidth)
-      console.log('clip', clip)
+      // console.log('xMin', xMin)
+      // console.log('svgWidth', svgWidth)
+      // console.log('xMin + svgWidth', xMin + svgWidth)
+      // console.log('clip', clip)
 
       if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
         return of(
