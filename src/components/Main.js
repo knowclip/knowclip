@@ -31,7 +31,7 @@ const VIDEO_EXTENSIONS = `.MP4 .AVI .MOV .FLV .WMV`.split(/\s/)
 const isVideo = filePath =>
   VIDEO_EXTENSIONS.includes(extname(filePath).toUpperCase())
 
-const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
+const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
   const props = {
     onEnded: handleAudioEnded,
     loop: loop,
@@ -44,7 +44,7 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
     src: filePath ? `file:///${filePath}` : null,
   }
 
-  return filePath && isVideo(filePath) ? (
+  return metadata && metadata.isVideo ? (
     <video {...props} />
   ) : (
     <audio {...props} />
@@ -100,6 +100,7 @@ class Main extends Component {
       // currentNoteType,
       clipsHaveBeenMade,
       constantBitrateFilePath,
+      currentMediaMetadata,
     } = this.props
     // const { noteTypeClipMenuAnchor } = this.state
 
@@ -187,6 +188,7 @@ class Main extends Component {
             filePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
             loop={loop}
+            metadata={currentMediaMetadata}
           />
         </section>
         {Boolean(currentFileName) && <Waveform show={!audioIsLoading} />}
@@ -230,6 +232,7 @@ const mapStateToProps = state => ({
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getConstantBitrateFilePath(state),
+  currentMediaMetadata: r.getCurrentMediaMetadata(state),
 })
 
 const mapDispatchToProps = {

@@ -47,6 +47,9 @@ export const reviewAndExportDialog = () =>
 export const newProjectFormDialog = () =>
   enqueueDialog({ type: 'NewProjectForm' })
 
+export const openMediaFileFailureDialog = (message: string): DialogAction =>
+  enqueueDialog({ type: 'OpenMediaFileFailure', props: { message } })
+
 export const closeDialog = (): DialogAction => ({
   type: 'CLOSE_DIALOG',
 })

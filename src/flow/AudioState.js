@@ -18,5 +18,6 @@ declare type MediaFileMetadata = Exact<{
   id: MediaFileId,
   name: MediaFileName,
   durationSeconds: number,
-  format: string,
+  format: 'UNKNOWN' | string,
+  isVideo: boolean,
 }>

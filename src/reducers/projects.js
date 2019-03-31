@@ -68,6 +68,26 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
         },
       }
 
+    case 'LOCATE_MEDIA_FILE_SUCCESS':
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.projectId]: {
+            ...state.byId[action.projectId],
+            mediaFilePaths: state.byId[action.projectId].mediaFilePaths.map(p =>
+              p.metadata.id === action.id
+                ? {
+                    ...p,
+                    filePath: action.filePath,
+                    metadata: action.metadata,
+                  }
+                : p
+            ),
+          },
+        },
+      }
+
     default:
       return state
   }

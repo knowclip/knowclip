@@ -42,6 +42,7 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
         durationSeconds: 0,
         format: 'UNKNOWN',
         name: project.audioFileName,
+        isVideo: false, // can't know yet
       },
     ],
     noteType: project.noteType,

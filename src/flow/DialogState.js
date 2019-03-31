@@ -19,6 +19,10 @@ declare type DialogData =
   | {
       type: 'NewProjectForm',
     }
+  | {
+      type: 'OpenMediaFileFailure',
+      props: { message: string },
+    }
 
 declare type DialogState = Exact<{
   queue: Array<DialogData>,

@@ -8,9 +8,11 @@ const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
 
 const getWaveformPng = async (state: AppState, path) => {
+  const ffprobeMetadata = await getMediaMetadata(path)
   const {
     format: { duration },
-  } = await getMediaMetadata(path)
+  } = ffprobeMetadata
+  console.log(ffprobeMetadata)
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 

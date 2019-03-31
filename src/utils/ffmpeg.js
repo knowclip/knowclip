@@ -1,3 +1,5 @@
+import { basename } from 'path'
+
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
 
 const setFfmpegAndFfprobePath = () => {
@@ -36,3 +38,17 @@ export const getMediaMetadata = path => {
     })
   })
 }
+
+export const convertMediaMetadata = (
+  ffprobeMetadata,
+  filePath,
+  id
+): MediaFileMetadata => ({
+  id,
+  name: basename(filePath),
+  durationSeconds: ffprobeMetadata.format.duration,
+  format: ffprobeMetadata.format.format_name,
+  isVideo: ffprobeMetadata.streams.some(({ codec_type }) =>
+    /video/i.test(codec_type)
+  ),
+})

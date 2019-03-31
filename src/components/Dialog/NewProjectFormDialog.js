@@ -10,12 +10,7 @@ import {
 import uuid from 'uuid/v4'
 import { showSaveDialog } from '../../utils/electron'
 import * as r from '../../redux'
-
-const deleteKey = (obj, key) => {
-  const clone = { ...obj }
-  delete clone[key]
-  return clone
-}
+import deleteKey from '../../utils/deleteKey'
 
 class NewProjectFormDialog extends Component {
   state = {

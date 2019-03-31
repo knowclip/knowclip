@@ -154,4 +154,15 @@ declare type MediaAction =
       projectId: ProjectId,
       mediaFileId: MediaFileId,
     |}
-  | {| type: 'SET_MEDIA_METADATA', metadata: MediaFileMetadata |}
+  | {|
+      type: 'LOCATE_MEDIA_FILE_REQUEST',
+      id: MediaFileId,
+      filePath: MediaFilePath,
+    |}
+  | {|
+      type: 'LOCATE_MEDIA_FILE_SUCCESS',
+      projectId: ProjectId,
+      id: MediaFileId,
+      metadata: MediaFileMetadata,
+      filePath: MediaFilePath,
+    |}

@@ -3,7 +3,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import tempy from 'tempy'
 import fs from 'fs'
-import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
 import uuid from 'uuid/v4'
 
@@ -49,7 +49,7 @@ const openMedia = (action$, state$) =>
       if (!filePath) {
         // also should open dialog
         return r.openMediaFileFailure(
-          "Since this is a shared project, and this is your first time opening this file, you'll first have to locate it on your filesystem."
+          "Since this is a shared project, and this is your first time opening this file, you'll first have to locate manually on your filesystem."
         )
       }
 
@@ -75,7 +75,7 @@ const openMedia = (action$, state$) =>
 const openMediaFileFailure = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_FAILURE'),
-    map(({ errorMessage }) => r.simpleMessageSnackbar(errorMessage))
+    map(({ errorMessage }) => r.openMediaFileFailureDialog(errorMessage))
   )
 
 const addMediaToProject = (action$, state$) =>
@@ -90,12 +90,7 @@ const addMediaToProject = (action$, state$) =>
             console.log(ffprobeMetadata)
             return {
               filePath,
-              metadata: {
-                id: uuid(),
-                name: basename(filePath),
-                durationSeconds: ffprobeMetadata.format.duration,
-                format: ffprobeMetadata.format.format_name,
-              },
+              metadata: convertMediaMetadata(ffprobeMetadata, filePath, uuid()),
             }
           })
         )
@@ -118,9 +113,47 @@ const openMediaOnAdd = (action$, state$) =>
     })
   )
 
+const locateMediaFile = (action$, state$) =>
+  action$.pipe(
+    ofType('LOCATE_MEDIA_FILE_REQUEST'),
+    flatMap(async ({ id, filePath }) => {
+      try {
+        const ffprobeMetadata = await getMediaMetadata(filePath)
+
+        const currentProjectId = r.getCurrentProjectId(state$.value)
+
+        const success = r.locateMediaFileSuccess(
+          id,
+          convertMediaMetadata(ffprobeMetadata, filePath, id),
+          currentProjectId,
+          filePath
+        )
+
+        const existingMetadata = r.getCurrentMediaMetadata(state$.value)
+        if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
+          const differenceMessage = `This file doesn't appear to match the "${
+            existingMetadata.name
+          }" on record.`
+          return r.confirmationDialog(
+            `${differenceMessage} Do you want to try using this file anyway?`,
+            success
+          )
+        }
+
+        return success
+      } catch (err) {
+        console.error(err)
+        return r.simpleMessageSnackbar(
+          `There was a problem opening this media file. ${err.message}`
+        )
+      }
+    })
+  )
+
 export default combineEpics(
   openMedia,
   openMediaFileFailure,
   addMediaToProject,
-  openMediaOnAdd
+  openMediaOnAdd,
+  locateMediaFile
 )

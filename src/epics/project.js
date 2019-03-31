@@ -125,7 +125,7 @@ const saveProjectFile = (action$, state$) =>
       'DELETE_NOTE_TYPE',
       'ADD_MEDIA_TO_PROJECT',
       'DELETE_MEDIA_FROM_PROJECT',
-      'SET_MEDIA_METADATA'
+      'LOCATE_MEDIA_METADATA_SUCCESS'
     ),
     debounce(() => timer(TEN_SECONDS)),
     flatMap(async () => {

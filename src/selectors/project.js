@@ -72,3 +72,21 @@ export const getProjectMediaMetadata = (
   const project = getProjectMetadata(state, projectId)
   return project ? project.mediaFilePaths.map(({ metadata }) => metadata) : []
 }
+
+export const getCurrentMediaMetadata = (
+  state: AppState
+): ?MediaFileMetadata => {
+  const currentProjectId = getCurrentProjectId(state)
+  if (!currentProjectId) return null
+
+  const currentProjectMediaMetadata = getProjectMediaMetadata(
+    state,
+    currentProjectId
+  )
+  if (!currentProjectMediaMetadata) return null
+
+  const { currentMediaFileId } = state.user
+  if (!currentMediaFileId) return null
+
+  return currentProjectMediaMetadata.find(({ id }) => id === currentMediaFileId)
+}

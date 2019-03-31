@@ -70,11 +70,6 @@ export const deleteMedia = (
   mediaFileId,
 })
 
-export const setMediaMetadata = (metadata: MediaFileMetadata): Action => ({
-  type: 'SET_MEDIA_METADATA',
-  metadata,
-})
-
 export const openMediaFileRequest = (id: MediaFileId): Action => ({
   type: 'OPEN_MEDIA_FILE_REQUEST',
   id,
@@ -94,4 +89,22 @@ export const openMediaFileSuccess = (
 export const openMediaFileFailure = (errorMessage: string): Action => ({
   type: 'OPEN_MEDIA_FILE_FAILURE',
   errorMessage,
+})
+
+export const locateMediaFileRequest = (
+  id: MediaFileId,
+  filePath: MediaFilePath
+): Action => ({ type: 'LOCATE_MEDIA_FILE_REQUEST', id, filePath })
+
+export const locateMediaFileSuccess = (
+  id: MediaFileId,
+  metadata: MediaFileMetadata,
+  projectId: ProjectId, // kind of unnecessary... maybe should change state shape
+  filePath: MediaFilePath
+): Action => ({
+  type: 'LOCATE_MEDIA_FILE_SUCCESS',
+  id,
+  metadata,
+  projectId,
+  filePath,
 })
