@@ -40,7 +40,7 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
     id: 'audioPlayer',
     className: 'audioPlayer',
     controlsList: 'nodownload',
-    autoPlay: true,
+    // autoPlay: true,
     src: filePath ? `file:///${filePath}` : null,
   }
 
@@ -65,9 +65,6 @@ class Main extends Component {
   //   const { addMediaToProjectRequest, currentProjectId } = this.props
   //   if (filePaths) addMediaToProjectRequest(currentProjectId, filePaths)
   // }
-
-  audioRef = el => (this.audio = el)
-  svgRef = el => (this.svg = el)
 
   reviewAndExportDialog = () => this.props.reviewAndExportDialog()
 
@@ -189,13 +186,10 @@ class Main extends Component {
           <Media
             filePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
-            ref={this.audioRef}
             loop={loop}
           />
         </section>
-        {Boolean(currentFileName) && (
-          <Waveform show={!audioIsLoading} svgRef={this.svgRef} />
-        )}
+        {Boolean(currentFileName) && <Waveform show={!audioIsLoading} />}
         {audioIsLoading && (
           <div className="waveform-placeholder">
             <CircularProgress />

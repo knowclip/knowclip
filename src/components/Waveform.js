@@ -70,7 +70,6 @@ class Waveform extends Component {
   render() {
     const {
       show,
-      svgRef,
       clips,
       pendingClip,
       pendingStretch,
@@ -83,7 +82,6 @@ class Waveform extends Component {
       <svg
         style={show ? {} : { display: 'none' }}
         id="waveform-svg"
-        ref={svgRef}
         viewBox={getViewBox(viewBox.xMin)}
         preserveAspectRatio="xMinYMin slice"
         className="waveform-svg"

@@ -43,7 +43,10 @@ export class ProjectsMenu extends Component {
                   <MenuItem disabled>No recent projects.</MenuItem>
                 )}
                 {projects.map(projectMetadata => (
-                  <MenuItem onClick={() => openProjectById(projectMetadata.id)}>
+                  <MenuItem
+                    key={projectMetadata.id}
+                    onClick={() => openProjectById(projectMetadata.id)}
+                  >
                     {projectMetadata.name}
                   </MenuItem>
                 ))}

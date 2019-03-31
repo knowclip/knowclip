@@ -1,4 +1,4 @@
-import React, { Component, useCallback, useState, useRef, useMemo } from 'react'
+import React, { useCallback, useState, useRef } from 'react'
 import { connect } from 'react-redux'
 import {
   Button,
@@ -20,11 +20,11 @@ import truncate from '../utils/truncate'
 import * as r from '../redux'
 import css from './Header.module.css'
 
-import { AppContainer, setConfig, cold } from 'react-hot-loader'
+// import { setConfig, cold } from 'react-hot-loader'
 
-setConfig({
-  onComponentCreate: (type, name) => cold(type),
-})
+// setConfig({
+//   onComponentCreate: (type, name) => cold(type),
+// })
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
@@ -50,13 +50,11 @@ const MediaFilesNavMenu = ({
     },
     [addMediaToProjectRequest, currentProjectId]
   )
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null)
-  const openMenu = e => {
-    setMenuAnchorEl(e.currentTarget)
-  }
-  const closeMenu = () => {
-    setMenuAnchorEl(null)
-  }
+
+  const menuAnchorEl = useRef(null)
+  const [menuIsOpen, setMenuIsOpen] = useState(false)
+  const openMenu = e => setMenuIsOpen(true)
+  const closeMenu = e => setMenuIsOpen(false)
 
   return (
     <DarkTheme>
@@ -67,10 +65,10 @@ const MediaFilesNavMenu = ({
               {currentFileName ? truncate(currentFileName, 30) : 'Select media'}
             </Button>
 
-            {Boolean(menuAnchorEl) && (
+            {menuIsOpen && (
               <Menu
-                anchorEl={menuAnchorEl || document.body}
-                open={Boolean(menuAnchorEl)}
+                anchorEl={menuAnchorEl.current}
+                open={menuIsOpen}
                 onClose={closeMenu}
               >
                 {projectMediaMetadata.map(({ name, id }) => (
