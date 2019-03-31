@@ -42,9 +42,8 @@ const getWaveformPng = async (state: AppState, path) => {
 
 const getWaveformEpic = (action$, state$) =>
   action$.pipe(
-    // ofType('LOAD_AUDIO'),
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(async ({ filePath }) => {
+    flatMap(async ({ filePath, constantBitrateFilePath }) => {
       try {
         if (!filePath) {
           return r.setWaveformImagePath(null)
@@ -52,9 +51,8 @@ const getWaveformEpic = (action$, state$) =>
 
         const imagePath = await getWaveformPng(
           state$.value,
-          r.getConstantBitrateFilePath(state$.value)
+          constantBitrateFilePath
         )
-        console.log(imagePath)
         return r.setWaveformImagePath(imagePath)
       } catch (err) {
         console.error(err)
