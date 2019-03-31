@@ -136,7 +136,8 @@ declare type MediaAction =
       type: 'OPEN_MEDIA_FILE_SUCCESS',
       filePath: MediaFilePath,
       constantBitrateFilePath: MediaFilePath,
-      id: MediaFileId,
+      metadata: MediaFileMetadata,
+      projectId: ProjectId,
     |}
   | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
   | {|

@@ -10,7 +10,13 @@ export const persistState = (state: AppState) => {
 
 const persistStateEpic = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_PROJECT', 'ADD_MEDIA_TO_PROJECT', 'DELETE_MEDIA_FROM_PROJECT'),
+    ofType(
+      'OPEN_PROJECT',
+      'ADD_MEDIA_TO_PROJECT',
+      'DELETE_MEDIA_FROM_PROJECT',
+      'OPEN_MEDIA_FILE_SUCCESS',
+      'LOCATE_MEDIA_FILE_SUCCESS'
+    ),
     tap(() => {
       persistState(state$.value)
     }),

@@ -72,11 +72,11 @@ const openProjectById = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_PROJECT_REQUEST_BY_ID'),
     flatMap(async ({ id }) => {
-      const project = r.getProjectMetadata(state$.value, id)
-      if (!project)
+      const projectMetadata = r.getProjectMetadata(state$.value, id)
+      if (!projectMetadata)
         return of(r.simpleMessageSnackbar(`Could not find project ${id}.`))
 
-      const { filePath } = project
+      const { filePath } = projectMetadata
       if (!filePath)
         return of(
           r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
@@ -125,7 +125,8 @@ const saveProjectFile = (action$, state$) =>
       'DELETE_NOTE_TYPE',
       'ADD_MEDIA_TO_PROJECT',
       'DELETE_MEDIA_FROM_PROJECT',
-      'LOCATE_MEDIA_METADATA_SUCCESS'
+      'LOCATE_MEDIA_METADATA_SUCCESS',
+      'CREATED NEW PROJECT METADATA'
     ),
     debounce(() => timer(TEN_SECONDS)),
     flatMap(async () => {

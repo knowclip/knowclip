@@ -34,10 +34,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       }
 
     case 'CLOSE_PROJECT':
-      return {
-        ...state,
-        currentProjectId: null,
-      }
+      return initialState
 
     case 'OPEN_MEDIA_FILE_REQUEST':
       return {

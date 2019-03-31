@@ -62,6 +62,28 @@ const openMedia = (action$, state$) =>
         )
       }
 
+      const ffprobeMetadata = await getMediaMetadata(filePath)
+      const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
+      const currentProjectId = r.getCurrentProjectId(state$.value)
+
+      const existingMetadata = r.getCurrentMediaMetadata(state$.value)
+      if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
+        const differenceMessage = getDifferenceMessage(
+          existingMetadata,
+          newMetadata
+        )
+        if (differenceMessage)
+          return from([
+            r.simpleMessageSnackbar(differenceMessage),
+            r.openMediaFileSuccess(
+              filePath,
+              filePath,
+              newMetadata,
+              currentProjectId
+            ),
+          ])
+      }
+
       if (extname(filePath) === '.mp3')
         return from([
           r.simpleMessageSnackbar(
@@ -70,7 +92,15 @@ const openMedia = (action$, state$) =>
           { type: 'OPEN_MP3_REQUEST', id, filePath },
         ])
 
-      return of(r.openMediaFileSuccess(filePath, filePath, id))
+      // newMetadata might actually be same? :| but if not it overrides 'UNKNOWN' format
+      return of(
+        r.openMediaFileSuccess(
+          filePath,
+          filePath,
+          newMetadata,
+          currentProjectId
+        )
+      )
     }),
     flatMap(x => x),
     takeWhile(() => r.getCurrentProjectId(state$.value))
@@ -85,7 +115,15 @@ const openMp3 = (action$, state$) =>
           filePath
         )
 
-        return r.openMediaFileSuccess(filePath, constantBitrateFilePath, id)
+        const ffprobeMetadata = await getMediaMetadata(filePath)
+        const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
+
+        return r.openMediaFileSuccess(
+          filePath,
+          constantBitrateFilePath,
+          metadata,
+          r.getCurrentProjectId(state$.value)
+        )
       } catch (err) {
         return r.openMediaFileFailure(
           `Error opening media file: ${
