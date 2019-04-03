@@ -82,7 +82,10 @@ export const makeClips = (format: ExportFormat): Action => ({
   format,
 })
 
-export const exportFlashcards = (): Action => ({ type: 'EXPORT_FLASHCARDS' })
+export const exportFlashcards = (exportData: ApkgExportData): Action => ({
+  type: 'EXPORT_FLASHCARDS',
+  exportData,
+})
 
 export const setMediaFolderLocation = (directoryPath: string): Action => ({
   type: 'SET_MEDIA_FOLDER_LOCATION',

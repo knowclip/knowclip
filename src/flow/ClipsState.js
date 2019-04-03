@@ -27,6 +27,29 @@ declare type PendingClip = {
   end: WaveformX,
 }
 
+// export
+
+declare type ClipSpecs = {
+  sourceFilePath: string,
+  outputFilename: string,
+  startTime: number,
+  endTime: number,
+  flashcardSpecs: {
+    fields: Array<string>,
+    tags: Array<string>,
+  },
+}
+
+declare type ApkgExportData = {
+  deckName: string,
+  template: {
+    fields: Array<string>, // field names
+    questionFormat: string,
+    answerFormat: string,
+  },
+  clips: Array<ClipSpecs>,
+}
+
 // project file version 0.0.0
 declare type ClipWithoutFilePath = Exact<{
   id: ClipId,

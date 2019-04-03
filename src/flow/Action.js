@@ -19,7 +19,7 @@ declare type Action =
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
   | {| type: 'SET_LOOP', loop: boolean |}
-  | {| type: 'EXPORT_FLASHCARDS' |}
+  | {| type: 'EXPORT_FLASHCARDS', exportData: ApkgExportData |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
   | {| type: 'DETECT_SILENCE' |}

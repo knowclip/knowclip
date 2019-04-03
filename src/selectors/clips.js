@@ -22,39 +22,6 @@ export const getClipMilliseconds = (
 
 // export const getClipMediaFilePath = (state: AppState, clipId: ClipId): ?MediaFilePath =>
 
-export const getClipOutputParameters = (state: AppState, clipId: ClipId) => {
-  const clip = state.clips.byId[clipId]
-  if (!clip) throw Error(`Could not find clip ${clipId}`)
-  const { start, end, fileId } = clip
-  // const filePath = getMediaFilePath(state, fileId)
-  const filePath = 'getMediaFilePath(state, fileId)'
-  if (!filePath) throw Error(`Could not find file path for clip ${clipId}`)
-
-  const extension = extname(filePath)
-  const filenameWithoutExtension = basename(filePath, extension)
-  const startTime = getMillisecondsAtX(state, start)
-  const endTime = getMillisecondsAtX(state, end)
-
-  const outputFilename = `${filenameWithoutExtension}___${toTimestamp(
-    startTime,
-    SAFE_SEPARATOR
-  )}-${toTimestamp(
-    endTime,
-    SAFE_SEPARATOR,
-    SAFE_MILLISECONDS_SEPARATOR
-  )}___afcaId${clipId}${'.mp3'}`
-
-  return {
-    filePath,
-    start: startTime,
-    end: endTime,
-    outputFilename,
-  }
-}
-
-export const getClipFilename = (state: AppState, clipId: ClipId) =>
-  getClipOutputParameters(state, clipId).outputFilename
-
 export const getClipIdsByMediaFileId = (
   state: AppState,
   mediaFileId: string
