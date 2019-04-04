@@ -1,4 +1,5 @@
 // @flow
+import { createSelector } from 'reselect'
 import { getSecondsAtX } from './waveformTime'
 import * as audioSelectors from './audio'
 
@@ -16,14 +17,20 @@ export * from './project'
 
 export const getClip = (state: AppState, id: ClipId): ?Clip =>
   state.clips.byId[id]
-export const getClips = (state: AppState): Array<Clip> =>
-  audioSelectors.getClipsOrder(state).map(
-    (id: ClipId): Clip => {
-      const clip = getClip(state, id)
+
+export const getClipsObject = (state: AppState): { [ClipId]: Clip } =>
+  state.clips.byId
+
+export const getClips: (state: AppState) => Array<Clip> = createSelector(
+  audioSelectors.getClipsOrder,
+  getClipsObject,
+  (clipsOrder, clips) =>
+    clipsOrder.map(id => {
+      const clip = clips[id]
       if (!clip) throw new Error('Impossible')
       return clip
-    }
-  )
+    })
+)
 
 type TimeSpan = {
   start: number,
@@ -143,3 +150,6 @@ export const isAudioLoading = (state: AppState): boolean =>
 
 export const getMediaFolderLocation = (state: AppState): ?string =>
   state.audio.mediaFolderLocation
+
+export const getConstantBitrateFilePath = (state: AppState): ?MediaFilePath =>
+  state.user.currentMediaFileId ? state.audio.constantBitrateFilePath : null

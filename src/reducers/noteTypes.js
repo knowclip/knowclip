@@ -11,7 +11,7 @@
 //   allIds: ['default'],
 //   defaultId: 'default',
 // }
-export const initialState: NoteTypesState = {
+export const initialState: Exact<NoteTypesState> = {
   byId: {
     default: {
       id: 'default',
@@ -21,14 +21,20 @@ export const initialState: NoteTypesState = {
     },
   },
   allIds: ['default'],
-  defaultId: 'default',
 }
 const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
   switch (action.type) {
-    case 'HYDRATE_FROM_PROJECT_FILE':
-      return action.state.noteTypes
-
+    case 'OPEN_PROJECT':
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.project.noteType.id]: action.project.noteType,
+        },
+        allIds: [...state.allIds, action.project.noteType.id],
+      }
     case 'ADD_NOTE_TYPE':
+    case 'CREATE_PROJECT':
       return {
         ...state,
         byId: {
@@ -58,17 +64,9 @@ const noteTypes: Reducer<NoteTypesState> = (state = initialState, action) => {
         ? {
             byId,
             allIds: state.allIds.filter(id => id !== action.id),
-            defaultId:
-              state.defaultId === action.id ? leftoverIds[0] : state.defaultId,
           }
         : initialState
     }
-
-    case 'SET_DEFAULT_NOTE_TYPE':
-      return {
-        ...state,
-        defaultId: action.id,
-      }
 
     default:
       return state

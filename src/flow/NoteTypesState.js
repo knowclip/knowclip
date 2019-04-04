@@ -3,7 +3,6 @@
 declare type NoteTypesState = {
   byId: { [NoteTypeId]: NoteType },
   allIds: Array<NoteTypeId>,
-  defaultId: NoteTypeId,
 }
 
 declare type NoteTypeId = string

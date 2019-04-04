@@ -1,0 +1,43 @@
+.header {
+  composes: container from './Header.module.css';
+}
+
+.mainHeading {
+  font-size: 1.4rem;
+  /* max-width: 600px; */
+  text-align: center;
+  margin: 10% auto 1em auto;
+}  
+
+.main {
+}
+
+.menu {
+  box-sizing: border-box;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.buttons {
+  margin: 1rem auto;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+}
+
+.button {
+  margin: auto 0.5rem !important;
+}
+.button:last-child {
+  margin-right: 0 !important;
+}
+.button:first-child {
+  margin-left: 0 !important;
+}
+
+.recentProjectsPaper {
+  height: 250px;
+  overflow-y: auto;
+}

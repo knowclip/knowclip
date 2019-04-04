@@ -55,7 +55,7 @@ video::-webkit-media-controls-panel {
   max-width: 30em;
   margin: auto;
 }
-.audioFileName {
+.mediaFileName {
   font-size: large;
   display: inline;
   /* overflow: hidden;

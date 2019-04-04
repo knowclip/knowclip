@@ -4,7 +4,6 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
-  Menu,
   Card,
   CardContent,
   Fab,
@@ -14,28 +13,18 @@ import {
   Delete as DeleteIcon,
   Layers,
 } from '@material-ui/icons'
+import { Redirect } from 'react-router-dom'
 import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
-import AudioFilesNavMenu from '../components/AudioFilesNavMenu'
-import NoteTypeSelectionMenu from '../components/NoteTypeSelectionMenu'
+import MediaFilesNavMenu from '../components/MediaFilesNavMenu'
+import ProjectMenu from '../components/ProjectMenu'
 import DarkTheme from '../components/DarkTheme'
-import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
-import uuid from 'uuid/v4'
 import truncate from '../utils/truncate'
-
 import * as r from '../redux'
-import electron from 'electron'
 
-const { remote } = electron
-const { dialog } = remote
-
-const VIDEO_EXTENSIONS = `.MP4 .AVI .MOV .FLV .WMV`.split(/\s/)
-const isVideo = filePath =>
-  VIDEO_EXTENSIONS.includes(extname(filePath).toUpperCase())
-
-const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
+const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
   const props = {
     onEnded: handleAudioEnded,
     loop: loop,
@@ -44,68 +33,21 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded }) => {
     id: 'audioPlayer',
     className: 'audioPlayer',
     controlsList: 'nodownload',
-    autoPlay: true,
+    // autoPlay: true,
+    src: filePath ? `file:///${filePath}` : null,
   }
 
-  return filePath && isVideo(filePath) ? (
+  return metadata && metadata.isVideo ? (
     <video {...props} />
   ) : (
     <audio {...props} />
   )
 }
 
-class App extends Component {
+class Main extends Component {
   state = {
     modalIsOpen: false,
     noteTypeClipMenuAnchor: null,
-  }
-
-  componentDidMount() {
-    this.props.initializeApp()
-  }
-
-  chooseAudioFiles = () => {
-    dialog.showOpenDialog(
-      // { properties: ['openFile', 'multiClips'] },
-      { properties: ['openFile'] },
-      filePaths => {
-        if (filePaths) {
-          const ids = filePaths.map(filePath => uuid())
-          this.props.chooseAudioFiles(
-            filePaths,
-            ids,
-            this.props.defaultNoteTypeId
-          )
-        }
-      }
-    )
-  }
-
-  removeAudioFiles = () =>
-    this.props.confirmationDialog(
-      'Are you sure you want to close this media file?',
-      r.removeAudioFiles()
-    )
-
-  audioRef = el => (this.audio = el)
-  svgRef = el => (this.svg = el)
-
-  goToFile = index => this.props.setCurrentFile(index)
-  prevFile = () => {
-    const lower = this.props.currentFileIndex - 1
-    this.goToFile(lower >= 0 ? lower : 0)
-  }
-  nextFile = () => {
-    const higher = this.props.currentFileIndex + 1
-    const lastIndex = this.props.filePaths.length - 1
-    this.goToFile(higher <= lastIndex ? higher : lastIndex)
-  }
-
-  deleteCard = () => {
-    const { deleteCard, highlightedClipId } = this.props
-    if (highlightedClipId) {
-      deleteCard(highlightedClipId)
-    }
   }
 
   reviewAndExportDialog = () => this.props.reviewAndExportDialog()
@@ -120,20 +62,11 @@ class App extends Component {
     this.props.mediaFolderLocationFormDialog()
   }
 
-  openNoteTypeSelectionMenu = e => {
-    e.preventDefault()
-    this.setState({ noteTypeClipMenuAnchor: e.currentTarget })
-  }
-  closeNoteTypeSelectionMenu = () =>
-    this.setState({ noteTypeClipMenuAnchor: null })
-
-  toggleLoop = () => this.props.toggleLoop()
-
   render() {
+    if (!this.props.currentProjectId) return <Redirect to="/projects" />
+
     const {
       loop,
-      isPrevButtonEnabled,
-      isNextButtonEnabled,
       currentFlashcard,
       currentFileName,
       currentFilePath,
@@ -141,10 +74,10 @@ class App extends Component {
       mediaFolderLocation,
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
-      currentNoteType,
       clipsHaveBeenMade,
+      constantBitrateFilePath,
+      currentMediaMetadata,
     } = this.props
-    const { noteTypeClipMenuAnchor } = this.state
 
     const form = Boolean(currentFlashcard) ? (
       <FlashcardForm />
@@ -159,6 +92,7 @@ class App extends Component {
               from your media file to turn into flashcards.
             </p>
           )}
+          You can add and remove fields in the flashcard template form.
         </CardContent>
       </Card>
     )
@@ -167,18 +101,10 @@ class App extends Component {
       <div className="App">
         <DarkTheme>
           <header className={headerCss.container}>
-            <AudioFilesNavMenu
-              className={headerCss.leftMenu}
-              onClickPrevious={this.prevFile}
-              onClickNext={this.nextFile}
-              onClickLoop={this.toggleLoop}
-              currentFilename={currentFileName}
-              isPrevButtonEnabled={isPrevButtonEnabled}
-              isNextButtonEnabled={isNextButtonEnabled}
-              chooseAudioFiles={this.chooseAudioFiles}
-              removeAudioFiles={this.removeAudioFiles}
-              loop={loop}
-            />
+            <section className={headerCss.block}>
+              <ProjectMenu />
+              <MediaFilesNavMenu className={headerCss.leftMenu} />
+            </section>
             <ul className={headerCss.rightMenu}>
               {mediaFolderLocation ? (
                 <li className={headerCss.menuTextItem}>
@@ -198,7 +124,7 @@ class App extends Component {
                   </a>
                 </li>
               )}
-              <li className={headerCss.menuTextItem}>
+              {/* <li className={headerCss.menuTextItem}>
                 using note type:{' '}
                 <a
                   ref={noteTypeClipMenuAnchor}
@@ -212,9 +138,8 @@ class App extends Component {
                   onClose={this.closeNoteTypeSelectionMenu}
                   open={Boolean(noteTypeClipMenuAnchor)}
                 >
-                  <NoteTypeSelectionMenu />
                 </Menu>
-              </li>
+              </li> */}
               <li className={headerCss.menuItem}>
                 <Tooltip title="Detect silences">
                   <IconButton onClick={detectSilenceRequest}>
@@ -235,13 +160,13 @@ class App extends Component {
 
         <section className="media">
           <Media
-            filePath={currentFilePath}
+            filePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
-            ref={this.audioRef}
             loop={loop}
+            metadata={currentMediaMetadata}
           />
         </section>
-        <Waveform show={!audioIsLoading} svgRef={this.svgRef} />
+        {Boolean(currentFileName) && <Waveform show={!audioIsLoading} />}
         {audioIsLoading && (
           <div className="waveform-placeholder">
             <CircularProgress />
@@ -265,32 +190,25 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
-  filePaths: r.getFilePaths(state),
-  flashcards: r.getFlashcardsByTime(state),
-  currentFileIndex: r.getCurrentFileIndex(state),
   currentFileName: r.getCurrentFileName(state),
   currentFilePath: r.getCurrentFilePath(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   selectedClipId: r.getSelectedClipId(state),
-  isNextButtonEnabled: r.isNextButtonEnabled(state),
-  isPrevButtonEnabled: r.isPrevButtonEnabled(state),
   loop: r.isLoopOn(state),
   highlightedClipId: r.getHighlightedClipId(state),
-  clipsTimes: r.getClipsTimes(state),
   audioIsLoading: r.isAudioLoading(state),
-  mediaFolderLocation: r.getMediaFolderLocation(state),
-  currentNoteType: r.getCurrentNoteType(state),
-  defaultNoteTypeId: r.getDefaultNoteTypeId(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
+  mediaFolderLocation: r.getMediaFolderLocation(state),
+  currentProjectId: r.getCurrentProjectId(state),
+  constantBitrateFilePath: r.getConstantBitrateFilePath(state),
+  currentMediaMetadata: r.getCurrentMediaMetadata(state),
 })
 
 const mapDispatchToProps = {
-  chooseAudioFiles: r.chooseAudioFiles,
-  removeAudioFiles: r.removeAudioFiles,
+  chooseMediaFiles: r.chooseMediaFiles,
   setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
-  deleteCard: r.deleteCard,
   makeClips: r.makeClips,
   exportFlashcards: r.exportFlashcards,
   highlightClip: r.highlightClip,
@@ -300,9 +218,10 @@ const mapDispatchToProps = {
   mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
   reviewAndExportDialog: r.reviewAndExportDialog,
   confirmationDialog: r.confirmationDialog,
+  addMediaToProjectRequest: r.addMediaToProjectRequest,
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(App)
+)(Main)

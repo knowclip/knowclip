@@ -27,6 +27,12 @@ const waveform: Reducer<WaveformState> = (state = initialState, action) => {
       }
     }
 
+    case 'SET_WAVEFORM_VIEW_BOX':
+      return {
+        ...state,
+        viewBox: action.viewBox,
+      }
+
     default:
       return state
   }

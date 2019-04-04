@@ -2,14 +2,13 @@ import {
   filter,
   map,
   flatMap,
-  tap,
   takeUntil,
   withLatestFrom,
   takeLast,
   take,
 } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
-import { fromEvent, of, merge } from 'rxjs'
+import { ofType, combineEpics } from 'redux-observable'
+import { fromEvent, merge } from 'rxjs'
 import { setPendingClip, addClip } from '../actions'
 import * as r from '../redux'
 import {
@@ -28,10 +27,12 @@ const pendingClipIsBigEnough = state => {
 }
 
 const waveformSelectionEpic = (action$, state$) => {
-  const loadAudioActions = action$.pipe(ofType('LOAD_AUDIO'))
+  const loadAudioActions = action$.pipe(ofType('OPEN_MEDIA_FILE_SUCCESS'))
   const mousedowns = loadAudioActions.pipe(
-    flatMap(({ svgElement }) =>
-      fromEvent(svgElement, 'mousedown').pipe(takeUntil(loadAudioActions))
+    flatMap(() =>
+      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+        takeUntil(loadAudioActions)
+      )
     )
   )
 
@@ -46,10 +47,9 @@ const waveformSelectionEpic = (action$, state$) => {
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
     filter(({ x }) => !r.getClipEdgeAt(state$.value, x)),
-    withLatestFrom(loadAudioActions),
-    flatMap(([waveformMousedown, loadAudio]) => {
+    flatMap(waveformMousedown => {
       const audioElement = document.getElementById('audioPlayer')
-      const { svgElement } = loadAudio
+      const svgElement = document.getElementById('waveform-svg')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =
@@ -101,34 +101,35 @@ const waveformSelectionEpic = (action$, state$) => {
               )
         })
       )
-      const highlightsAndTimeChanges = mouseups.pipe(
-        map(mouseup => {
-          const x = toWaveformX(
-            mouseup,
-            svgElement,
-            r.getWaveformViewBoxXMin(state$.value)
-          )
-          const clipIdAtX = r.getClipIdAt(state$.value, x)
-          return { x, clipIdAtX }
-        }),
-        // this should probably be done elsewhere.
-        // tapping gets repeated unexpectedly, so maybe better always at the 'end' of the epic
-        tap(({ x, clipIdAtX }) => {
-          const state = state$.value
-          const mousePositionOrClipStart = clipIdAtX
-            ? r.getClip(state, clipIdAtX).start
-            : x
-          const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
-          audioElement.currentTime = newTime
-        }),
-        flatMap(({ x, clipIdAtX }) =>
-          clipIdAtX ? of(r.highlightClip(clipIdAtX)) : of(r.highlightClip(null))
-        )
-      )
-
-      return merge(pendingClips, pendingClipEnds, highlightsAndTimeChanges)
+      return merge(pendingClips, pendingClipEnds)
     })
   )
 }
 
-export default waveformSelectionEpic
+const highlightEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    flatMap(() =>
+      fromEvent(document.getElementById('waveform-svg'), 'mouseup')
+    ),
+    withLatestFrom(
+      action$.pipe(
+        ofType('WAVEFORM_MOUSEDOWN'),
+        map(({ x }: Action) => {
+          const clipIdAtX = r.getClipIdAt(state$.value, x)
+          return { x, clipIdAtX }
+        })
+      )
+    ),
+    map(([mouseUp, { x, clipIdAtX }]) => {
+      const state = state$.value
+      const mousePositionOrClipStart = clipIdAtX
+        ? r.getClip(state, clipIdAtX).start
+        : x
+      const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
+      document.getElementById('audioPlayer').currentTime = newTime
+      return clipIdAtX ? r.highlightClip(clipIdAtX) : r.highlightClip(null)
+    })
+  )
+
+export default combineEpics(waveformSelectionEpic, highlightEpic)

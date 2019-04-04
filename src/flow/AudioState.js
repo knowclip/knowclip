@@ -1,27 +1,23 @@
 // @flow
 
-declare type AudioFileId = string
-declare type AudioFilePath = string
-declare type AudioFileData = Exact<{
-  id: AudioFileId,
-  path: AudioFilePath,
-  noteTypeId: NoteTypeId, // bye bye
-}>
+declare type MediaFileId = string
+declare type MediaFilePath = string
 
 declare type AudioState = Exact<{
   loop: boolean,
-  files: {
-    [AudioFileId]: AudioFileData,
-  },
-  filesOrder: Array<AudioFilePath>,
-  currentFileIndex: number,
   isLoading: boolean,
   mediaFolderLocation: ?string,
+  constantBitrateFilePath: ?MediaFilePath,
+  // filesMetadata: Exact<{
+  //   byId: { [MediaFileId]: MediaFileMetadata },
+  //   allIds: Array<MediaFileData>,
+  // }>,
 }>
 
-declare type AudioFileMetadata = Exact<{
-  id: AudioFileId,
-  name: AudioFileName,
+declare type MediaFileMetadata = Exact<{
+  id: MediaFileId,
+  name: MediaFileName,
   durationSeconds: number,
-  format: string,
+  format: 'UNKNOWN' | string,
+  isVideo: boolean,
 }>

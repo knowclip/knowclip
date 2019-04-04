@@ -4,12 +4,43 @@ const initialState: UserState = {
   pendingClip: null,
   pendingStretch: null,
   highlightedClipId: null,
-  defaultNoteTypeId: 'default',
   defaultTags: [],
+  currentMediaFileId: null,
+  currentProjectId: null,
+  currentNoteTypeId: null,
 }
 
 const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'DELETE_MEDIA_FROM_PROJECT':
+      return action.mediaFileId === state.currentMediaFileId
+        ? {
+            ...state,
+            currentMediaFileId: null,
+          }
+        : state
+
+    case 'CREATE_PROJECT':
+      return {
+        ...state,
+        currentNoteTypeId: action.noteType.id,
+      }
+    case 'OPEN_PROJECT':
+      return {
+        ...state,
+        currentProjectId: action.project.id,
+        currentNoteTypeId: action.project.noteType.id,
+      }
+
+    case 'CLOSE_PROJECT':
+      return initialState
+
+    case 'OPEN_MEDIA_FILE_REQUEST':
+      return {
+        ...state,
+        currentMediaFileId: action.id,
+      }
+
     case 'ADD_CLIP':
       return {
         ...state,

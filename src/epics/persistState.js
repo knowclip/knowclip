@@ -1,13 +1,23 @@
-import { ignoreElements } from 'rxjs/operators'
-import { fromEvent } from 'rxjs'
-import { ipcRenderer } from 'electron'
-import { persistState } from '../utils/statePersistence'
+import { ignoreElements, tap } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
+
+export const persistState = (state: AppState) => {
+  window.localStorage.setItem('projects', JSON.stringify(state.projects))
+}
 
 const persistStateEpic = (action$, state$) =>
-  fromEvent(ipcRenderer, 'app-close', () => {
-    persistState(state$.value)
-
-    ipcRenderer.send('closed')
-  }).pipe(ignoreElements())
+  action$.pipe(
+    ofType(
+      'OPEN_PROJECT',
+      'ADD_MEDIA_TO_PROJECT',
+      'DELETE_MEDIA_FROM_PROJECT',
+      'OPEN_MEDIA_FILE_SUCCESS',
+      'LOCATE_MEDIA_FILE_SUCCESS'
+    ),
+    tap(() => {
+      persistState(state$.value)
+    }),
+    ignoreElements()
+  )
 
 export default persistStateEpic

@@ -1,11 +1,9 @@
 // @flow
 const initialState: AudioState = {
   loop: true,
-  currentFileIndex: 0,
-  files: ({}: { [AudioFilePath]: AudioFileData }),
-  filesOrder: [],
   isLoading: false,
   mediaFolderLocation: null,
+  constantBitrateFilePath: null,
 }
 
 const audio: Reducer<AudioState> = (
@@ -13,62 +11,41 @@ const audio: Reducer<AudioState> = (
   action: Action
 ) => {
   switch (action.type) {
-    case 'HYDRATE_FROM_PROJECT_FILE':
-      return action.state.audio
-
     case 'TOGGLE_LOOP':
       return {
         ...state,
         loop: !state.loop,
       }
 
-    case 'CHOOSE_AUDIO_FILES': {
-      const { noteTypeId, ids, filePaths } = action
-
+    case 'SET_LOOP':
       return {
         ...state,
-        filesOrder: ids,
-        files: ids.reduce((files, id, i) => {
-          const fileData: AudioFileData = {
-            path: filePaths[i],
-            noteTypeId,
-            id,
-          }
-          return { ...files, [id]: fileData }
-        }, {}),
-        isLoading: true,
-        currentFileIndex: 0,
+        loop: action.loop,
       }
-    }
 
-    case 'REMOVE_AUDIO_FILES':
+    case 'CLOSE_PROJECT': // maybe better as action for closed media specifically
       return {
         ...state,
-        filesOrder: [],
-        files: {},
+        loop: true,
         isLoading: false,
-        currentFileIndex: 0,
+        constantBitrateFilePath: null,
       }
 
-    case 'INITIALIZE_APP':
+    case 'OPEN_MEDIA_FILE_REQUEST':
       return {
         ...state,
-        isLoading: Boolean(state.filesOrder.length),
+        constantBitrateFilePath: null,
+        isLoading: true,
       }
 
-    case 'SET_CURRENT_FILE':
+    case 'OPEN_MEDIA_FILE_SUCCESS':
       return {
         ...state,
-        currentFileIndex: action.index,
+        constantBitrateFilePath: action.constantBitrateFilePath,
+        isLoading: false,
       }
 
-    case 'LOAD_AUDIO':
-      return {
-        ...state,
-        isLoading: Boolean(action.filePath),
-      }
-
-    case 'LOAD_AUDIO_SUCCESS':
+    case 'OPEN_MEDIA_FILE_FAILURE':
       return {
         ...state,
         isLoading: false,
@@ -80,23 +57,6 @@ const audio: Reducer<AudioState> = (
         mediaFolderLocation: action.directoryPath,
       }
 
-    case 'SET_AUDIO_FILE_NOTE_TYPE': {
-      const { noteTypeId } = action
-      return {
-        ...state,
-        files: Object.keys(state.files).reduce(
-          (all, id) => ({
-            ...all,
-            [id]: {
-              ...state.files[id],
-              noteTypeId,
-            },
-          }),
-          {}
-        ),
-      }
-    }
-    // case 'ADD_CLIP'
     default:
       return state
   }

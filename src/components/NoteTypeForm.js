@@ -22,8 +22,6 @@ const deleteKey = (obj, key) => {
 }
 
 class NoteTypeForm extends Component {
-  static defaultProps = { closeDialogOnDelete: true }
-
   constructor(props) {
     super(props)
     this.state = {
@@ -39,7 +37,7 @@ class NoteTypeForm extends Component {
       },
     }
 
-    this.validate = this.getValidator(props.noteTypeNames)
+    this.validate = this.getValidator([])
   }
 
   noteTypeAlreadySaved() {
@@ -92,13 +90,11 @@ class NoteTypeForm extends Component {
 
   setNameText = text =>
     this.setState(state => ({
-      // ...state,
       noteType: { ...state.noteType, name: text },
       errors: deleteKey(state.errors, 'name'),
     }))
   setFieldText = (index, text) =>
     this.setState(state => ({
-      // ...state,
       noteType: {
         ...state.noteType,
         fields: state.noteType.fields.map((field, i) =>
@@ -142,18 +138,20 @@ class NoteTypeForm extends Component {
   render() {
     const { noteType, errors } = this.state
     const { handleSubmit } = this
-    const {
-      cancel,
-      deleteNoteTypeRequest,
-      id,
-      closeDialogOnDelete,
-    } = this.props
+    const { cancel } = this.props
     return (
       <>
         <DialogContent>
           <form onSubmit={handleSubmit}>
-            <p>What kind of flashcards are you making?</p>
-            <p>Define your flashcard fields below.</p>
+            <h3>Flashcard template</h3>
+            <TextField
+              label="Template name"
+              value={noteType.name}
+              error={Boolean(errors.name)}
+              helperText={errors.name}
+              onChange={this.handleChangeNoteNameText}
+            />
+            <h4>Fields</h4>
 
             <p>
               <small>
@@ -185,15 +183,6 @@ class NoteTypeForm extends Component {
               Add field <AddIcon />
             </Button>
 
-            <p>Name this note type (for later reuse):</p>
-
-            <TextField
-              value={noteType.name}
-              error={Boolean(errors.name)}
-              helperText={errors.name}
-              onChange={this.handleChangeNoteNameText}
-            />
-
             <p>
               <FormControlLabel
                 label="Include tags field"
@@ -208,13 +197,6 @@ class NoteTypeForm extends Component {
           </form>
         </DialogContent>
         <DialogActions>
-          {this.noteTypeAlreadySaved() && (
-            <Button
-              onClick={() => deleteNoteTypeRequest(id, closeDialogOnDelete)}
-            >
-              Delete Note Type
-            </Button>
-          )}
           <Button onClick={cancel}>Exit</Button>
           <Button onClick={handleSubmit}>Save</Button>
         </DialogActions>
@@ -224,18 +206,13 @@ class NoteTypeForm extends Component {
 }
 
 const mapStateToProps = (state, { id }) => ({
-  // noteTypeFields: r.getNoteTypeFields(state),
-  // noteTypeName: r.getNoteTypeId(state),
   noteType: r.getNoteType(state, id),
-  noteTypeNames: r.getNoteTypeNames(state),
 })
 
 const mapDispatchToProps = {
   addNoteType: r.addNoteType,
-  setDefaultNoteType: r.setDefaultNoteType,
   simpleMessageSnackbar: r.simpleMessageSnackbar,
   editNoteTypeRequest: r.editNoteTypeRequest,
-  deleteNoteTypeRequest: r.deleteNoteTypeRequest,
 }
 
 export default connect(

@@ -7,29 +7,24 @@ declare type Action =
   | WaveformAction
   | NoteTypeAction
   | ClipAction
+  | ProjectAction
+  | MediaAction
   | {|
       type: 'CHOOSE_AUDIO_FILES',
-      filePaths: Array<AudioFilePath>,
-      ids: Array<AudioFileId>,
+      filePaths: Array<MediaFilePath>,
+      ids: Array<MediaFileId>,
       noteTypeId: NoteTypeId,
     |}
   | {| type: 'REMOVE_AUDIO_FILES' |}
-  | {|
-      type: 'LOAD_AUDIO',
-      filePath: ?string,
-      audioElement: Object,
-      svgElement: Object,
-    |}
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
-  | {| type: 'LOAD_AUDIO_SUCCESS', file: ?Object |}
-  | {| type: 'EXPORT_FLASHCARDS' |}
+  | {| type: 'SET_LOOP', loop: boolean |}
+  | {| type: 'EXPORT_FLASHCARDS', exportData: ApkgExportData |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
   | {| type: 'DETECT_SILENCE' |}
   | {| type: 'DETECT_SILENCE_REQUEST' |}
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
-  | {| type: 'HYDRATE_FROM_PROJECT_FILE', state: $Shape<AppState> |}
 
 declare type ExportFormat = 'CSV+MP3' | 'APKG'
 
@@ -63,15 +58,15 @@ declare type ClipAction =
   | {|
       type: 'ADD_CLIPS',
       clips: Array<Clip>,
-      fileId: AudioFileId,
+      fileId: MediaFileId,
     |}
   | {| type: 'EDIT_CLIP', id: ClipId, override: $Shape<Clip> |}
   | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
   | {| type: 'HIGHLIGHT_CLIP', id: ?ClipId |}
 
 declare type NoteTypeAction =
-  | { type: 'ADD_NOTE_TYPE', noteType: NoteType }
-  | { type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> }
+  | {| type: 'ADD_NOTE_TYPE', noteType: NoteType |}
+  | {| type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> |}
   | {
       type: 'EDIT_NOTE_TYPE_REQUEST',
       id: NoteTypeId,
@@ -87,21 +82,21 @@ declare type NoteTypeAction =
       id: NoteTypeId,
       closeDialogOnComplete: boolean,
     |}
-  | {| type: 'SET_DEFAULT_NOTE_TYPE', id: NoteTypeId |}
   | {
       type: 'SET_AUDIO_FILE_NOTE_TYPE',
-      audioFileId: AudioFileId,
+      mediaFileId: MediaFileId,
       noteTypeId: NoteTypeId,
     }
-  | {
+  | {|
       type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
-      audioFileId: AudioFileId,
+      mediaFileId: MediaFileId,
       noteTypeId: NoteTypeId,
-    }
+    |}
 
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
+  | {| type: 'SET_WAVEFORM_VIEW_BOX', viewBox: WaveformViewBox |}
   | {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
   | {| type: 'SET_PENDING_STRETCH', stretch: PendingStretch |}
 
@@ -114,7 +109,57 @@ declare type SnackbarAction =
   | {| type: 'CLOSE_SNACKBAR' |}
 
 declare type ProjectAction =
-  | {| type: 'OPEN_LISTED_PROJECT_REQUEST', id: ProjectId |}
-  | {| type: 'OPEN_UNLISTED_PROJECT_REQUEST', filePath: ProjectFilePath |}
-  | {| type: 'OPEN_PROJECT', project: Project2_0_0 |}
-  | {| type: 'CREATE_PROJECT', id: ProjectId, name: string |}
+  | {| type: 'OPEN_PROJECT_REQUEST_BY_ID', id: ProjectId |}
+  | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
+  | {|
+      type: 'OPEN_PROJECT',
+      project: Project2_0_0,
+      projectMetadata: ProjectMetadata,
+    |}
+  | {|
+      type: 'CREATE_PROJECT',
+      projectMetadata: ProjectMetadata,
+      noteType: NoteType,
+    |}
+  | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
+  | {| type: 'SET_PROJECT_ERROR', error: ?string |}
+  | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
+  | {| type: 'CLOSE_PROJECT' |}
+
+declare type MediaAction =
+  | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
+  | {|
+      type: 'OPEN_MEDIA_FILE_SUCCESS',
+      filePath: MediaFilePath,
+      constantBitrateFilePath: MediaFilePath,
+      metadata: MediaFileMetadata,
+      projectId: ProjectId,
+    |}
+  | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
+  | {|
+      type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
+      projectId: ProjectId,
+      filePaths: Array<MediaFilePath>,
+    |}
+  | {|
+      type: 'ADD_MEDIA_TO_PROJECT',
+      projectId: ProjectId,
+      mediaFilePaths: Array<AudioMetadataAndPath>,
+    |}
+  | {|
+      type: 'DELETE_MEDIA_FROM_PROJECT',
+      projectId: ProjectId,
+      mediaFileId: MediaFileId,
+    |}
+  | {|
+      type: 'LOCATE_MEDIA_FILE_REQUEST',
+      id: MediaFileId,
+      filePath: MediaFilePath,
+    |}
+  | {|
+      type: 'LOCATE_MEDIA_FILE_SUCCESS',
+      projectId: ProjectId,
+      id: MediaFileId,
+      metadata: MediaFileMetadata,
+      filePath: MediaFilePath,
+    |}

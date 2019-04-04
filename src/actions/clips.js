@@ -7,7 +7,7 @@ export const addClip = (clip: Clip): ClipAction => ({
 
 export const addClips = (
   clips: Array<Clip>,
-  fileId: AudioFileId
+  fileId: MediaFileId
 ): ClipAction => ({
   type: 'ADD_CLIPS',
   clips,

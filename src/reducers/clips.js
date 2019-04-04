@@ -1,7 +1,7 @@
 // @flow
 const initialState: ClipsState = {
   byId: {},
-  idsByAudioFileId: {},
+  idsByMediaFileId: {},
 }
 
 const byStart = clips => (aId, bId) => {
@@ -12,29 +12,29 @@ const byStart = clips => (aId, bId) => {
   return 0
 }
 
-const addIdToIdsByAudioFileId = (
+const addIdToIdsByMediaFileId = (
   oldById,
-  oldIdsByAudioFileId: Array<ClipId>,
+  oldIdsByMediaFileId: Array<ClipId>,
   clip
 ) => {
-  return oldIdsByAudioFileId
+  return oldIdsByMediaFileId
     .map(id => oldById[id])
     .concat(clip)
     .sort((a, b) => a.start - b.start)
     .map(clip => clip.id)
 }
 
-const addIdstoIdsByAudioFileId = (
+const addIdstoIdsByMediaFileId = (
   oldById,
-  oldIdsByAudioFileId: Array<ClipId>,
+  oldIdsByMediaFileId: Array<ClipId>,
   sortedClips
 ) => {
-  const newIndex = oldIdsByAudioFileId.findIndex(
+  const newIndex = oldIdsByMediaFileId.findIndex(
     id => oldById[id].start > sortedClips[0].start
   )
-  return (newIndex === -1 ? [] : oldIdsByAudioFileId.slice(0, newIndex))
+  return (newIndex === -1 ? [] : oldIdsByMediaFileId.slice(0, newIndex))
     .concat(sortedClips.map(clip => clip.id))
-    .concat(oldIdsByAudioFileId.slice(newIndex))
+    .concat(oldIdsByMediaFileId.slice(newIndex))
 }
 
 const arrayToMapById = array =>
@@ -45,13 +45,31 @@ const arrayToMapById = array =>
 
 const clips: Reducer<ClipsState> = (state = initialState, action) => {
   switch (action.type) {
-    case 'HYDRATE_FROM_PROJECT_FILE':
-      return action.state.clips
+    case 'CLOSE_PROJECT':
+      return initialState
+
+    case 'OPEN_PROJECT': {
+      const newState: ClipsState = { byId: {}, idsByMediaFileId: {} }
+      const { idsByMediaFileId, byId } = newState
+      action.project.mediaFilesMetadata.forEach(({ id }) => {
+        idsByMediaFileId[id] = []
+      })
+
+      for (const id in action.project.clips) {
+        const clip = action.project.clips[id]
+        byId[id] = clip
+        idsByMediaFileId[clip.fileId].push(clip.id)
+      }
+      for (const fileId in idsByMediaFileId) {
+        idsByMediaFileId[fileId].sort(byStart(byId))
+      }
+      return newState
+    }
 
     case 'CHOOSE_AUDIO_FILES':
       return {
         ...state,
-        idsByAudioFileId: action.ids.reduce(
+        idsByMediaFileId: action.ids.reduce(
           (all, id) => ({
             ...all,
             [id]: [],
@@ -63,7 +81,7 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
     case 'REMOVE_AUDIO_FILES':
       return {
         ...state,
-        idsByAudioFileId: {},
+        idsByMediaFileId: {},
         byId: {},
       }
 
@@ -76,11 +94,11 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
           ...state.byId,
           [clip.id]: clip,
         },
-        idsByAudioFileId: {
-          ...state.idsByAudioFileId,
-          [fileId]: addIdToIdsByAudioFileId(
+        idsByMediaFileId: {
+          ...state.idsByMediaFileId,
+          [fileId]: addIdToIdsByMediaFileId(
             state.byId,
-            state.idsByAudioFileId[fileId],
+            state.idsByMediaFileId[fileId],
             clip
           ),
         },
@@ -95,11 +113,11 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
           ...state.byId,
           ...arrayToMapById(clips),
         },
-        idsByAudioFileId: {
-          ...state.idsByAudioFileId,
-          [fileId]: addIdstoIdsByAudioFileId(
+        idsByMediaFileId: {
+          ...state.idsByMediaFileId,
+          [fileId]: addIdstoIdsByMediaFileId(
             state.byId,
-            state.idsByAudioFileId[fileId],
+            state.idsByMediaFileId[fileId],
             clips
           ),
         },
@@ -146,9 +164,9 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       return {
         ...state,
         byId: newClips,
-        idsByAudioFileId: {
-          ...state.idsByAudioFileId,
-          [fileId]: state.idsByAudioFileId[fileId].filter(
+        idsByMediaFileId: {
+          ...state.idsByMediaFileId,
+          [fileId]: state.idsByMediaFileId[fileId].filter(
             id => !idsToBeDiscarded.includes(id)
           ),
         },
@@ -163,9 +181,9 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       return {
         ...state,
         byId,
-        idsByAudioFileId: {
-          ...state.idsByAudioFileId,
-          [fileId]: state.idsByAudioFileId[fileId].filter(
+        idsByMediaFileId: {
+          ...state.idsByMediaFileId,
+          [fileId]: state.idsByMediaFileId[fileId].filter(
             id => id !== action.id
           ),
         },
@@ -184,9 +202,9 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       return {
         ...state,
         byId,
-        idsByAudioFileId: {
-          ...state.idsByAudioFileId,
-          [fileId]: state.idsByAudioFileId[fileId].filter(
+        idsByMediaFileId: {
+          ...state.idsByMediaFileId,
+          [fileId]: state.idsByMediaFileId[fileId].filter(
             id => !ids.includes(id)
           ),
         },
@@ -267,6 +285,36 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
             },
           },
         },
+      }
+    }
+
+    case 'ADD_MEDIA_TO_PROJECT': {
+      const idsByMediaFileId = { ...state.idsByMediaFileId }
+      action.mediaFilePaths.forEach(({ metadata }) => {
+        idsByMediaFileId[metadata.id] = []
+      })
+      return {
+        ...state,
+        idsByMediaFileId,
+      }
+    }
+
+    case 'DELETE_MEDIA_FROM_PROJECT': {
+      const clipIds = state.idsByMediaFileId[action.mediaFileId] || []
+      console.log('mediaFileId', action.mediaFileId)
+
+      const byId = { ...state.byId }
+      clipIds.forEach(id => {
+        delete byId[id]
+      })
+
+      const idsByMediaFileId = { ...state.idsByMediaFileId }
+      delete idsByMediaFileId[action.mediaFileId]
+
+      return {
+        ...state,
+        byId,
+        idsByMediaFileId,
       }
     }
 

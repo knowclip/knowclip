@@ -6,14 +6,21 @@
   padding-bottom: 3rem;
 }
 
-.timeStamp {
+.timeStamp,
+.noteTypeName {
   opacity: 0.5;
   font-size: 0.8em;
+}
+.timeStamp {
   text-align: right;
 }
 
-.deleteButton {
+.bottom {
   position: absolute !important;
   bottom: 1rem;
   right: 1rem;
+}
+.noteTypeNameLink {
+  text-decoration: underline;
+  cursor: pointer;
 }

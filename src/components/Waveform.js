@@ -66,11 +66,23 @@ const PendingStretch = ({ start, end, stepsPerSecond }) => (
 
 const getViewBox = xMin => `${xMin} 0 3000 100`
 
+const Clips = React.memo(({ clips, highlightedClipId, stepsPerSecond }) => (
+  <g className="waveform-clips">
+    {clips.map(clip => (
+      <Clip
+        {...clip}
+        key={clip.id}
+        stepsPerSecond={stepsPerSecond}
+        isHighlighted={clip.id === highlightedClipId}
+      />
+    ))}
+  </g>
+))
+
 class Waveform extends Component {
   render() {
     const {
       show,
-      svgRef,
       clips,
       pendingClip,
       pendingStretch,
@@ -83,7 +95,6 @@ class Waveform extends Component {
       <svg
         style={show ? {} : { display: 'none' }}
         id="waveform-svg"
-        ref={svgRef}
         viewBox={getViewBox(viewBox.xMin)}
         preserveAspectRatio="xMinYMin slice"
         className="waveform-svg"
@@ -92,16 +103,7 @@ class Waveform extends Component {
       >
         {path && <image xlinkHref={`file://${path}`} />}
         <Cursor {...cursor} />
-        <g className="waveform-clips">
-          {clips.map(clip => (
-            <Clip
-              {...clip}
-              key={clip.id}
-              stepsPerSecond={stepsPerSecond}
-              isHighlighted={clip.id === highlightedClipId}
-            />
-          ))}
-        </g>
+        <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
         {pendingClip && (
           <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
         )}

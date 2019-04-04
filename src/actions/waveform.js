@@ -23,3 +23,10 @@ export const setPendingStretch = (stretch: PendingStretch): WaveformAction => ({
   type: 'SET_PENDING_STRETCH',
   stretch,
 })
+
+export const setWaveformViewBox = (
+  viewBox: WaveformViewBox
+): WaveformAction => ({
+  type: 'SET_WAVEFORM_VIEW_BOX',
+  viewBox,
+})

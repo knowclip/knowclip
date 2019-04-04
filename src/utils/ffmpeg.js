@@ -1,3 +1,5 @@
+import { basename } from 'path'
+
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
 
 const setFfmpegAndFfprobePath = () => {
@@ -26,3 +28,27 @@ export const toTimestamp = (
   const hoursStamp = zeroPad(2, Math.floor(milliseconds / 1000 / 60 / 60))
   return `${hoursStamp}${unitsSeparator}${minutesStamp}${unitsSeparator}${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }
+
+export const getMediaMetadata = path => {
+  return new Promise((res, rej) => {
+    ffmpeg.ffprobe(path, (err, metadata) => {
+      if (err) rej(err)
+
+      res(metadata)
+    })
+  })
+}
+
+export const convertMediaMetadata = (
+  ffprobeMetadata,
+  filePath,
+  id
+): MediaFileMetadata => ({
+  id,
+  name: basename(filePath),
+  durationSeconds: ffprobeMetadata.format.duration,
+  format: ffprobeMetadata.format.format_name,
+  isVideo: ffprobeMetadata.streams.some(({ codec_type }) =>
+    /video/i.test(codec_type)
+  ),
+})

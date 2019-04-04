@@ -5,12 +5,13 @@ export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
 export * from './noteTypes'
+export * from './projects'
 
 export const initializeApp = (): Action => ({ type: 'INITIALIZE_APP' })
 
-export const chooseAudioFiles = (
-  filePaths: Array<AudioFilePath>,
-  ids: Array<AudioFileId>,
+export const chooseMediaFiles = (
+  filePaths: Array<MediaFilePath>,
+  ids: Array<MediaFileId>,
   noteTypeId: NoteTypeId
 ): Action => ({
   type: 'CHOOSE_AUDIO_FILES',
@@ -19,7 +20,7 @@ export const chooseAudioFiles = (
   noteTypeId,
 })
 
-export const removeAudioFiles = (): Action => ({
+export const removeMediaFiles = (): Action => ({
   type: 'REMOVE_AUDIO_FILES',
 })
 
@@ -52,17 +53,6 @@ export const deleteFlashcardTag = (id: ClipId, index: number): Action => ({
   index,
 })
 
-export const loadAudio = (
-  filePath: string,
-  audioElement: Object,
-  svgElement: Object
-): Action => ({
-  type: 'LOAD_AUDIO',
-  filePath,
-  audioElement,
-  svgElement,
-})
-
 export const setCurrentFile = (index: number): Action => ({
   type: 'SET_CURRENT_FILE',
   index,
@@ -72,9 +62,9 @@ export const toggleLoop = (): Action => ({
   type: 'TOGGLE_LOOP',
 })
 
-export const loadAudioSuccess = (file: Object): Action => ({
-  type: 'LOAD_AUDIO_SUCCESS',
-  file,
+export const setLoop = (loop: boolean): Action => ({
+  type: 'SET_LOOP',
+  loop,
 })
 
 export const deleteCard = (id: ClipId): Action => ({
@@ -92,7 +82,10 @@ export const makeClips = (format: ExportFormat): Action => ({
   format,
 })
 
-export const exportFlashcards = (): Action => ({ type: 'EXPORT_FLASHCARDS' })
+export const exportFlashcards = (exportData: ApkgExportData): Action => ({
+  type: 'EXPORT_FLASHCARDS',
+  exportData,
+})
 
 export const setMediaFolderLocation = (directoryPath: string): Action => ({
   type: 'SET_MEDIA_FOLDER_LOCATION',
@@ -106,9 +99,4 @@ export const detectSilence = (): Action => ({ type: 'DETECT_SILENCE' })
 
 export const deleteAllCurrentFileClipsRequest = (): Action => ({
   type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
-})
-
-export const hydrateFromProjectFile = (state: $Shape<AppState>): Action => ({
-  type: 'HYDRATE_FROM_PROJECT_FILE',
-  state,
 })

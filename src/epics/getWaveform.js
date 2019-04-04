@@ -2,30 +2,28 @@ import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import tempy from 'tempy'
-import ffmpeg from '../utils/ffmpeg'
+import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import { existsSync } from 'fs'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
 
-const getMediaMetadata = path => {
-  return new Promise((res, rej) => {
-    ffmpeg.ffprobe(path, (err, metadata) => {
-      if (err) rej(err)
-
-      console.log(metadata)
-      res(metadata)
-    })
-  })
-}
-
 const getWaveformPng = async (state: AppState, path) => {
+  const ffprobeMetadata = await getMediaMetadata(path)
   const {
     format: { duration },
-  } = await getMediaMetadata(path)
+  } = ffprobeMetadata
+  console.log(ffprobeMetadata)
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 
-  const outputFilename = tempy.file({ extension: 'png' })
+  const pngId = 'waveform_png_for_' + path
+  let outputFilename = localStorage.getItem(pngId)
+  if (outputFilename && existsSync(outputFilename)) {
+    return outputFilename
+  }
+  outputFilename = tempy.file({ extension: 'png' })
+  localStorage.setItem(pngId, outputFilename)
 
   return await new Promise((res, rej) => {
     ffmpeg(path)
@@ -53,15 +51,17 @@ const getWaveformPng = async (state: AppState, path) => {
 
 const getWaveformEpic = (action$, state$) =>
   action$.pipe(
-    ofType('LOAD_AUDIO'),
-    flatMap(async ({ filePath }) => {
+    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    flatMap(async ({ filePath, constantBitrateFilePath }) => {
       try {
         if (!filePath) {
           return r.setWaveformImagePath(null)
         }
 
-        const imagePath = await getWaveformPng(state$.value, filePath)
-        console.log(imagePath)
+        const imagePath = await getWaveformPng(
+          state$.value,
+          constantBitrateFilePath
+        )
         return r.setWaveformImagePath(imagePath)
       } catch (err) {
         console.error(err)

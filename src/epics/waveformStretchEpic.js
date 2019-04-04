@@ -1,10 +1,4 @@
-import {
-  map,
-  flatMap,
-  takeUntil,
-  withLatestFrom,
-  takeLast,
-} from 'rxjs/operators'
+import { map, flatMap, takeUntil, takeLast } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
@@ -17,8 +11,7 @@ const waveformStretchEpic = (action$, state$) => {
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()
     }),
-    withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([mousedownData, loadAudio]) => {
+    flatMap(mousedownData => {
       const {
         edge: { key, id },
       } = mousedownData
@@ -31,7 +24,7 @@ const waveformStretchEpic = (action$, state$) => {
             originKey: key,
             end: toWaveformX(
               mousemove,
-              loadAudio.svgElement,
+              document.getElementById('waveform-svg'),
               r.getWaveformViewBoxXMin(state$.value)
             ),
           })

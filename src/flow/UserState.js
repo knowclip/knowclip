@@ -15,6 +15,8 @@ declare type UserState = Exact<{
   pendingClip: ?PendingClip,
   pendingStretch: ?PendingStretch,
   highlightedClipId: ?ClipId,
-  defaultNoteTypeId: ?NoteTypeId,
   defaultTags: Array<string>,
+  currentProjectId: ?ProjectId,
+  currentMediaFileId: ?MediaFileId,
+  currentNoteTypeId: ?NoteTypeId,
 }>

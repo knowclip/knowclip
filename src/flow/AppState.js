@@ -8,4 +8,5 @@ declare type AppState = Exact<{
   user: UserState,
   snackbar: SnackbarState,
   dialog: DialogState,
+  projects: ProjectsState,
 }>

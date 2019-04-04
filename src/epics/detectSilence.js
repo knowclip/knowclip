@@ -1,4 +1,4 @@
-import { flatMap, map, withLatestFrom } from 'rxjs/operators'
+import { flatMap, map } from 'rxjs/operators'
 import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
@@ -49,8 +49,7 @@ const detectSilence = (
 const detectSilenceEpic = (action$, state$) =>
   action$.pipe(
     ofType('DETECT_SILENCE'),
-    withLatestFrom(action$.ofType('LOAD_AUDIO')),
-    flatMap(([_ /*{ audioElement }*/]) => {
+    flatMap(() => {
       const audioElement = document.getElementById('audioPlayer')
       const currentFilePath = r.getCurrentFilePath(state$.value)
       return detectSilence(currentFilePath).then(silences => {
@@ -79,6 +78,7 @@ const detectSilenceEpic = (action$, state$) =>
         const currentNoteType = r.getCurrentNoteType(state$.value)
         const newClips = chunks.map(({ start, end }) =>
           newClip(
+            // shoudl have fewer arguments
             {
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),
@@ -91,7 +91,7 @@ const detectSilenceEpic = (action$, state$) =>
         )
 
         return from([
-          r.deleteCards(r.getClipIdsByAudioFileId(state$.value, fileId)),
+          r.deleteCards(r.getClipIdsByMediaFileId(state$.value, fileId)),
           r.addClips(newClips, fileId),
         ])
       })
