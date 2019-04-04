@@ -39,8 +39,7 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  // if (!isPackaged) {
-  if (true) {
+  if (!isPackaged) {
     await installDevtools()
 
     mainWindow.webContents.openDevTools()

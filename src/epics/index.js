@@ -1,18 +1,12 @@
-import {
-  filter,
-  map,
-  flatMap,
-  tap,
-  ignoreElements,
-  takeWhile,
-} from 'rxjs/operators'
+import { map, flatMap, tap, ignoreElements } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, empty, of } from 'rxjs'
-import { setWaveformCursor } from '../actions'
+import { fromEvent } from 'rxjs'
+import { ipcRenderer } from 'electron'
 import * as r from '../redux'
 import getWaveformEpic from './getWaveform'
-import waveformSelectionEpic from './waveformSelectionEpic'
-import waveformStretchEpic from './waveformStretchEpic'
+import setWaveformCursorEpic from './setWaveformCursor'
+import addClip from './addClip'
+import stretchClip from './stretchClip'
 import detectSilenceEpic from './detectSilence'
 import makeClipsEpic from './makeClips'
 import exportFlashcardsEpic from './exportFlashcards'
@@ -23,151 +17,7 @@ import media from './media'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
-
-const elementWidth = element => {
-  const boundingClientRect = element.getBoundingClientRect()
-  return boundingClientRect.right - boundingClientRect.left
-}
-
-const audioElement = () => document.getElementById('audioPlayer')
-
-const setWaveformCursorEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(() =>
-      fromEvent(audioElement(), 'timeupdate').pipe(
-        // takeUntil(
-        // merge(
-        //   action$.pipe(
-        //     ofType('CLOSE_PROJECT', 'OPEN_MEDIA_FILE_REQUEST' /* CLOSE_MEDIA_FILE */),
-        //   ),
-        //   action$.pipe(
-        //     ofType('DELETE_MEDIA_FROM_PROJECT'),
-        //     withLatestFrom('OPEN_MEDIA_FILE_SUCCESS'),
-        //     filter(([deleteMedia, openMediaFileSuccess]) => deleteMedia.mediaFileId === openMediaFileSuccess.id)
-        //   )
-        // ),
-        // ),
-        takeWhile(() => r.getConstantBitrateFilePath(state$.value)),
-        map(e => {
-          const viewBox = state$.value.waveform.viewBox
-
-          const highlightedId = r.getHighlightedClipId(state$.value)
-          const highlightedClip =
-            highlightedId && r.getClip(state$.value, highlightedId)
-          const timeToLoop =
-            highlightedClip &&
-            r.isLoopOn(state$.value) &&
-            e.target.currentTime >=
-              r.getSecondsAtX(state$.value, highlightedClip.end)
-          if (timeToLoop) {
-            e.target.currentTime = r.getSecondsAtX(
-              state$.value,
-              highlightedClip.start
-            )
-          }
-
-          const newX = Math.round(
-            timeToLoop
-              ? highlightedClip.start
-              : e.target.currentTime && e.target.currentTime * 50
-          )
-          const svgElement = document.getElementById('waveform-svg')
-          // if (!svgElement) return { type: 'WHOOPS CaNT UPDATE CURSOR NOW' }
-          const svgWidth = elementWidth(svgElement)
-          if (newX < viewBox.xMin) {
-            return setWaveformCursor(newX, {
-              ...viewBox,
-              xMin: Math.max(0, newX - svgWidth * 0.9),
-            })
-          }
-          if (newX > svgWidth + viewBox.xMin) {
-            return setWaveformCursor(newX, { ...viewBox, xMin: newX })
-          }
-          return setWaveformCursor(newX)
-        })
-      )
-    )
-  )
-
-const waveformMousedownEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
-        tap(e => e.preventDefault()),
-        map(mousedown => ({
-          type: 'WAVEFORM_MOUSEDOWN',
-          ...toWaveformCoordinates(
-            mousedown,
-            mousedown.currentTarget,
-            r.getWaveformViewBoxXMin(state$.value)
-          ),
-        }))
-      )
-    )
-  )
-
-const LOOP_BUFFER = 25
-const deselectClipOnManualChangeTime = (action$, state$) =>
-  action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(() =>
-      fromEvent(audioElement(), 'seeking').pipe(
-        takeWhile(() => r.getConstantBitrateFilePath(state$.value))
-      )
-    ),
-    filter(() => {
-      if (!r.isLoopOn(state$.value)) return false
-
-      const highlightedClipId = r.getHighlightedClipId(state$.value)
-      if (!highlightedClipId) return false
-
-      const highlightedClip = r.getClip(state$.value, highlightedClipId)
-      const x = r.getXAtMilliseconds(
-        state$.value,
-        audioElement().currentTime * 1000
-      )
-      return x < highlightedClip.start || x > highlightedClip.end + LOOP_BUFFER
-    }),
-    map(() => r.highlightClip(null))
-  )
-
-const highlightClipsOnAddEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('ADD_CLIP'),
-    map(({ clip: { id } }) => r.highlightClip(id))
-  )
-
-const playClipsOnHighlightEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('HIGHLIGHT_CLIP'),
-    filter(({ id }) => Boolean(id)),
-    tap(({ id: clipId }) => {
-      const { start } = r.getClip(state$.value, clipId)
-      const newTime = r.getSecondsAtX(state$.value, start)
-      audioElement().currentTime = newTime
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-
-      const input = document.querySelector('textarea:not([aria-hidden=true])')
-      input && input.focus()
-      //
-      //
-      //
-      //
-      //
-      //
-    }),
-    ignoreElements()
-  )
+import highlightClip from './highlightClip'
 
 const defaultTagsEpic = (action$, state$) =>
   action$.pipe(
@@ -188,66 +38,36 @@ const defaultTagsEpic = (action$, state$) =>
 //     }))
 //   )
 
-const selectClipOnStretch = (action$, state$) =>
+const waveformMousedownEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EDIT_CLIP'),
-    filter(({ id, override }) => {
-      const isStretch =
-        override.start !== undefined || override.end !== undefined
-      return isStretch && id !== r.getHighlightedClipId(state$.value)
-    }),
-    map(({ id }) => r.highlightClip(id))
+    ofType('OPEN_MEDIA_FILE_SUCCESS'),
+    flatMap(() =>
+      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+        tap(e => e.preventDefault()),
+        map(mousedown => ({
+          type: 'WAVEFORM_MOUSEDOWN',
+          ...toWaveformCoordinates(
+            mousedown,
+            mousedown.currentTarget,
+            r.getWaveformViewBoxXMin(state$.value)
+          ),
+        }))
+      )
+    )
   )
 
-const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
-const centerSelectedClip = (action$, state$) =>
-  action$.pipe(
-    ofType('HIGHLIGHT_CLIP'),
-    flatMap(({ id }) => {
-      // console.log('highlight!!')
-      const clip = r.getClip(state$.value, id)
-      if (!clip) return empty()
-
-      const svgElement = document.getElementById('waveform-svg')
-      const svgWidth = elementWidth(svgElement)
-
-      const svgFits = clip.end - clip.start <= svgWidth
-      if (!svgFits) return empty()
-
-      const { xMin } = state$.value.waveform.viewBox
-
-      if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
-        return of(
-          r.setWaveformViewBox({
-            xMin: Math.max(
-              0,
-              clip.start - HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER
-            ),
-          })
-        )
-
-      if (xMin + svgWidth - clip.end < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
-        return of(
-          r.setWaveformViewBox({
-            xMin:
-              clip.end + HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER - svgWidth,
-          })
-        )
-
-      return empty()
-    })
-  )
+const closeEpic = (action$, state$) =>
+  fromEvent(ipcRenderer, 'app-close', () => {
+    ipcRenderer.send('closed')
+  }).pipe(ignoreElements())
 
 export default combineEpics(
   media,
   getWaveformEpic,
   setWaveformCursorEpic,
   waveformMousedownEpic,
-  waveformSelectionEpic,
-  waveformStretchEpic,
-  selectClipOnStretch,
-  highlightClipsOnAddEpic,
-  playClipsOnHighlightEpic,
+  addClip,
+  stretchClip,
   makeClipsEpic,
   detectSilenceEpic,
   persistStateEpic,
@@ -257,6 +77,6 @@ export default combineEpics(
   noteTypesEpic,
   defaultTagsEpic,
   keyboard,
-  deselectClipOnManualChangeTime,
-  centerSelectedClip
+  highlightClip,
+  closeEpic
 )

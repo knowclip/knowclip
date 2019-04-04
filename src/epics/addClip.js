@@ -1,13 +1,5 @@
-import {
-  filter,
-  map,
-  flatMap,
-  takeUntil,
-  withLatestFrom,
-  takeLast,
-  take,
-} from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
+import { filter, map, flatMap, takeUntil, takeLast, take } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
 import { fromEvent, merge } from 'rxjs'
 import { setPendingClip, addClip } from '../actions'
 import * as r from '../redux'
@@ -23,10 +15,10 @@ const pendingClipIsBigEnough = state => {
   if (!pendingClip) return false
 
   const { start, end } = pendingClip
-  return Math.abs(end - start) >= r.SELECTION_THRESHOLD
+  return Math.abs(end - start) >= r.CLIP_THRESHOLD
 }
 
-const waveformSelectionEpic = (action$, state$) => {
+const addClipEpic = (action$, state$) => {
   const loadAudioActions = action$.pipe(ofType('OPEN_MEDIA_FILE_SUCCESS'))
   const mousedowns = loadAudioActions.pipe(
     flatMap(() =>
@@ -106,30 +98,4 @@ const waveformSelectionEpic = (action$, state$) => {
   )
 }
 
-const highlightEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mouseup')
-    ),
-    withLatestFrom(
-      action$.pipe(
-        ofType('WAVEFORM_MOUSEDOWN'),
-        map(({ x }: Action) => {
-          const clipIdAtX = r.getClipIdAt(state$.value, x)
-          return { x, clipIdAtX }
-        })
-      )
-    ),
-    map(([mouseUp, { x, clipIdAtX }]) => {
-      const state = state$.value
-      const mousePositionOrClipStart = clipIdAtX
-        ? r.getClip(state, clipIdAtX).start
-        : x
-      const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
-      document.getElementById('audioPlayer').currentTime = newTime
-      return clipIdAtX ? r.highlightClip(clipIdAtX) : r.highlightClip(null)
-    })
-  )
-
-export default combineEpics(waveformSelectionEpic, highlightEpic)
+export default addClipEpic

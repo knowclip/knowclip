@@ -5,7 +5,7 @@ import * as audioSelectors from './audio'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
-export const SELECTION_THRESHOLD = 40
+export const CLIP_THRESHOLD = 40
 
 export * from './waveformTime'
 export * from './clips'

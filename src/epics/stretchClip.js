@@ -4,7 +4,7 @@ import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 
-const waveformStretchEpic = (action$, state$) => {
+const stretchClipEpic = (action$, state$) => {
   const clipMousedowns = action$.pipe(
     ofType('WAVEFORM_MOUSEDOWN'),
     flatMap(({ x }) => {
@@ -67,10 +67,7 @@ const waveformStretchEpic = (action$, state$) => {
             if (originKey === 'start' && stretchedClip.end > end) {
               return from([
                 r.editClip(id, {
-                  start: Math.min(
-                    end,
-                    stretchedClip.end - r.SELECTION_THRESHOLD
-                  ),
+                  start: Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD),
                 }),
                 r.setPendingStretch(null),
               ])
@@ -79,10 +76,7 @@ const waveformStretchEpic = (action$, state$) => {
             if (originKey === 'end' && end > stretchedClip.start) {
               return from([
                 r.editClip(id, {
-                  end: Math.max(
-                    end,
-                    stretchedClip.start + r.SELECTION_THRESHOLD
-                  ),
+                  end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD),
                 }),
                 r.setPendingStretch(null),
               ])
@@ -97,4 +91,4 @@ const waveformStretchEpic = (action$, state$) => {
   return clipMousedowns
 }
 
-export default waveformStretchEpic
+export default stretchClipEpic
