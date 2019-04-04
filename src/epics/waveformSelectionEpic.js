@@ -2,14 +2,13 @@ import {
   filter,
   map,
   flatMap,
-  tap,
   takeUntil,
   withLatestFrom,
   takeLast,
   take,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, of, merge } from 'rxjs'
+import { fromEvent, merge } from 'rxjs'
 import { setPendingClip, addClip } from '../actions'
 import * as r from '../redux'
 import {

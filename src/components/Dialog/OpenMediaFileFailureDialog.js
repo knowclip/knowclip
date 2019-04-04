@@ -7,7 +7,6 @@ import {
   DialogActions,
   Button,
 } from '@material-ui/core'
-import deleteKey from '../../utils/deleteKey'
 import { showOpenDialog } from '../../utils/electron'
 import * as r from '../../redux'
 import { extname } from 'path'

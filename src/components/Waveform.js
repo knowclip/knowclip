@@ -1,4 +1,4 @@
-import React, { Component, Memo } from 'react'
+import React, { Component } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'

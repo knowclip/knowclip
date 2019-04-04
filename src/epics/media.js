@@ -5,7 +5,7 @@ import * as r from '../redux'
 import tempy from 'tempy'
 import fs from 'fs'
 import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
-import { extname, basename } from 'path'
+import { extname } from 'path'
 import uuid from 'uuid/v4'
 
 const coerceMp3ToConstantBitrate = path => {

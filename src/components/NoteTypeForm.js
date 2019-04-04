@@ -138,7 +138,7 @@ class NoteTypeForm extends Component {
   render() {
     const { noteType, errors } = this.state
     const { handleSubmit } = this
-    const { cancel, id } = this.props
+    const { cancel } = this.props
     return (
       <>
         <DialogContent>

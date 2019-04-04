@@ -1,12 +1,5 @@
 // @flow
-
-import { basename, extname } from 'path'
-import { toTimestamp } from '../utils/ffmpeg'
 import { getMillisecondsAtX } from './waveformTime'
-// import { getMediaFilePath } from './audio'
-
-const SAFE_SEPARATOR = '-'
-const SAFE_MILLISECONDS_SEPARATOR = '_'
 
 export const getClipMilliseconds = (
   state: AppState,
@@ -19,8 +12,6 @@ export const getClipMilliseconds = (
     end: getMillisecondsAtX(state, clip.end),
   }
 }
-
-// export const getClipMediaFilePath = (state: AppState, clipId: ClipId): ?MediaFilePath =>
 
 export const getClipIdsByMediaFileId = (
   state: AppState,

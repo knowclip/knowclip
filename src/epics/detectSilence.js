@@ -1,4 +1,4 @@
-import { flatMap, map, withLatestFrom } from 'rxjs/operators'
+import { flatMap, map } from 'rxjs/operators'
 import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
