@@ -1,5 +1,5 @@
 // @flow
-const initialState: AudioState = {
+export const initialState: AudioState = {
   loop: true,
   isLoading: false,
   mediaFolderLocation: null,

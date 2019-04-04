@@ -19,7 +19,6 @@ declare type Action =
   | {| type: 'SET_CURRENT_FILE', index: number |}
   | {| type: 'TOGGLE_LOOP' |}
   | {| type: 'SET_LOOP', loop: boolean |}
-  | {| type: 'EXPORT_FLASHCARDS', exportData: ApkgExportData |}
   | {| type: 'INITIALIZE_APP' |}
   | {| type: 'SET_MEDIA_FOLDER_LOCATION', directoryPath: ?string |}
   | {| type: 'DETECT_SILENCE' |}
@@ -30,7 +29,9 @@ declare type ExportFormat = 'CSV+MP3' | 'APKG'
 
 declare type ClipAction =
   | {| type: 'DELETE_CARD', id: ClipId |}
-  | {| type: 'MAKE_CLIPS', format: ExportFormat |}
+  | {| type: 'EXPORT_MP3', exportData: ApkgExportData |}
+  | {| type: 'EXPORT_APKG' |}
+  | {| type: 'EXPORT_CSV' |}
   | {| type: 'DELETE_CARDS', ids: Array<ClipId> |}
   | {|
       type: 'SET_FLASHCARD_FIELD',

@@ -8,8 +8,8 @@ import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
 import stretchClip from './stretchClip'
 import detectSilenceEpic from './detectSilence'
-import makeClipsEpic from './makeClips'
-import exportFlashcardsEpic from './exportFlashcards'
+import exportCsvAndMp3 from './exportCsvAndMp3'
+import exportApkg from './exportApkg'
 import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
@@ -68,10 +68,10 @@ export default combineEpics(
   waveformMousedownEpic,
   addClip,
   stretchClip,
-  makeClipsEpic,
   detectSilenceEpic,
   persistStateEpic,
-  exportFlashcardsEpic,
+  exportCsvAndMp3,
+  exportApkg,
   deleteAllCurrentFileClips,
   project,
   noteTypesEpic,

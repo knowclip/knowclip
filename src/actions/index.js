@@ -77,14 +77,17 @@ export const deleteCards = (ids: Array<ClipId>): Action => ({
   ids,
 })
 
-export const makeClips = (format: ExportFormat): Action => ({
-  type: 'MAKE_CLIPS',
-  format,
+export const exportApkg = (): Action => ({
+  type: 'EXPORT_APKG',
 })
 
-export const exportFlashcards = (exportData: ApkgExportData): Action => ({
-  type: 'EXPORT_FLASHCARDS',
+export const exportMp3 = (exportData: ApkgExportData): Action => ({
+  type: 'EXPORT_MP3',
   exportData,
+})
+
+export const exportCsv = (): Action => ({
+  type: 'EXPORT_CSV',
 })
 
 export const setMediaFolderLocation = (directoryPath: string): Action => ({

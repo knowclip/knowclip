@@ -173,16 +173,11 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-  setCurrentFile: r.setCurrentFile,
   setFlashcardField: r.setFlashcardField,
   deleteCard: r.deleteCard,
   confirmationDialog: r.confirmationDialog,
-  makeClips: r.makeClips,
-  exportFlashcards: r.exportFlashcards,
   highlightClip: r.highlightClip,
   initializeApp: r.initializeApp,
-  detectSilenceRequest: r.detectSilenceRequest,
-  deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
   setFlashcardTagsText: r.setFlashcardTagsText,
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,

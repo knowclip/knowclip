@@ -3,6 +3,7 @@ import { createEpicMiddleware } from 'redux-observable'
 import reducer from './reducers'
 import epic from './epics'
 import { getPersistedState } from './utils/statePersistence'
+import { initialState as initialAudioState } from './reducers/audio'
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -12,11 +13,25 @@ const composeEnhancers =
 export default function getStore() {
   const epicMiddleware = createEpicMiddleware()
 
-  console.log('persisted state', getPersistedState())
+  const persistedState = getPersistedState()
+  console.log('persisted state', persistedState)
+
+  const { audio: persistedAudio } = persistedState
+  const state = {
+    ...persistedState,
+    audio: {
+      ...initialAudioState,
+      ...(persistedAudio
+        ? {
+            mediaFolderLocation: persistedAudio.mediaFolderLocation,
+          }
+        : null),
+    },
+  }
 
   const store = createStore(
     reducer,
-    getPersistedState(),
+    state,
     composeEnhancers(applyMiddleware(epicMiddleware))
   )
 

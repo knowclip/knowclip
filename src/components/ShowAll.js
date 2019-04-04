@@ -47,8 +47,8 @@ const ShowAll = ({
   flashcards,
   currentFileIndex,
   highlightClip,
-  makeClips,
-  exportFlashcards,
+  exportCsv,
+  exportApkg,
   noteType,
   open,
 }) => (
@@ -71,13 +71,13 @@ const ShowAll = ({
     </DialogContent>
     <DialogActions>
       <Tooltip title="Good for updating existing deck">
-        <Button onClick={() => makeClips('CSV+MP3')}>Export CSV and MP3</Button>
+        <Button onClick={() => exportCsv()}>Export CSV and MP3</Button>
       </Tooltip>
       <Tooltip title="Good for starting new deck">
         <Button
           variant="contained"
           color="primary"
-          onClick={() => makeClips('APKG')}
+          onClick={() => exportApkg()}
         >
           Export Anki Deck
         </Button>
@@ -91,8 +91,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-  makeClips: r.makeClips,
-  exportFlashcards: r.exportFlashcards,
+  exportApkg: r.exportApkg,
+  exportCsv: r.exportCsv,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
 }

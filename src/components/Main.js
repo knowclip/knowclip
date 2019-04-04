@@ -193,9 +193,7 @@ const mapStateToProps = state => ({
   currentFileName: r.getCurrentFileName(state),
   currentFilePath: r.getCurrentFilePath(state),
   currentFlashcard: r.getCurrentFlashcard(state),
-  selectedClipId: r.getSelectedClipId(state),
   loop: r.isLoopOn(state),
-  highlightedClipId: r.getHighlightedClipId(state),
   audioIsLoading: r.isAudioLoading(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
   mediaFolderLocation: r.getMediaFolderLocation(state),
@@ -205,20 +203,12 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-  chooseMediaFiles: r.chooseMediaFiles,
-  setCurrentFile: r.setCurrentFile,
-  setFlashcardField: r.setFlashcardField,
   toggleLoop: r.toggleLoop,
-  makeClips: r.makeClips,
-  exportFlashcards: r.exportFlashcards,
-  highlightClip: r.highlightClip,
-  initializeApp: r.initializeApp,
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
   mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
   reviewAndExportDialog: r.reviewAndExportDialog,
   confirmationDialog: r.confirmationDialog,
-  addMediaToProjectRequest: r.addMediaToProjectRequest,
 }
 
 export default connect(
