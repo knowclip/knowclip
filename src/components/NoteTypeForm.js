@@ -90,13 +90,11 @@ class NoteTypeForm extends Component {
 
   setNameText = text =>
     this.setState(state => ({
-      // ...state,
       noteType: { ...state.noteType, name: text },
       errors: deleteKey(state.errors, 'name'),
     }))
   setFieldText = (index, text) =>
     this.setState(state => ({
-      // ...state,
       noteType: {
         ...state.noteType,
         fields: state.noteType.fields.map((field, i) =>
@@ -208,10 +206,7 @@ class NoteTypeForm extends Component {
 }
 
 const mapStateToProps = (state, { id }) => ({
-  // noteTypeFields: r.getNoteTypeFields(state),
-  // noteTypeName: r.getNoteTypeId(state),
   noteType: r.getNoteType(state, id),
-  // noteTypeNames: r.getNoteTypeNames(state),
 })
 
 const mapDispatchToProps = {

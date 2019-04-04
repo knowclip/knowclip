@@ -4,15 +4,11 @@ import {
   flatMap,
   tap,
   ignoreElements,
-  takeUntil,
   takeWhile,
-  withLatestFrom,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, merge, empty, of } from 'rxjs'
+import { fromEvent, empty, of } from 'rxjs'
 import { setWaveformCursor } from '../actions'
-// import { getFlashcard } from '../selectors'
-// import { setLocalFlashcard } from '../utils/localFlashcards'
 import * as r from '../redux'
 import getWaveformEpic from './getWaveform'
 import waveformSelectionEpic from './waveformSelectionEpic'
@@ -27,18 +23,6 @@ import media from './media'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
-
-import { basename } from 'path'
-
-// const setLocalFlashcardEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType('SET_FLASHCARD_FIELD'),
-//     tap(({ id, key, value }) => {
-//       const flashcard = getFlashcard(state$.value, id)
-//       setLocalFlashcard({ ...flashcard, [key]: value })
-//     }),
-//     ignoreElements()
-//   )
 
 const elementWidth = element => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -232,11 +216,6 @@ const centerSelectedClip = (action$, state$) =>
 
       const { xMin } = state$.value.waveform.viewBox
 
-      // console.log('xMin', xMin)
-      // console.log('svgWidth', svgWidth)
-      // console.log('xMin + svgWidth', xMin + svgWidth)
-      // console.log('clip', clip)
-
       if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
         return of(
           r.setWaveformViewBox({
@@ -255,22 +234,15 @@ const centerSelectedClip = (action$, state$) =>
           })
         )
 
-      console.log('bolsfdahsdkfjhaskdfhkj')
-
       return empty()
     })
   )
 
-// CENTER STRETCHED CLIP
-
 export default combineEpics(
   media,
   getWaveformEpic,
-  // setLocalFlashcardEpic,
   setWaveformCursorEpic,
-  // waveformMousemoveEpic,
   waveformMousedownEpic,
-  // waveformMouseupEpic,
   waveformSelectionEpic,
   waveformStretchEpic,
   selectClipOnStretch,
@@ -284,7 +256,6 @@ export default combineEpics(
   project,
   noteTypesEpic,
   defaultTagsEpic,
-  // defaultTagsAudioEpic,
   keyboard,
   deselectClipOnManualChangeTime,
   centerSelectedClip

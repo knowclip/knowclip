@@ -9,22 +9,12 @@ import {
   ListItemText,
   ListItemSecondaryAction,
 } from '@material-ui/core'
-import {
-  Close as CloseIcon,
-  Loop,
-  Delete as DeleteIcon,
-} from '@material-ui/icons'
+import { Loop, Delete as DeleteIcon } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import { showOpenDialog } from '../utils/electron'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
 import css from './Header.module.css'
-
-// import { setConfig, cold } from 'react-hot-loader'
-
-// setConfig({
-//   onComponentCreate: (type, name) => cold(type),
-// })
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
@@ -99,9 +89,6 @@ const MediaFilesNavMenu = ({
                 </MenuItem>
               </Menu>
             )}
-            {/* <IconButton onClick={removeMediaFiles}>
-                <CloseIcon />
-              </IconButton> */}
           </span>
         ) : (
           <Button onClick={chooseMediaFiles}>Choose source file</Button>
@@ -139,10 +126,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(MediaFilesNavMenu)
-
-// <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-//   <FastRewind />
-// </IconButton>
-// <IconButton onClick={onClickNext} disabled={!isNextButtonEnabled}>
-//   <FastForward />
-// </IconButton>

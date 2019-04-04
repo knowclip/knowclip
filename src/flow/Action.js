@@ -109,26 +109,22 @@ declare type SnackbarAction =
   | {| type: 'CLOSE_SNACKBAR' |}
 
 declare type ProjectAction =
-  // tries to load project file using stored path
   | {| type: 'OPEN_PROJECT_REQUEST_BY_ID', id: ProjectId |}
-    // tries to load project file using path
-    | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
-    // opens project already loaded from file
-    //    syncs project metadata (in redux an local storage)
-    | {|
-        type: 'OPEN_PROJECT',
-        project: Project2_0_0,
-        projectMetadata: ProjectMetadata,
-      |}
-    | {|
-        type: 'CREATE_PROJECT',
-        projectMetadata: ProjectMetadata,
-        noteType: NoteType,
-      |}
-    | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
-    | {| type: 'SET_PROJECT_ERROR', error: ?string |}
-    | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
-    | {| type: 'CLOSE_PROJECT' |}
+  | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
+  | {|
+      type: 'OPEN_PROJECT',
+      project: Project2_0_0,
+      projectMetadata: ProjectMetadata,
+    |}
+  | {|
+      type: 'CREATE_PROJECT',
+      projectMetadata: ProjectMetadata,
+      noteType: NoteType,
+    |}
+  | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
+  | {| type: 'SET_PROJECT_ERROR', error: ?string |}
+  | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
+  | {| type: 'CLOSE_PROJECT' |}
 
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}

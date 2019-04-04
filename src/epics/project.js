@@ -4,10 +4,8 @@ import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
-import { getProjectFilePath } from '../utils/statePersistence'
 import parseProject, { getMediaFilePaths } from '../utils/parseProject'
 
-// import electron from 'electron'
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 
@@ -25,19 +23,6 @@ const openProject = async (filePath, projectId, state$) => {
         )
       )
     let originalProjectJson = JSON.parse(projectJson)
-    // const mediaFilePaths =
-    //   originalProjectJson &&
-    //   ['0.0.0', '1.0.0'].includes(originalProjectJson.version)
-    //     ? [
-    //         {
-    //           metadata: project.mediaFilesMetadata[0],
-    //           filePath: filePath.replace(/\.afca$/, ''),
-    //         },
-    //       ]
-    //     : project.mediaFilesMetadata.map((metadata) => ({
-    //         metadata,
-    //         filePath: null,
-    //       }))
     const mediaFilePaths = getMediaFilePaths(
       originalProjectJson,
       project,
@@ -139,7 +124,6 @@ const saveProjectFile = (action$, state$) =>
         )
         await writeFile(projectMetadata.filePath, json, 'utf8')
         return { type: 'SAVE PROJECT!!' }
-        return { type: 'NO AUDIO FILE! NOT SAVING ANY PROJECT' }
       } catch (err) {
         return r.simpleMessageSnackbar(
           `Problem saving project file: ${err.message}`

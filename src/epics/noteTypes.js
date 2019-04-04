@@ -1,26 +1,6 @@
-import { map, filter } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
-
-// const deleteNoteTypeRequestEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType('DELETE_NOTE_TYPE_REQUEST'),
-//     map(({ id, closeDialogOnComplete }) => {
-//       const currentFile = r.getCurrentFile(state$.value)
-//       return currentFile && currentFile.noteTypeId === id
-//         ? r.simpleMessageSnackbar(
-//             "You can't delete this note type while it's currently in use."
-//           )
-//         : r.deleteNoteType(id, closeDialogOnComplete)
-//     })
-//   )
-
-// const deleteNoteTypeEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType('DELETE_NOTE_TYPE'),
-//     filter(({ closeDialogOnComplete }) => closeDialogOnComplete),
-//     map(() => r.closeDialog())
-//   )
 
 const editNoteTypeEpic = (action$, state$) =>
   action$.pipe(
@@ -66,9 +46,4 @@ const setMediaFileNoteTypeEpic = (action$, state$) =>
     })
   )
 
-export default combineEpics(
-  // deleteNoteTypeRequestEpic,
-  // deleteNoteTypeEpic,
-  editNoteTypeEpic,
-  setMediaFileNoteTypeEpic
-)
+export default combineEpics(editNoteTypeEpic, setMediaFileNoteTypeEpic)

@@ -62,7 +62,6 @@ class NewProjectFormDialog extends Component {
 
   setNameText = text =>
     this.setState(state => ({
-      // ...state,
       fieldValues: { ...state.fieldValues, name: text },
       errors: deleteKey(state.errors, 'name'),
     }))
@@ -70,7 +69,6 @@ class NewProjectFormDialog extends Component {
   setFilePathText = text => {
     console.log('boop!', text)
     this.setState(state => ({
-      // ...state,
       fieldValues: { ...state.fieldValues, filePath: text },
       errors: deleteKey(state.errors, 'filePath'),
     }))
@@ -112,7 +110,6 @@ class NewProjectFormDialog extends Component {
               helperText={errors.filePath}
               onClick={this.showSaveDialog}
               onKeyPress={this.showSaveDialog}
-              // onChange={this.handleChangeFilePathTextasdfadsf}
             />
           </form>
         </DialogContent>

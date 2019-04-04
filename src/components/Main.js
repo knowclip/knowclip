@@ -4,7 +4,6 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
-  Menu,
   Card,
   CardContent,
   Fab,
@@ -19,17 +18,11 @@ import Waveform from '../components/Waveform'
 import FlashcardForm from '../components/FlashcardForm'
 import MediaFilesNavMenu from '../components/MediaFilesNavMenu'
 import ProjectMenu from '../components/ProjectMenu'
-// import NoteTypeSelectionMenu from '../components/NoteTypeSelectionMenu'
 import DarkTheme from '../components/DarkTheme'
-import { extname } from 'path'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
-
-const VIDEO_EXTENSIONS = `.MP4 .AVI .MOV .FLV .WMV`.split(/\s/)
-const isVideo = filePath =>
-  VIDEO_EXTENSIONS.includes(extname(filePath).toUpperCase())
 
 const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
   const props = {
@@ -57,15 +50,6 @@ class Main extends Component {
     noteTypeClipMenuAnchor: null,
   }
 
-  // chooseMediaFiles = async () => {
-  //   const filePaths = await showOpenDialog(
-  //     [{ name: 'Audio or video files' }],
-  //     true
-  //   )
-  //   const { addMediaToProjectRequest, currentProjectId } = this.props
-  //   if (filePaths) addMediaToProjectRequest(currentProjectId, filePaths)
-  // }
-
   reviewAndExportDialog = () => this.props.reviewAndExportDialog()
 
   handleAudioEnded = e => {
@@ -77,13 +61,6 @@ class Main extends Component {
     e.preventDefault()
     this.props.mediaFolderLocationFormDialog()
   }
-
-  // openNoteTypeSelectionMenu = e => {
-  //   e.preventDefault()
-  //   this.setState({ noteTypeClipMenuAnchor: e.currentTarget })
-  // }
-  // closeNoteTypeSelectionMenu = () =>
-  //   this.setState({ noteTypeClipMenuAnchor: null })
 
   render() {
     if (!this.props.currentProjectId) return <Redirect to="/projects" />
@@ -97,12 +74,10 @@ class Main extends Component {
       mediaFolderLocation,
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
-      // currentNoteType,
       clipsHaveBeenMade,
       constantBitrateFilePath,
       currentMediaMetadata,
     } = this.props
-    // const { noteTypeClipMenuAnchor } = this.state
 
     const form = Boolean(currentFlashcard) ? (
       <FlashcardForm />
@@ -215,21 +190,15 @@ class Main extends Component {
 }
 
 const mapStateToProps = state => ({
-  // filePaths: r.getFilePaths(state),
-  flashcards: [], //r.getFlashcardsByTime(state),
-  // currentFileIndex: r.getCurrentFileIndex(state),
   currentFileName: r.getCurrentFileName(state),
   currentFilePath: r.getCurrentFilePath(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   selectedClipId: r.getSelectedClipId(state),
   loop: r.isLoopOn(state),
   highlightedClipId: r.getHighlightedClipId(state),
-  clipsTimes: [], // r.getClipsTimes(state),
   audioIsLoading: r.isAudioLoading(state),
-  mediaFolderLocation: r.getMediaFolderLocation(state),
-  // currentNoteType: r.getCurrentNoteType(state),
-  // defaultNoteTypeId: r.getDefaultNoteTypeId(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
+  mediaFolderLocation: r.getMediaFolderLocation(state),
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getConstantBitrateFilePath(state),
   currentMediaMetadata: r.getCurrentMediaMetadata(state),

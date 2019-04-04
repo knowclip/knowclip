@@ -4,7 +4,6 @@ const initialState: UserState = {
   pendingClip: null,
   pendingStretch: null,
   highlightedClipId: null,
-  // defaultNoteTypeId: 'default',
   defaultTags: [],
   currentMediaFileId: null,
   currentProjectId: null,

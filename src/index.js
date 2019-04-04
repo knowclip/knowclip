@@ -4,10 +4,8 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import App from './App'
 import getStore from './getStore'
-// import epic from './epics'
 import './index.css'
 import registerServiceWorker from './registerServiceWorker'
-// import { AppContainer } from 'react-hot-loader'
 import { AppContainer, setConfig, cold } from 'react-hot-loader'
 
 setConfig({

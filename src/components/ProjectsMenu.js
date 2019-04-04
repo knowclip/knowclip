@@ -12,7 +12,6 @@ const { dialog } = remote
 export class ProjectsMenu extends Component {
   openProjectByFilePath = () =>
     dialog.showOpenDialog(
-      // { properties: ['openFile', 'multiClips'] },
       {
         properties: ['openFile'],
         filters: [{ name: 'AFCA project file', extensions: ['afca'] }],
