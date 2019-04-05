@@ -7,6 +7,7 @@ import fs from 'fs'
 import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
+import { getConstantBitrateMp3Path } from '../utils/localStorage'
 
 const coerceMp3ToConstantBitrate = path => {
   // should check if mp3
@@ -14,11 +15,9 @@ const coerceMp3ToConstantBitrate = path => {
   return new Promise((res, rej) => {
     if (extname(path) !== '.mp3') return res(path)
 
-    const storedPath = localStorage.getItem(path)
-    if (storedPath && fs.existsSync(storedPath)) return res(storedPath)
+    const constantBitratePath = getConstantBitrateMp3Path(path)
 
-    const tmpPath = tempy.file({ extension: 'mp3' })
-    localStorage.setItem(path, tmpPath)
+    if (fs.existsSync(constantBitratePath)) return res(constantBitratePath)
 
     // I guess by default it does CBR
     // though maybe we should check that
@@ -26,9 +25,9 @@ const coerceMp3ToConstantBitrate = path => {
     //   .outputOptions('-bufsize 192k')
     ffmpeg(path)
       .audioBitrate('64k')
-      .on('end', () => res(tmpPath))
+      .on('end', () => res(constantBitratePath))
       .on('error', rej)
-      .output(tmpPath)
+      .output(constantBitratePath)
       .run()
   })
 }

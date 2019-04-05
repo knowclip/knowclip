@@ -19,4 +19,5 @@ declare type UserState = Exact<{
   currentProjectId: ?ProjectId,
   currentMediaFileId: ?MediaFileId,
   currentNoteTypeId: ?NoteTypeId,
+  workIsUnsaved: boolean,
 }>

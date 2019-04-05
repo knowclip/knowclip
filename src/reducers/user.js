@@ -8,6 +8,7 @@ const initialState: UserState = {
   currentMediaFileId: null,
   currentProjectId: null,
   currentNoteTypeId: null,
+  workIsUnsaved: false,
 }
 
 const user: Reducer<UserState> = (state = initialState, action) => {
@@ -69,6 +70,12 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       return {
         ...state,
         defaultTags: action.tags,
+      }
+
+    case 'SET_WORK_IS_UNSAVED':
+      return {
+        ...state,
+        workIsUnsaved: action.workIsUnsaved,
       }
 
     default:

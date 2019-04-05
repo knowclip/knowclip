@@ -1,4 +1,5 @@
 // @flow
+import moment from 'moment'
 import * as audioSelectors from './audio'
 import getAllTags from '../utils/getAllTags'
 
@@ -11,9 +12,10 @@ export const getProject = (
 
   return {
     version: '2.0.0',
-    noteType,
-    id: projectMetadata.id,
+    timestamp: moment.utc().format(),
     name: projectMetadata.name,
+    id: projectMetadata.id,
+    noteType,
     mediaFilesMetadata: projectMetadata.mediaFilePaths.map(
       ({ metadata }) => metadata
     ),

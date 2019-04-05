@@ -1,5 +1,14 @@
-import { filter, map, flatMap, tap, ignoreElements } from 'rxjs/operators'
-import { fromEvent, from, of, empty } from 'rxjs'
+import {
+  filter,
+  map,
+  flatMap,
+  tap,
+  ignoreElements,
+  switchMap,
+  takeUntil,
+  take,
+} from 'rxjs/operators'
+import { fromEvent, from, of, empty, merge } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 
@@ -129,10 +138,37 @@ const lEpic = (action$, state$) =>
     })
   )
 
+const cmd = filter(({ keyCode }) => keyCode === 91)
+const saveKey = merge(
+  fromEvent(window, 'keydown').pipe(
+    filter(({ ctrlKey, keyCode }) => keyCode === 83 && ctrlKey) // ctrl + S
+  ),
+  fromEvent(window, 'keydown').pipe(
+    cmd,
+    switchMap(() =>
+      fromEvent(window, 'keydown').pipe(
+        takeUntil(
+          fromEvent(window, 'keyup').pipe(cmd),
+          filter(({ keyCode }) => keyCode === 83) // S
+        ),
+        take(1)
+      )
+    )
+  )
+)
+
+const saveEpic = (action$, state$) =>
+  saveKey.pipe(
+    map(({ shiftKey }) =>
+      shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
+    )
+  )
+
 export default combineEpics(
   spaceEpic,
   escEpic,
   lEpic,
   ctrlRightBracket,
-  ctrlLeftBracket
+  ctrlLeftBracket,
+  saveEpic
 )

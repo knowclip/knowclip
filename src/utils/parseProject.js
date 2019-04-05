@@ -1,5 +1,6 @@
 // @flow
 import uuid from 'uuid/v4'
+import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 
 const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
@@ -34,6 +35,7 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
   return {
     version: '2.0.0',
     id: uuid(),
+    timestamp: moment.utc().format(),
     name: `Clips from ${project.audioFileName}`,
     tags: [...getAllTags(project.clips)],
     mediaFilesMetadata: [

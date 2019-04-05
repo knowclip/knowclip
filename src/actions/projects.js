@@ -110,3 +110,11 @@ export const locateMediaFileSuccess = (
   projectId,
   filePath,
 })
+
+export const saveProjectRequest = (): Action => ({
+  type: 'SAVE_PROJECT_REQUEST',
+})
+
+export const saveProjectAsRequest = (): Action => ({
+  type: 'SAVE_PROJECT_AS_REQUEST',
+})

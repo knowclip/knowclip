@@ -1,10 +1,11 @@
-import { flatMap, debounce, map } from 'rxjs/operators'
+import { flatMap, debounce, map, filter } from 'rxjs/operators'
 import { timer, of, from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
 import parseProject, { getMediaFilePaths } from '../utils/parseProject'
+import { saveProjectToLocalStorage } from '../utils/localStorage'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
@@ -91,8 +92,35 @@ const openProjectByFilePath = (action$, state$) =>
     flatMap(x => x)
   )
 
-const TEN_SECONDS = 3000
-const saveProjectFile = (action$, state$) =>
+const saveProject = (action$, state$) =>
+  action$.pipe(
+    ofType('SAVE_PROJECT_REQUEST'),
+    filter(() => {
+      const projectMetadata = r.getCurrentProject(state$.value)
+      if (!projectMetadata) return { type: 'NOOP_SAVE_PROJECT_WITH_NONE_OPEN' }
+      const { filePath } = projectMetadata
+      return filePath && fs.existsSync(filePath)
+    }), // while can't find project file path in local storage, or file doesn't exist
+    flatMap(async () => {
+      try {
+        const projectMetadata = r.getCurrentProject(state$.value)
+        const json = JSON.stringify(
+          r.getProject(state$.value, projectMetadata),
+          null,
+          2
+        )
+        await writeFile(projectMetadata.filePath, json, 'utf8')
+        return { type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: false }
+      } catch (err) {
+        return r.simpleMessageSnackbar(
+          `Problem saving project file: ${err.message}`
+        )
+      }
+    })
+  )
+
+const THREE_SECONDS = 3000
+const autoSaveProject = (action$, state$) =>
   action$.pipe(
     ofType(
       'DELETE_CARD',
@@ -113,17 +141,12 @@ const saveProjectFile = (action$, state$) =>
       'LOCATE_MEDIA_METADATA_SUCCESS',
       'CREATED NEW PROJECT METADATA'
     ),
-    debounce(() => timer(TEN_SECONDS)),
-    flatMap(async () => {
+    debounce(() => timer(THREE_SECONDS)),
+    map(() => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
-        const json = JSON.stringify(
-          r.getProject(state$.value, projectMetadata),
-          null,
-          2
-        )
-        await writeFile(projectMetadata.filePath, json, 'utf8')
-        return { type: 'SAVE PROJECT!!' }
+        saveProjectToLocalStorage(r.getProject(state$.value, projectMetadata))
+        return { type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: true }
       } catch (err) {
         return r.simpleMessageSnackbar(
           `Problem saving project file: ${err.message}`
@@ -173,7 +196,8 @@ const openProjectOnCreate = (action$, state$) =>
 export default combineEpics(
   openProjectByFilePath,
   openProjectById,
-  saveProjectFile,
+  saveProject,
+  autoSaveProject,
   openMediaFileRequestOnOpenProject,
   openProjectOnCreate
 )

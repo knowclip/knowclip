@@ -1,7 +1,7 @@
 import { map, flatMap, tap, ignoreElements } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, remote } from 'electron'
 import * as r from '../redux'
 import getWaveformEpic from './getWaveform'
 import setWaveformCursorEpic from './setWaveformCursor'
@@ -58,7 +58,27 @@ const waveformMousedownEpic = (action$, state$) =>
 
 const closeEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', () => {
-    ipcRenderer.send('closed')
+    if (
+      !r.getCurrentProject(state$.value) ||
+      !state$.value.user.workIsUnsaved
+    ) {
+      ipcRenderer.send('closed')
+      return { type: 'QUIT_APP' }
+    }
+
+    const choice = remote.dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'Are you sure you want to quit without saving your work?',
+    })
+    if (choice === 1) {
+      // e.preventDefault()
+      return { type: "DON'T QUIT ON ME!!" }
+    } else {
+      ipcRenderer.send('closed')
+      return { type: 'QUIT_APP' }
+    }
   }).pipe(ignoreElements())
 
 export default combineEpics(

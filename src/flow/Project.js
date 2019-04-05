@@ -26,4 +26,5 @@ declare type Project2_0_0 = {
   noteType: NoteType,
   clips: { [ClipId]: Clip },
   tags: Array<string>,
+  timestamp: string,
 }

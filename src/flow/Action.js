@@ -126,6 +126,8 @@ declare type ProjectAction =
   | {| type: 'SET_PROJECT_ERROR', error: ?string |}
   | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
   | {| type: 'CLOSE_PROJECT' |}
+  | {| type: 'SAVE_PROJECT_REQUEST' |}
+  | {| type: 'SAVE_PROJECT_AS_REQUEST' |}
 
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}

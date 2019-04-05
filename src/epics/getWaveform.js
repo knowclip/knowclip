@@ -1,15 +1,14 @@
 import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
-import tempy from 'tempy'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
-import { existsSync } from 'fs'
+import { getWaveformPngPath } from '../utils/localStorage'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
 
-const getWaveformPng = async (state: AppState, path) => {
-  const ffprobeMetadata = await getMediaMetadata(path)
+const getWaveformPng = async (state: AppState, constantBitrateFilePath) => {
+  const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
   const {
     format: { duration },
   } = ffprobeMetadata
@@ -17,16 +16,10 @@ const getWaveformPng = async (state: AppState, path) => {
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 
-  const pngId = 'waveform_png_for_' + path
-  let outputFilename = localStorage.getItem(pngId)
-  if (outputFilename && existsSync(outputFilename)) {
-    return outputFilename
-  }
-  outputFilename = tempy.file({ extension: 'png' })
-  localStorage.setItem(pngId, outputFilename)
+  const outputFilename = getWaveformPngPath(constantBitrateFilePath)
 
   return await new Promise((res, rej) => {
-    ffmpeg(path)
+    ffmpeg(constantBitrateFilePath)
       // .audioCodec('copy') // later, do this and change hardcoded '.mp3' for audio-only input
       .complexFilter(
         [
