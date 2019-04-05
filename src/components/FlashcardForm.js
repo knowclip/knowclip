@@ -36,8 +36,6 @@ class FlashcardForm extends Component {
 
   handleFlashcardSubmit = e => {
     e.preventDefault()
-    this.nextFile()
-    this.germanInput.focus()
   }
 
   setFlashcardText = (key, text) => {

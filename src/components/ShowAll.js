@@ -25,10 +25,11 @@ const Field = ({ text }) => (
 )
 
 let FlashcardRow = ({
-  flashcard: { fields, id },
+  flashcard: { fields, id, tags },
   highlightClip,
   closeModal,
   file,
+  useTagsField,
 }) => (
   <TableRow hover onClick={() => highlightClip(id)} onDoubleClick={closeModal}>
     {Object.entries(fields).map(([fieldName, fieldText]) => (
@@ -36,6 +37,7 @@ let FlashcardRow = ({
         <Field text={fieldText} />
       </TableCell>
     ))}
+    <TableCell>{useTagsField && tags.join(', ')}</TableCell>
   </TableRow>
 )
 FlashcardRow = connect((state, { flashcardId }) => ({
@@ -64,6 +66,7 @@ const ShowAll = ({
               closeModal={closeDialog}
               flashcardId={flashcard.id}
               isCurrent={currentFileIndex === i}
+              useTagsField={noteType.useTagsField}
             />
           ))}
         </TableBody>
@@ -88,6 +91,7 @@ const ShowAll = ({
 
 const mapStateToProps = state => ({
   flashcards: r.getFlashcardsByTime(state),
+  noteType: r.getCurrentNoteType(state),
 })
 
 const mapDispatchToProps = {
