@@ -43,7 +43,7 @@ const ctrlRightBracket = (action$, state$) =>
       const highlightedClipId = r.getHighlightedClipId(state)
       const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
       const lastIndex = currentFileClipIds.length - 1
-      const nextId = currentFileClipIds[nextIndex >= lastIndex ? 0 : nextIndex]
+      const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
       if (highlightedClipId && nextId) return of(r.highlightClip(nextId))
 
       const x =
