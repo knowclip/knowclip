@@ -24,6 +24,7 @@ declare type Action =
   | {| type: 'DETECT_SILENCE' |}
   | {| type: 'DETECT_SILENCE_REQUEST' |}
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
+  | {| type: 'SET_ALL_TAGS', tagsToClipIds: { [string]: Array<ClipId> } |}
 
 declare type ExportFormat = 'CSV+MP3' | 'APKG'
 
@@ -39,11 +40,11 @@ declare type ClipAction =
       key: string,
       value: string,
     |}
-  | {|
-      type: 'SET_FLASHCARD_TAGS_TEXT',
-      id: ClipId,
-      value: string,
-    |}
+  // | {|
+  //     type: 'SET_FLASHCARD_TAGS_TEXT',
+  //     id: ClipId,
+  //     value: Array<string>,
+  //   |}
   | {|
       type: 'ADD_FLASHCARD_TAG',
       id: ClipId,
@@ -53,6 +54,7 @@ declare type ClipAction =
       type: 'DELETE_FLASHCARD_TAG',
       id: ClipId,
       index: number,
+      tag: string,
     |}
   | {| type: 'SET_DEFAULT_TAGS', tags: Array<string> |}
   | {| type: 'ADD_CLIP', clip: Clip |}

@@ -158,7 +158,7 @@ const autoSaveProject = (action$, state$) =>
 const openMediaFileRequestOnOpenProject = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_PROJECT'),
-    map(({ projectMetadata }) => {
+    flatMap(({ projectMetadata }) => {
       if (!projectMetadata.mediaFilePaths.length)
         return { type: 'NOOP_OPEN_PROJECT_NO_AUDIO_FILES' }
 
@@ -167,7 +167,25 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
           metadata: { id: firstMediaFileId },
         },
       ] = projectMetadata.mediaFilePaths
-      return r.openMediaFileRequest(firstMediaFileId)
+
+      const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
+        (a, b) => a.concat(b),
+        []
+      )
+
+      const tagsToClipIds = clips.reduce((tags, clipId: ClipId) => {
+        const clip = r.getClip(state$.value, clipId)
+        clip.flashcard.tags.forEach(tag => {
+          tags[tag] = tags[tag] || []
+          tags[tag].push(clip.id)
+        })
+        return tags
+      }, {})
+
+      return from([
+        r.openMediaFileRequest(firstMediaFileId),
+        r.setAllTags(tagsToClipIds),
+      ])
     })
   )
 

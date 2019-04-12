@@ -24,3 +24,9 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+.suggestionsList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}

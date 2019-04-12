@@ -35,11 +35,11 @@ export const setFlashcardField = (
   value,
 })
 
-export const setFlashcardTagsText = (id: ClipId, value: string): Action => ({
-  type: 'SET_FLASHCARD_TAGS_TEXT',
-  id,
-  value,
-})
+// export const setFlashcardTagsText = (id: ClipId, value: Array<string>): Action => ({
+//   type: 'SET_FLASHCARD_TAGS_TEXT',
+//   id,
+//   value,
+// })
 
 export const addFlashcardTag = (id: ClipId, text: string): Action => ({
   type: 'ADD_FLASHCARD_TAG',
@@ -47,10 +47,15 @@ export const addFlashcardTag = (id: ClipId, text: string): Action => ({
   text,
 })
 
-export const deleteFlashcardTag = (id: ClipId, index: number): Action => ({
+export const deleteFlashcardTag = (
+  id: ClipId,
+  index: number,
+  tag: string
+): Action => ({
   type: 'DELETE_FLASHCARD_TAG',
   id,
   index,
+  tag,
 })
 
 export const setCurrentFile = (index: number): Action => ({
@@ -102,4 +107,11 @@ export const detectSilence = (): Action => ({ type: 'DETECT_SILENCE' })
 
 export const deleteAllCurrentFileClipsRequest = (): Action => ({
   type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
+})
+
+export const setAllTags = (tagsToClipIds: {
+  [string]: Array<ClipId>,
+}): Action => ({
+  type: 'SET_ALL_TAGS',
+  tagsToClipIds,
 })

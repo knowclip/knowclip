@@ -6,17 +6,97 @@ import {
   Card,
   CardContent,
   Menu,
+  MenuList,
   MenuItem,
   Tooltip,
+  Paper,
 } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
 import ChipInput from 'material-ui-chip-input'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardForm.module.css'
+import Autosuggest from 'react-autosuggest'
 
 class FlashcardForm extends Component {
-  state = { moreMenuAnchorEl: null }
+  state = {
+    moreMenuAnchorEl: null,
+    textFieldInput: '', // ???? necessary?
+    suggestions: [],
+  }
+  onSuggestionsFetchRequested = ({ value }) => {
+    this.setState({
+      suggestions: this.getSuggestions(value),
+    })
+  }
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: [],
+    })
+  }
+
+  getSuggestions = value => {
+    const inputValue = value.trim().toLowerCase()
+
+    return inputValue.length === 0
+      ? []
+      : this.props.allTags.filter(tag =>
+          tag.toLowerCase().startsWith(inputValue)
+        )
+  }
+
+  renderSuggestionsContainer = ({ children, containerProps }) => (
+    <Paper {...containerProps} square>
+      {children}
+    </Paper>
+  )
+  getSuggestionValue = a => a
+  renderSuggestion = (suggestion, { query, isHighlighted, ...other }) => {
+    // const matches = match(suggestion.name, query)
+    // const parts = parse(suggestion.name, matches)
+
+    return (
+      <MenuItem
+        selected={isHighlighted}
+        onMouseDown={e => e.preventDefault()} // prevent the click causing the input to be blurred
+        {...other}
+      >
+        {/* {parts.map((part, index) => {
+            return part.highlight ? (
+              <span key={String(index)} style={{ fontWeight: 500 }}>
+                {part.text}
+              </span>
+            ) : (
+              <span key={String(index)}>{part.text}</span>
+            )
+          })} */}
+        {suggestion}
+      </MenuItem>
+    )
+  }
+
+  renderChipsInput = ({ value, onChange, chips, ref, ...other }) => (
+    <ChipInput
+      label="Tags"
+      placeholder="Type your tag and press 'enter'"
+      className={css.tagsField}
+      inputRef={ref}
+      value={this.props.currentFlashcard.tags || []}
+      fullWidth
+      onAdd={chip => this.handleAddChip(chip)}
+      onDelete={(chip, index) => this.handleDeleteChip(chip, index)}
+      dataSource={this.props.allTags}
+      newChipKeyCodes={[13, 9, 32]}
+      openOnFocus
+      onUpdateInput={onChange}
+      value={chips}
+      clearInputValueOnChange
+      {...other}
+    />
+  )
+
+  handletextFieldInputChange = (e, { newValue }) =>
+    this.setState({ textFieldInput: newValue })
 
   handleClickMoreButton = event => {
     this.setState({ moreMenuAnchorEl: event.currentTarget })
@@ -41,13 +121,16 @@ class FlashcardForm extends Component {
   setFlashcardText = (key, text) => {
     this.props.setFlashcardField(this.props.selectedClipId, key, text)
   }
-  setFlashcardTagsText = text =>
-    this.props.setFlashcardTagsText(this.props.selectedClipId, text)
+  // setFlashcardTagsText = text =>
+  // this.props.setFlashcardTagsText(this.props.selectedClipId, text)
 
-  handleAddChip = text =>
+  handleAddChip = text => {
+    this.setState({ textFieldInput: '' })
+    console.log('addFlashcardTag', text)
     this.props.addFlashcardTag(this.props.selectedClipId, text)
+  }
   handleDeleteChip = (text, index) =>
-    this.props.deleteFlashcardTag(this.props.selectedClipId, index)
+    this.props.deleteFlashcardTag(this.props.selectedClipId, index, text)
 
   deleteCard = () => {
     const { deleteCard, highlightedClipId } = this.props
@@ -69,8 +152,9 @@ class FlashcardForm extends Component {
       currentNoteType,
       toggleLoop,
       isLoopOn,
+      allTags,
     } = this.props
-    const { moreMenuAnchorEl } = this.state
+    const { moreMenuAnchorEl, suggestions } = this.state
 
     return (
       <Card className={css.container}>
@@ -104,15 +188,33 @@ class FlashcardForm extends Component {
               ))}
 
               {currentNoteType.useTagsField && (
-                <ChipInput
-                  label="Tags"
-                  placeholder="Type your tag and press 'enter'"
-                  className={css.tagsField}
-                  inputRef={this.inputRef('tags')}
-                  value={currentFlashcard.tags || []}
-                  fullWidth
-                  onAdd={chip => this.handleAddChip(chip)}
-                  onDelete={(chip, index) => this.handleDeleteChip(chip, index)}
+                <Autosuggest
+                  theme={{
+                    suggestionsList: css.suggestionsList,
+                  }}
+                  suggestions={suggestions}
+                  onSuggestionSelected={(e, { suggestionValue }) => {
+                    this.handleAddChip(suggestionValue)
+                    e.preventDefault()
+                  }}
+                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  renderSuggestionsContainer={this.renderSuggestionsContainer}
+                  getSuggestionValue={this.getSuggestionValue}
+                  renderSuggestion={this.renderSuggestion}
+                  focusInputOnSuggestionClick={false}
+                  shouldRenderSuggestions={value =>
+                    value && value.trim().length > 0
+                  }
+                  inputProps={{
+                    chips: currentFlashcard.tags || [],
+                    value: this.state.textFieldInput,
+                    onChange: this.handletextFieldInputChange,
+                    onAdd: chip => this.handleAddChip(chip),
+                    onDelete: (chip, index) =>
+                      this.handleDeleteChip(chip, index),
+                  }}
+                  renderInputComponent={this.renderChipsInput}
                 />
               )}
 
@@ -168,6 +270,7 @@ const mapStateToProps = state => ({
   clipsTimes: r.getClipsTimes(state),
   currentNoteType: r.getCurrentNoteType(state),
   isLoopOn: r.isLoopOn(state),
+  allTags: r.getAllTags(state),
 })
 
 const mapDispatchToProps = {
@@ -176,7 +279,7 @@ const mapDispatchToProps = {
   confirmationDialog: r.confirmationDialog,
   highlightClip: r.highlightClip,
   initializeApp: r.initializeApp,
-  setFlashcardTagsText: r.setFlashcardTagsText,
+  // // setFlashcardTagsText: r.setFlashcardTagsText,
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
   editNoteTypeDialog: r.editNoteTypeDialog,
