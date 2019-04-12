@@ -1,4 +1,4 @@
-import { map, flatMap, takeWhile } from 'rxjs/operators'
+import { map, flatMap, takeWhile, startWith } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { setWaveformCursor } from '../actions'
@@ -65,7 +65,8 @@ const setWaveformCursorEpic = (action$, state$) =>
             return setWaveformCursor(newX, { ...viewBox, xMin: newX })
           }
           return setWaveformCursor(newX)
-        })
+        }),
+        startWith(setWaveformCursor(0, { xMin: 0 }))
       )
     )
   )

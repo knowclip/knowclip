@@ -154,11 +154,18 @@ const deselectClipOnManualChangeTime = (action$, state$) =>
     map(() => r.highlightClip(null))
   )
 
+const deselectOnOpenMediaFile = (action$, state$) =>
+  action$.pipe(
+    ofType('OPEN_MEDIA_FILE_REQUEST'),
+    map(() => r.highlightClip(null))
+  )
+
 export default combineEpics(
   highlightEpic,
   highlightClipsOnAddEpic,
   playClipsOnHighlightEpic,
   selectClipOnStretch,
   centerSelectedClip,
-  deselectClipOnManualChangeTime
+  deselectClipOnManualChangeTime,
+  deselectOnOpenMediaFile
 )
