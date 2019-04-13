@@ -227,7 +227,7 @@ const deleteMediaFileFromProject = (action$, state$) =>
     flatMap(({ projectId, mediaFileId }) => {
       const highlightedClip = r.getHighlightedClip(state$.value)
       return from([
-        ...(highlightedClip ? r.highlightClip(null) : []),
+        ...(highlightedClip ? [r.highlightClip(null)] : []),
         r.deleteMediaFromProject(projectId, mediaFileId),
       ])
     })

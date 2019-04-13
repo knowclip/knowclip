@@ -5,6 +5,7 @@ import { Close as CloseIcon } from '@material-ui/icons'
 import * as r from '../redux'
 import DarkTheme from './DarkTheme'
 import css from './Header.module.css'
+import cn from 'classnames'
 
 class ProjectMenu extends Component {
   state = { editing: false, text: '' }
@@ -43,9 +44,12 @@ class ProjectMenu extends Component {
 
     return (
       <DarkTheme>
-        <section className={className}>
+        <section className={cn(className, css.projectMenu)}>
           {editing ? (
-            <form onSubmit={this.handleSubmit}>
+            <form
+              onSubmit={this.handleSubmit}
+              style={{ display: 'inline-block' }}
+            >
               <TextField
                 inputRef={this.inputRef}
                 value={text}

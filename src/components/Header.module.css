@@ -42,3 +42,9 @@
 .audioButton {
   text-transform: none !important;
 }
+
+.projectMenu {
+  display: flex;
+  align-items: center;
+  height: 4em;
+}
