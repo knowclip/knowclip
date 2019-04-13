@@ -1,7 +1,6 @@
 import {
   map,
   flatMap,
-  withLatestFrom,
   ignoreElements,
   filter,
   tap,
@@ -10,6 +9,7 @@ import {
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
+import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 
 const audioElement = () => document.getElementById('audioPlayer')
 const elementWidth = element => {
@@ -23,16 +23,16 @@ const highlightEpic = (action$, state$) =>
     flatMap(() =>
       fromEvent(document.getElementById('waveform-svg'), 'mouseup')
     ),
-    withLatestFrom(
-      action$.pipe(
-        ofType('WAVEFORM_MOUSEDOWN'),
-        map(({ x }: Action) => {
-          const clipIdAtX = r.getClipIdAt(state$.value, x)
-          return { x, clipIdAtX }
-        })
+    filter(() => !r.getPendingStretch(state$.value)),
+    map(mouseUp => {
+      const waveformMouseup = toWaveformCoordinates(
+        mouseUp,
+        mouseUp.currentTarget,
+        r.getWaveformViewBoxXMin(state$.value)
       )
-    ),
-    map(([mouseUp, { x, clipIdAtX }]) => {
+      const { x } = waveformMouseup
+      const clipIdAtX = r.getClipIdAt(state$.value, x)
+
       const state = state$.value
       const mousePositionOrClipStart = clipIdAtX
         ? r.getClip(state, clipIdAtX).start
