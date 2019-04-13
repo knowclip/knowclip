@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Menu,
-  MenuList,
   MenuItem,
   Tooltip,
   Paper,
@@ -152,7 +151,6 @@ class FlashcardForm extends Component {
       currentNoteType,
       toggleLoop,
       isLoopOn,
-      allTags,
     } = this.props
     const { moreMenuAnchorEl, suggestions } = this.state
 
@@ -279,7 +277,6 @@ const mapDispatchToProps = {
   confirmationDialog: r.confirmationDialog,
   highlightClip: r.highlightClip,
   initializeApp: r.initializeApp,
-  // // setFlashcardTagsText: r.setFlashcardTagsText,
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
   editNoteTypeDialog: r.editNoteTypeDialog,

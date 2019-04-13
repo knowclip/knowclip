@@ -133,6 +133,11 @@ export const getWaveformViewBoxXMin = (state: AppState) =>
 export const getHighlightedClipId = (state: AppState): ?ClipId =>
   state.user.highlightedClipId
 
+export const getHighlightedClip = (state: AppState): ?Clip => {
+  const highlightedClipId = getHighlightedClipId(state)
+  return highlightedClipId ? getClip(state, highlightedClipId) : null
+}
+
 export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
   const clip = getClip(state, id)
   if (!clip) throw new Error('Maybe impossible')

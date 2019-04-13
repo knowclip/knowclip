@@ -35,7 +35,17 @@ const openProject = async (filePath, projectId, state$) => {
     )
 
     return projectMetadata
-      ? of(r.openProject(project, projectMetadata))
+      ? of(
+          r.openProject(
+            project,
+            filePath === projectMetadata.filePath
+              ? projectMetadata
+              : {
+                  ...projectMetadata,
+                  filePath,
+                }
+          )
+        )
       : from([
           r.openProject(project, {
             id: project.id,
@@ -211,11 +221,24 @@ const openProjectOnCreate = (action$, state$) =>
     })
   )
 
+const deleteMediaFileFromProject = (action$, state$) =>
+  action$.pipe(
+    ofType('DELETE_MEDIA_FROM_PROJECT_REQUEST'),
+    flatMap(({ projectId, mediaFileId }) => {
+      const highlightedClip = r.getHighlightedClip(state$.value)
+      return from([
+        ...(highlightedClip ? r.highlightClip(null) : []),
+        r.deleteMediaFromProject(projectId, mediaFileId),
+      ])
+    })
+  )
+
 export default combineEpics(
   openProjectByFilePath,
   openProjectById,
   saveProject,
   autoSaveProject,
   openMediaFileRequestOnOpenProject,
-  openProjectOnCreate
+  openProjectOnCreate,
+  deleteMediaFileFromProject
 )

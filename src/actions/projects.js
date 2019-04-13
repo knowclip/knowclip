@@ -61,7 +61,16 @@ export const addMediaToProject = (
   mediaFilePaths,
 })
 
-export const deleteMedia = (
+export const deleteMediaFromProjectRequest = (
+  projectId: ProjectId,
+  mediaFileId: MediaFileId
+): Action => ({
+  type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST',
+  projectId,
+  mediaFileId,
+})
+
+export const deleteMediaFromProject = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
 ): Action => ({

@@ -40,11 +40,6 @@ declare type ClipAction =
       key: string,
       value: string,
     |}
-  // | {|
-  //     type: 'SET_FLASHCARD_TAGS_TEXT',
-  //     id: ClipId,
-  //     value: Array<string>,
-  //   |}
   | {|
       type: 'ADD_FLASHCARD_TAG',
       id: ClipId,
@@ -150,6 +145,11 @@ declare type MediaAction =
       type: 'ADD_MEDIA_TO_PROJECT',
       projectId: ProjectId,
       mediaFilePaths: Array<AudioMetadataAndPath>,
+    |}
+  | {|
+      type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST',
+      projectId: ProjectId,
+      mediaFileId: MediaFileId,
     |}
   | {|
       type: 'DELETE_MEDIA_FROM_PROJECT',

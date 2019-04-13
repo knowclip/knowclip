@@ -43,12 +43,17 @@ const openMedia = (action$, state$) =>
 
       // const currentProject = r.getCurrentProject(state$.value)
       const filePath = r.getMediaFilePathFromCurrentProject(state$.value, id)
+      const metadata = r.getMediaMetadataFromCurrentProject(state$.value, id)
+      if (!metadata)
+        return of(r.openMediaFileFailure('Could not open media file.'))
 
       if (!filePath) {
         // also should open dialog
         return of(
           r.openMediaFileFailure(
-            "This is probably your first time opening this file. You'll first have to locate manually on your filesystem. (This is probably due to it being a shared file, or an older format.)"
+            `Before opening this media file: \n\n"${
+              metadata.name
+            }"\n\nYou'll first have to locate manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
           )
         )
       }
@@ -178,12 +183,19 @@ const getDifferenceMessage = (existingMetadata, newMetadata) => {
   if (existingMetadata.id !== newMetadata.id)
     throw new Error("Metadata IDs don't match")
 
-  if (existingMetadata.name !== newMetadata.name)
-    return `The name of this file doesn't match the one on record.`
+  const differences = []
+
+  if (existingMetadata.name !== newMetadata.name) differences.push('name')
   if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
-    return `This duration of this media file doesn't match the one on record.`
+    differences.push('duration')
   if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
-    return `The format of this media file doesn't match the one on record.`
+    differences.push('format')
+
+  if (differences.length) {
+    return `This media file differs from the one on record by: ${differences.join(
+      ', '
+    )}.`
+  }
 }
 
 const locateMediaFile = (action$, state$) =>

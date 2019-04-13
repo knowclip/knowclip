@@ -35,12 +35,6 @@ export const setFlashcardField = (
   value,
 })
 
-// export const setFlashcardTagsText = (id: ClipId, value: Array<string>): Action => ({
-//   type: 'SET_FLASHCARD_TAGS_TEXT',
-//   id,
-//   value,
-// })
-
 export const addFlashcardTag = (id: ClipId, text: string): Action => ({
   type: 'ADD_FLASHCARD_TAG',
   id,

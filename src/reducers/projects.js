@@ -1,4 +1,5 @@
 // @flow
+import deleteKey from '../utils/deleteKey'
 
 const initialState: ProjectsState = {
   byId: {},
@@ -106,6 +107,13 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
             ),
           },
         },
+      }
+
+    case 'REMOVE_PROJECT_FROM_RECENTS':
+      return {
+        ...state,
+        byId: deleteKey(state.byId, action.id),
+        allIds: state.allIds.filter(id => id !== action.id),
       }
 
     default:

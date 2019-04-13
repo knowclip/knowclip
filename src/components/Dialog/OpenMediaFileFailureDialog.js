@@ -79,7 +79,7 @@ const OpenMediaFileFailureDialog = ({
   return (
     <Dialog open={open}>
       <DialogContent>
-        <p>{message}</p>
+        <p style={{ whiteSpace: 'pre-wrap' }}>{message}</p>
 
         <form className={css.form}>
           <TextField
