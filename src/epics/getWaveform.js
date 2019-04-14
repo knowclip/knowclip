@@ -3,6 +3,7 @@ import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import { getWaveformPngPath } from '../utils/localStorage'
+import { existsSync } from 'fs'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
@@ -17,6 +18,7 @@ const getWaveformPng = async (state: AppState, constantBitrateFilePath) => {
   const width = ~~(duration * (stepsPerSecond * stepLength))
 
   const outputFilename = getWaveformPngPath(constantBitrateFilePath)
+  if (outputFilename && existsSync(outputFilename)) return outputFilename
 
   return await new Promise((res, rej) => {
     ffmpeg(constantBitrateFilePath)
