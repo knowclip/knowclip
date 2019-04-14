@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
 import {
   IconButton,
@@ -34,9 +34,18 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
     className: 'audioPlayer',
     controlsList: 'nodownload',
     // autoPlay: true,
-    src: filePath ? `file:///${filePath}` : null,
+    src: filePath ? `file://${filePath}` : null,
   }
-
+  useEffect(
+    () => {
+      if (props.src) {
+        setTimeout(() => {
+          document.getElementById('audioPlayer').src = props.src
+        }, 0)
+      }
+    },
+    [props.src]
+  )
   return metadata && metadata.isVideo ? (
     <video {...props} />
   ) : (
@@ -160,6 +169,7 @@ class Main extends Component {
 
         <section className="media">
           <Media
+            key={String(constantBitrateFilePath)}
             filePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
             loop={loop}
