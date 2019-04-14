@@ -32,6 +32,15 @@ const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   }
 }
 const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
+  const clips = {}
+  for (const clipId in project.clips) {
+    const clip = project.clips[clipId]
+    clips[clipId] = {
+      ...clip,
+      start: +clip.start.toFixed(2),
+      end: +clip.end.toFixed(2),
+    }
+  }
   return {
     version: '2.0.0',
     id: uuid(),
@@ -48,7 +57,7 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
       },
     ],
     noteType: project.noteType,
-    clips: project.clips,
+    clips,
   }
 }
 const parseProject = (jsonFileContents: string): ?Project2_0_0 => {
