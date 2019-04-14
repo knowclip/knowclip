@@ -28,7 +28,7 @@ const setWaveformCursorEpic = (action$, state$) =>
         //   )
         // ),
         // ),
-        takeWhile(() => r.getConstantBitrateFilePath(state$.value)),
+        takeWhile(() => r.getCurrentMediaFileConstantBitratePath(state$.value)),
         map(e => {
           const viewBox = state$.value.waveform.viewBox
 

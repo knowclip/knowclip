@@ -2,9 +2,31 @@
 import deleteKey from '../utils/deleteKey'
 
 const initialState: ProjectsState = {
-  byId: {},
-  allIds: [],
+  byId: ({}: { [ProjectId]: ProjectMetadata }),
+  allIds: ([]: Array<ProjectId>),
 }
+
+type MediaFilePathEdit = (
+  metadataAndPath: AudioMetadataAndPath
+) => AudioMetadataAndPath
+
+const editMediaFilePath = (
+  state: ProjectsState,
+  projectId: ProjectId,
+  mediaFileId: MediaFileId,
+  edit: MediaFilePathEdit
+) => ({
+  ...state,
+  byId: {
+    ...state.byId,
+    [projectId]: {
+      ...state.byId[projectId],
+      mediaFilePaths: state.byId[projectId].mediaFilePaths.map(p =>
+        p.metadata.id === mediaFileId ? edit(p) : p
+      ),
+    },
+  },
+})
 
 const projects: Reducer<ProjectsState> = (state = initialState, action) => {
   switch (action.type) {
@@ -70,44 +92,29 @@ const projects: Reducer<ProjectsState> = (state = initialState, action) => {
       }
 
     case 'LOCATE_MEDIA_FILE_SUCCESS':
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [action.projectId]: {
-            ...state.byId[action.projectId],
-            mediaFilePaths: state.byId[action.projectId].mediaFilePaths.map(p =>
-              p.metadata.id === action.id
-                ? {
-                    ...p,
-                    filePath: action.filePath,
-                    metadata: action.metadata,
-                  }
-                : p
-            ),
-          },
-        },
-      }
+      return editMediaFilePath(
+        state,
+        action.projectId,
+        action.metadata.id,
+        mediaFileAndPath => ({
+          ...mediaFileAndPath,
+          filePath: action.filePath,
+          metadata: action.metadata,
+        })
+      )
 
     case 'OPEN_MEDIA_FILE_SUCCESS':
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [action.projectId]: {
-            ...state.byId[action.projectId],
-            mediaFilePaths: state.byId[action.projectId].mediaFilePaths.map(p =>
-              p.metadata.id === action.metadata.id
-                ? {
-                    ...p,
-                    filePath: action.filePath,
-                    metadata: action.metadata,
-                  }
-                : p
-            ),
-          },
-        },
-      }
+      return editMediaFilePath(
+        state,
+        action.projectId,
+        action.metadata.id,
+        mediaFileAndPath => ({
+          ...mediaFileAndPath,
+          filePath: action.filePath,
+          metadata: action.metadata,
+          constantBitrateFilePath: action.constantBitrateFilePath,
+        })
+      )
 
     case 'REMOVE_PROJECT_FROM_RECENTS':
       return {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { Fragment, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import {
@@ -38,19 +38,17 @@ const ProjectMenuItem = ({
 }) => {
   const menuAnchorEl = useRef(null)
   const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const openMenu = e => setMenuIsOpen(true)
-  const closeMenu = e => setMenuIsOpen(false)
+  const openMenu = e => {
+    setMenuIsOpen(true)
+    e.stopPropagation()
+  }
+  const closeMenu = e => {
+    e.stopPropagation()
+    setMenuIsOpen(false)
+  }
 
   return (
-    <MenuItem key={projectMetadata.id}>
-      <RootRef rootRef={menuAnchorEl}>
-        <ListItemText onClick={() => openProjectById(projectMetadata.id)}>
-          {projectMetadata.name}
-        </ListItemText>
-      </RootRef>
-      <IconButton onClick={openMenu}>
-        <MoreVertIcon />
-      </IconButton>
+    <Fragment>
       {menuIsOpen && (
         <Menu
           open={menuIsOpen}
@@ -63,7 +61,18 @@ const ProjectMenuItem = ({
           </MenuItem>
         </Menu>
       )}
-    </MenuItem>
+      <MenuItem
+        key={projectMetadata.id}
+        onClick={() => openProjectById(projectMetadata.id)}
+      >
+        <RootRef rootRef={menuAnchorEl}>
+          <ListItemText>{projectMetadata.name}</ListItemText>
+        </RootRef>
+        <IconButton onClick={openMenu}>
+          <MoreVertIcon />
+        </IconButton>
+      </MenuItem>
+    </Fragment>
   )
 }
 

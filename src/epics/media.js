@@ -7,17 +7,16 @@ import fs from 'fs'
 import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
-import { getConstantBitrateMp3Path } from '../utils/localStorage'
 
-const coerceMp3ToConstantBitrate = path => {
+const coerceMp3ToConstantBitrate = (path, oldConstantBitratePath) => {
   // should check if mp3
   // and if possible, constant vs. variable bitrate
   return new Promise((res, rej) => {
     if (extname(path) !== '.mp3') return res(path)
+    if (oldConstantBitratePath && fs.existsSync(oldConstantBitratePath))
+      return res(oldConstantBitratePath)
 
-    const constantBitratePath = getConstantBitrateMp3Path(path)
-
-    if (fs.existsSync(constantBitratePath)) return res(constantBitratePath)
+    const constantBitratePath = tempy.file({ extension: 'mp3' })
 
     // I guess by default it does CBR
     // though maybe we should check that
@@ -88,13 +87,22 @@ const openMedia = (action$, state$) =>
           ])
       }
 
-      if (extname(filePath) === '.mp3')
+      if (extname(filePath) === '.mp3') {
+        const constantBitrateFilePath = r.getMediaFileConstantBitratePathFromCurrentProject(
+          state$.value,
+          id
+        )
         return from([
-          r.simpleMessageSnackbar(
-            'Due to variable bitrate, MP3 files may take a bit longer to open. Please be patient!'
-          ),
+          ...(constantBitrateFilePath && fs.existsSync(constantBitrateFilePath)
+            ? []
+            : [
+                r.simpleMessageSnackbar(
+                  'Due to variable bitrate, MP3 files may take a bit longer to open. Please be patient!'
+                ),
+              ]),
           { type: 'OPEN_MP3_REQUEST', id, filePath },
         ])
+      }
 
       // newMetadata might actually be same? :| but if not it overrides 'UNKNOWN' format
       return of(
@@ -116,7 +124,8 @@ const openMp3 = (action$, state$) =>
     flatMap(async ({ id, filePath }) => {
       try {
         const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
-          filePath
+          filePath,
+          r.getMediaFileConstantBitratePathFromCurrentProject(state$.value, id)
         )
 
         const ffprobeMetadata = await getMediaMetadata(filePath)

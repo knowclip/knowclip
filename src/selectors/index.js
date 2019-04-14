@@ -156,9 +156,6 @@ export const isAudioLoading = (state: AppState): boolean =>
 export const getMediaFolderLocation = (state: AppState): ?string =>
   state.audio.mediaFolderLocation
 
-export const getConstantBitrateFilePath = (state: AppState): ?MediaFilePath =>
-  state.user.currentMediaFileId ? state.audio.constantBitrateFilePath : null
-
 export const getAllTags = (state: AppState): Array<string> => {
   const tags: any = Object.keys(state.user.tagsToClipIds)
   return (tags: Array<Array<string>>).reduce((a, b) => a.concat(b), [])

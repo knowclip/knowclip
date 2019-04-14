@@ -4,6 +4,7 @@ declare type ProjectFilePath = string
 declare type AudioMetadataAndPath = Exact<{
   metadata: MediaFileMetadata,
   filePath: ?MediaFilePath,
+  constantBitrateFilePath: ?MediaFilePath,
   error: ?string,
 }>
 

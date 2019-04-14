@@ -135,7 +135,7 @@ const deselectClipOnManualChangeTime = (action$, state$) =>
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
       fromEvent(audioElement(), 'seeking').pipe(
-        takeWhile(() => r.getConstantBitrateFilePath(state$.value))
+        takeWhile(() => r.getCurrentMediaFileConstantBitratePath(state$.value))
       )
     ),
     filter(() => {

@@ -198,7 +198,7 @@ const mapStateToProps = state => ({
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
   mediaFolderLocation: r.getMediaFolderLocation(state),
   currentProjectId: r.getCurrentProjectId(state),
-  constantBitrateFilePath: r.getConstantBitrateFilePath(state),
+  constantBitrateFilePath: r.getCurrentMediaFileConstantBitratePath(state),
   currentMediaMetadata: r.getCurrentMediaMetadata(state),
 })
 

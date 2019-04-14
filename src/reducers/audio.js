@@ -3,7 +3,6 @@ export const initialState: AudioState = {
   loop: true,
   isLoading: false,
   mediaFolderLocation: null,
-  constantBitrateFilePath: null,
 }
 
 const audio: Reducer<AudioState> = (
@@ -28,24 +27,16 @@ const audio: Reducer<AudioState> = (
         ...state,
         loop: true,
         isLoading: false,
-        constantBitrateFilePath: null,
       }
 
     case 'OPEN_MEDIA_FILE_REQUEST':
       return {
         ...state,
-        constantBitrateFilePath: null,
         isLoading: true,
       }
 
-    case 'OPEN_MEDIA_FILE_SUCCESS':
-      return {
-        ...state,
-        constantBitrateFilePath: action.constantBitrateFilePath,
-        isLoading: false,
-      }
-
     case 'OPEN_MEDIA_FILE_FAILURE':
+    case 'OPEN_MEDIA_FILE_SUCCESS':
       return {
         ...state,
         isLoading: false,

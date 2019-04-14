@@ -72,6 +72,28 @@ export const getMediaFilePathFromCurrentProject = (
   return fileMetadata ? fileMetadata.filePath : null
 }
 
+export const getMediaFileConstantBitratePathFromCurrentProject = (
+  state: AppState,
+  id: MediaFileId
+): ?MediaFilePath => {
+  const currentProject = getCurrentProject(state)
+  if (!currentProject) return null
+  const fileMetadata = currentProject.mediaFilePaths.find(
+    mediaMetadata => mediaMetadata.metadata.id === id
+  )
+  return fileMetadata ? fileMetadata.constantBitrateFilePath : null
+}
+
+export const getCurrentMediaFileConstantBitratePath = (
+  state: AppState
+): ?MediaFilePath =>
+  state.user.currentMediaFileId
+    ? getMediaFileConstantBitratePathFromCurrentProject(
+        state,
+        state.user.currentMediaFileId
+      )
+    : null
+
 export const getCurrentFilePath = (state: AppState): ?MediaFilePath => {
   const currentFileId = state.user.currentMediaFileId
   return currentFileId
