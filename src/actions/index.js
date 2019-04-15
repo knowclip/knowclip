@@ -89,6 +89,10 @@ export const exportCsv = (): Action => ({
   type: 'EXPORT_CSV',
 })
 
+export const exportMarkdown = (): Action => ({
+  type: 'EXPORT_MARKDOWN',
+})
+
 export const setMediaFolderLocation = (directoryPath: string): Action => ({
   type: 'SET_MEDIA_FOLDER_LOCATION',
   directoryPath,

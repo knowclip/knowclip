@@ -13,7 +13,6 @@ const getWaveformPng = async (state: AppState, constantBitrateFilePath) => {
   const {
     format: { duration },
   } = ffprobeMetadata
-  console.log(ffprobeMetadata)
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 

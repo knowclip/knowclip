@@ -51,6 +51,7 @@ const ShowAll = ({
   highlightClip,
   exportCsv,
   exportApkg,
+  exportMarkdown,
   noteType,
   open,
 }) => (
@@ -76,6 +77,9 @@ const ShowAll = ({
       <Tooltip title="Good for updating existing deck">
         <Button onClick={() => exportCsv()}>Export CSV and MP3</Button>
       </Tooltip>
+      <Tooltip title="Create a document for at-a-glance reviews">
+        <Button onClick={() => exportMarkdown()}>Export Markdown</Button>
+      </Tooltip>
       <Tooltip title="Good for starting new deck">
         <Button
           variant="contained"
@@ -97,6 +101,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   exportApkg: r.exportApkg,
   exportCsv: r.exportCsv,
+  exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
 }

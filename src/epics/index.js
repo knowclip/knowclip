@@ -9,6 +9,7 @@ import addClip from './addClip'
 import stretchClip from './stretchClip'
 import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
+import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
 import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
@@ -92,6 +93,7 @@ export default combineEpics(
   persistStateEpic,
   exportCsvAndMp3,
   exportApkg,
+  exportMarkdown,
   deleteAllCurrentFileClips,
   project,
   noteTypesEpic,

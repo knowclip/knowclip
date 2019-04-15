@@ -26,13 +26,8 @@ declare type Action =
   | {| type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' |}
   | {| type: 'SET_ALL_TAGS', tagsToClipIds: { [string]: Array<ClipId> } |}
 
-declare type ExportFormat = 'CSV+MP3' | 'APKG'
-
 declare type ClipAction =
   | {| type: 'DELETE_CARD', id: ClipId |}
-  | {| type: 'EXPORT_MP3', exportData: ApkgExportData |}
-  | {| type: 'EXPORT_APKG' |}
-  | {| type: 'EXPORT_CSV' |}
   | {| type: 'DELETE_CARDS', ids: Array<ClipId> |}
   | {|
       type: 'SET_FLASHCARD_FIELD',
@@ -125,7 +120,10 @@ declare type ProjectAction =
   | {| type: 'CLOSE_PROJECT' |}
   | {| type: 'SAVE_PROJECT_REQUEST' |}
   | {| type: 'SAVE_PROJECT_AS_REQUEST' |}
-
+  | {| type: 'EXPORT_MP3', exportData: ApkgExportData |}
+  | {| type: 'EXPORT_APKG' |}
+  | {| type: 'EXPORT_MARKDOWN' |}
+  | {| type: 'EXPORT_CSV' |}
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
   | {|
