@@ -70,7 +70,7 @@ const addClipEpic = (action$, state$) => {
         takeLast(1),
         map(pendingClipAction => {
           const { clip: pendingClip } = pendingClipAction
-          const clipsOrder = r.getClipsOrder(state$.value)
+          const clipsOrder = r.getCurrentFileClipsOrder(state$.value)
           const pendingClipOverlaps = [
             r.getClipIdAt(state$.value, pendingClip.start),
             r.getClipIdAt(state$.value, pendingClip.end),

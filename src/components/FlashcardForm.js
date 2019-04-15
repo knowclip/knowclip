@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useRef } from 'react'
 import { connect } from 'react-redux'
 import {
   TextField,
@@ -17,12 +17,33 @@ import * as r from '../redux'
 import css from './FlashcardForm.module.css'
 import Autosuggest from 'react-autosuggest'
 
+let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
+  const handleChange = useRef(e => setFlashcardText(id, e.target.value))
+  return (
+    <section>
+      <TextField
+        onChange={handleChange.current}
+        value={currentFlashcard.fields[id] || ''}
+        fullWidth
+        multiline
+        label={name}
+      />
+    </section>
+  )
+}
+
 class FlashcardForm extends Component {
   state = {
     moreMenuAnchorEl: null,
     textFieldInput: '', // ???? necessary?
     suggestions: [],
   }
+
+  onSuggestionSelected = (e, { suggestionValue }) => {
+    this.handleAddChip(suggestionValue)
+    e.preventDefault()
+  }
+
   onSuggestionsFetchRequested = ({ value }) => {
     this.setState({
       suggestions: this.getSuggestions(value),
@@ -79,8 +100,6 @@ class FlashcardForm extends Component {
       label="Tags"
       placeholder="Type your tag and press 'enter'"
       className={css.tagsField}
-      inputRef={ref}
-      value={this.props.currentFlashcard.tags || []}
       fullWidth
       onAdd={chip => this.handleAddChip(chip)}
       onDelete={(chip, index) => this.handleDeleteChip(chip, index)}
@@ -141,9 +160,6 @@ class FlashcardForm extends Component {
   editCardTemplate = () =>
     this.props.editNoteTypeDialog(this.props.currentNoteType.id)
 
-  inputRefs = {}
-  inputRef = name => el => (this.inputRefs[name] = el)
-
   render() {
     const {
       currentFlashcard,
@@ -173,16 +189,13 @@ class FlashcardForm extends Component {
                 </Tooltip>
               </section>
               {currentNoteType.fields.map(({ name, id }) => (
-                <section key={`${id}_${currentFlashcard.id}`}>
-                  <TextField
-                    inputRef={this.inputRef(id)}
-                    onChange={e => this.setFlashcardText(id, e.target.value)}
-                    value={currentFlashcard.fields[id] || ''}
-                    fullWidth
-                    multiline
-                    label={name}
-                  />
-                </section>
+                <Field
+                  key={`${id}_${currentFlashcard.id}`}
+                  id={id}
+                  currentFlashcard={currentFlashcard}
+                  name={name}
+                  setFlashcardText={this.setFlashcardText}
+                />
               ))}
 
               {currentNoteType.useTagsField && (
@@ -191,10 +204,7 @@ class FlashcardForm extends Component {
                     suggestionsList: css.suggestionsList,
                   }}
                   suggestions={suggestions}
-                  onSuggestionSelected={(e, { suggestionValue }) => {
-                    this.handleAddChip(suggestionValue)
-                    e.preventDefault()
-                  }}
+                  onSuggestionSelected={this.onSuggestionSelected}
                   onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                   onSuggestionsClearRequested={this.onSuggestionsClearRequested}
                   renderSuggestionsContainer={this.renderSuggestionsContainer}
@@ -208,9 +218,8 @@ class FlashcardForm extends Component {
                     chips: currentFlashcard.tags || [],
                     value: this.state.textFieldInput,
                     onChange: this.handletextFieldInputChange,
-                    onAdd: chip => this.handleAddChip(chip),
-                    onDelete: (chip, index) =>
-                      this.handleDeleteChip(chip, index),
+                    onAdd: this.handleAddChip,
+                    onDelete: this.handleDeleteChip,
                   }}
                   renderInputComponent={this.renderChipsInput}
                 />
