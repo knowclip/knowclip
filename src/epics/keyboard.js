@@ -41,7 +41,6 @@ const ctrlRightBracket = (action$, state$) =>
       const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
 
       const highlightedClipId = r.getHighlightedClipId(state)
-
       const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
       const lastIndex = currentFileClipIds.length - 1
       const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
@@ -57,6 +56,14 @@ const ctrlRightBracket = (action$, state$) =>
       return nextClipId ? of(r.highlightClip(nextClipId)) : empty()
     })
   )
+
+const findLast = (array, predicate) => {
+  if (!array.length) return null
+  for (let i = array.length - 1; i >= 0; i -= 1) {
+    const item = array[i]
+    if (predicate(item)) return item
+  }
+}
 
 const ctrlLeftBracket = (action$, state$) =>
   fromEvent(window, 'keydown').pipe(
@@ -86,8 +93,10 @@ const ctrlLeftBracket = (action$, state$) =>
         media && r.getXAtMilliseconds(state$.value, media.currentTime * 1000)
 
       const prevClipId =
-        currentFileClipIds.find(clipId => r.getClip(state, clipId).end <= x) ||
-        currentFileClipIds[currentFileClipIds.length - 1]
+        findLast(
+          currentFileClipIds,
+          clipId => r.getClip(state, clipId).end <= x
+        ) || currentFileClipIds[currentFileClipIds.length - 1]
 
       return prevClipId ? of(r.highlightClip(prevClipId)) : empty()
     })
