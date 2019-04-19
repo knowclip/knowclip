@@ -1,4 +1,4 @@
-import { map, flatMap, takeUntil, takeLast } from 'rxjs/operators'
+import { map, switchMap, takeUntil, takeLast } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
@@ -7,11 +7,11 @@ import { toWaveformX } from '../utils/waveformCoordinates'
 const stretchClipEpic = (action$, state$) => {
   const clipMousedowns = action$.pipe(
     ofType('WAVEFORM_MOUSEDOWN'),
-    flatMap(({ x }) => {
+    switchMap(({ x }) => {
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()
     }),
-    flatMap(mousedownData => {
+    switchMap(mousedownData => {
       const {
         edge: { key, id },
       } = mousedownData
@@ -35,7 +35,7 @@ const stretchClipEpic = (action$, state$) => {
         pendingStretches,
         pendingStretches.pipe(
           takeLast(1),
-          flatMap(lastPendingStretch => {
+          switchMap(lastPendingStretch => {
             const {
               stretch: { id, originKey, end },
             } = lastPendingStretch
@@ -50,8 +50,8 @@ const stretchClipEpic = (action$, state$) => {
             const previousClip = r.getClip(state$.value, previousClipId)
             if (previousClip && end <= previousClip.end) {
               return from([
-                r.mergeClips([id, previousClipId]),
                 r.setPendingStretch(null),
+                r.mergeClips([id, previousClipId]),
               ])
             }
 
@@ -59,26 +59,26 @@ const stretchClipEpic = (action$, state$) => {
             const nextClip = r.getClip(state$.value, nextClipId)
             if (nextClip && end >= nextClip.start) {
               return from([
-                r.mergeClips([id, nextClipId]),
                 r.setPendingStretch(null),
+                r.mergeClips([id, nextClipId]),
               ])
             }
 
             if (originKey === 'start' && stretchedClip.end > end) {
               return from([
+                r.setPendingStretch(null),
                 r.editClip(id, {
                   start: Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD),
                 }),
-                r.setPendingStretch(null),
               ])
             }
 
             if (originKey === 'end' && end > stretchedClip.start) {
               return from([
+                r.setPendingStretch(null),
                 r.editClip(id, {
                   end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD),
                 }),
-                r.setPendingStretch(null),
               ])
             }
 

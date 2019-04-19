@@ -41,6 +41,7 @@ const ctrlRightBracket = (action$, state$) =>
       const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
 
       const highlightedClipId = r.getHighlightedClipId(state)
+
       const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
       const lastIndex = currentFileClipIds.length - 1
       const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
@@ -71,20 +72,22 @@ const ctrlLeftBracket = (action$, state$) =>
       const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
 
       const highlightedClipId = r.getHighlightedClipId(state)
-      const prevIndex = currentFileClipIds.indexOf(highlightedClipId) - 1
-      const firstIndex = 0
-      const nextId =
-        currentFileClipIds[
-          prevIndex < firstIndex ? currentFileClipIds.length - 1 : prevIndex
-        ]
-      if (highlightedClipId && nextId) return of(r.highlightClip(nextId))
-
+      if (highlightedClipId) {
+        const highlightedIndex = currentFileClipIds.indexOf(highlightedClipId)
+        const nextId =
+          currentFileClipIds[
+            highlightedIndex === 0
+              ? currentFileClipIds.length - 1
+              : highlightedIndex - 1
+          ]
+        return of(r.highlightClip(nextId))
+      }
       const x =
         media && r.getXAtMilliseconds(state$.value, media.currentTime * 1000)
 
-      const prevClipId = currentFileClipIds.find(
-        clipId => r.getClip(state, clipId).end <= x
-      )
+      const prevClipId =
+        currentFileClipIds.find(clipId => r.getClip(state, clipId).end <= x) ||
+        currentFileClipIds[currentFileClipIds.length - 1]
 
       return prevClipId ? of(r.highlightClip(prevClipId)) : empty()
     })

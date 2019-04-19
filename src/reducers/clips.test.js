@@ -67,4 +67,35 @@ describe('clips reducer', () => {
       'b-c2': bC2,
     })
   })
+
+  it('merges clips', () => {
+    const state: ClipsState = clips(
+      {
+        byId: {
+          a: newClip({ start: 1, end: 1.5 }, fileId, 'a', noteType),
+          b: newClip({ start: 2, end: 2.5 }, fileId, 'b', noteType),
+          c: newClip({ start: 3, end: 3.5 }, fileId, 'c', noteType),
+        },
+        idsByMediaFileId: {
+          [fileId]: ['a', 'b', 'c'],
+        },
+      },
+      { type: '@@INIT' }
+    )
+    const mergeAction = r.mergeClips(['a', 'b'])
+    expect(clips(state, mergeAction)).toEqual(
+      clips(
+        {
+          byId: {
+            a: newClip({ start: 1, end: 2.5 }, fileId, 'a', noteType),
+            c: newClip({ start: 3, end: 3.5 }, fileId, 'c', noteType),
+          },
+          idsByMediaFileId: {
+            [fileId]: ['a', 'c'],
+          },
+        },
+        { type: '@@INIT' }
+      )
+    )
+  })
 })

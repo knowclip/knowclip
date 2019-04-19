@@ -43,11 +43,21 @@ video::-webkit-media-controls-panel {
 .media {
   background: black;
   display: flex;
+  justify-content: center;
 }
-.audioPlayer {
-  /* max-width: 30rem; */
+
+.videoContainer {
+  height: 25rem;
+  overflow-y: auto;
+  resize: vertical;
+}
+audio.audioPlayer {
   width: 100%;
-  max-height: 25rem;
+}
+video.audioPlayer {
+  height: calc(100% - 36px);
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .form {

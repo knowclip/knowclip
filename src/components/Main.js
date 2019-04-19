@@ -47,7 +47,9 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
     [props.src]
   )
   return metadata && metadata.isVideo ? (
-    <video {...props} />
+    <div className="videoContainer">
+      <video {...props} />
+    </div>
   ) : (
     <audio {...props} />
   )
