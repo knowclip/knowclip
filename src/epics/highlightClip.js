@@ -5,6 +5,7 @@ import {
   filter,
   tap,
   takeWhile,
+  sample,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of } from 'rxjs'
@@ -21,22 +22,28 @@ const highlightEpic = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mouseup')
-    ),
-    filter(() => !r.getPendingStretch(state$.value)),
-    map(mouseUp => {
-      const waveformMouseup = toWaveformCoordinates(
-        mouseUp,
-        mouseUp.currentTarget,
-        r.getWaveformViewBoxXMin(state$.value)
-      )
-      const { x } = waveformMouseup
-      const clipIdAtX = r.getClipIdAt(state$.value, x)
+      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+        flatMap(mouseDown => {
+          if (r.getPendingStretch(state$.value)) return empty()
 
+          const waveformMouseDown = toWaveformCoordinates(
+            mouseDown,
+            mouseDown.currentTarget,
+            r.getWaveformViewBoxXMin(state$.value)
+          )
+          return of({
+            waveformMouseDown,
+            clipIdAtX: r.getClipIdAt(state$.value, waveformMouseDown.x),
+          })
+        }),
+        sample(fromEvent(document.getElementById('waveform-svg'), 'mouseup'))
+      )
+    ),
+    map(({ waveformMouseDown, clipIdAtX }) => {
       const state = state$.value
       const mousePositionOrClipStart = clipIdAtX
         ? r.getClip(state, clipIdAtX).start
-        : x
+        : waveformMouseDown.x
       const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
       document.getElementById('audioPlayer').currentTime = newTime
       return clipIdAtX ? r.highlightClip(clipIdAtX) : r.highlightClip(null)
@@ -85,7 +92,7 @@ const selectClipOnStretch = (action$, state$) =>
     filter(({ id, override }) => {
       const isStretch =
         override.start !== undefined || override.end !== undefined
-      return isStretch && id !== r.getHighlightedClipId(state$.value)
+      return isStretch
     }),
     map(({ id }) => r.highlightClip(id))
   )
