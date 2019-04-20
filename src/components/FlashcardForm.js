@@ -109,6 +109,7 @@ class FlashcardForm extends Component {
       onUpdateInput={onChange}
       value={chips}
       clearInputValueOnChange
+      inputRef={ref}
       {...other}
     />
   )
@@ -144,11 +145,12 @@ class FlashcardForm extends Component {
 
   handleAddChip = text => {
     this.setState({ textFieldInput: '' })
-    console.log('addFlashcardTag', text)
     this.props.addFlashcardTag(this.props.selectedClipId, text)
   }
-  handleDeleteChip = (text, index) =>
+  handleDeleteChip = (text, index) => {
     this.props.deleteFlashcardTag(this.props.selectedClipId, index, text)
+    this.autosuggest && this.autosuggest.input.focus()
+  }
 
   deleteCard = () => {
     const { deleteCard, highlightedClipId } = this.props
@@ -159,6 +161,8 @@ class FlashcardForm extends Component {
 
   editCardTemplate = () =>
     this.props.editNoteTypeDialog(this.props.currentNoteType.id)
+
+  autosuggestRef = c => (this.autosuggest = c)
 
   render() {
     const {
@@ -222,6 +226,7 @@ class FlashcardForm extends Component {
                     onDelete: this.handleDeleteChip,
                   }}
                   renderInputComponent={this.renderChipsInput}
+                  ref={this.autosuggestRef}
                 />
               )}
 

@@ -35,6 +35,7 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
     controlsList: 'nodownload',
     // autoPlay: true,
     src: filePath ? `file://${filePath}` : null,
+    playbackspeed: 1.5,
   }
   useEffect(
     () => {
