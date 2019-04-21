@@ -1,13 +1,15 @@
 // @flow
 
-declare type NoteTypesState = {
-  byId: { [NoteTypeId]: NoteType },
-  allIds: Array<NoteTypeId>,
-}
+declare type NoteType = 'Simple' | 'Transliteration'
+
+// declare type NoteTypesState = {
+//   byId: { [NoteTypeId]: NoteType },
+//   allIds: Array<NoteTypeId>,
+// }
 
 declare type NoteTypeId = string
 
-declare type NoteType = {
+declare type NoteTypePre3_0_0 = {
   id: NoteTypeId,
   name: string,
   fields: Array<NoteTypeField>,

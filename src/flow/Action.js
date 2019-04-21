@@ -5,7 +5,6 @@ declare type Action =
   | SnackbarAction
   | DialogAction
   | WaveformAction
-  | NoteTypeAction
   | ClipAction
   | ProjectAction
   | MediaAction
@@ -57,35 +56,6 @@ declare type ClipAction =
   | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
   | {| type: 'HIGHLIGHT_CLIP', id: ?ClipId |}
 
-declare type NoteTypeAction =
-  | {| type: 'ADD_NOTE_TYPE', noteType: NoteType |}
-  | {| type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> |}
-  | {
-      type: 'EDIT_NOTE_TYPE_REQUEST',
-      id: NoteTypeId,
-      override: $Shape<NoteType>,
-    }
-  | {|
-      type: 'DELETE_NOTE_TYPE',
-      id: NoteTypeId,
-      closeDialogOnComplete: boolean,
-    |}
-  | {|
-      type: 'DELETE_NOTE_TYPE_REQUEST',
-      id: NoteTypeId,
-      closeDialogOnComplete: boolean,
-    |}
-  | {
-      type: 'SET_AUDIO_FILE_NOTE_TYPE',
-      mediaFileId: MediaFileId,
-      noteTypeId: NoteTypeId,
-    }
-  | {|
-      type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
-      mediaFileId: MediaFileId,
-      noteTypeId: NoteTypeId,
-    |}
-
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
@@ -106,7 +76,7 @@ declare type ProjectAction =
   | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
   | {|
       type: 'OPEN_PROJECT',
-      project: Project2_0_0,
+      project: Project3_0_0,
       projectMetadata: ProjectMetadata,
     |}
   | {|

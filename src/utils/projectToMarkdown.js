@@ -32,9 +32,19 @@ const projectToMarkdown = (
                       .map(tag => `_#${tag}_`)
                       .join(' ')}`
                   : '',
-                ...noteType.fields
-                  .map(f => `* ${clip.flashcard.fields[f.id]}`)
-                  .map(rawString => rawString.replace(/\n/g, '<br>')),
+                ...(clip.flashcard.type === 'Simple'
+                  ? [
+                      `* ${clip.flashcard.fields.transcription}`,
+                      `* ${clip.flashcard.fields.meaning}`,
+                      `* ${clip.flashcard.fields.notes}`,
+                    ]
+                  : [
+                      `* ${clip.flashcard.fields.transcription}`,
+                      `* ${clip.flashcard.fields.pronunciation}`,
+                      `* ${clip.flashcard.fields.meaning}`,
+                      `* ${clip.flashcard.fields.notes}`,
+                    ]
+                ).map(rawString => rawString.replace(/\n/g, '<br>')),
               ]
             })
             .reduce(...flatten),

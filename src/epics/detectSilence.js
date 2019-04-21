@@ -86,7 +86,7 @@ const detectSilenceEpic = (action$, state$) =>
             fileId,
             uuid(),
             currentNoteType,
-            currentNoteType.useTagsField ? r.getDefaultTags(state$.value) : []
+            r.getDefaultTags(state$.value)
           )
         )
 

@@ -206,11 +206,11 @@ class NoteTypeForm extends Component {
 }
 
 const mapStateToProps = (state, { id }) => ({
-  noteType: r.getNoteType(state, id),
+  // noteType: r.getNoteType(state, id),
 })
 
 const mapDispatchToProps = {
-  addNoteType: r.addNoteType,
+  // addNoteType: r.addNoteType,
   simpleMessageSnackbar: r.simpleMessageSnackbar,
   editNoteTypeRequest: r.editNoteTypeRequest,
 }

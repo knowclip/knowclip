@@ -29,10 +29,10 @@ const openProject = async (filePath, projectId, state$) => {
       project,
       filePath
     )
-    const projectMetadata: ProjectMetadata = r.getProjectMetadata(
-      state$.value,
-      project.id
-    )
+    const projectMetadata: ProjectMetadata = {
+      ...r.getProjectMetadata(state$.value, project.id),
+      noteType: project.noteType,
+    }
 
     return projectMetadata
       ? of(

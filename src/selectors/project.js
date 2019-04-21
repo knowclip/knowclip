@@ -6,12 +6,12 @@ import getAllTags from '../utils/getAllTags'
 export const getProject = (
   state: AppState,
   projectMetadata: ProjectMetadata
-): Project2_0_0 => {
+): Project3_0_0 => {
   const noteType = audioSelectors.getCurrentNoteType(state)
   if (!noteType) throw new Error('no note type found')
 
   return {
-    version: '2.0.0',
+    version: '3.0.0',
     timestamp: moment.utc().format(),
     name: projectMetadata.name,
     id: projectMetadata.id,

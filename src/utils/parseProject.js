@@ -5,7 +5,7 @@ import getAllTags from '../utils/getAllTags'
 
 const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   const { clips: oldClips } = project
-  const newClips: { [ClipId]: Clip } = {}
+  const newClips: { [ClipId]: ClipPre3_0_0 } = {}
   const fileId = uuid()
   for (const clipId in oldClips) {
     const clip = oldClips[clipId]
@@ -60,14 +60,79 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
     clips,
   }
 }
-const parseProject = (jsonFileContents: string): ?Project2_0_0 => {
+
+const getNoteType = (oldProject: Project2_0_0): NoteType =>
+  oldProject.noteType.fields.length > 3 ? 'Transliteration' : 'Simple'
+const getFlashcard = (
+  noteType: NoteType,
+  oldFlashcard: FlashcardPre3_0_0,
+  [noteField1, noteField2, noteField3, ...noteFieldsRest]: Array<NoteTypeField>
+): Flashcard =>
+  noteType === 'Simple'
+    ? {
+        id: oldFlashcard.id,
+        tags: oldFlashcard.tags,
+        type: 'Simple',
+        fields: {
+          transcription: oldFlashcard.fields[noteField1.id],
+          meaning: noteField2 ? oldFlashcard.fields[noteField2.id] : '',
+          notes: noteField3 ? oldFlashcard.fields[noteField3.id] : '',
+        },
+      }
+    : {
+        id: oldFlashcard.id,
+        tags: oldFlashcard.tags,
+        type: 'Transliteration',
+        fields: {
+          transcription: oldFlashcard.fields[noteField1.id],
+          pronunciation: noteField2 ? oldFlashcard.fields[noteField2.id] : '',
+          meaning: noteField3 ? oldFlashcard.fields[noteField3.id] : '',
+          notes: noteFieldsRest
+            .map(({ id }) => oldFlashcard.fields[id])
+            .join('\n\n'),
+        },
+      }
+const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
+  const noteType = getNoteType(project)
+  const clips: { [ClipId]: Clip } = {}
+  for (const clipId in project.clips) {
+    const clip = project.clips[clipId]
+    clips[clipId] = {
+      id: clip.id,
+      fileId: clip.fileId,
+      start: clip.start,
+      end: clip.end,
+      flashcard: getFlashcard(
+        noteType,
+        clip.flashcard,
+        project.noteType.fields
+      ),
+    }
+  }
+  return {
+    version: '3.0.0',
+    id: uuid(),
+    noteType,
+    timestamp: moment.utc().format(),
+    name: project.name,
+    tags: project.tags,
+    mediaFilesMetadata: project.mediaFilesMetadata,
+    clips,
+  }
+}
+
+const parseProject = (jsonFileContents: string): ?Project3_0_0 => {
   const project: Project = JSON.parse(jsonFileContents)
   switch (project.version) {
     case '0.0.0':
-      return convertProject1_0_0___2_0_0(convertProject0_0_0___1_0_0(project))
+      return convertProject2_0_0___3_0_0(
+        convertProject1_0_0___2_0_0(convertProject0_0_0___1_0_0(project))
+      )
     case '1.0.0':
-      return convertProject1_0_0___2_0_0(project)
+      return convertProject2_0_0___3_0_0(convertProject1_0_0___2_0_0(project))
     case '2.0.0':
+      return convertProject2_0_0___3_0_0(project)
+    case '3.0.0':
       return project
     default:
       return null

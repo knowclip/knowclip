@@ -48,7 +48,7 @@ export const getApkgExportData = (
               ...noteType.fields.map(f => clip.flashcard.fields[f.id] || ''),
               `[sound:${outputFilename}]`,
             ],
-            tags: noteType.useTagsField ? clip.flashcard.tags : [],
+            tags: clip.flashcard.tags || [],
           },
         }
       })

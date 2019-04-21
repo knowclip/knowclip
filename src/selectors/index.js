@@ -12,7 +12,6 @@ export * from './clips'
 export * from './audio'
 export * from './snackbar'
 export * from './dialog'
-export * from './noteTypes'
 export * from './project'
 
 export const getClip = (state: AppState, id: ClipId): ?Clip =>

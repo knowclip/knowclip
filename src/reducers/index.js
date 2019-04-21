@@ -6,7 +6,6 @@ import clips from './clips'
 import user from './user'
 import snackbar from './snackbar'
 import dialog from './dialog'
-import noteTypes from './noteTypes'
 import projects from './projects'
 
 export default combineReducers({
@@ -16,6 +15,5 @@ export default combineReducers({
   user,
   snackbar,
   dialog,
-  noteTypes,
   projects,
 })

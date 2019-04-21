@@ -4,7 +4,6 @@ export * from './clips'
 export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
-export * from './noteTypes'
 export * from './projects'
 
 export const initializeApp = (): Action => ({ type: 'INITIALIZE_APP' })
