@@ -159,10 +159,8 @@ const saveKey = merge(
     cmd,
     switchMap(() =>
       fromEvent(window, 'keydown').pipe(
-        takeUntil(
-          fromEvent(window, 'keyup').pipe(cmd),
-          filter(({ keyCode }) => keyCode === 83) // S
-        ),
+        filter(({ keyCode }) => keyCode === 83), // S
+        takeUntil(fromEvent(window, 'keyup').pipe(cmd)),
         take(1)
       )
     )

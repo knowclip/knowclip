@@ -39,11 +39,11 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  if (!isPackaged) {
-    await installDevtools()
+  // if (!isPackaged) {
+  //   await installDevtools()
 
-    mainWindow.webContents.openDevTools()
-  }
+  //   mainWindow.webContents.openDevTools()
+  // }
 
   mainWindow.on('close', e => {
     if (mainWindow) {
@@ -64,7 +64,29 @@ async function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow()
+
+  // Register a 'CommandOrControl+X' shortcut listener.
+  const ret = electron.globalShortcut.register('CommandOrControl+K', () => {
+    electron.BrowserWindow.getFocusedWindow().webContents.openDevTools()
+  })
+
+  if (!ret) {
+    console.log('registration failed')
+  }
+
+  // Check whether a shortcut is registered.
+  console.log(electron.globalShortcut.isRegistered('CommandOrControl+K'))
+})
+
+app.on('will-quit', () => {
+  // Unregister a shortcut.
+  electron.globalShortcut.unregister('CommandOrControl+K')
+
+  // Unregister all shortcuts.
+  electron.globalShortcut.unregisterAll()
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
