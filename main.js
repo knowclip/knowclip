@@ -40,9 +40,9 @@ async function createWindow() {
   )
 
   // if (!isPackaged) {
-  //   await installDevtools()
+  await installDevtools()
 
-  //   mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
   // }
 
   mainWindow.on('close', e => {
