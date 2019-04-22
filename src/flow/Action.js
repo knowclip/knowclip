@@ -91,9 +91,11 @@ declare type ProjectAction =
   | {| type: 'SAVE_PROJECT_REQUEST' |}
   | {| type: 'SAVE_PROJECT_AS_REQUEST' |}
   | {| type: 'EXPORT_MP3', exportData: ApkgExportData |}
-  | {| type: 'EXPORT_APKG' |}
-  | {| type: 'EXPORT_MARKDOWN' |}
-  | {| type: 'EXPORT_CSV' |}
+  | {| type: 'EXPORT_APKG_REQUEST', clipIds: Array<ClipId> |}
+  | {| type: 'EXPORT_APKG_FAILURE', errorMessage: ?string |}
+  | {| type: 'EXPORT_APKG_SUCCESS', successMessage: string |}
+  | {| type: 'EXPORT_MARKDOWN', clipIds: Array<ClipId> |}
+  | {| type: 'EXPORT_CSV', clipIds: Array<ClipId> |}
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
   | {|

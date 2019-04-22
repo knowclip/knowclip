@@ -21,40 +21,11 @@ import {
   Chip,
   IconButton,
 } from '@material-ui/core'
-import { ExpandLess, ExpandMore } from '@material-ui/icons'
+import { ExpandLess, ExpandMore, Loop } from '@material-ui/icons'
 import * as r from '../redux'
-import truncate from '../utils/truncate'
 import css from './Export.module.css'
 import cn from 'classnames'
 import moment from 'moment'
-
-const MediaMenu = ({
-  menuIsOpen,
-  anchorEl,
-  closeMenu,
-  projectMediaMetadata,
-  selectedIds,
-  onChangeCheckbox,
-}) =>
-  menuIsOpen && (
-    <Popover anchorEl={anchorEl} open={menuIsOpen} onClose={closeMenu}>
-      <FormControl component="fieldset">
-        <FormGroup>
-          {projectMediaMetadata.map(({ name, id }) => (
-            <FormControlLabel
-              label={name}
-              control={
-                <Checkbox
-                  checked={selectedIds.includes(id)}
-                  onChange={() => onChangeCheckbox(id)}
-                />
-              }
-            />
-          ))}
-        </FormGroup>
-      </FormControl>
-    </Popover>
-  )
 
 let FlashcardRow = ({
   flashcard: { fields, id, tags },
@@ -65,6 +36,8 @@ let FlashcardRow = ({
   isHighlighted,
   formattedClipTime,
   onSelect,
+  toggleLoop,
+  isLoopOn,
 }) => (
   <TableRow
     className={css.tableRow}
@@ -80,8 +53,15 @@ let FlashcardRow = ({
       />
     </TableCell>
     <TableCell padding="default">
-      {' '}
       <span className={css.clipTime}>{formattedClipTime}</span>
+      {isHighlighted && (
+        <IconButton
+          onClick={toggleLoop}
+          color={isLoopOn ? 'secondary' : 'default'}
+        >
+          <Loop />
+        </IconButton>
+      )}
     </TableCell>
     <TableCell className={css.flashcardContents}>
       <p
@@ -111,8 +91,9 @@ let FlashcardRow = ({
 FlashcardRow = connect(
   (state, { id }) => ({
     formattedClipTime: r.getFormattedClipTime(state, id),
+    isLoopOn: r.isLoopOn(state),
   }),
-  { highlightClip: r.highlightClip }
+  { highlightClip: r.highlightClip, toggleLoop: r.toggleLoop }
 )(FlashcardRow)
 
 const formatDuration = duration =>
@@ -219,7 +200,7 @@ const Export = ({
   currentFileIndex,
   highlightClip,
   exportCsv,
-  exportApkg,
+  exportApkgRequest,
   exportMarkdown,
   noteType,
   open,
@@ -252,7 +233,7 @@ const Export = ({
   const [expandedTableIndex, setExpandedTableIndex] = useState(-1)
   const onClickTable = index => {
     const mediaMetadata = projectMediaMetadata[index]
-    if (mediaMetadata && mediaMetadata.id !== currentMedia)
+    if (mediaMetadata && mediaMetadata.id !== currentMedia.id)
       openMediaFileRequest(mediaMetadata.id)
     setExpandedTableIndex(index)
   }
@@ -314,7 +295,7 @@ const Export = ({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => exportCsv()}
+              onClick={() => exportCsv(selectedIds)}
             >
               Export CSV and MP3 from selected clips
             </Button>
@@ -323,7 +304,7 @@ const Export = ({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => exportMarkdown()}
+              onClick={() => exportMarkdown(selectedIds)}
             >
               Export Markdown from selected clips
             </Button>
@@ -332,7 +313,7 @@ const Export = ({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => exportApkg()}
+              onClick={() => exportApkgRequest(selectedIds)}
             >
               Export Anki Deck from selected clips
             </Button>
@@ -360,7 +341,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = {
-  exportApkg: r.exportApkg,
+  exportApkgRequest: r.exportApkgRequest,
   exportCsv: r.exportCsv,
   exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,

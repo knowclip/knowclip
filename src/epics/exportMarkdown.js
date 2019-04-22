@@ -12,21 +12,18 @@ const writeFile = promisify(fs.writeFile)
 const exportMarkdown = (action$, state$) =>
   action$.pipe(
     ofType('EXPORT_MARKDOWN'),
-    flatMap(async () => {
+    flatMap(async ({ clipIds }) => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
         if (!filename) return { type: 'NOOP_EXPORT_MARKDOWN' }
         const currentProjectMetadata = r.getCurrentProject(state$.value)
         if (!currentProjectMetadata)
           return of(r.simpleMessageSnackbar('Could not find project'))
-        const noteType = r.getCurrentNoteType(state$.value)
-        if (!noteType)
-          return of(r.simpleMessageSnackbar('Could not find note type'))
 
         const markdown = projectToMarkdown(
           state$.value,
           currentProjectMetadata.id,
-          noteType
+          clipIds
         )
         await writeFile(filename, markdown, 'utf8')
         return from([

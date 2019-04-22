@@ -75,8 +75,19 @@ export const deleteCards = (ids: Array<ClipId>): Action => ({
   ids,
 })
 
-export const exportApkg = (): Action => ({
-  type: 'EXPORT_APKG',
+export const exportApkgRequest = (clipIds: Array<ClipId>): Action => ({
+  type: 'EXPORT_APKG_REQUEST',
+  clipIds,
+})
+
+export const exportApkgFailure = (errorMessage: ?string): Action => ({
+  type: 'EXPORT_APKG_FAILURE',
+  errorMessage,
+})
+
+export const exportApkgSuccess = (successMessage: string): Action => ({
+  type: 'EXPORT_APKG_SUCCESS',
+  successMessage,
 })
 
 export const exportMp3 = (exportData: ApkgExportData): Action => ({
@@ -84,12 +95,14 @@ export const exportMp3 = (exportData: ApkgExportData): Action => ({
   exportData,
 })
 
-export const exportCsv = (): Action => ({
+export const exportCsv = (clipIds: Array<ClipId>): Action => ({
   type: 'EXPORT_CSV',
+  clipIds,
 })
 
-export const exportMarkdown = (): Action => ({
+export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({
   type: 'EXPORT_MARKDOWN',
+  clipIds,
 })
 
 export const setMediaFolderLocation = (directoryPath: string): Action => ({

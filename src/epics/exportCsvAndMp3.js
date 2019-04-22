@@ -18,21 +18,18 @@ const exportFailureSnackbar = err =>
 const exportCsv = (action$, state$) =>
   action$.pipe(
     ofType('EXPORT_CSV'),
-    flatMap(async () => {
+    flatMap(async ({ clipIds }) => {
       try {
         const filename = await showSaveDialog('Comma-separated values', ['csv'])
         if (!filename) return { type: 'NOOP_EXPORT_CSV' }
         const currentProjectMetadata = r.getCurrentProject(state$.value)
         if (!currentProjectMetadata)
           return of(r.simpleMessageSnackbar('Could not find project'))
-        const noteType = r.getCurrentNoteType(state$.value)
-        if (!noteType)
-          return of(r.simpleMessageSnackbar('Could not find note type'))
 
         const exportData = getApkgExportData(
           state$.value,
           currentProjectMetadata,
-          noteType
+          clipIds
         )
         const csvText = getCsvText(exportData)
         await writeFile(filename, csvText, 'utf8')
