@@ -1,0 +1,73 @@
+
+.mediaFileName {
+  margin: 1em;
+  flex: 1 1;
+  
+}
+.mediaFileName small {
+  font-weight: normal;
+  
+}
+.toolbar {
+  background-color: aliceblue;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  padding-left: 1rem !important;
+  padding-bottom: 1rem;
+}
+.selectAllClipsCheckbox {
+  
+}
+.selectedClipsCount {
+  min-width: 8em;
+  text-align: center;
+}
+.fileTagChips {
+  flex-basis: 100%;
+  padding-left: 12rem;
+  line-height: 3;
+}
+
+
+.table {
+  vertical-align: top !important;
+}
+.tableRow {
+  vertical-align: top !important;
+}
+.flashcardContents {
+  padding-top: .8rem !important;
+  padding-bottom: .8rem !important;
+}
+
+.field {
+  white-space: pre-wrap;
+}
+
+.transcription {
+  composes: field;
+  font-size: 1.4em;
+  margin: 0;
+}
+
+.pronunciation {
+  composes: field;
+  /* font-size: 1.4em; */
+  font-style: italic;
+  margin: 0;
+  margin-top:.4em;
+}
+
+.meaning {
+  composes: field;
+  margin-bottom: 0;
+}
+
+.clipTime {
+  padding-top: .8rem;
+  display: block;
+}
+
+.blank {
+  color: pink;
+}

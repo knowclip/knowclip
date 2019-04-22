@@ -6,6 +6,7 @@ import * as r from '../redux'
 import DarkTheme from './DarkTheme'
 import css from './Header.module.css'
 import cn from 'classnames'
+import truncate from '../utils/truncate'
 
 class ProjectMenu extends Component {
   state = { editing: false, text: '' }
@@ -46,12 +47,11 @@ class ProjectMenu extends Component {
       <DarkTheme>
         <section className={cn(className, css.projectMenu)}>
           {editing ? (
-            <form
-              onSubmit={this.handleSubmit}
-              style={{ display: 'inline-block' }}
-            >
+            <form onSubmit={this.handleSubmit} style={{ width: '100%' }}>
               <TextField
+                fullWidth
                 inputRef={this.inputRef}
+                classes={{ root: css.projectNameInput }}
                 value={text}
                 onChange={this.handleChangeText}
                 onBlur={this.handleBlur}
@@ -60,7 +60,7 @@ class ProjectMenu extends Component {
           ) : (
             <Tooltip title="Double-click to edit">
               <h1 className={css.projectName} onDoubleClick={this.startEditing}>
-                {projectMetadata.name}
+                {truncate(projectMetadata.name, 40)}
               </h1>
             </Tooltip>
           )}

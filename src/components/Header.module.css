@@ -19,6 +19,7 @@
 .rightMenu {
   display: flex;
   padding: .5rem;
+  margin: 0;
   align-items: center;
 }
 
@@ -47,4 +48,9 @@
   display: flex;
   align-items: center;
   height: 4em;
+  flex-basis: 25%;
+}
+
+.projectNameInput input {
+  font-size: 1.5rem !important;
 }
