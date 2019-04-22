@@ -16,11 +16,7 @@ import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardForm.module.css'
 import Autosuggest from 'react-autosuggest'
-
-const getNoteTypeFields = noteType =>
-  noteType === 'Transliteration'
-    ? ['transcription', 'pronunciation', 'meaning', 'notes']
-    : ['transcription', 'meaning', 'notes']
+import { getNoteTypeFields } from '../utils/noteType'
 
 let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
   const handleChange = useRef(e => setFlashcardText(id, e.target.value))

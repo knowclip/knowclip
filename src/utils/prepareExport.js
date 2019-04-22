@@ -3,16 +3,15 @@ import * as r from '../redux'
 import { toTimestamp } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
 import { unparse } from 'papaparse'
-
+import { getNoteTypeFields } from '../utils/noteType'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
 export const getApkgExportData = (
   state: AppState,
-  projectMetadata: ProjectMetadata,
-  noteType: NoteType
+  projectMetadata: ProjectMetadata
 ): ApkgExportData => {
-  const fieldNames = noteType.fields.map(f => f.name)
+  const fieldNames = getNoteTypeFields(projectMetadata.noteType)
   const [firstFieldName, ...restFieldNames] = fieldNames
   const mediaFilePaths = r.getMediaFilePaths(state, projectMetadata.id)
 
@@ -45,7 +44,7 @@ export const getApkgExportData = (
           flashcardSpecs: {
             fields: [
               clip.id,
-              ...noteType.fields.map(f => clip.flashcard.fields[f.id] || ''),
+              ...fieldNames.map(f => clip.flashcard.fields[f] || ''),
               `[sound:${outputFilename}]`,
             ],
             tags: clip.flashcard.tags || [],

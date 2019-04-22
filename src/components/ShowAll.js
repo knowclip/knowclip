@@ -10,7 +10,7 @@ import {
   TableRow,
   TableCell,
   Button,
-  Tooltip,
+  Paper,
   Tabs,
   Tab,
   Popover,
@@ -62,6 +62,7 @@ let FlashcardRow = ({
   closeModal,
   file,
   isSelected,
+  isHighlighted,
   formattedClipTime,
   onSelect,
 }) => (
@@ -69,9 +70,14 @@ let FlashcardRow = ({
     className={css.tableRow}
     onClick={() => highlightClip(id)}
     onDoubleClick={closeModal}
+    selected={isHighlighted}
   >
     <TableCell padding="checkbox">
-      <Checkbox checked={isSelected} onChange={e => onSelect(id)} />
+      <Checkbox
+        checked={isSelected}
+        onClick={e => e.stopPropagation()}
+        onChange={e => onSelect(id)}
+      />
     </TableCell>
     <TableCell padding="default">
       {' '}
@@ -92,11 +98,6 @@ let FlashcardRow = ({
         {fields.meaning.trim() || '[no meaning given]'}
       </p>
     </TableCell>
-    {/* {Object.entries(fields).map(([fieldName, fieldText]) => (
-      <TableCell key={fieldName}>
-        <Field text={fieldText} />
-      </TableCell>
-    ))} */}
     <TableCell>
       <p className={css.field}>{fields.notes}</p>
     </TableCell>
@@ -137,12 +138,17 @@ let MediaTable = ({
   onSelect,
   onSelectAll,
   toggleOpen,
+  highlightedClipId,
 }) => (
-  <Fragment>
-    <Toolbar className={css.toolbar}>
+  <Paper>
+    <Toolbar
+      className={cn(css.toolbar, { [css.openToolbar]: open })}
+      onClick={toggleOpen}
+    >
       <Checkbox
         checked={clips.every(c => selectedIds.includes(c.id))}
         onChange={() => onSelectAll(clips.map(c => c.id))}
+        onClick={e => e.stopPropagation()}
         className={css.selectAllClipsCheckbox}
       />
 
@@ -160,26 +166,22 @@ let MediaTable = ({
         </small>
       </h2>
 
-      <IconButton onClick={toggleOpen}>
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </IconButton>
-
       <div className={css.fileTagChips}>
-        {!open &&
-          [
-            ...clips.reduce((tags, clip) => {
-              clip.flashcard.tags.forEach(tag => tags.add(tag))
-              return tags
-            }, new Set()),
-          ]
-            .sort()
-            .map(tag => (
-              <Fragment>
-                <Chip key={tag} label={tag} />{' '}
-              </Fragment>
+        {open
+          ? ' '
+          : [
+              ...clips.reduce((tags, clip) => {
+                clip.flashcard.tags.forEach(tag => tags.add(tag))
+                return tags
+              }, new Set()),
+            ].map(tag => (
+              <span key={tag} className={css.smallTag}>{`${tag}`}</span>
             ))}
       </div>
+
+      <IconButton>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
     </Toolbar>
+
     <Table className={css.table}>
       <colgroup>
         <col width="1%" />
@@ -188,16 +190,6 @@ let MediaTable = ({
         <col width="10%" />
         <col width="10%" />
       </colgroup>
-      {/* <TableHead className={css.tableHead}>
-        <TableRow className={css.tableRow}>
-          <TableCell padding="checkbox">
-            <Checkbox
-              checked={clips.every(c => selectedIds.includes(c.id))}
-              onChange={() => onSelectAll(clips.map(c => c.id))}
-            />
-          </TableCell>{' '}
-        </TableRow>{' '}
-      </TableHead> */}
       {open && (
         <TableBody>
           {clips.map(({ id, flashcard }, i) => (
@@ -207,16 +199,18 @@ let MediaTable = ({
               key={flashcard.id}
               closeModal={closeDialog}
               onSelect={onSelect}
+              isHighlighted={highlightedClipId === id}
               isSelected={selectedIds.includes(id)}
             />
           ))}
         </TableBody>
       )}
     </Table>
-  </Fragment>
+  </Paper>
 )
 MediaTable = connect((state, { open, mediaFileMetadata }) => ({
   clips: r.getClips(state, mediaFileMetadata.id),
+  highlightedClipId: r.getHighlightedClipId(state),
 }))(MediaTable)
 
 const Export = ({
@@ -231,19 +225,17 @@ const Export = ({
   open,
   projectMediaMetadata,
   allProjectClipsIds,
+  openMediaFileRequest,
+  currentMedia,
 }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
-  const menuAnchorEl = useRef(null)
-  // const [menuIsOpen, setMenuIsOpen] = useState(false)
-  // const openMenu = e => setMenuIsOpen(true)
-  // const closeMenu = e => setMenuIsOpen(false)
+  const [selectionHasStarted, setSelectionHasStarted] = useState(false)
+  const chooseTab = index => {
+    setCurrentTabIndex(index)
+    setSelectionHasStarted(false)
+  }
 
   const [selectedIds, setSelectedIds] = useState(allProjectClipsIds)
-  // const handleChangeCheckbox = id => {
-  //   if (selectedIds.includes(id))
-  //     setSelectedIds(selectedIds.filter(x => x !== id))
-  //   else setSelectedIds(selectedIds.concat(id))
-  // }
 
   const onSelect = id =>
     setSelectedIds(
@@ -258,58 +250,100 @@ const Export = ({
         : [...new Set([...selectedIds, ...ids])]
     )
   const [expandedTableIndex, setExpandedTableIndex] = useState(-1)
+  const onClickTable = index => {
+    const mediaMetadata = projectMediaMetadata[index]
+    if (mediaMetadata && mediaMetadata.id !== currentMedia)
+      openMediaFileRequest(mediaMetadata.id)
+    setExpandedTableIndex(index)
+  }
 
   return (
-    <Dialog open={open} onClose={closeDialog} fullScreen>
+    <Dialog open={open} onClose={closeDialog} fullScreen={selectionHasStarted}>
+      <Tabs value={currentTabIndex} className={css.tabs}>
+        <Tab label="Export APKG" onClick={() => chooseTab(0)} />
+        <Tab label="Export CSV & MP3" onClick={() => chooseTab(1)} />
+        <Tab label="Export MD" onClick={() => chooseTab(2)} />
+      </Tabs>
       <DialogContent>
-        <Tabs value={currentTabIndex}>
-          <Tab label="Export APKG" onClick={() => setCurrentTabIndex(0)} />
-          <Tab label="Export CSV & MP3" onClick={() => setCurrentTabIndex(1)} />
-          <Tab label="Export MD" onClick={() => setCurrentTabIndex(2)} />
-        </Tabs>
-        {/* <Button onClick={openMenu} buttonRef={menuAnchorEl}>
-          {selectedIds.length} media files selected
-        </Button>
-        <MediaMenu
-          menuIsOpen={menuIsOpen}
-          closeMenu={closeMenu}
-          projectMediaMetadata={projectMediaMetadata}
-          selectedIds={selectedIds}
-          anchorEl={menuAnchorEl.current}
-          onChangeCheckbox={handleChangeCheckbox}
-        /> */}
-        {projectMediaMetadata.map((metadata, i) => (
-          <MediaTable
-            key={metadata.id}
-            open={i === expandedTableIndex}
-            toggleOpen={e =>
-              setExpandedTableIndex(i === expandedTableIndex ? -1 : i)
-            }
-            mediaFileMetadata={metadata}
-            selectedIds={selectedIds}
-            onSelect={onSelect}
-            onSelectAll={onSelectAll}
-          />
-        ))}
+        {currentTabIndex === 0 && (
+          <section>
+            <p>
+              Export an Anki .apkg file. This format is best for{' '}
+              <strong>starting a new deck.</strong>
+            </p>
+            <p>
+              If you want to update some flashcards you've previously exported,
+              or add some new cards to a previously exported deck, you probably
+              want to export CSV and MP3s.
+            </p>
+          </section>
+        )}
+        {currentTabIndex === 1 && (
+          <section>
+            <p>Export a Comma-Separated-Values file along with MP3s.</p>
+            <p>
+              This format is best for updating some flashcards you've previously
+              exported.
+            </p>
+          </section>
+        )}
+
+        {currentTabIndex === 2 && (
+          <section>
+            <p>Export a Markdown file.</p>
+            <p>This lets you review all your notes in a handy text format.</p>
+          </section>
+        )}
+        {selectionHasStarted &&
+          projectMediaMetadata.map((metadata, i) => (
+            <MediaTable
+              key={metadata.id}
+              open={i === expandedTableIndex}
+              toggleOpen={e => onClickTable(i === expandedTableIndex ? -1 : i)}
+              mediaFileMetadata={metadata}
+              selectedIds={selectedIds}
+              onSelect={onSelect}
+              onSelectAll={onSelectAll}
+            />
+          ))}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={() => closeDialog()}>Exit</Button>
-        <Tooltip title="Good for updating existing deck">
-          <Button onClick={() => exportCsv()}>Export CSV and MP3</Button>
-        </Tooltip>
-        <Tooltip title="Create a document for at-a-glance reviews">
-          <Button onClick={() => exportMarkdown()}>Export Markdown</Button>
-        </Tooltip>
-        <Tooltip title="Good for starting new deck">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => exportApkg()}
-          >
-            Export Anki Deck
-          </Button>
-        </Tooltip>
-      </DialogActions>
+      {selectionHasStarted ? (
+        <DialogActions>
+          <Button onClick={() => closeDialog()}>Exit</Button>
+          {currentTabIndex === 1 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => exportCsv()}
+            >
+              Export CSV and MP3 from selected clips
+            </Button>
+          )}
+          {currentTabIndex === 2 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => exportMarkdown()}
+            >
+              Export Markdown from selected clips
+            </Button>
+          )}
+          {currentTabIndex === 0 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => exportApkg()}
+            >
+              Export Anki Deck from selected clips
+            </Button>
+          )}
+        </DialogActions>
+      ) : (
+        <DialogActions>
+          <Button onClick={() => closeDialog()}>Exit</Button>
+          <Button onClick={() => setSelectionHasStarted(true)}>Continue</Button>
+        </DialogActions>
+      )}
     </Dialog>
   )
 }
@@ -318,6 +352,7 @@ const mapStateToProps = state => ({
   // flashcards: r.getFlashcardsByTime(state),
   allProjectClipsIds: r.getAllProjectClipsIds(state),
   noteType: r.getCurrentNoteType(state),
+  currentMedia: r.getCurrentMediaMetadata(state),
   projectMediaMetadata: r.getProjectMediaMetadata(
     state,
     r.getCurrentProjectId(state)
@@ -330,6 +365,7 @@ const mapDispatchToProps = {
   exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
+  openMediaFileRequest: r.openMediaFileRequest,
 }
 
 export default connect(
