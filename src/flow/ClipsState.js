@@ -51,6 +51,8 @@ declare type ClipSpecs = {
   flashcardSpecs: {
     fields: Array<string>,
     tags: Array<string>,
+    due: number,
+    sortField: string,
   },
 }
 
@@ -58,8 +60,11 @@ declare type ApkgExportData = {
   deckName: string,
   template: {
     fields: Array<string>, // field names
-    questionFormat: string,
-    answerFormat: string,
+    cards: Array<{|
+      name: string,
+      questionFormat: string,
+      answerFormat: string,
+    |}>,
   },
   clips: Array<ClipSpecs>,
 }

@@ -80,9 +80,11 @@ const exportApkg = (action$, state$) =>
           })
         )
 
-        exportData.clips.forEach(({ flashcardSpecs }) => {
-          apkg.addCard(flashcardSpecs.fields, flashcardSpecs.tags)
-        })
+        exportData.clips.forEach(
+          ({ flashcardSpecs: { fields, ...restSpecs } }) => {
+            apkg.addCard(fields, restSpecs)
+          }
+        )
 
         await apkg
           .save({
@@ -98,7 +100,7 @@ const exportApkg = (action$, state$) =>
         return r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
       } catch (err) {
         console.error(err)
-        return exportApkgFailure(err)
+        return r.exportApkgFailure(err)
       }
     })
   )
