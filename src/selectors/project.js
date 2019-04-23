@@ -1,28 +1,22 @@
 // @flow
 import moment from 'moment'
-import * as audioSelectors from './audio'
 import getAllTags from '../utils/getAllTags'
 
 export const getProject = (
   state: AppState,
   projectMetadata: ProjectMetadata
-): Project3_0_0 => {
-  const noteType = audioSelectors.getCurrentNoteType(state)
-  if (!noteType) throw new Error('no note type found')
-
-  return {
-    version: '3.0.0',
-    timestamp: moment.utc().format(),
-    name: projectMetadata.name,
-    id: projectMetadata.id,
-    noteType,
-    mediaFilesMetadata: projectMetadata.mediaFilePaths.map(
-      ({ metadata }) => metadata
-    ),
-    tags: [...getAllTags(state.clips.byId)],
-    clips: state.clips.byId,
-  }
-}
+): Project3_0_0 => ({
+  version: '3.0.0',
+  timestamp: moment.utc().format(),
+  name: projectMetadata.name,
+  id: projectMetadata.id,
+  noteType: projectMetadata.noteType,
+  mediaFilesMetadata: projectMetadata.mediaFilePaths.map(
+    ({ metadata }) => metadata
+  ),
+  tags: [...getAllTags(state.clips.byId)],
+  clips: state.clips.byId,
+})
 
 export const getProjects = (state: AppState): Array<ProjectMetadata> =>
   state.projects.allIds.map(id => state.projects.byId[id])

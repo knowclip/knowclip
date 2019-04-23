@@ -160,9 +160,6 @@ class FlashcardForm extends Component {
     }
   }
 
-  // editCardTemplate = () =>
-  //   this.props.editNoteTypeDialog(this.props.currentNoteType.id)
-
   autosuggestRef = c => (this.autosuggest = c)
 
   render() {
@@ -292,7 +289,6 @@ const mapDispatchToProps = {
   initializeApp: r.initializeApp,
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
-  // editNoteTypeDialog: r.editNoteTypeDialog,
   toggleLoop: r.toggleLoop,
 }
 

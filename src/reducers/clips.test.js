@@ -6,12 +6,6 @@ import * as r from '../redux'
 describe('clips reducer', () => {
   const fileId = 'fileId'
   const noteType = 'Transliteration'
-  // const noteType: NoteType = {
-  //   name: 'default',
-  //   id: 'default',
-  //   fields: [{ id: 'asdf', name: 'Front' }, { id: 'dfjk', name: 'Back' }],
-  //   useTagsField: false,
-  // }
   const oldState: ClipsState = clips(
     {
       byId: {

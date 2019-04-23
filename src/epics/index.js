@@ -11,7 +11,6 @@ import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
-// import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import media from './media'
@@ -96,7 +95,6 @@ export default combineEpics(
   exportMarkdown,
   deleteAllCurrentFileClips,
   project,
-  // noteTypesEpic,
   defaultTagsEpic,
   keyboard,
   highlightClip,
