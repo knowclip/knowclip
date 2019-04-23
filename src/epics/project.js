@@ -13,10 +13,7 @@ const readFile = promisify(fs.readFile)
 const openProject = async (filePath, projectId, state$) => {
   try {
     const projectJson = await readFile(filePath)
-    const project = {
-      ...parseProject(projectJson), // why is the media metadata from here giving a random audio file id?
-      ...(projectId ? { id: projectId } : null),
-    }
+    const project = parseProject(projectJson)
     if (!project)
       return of(
         r.simpleMessageSnackbar(
@@ -27,35 +24,28 @@ const openProject = async (filePath, projectId, state$) => {
     const mediaFilePaths = getMediaFilePaths(
       originalProjectJson,
       project,
-      filePath
+      filePath,
+      r.getMediaFilePaths(state$.value, project.id)
     )
-    const projectMetadata: ProjectMetadata = {
-      ...r.getProjectMetadata(state$.value, project.id),
-      noteType: project.noteType,
-    }
-
-    return projectMetadata
-      ? of(
-          r.openProject(
-            project,
-            filePath === projectMetadata.filePath
-              ? projectMetadata
-              : {
-                  ...projectMetadata,
-                  filePath,
-                }
-          )
-        )
-      : from([
-          r.openProject(project, {
-            id: project.id,
-            filePath: filePath,
-            name: project.name,
-            mediaFilePaths,
-            error: null,
-          }),
-          { type: 'CREATED NEW PROJECT METADATA' },
-        ])
+    const projectMetadata: ProjectMetadata = r.getProjectMetadata(
+      state$.value,
+      project.id
+    )
+    return from([
+      r.openProject(project, {
+        id: project.id,
+        filePath: filePath,
+        name: project.name,
+        mediaFilePaths,
+        error: null,
+        noteType: project.noteType,
+      }),
+      {
+        type: projectMetadata
+          ? 'CREATED NEW PROJECT METADATA'
+          : 'open old project metadata',
+      },
+    ])
   } catch (err) {
     console.error(err)
     return of(

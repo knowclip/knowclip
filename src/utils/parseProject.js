@@ -143,8 +143,9 @@ export default parseProject
 
 export const getMediaFilePaths = (
   originalProjectJson: ?Project,
-  project: Project2_0_0,
-  filePath: string
+  project: Project3_0_0,
+  projectFilePath: string,
+  mediaFilePaths: Array<AudioMetadataAndPath>
 ): Array<AudioMetadataAndPath> => {
   if (
     originalProjectJson &&
@@ -154,16 +155,25 @@ export const getMediaFilePaths = (
     return [
       {
         metadata: project.mediaFilesMetadata[0],
-        filePath: filePath.replace(/\.afca$/, ''),
+        filePath: projectFilePath.replace(/\.afca$/, ''),
         constantBitrateFilePath: null,
         error: null,
       },
     ]
   }
-  return project.mediaFilesMetadata.map(metadata => ({
-    metadata,
-    constantBitrateFilePath: null,
-    filePath: null,
-    error: null,
-  }))
+  return project.mediaFilesMetadata.map(metadata => {
+    const existingMetadataAndFilePath = mediaFilePaths.find(
+      ({ metadata: { id }, filePath }) => id === metadata.id
+    )
+    return {
+      metadata,
+      constantBitrateFilePath: existingMetadataAndFilePath
+        ? existingMetadataAndFilePath.constantBitrateFilePath
+        : null,
+      filePath: existingMetadataAndFilePath
+        ? existingMetadataAndFilePath.filePath
+        : null,
+      error: null,
+    }
+  })
 }
