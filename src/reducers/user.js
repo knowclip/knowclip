@@ -8,7 +8,6 @@ const initialState: UserState = {
   defaultTags: [],
   currentMediaFileId: null,
   currentProjectId: null,
-  currentNoteTypeId: null,
   workIsUnsaved: false,
   tagsToClipIds: {},
 }
@@ -23,16 +22,10 @@ const user: Reducer<UserState> = (state = initialState, action) => {
           }
         : state
 
-    case 'CREATE_PROJECT':
-      return {
-        ...state,
-        currentNoteTypeId: action.noteType.id,
-      }
     case 'OPEN_PROJECT':
       return {
         ...state,
         currentProjectId: action.project.id,
-        currentNoteTypeId: action.project.noteType.id,
       }
 
     case 'CLOSE_PROJECT':

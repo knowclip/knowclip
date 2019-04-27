@@ -86,9 +86,7 @@ const addClipEpic = (action$, state$) => {
                   r.getCurrentFileId(state$.value),
                   uuid(),
                   currentNoteType,
-                  currentNoteType.useTagsField
-                    ? r.getDefaultTags(state$.value)
-                    : []
+                  r.getDefaultTags(state$.value)
                 )
               )
         })

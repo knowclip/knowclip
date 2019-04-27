@@ -7,40 +7,19 @@ describe('projectToMarkdown', () => {
   const baseState: AppState = reducer(undefined, { type: '@@INIT' })
   const mediaFileId = 'mediaFileId'
 
-  const noteType: NoteType = {
-    id: '879ec327-80c2-4723-88e4-21c550f30ad6',
-    name: 'Japanese',
-    fields: [
-      {
-        id: 'jp',
-        name: 'Japanese',
-      },
-      {
-        id: 'rj',
-        name: 'Romaji',
-      },
-      {
-        id: 'en',
-        name: 'English',
-      },
-      {
-        id: 'notes',
-        name: 'Notes',
-      },
-    ],
-    useTagsField: true,
-  }
+  const noteType: NoteType = 'Transliteration'
   const newClipWithCard = (
     id,
     start,
     end,
-    [jp, rj, en, notes],
+    [transcription, pronunciation, meaning, notes],
     tags
   ): Clip => ({
     ...newClip({ start, end }, mediaFileId, id, noteType, []),
     flashcard: {
       id,
-      fields: { jp, rj, en, notes },
+      type: 'Transliteration',
+      fields: { transcription, pronunciation, meaning, notes },
       tags,
     },
   })
@@ -50,6 +29,7 @@ describe('projectToMarkdown', () => {
     id: 'xxx',
     filePath: '/xxx.afca',
     name: 'Basic Japanese',
+    noteType: 'Transliteration',
     mediaFilePaths: [
       {
         filePath: '/xxx.mp4',

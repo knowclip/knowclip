@@ -52,7 +52,7 @@ const MediaFilesNavMenu = ({
         {projectMediaMetadata.length > 0 ? (
           <span className="mediaFileName" title={currentFileName}>
             <Button className={css.audioButton} onClick={openMenu}>
-              {currentFileName ? truncate(currentFileName, 30) : 'Select media'}
+              {currentFileName ? truncate(currentFileName, 40) : 'Select media'}
             </Button>
 
             {menuIsOpen && (
@@ -68,7 +68,7 @@ const MediaFilesNavMenu = ({
                     onClick={() => openMediaFileRequest(id)}
                   >
                     <ListItemText title={name}>
-                      {truncate(name, 30)}
+                      {truncate(name, 40)}
                     </ListItemText>
                     <ListItemSecondaryAction>
                       <IconButton

@@ -3,66 +3,178 @@ import * as r from '../redux'
 import { toTimestamp } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
 import { unparse } from 'papaparse'
-
+import { getNoteTypeFields } from '../utils/noteType'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
+
+const roughEscape = text => text.replace(/\n/g, '<br />')
+
+const FRONT_SIDE = '{{FrontSide}}'
+const HR = '<hr id="answer" />'
+const TRANSCRIPTION = '<p class="transcription">{{transcription}}</p>'
+const MEANING = '<p class="meaning">{{meaning}}</p>'
+const PRONUNCIATION = `{{#pronunciation}}
+<p class="pronunciation">{{pronunciation}}
+</p>
+{{/pronunciation}}`
+const NOTES = `{{#notes}}
+<p class="notes">{{notes}}
+</p>
+{{/notes}}`
+
+const getCards = (
+  noteType: NoteType
+): Array<{| name: string, questionFormat: string, answerFormat: string |}> => [
+  {
+    name: 'Listening',
+    questionFormat: `♫{{sound}}`,
+    answerFormat: [
+      FRONT_SIDE,
+      HR,
+      TRANSCRIPTION,
+      PRONUNCIATION,
+      MEANING,
+      NOTES,
+    ].join('\n\n'),
+  },
+  {
+    name: 'Reading',
+    questionFormat: TRANSCRIPTION,
+    answerFormat: [
+      FRONT_SIDE,
+      HR,
+      '{{sound}}',
+      PRONUNCIATION,
+      MEANING,
+      NOTES,
+    ].join('\n\n'),
+  },
+]
 
 export const getApkgExportData = (
   state: AppState,
   projectMetadata: ProjectMetadata,
-  noteType: NoteType
+  clipIds: Array<ClipId>
 ): ApkgExportData => {
-  const fieldNames = noteType.fields.map(f => f.name)
-  const [firstFieldName, ...restFieldNames] = fieldNames
+  const fieldNames = getNoteTypeFields(projectMetadata.noteType)
   const mediaFilePaths = r.getMediaFilePaths(state, projectMetadata.id)
 
-  const clips = mediaFilePaths
-    .map(({ metadata, filePath }) => {
-      if (!filePath)
-        throw new Error(`Please locate ${metadata.name} and try again.`)
+  // sort and validate
+  clipIds.sort((id, id2) => {
+    const clip = r.getClip(state, id)
+    if (!clip) throw new Error('Could not find clip ' + id)
 
-      const extension = extname(filePath)
-      const filenameWithoutExtension = basename(filePath, extension)
+    const clip2 = r.getClip(state, id2)
+    if (!clip2) throw new Error('Could not find clip ' + id2)
 
-      return state.clips.idsByMediaFileId[metadata.id].map(id => {
-        const clip = r.getClip(state, id)
-        if (!clip) throw new Error('Could not find clip ' + id)
-        const startTime = r.getMillisecondsAtX(state, clip.start)
-        const endTime = r.getMillisecondsAtX(state, clip.end)
-        const outputFilename = `${filenameWithoutExtension}___${toTimestamp(
-          startTime,
-          SAFE_SEPARATOR
-        )}-${toTimestamp(
-          endTime,
-          SAFE_SEPARATOR,
-          SAFE_MILLISECONDS_SEPARATOR
-        )}___afcaId${id}${'.mp3'}`
-        return {
-          sourceFilePath: filePath,
-          startTime,
-          endTime,
-          outputFilename,
-          flashcardSpecs: {
-            fields: [
-              clip.id,
-              ...noteType.fields.map(f => clip.flashcard.fields[f.id] || ''),
-              `[sound:${outputFilename}]`,
-            ],
-            tags: noteType.useTagsField ? clip.flashcard.tags : [],
-          },
-        }
-      })
-    })
-    .reduce((a, b) => a.concat(b))
+    const metadataAndPath = mediaFilePaths.find(
+      mAndP => mAndP.metadata.id === clip.fileId
+    )
+    if (!metadataAndPath)
+      throw new Error(`Couldn't find media metadata for clip ${id}`)
+    const { metadata, filePath } = metadataAndPath
+    if (!filePath)
+      throw new Error(`Please open ${metadata.name} and try again.`)
+
+    const metadataAndPath2 = mediaFilePaths.find(
+      mAndP => mAndP.metadata.id === clip.fileId
+    )
+    if (!metadataAndPath2)
+      throw new Error(`Couldn't find media metadata for clip ${id}`)
+
+    const fileIndex1 = mediaFilePaths.indexOf(metadataAndPath)
+    const fileIndex2 = mediaFilePaths.indexOf(
+      mediaFilePaths.find(mAndP => mAndP.metadata.id === clip2.fileId)
+    )
+    if (fileIndex1 < fileIndex2) return -1
+    if (fileIndex1 > fileIndex2) return 1
+
+    if (clip.start < clip2.start) return -1
+    if (clip.start > clip2.start) return 1
+    return 0
+  })
+
+  const clips = clipIds.map((id, i) => {
+    const clip = r.getClip(state, id)
+    if (!clip) throw new Error('Could not find clip ' + id)
+
+    const metadataAndPath = mediaFilePaths.find(
+      mAndP => mAndP.metadata.id === clip.fileId
+    )
+    if (!metadataAndPath)
+      throw new Error(`Couldn't find media metadata for clip ${id}`)
+    const { metadata, filePath } = metadataAndPath
+    if (!filePath)
+      throw new Error(`Please open ${metadata.name} and try again.`)
+
+    const extension = extname(filePath)
+    const filenameWithoutExtension = basename(filePath, extension)
+
+    const startTime = r.getMillisecondsAtX(state, clip.start)
+    const endTime = r.getMillisecondsAtX(state, clip.end)
+    const outputFilename = `${filenameWithoutExtension}___${toTimestamp(
+      startTime,
+      SAFE_SEPARATOR
+    )}-${toTimestamp(
+      endTime,
+      SAFE_SEPARATOR,
+      SAFE_MILLISECONDS_SEPARATOR
+    )}___afcaId${id}${'.mp3'}`
+    return {
+      sourceFilePath: filePath,
+      startTime,
+      endTime,
+      outputFilename,
+      flashcardSpecs: {
+        sortField: 'transcription',
+        fields: [
+          clip.id,
+          ...fieldNames.map(f => roughEscape(clip.flashcard.fields[f]) || ''),
+          `[sound:${outputFilename}]`,
+        ],
+        tags: clip.flashcard.tags || [],
+        due: i,
+      },
+    }
+  })
 
   return {
     deckName: `${projectMetadata.name} (Generated by AFCA)`,
     template: {
       fields: ['id', ...fieldNames, 'sound'],
-      questionFormat: `{{${firstFieldName}}} {{sound}}`,
-      answerFormat: `{{FrontSide}}\n\n<hr id="answer">\n\n${restFieldNames
-        .map(fieldName => `{{${fieldName}}}`)
-        .join('<br />')}`,
+      cards: getCards(projectMetadata.noteType),
+      css: `.card {
+  font-family: Helvetica, Arial;
+  font-size: 16px;
+  text-align: center;
+  color: black;
+  background-color: white;
+  line-height: 1.25
+}
+
+.transcription {
+  font-size: 2em;
+}
+
+.pronunciation {
+  font-style: italic;
+  font-size: 1.4em;
+}
+
+.meaning {
+  margin-top: 4em;
+  margin-bottom: 4em;
+}
+
+.notes {
+  background-color: #efefef;
+  padding: .8em;
+  border-radius: .2em;
+  text-align: justify;
+  max-width: 40em;
+  margin-left: auto;
+  margin-right: auto;
+}`,
     },
     clips,
   }
@@ -70,10 +182,8 @@ export const getApkgExportData = (
 
 export const getCsvText = (exportData: ApkgExportData): string => {
   const csvData: Array<Array<string>> = exportData.clips.map(
-    ({ flashcardSpecs }) => [
-      ...flashcardSpecs.fields,
-      ...flashcardSpecs.tags.join(' '),
-    ]
+    ({ flashcardSpecs }) =>
+      [...flashcardSpecs.fields].concat(flashcardSpecs.tags.join(' '))
   )
 
   return unparse(csvData)

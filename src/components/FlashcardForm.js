@@ -16,6 +16,10 @@ import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardForm.module.css'
 import Autosuggest from 'react-autosuggest'
+import { getNoteTypeFields } from '../utils/noteType'
+
+const capitalize = string =>
+  string.substring(0, 1).toUpperCase() + string.slice(1)
 
 let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
   const handleChange = useRef(e => setFlashcardText(id, e.target.value))
@@ -159,9 +163,6 @@ class FlashcardForm extends Component {
     }
   }
 
-  editCardTemplate = () =>
-    this.props.editNoteTypeDialog(this.props.currentNoteType.id)
-
   autosuggestRef = c => (this.autosuggest = c)
 
   render() {
@@ -192,46 +193,44 @@ class FlashcardForm extends Component {
                   </IconButton>
                 </Tooltip>
               </section>
-              {currentNoteType.fields.map(({ name, id }) => (
+              {getNoteTypeFields(currentNoteType).map(id => (
                 <Field
                   key={`${id}_${currentFlashcard.id}`}
                   id={id}
                   currentFlashcard={currentFlashcard}
-                  name={name}
+                  name={capitalize(id)}
                   setFlashcardText={this.setFlashcardText}
                 />
               ))}
 
-              {currentNoteType.useTagsField && (
-                <Autosuggest
-                  theme={{
-                    suggestionsList: css.suggestionsList,
-                  }}
-                  suggestions={suggestions}
-                  onSuggestionSelected={this.onSuggestionSelected}
-                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                  renderSuggestionsContainer={this.renderSuggestionsContainer}
-                  getSuggestionValue={this.getSuggestionValue}
-                  renderSuggestion={this.renderSuggestion}
-                  focusInputOnSuggestionClick={false}
-                  shouldRenderSuggestions={value =>
-                    value && value.trim().length > 0
-                  }
-                  inputProps={{
-                    chips: currentFlashcard.tags || [],
-                    value: this.state.textFieldInput,
-                    onChange: this.handletextFieldInputChange,
-                    onAdd: this.handleAddChip,
-                    onDelete: this.handleDeleteChip,
-                  }}
-                  renderInputComponent={this.renderChipsInput}
-                  ref={this.autosuggestRef}
-                />
-              )}
+              <Autosuggest
+                theme={{
+                  suggestionsList: css.suggestionsList,
+                }}
+                suggestions={suggestions}
+                onSuggestionSelected={this.onSuggestionSelected}
+                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                renderSuggestionsContainer={this.renderSuggestionsContainer}
+                getSuggestionValue={this.getSuggestionValue}
+                renderSuggestion={this.renderSuggestion}
+                focusInputOnSuggestionClick={false}
+                shouldRenderSuggestions={value =>
+                  value && value.trim().length > 0
+                }
+                inputProps={{
+                  chips: currentFlashcard.tags || [],
+                  value: this.state.textFieldInput,
+                  onChange: this.handletextFieldInputChange,
+                  onAdd: this.handleAddChip,
+                  onDelete: this.handleDeleteChip,
+                }}
+                renderInputComponent={this.renderChipsInput}
+                ref={this.autosuggestRef}
+              />
 
               <section className={css.bottom}>
-                <span className={css.noteTypeName}>
+                {/* <span className={css.noteTypeName}>
                   Using card template:{' '}
                   <Tooltip title="Edit card template">
                     <span
@@ -242,7 +241,7 @@ class FlashcardForm extends Component {
                       {currentNoteType.name}
                     </span>
                   </Tooltip>
-                </span>
+                </span> */}
                 <IconButton
                   className={css.moreMenuButton}
                   onClick={this.handleClickDeleteButton}
@@ -254,9 +253,9 @@ class FlashcardForm extends Component {
                   open={Boolean(moreMenuAnchorEl)}
                   onClose={this.handleCloseMoreMenu}
                 >
-                  <MenuItem onClick={this.editCardTemplate}>
+                  {/* <MenuItem onClick={this.editCardTemplate}>
                     Edit card template
-                  </MenuItem>
+                  </MenuItem> */}
                   <MenuItem onClick={this.deleteCard}>Delete card</MenuItem>
                 </Menu>
               </section>
@@ -293,7 +292,6 @@ const mapDispatchToProps = {
   initializeApp: r.initializeApp,
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
-  editNoteTypeDialog: r.editNoteTypeDialog,
   toggleLoop: r.toggleLoop,
 }
 

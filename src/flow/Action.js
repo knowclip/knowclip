@@ -5,7 +5,6 @@ declare type Action =
   | SnackbarAction
   | DialogAction
   | WaveformAction
-  | NoteTypeAction
   | ClipAction
   | ProjectAction
   | MediaAction
@@ -57,35 +56,6 @@ declare type ClipAction =
   | {| type: 'MERGE_CLIPS', ids: Array<ClipId> |}
   | {| type: 'HIGHLIGHT_CLIP', id: ?ClipId |}
 
-declare type NoteTypeAction =
-  | {| type: 'ADD_NOTE_TYPE', noteType: NoteType |}
-  | {| type: 'EDIT_NOTE_TYPE', id: NoteTypeId, override: $Shape<NoteType> |}
-  | {
-      type: 'EDIT_NOTE_TYPE_REQUEST',
-      id: NoteTypeId,
-      override: $Shape<NoteType>,
-    }
-  | {|
-      type: 'DELETE_NOTE_TYPE',
-      id: NoteTypeId,
-      closeDialogOnComplete: boolean,
-    |}
-  | {|
-      type: 'DELETE_NOTE_TYPE_REQUEST',
-      id: NoteTypeId,
-      closeDialogOnComplete: boolean,
-    |}
-  | {
-      type: 'SET_AUDIO_FILE_NOTE_TYPE',
-      mediaFileId: MediaFileId,
-      noteTypeId: NoteTypeId,
-    }
-  | {|
-      type: 'SET_AUDIO_FILE_NOTE_TYPE_REQUEST',
-      mediaFileId: MediaFileId,
-      noteTypeId: NoteTypeId,
-    |}
-
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
   | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
@@ -106,7 +76,7 @@ declare type ProjectAction =
   | {| type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH', filePath: ProjectFilePath |}
   | {|
       type: 'OPEN_PROJECT',
-      project: Project2_0_0,
+      project: Project3_0_0,
       projectMetadata: ProjectMetadata,
     |}
   | {|
@@ -118,12 +88,15 @@ declare type ProjectAction =
   | {| type: 'SET_PROJECT_ERROR', error: ?string |}
   | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
   | {| type: 'CLOSE_PROJECT' |}
+  | {| type: 'CLOSE_PROJECT_REQUEST' |}
   | {| type: 'SAVE_PROJECT_REQUEST' |}
   | {| type: 'SAVE_PROJECT_AS_REQUEST' |}
   | {| type: 'EXPORT_MP3', exportData: ApkgExportData |}
-  | {| type: 'EXPORT_APKG' |}
-  | {| type: 'EXPORT_MARKDOWN' |}
-  | {| type: 'EXPORT_CSV' |}
+  | {| type: 'EXPORT_APKG_REQUEST', clipIds: Array<ClipId> |}
+  | {| type: 'EXPORT_APKG_FAILURE', errorMessage: ?string |}
+  | {| type: 'EXPORT_APKG_SUCCESS', successMessage: string |}
+  | {| type: 'EXPORT_MARKDOWN', clipIds: Array<ClipId> |}
+  | {| type: 'EXPORT_CSV', clipIds: Array<ClipId> |}
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
   | {|
@@ -166,3 +139,4 @@ declare type MediaAction =
       metadata: MediaFileMetadata,
       filePath: MediaFilePath,
     |}
+  | {| type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: boolean |}

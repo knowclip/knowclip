@@ -12,6 +12,7 @@ declare type ProjectMetadata = Exact<{
   id: ProjectId,
   filePath: ProjectFilePath,
   name: string,
+  noteType: NoteType,
   mediaFilePaths: Array<AudioMetadataAndPath>,
   error: ?string,
 }>

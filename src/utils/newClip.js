@@ -18,17 +18,29 @@ const newClip = (
     end: +end.toFixed(2),
     id,
     fileId,
-    flashcard: {
-      id,
-      tags,
-      fields: noteType.fields.reduce(
-        (fields, field) => ({
-          ...fields,
-          [field.id]: '',
-        }),
-        {}
-      ),
-    },
+    flashcard:
+      noteType === 'Simple'
+        ? {
+            id,
+            tags,
+            type: 'Simple',
+            fields: {
+              transcription: '',
+              meaning: '',
+              notes: '',
+            },
+          }
+        : {
+            id,
+            tags,
+            type: 'Transliteration',
+            fields: {
+              transcription: '',
+              pronunciation: '',
+              meaning: '',
+              notes: '',
+            },
+          },
   }
 }
 

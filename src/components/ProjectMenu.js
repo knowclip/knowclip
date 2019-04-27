@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@material-ui/core'
-import { Close as CloseIcon } from '@material-ui/icons'
+import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
 import * as r from '../redux'
 import DarkTheme from './DarkTheme'
 import css from './Header.module.css'
 import cn from 'classnames'
+import truncate from '../utils/truncate'
 
 class ProjectMenu extends Component {
   state = { editing: false, text: '' }
@@ -39,19 +40,29 @@ class ProjectMenu extends Component {
   inputRef = el => (this.input = el)
 
   render() {
-    const { projectMetadata, closeProject, className } = this.props
+    const {
+      projectMetadata,
+      closeProjectRequest,
+      saveProjectRequest,
+      className,
+    } = this.props
     const { editing, text } = this.state
 
     return (
       <DarkTheme>
         <section className={cn(className, css.projectMenu)}>
+          <IconButton onClick={closeProjectRequest}>
+            <CloseIcon />
+          </IconButton>
+          <IconButton onClick={saveProjectRequest}>
+            <SaveIcon />
+          </IconButton>{' '}
           {editing ? (
-            <form
-              onSubmit={this.handleSubmit}
-              style={{ display: 'inline-block' }}
-            >
+            <form onSubmit={this.handleSubmit} style={{ width: '100%' }}>
               <TextField
+                fullWidth
                 inputRef={this.inputRef}
+                classes={{ root: css.projectNameInput }}
                 value={text}
                 onChange={this.handleChangeText}
                 onBlur={this.handleBlur}
@@ -60,13 +71,10 @@ class ProjectMenu extends Component {
           ) : (
             <Tooltip title="Double-click to edit">
               <h1 className={css.projectName} onDoubleClick={this.startEditing}>
-                {projectMetadata.name}
+                {truncate(projectMetadata.name, 40)}
               </h1>
             </Tooltip>
           )}
-          <IconButton onClick={closeProject}>
-            <CloseIcon />
-          </IconButton>
         </section>
       </DarkTheme>
     )
@@ -77,8 +85,9 @@ const mapStateToProps = state => ({
   projectMetadata: r.getCurrentProject(state),
 })
 const mapDispatchToProps = {
-  closeProject: r.closeProject,
+  closeProjectRequest: r.closeProjectRequest,
   setProjectName: r.setProjectName,
+  saveProjectRequest: r.saveProjectRequest,
 }
 
 export default connect(

@@ -1,6 +1,10 @@
 // @flow
 import { basename } from 'path'
-import { getCurrentFilePath, getProjectMetadata } from './project'
+import {
+  getCurrentFilePath,
+  getProjectMetadata,
+  getCurrentProject,
+} from './project'
 
 export const isLoopOn = (state: AppState) => state.audio.loop
 
@@ -44,8 +48,8 @@ export const doesCurrentFileHaveClips = (state: AppState): boolean => {
 }
 
 export const getCurrentNoteType = (state: AppState): ?NoteType => {
-  const { currentNoteTypeId } = state.user
-  return currentNoteTypeId ? state.noteTypes.byId[currentNoteTypeId] : null
+  const currentProject = getCurrentProject(state)
+  return currentProject ? currentProject.noteType : null
 }
 
 export const getMediaFilePaths = (

@@ -48,7 +48,7 @@ export const convertMediaMetadata = (
   name: basename(filePath),
   durationSeconds: ffprobeMetadata.format.duration,
   format: ffprobeMetadata.format.format_name,
-  isVideo: ffprobeMetadata.streams.some(({ codec_type }) =>
-    /video/i.test(codec_type)
-  ),
+  isVideo:
+    ffprobeMetadata.format.format_name !== 'mp3' &&
+    ffprobeMetadata.streams.some(({ codec_type }) => /video/i.test(codec_type)),
 })

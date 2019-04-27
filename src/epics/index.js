@@ -11,7 +11,6 @@ import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
-import noteTypesEpic from './noteTypes'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import persistStateEpic from './persistState'
 import media from './media'
@@ -59,10 +58,7 @@ const waveformMousedownEpic = (action$, state$) =>
 
 const closeEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', () => {
-    if (
-      !r.getCurrentProject(state$.value) ||
-      !state$.value.user.workIsUnsaved
-    ) {
+    if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
       ipcRenderer.send('closed')
       return { type: 'QUIT_APP' }
     }
@@ -96,7 +92,6 @@ export default combineEpics(
   exportMarkdown,
   deleteAllCurrentFileClips,
   project,
-  noteTypesEpic,
   defaultTagsEpic,
   keyboard,
   highlightClip,

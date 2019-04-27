@@ -66,6 +66,7 @@ const openMedia = (action$, state$) =>
       }
 
       const ffprobeMetadata = await getMediaMetadata(filePath)
+      console.log('ffprobeMetadata', ffprobeMetadata)
       const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
       const currentProjectId = r.getCurrentProjectId(state$.value)
 
@@ -169,10 +170,10 @@ const addMediaToProject = (action$, state$) =>
             }
           })
         )
-        return r.addMediaToProject(projectId, metadatas)
+        return await r.addMediaToProject(projectId, metadatas)
       } catch (err) {
         console.log(err)
-        return r.simpleMessageSnackbar(
+        return await r.simpleMessageSnackbar(
           `Error adding media file: ${err.message}`
         )
       }

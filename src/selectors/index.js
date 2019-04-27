@@ -2,6 +2,7 @@
 import { createSelector } from 'reselect'
 import { getSecondsAtX } from './waveformTime'
 import * as audioSelectors from './audio'
+import formatTime from '../utils/formatTime'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 10
@@ -12,7 +13,6 @@ export * from './clips'
 export * from './audio'
 export * from './snackbar'
 export * from './dialog'
-export * from './noteTypes'
 export * from './project'
 
 export const getClip = (state: AppState, id: ClipId): ?Clip =>
@@ -39,6 +39,13 @@ export const getClips = (
   return clipsOrder ? getClipsByIds(clipsOrder, getClipsObject(state)) : []
 }
 
+export const getAllProjectClipsIds: (
+  state: AppState
+) => Array<ClipId> = createSelector(
+  getClipsObject,
+  clipsObject => Object.keys(clipsObject)
+)
+
 export const getCurrentFileClips: (
   state: AppState
 ) => Array<Clip> = createSelector(
@@ -60,6 +67,13 @@ export const getClipTime = (state: AppState, id: ClipId): ?TimeSpan => {
     start: getSecondsAtX(state, clip.start),
     end: getSecondsAtX(state, clip.end),
   }
+}
+
+export const getFormattedClipTime = (state: AppState, id: ClipId): ?string => {
+  const clipTime = getClipTime(state, id)
+  if (!clipTime) return null
+
+  return `${formatTime(clipTime.start)} - ${formatTime(clipTime.end)}`
 }
 
 export const getFlashcard = (state: AppState, id: ClipId): ?Flashcard => {

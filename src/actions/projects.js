@@ -20,7 +20,7 @@ export const openProjectById = (id: ProjectId): Action => ({
 })
 
 export const openProject = (
-  project: Project2_0_0,
+  project: Project3_0_0,
   projectMetadata: ProjectMetadata
 ): Action => ({
   type: 'OPEN_PROJECT',
@@ -35,6 +35,10 @@ export const removeProjectFromRecents = (id: ProjectId): Action => ({
 
 export const closeProject = (): Action => ({
   type: 'CLOSE_PROJECT',
+})
+
+export const closeProjectRequest = (): Action => ({
+  type: 'CLOSE_PROJECT_REQUEST',
 })
 
 export const setProjectName = (id: ProjectId, name: string): Action => ({
@@ -126,4 +130,9 @@ export const saveProjectRequest = (): Action => ({
 
 export const saveProjectAsRequest = (): Action => ({
   type: 'SAVE_PROJECT_AS_REQUEST',
+})
+
+export const setWorkIsUnsaved = (workIsUnsaved: boolean): Action => ({
+  type: 'SET_WORK_IS_UNSAVED',
+  workIsUnsaved,
 })

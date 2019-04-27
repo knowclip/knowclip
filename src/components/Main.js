@@ -113,8 +113,8 @@ class Main extends Component {
       <div className="App">
         <DarkTheme>
           <header className={headerCss.container}>
+            <ProjectMenu className={headerCss.block} />
             <section className={headerCss.block}>
-              <ProjectMenu />
               <MediaFilesNavMenu className={headerCss.leftMenu} />
             </section>
             <ul className={headerCss.rightMenu}>

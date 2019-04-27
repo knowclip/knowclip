@@ -1,6 +1,6 @@
-import { flatMap } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
-import { from, of } from 'rxjs'
+import { flatMap, tap, map } from 'rxjs/operators'
+import { ofType, combineEpics } from 'redux-observable'
+import { from, of, empty } from 'rxjs'
 import * as r from '../redux'
 import { join } from 'path'
 import { readFileSync, writeFileSync } from 'fs'
@@ -11,30 +11,49 @@ import { showSaveDialog } from '../utils/electron'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 
-const exportFailureSnackbar = err =>
-  r.simpleMessageSnackbar(`There was a problem making clips: ${err.message}`)
+const exportApkgFailure = (action$, state$) =>
+  action$.pipe(
+    ofType('EXPORT_APKG_FAILURE'),
+    tap(() => (document.body.style.cursor = 'default')),
+    flatMap(({ errorMessage }) =>
+      errorMessage
+        ? of(
+            r.simpleMessageSnackbar(
+              `There was a problem making clips: ${errorMessage}`
+            )
+          )
+        : empty()
+    )
+  )
+const exportApkgSuccess = (action$, state$) =>
+  action$.pipe(
+    ofType('EXPORT_APKG_SUCCESS'),
+    tap(() => (document.body.style.cursor = 'default')),
+    map(({ successMessage }) => r.simpleMessageSnackbar(successMessage))
+  )
 
 const exportApkg = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_APKG'),
-    flatMap(async ({ format }) => {
+    ofType('EXPORT_APKG_REQUEST'),
+    flatMap(async ({ clipIds }) => {
       const directory = tempy.directory()
       const outputFilePath = await showSaveDialog('Anki deck file', ['apkg'])
 
-      if (!outputFilePath) return from([])
+      if (!outputFilePath) return r.exportApkgFailure()
+
+      document.body.style.cursor = 'progress'
 
       try {
         const currentProjectMetadata = r.getCurrentProject(state$.value)
         if (!currentProjectMetadata)
-          return of(r.simpleMessageSnackbar('Could not find project'))
+          return r.exportApkgFailure('Could not find project')
         const noteType = r.getCurrentNoteType(state$.value)
-        if (!noteType)
-          return of(r.simpleMessageSnackbar('Could not find note type'))
+        if (!noteType) return r.exportApkgFailure('Could not find note type')
 
         const exportData = getApkgExportData(
           state$.value,
           currentProjectMetadata,
-          noteType
+          clipIds
         )
 
         const apkg = new Exporter(exportData.deckName, {
@@ -61,9 +80,11 @@ const exportApkg = (action$, state$) =>
           })
         )
 
-        exportData.clips.forEach(({ flashcardSpecs }) => {
-          apkg.addCard(flashcardSpecs.fields, flashcardSpecs.tags)
-        })
+        exportData.clips.forEach(
+          ({ flashcardSpecs: { fields, ...restSpecs } }) => {
+            apkg.addCard(fields, restSpecs)
+          }
+        )
 
         await apkg
           .save({
@@ -76,15 +97,12 @@ const exportApkg = (action$, state$) =>
             console.log(`Package has been generated: ${outputFilePath}`)
           })
 
-        return of(
-          r.simpleMessageSnackbar('Flashcards made in ' + outputFilePath)
-        )
+        return r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
       } catch (err) {
         console.error(err)
-        return of(exportFailureSnackbar(err))
+        return r.exportApkgFailure(err)
       }
-    }),
-    flatMap(x => x)
+    })
   )
 
-export default exportApkg
+export default combineEpics(exportApkg, exportApkgSuccess, exportApkgFailure)
