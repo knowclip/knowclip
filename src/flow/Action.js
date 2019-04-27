@@ -88,6 +88,7 @@ declare type ProjectAction =
   | {| type: 'SET_PROJECT_ERROR', error: ?string |}
   | {| type: 'SET_PROJECT_NAME', id: ProjectId, name: string |}
   | {| type: 'CLOSE_PROJECT' |}
+  | {| type: 'CLOSE_PROJECT_REQUEST' |}
   | {| type: 'SAVE_PROJECT_REQUEST' |}
   | {| type: 'SAVE_PROJECT_AS_REQUEST' |}
   | {| type: 'EXPORT_MP3', exportData: ApkgExportData |}
@@ -138,3 +139,4 @@ declare type MediaAction =
       metadata: MediaFileMetadata,
       filePath: MediaFilePath,
     |}
+  | {| type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: boolean |}

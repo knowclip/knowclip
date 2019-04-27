@@ -37,6 +37,10 @@ export const closeProject = (): Action => ({
   type: 'CLOSE_PROJECT',
 })
 
+export const closeProjectRequest = (): Action => ({
+  type: 'CLOSE_PROJECT_REQUEST',
+})
+
 export const setProjectName = (id: ProjectId, name: string): Action => ({
   type: 'SET_PROJECT_NAME',
   id,
@@ -126,4 +130,9 @@ export const saveProjectRequest = (): Action => ({
 
 export const saveProjectAsRequest = (): Action => ({
   type: 'SAVE_PROJECT_AS_REQUEST',
+})
+
+export const setWorkIsUnsaved = (workIsUnsaved: boolean): Action => ({
+  type: 'SET_WORK_IS_UNSAVED',
+  workIsUnsaved,
 })

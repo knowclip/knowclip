@@ -48,7 +48,6 @@
   display: flex;
   align-items: center;
   height: 4em;
-  flex-basis: 25%;
 }
 
 .projectNameInput input {

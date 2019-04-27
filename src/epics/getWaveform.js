@@ -1,4 +1,4 @@
-import { flatMap } from 'rxjs/operators'
+import { switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
@@ -46,7 +46,7 @@ const getWaveformPng = async (state: AppState, constantBitrateFilePath) => {
 const getWaveformEpic = (action$, state$) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(async ({ filePath, constantBitrateFilePath }) => {
+    switchMap(async ({ filePath, constantBitrateFilePath }) => {
       try {
         if (!filePath) {
           return r.setWaveformImagePath(null)

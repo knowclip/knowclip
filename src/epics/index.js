@@ -58,10 +58,7 @@ const waveformMousedownEpic = (action$, state$) =>
 
 const closeEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', () => {
-    if (
-      !r.getCurrentProject(state$.value) ||
-      !state$.value.user.workIsUnsaved
-    ) {
+    if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
       ipcRenderer.send('closed')
       return { type: 'QUIT_APP' }
     }

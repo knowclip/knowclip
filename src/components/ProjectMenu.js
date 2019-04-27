@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@material-ui/core'
-import { Close as CloseIcon } from '@material-ui/icons'
+import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
 import * as r from '../redux'
 import DarkTheme from './DarkTheme'
 import css from './Header.module.css'
@@ -40,12 +40,23 @@ class ProjectMenu extends Component {
   inputRef = el => (this.input = el)
 
   render() {
-    const { projectMetadata, closeProject, className } = this.props
+    const {
+      projectMetadata,
+      closeProjectRequest,
+      saveProjectRequest,
+      className,
+    } = this.props
     const { editing, text } = this.state
 
     return (
       <DarkTheme>
         <section className={cn(className, css.projectMenu)}>
+          <IconButton onClick={closeProjectRequest}>
+            <CloseIcon />
+          </IconButton>
+          <IconButton onClick={saveProjectRequest}>
+            <SaveIcon />
+          </IconButton>{' '}
           {editing ? (
             <form onSubmit={this.handleSubmit} style={{ width: '100%' }}>
               <TextField
@@ -64,9 +75,6 @@ class ProjectMenu extends Component {
               </h1>
             </Tooltip>
           )}
-          <IconButton onClick={closeProject}>
-            <CloseIcon />
-          </IconButton>
         </section>
       </DarkTheme>
     )
@@ -77,8 +85,9 @@ const mapStateToProps = state => ({
   projectMetadata: r.getCurrentProject(state),
 })
 const mapDispatchToProps = {
-  closeProject: r.closeProject,
+  closeProjectRequest: r.closeProjectRequest,
   setProjectName: r.setProjectName,
+  saveProjectRequest: r.saveProjectRequest,
 }
 
 export default connect(

@@ -110,43 +110,58 @@ const saveProject = (action$, state$) =>
           2
         )
         await writeFile(projectMetadata.filePath, json, 'utf8')
-        return { type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: false }
+
+        return from([
+          r.setWorkIsUnsaved(false),
+          r.simpleMessageSnackbar(
+            `Project saved in ${projectMetadata.filePath}`
+          ),
+        ])
       } catch (err) {
-        return r.simpleMessageSnackbar(
-          `Problem saving project file: ${err.message}`
+        return of(
+          r.simpleMessageSnackbar(`Problem saving project file: ${err.message}`)
         )
       }
-    })
+    }),
+    flatMap(x => x)
+  )
+
+const PROJECT_EDIT_ACTIONS = [
+  'DELETE_CARD',
+  'MAKE_CLIPS',
+  'DELETE_CARDS',
+  'SET_FLASHCARD_FIELD',
+  'ADD_FLASHCARD_TAG',
+  'DELETE_FLASHCARD_TAG',
+  'ADD_CLIP',
+  'ADD_CLIPS',
+  'EDIT_CLIP',
+  'MERGE_CLIPS',
+  'ADD_NOTE_TYPE',
+  'EDIT_NOTE_TYPE',
+  'DELETE_NOTE_TYPE',
+  'ADD_MEDIA_TO_PROJECT',
+  'DELETE_MEDIA_FROM_PROJECT',
+  'LOCATE_MEDIA_METADATA_SUCCESS',
+  // 'CREATED NEW PROJECT METADATA',
+]
+
+const registerUnsavedWork = (action$, state$) =>
+  action$.pipe(
+    ofType(...PROJECT_EDIT_ACTIONS),
+    map(() => r.setWorkIsUnsaved(true))
   )
 
 const THREE_SECONDS = 3000
 const autoSaveProject = (action$, state$) =>
   action$.pipe(
-    ofType(
-      'DELETE_CARD',
-      'MAKE_CLIPS',
-      'DELETE_CARDS',
-      'SET_FLASHCARD_FIELD',
-      'ADD_FLASHCARD_TAG',
-      'DELETE_FLASHCARD_TAG',
-      'ADD_CLIP',
-      'ADD_CLIPS',
-      'EDIT_CLIP',
-      'MERGE_CLIPS',
-      'ADD_NOTE_TYPE',
-      'EDIT_NOTE_TYPE',
-      'DELETE_NOTE_TYPE',
-      'ADD_MEDIA_TO_PROJECT',
-      'DELETE_MEDIA_FROM_PROJECT',
-      'LOCATE_MEDIA_METADATA_SUCCESS',
-      'CREATED NEW PROJECT METADATA'
-    ),
+    ofType(...PROJECT_EDIT_ACTIONS),
     debounce(() => timer(THREE_SECONDS)),
     map(() => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
         saveProjectToLocalStorage(r.getProject(state$.value, projectMetadata))
-        return { type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: true }
+        return { type: 'AUTOSAVE' }
       } catch (err) {
         return r.simpleMessageSnackbar(
           `Problem saving project file: ${err.message}`
@@ -160,7 +175,7 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
     ofType('OPEN_PROJECT'),
     flatMap(({ projectMetadata }) => {
       if (!projectMetadata.mediaFilePaths.length)
-        return { type: 'NOOP_OPEN_PROJECT_NO_AUDIO_FILES' }
+        return of({ type: 'NOOP_OPEN_PROJECT_NO_AUDIO_FILES' })
 
       const [
         {
@@ -223,12 +238,27 @@ const deleteMediaFileFromProject = (action$, state$) =>
     })
   )
 
+const closeProject = (action$, state$) =>
+  action$.pipe(
+    ofType('CLOSE_PROJECT_REQUEST'),
+    map(() => {
+      if (r.isWorkUnsaved(state$.value))
+        return r.confirmationDialog(
+          'Are you sure you want to close this project without saving your work?',
+          r.closeProject()
+        )
+      else return r.closeProject()
+    })
+  )
+
 export default combineEpics(
   openProjectByFilePath,
   openProjectById,
   saveProject,
+  registerUnsavedWork,
   autoSaveProject,
   openMediaFileRequestOnOpenProject,
   openProjectOnCreate,
-  deleteMediaFileFromProject
+  deleteMediaFileFromProject,
+  closeProject
 )

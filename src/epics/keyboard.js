@@ -159,10 +159,8 @@ const saveKey = merge(
     cmd,
     switchMap(() =>
       fromEvent(window, 'keydown').pipe(
-        takeUntil(
-          fromEvent(window, 'keyup').pipe(cmd),
-          filter(({ keyCode }) => keyCode === 83) // S
-        ),
+        filter(({ keyCode }) => keyCode === 83), // S
+        takeUntil(fromEvent(window, 'keyup').pipe(cmd)),
         take(1)
       )
     )
@@ -170,9 +168,14 @@ const saveKey = merge(
 )
 
 const saveEpic = (action$, state$) =>
-  saveKey.pipe(
-    map(({ shiftKey }) =>
-      shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
+  action$.ofType('OPEN_PROJECT').pipe(
+    switchMap(() =>
+      saveKey.pipe(
+        map(({ shiftKey }) =>
+          shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
+        ),
+        takeUntil(action$.ofType('CLOSE_PROJECT'))
+      )
     )
   )
 

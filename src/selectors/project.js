@@ -120,3 +120,6 @@ export const getCurrentMediaMetadata = (
 
   return currentProjectMediaMetadata.find(({ id }) => id === currentMediaFileId)
 }
+
+export const isWorkUnsaved = (state: AppState): boolean =>
+  state.user.workIsUnsaved

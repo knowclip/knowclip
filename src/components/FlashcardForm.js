@@ -18,6 +18,9 @@ import css from './FlashcardForm.module.css'
 import Autosuggest from 'react-autosuggest'
 import { getNoteTypeFields } from '../utils/noteType'
 
+const capitalize = string =>
+  string.substring(0, 1).toUpperCase() + string.slice(1)
+
 let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
   const handleChange = useRef(e => setFlashcardText(id, e.target.value))
   return (
@@ -195,7 +198,7 @@ class FlashcardForm extends Component {
                   key={`${id}_${currentFlashcard.id}`}
                   id={id}
                   currentFlashcard={currentFlashcard}
-                  name={id}
+                  name={capitalize(id)}
                   setFlashcardText={this.setFlashcardText}
                 />
               ))}
