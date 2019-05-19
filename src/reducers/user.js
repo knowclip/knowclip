@@ -14,6 +14,11 @@ const initialState: UserState = {
 
 const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
+    case 'DELETE_CARD':
+      return action.id === state.highlightedClipId
+        ? { ...state, highlightedClipId: null }
+        : state
+
     case 'DELETE_MEDIA_FROM_PROJECT':
       return action.mediaFileId === state.currentMediaFileId
         ? {
@@ -90,7 +95,9 @@ const user: Reducer<UserState> = (state = initialState, action) => {
 
     case 'DELETE_FLASHCARD_TAG': {
       const { tag } = action
-      const newIds = state.tagsToClipIds[tag].filter(id => id !== action.id)
+      const newIds = (state.tagsToClipIds[tag] || []).filter(
+        id => id !== action.id
+      )
       const newTagsToClipIds = newIds.length
         ? {
             ...state.tagsToClipIds,

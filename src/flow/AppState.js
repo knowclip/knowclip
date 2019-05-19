@@ -3,7 +3,7 @@
 declare type AppState = Exact<{
   waveform: WaveformState,
   clips: ClipsState,
-  audio: AudioState,
+  audio: MediaState,
   user: UserState,
   snackbar: SnackbarState,
   dialog: DialogState,

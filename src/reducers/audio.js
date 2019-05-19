@@ -1,12 +1,12 @@
 // @flow
-export const initialState: AudioState = {
+export const initialState: MediaState = {
   loop: true,
   isLoading: false,
   mediaFolderLocation: null,
 }
 
-const audio: Reducer<AudioState> = (
-  state: AudioState = initialState,
+const audio: Reducer<MediaState> = (
+  state: MediaState = initialState,
   action: Action
 ) => {
   switch (action.type) {

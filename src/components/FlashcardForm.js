@@ -43,6 +43,14 @@ class FlashcardForm extends Component {
     suggestions: [],
   }
 
+  onSuggestionHighlighted = ({ suggestion }) => {
+    const el =
+      suggestion && document.querySelector(`#tag__${suggestion}:not(:hover)`)
+    if (el) {
+      el.scrollIntoView(false)
+    }
+  }
+
   onSuggestionSelected = (e, { suggestionValue }) => {
     this.handleAddChip(suggestionValue)
     e.preventDefault()
@@ -70,7 +78,7 @@ class FlashcardForm extends Component {
   }
 
   renderSuggestionsContainer = ({ children, containerProps }) => (
-    <Paper {...containerProps} square>
+    <Paper {...containerProps} square className={css.suggestionsContainer}>
       {children}
     </Paper>
   )
@@ -78,11 +86,12 @@ class FlashcardForm extends Component {
   renderSuggestion = (suggestion, { query, isHighlighted, ...other }) => {
     // const matches = match(suggestion.name, query)
     // const parts = parse(suggestion.name, matches)
-
+    const preventDefault = e => e.preventDefault() // prevent the click causing the input to be blurred
     return (
       <MenuItem
         selected={isHighlighted}
-        onMouseDown={e => e.preventDefault()} // prevent the click causing the input to be blurred
+        onMouseDown={preventDefault}
+        id={`tag__${suggestion}`}
         {...other}
       >
         {/* {parts.map((part, index) => {
@@ -206,8 +215,10 @@ class FlashcardForm extends Component {
               <Autosuggest
                 theme={{
                   suggestionsList: css.suggestionsList,
+                  suggestionsContainer: css.suggestionsContainer,
                 }}
                 suggestions={suggestions}
+                onSuggestionHighlighted={this.onSuggestionHighlighted}
                 onSuggestionSelected={this.onSuggestionSelected}
                 onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                 onSuggestionsClearRequested={this.onSuggestionsClearRequested}

@@ -66,7 +66,7 @@ let FlashcardRow = ({
     <TableCell className={css.flashcardContents}>
       <p
         className={cn(css.transcription, {
-          [css.blank]: !fields.transcription,
+          [css.blank]: !fields.transcription.trim(),
         })}
       >
         {fields.transcription.trim() || '[no transcription given]'}
@@ -74,7 +74,7 @@ let FlashcardRow = ({
       {fields.pronunciation && (
         <p className={css.pronunciation}>{fields.pronunciation}</p>
       )}
-      <p className={cn(css.meaning, { [css.blank]: !fields.meaning })}>
+      <p className={cn(css.meaning, { [css.blank]: !fields.meaning.trim() })}>
         {fields.meaning.trim() || '[no meaning given]'}
       </p>
     </TableCell>

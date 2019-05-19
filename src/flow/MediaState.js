@@ -3,7 +3,7 @@
 declare type MediaFileId = string
 declare type MediaFilePath = string
 
-declare type AudioState = Exact<{
+declare type MediaState = Exact<{
   loop: boolean,
   isLoading: boolean,
   mediaFolderLocation: ?string,
