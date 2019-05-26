@@ -9,9 +9,18 @@ const newClip = (
   fileId: MediaFileId,
   id: ClipId,
   noteType: NoteType,
-  tags: Array<string> = []
+  tags: Array<string> = [],
+  fields: ?{
+    transcription: string,
+    pronunciation: string,
+    meaning: string,
+    notes: string,
+  }
 ): Clip => {
   const [start, end] = sortClipPoints(pendingClip)
+
+  const { transcription = '', pronunciation = '', meaning = '', notes = '' } =
+    fields || {}
 
   return {
     start: +start.toFixed(2),
@@ -25,9 +34,9 @@ const newClip = (
             tags,
             type: 'Simple',
             fields: {
-              transcription: '',
-              meaning: '',
-              notes: '',
+              transcription,
+              meaning,
+              notes,
             },
           }
         : {
@@ -35,10 +44,10 @@ const newClip = (
             tags,
             type: 'Transliteration',
             fields: {
-              transcription: '',
-              pronunciation: '',
-              meaning: '',
-              notes: '',
+              transcription,
+              pronunciation,
+              meaning,
+              notes,
             },
           },
   }

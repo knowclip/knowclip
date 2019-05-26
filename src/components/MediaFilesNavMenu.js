@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react'
+import React, { Fragment, useCallback, useState, useRef } from 'react'
 import { connect } from 'react-redux'
 import {
   Button,
@@ -6,8 +6,11 @@ import {
   Tooltip,
   Menu,
   MenuItem,
+  MenuList,
   ListItemText,
   ListItemSecondaryAction,
+  Divider,
+  Popover,
 } from '@material-ui/core'
 import { Loop, Delete as DeleteIcon } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
@@ -56,42 +59,50 @@ const MediaFilesNavMenu = ({
             </Button>
 
             {menuIsOpen && (
-              <Menu
+              <Popover
                 anchorEl={menuAnchorEl.current}
                 open={menuIsOpen}
                 onClose={closeMenu}
               >
-                {projectMediaMetadata.map(({ name, id }) => (
-                  <MenuItem
-                    dense
-                    key={id}
-                    selected={id === currentFileId}
-                    onClick={() => openMediaFileRequest(id)}
-                  >
-                    <ListItemText title={name}>
-                      {truncate(name, 40)}
-                    </ListItemText>
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        onClick={() =>
-                          confirmationDialog(
-                            CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
-                            r.deleteMediaFromProjectRequest(
-                              currentProjectId,
-                              id
-                            )
-                          )
-                        }
+                <MenuList className={css.mediaFilesMenuList}>
+                  {projectMediaMetadata.map(({ name, id }) => (
+                    <MenuItem
+                      dense
+                      key={id}
+                      selected={id === currentFileId}
+                      onClick={() => openMediaFileRequest(id)}
+                    >
+                      <ListItemText
+                        title={name}
+                        className={css.mediaFilesMenuListItemText}
                       >
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </MenuItem>
-                ))}
-                <MenuItem onClick={chooseMediaFiles}>
-                  <ListItemText>Add new media</ListItemText>
+                        {truncate(name, 40)}
+                      </ListItemText>
+                      <ListItemSecondaryAction>
+                        <IconButton
+                          onClick={() =>
+                            confirmationDialog(
+                              CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
+                              r.deleteMediaFromProjectRequest(
+                                currentProjectId,
+                                id
+                              )
+                            )
+                          }
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+                <Divider />
+                <MenuItem dense>
+                  <ListItemText onClick={chooseMediaFiles}>
+                    Add new media
+                  </ListItemText>
                 </MenuItem>
-              </Menu>
+              </Popover>
             )}
           </span>
         ) : (

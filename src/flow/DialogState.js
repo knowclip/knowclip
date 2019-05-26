@@ -27,6 +27,7 @@ declare type DialogData =
       type: 'CsvAndMp3Export',
       props: { clipIds: Array<ClipId> },
     }
+  | { type: 'SubtitlesClips' }
 declare type DialogState = Exact<{
   queue: Array<DialogData>,
 }>

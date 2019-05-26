@@ -152,3 +152,10 @@ declare type SubtitlesAction =
   | {| type: 'DELETE_SUBTITLES_TRACK', id: SubtitlesTrackId |}
   | {| type: 'SHOW_SUBTITLES', id: SubtitlesTrackId |}
   | {| type: 'HIDE_SUBTITLES', id: SubtitlesTrackId |}
+  | {|
+      type: 'MAKE_CLIPS_FROM_SUBTITLES',
+      fileId: MediaFileId,
+      fieldNamesToTrackIds: { [FlashcardFieldName]: SubtitlesTrackId },
+      tags: Array<string>,
+    |}
+  | {| type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST' |}

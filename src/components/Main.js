@@ -215,7 +215,7 @@ const mapStateToProps = state => ({
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getCurrentMediaFileConstantBitratePath(state),
   currentMediaMetadata: r.getCurrentMediaMetadata(state),
-  subtitles: r.getSubtitles(state),
+  subtitles: r.getSubtitlesTracks(state),
 })
 
 const mapDispatchToProps = {

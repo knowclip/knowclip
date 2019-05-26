@@ -12,6 +12,10 @@ import { extname } from 'path'
 import ass2vtt from 'ass-to-vtt'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
+import newClip from '../utils/newClip'
+import { getNoteTypeFields } from '../utils/noteType'
+import { from } from 'rxjs'
+
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
@@ -71,7 +75,9 @@ export const getSubtitlesFromMedia = async (
 
   return {
     tmpFilePath: subtitlesFilePath,
-    chunks: parse(vttText).map(vttChunk => r.readVttChunk(state, vttChunk)),
+    chunks: parse(vttText)
+      .map(vttChunk => r.readVttChunk(state, vttChunk))
+      .filter(({ text }) => text),
   }
 }
 
@@ -108,7 +114,10 @@ const parseSubtitles = (state, fileContents, extension) =>
         .parse(fileContents)
         .filter(({ type }) => type === 'caption')
         .map(chunk => r.readSubsrtChunk(state, chunk))
-    : parse(fileContents).map(vttChunk => r.readVttChunk(state, vttChunk))
+        .filter(({ text }) => text)
+    : parse(fileContents)
+        .map(vttChunk => r.readVttChunk(state, vttChunk))
+        .filter(({ text }) => text)
 
 export const getSubtitlesFromFile = async (filePath, state) => {
   const extension = extname(filePath).toLowerCase()
@@ -186,8 +195,93 @@ export const loadSubtitlesFile = (action$, state$) =>
     })
   )
 
+const makeClipsFromSubtitles = (action$, state$) =>
+  action$.pipe(
+    ofType('MAKE_CLIPS_FROM_SUBTITLES'),
+    flatMap(({ fileId, fieldNamesToTrackIds, tags }) => {
+      const transcriptionTrackId = fieldNamesToTrackIds.transcription
+      const transcriptionTrack = r.getSubtitlesTrack(
+        state$.value,
+        transcriptionTrackId
+      )
+      if (!transcriptionTrack)
+        return r.simpleMessageSnackbar(
+          'Could not find subtitles track to match with transcription field.'
+        )
+
+      const currentNoteType = r.getCurrentNoteType(state$.value)
+      const currentNoteTypeFields = getNoteTypeFields(currentNoteType)
+
+      const clips = transcriptionTrack.chunks.map(chunk => {
+        const fields = {
+          transcription: chunk.text,
+        }
+        // const fieldNames = Object.keys(fieldNamesToTrackIds).filter(
+        //   fieldName => fieldNamesToTrackIds[fieldName] === 'transcription'
+        // )
+        currentNoteTypeFields.forEach(fieldName => {
+          const trackId = fieldNamesToTrackIds[fieldName]
+          fields[fieldName] = trackId
+            ? r
+                .getSubtitlesChunksWithinRange(
+                  state$.value,
+                  trackId,
+                  chunk.start,
+                  chunk.end
+                )
+                .map(chunk => chunk.text)
+                .join('\n')
+            : ''
+        })
+
+        return newClip(
+          chunk,
+          fileId,
+          uuid(),
+          r.getCurrentNoteType(state$.value),
+          tags,
+          fields
+        )
+      })
+
+      return from([
+        r.deleteCards(
+          r.getClipIdsByMediaFileId(
+            state$.value,
+            r.getCurrentFileId(state$.value)
+          )
+        ),
+        r.addClips(clips, fileId),
+      ])
+    })
+  )
+
+const subtitlesClipsDialogRequest = (action$, state$) =>
+  action$.pipe(
+    ofType('SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'),
+    map(() => {
+      const tracks = r.getSubtitlesTracks(state$.value)
+      if (!tracks.length)
+        return r.simpleMessageSnackbar(
+          'Please add a subtitles track and try again.'
+        )
+      const mediaFile = r.getCurrentMediaMetadata(state$.value)
+      if (!mediaFile || !r.getCurrentFilePath(state$.value))
+        return r.simpleMessageSnackbar(
+          'Please locate this media file and try again.'
+        )
+      if (!r.getCurrentFileClips(state$.value)) return r.subtitlesClipDialog()
+      return r.confirmationDialog(
+        'This action will delete any clips and cards you made for this current file. Are you sure you want to continue?',
+        r.subtitlesClipDialog()
+      )
+    })
+  )
+
 export default combineEpics(
   loadEmbeddedSubtitles,
   loadSubtitlesFile,
-  loadSubtitlesFailure
+  loadSubtitlesFailure,
+  makeClipsFromSubtitles,
+  subtitlesClipsDialogRequest
 )

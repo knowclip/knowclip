@@ -7,6 +7,7 @@ import ReviewAndExport from '../ReviewAndExport'
 import NewProjectForm from './NewProjectFormDialog'
 import OpenMediaFileFailure from './OpenMediaFileFailureDialog'
 import CsvAndMp3Export from './CsvAndMp3ExportDialog'
+import SubtitlesClips from './SubtitlesClipsDialog'
 
 const DIALOGS = {
   Confirmation,
@@ -15,6 +16,7 @@ const DIALOGS = {
   NewProjectForm,
   OpenMediaFileFailure,
   CsvAndMp3Export,
+  SubtitlesClips,
 }
 
 const DialogView = ({ currentDialog, closeDialog }) => {

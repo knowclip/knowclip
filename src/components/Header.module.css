@@ -54,6 +54,12 @@
   font-size: 1.5rem !important;
 }
 
-.subtitlesMenuListItem {
+.subtitlesMenuListItemText,
+.mediaFilesMenuListItemText {
   padding-right: 3rem !important;
+}
+
+.mediaFilesMenuList {
+  max-height: 30rem;
+  overflow-y: auto;
 }

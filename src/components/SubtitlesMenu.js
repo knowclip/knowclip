@@ -17,6 +17,7 @@ import {
   MenuItem,
   ListItemText,
   ListItemSecondaryAction,
+  Divider,
 } from '@material-ui/core'
 import { showOpenDialog } from '../utils/electron'
 import css from './Header.module.css'
@@ -43,6 +44,7 @@ const SubtitlesMenu = ({
   showSubtitles,
   hideSubtitles,
   loadSubtitlesFromFile,
+  subtitlesClipsDialogRequest,
 }) => {
   const menuAnchorEl = useRef(null)
   const [menuIsOpen, setMenuIsOpen] = useState(false)
@@ -64,7 +66,7 @@ const SubtitlesMenu = ({
         {embeddedTracks.map((track, i) => (
           <MenuItem dense key={track.id}>
             <ListItemText
-              className={css.subtitlesMenuListItem}
+              className={css.subtitlesMenuListItemText}
               primary={`Embedded track ${i + 1}`}
             />
             <ListItemSecondaryAction>
@@ -79,7 +81,7 @@ const SubtitlesMenu = ({
         {externalTracks.map((track, i) => (
           <MenuItem dense key={track.id}>
             <ListItemText
-              className={css.subtitlesMenuListItem}
+              className={css.subtitlesMenuListItemText}
               primary={`External track ${i + 1}`}
             />
             <ListItemSecondaryAction>
@@ -91,8 +93,12 @@ const SubtitlesMenu = ({
             </ListItemSecondaryAction>
           </MenuItem>
         ))}
+        <Divider />
         <MenuItem dense onClick={getOnClickLoadExternal(loadSubtitlesFromFile)}>
           <ListItemText primary="Load external track" />
+        </MenuItem>
+        <MenuItem dense onClick={e => subtitlesClipsDialogRequest()}>
+          <ListItemText primary="Make clips + cards from subtitles" />
         </MenuItem>
       </Menu>
     </Fragment>
@@ -112,6 +118,7 @@ const mapDispatchToProps = {
   showSubtitles: r.showSubtitles,
   hideSubtitles: r.hideSubtitles,
   loadSubtitlesFromFile: r.loadSubtitlesFromFileRequest,
+  subtitlesClipsDialogRequest: r.subtitlesClipsDialogRequest,
 }
 
 export default connect(

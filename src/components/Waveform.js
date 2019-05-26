@@ -93,31 +93,43 @@ const getSubtitlesPath = (
   return `M${startX} ${startYRaw} L${endX} ${startYRaw} L${endX} ${endYRaw} L${startX} ${endYRaw} L${startX} ${startYRaw}`
 }
 
+const SUBTITLES_CHUNK_HEIGHT = 24
+
+const SubtitlesChunk = ({ chunk, trackIndex }) => (
+  <g className={css.subtitlesChunk}>
+    <path
+      className={css.subtitlesChunkRectangle}
+      d={getSubtitlesPath(
+        chunk.start,
+        chunk.end,
+        trackIndex * SUBTITLES_CHUNK_HEIGHT,
+        (trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT
+      )}
+    />
+    <text
+      className={css.subtitlesText}
+      x={chunk.start + 4}
+      y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 4}
+      width={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - chunk.start}
+    >
+      {chunk.text}
+    </text>
+  </g>
+)
+
 const SubtitlesTimeline = memo(({ subtitles, viewBox }) => (
   <svg
     className={css.subtitlesSvg}
     preserveAspectRatio="xMinYMin slice"
-    viewBox={getSubtitlesViewBoxString(viewBox.xMin, subtitles.length * 16)}
+    viewBox={getSubtitlesViewBoxString(
+      viewBox.xMin,
+      subtitles.length * SUBTITLES_CHUNK_HEIGHT
+    )}
     width="100%"
-    height={subtitles.length * 16}
+    height={subtitles.length * SUBTITLES_CHUNK_HEIGHT}
   >
     {subtitles.map(({ chunks }, i) =>
-      chunks.map(chunk => (
-        <g>
-          <path
-            className={css.subtitlesChunk}
-            d={getSubtitlesPath(chunk.start, chunk.end, i * 16, (i + 1) * 16)}
-          />
-
-          <text
-            x={chunk.start}
-            y={(i + 1) * 16}
-            width={(i + 1) * 16 - chunk.start}
-          >
-            {chunk.text}
-          </text>
-        </g>
-      ))
+      chunks.map(chunk => <SubtitlesChunk chunk={chunk} trackIndex={i} />)
     )}
   </svg>
 ))
@@ -173,7 +185,7 @@ const mapStateToProps = state => ({
   pendingClip: r.getPendingClip(state),
   pendingStretch: r.getPendingStretch(state),
   highlightedClipId: r.getHighlightedClipId(state),
-  subtitles: r.getSubtitles(state),
+  subtitles: r.getSubtitlesTracks(state),
 })
 
 export default connect(

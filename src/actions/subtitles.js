@@ -76,3 +76,18 @@ export const deleteSubtitlesTrack = (
   type: 'DELETE_SUBTITLES_TRACK',
   id,
 })
+
+export const makeClipsFromSubtitles = (
+  fileId: MediaFileId,
+  fieldNamesToTrackIds: { [FlashcardFieldName]: SubtitlesTrackId },
+  tags: Array<string>
+): SubtitlesAction => ({
+  type: 'MAKE_CLIPS_FROM_SUBTITLES',
+  fileId,
+  fieldNamesToTrackIds,
+  tags,
+})
+
+export const subtitlesClipsDialogRequest = (): SubtitlesAction => ({
+  type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST',
+})
