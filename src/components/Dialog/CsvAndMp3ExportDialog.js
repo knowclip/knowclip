@@ -23,9 +23,6 @@ const CsvAndMp3ExportDialog = ({
   exportCsv,
   clipIds,
 }) => {
-  // const [csvFilePath, setCsvFilePath] = useState('')
-  // const [mediaFolderLocation, setMediaFolderLocation] = useState(currentMediaFolderLocation || '')
-
   const [fields, setFields] = useState({
     mediaFolderLocation: currentMediaFolderLocation || '',
     csvFilePath: '',
@@ -42,9 +39,9 @@ const CsvAndMp3ExportDialog = ({
     if (!csvFilePath)
       errors.csvFilePath =
         'Please choose a location to save your flashcards file.'
-    if (!csvFilePath)
-      errors.csvFilePath =
-        'Please choose a location to save your flashcards file.'
+    if (!mediaFolderLocation)
+      errors.mediaFolderLocation =
+        'Please choose a location to save your audio clips.'
     setErrors(errors)
   }
   const setField = (key, value) => {

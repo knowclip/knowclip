@@ -1,15 +1,12 @@
 import { promisify } from 'util'
 import tempy from 'tempy'
 import fs from 'fs'
-// import parseSRT from 'parse-srt'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
-import srtParser from 'subtitles-parser'
 import { ofType, combineEpics } from 'redux-observable'
 import { filter, flatMap, map } from 'rxjs/operators'
 import uuid from 'uuid/v4'
 import * as r from '../redux'
 import { extname } from 'path'
-import ass2vtt from 'ass-to-vtt'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import newClip from '../utils/newClip'
@@ -24,19 +21,12 @@ export const getSubtitlesFilePathFromMedia = async (
   streamIndex
 ) => {
   const mediaMetadata = await getMediaMetadata(mediaFilePath)
-  console.log('got metadata', mediaMetadata)
-  console.log('streamindex', streamIndex)
   if (
     !mediaMetadata.streams[streamIndex] ||
     mediaMetadata.streams[streamIndex].codec_type !== 'subtitle'
   ) {
-    console.log(
-      'falsdfjlaksdjflkasdjflkasjdflajsdlfjaslkdfjalskdjflaskjdflkasjdflkasjfdlkj'
-    )
     return null
   }
-  //   const subtitlesFormat = mediaMetadata.streams[streamIndex].codec_name
-  // const outputFilePath = tempy.file({ extension: 'vtt' })
   const outputFilePath = tempy.file({ extension: 'vtt' })
 
   return await new Promise((res, rej) =>
@@ -44,11 +34,10 @@ export const getSubtitlesFilePathFromMedia = async (
       .outputOptions(`-map 0:${streamIndex}`)
       .output(outputFilePath)
       .on('end', () => {
-        console.log('DONE!!')
         res(outputFilePath)
       })
       .on('error', err => {
-        console.error('error')
+        console.error(err)
         rej(err)
       })
       .run()
@@ -65,13 +54,9 @@ export const getSubtitlesFromMedia = async (
     streamIndex
   )
   if (!subtitlesFilePath) {
-    console.log(
-      'asldfjalskdfjaslkdjf;lasdjf;lkasjdf;lajsd;flkjas;ldfkjas;ldfkjas;lfkj;'
-    )
-    return []
+    throw new Error('There was a problem loading embedded subtitles')
   }
   const vttText = await readFile(subtitlesFilePath, 'utf8')
-  console.log(vttText)
 
   return {
     tmpFilePath: subtitlesFilePath,
@@ -84,29 +69,16 @@ export const getSubtitlesFromMedia = async (
 export const convertAssToVtt = (filePath, vttFilePath) =>
   new Promise((res, rej) =>
     ffmpeg(filePath)
-      // .outputOptions(`-map 0:${streamIndex}`)
       .output(vttFilePath)
       .on('end', () => {
-        console.log('DONE!!')
         res(vttFilePath)
       })
       .on('error', err => {
-        console.error('error')
+        console.error(err)
         rej(err)
       })
       .run()
   )
-
-// new Promise((res, rej) => {
-//   fs.createReadStream(filePath)
-//     .pipe(ass2vtt())
-//     .pipe(fs.createWriteStream(vttFilePath))
-//     .on('end', () => res(vttFilePath))
-//     .on('error', err => {
-//       console.error(err)
-//       rej(err)
-//     })
-// })
 
 const parseSubtitles = (state, fileContents, extension) =>
   extension === '.ass'
@@ -124,7 +96,6 @@ export const getSubtitlesFromFile = async (filePath, state) => {
   const vttFilePath =
     extension === '.vtt' ? filePath : tempy.file({ extension: 'vtt' })
   const fileContents = await readFile(filePath, 'utf8')
-  // can be secs or ms depnding on type, fix this!!!
   const chunks = parseSubtitles(state, fileContents, extension)
 
   if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
@@ -216,9 +187,6 @@ const makeClipsFromSubtitles = (action$, state$) =>
         const fields = {
           transcription: chunk.text,
         }
-        // const fieldNames = Object.keys(fieldNamesToTrackIds).filter(
-        //   fieldName => fieldNamesToTrackIds[fieldName] === 'transcription'
-        // )
         currentNoteTypeFields.forEach(fieldName => {
           const trackId = fieldNamesToTrackIds[fieldName]
           fields[fieldName] = trackId

@@ -42,18 +42,6 @@ export const readVttChunk = (
 
 export const readSubsrtChunk = readVttChunk
 
-const chunkLength = (chunk: SubtitlesChunk): WaveformX =>
-  chunk.end - chunk.start
-
-// const overlap = (
-//   chunk: SubtitlesChunk,
-//   start: WaveformX,
-//   end: WaveformX
-// ): boolean =>
-//   (start >= chunk.start && chunk.end - start >= chunkLength(chunk) * 0.5) ||
-//   (end <= chunk.end && end - chunk.start >= chunkLength(chunk) * 0.5) ||
-//   (chunk.start >= start && chunk.end <= end)
-
 const overlap = (
   chunk: SubtitlesChunk,
   start: WaveformX,

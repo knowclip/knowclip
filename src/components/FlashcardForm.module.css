@@ -34,8 +34,3 @@
   max-height: 10em !important;
   overflow-y: auto;
 }
-
-/* :global .react-autosuggest__suggestions-container--open {
-  max-height: 10em;
-  overflow-y: auto;
-} */

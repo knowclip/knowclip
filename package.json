@@ -16,9 +16,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "material-ui-chip-input": "^1.0.0-beta.14",
     "moment": "^2.24.0",
-    "node-webvtt": "^1.5.0",
     "papaparse": "^4.5.0",
-    "parse-srt": "^1.0.0-alpha",
     "react": "^16.8.4",
     "react-autosuggest": "^9.4.3",
     "react-dom": "npm:@hot-loader/react-dom",
@@ -32,7 +30,6 @@
     "rxjs": "^6.2.2",
     "subsrt": "^1.0.0",
     "subtitle": "^2.0.3",
-    "subtitles-parser": "^0.0.2",
     "tempy": "^0.2.1",
     "uuid": "^3.3.2",
     "xss": "^1.0.6"

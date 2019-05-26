@@ -57,7 +57,6 @@ const Media = ({
     id: 'audioPlayer',
     className: 'audioPlayer',
     controlsList: 'nodownload nofullscreen',
-    // autoPlay: true,
     src: filePath ? `file://${filePath}` : null,
     playbackspeed: 1.5,
   }
@@ -72,11 +71,6 @@ const Media = ({
     [props.src]
   )
 
-  // useEffect(
-  //   () => {
-  //     document.getElementById(props.id).textTracks
-  //   }, [subtitles]
-  // )
   return metadata && metadata.isVideo ? (
     <div className="videoContainer">
       <video {...props}>

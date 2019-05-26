@@ -51,20 +51,6 @@ export const newExternalSubtitlesTrack = (
   vttFilePath,
 })
 
-// export const loadEmbeddedSubtitlesSuccess = (
-
-// ): SubtitlesAction =>
-//   loadSubtitlesSuccess([
-//     {
-//       type: 'EmbeddedSubtitlesTrack',
-//       id,
-//       mode: 'showing',
-//       chunks,
-//       streamIndex,
-//       tmpFilePath,
-//     },
-//   ])
-
 export const loadSubtitlesFailure = (error: string): SubtitlesAction => ({
   type: 'LOAD_SUBTITLES_FAILURE',
   error,

@@ -32,7 +32,6 @@ const getOnClickLoadExternal = loadSubtitlesFromFile => async () => {
   const filePaths = await showOpenDialog([
     { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
   ])
-  console.log(filePaths)
   if (!filePaths) return
 
   loadSubtitlesFromFile(filePaths[0])

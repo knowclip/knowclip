@@ -12,9 +12,17 @@ import {
   InputLabel,
 } from '@material-ui/core'
 import * as r from '../../redux'
-import { showOpenDirectoryDialog, showSaveDialog } from '../../utils/electron'
-import { remote, shell } from 'electron'
+import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
+
+const getOnClickLoadExternal = loadSubtitlesFromFile => async () => {
+  const filePaths = await showOpenDialog([
+    { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
+  ])
+  if (!filePaths) return
+
+  loadSubtitlesFromFile(filePaths[0])
+}
 
 const getDefaultFields = (currentNoteTypeFieldNames, firstSubtitlesTrackId) => {
   const fields = {}
@@ -41,18 +49,13 @@ const SubtitlesClipsDialog = ({
   subtitlesTracks,
   currentFileId,
   makeClipsFromSubtitles,
+  loadSubtitlesFromFile,
 }) => {
-  // const [csvFilePath, setCsvFilePath] = useState('')
-  // const [mediaFolderLocation, setMediaFolderLocation] = useState(currentMediaFolderLocation || '')
-
   const [fields, setFields] = useState(() =>
     getDefaultFields(currentNoteTypeFields, subtitlesTracks[0].id)
   )
-  const [errors, setErrors] = useState({})
 
   const onSubmit = () => {
-    // if (csvFilePath && mediaFolderLocation) {
-
     const fieldsWithoutBlankValues = {}
     Object.keys(fields)
       .filter(fieldName => fields[fieldName])
@@ -62,13 +65,8 @@ const SubtitlesClipsDialog = ({
     closeDialog()
     const tags = []
     return makeClipsFromSubtitles(currentFileId, fieldsWithoutBlankValues, tags)
-    // }
-    // const errors = {}
-    // setErrors(errors)
   }
   const setField = (key, value) => {
-    console.log('key value', key, value)
-    setErrors(errors => ({ ...errors, [key]: null }))
     setFields(fields => ({
       ...fields,
       [key]: value,
@@ -84,6 +82,20 @@ const SubtitlesClipsDialog = ({
             onSubmit()
           }}
         >
+          You currently have {embeddedSubtitlesTracks.length} subtitles track
+          {embeddedSubtitlesTracks.length === 1 ? '' : 's'} loaded.
+          <br />
+          <br />
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={getOnClickLoadExternal(loadSubtitlesFromFile)}
+          >
+            Load more subtitles
+          </Button>
+          <br />
+          <br />
+          <br />
           <FormControl fullWidth>
             <InputLabel htmlFor="transcription">Transcription</InputLabel>
             <Select
@@ -96,7 +108,7 @@ const SubtitlesClipsDialog = ({
             </Select>
           </FormControl>
           <br />
-
+          <br />
           {currentNoteTypeFields.includes('pronunciation') && (
             <FormControl fullWidth>
               <InputLabel htmlFor="pronunciation">Pronunciation</InputLabel>
@@ -112,7 +124,7 @@ const SubtitlesClipsDialog = ({
             </FormControl>
           )}
           <br />
-
+          <br />
           <FormControl fullWidth>
             <InputLabel htmlFor="meaning">Meaning</InputLabel>
             <Select
@@ -126,7 +138,7 @@ const SubtitlesClipsDialog = ({
             </Select>
           </FormControl>
           <br />
-
+          <br />
           <FormControl fullWidth>
             <InputLabel htmlFor="notes">Notes</InputLabel>
             <Select
@@ -139,8 +151,6 @@ const SubtitlesClipsDialog = ({
               {externalSubtitlesTracks.map(trackMenuItem)}
             </Select>
           </FormControl>
-
-          <br />
         </form>
       </DialogContent>
       <DialogActions>
@@ -161,6 +171,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   makeClipsFromSubtitles: r.makeClipsFromSubtitles,
+  loadSubtitlesFromFile: r.loadSubtitlesFromFileRequest,
 }
 
 export default connect(
