@@ -7,7 +7,6 @@ import { join } from 'path'
 import * as r from '../redux'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
-// import { showSaveDialog } from '../utils/electron'
 import clipAudio from '../utils/clipAudio'
 
 const writeFile = promisify(fs.writeFile)
@@ -20,8 +19,6 @@ const exportCsv = (action$, state$) =>
     ofType('EXPORT_CSV'),
     flatMap(async ({ clipIds, csvFilePath }) => {
       try {
-        // const filename = await showSaveDialog('Comma-separated values', ['csv'])
-        // if (!filename) return { type: 'NOOP_EXPORT_CSV' }
         const currentProjectMetadata = r.getCurrentProject(state$.value)
         if (!currentProjectMetadata)
           return of(r.simpleMessageSnackbar('Could not find project'))

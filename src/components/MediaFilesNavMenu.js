@@ -63,11 +63,6 @@ const MediaFilesNavMenu = ({
                 anchorEl={menuAnchorEl.current}
                 open={menuIsOpen}
                 onClose={closeMenu}
-                // PaperProps={{
-                //   style: {
-                //     maxHeight: '40em',
-                //   },
-                // }}
               >
                 <MenuList style={{ maxHeight: '40em', overflowY: 'auto' }}>
                   {projectMediaMetadata.map(({ name, id }) => (

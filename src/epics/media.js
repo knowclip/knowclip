@@ -76,7 +76,6 @@ const openMedia = (action$, state$) =>
       console.log('ffprobeMetadata', ffprobeMetadata)
       const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
       const currentProjectId = r.getCurrentProjectId(state$.value)
-      // console.log(await getSubtitlesFromMedia(filePath, 2, state$.value))
       const existingMetadata = r.getCurrentMediaMetadata(state$.value)
       if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
         const differenceMessage = getDifferenceMessage(
