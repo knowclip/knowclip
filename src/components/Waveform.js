@@ -1,4 +1,4 @@
-import React, { Component, Fragment, memo } from 'react'
+import React, { Component, Fragment, memo, useRef } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
@@ -95,10 +95,16 @@ const getSubtitlesPath = (
 
 const SUBTITLES_CHUNK_HEIGHT = 24
 
-const SubtitlesChunk = ({ chunk, trackIndex }) => (
-  <g className={css.subtitlesChunk}>
+const SubtitlesChunk = ({ chunk, trackIndex, chunkIndex, trackId }) => (
+  <g
+    className={css.subtitlesChunk}
+    data-chunkIndex={chunkIndex}
+    data-trackId={trackId}
+  >
     <path
       className={css.subtitlesChunkRectangle}
+      data-trackId={trackId}
+      data-chunkIndex={chunkIndex}
       d={getSubtitlesPath(
         chunk.start,
         chunk.end,
@@ -107,6 +113,8 @@ const SubtitlesChunk = ({ chunk, trackIndex }) => (
       )}
     />
     <text
+      data-chunkIndex={chunkIndex}
+      data-trackId={trackId}
       className={css.subtitlesText}
       x={chunk.start + 4}
       y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 4}
@@ -117,22 +125,38 @@ const SubtitlesChunk = ({ chunk, trackIndex }) => (
   </g>
 )
 
-const SubtitlesTimeline = memo(({ subtitles, viewBox }) => (
-  <svg
-    className={css.subtitlesSvg}
-    preserveAspectRatio="xMinYMin slice"
-    viewBox={getSubtitlesViewBoxString(
-      viewBox.xMin,
-      subtitles.length * SUBTITLES_CHUNK_HEIGHT
-    )}
-    width="100%"
-    height={subtitles.length * SUBTITLES_CHUNK_HEIGHT}
-  >
-    {subtitles.map(({ chunks }, i) =>
-      chunks.map(chunk => <SubtitlesChunk chunk={chunk} trackIndex={i} />)
-    )}
-  </svg>
-))
+const SubtitlesTimelines = memo(
+  ({ subtitles, viewBox, goToSubtitlesChunk }) => {
+    const handleClick = useRef(e =>
+      goToSubtitlesChunk(e.target.dataset.trackId, e.target.dataset.chunkIndex)
+    )
+    return (
+      <svg
+        className={css.subtitlesSvg}
+        preserveAspectRatio="xMinYMin slice"
+        viewBox={getSubtitlesViewBoxString(
+          viewBox.xMin,
+          subtitles.length * SUBTITLES_CHUNK_HEIGHT
+        )}
+        width="100%"
+        height={subtitles.length * SUBTITLES_CHUNK_HEIGHT}
+        onClick={handleClick.current}
+      >
+        {subtitles.map(({ chunks, id }, trackIndex) =>
+          chunks.map((chunk, index) => (
+            <SubtitlesChunk
+              key={chunk.id}
+              chunk={chunk}
+              trackIndex={trackIndex}
+              trackId={id}
+              chunkIndex={index}
+            />
+          ))
+        )}
+      </svg>
+    )
+  }
+)
 
 class Waveform extends Component {
   render() {
@@ -144,6 +168,7 @@ class Waveform extends Component {
       highlightedClipId,
       waveform,
       subtitles,
+      goToSubtitlesChunk,
     } = this.props
     const { viewBox, cursor, stepsPerSecond, path } = waveform
     const viewBoxString = getViewBoxString(viewBox.xMin)
@@ -172,7 +197,11 @@ class Waveform extends Component {
           )}
         </svg>
         {Boolean(subtitles.length) && (
-          <SubtitlesTimeline subtitles={subtitles} viewBox={viewBox} />
+          <SubtitlesTimelines
+            subtitles={subtitles}
+            viewBox={viewBox}
+            goToSubtitlesChunk={goToSubtitlesChunk}
+          />
         )}
       </Fragment>
     )
@@ -190,5 +219,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { highlightClip: r.highlightClip }
+  { highlightClip: r.highlightClip, goToSubtitlesChunk: r.goToSubtitlesChunk }
 )(Waveform)

@@ -86,3 +86,12 @@ export const linkFlashcardFieldToSubtitlesTrack = (
   flashcardFieldName,
   subtitlesTrackId,
 })
+
+export const goToSubtitlesChunk = (
+  subtitlesTrackId: SubtitlesTrackId,
+  chunkIndex: number
+): SubtitlesAction => ({
+  type: 'GO_TO_SUBTITLES_CHUNK',
+  subtitlesTrackId,
+  chunkIndex,
+})

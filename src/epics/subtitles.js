@@ -246,10 +246,25 @@ const subtitlesClipsDialogRequest = (action$, state$) =>
     })
   )
 
+const goToSubtitlesChunk = (action$, state$) =>
+  action$.pipe(
+    ofType('GO_TO_SUBTITLES_CHUNK'),
+    map(({ chunkIndex, subtitlesTrackId }) => {
+      const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
+      const { start } = track.chunks[chunkIndex]
+      document.getElementById('audioPlayer').currentTime = r.getSecondsAtX(
+        state$.value,
+        start
+      )
+      return { type: 'moved to', start }
+    })
+  )
+
 export default combineEpics(
   loadEmbeddedSubtitles,
   loadSubtitlesFile,
   loadSubtitlesFailure,
   makeClipsFromSubtitles,
-  subtitlesClipsDialogRequest
+  subtitlesClipsDialogRequest,
+  goToSubtitlesChunk
 )

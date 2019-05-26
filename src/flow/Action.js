@@ -59,7 +59,7 @@ declare type ClipAction =
 
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
-  | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
+  | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: ?WaveformViewBox |}
   | {| type: 'SET_WAVEFORM_VIEW_BOX', viewBox: WaveformViewBox |}
   | {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
   | {| type: 'SET_PENDING_STRETCH', stretch: PendingStretch |}
@@ -163,4 +163,9 @@ declare type SubtitlesAction =
       type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
       flashcardFieldName: FlashcardFieldName,
       subtitlesTrackId: SubtitlesTrackId,
+    |}
+  | {|
+      type: 'GO_TO_SUBTITLES_CHUNK',
+      subtitlesTrackId: SubtitlesTrackId,
+      chunkIndex: number,
     |}
