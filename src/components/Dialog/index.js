@@ -6,6 +6,7 @@ import MediaFolderLocationForm from './MediaFolderLocationFormDialog'
 import ReviewAndExport from '../ReviewAndExport'
 import NewProjectForm from './NewProjectFormDialog'
 import OpenMediaFileFailure from './OpenMediaFileFailureDialog'
+import CsvAndMp3Export from './CsvAndMp3ExportDialog'
 
 const DIALOGS = {
   Confirmation,
@@ -13,6 +14,7 @@ const DIALOGS = {
   ReviewAndExport,
   NewProjectForm,
   OpenMediaFileFailure,
+  CsvAndMp3Export,
 }
 
 const DialogView = ({ currentDialog, closeDialog }) => {

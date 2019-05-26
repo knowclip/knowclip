@@ -5,6 +5,7 @@ export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
 export * from './projects'
+export * from './subtitles'
 
 export const initializeApp = (): Action => ({ type: 'INITIALIZE_APP' })
 
@@ -95,9 +96,13 @@ export const exportMp3 = (exportData: ApkgExportData): Action => ({
   exportData,
 })
 
-export const exportCsv = (clipIds: Array<ClipId>): Action => ({
+export const exportCsv = (
+  clipIds: Array<ClipId>,
+  csvFilePath: string
+): Action => ({
   type: 'EXPORT_CSV',
   clipIds,
+  csvFilePath,
 })
 
 export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({

@@ -53,3 +53,7 @@
 .projectNameInput input {
   font-size: 1.5rem !important;
 }
+
+.subtitlesMenuListItem {
+  padding-right: 3rem !important;
+}

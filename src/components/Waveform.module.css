@@ -1,0 +1,8 @@
+.subtitlesSvg {
+  background-color: #ffffff;
+}
+.subtitlesChunk {
+  stroke: #000000;
+  stroke-width: 1px;
+  fill: rgba(22,100,200,.2);
+}

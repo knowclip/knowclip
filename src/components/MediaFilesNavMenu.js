@@ -63,6 +63,7 @@ const MediaFilesNavMenu = ({
               >
                 {projectMediaMetadata.map(({ name, id }) => (
                   <MenuItem
+                    dense
                     key={id}
                     selected={id === currentFileId}
                     onClick={() => openMediaFileRequest(id)}

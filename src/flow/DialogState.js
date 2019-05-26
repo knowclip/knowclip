@@ -23,7 +23,10 @@ declare type DialogData =
       type: 'OpenMediaFileFailure',
       props: { message: string },
     }
-
+  | {
+      type: 'CsvAndMp3Export',
+      props: { clipIds: Array<ClipId> },
+    }
 declare type DialogState = Exact<{
   queue: Array<DialogData>,
 }>
