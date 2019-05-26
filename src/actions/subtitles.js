@@ -91,3 +91,12 @@ export const makeClipsFromSubtitles = (
 export const subtitlesClipsDialogRequest = (): SubtitlesAction => ({
   type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST',
 })
+
+export const linkFlashcardFieldToSubtitlesTrack = (
+  flashcardFieldName: FlashcardFieldName,
+  subtitlesTrackId: SubtitlesTrackId
+) => ({
+  type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
+  flashcardFieldName,
+  subtitlesTrackId,
+})

@@ -159,3 +159,8 @@ declare type SubtitlesAction =
       tags: Array<string>,
     |}
   | {| type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST' |}
+  | {|
+      type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
+      flashcardFieldName: FlashcardFieldName,
+      subtitlesTrackId: SubtitlesTrackId,
+    |}

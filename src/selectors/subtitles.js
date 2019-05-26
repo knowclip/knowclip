@@ -82,3 +82,8 @@ export const getSubtitlesChunksWithinRange = (
     )
   )
 }
+
+export const getSubtitlesFashcardFieldLinks = (
+  state: AppState
+): { [FlashcardFieldName]: SubtitlesTrackId } =>
+  state.subtitles.flashcardFieldLinks

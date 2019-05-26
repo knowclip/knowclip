@@ -53,7 +53,7 @@ const SubtitlesMenu = ({
 
   return (
     <Fragment>
-      <Tooltip title="subtitles">
+      <Tooltip title="Subtitles">
         <IconButton buttonRef={menuAnchorEl} onClick={openMenu}>
           <SubtitlesIcon />
         </IconButton>
@@ -63,6 +63,11 @@ const SubtitlesMenu = ({
         open={menuIsOpen}
         onClose={closeMenu}
       >
+        {!(embeddedTracks.length + externalTracks.length) && (
+          <MenuItem dense disabled>
+            No subtitles loaded.
+          </MenuItem>
+        )}
         {embeddedTracks.map((track, i) => (
           <MenuItem dense key={track.id}>
             <ListItemText

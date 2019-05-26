@@ -3,6 +3,7 @@
 const initialState: SubtitlesState = {
   loadedTracks: [],
   mediaFileTracksStreamIndexes: [],
+  flashcardFieldLinks: {},
 }
 
 const editEmbeddedTrack = (
@@ -36,10 +37,9 @@ const subtitles: Reducer<SubtitlesState> = (
         loadedTracks: [],
       }
     case 'OPEN_MEDIA_FILE_REQUEST':
-      return {
-        mediaFileTracksStreamIndexes: [],
-        loadedTracks: [],
-      }
+    case 'OPEN_PROJECT':
+    case 'CLOSE_PROJECT':
+      return initialState
     case 'LOAD_SUBTITLES_SUCCESS':
       return {
         ...state,

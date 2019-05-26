@@ -150,9 +150,7 @@ class Main extends Component {
             </section>
             <ul className={headerCss.rightMenu}>
               <li className={headerCss.menuItem}>
-                <Tooltip title="Subtitles">
-                  <SubtitlesMenu />
-                </Tooltip>
+                <SubtitlesMenu />
               </li>
               <li className={headerCss.menuItem}>
                 <Tooltip title="Detect silences">

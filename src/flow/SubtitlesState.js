@@ -3,6 +3,7 @@
 declare type SubtitlesState = Exact<{
   loadedTracks: Array<SubtitlesTrack>,
   mediaFileTracksStreamIndexes: Array<number>,
+  flashcardFieldLinks: { [FlashcardFieldName]: SubtitlesTrackId },
 }>
 
 declare type SubtitlesTrack = EmbeddedSubtitlesTrack | ExternalSubtitlesTrack
