@@ -120,6 +120,13 @@ export const getApkgExportData = (
       SAFE_SEPARATOR,
       SAFE_MILLISECONDS_SEPARATOR
     )}___afcaId${id}${'.mp3'}`
+
+    const fieldValues = []
+    for (const fieldName in clip.flashcard.fields) {
+      const value = roughEscape(clip.flashcard.fields[fieldName]) || ''
+      fieldValues.push(value)
+    }
+
     return {
       sourceFilePath: filePath,
       startTime,
@@ -127,11 +134,7 @@ export const getApkgExportData = (
       outputFilename,
       flashcardSpecs: {
         sortField: 'transcription',
-        fields: [
-          clip.id,
-          ...fieldNames.map(f => roughEscape(clip.flashcard.fields[f]) || ''),
-          `[sound:${outputFilename}]`,
-        ],
+        fields: [clip.id, ...fieldValues, `[sound:${outputFilename}]`],
         tags: clip.flashcard.tags || [],
         due: i,
       },

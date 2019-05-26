@@ -1,4 +1,6 @@
 // @flow
+import { getNoteTypeFields, getBlankFlashcard } from '../utils/noteType'
+
 const initialState: ClipsState = {
   byId: {},
   idsByMediaFileId: {},
@@ -156,10 +158,31 @@ const clips: Reducer<ClipsState> = (state = initialState, action) => {
       const sortedClipsToMerge = ids
         .sort(byStart(state.byId))
         .map(id => state.byId[id])
+
+      const flashcard = getBlankFlashcard(
+        finalId,
+        state.byId[finalId].flashcard.type,
+        [
+          ...sortedClipsToMerge.reduce((all, { flashcard: { tags } }) => {
+            tags.forEach(tag => all.add(tag))
+            return all
+          }, new Set()),
+        ]
+      )
+
+      for (const fieldName in flashcard.fields) {
+        const value = sortedClipsToMerge
+          .map(({ flashcard: { fields } }) => fields[fieldName])
+          .filter(x => x.trim())
+          .join('\n')
+        flashcard.fields[fieldName] = value
+      }
+
       newClips[finalId] = {
         ...state.byId[finalId],
         start: sortedClipsToMerge[0].start,
         end: sortedClipsToMerge[sortedClipsToMerge.length - 1].end,
+        flashcard,
       }
       return {
         ...state,
