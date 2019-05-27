@@ -14,9 +14,16 @@ import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
 import ChipInput from 'material-ui-chip-input'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
-import css from './FlashcardForm.module.css'
+import css from './FlashcardSection.module.css'
 import Autosuggest from 'react-autosuggest'
 import { getNoteTypeFields } from '../utils/noteType'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Subtitles,
+  Hearing,
+  Layers,
+} from '@material-ui/icons'
 
 const capitalize = string =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
@@ -30,13 +37,14 @@ let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
         value={currentFlashcard.fields[id] || ''}
         fullWidth
         multiline
+        margin="dense"
         label={name}
       />
     </section>
   )
 }
 
-class FlashcardForm extends Component {
+class FlashcardSection extends Component {
   state = {
     moreMenuAnchorEl: null,
     textFieldInput: '', // ???? necessary?
@@ -110,6 +118,7 @@ class FlashcardForm extends Component {
 
   renderChipsInput = ({ value, onChange, chips, ref, ...other }) => (
     <ChipInput
+      margin="dense"
       label="Tags"
       placeholder="Type your tag and press 'enter'"
       className={css.tagsField}
@@ -118,7 +127,6 @@ class FlashcardForm extends Component {
       onDelete={(chip, index) => this.handleDeleteChip(chip, index)}
       dataSource={this.props.allTags}
       newChipKeyCodes={[13, 9, 32]}
-      openOnFocus
       onUpdateInput={onChange}
       value={chips}
       clearInputValueOnChange
@@ -181,67 +189,113 @@ class FlashcardForm extends Component {
       currentNoteType,
       toggleLoop,
       isLoopOn,
+      showing,
+      clipsHaveBeenMade,
+      prevId,
+      nextId,
+      highlightClip,
     } = this.props
     const { moreMenuAnchorEl, suggestions } = this.state
 
     return (
-      <Card className={css.container}>
-        <CardContent>
-          <form className="form" onSubmit={this.handleFlashcardSubmit}>
-            <div className="formBody">
-              <section className={css.timeStamp}>
-                {formatTime(selectedClipTime.start)}
-                {' - '}
-                {formatTime(selectedClipTime.end)}
-                <Tooltip title="Loop audio (Ctrl + L)">
-                  <IconButton
-                    onClick={toggleLoop}
-                    color={isLoopOn ? 'secondary' : 'default'}
-                  >
-                    <Loop />
-                  </IconButton>
-                </Tooltip>
-              </section>
-              {getNoteTypeFields(currentNoteType).map(id => (
-                <Field
-                  key={`${id}_${currentFlashcard.id}`}
-                  id={id}
-                  currentFlashcard={currentFlashcard}
-                  name={capitalize(id)}
-                  setFlashcardText={this.setFlashcardText}
-                />
-              ))}
+      <section className={css.container}>
+        <Tooltip title="Previous clip (Ctrl + comma)">
+          <IconButton
+            className={css.navButton}
+            disabled={!prevId}
+            onClick={() => highlightClip(prevId)}
+          >
+            <ChevronLeft />
+          </IconButton>
+        </Tooltip>
 
-              <Autosuggest
-                theme={{
-                  suggestionsList: css.suggestionsList,
-                  suggestionsContainer: css.suggestionsContainer,
-                }}
-                suggestions={suggestions}
-                onSuggestionHighlighted={this.onSuggestionHighlighted}
-                onSuggestionSelected={this.onSuggestionSelected}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                renderSuggestionsContainer={this.renderSuggestionsContainer}
-                getSuggestionValue={this.getSuggestionValue}
-                renderSuggestion={this.renderSuggestion}
-                focusInputOnSuggestionClick={false}
-                shouldRenderSuggestions={value =>
-                  value && value.trim().length > 0
-                }
-                inputProps={{
-                  chips: currentFlashcard.tags || [],
-                  value: this.state.textFieldInput,
-                  onChange: this.handletextFieldInputChange,
-                  onAdd: this.handleAddChip,
-                  onDelete: this.handleDeleteChip,
-                }}
-                renderInputComponent={this.renderChipsInput}
-                ref={this.autosuggestRef}
-              />
+        <Card className={css.form}>
+          {!showing ? (
+            <CardContent className={css.intro}>
+              <p className={css.introText}>
+                You can create clips in a few different ways:
+              </p>
+              <ul className={css.introList}>
+                <li>
+                  Manually <strong>click and drag</strong> on the waveform
+                </li>
 
-              <section className={css.bottom}>
-                {/* <span className={css.noteTypeName}>
+                <li>
+                  Use <Hearing /> <strong>silence detection</strong> to
+                  automatically make clips from audio containing little
+                  background noise.
+                </li>
+                <li>
+                  Use <Subtitles /> <strong>subtitles</strong> to automatically
+                  create both clips and flashcards.
+                </li>
+              </ul>
+              <p className={css.introText}>
+                When you're done, press the <Layers />{' '}
+                <strong>export button</strong>.
+              </p>
+            </CardContent>
+          ) : (
+            <CardContent>
+              <form className="form" onSubmit={this.handleFlashcardSubmit}>
+                <div className="formBody">
+                  <section className={css.timeStamp}>
+                    {formatTime(selectedClipTime.start)}
+                    {' - '}
+                    {formatTime(selectedClipTime.end)}
+                    <Tooltip title="Loop audio (Ctrl + L)">
+                      <IconButton
+                        onClick={toggleLoop}
+                        color={isLoopOn ? 'secondary' : 'default'}
+                      >
+                        <Loop />
+                      </IconButton>
+                    </Tooltip>
+                  </section>
+                  {getNoteTypeFields(currentNoteType).map(id => (
+                    <Field
+                      key={`${id}_${currentFlashcard.id}`}
+                      id={id}
+                      currentFlashcard={currentFlashcard}
+                      name={capitalize(id)}
+                      setFlashcardText={this.setFlashcardText}
+                    />
+                  ))}
+
+                  <Autosuggest
+                    theme={{
+                      suggestionsList: css.suggestionsList,
+                      suggestionsContainer: css.suggestionsContainer,
+                    }}
+                    suggestions={suggestions}
+                    onSuggestionHighlighted={this.onSuggestionHighlighted}
+                    onSuggestionSelected={this.onSuggestionSelected}
+                    onSuggestionsFetchRequested={
+                      this.onSuggestionsFetchRequested
+                    }
+                    onSuggestionsClearRequested={
+                      this.onSuggestionsClearRequested
+                    }
+                    renderSuggestionsContainer={this.renderSuggestionsContainer}
+                    getSuggestionValue={this.getSuggestionValue}
+                    renderSuggestion={this.renderSuggestion}
+                    focusInputOnSuggestionClick={false}
+                    shouldRenderSuggestions={value =>
+                      value && value.trim().length > 0
+                    }
+                    inputProps={{
+                      chips: currentFlashcard.tags || [],
+                      value: this.state.textFieldInput,
+                      onChange: this.handletextFieldInputChange,
+                      onAdd: this.handleAddChip,
+                      onDelete: this.handleDeleteChip,
+                    }}
+                    renderInputComponent={this.renderChipsInput}
+                    ref={this.autosuggestRef}
+                  />
+
+                  <section className={css.bottom}>
+                    {/* <span className={css.noteTypeName}>
                   Using card template:{' '}
                   <Tooltip title="Edit card template">
                     <span
@@ -253,33 +307,45 @@ class FlashcardForm extends Component {
                     </span>
                   </Tooltip>
                 </span> */}
-                <IconButton
-                  className={css.moreMenuButton}
-                  onClick={this.handleClickDeleteButton}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={moreMenuAnchorEl}
-                  open={Boolean(moreMenuAnchorEl)}
-                  onClose={this.handleCloseMoreMenu}
-                >
-                  {/* <MenuItem onClick={this.editCardTemplate}>
+                    <IconButton
+                      className={css.moreMenuButton}
+                      onClick={this.handleClickDeleteButton}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                    <Menu
+                      anchorEl={moreMenuAnchorEl}
+                      open={Boolean(moreMenuAnchorEl)}
+                      onClose={this.handleCloseMoreMenu}
+                    >
+                      {/* <MenuItem onClick={this.editCardTemplate}>
                     Edit card template
                   </MenuItem> */}
-                  <MenuItem onClick={this.deleteCard}>Delete card</MenuItem>
-                </Menu>
-              </section>
-              {/* <IconButton
+                      <MenuItem onClick={this.deleteCard}>Delete card</MenuItem>
+                    </Menu>
+                  </section>
+                  {/* <IconButton
                 className={css.deleteButton}
                 onClick={this.deleteCard}
               >
                 <DeleteIcon />
               </IconButton> */}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                </div>
+              </form>
+            </CardContent>
+          )}
+        </Card>
+
+        <Tooltip title="Next clip (Ctrl + period)">
+          <IconButton
+            className={css.navButton}
+            disabled={!nextId}
+            onClick={() => highlightClip(nextId)}
+          >
+            <ChevronRight />
+          </IconButton>
+        </Tooltip>
+      </section>
     )
   }
 }
@@ -293,6 +359,8 @@ const mapStateToProps = state => ({
   currentNoteType: r.getCurrentNoteType(state),
   isLoopOn: r.isLoopOn(state),
   allTags: r.getAllTags(state),
+  prevId: r.getFlashcardIdBeforeCurrent(state),
+  nextId: r.getFlashcardIdAfterCurrent(state),
 })
 
 const mapDispatchToProps = {
@@ -304,9 +372,10 @@ const mapDispatchToProps = {
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
   toggleLoop: r.toggleLoop,
+  highlightClip: r.highlightClip,
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(FlashcardForm)
+)(FlashcardSection)

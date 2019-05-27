@@ -145,6 +145,18 @@ export const getNextClipId = (state: AppState, id: ClipId): ?ClipId => {
   return clipsOrder[clipsOrder.indexOf(id) + 1]
 }
 
+export const getFlashcardIdBeforeCurrent = (state: AppState): ?FlashcardId => {
+  const flashcardId = getSelectedClipId(state)
+  if (!flashcardId) return null
+  return getPreviousClipId(state, flashcardId)
+}
+
+export const getFlashcardIdAfterCurrent = (state: AppState): ?FlashcardId => {
+  const flashcardId = getSelectedClipId(state)
+  if (!flashcardId) return null
+  return getNextClipId(state, flashcardId)
+}
+
 export const getClipEdgeAt = (state: AppState, x: WaveformX) => {
   const clipIdAtX = getClipIdAt(state, x)
   if (!clipIdAtX) return null

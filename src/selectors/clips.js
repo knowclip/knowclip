@@ -18,8 +18,5 @@ export const getClipIdsByMediaFileId = (
   mediaFileId: string
 ): Array<ClipId> => state.clips.idsByMediaFileId[mediaFileId]
 
-export const haveClipsBeenMade = (state: AppState): boolean =>
-  Object.keys(state.clips.byId).length > 0
-
 export const getDefaultTags = (state: AppState): Array<string> =>
   state.user.defaultTags

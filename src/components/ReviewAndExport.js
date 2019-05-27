@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import {
   Dialog,
@@ -13,10 +13,6 @@ import {
   Paper,
   Tabs,
   Tab,
-  Popover,
-  FormControlLabel,
-  FormControl,
-  FormGroup,
   Checkbox,
   Chip,
   IconButton,
@@ -237,7 +233,7 @@ const Export = ({
       openMediaFileRequest(mediaMetadata.id)
     setExpandedTableIndex(index)
   }
-
+  // PaperProps={{ style: { minWidth: '600px', minHeight: '300px' } }}
   return (
     <Dialog open={open} onClose={closeDialog} fullScreen={selectionHasStarted}>
       <Tabs value={currentTabIndex} className={css.tabs}>
@@ -247,7 +243,7 @@ const Export = ({
       </Tabs>
       <DialogContent>
         {currentTabIndex === 0 && (
-          <section>
+          <section className={css.introText}>
             <p>
               Export an Anki .apkg file. This format is best for{' '}
               <strong>starting a new deck.</strong>
@@ -260,7 +256,7 @@ const Export = ({
           </section>
         )}
         {currentTabIndex === 1 && (
-          <section>
+          <section className={css.introText}>
             <p>Export a Comma-Separated-Values file along with MP3s.</p>
             <p>
               This format is best for updating some flashcards you've previously
@@ -270,7 +266,7 @@ const Export = ({
         )}
 
         {currentTabIndex === 2 && (
-          <section>
+          <section className={css.introText}>
             <p>Export a Markdown file.</p>
             <p>This lets you review all your notes in a handy text format.</p>
           </section>

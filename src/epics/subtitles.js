@@ -251,6 +251,10 @@ const goToSubtitlesChunk = (action$, state$) =>
     ofType('GO_TO_SUBTITLES_CHUNK'),
     map(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
+      if (!track) {
+        console.error('Track not found')
+        return { type: 'Subtitles track not found' }
+      }
       const { start } = track.chunks[chunkIndex]
       document.getElementById('audioPlayer').currentTime = r.getSecondsAtX(
         state$.value,

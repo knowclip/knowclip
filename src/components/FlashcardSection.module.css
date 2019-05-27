@@ -1,7 +1,35 @@
 .container {
-  min-height: 15rem;
+  display: flex;
+  flex-flow: row nowrap;
+  padding: .5rem !important;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+}
+
+.intro {
+  padding: 2rem !important;
+}
+
+.introText {
+  text-align: center;
+}
+.introText:first-child {
+  /* padding-top: 15%; */
+}
+
+.introText,.introList {
+  line-height: 1.5;
+}
+
+.navButton {
+  margin: 10rem .5rem .5rem .5rem !important;
+}
+
+.form {
+  min-height: 20rem;
   width: 30rem;
-  margin: 1rem auto;
+  margin: .5rem !important;
   position: relative;
   padding-bottom: 3rem;
 }

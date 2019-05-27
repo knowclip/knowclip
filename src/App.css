@@ -32,11 +32,6 @@ video::-webkit-media-controls-panel {
   right: 5%;
 }
 
-.introText {
-  text-align: center;
-  padding: 10%;
-}
-
 .App-title {
   font-size: 1.5em;
 }

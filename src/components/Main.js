@@ -11,16 +11,17 @@ import {
 import {
   Hearing as HearingIcon,
   Delete as DeleteIcon,
+  ChevronLeft,
+  ChevronRight,
   Layers,
 } from '@material-ui/icons'
 import { Redirect } from 'react-router-dom'
 import Waveform from '../components/Waveform'
-import FlashcardForm from '../components/FlashcardForm'
+import FlashcardSection from '../components/FlashcardSection'
 import MediaFilesNavMenu from '../components/MediaFilesNavMenu'
 import ProjectMenu from '../components/ProjectMenu'
 import DarkTheme from '../components/DarkTheme'
 import headerCss from '../components/Header.module.css'
-import flashcardFormCss from '../components/FlashcardForm.module.css'
 import * as r from '../redux'
 import SubtitlesMenu from '../components/SubtitlesMenu.js'
 
@@ -110,29 +111,10 @@ class Main extends Component {
       audioIsLoading,
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
-      clipsHaveBeenMade,
       constantBitrateFilePath,
       currentMediaMetadata,
       subtitles,
     } = this.props
-
-    const form = Boolean(currentFlashcard) ? (
-      <FlashcardForm />
-    ) : (
-      <Card className={flashcardFormCss.container}>
-        <CardContent>
-          {clipsHaveBeenMade ? (
-            <p className="introText">No clip selected</p>
-          ) : (
-            <p className="introText">
-              <strong>Click and drag</strong> on the waveform to select clips
-              from your media file to turn into flashcards.
-            </p>
-          )}
-          You can add and remove fields in the flashcard template form.
-        </CardContent>
-      </Card>
-    )
 
     return (
       <div className="App">
@@ -180,7 +162,7 @@ class Main extends Component {
             <CircularProgress />
           </div>
         )}
-        {form}
+        <FlashcardSection showing={Boolean(currentFlashcard)} />
         {currentFilePath && (
           <Tooltip title="Review and export flashcards">
             <Fab
@@ -203,7 +185,6 @@ const mapStateToProps = state => ({
   currentFlashcard: r.getCurrentFlashcard(state),
   loop: r.isLoopOn(state),
   audioIsLoading: r.isAudioLoading(state),
-  clipsHaveBeenMade: r.haveClipsBeenMade(state),
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getCurrentMediaFileConstantBitratePath(state),
   currentMediaMetadata: r.getCurrentMediaMetadata(state),

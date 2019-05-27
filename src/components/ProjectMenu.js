@@ -51,12 +51,16 @@ class ProjectMenu extends Component {
     return (
       <DarkTheme>
         <section className={cn(className, css.projectMenu)}>
-          <IconButton onClick={closeProjectRequest}>
-            <CloseIcon />
-          </IconButton>
-          <IconButton onClick={saveProjectRequest}>
-            <SaveIcon />
-          </IconButton>{' '}
+          <Tooltip title="Close project">
+            <IconButton onClick={closeProjectRequest}>
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Save project">
+            <IconButton onClick={saveProjectRequest}>
+              <SaveIcon />
+            </IconButton>
+          </Tooltip>{' '}
           {editing ? (
             <form onSubmit={this.handleSubmit} style={{ width: '100%' }}>
               <TextField
