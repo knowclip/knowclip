@@ -35,7 +35,7 @@ const getDefaultFields = (currentNoteTypeFieldNames, firstSubtitlesTrackId) => {
 
 const trackMenuItem = (track, index) => (
   <MenuItem key={track.id} value={track.id}>
-    {track.type === 'EmbeddedSubtitlesTrack' ? 'Embedded ' : 'External '}track
+    {track.type === 'EmbeddedSubtitlesTrack' ? 'Embedded ' : 'External '}track{' '}
     {index + 1}
   </MenuItem>
 )
@@ -95,8 +95,7 @@ const SubtitlesClipsDialog = ({
           </Button>
           <br />
           <br />
-          <br />
-          <FormControl fullWidth>
+          <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="transcription">Transcription</InputLabel>
             <Select
               inputProps={{ id: 'transcription', name: 'transcription' }}
@@ -107,10 +106,8 @@ const SubtitlesClipsDialog = ({
               {externalSubtitlesTracks.map(trackMenuItem)}
             </Select>
           </FormControl>
-          <br />
-          <br />
           {currentNoteTypeFields.includes('pronunciation') && (
-            <FormControl fullWidth>
+            <FormControl fullWidth margin="normal">
               <InputLabel htmlFor="pronunciation">Pronunciation</InputLabel>
               <Select
                 inputProps={{ id: 'pronunciation', name: 'pronunciation' }}
@@ -123,9 +120,7 @@ const SubtitlesClipsDialog = ({
               </Select>
             </FormControl>
           )}
-          <br />
-          <br />
-          <FormControl fullWidth>
+          <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="meaning">Meaning</InputLabel>
             <Select
               inputProps={{ id: 'meaning', name: 'meaning' }}
@@ -137,9 +132,7 @@ const SubtitlesClipsDialog = ({
               {externalSubtitlesTracks.map(trackMenuItem)}
             </Select>
           </FormControl>
-          <br />
-          <br />
-          <FormControl fullWidth>
+          <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="notes">Notes</InputLabel>
             <Select
               inputProps={{ id: 'notes', name: 'notes' }}
