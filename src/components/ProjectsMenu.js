@@ -14,22 +14,17 @@ import {
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
 import css from './ProjectsMenu.module.css'
-import { remote } from 'electron'
+import { showOpenDialog } from '../utils/electron'
 
-const { dialog } = remote
+const getOpenProjectByFilePath = openProjectByFilePath => async () => {
+  const filePaths = await showOpenDialog[
+    { name: 'AFCA project file', extensions: ['afca'] }
+  ]
 
-const getOpenProjectByFilePath = openProjectByFilePath => () =>
-  dialog.showOpenDialog(
-    {
-      properties: ['openFile'],
-      filters: [{ name: 'AFCA project file', extensions: ['afca'] }],
-    },
-    filePaths => {
-      if (filePaths) {
-        openProjectByFilePath(filePaths[0])
-      }
-    }
-  )
+  if (filePaths) {
+    openProjectByFilePath(filePaths[0])
+  }
+}
 
 const ProjectMenuItem = ({
   projectMetadata,

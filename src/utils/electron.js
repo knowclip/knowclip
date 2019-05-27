@@ -1,15 +1,21 @@
 import electron from 'electron'
 
 const {
-  remote: { dialog },
+  remote: { dialog, getCurrentWindow },
 } = electron
+
+const win = getCurrentWindow()
 
 export const showSaveDialog = (name, extensions) =>
   new Promise((res, rej) => {
     try {
-      dialog.showSaveDialog({ filters: [{ name, extensions }] }, filename => {
-        res(filename)
-      })
+      dialog.showSaveDialog(
+        win,
+        { filters: [{ name, extensions }] },
+        filename => {
+          res(filename)
+        }
+      )
     } catch (err) {
       rej(err)
     }
@@ -22,6 +28,7 @@ export const showOpenDialog = (
   new Promise((res, rej) => {
     try {
       dialog.showOpenDialog(
+        win,
         {
           properties: ['openFile'].concat(
             multiSelections ? 'multiSelections' : []
@@ -41,6 +48,7 @@ export const showOpenDirectoryDialog = (
   new Promise((res, rej) => {
     try {
       dialog.showOpenDialog(
+        win,
         {
           properties: ['openDirectory'].concat(
             showHiddenFiles ? 'showHiddenFiles' : []

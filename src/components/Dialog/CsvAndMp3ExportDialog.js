@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core'
 import * as r from '../../redux'
 import { showOpenDirectoryDialog, showSaveDialog } from '../../utils/electron'
-import { remote, shell } from 'electron'
+import { shell } from 'electron'
 
 const openInBrowser = e => {
   e.preventDefault()

@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { TextField, Button } from '@material-ui/core'
-import { remote, shell } from 'electron'
+import { shell } from 'electron'
 import * as r from '../redux'
 import * as css from './MediaFolderLocationForm.module.css'
+import { showOpenDirectoryDialog } from '../utils/electron'
 
 const openInBrowser = e => {
   e.preventDefault()
@@ -19,16 +20,13 @@ class MediaFolderLocationForm extends Component {
     }
   }
 
-  onLocationTextFocus = e => {
-    remote.dialog.showOpenDialog(
-      { properties: ['openDirectory', 'showHiddenFiles'] },
-      filePaths => {
-        if (!filePaths) return
+  onLocationTextFocus = async e => {
+    const filePaths = await showOpenDirectoryDialog()
 
-        const [directory] = filePaths
-        this.setLocationText(directory)
-      }
-    )
+    if (!filePaths) return
+
+    const [directory] = filePaths
+    this.setLocationText(directory)
   }
 
   handleSubmit = e => {
