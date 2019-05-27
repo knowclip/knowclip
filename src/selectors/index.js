@@ -145,13 +145,13 @@ export const getNextClipId = (state: AppState, id: ClipId): ?ClipId => {
   return clipsOrder[clipsOrder.indexOf(id) + 1]
 }
 
-export const getFlashcardIdBeforeCurrent = (state: AppState): ?FlashcardId => {
+export const getFlashcardIdBeforeCurrent = (state: AppState): ?ClipId => {
   const flashcardId = getSelectedClipId(state)
   if (!flashcardId) return null
   return getPreviousClipId(state, flashcardId)
 }
 
-export const getFlashcardIdAfterCurrent = (state: AppState): ?FlashcardId => {
+export const getFlashcardIdAfterCurrent = (state: AppState): ?ClipId => {
   const flashcardId = getSelectedClipId(state)
   if (!flashcardId) return null
   return getNextClipId(state, flashcardId)
