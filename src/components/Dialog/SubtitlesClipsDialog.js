@@ -82,8 +82,8 @@ const SubtitlesClipsDialog = ({
             onSubmit()
           }}
         >
-          You currently have {embeddedSubtitlesTracks.length} subtitles track
-          {embeddedSubtitlesTracks.length === 1 ? '' : 's'} loaded.
+          You currently have {subtitlesTracks.length} subtitles track
+          {subtitlesTracks.length === 1 ? '' : 's'} loaded.
           <br />
           <br />
           <Button
