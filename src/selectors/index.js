@@ -14,6 +14,7 @@ export * from './audio'
 export * from './snackbar'
 export * from './dialog'
 export * from './project'
+export * from './subtitles'
 
 export const getClip = (state: AppState, id: ClipId): ?Clip =>
   state.clips.byId[id]

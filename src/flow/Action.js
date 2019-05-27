@@ -8,6 +8,7 @@ declare type Action =
   | ClipAction
   | ProjectAction
   | MediaAction
+  | SubtitlesAction
   | {|
       type: 'CHOOSE_AUDIO_FILES',
       filePaths: Array<MediaFilePath>,
@@ -58,7 +59,7 @@ declare type ClipAction =
 
 declare type WaveformAction =
   | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
-  | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: Object |}
+  | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: ?WaveformViewBox |}
   | {| type: 'SET_WAVEFORM_VIEW_BOX', viewBox: WaveformViewBox |}
   | {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
   | {| type: 'SET_PENDING_STRETCH', stretch: PendingStretch |}
@@ -96,7 +97,8 @@ declare type ProjectAction =
   | {| type: 'EXPORT_APKG_FAILURE', errorMessage: ?string |}
   | {| type: 'EXPORT_APKG_SUCCESS', successMessage: string |}
   | {| type: 'EXPORT_MARKDOWN', clipIds: Array<ClipId> |}
-  | {| type: 'EXPORT_CSV', clipIds: Array<ClipId> |}
+  | {| type: 'EXPORT_CSV', clipIds: Array<ClipId>, csvFilePath: string |}
+
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
   | {|
@@ -105,6 +107,7 @@ declare type MediaAction =
       constantBitrateFilePath: MediaFilePath,
       metadata: MediaFileMetadata,
       projectId: ProjectId,
+      subtitlesTracksStreamIndexes: Array<number>,
     |}
   | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
   | {|
@@ -140,3 +143,29 @@ declare type MediaAction =
       filePath: MediaFilePath,
     |}
   | {| type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: boolean |}
+
+declare type SubtitlesAction =
+  | {| type: 'LOAD_SUBTITLES_FROM_VIDEO_REQUEST', streamIndex: number |}
+  | {| type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST', filePath: SubtitlesFilePath |}
+  | {| type: 'LOAD_SUBTITLES_SUCCESS', subtitlesTracks: Array<SubtitlesTrack> |}
+  | {| type: 'LOAD_SUBTITLES_FAILURE', error: string |}
+  | {| type: 'DELETE_SUBTITLES_TRACK', id: SubtitlesTrackId |}
+  | {| type: 'SHOW_SUBTITLES', id: SubtitlesTrackId |}
+  | {| type: 'HIDE_SUBTITLES', id: SubtitlesTrackId |}
+  | {|
+      type: 'MAKE_CLIPS_FROM_SUBTITLES',
+      fileId: MediaFileId,
+      fieldNamesToTrackIds: { [FlashcardFieldName]: SubtitlesTrackId },
+      tags: Array<string>,
+    |}
+  | {| type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST' |}
+  | {|
+      type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
+      flashcardFieldName: FlashcardFieldName,
+      subtitlesTrackId: SubtitlesTrackId,
+    |}
+  | {|
+      type: 'GO_TO_SUBTITLES_CHUNK',
+      subtitlesTrackId: SubtitlesTrackId,
+      chunkIndex: number,
+    |}

@@ -8,4 +8,5 @@ declare type AppState = Exact<{
   snackbar: SnackbarState,
   dialog: DialogState,
   projects: ProjectsState,
+  subtitles: SubtitlesState,
 }>

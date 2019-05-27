@@ -7,6 +7,12 @@ import fs from 'fs'
 import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
+import { getSubtitlesFromMedia } from './subtitles'
+
+const getSubtitlesStreamIndexes = ffprobeMetadata =>
+  ffprobeMetadata.streams
+    .filter(stream => stream.codec_type === 'subtitle')
+    .map(stream => stream.index)
 
 const coerceMp3ToConstantBitrate = (path, oldConstantBitratePath) => {
   // should check if mp3
@@ -66,10 +72,10 @@ const openMedia = (action$, state$) =>
       }
 
       const ffprobeMetadata = await getMediaMetadata(filePath)
+      const subtitlesStreamIndexes = getSubtitlesStreamIndexes(ffprobeMetadata)
       console.log('ffprobeMetadata', ffprobeMetadata)
       const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
       const currentProjectId = r.getCurrentProjectId(state$.value)
-
       const existingMetadata = r.getCurrentMediaMetadata(state$.value)
       if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
         const differenceMessage = getDifferenceMessage(
@@ -83,7 +89,8 @@ const openMedia = (action$, state$) =>
               filePath,
               filePath,
               newMetadata,
-              currentProjectId
+              currentProjectId,
+              subtitlesStreamIndexes
             ),
           ])
       }
@@ -111,7 +118,8 @@ const openMedia = (action$, state$) =>
           filePath,
           filePath,
           newMetadata,
-          currentProjectId
+          currentProjectId,
+          subtitlesStreamIndexes
         )
       )
     }),
@@ -136,7 +144,8 @@ const openMp3 = (action$, state$) =>
           filePath,
           constantBitrateFilePath,
           metadata,
-          r.getCurrentProjectId(state$.value)
+          r.getCurrentProjectId(state$.value),
+          getSubtitlesStreamIndexes(ffprobeMetadata)
         )
       } catch (err) {
         return r.openMediaFileFailure(

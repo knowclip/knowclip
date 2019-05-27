@@ -34,3 +34,21 @@ export const showOpenDialog = (
       rej(err)
     }
   })
+
+export const showOpenDirectoryDialog = (
+  showHiddenFiles = true
+): Promise<?Array<string>> =>
+  new Promise((res, rej) => {
+    try {
+      dialog.showOpenDialog(
+        {
+          properties: ['openDirectory'].concat(
+            showHiddenFiles ? 'showHiddenFiles' : []
+          ),
+        },
+        directoryPaths => res(directoryPaths ? directoryPaths[0] : null)
+      )
+    } catch (err) {
+      rej(err)
+    }
+  })

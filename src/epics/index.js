@@ -18,6 +18,7 @@ import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
+import subtitles from './subtitles'
 
 const defaultTagsEpic = (action$, state$) =>
   action$.pipe(
@@ -95,5 +96,6 @@ export default combineEpics(
   defaultTagsEpic,
   keyboard,
   highlightClip,
-  closeEpic
+  closeEpic,
+  subtitles
 )

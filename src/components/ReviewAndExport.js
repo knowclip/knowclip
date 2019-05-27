@@ -199,7 +199,7 @@ const Export = ({
   flashcards,
   currentFileIndex,
   highlightClip,
-  exportCsv,
+  csvAndMp3ExportDialog,
   exportApkgRequest,
   exportMarkdown,
   noteType,
@@ -295,7 +295,7 @@ const Export = ({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => exportCsv(selectedIds)}
+              onClick={() => csvAndMp3ExportDialog(selectedIds)}
             >
               Export CSV and MP3 from selected clips
             </Button>
@@ -342,7 +342,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   exportApkgRequest: r.exportApkgRequest,
-  exportCsv: r.exportCsv,
+  csvAndMp3ExportDialog: r.csvAndMp3ExportDialog,
   exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,

@@ -21,10 +21,34 @@ import ProjectMenu from '../components/ProjectMenu'
 import DarkTheme from '../components/DarkTheme'
 import headerCss from '../components/Header.module.css'
 import flashcardFormCss from '../components/FlashcardForm.module.css'
-import truncate from '../utils/truncate'
 import * as r from '../redux'
+import SubtitlesMenu from '../components/SubtitlesMenu.js'
 
-const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
+const Subtitles = ({ track }) =>
+  track.type === 'EmbeddedSubtitlesTrack' ? (
+    <track
+      kind="subtitles"
+      src={`file://${track.tmpFilePath}`}
+      mode={track.mode}
+      default={track.mode === 'showing'}
+    />
+  ) : (
+    <track
+      kind="subtitles"
+      src={`file://${track.vttFilePath}`}
+      mode={track.mode}
+      default={track.mode === 'showing'}
+    />
+  )
+
+const Media = ({
+  filePath,
+  loop,
+  audioRef,
+  handleAudioEnded,
+  metadata,
+  subtitles,
+}) => {
   const props = {
     onEnded: handleAudioEnded,
     loop: loop,
@@ -32,8 +56,7 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
     controls: true,
     id: 'audioPlayer',
     className: 'audioPlayer',
-    controlsList: 'nodownload',
-    // autoPlay: true,
+    controlsList: 'nodownload nofullscreen',
     src: filePath ? `file://${filePath}` : null,
     playbackspeed: 1.5,
   }
@@ -47,9 +70,16 @@ const Media = ({ filePath, loop, audioRef, handleAudioEnded, metadata }) => {
     },
     [props.src]
   )
+
   return metadata && metadata.isVideo ? (
     <div className="videoContainer">
-      <video {...props} />
+      <video {...props}>
+        {subtitles.map(track =>
+          track.mode === 'showing' ? (
+            <Subtitles track={track} key={track.id} />
+          ) : null
+        )}
+      </video>
     </div>
   ) : (
     <audio {...props} />
@@ -69,11 +99,6 @@ class Main extends Component {
   }
   toggleLoop = () => this.props.toggleLoop()
 
-  openMediaFolderLocationFormDialog = e => {
-    e.preventDefault()
-    this.props.mediaFolderLocationFormDialog()
-  }
-
   render() {
     if (!this.props.currentProjectId) return <Redirect to="/projects" />
 
@@ -83,12 +108,12 @@ class Main extends Component {
       currentFileName,
       currentFilePath,
       audioIsLoading,
-      mediaFolderLocation,
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
       clipsHaveBeenMade,
       constantBitrateFilePath,
       currentMediaMetadata,
+      subtitles,
     } = this.props
 
     const form = Boolean(currentFlashcard) ? (
@@ -118,40 +143,9 @@ class Main extends Component {
               <MediaFilesNavMenu className={headerCss.leftMenu} />
             </section>
             <ul className={headerCss.rightMenu}>
-              {mediaFolderLocation ? (
-                <li className={headerCss.menuTextItem}>
-                  audio will be saved in:{' '}
-                  <a
-                    href="/#"
-                    onClick={this.openMediaFolderLocationFormDialog}
-                    title={mediaFolderLocation}
-                  >
-                    {truncate(mediaFolderLocation, 30)}
-                  </a>
-                </li>
-              ) : (
-                <li className={headerCss.menuTextItem}>
-                  <a href="/#" onClick={this.openMediaFolderLocationFormDialog}>
-                    choose media folder location
-                  </a>
-                </li>
-              )}
-              {/* <li className={headerCss.menuTextItem}>
-                using note type:{' '}
-                <a
-                  ref={noteTypeClipMenuAnchor}
-                  href="/#"
-                  onClick={this.openNoteTypeSelectionMenu}
-                >
-                  {currentNoteType.name}
-                </a>
-                <Menu
-                  anchorEl={noteTypeClipMenuAnchor}
-                  onClose={this.closeNoteTypeSelectionMenu}
-                  open={Boolean(noteTypeClipMenuAnchor)}
-                >
-                </Menu>
-              </li> */}
+              <li className={headerCss.menuItem}>
+                <SubtitlesMenu />
+              </li>
               <li className={headerCss.menuItem}>
                 <Tooltip title="Detect silences">
                   <IconButton onClick={detectSilenceRequest}>
@@ -177,6 +171,7 @@ class Main extends Component {
             onEnded={this.handleAudioEnded}
             loop={loop}
             metadata={currentMediaMetadata}
+            subtitles={subtitles}
           />
         </section>
         {Boolean(currentFileName) && <Waveform show={!audioIsLoading} />}
@@ -209,17 +204,16 @@ const mapStateToProps = state => ({
   loop: r.isLoopOn(state),
   audioIsLoading: r.isAudioLoading(state),
   clipsHaveBeenMade: r.haveClipsBeenMade(state),
-  mediaFolderLocation: r.getMediaFolderLocation(state),
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getCurrentMediaFileConstantBitratePath(state),
   currentMediaMetadata: r.getCurrentMediaMetadata(state),
+  subtitles: r.getSubtitlesTracks(state),
 })
 
 const mapDispatchToProps = {
   toggleLoop: r.toggleLoop,
   detectSilenceRequest: r.detectSilenceRequest,
   deleteAllCurrentFileClipsRequest: r.deleteAllCurrentFileClipsRequest,
-  mediaFolderLocationFormDialog: r.mediaFolderLocationFormDialog,
   reviewAndExportDialog: r.reviewAndExportDialog,
   confirmationDialog: r.confirmationDialog,
 }

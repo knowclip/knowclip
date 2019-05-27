@@ -1,0 +1,17 @@
+.subtitlesSvg {
+  background-color: #616161;
+}
+
+.subtitlesChunkRectangle {
+  stroke: #303f9f;
+  stroke-width: 1px;
+  fill: #e4ecf7;
+}
+.subtitlesText {
+  font-size: 16px;
+  fill: #616161;
+}
+
+.subtitlesChunk:hover .subtitlesChunkRectangle {
+  fill: aliceblue;
+}

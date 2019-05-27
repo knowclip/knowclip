@@ -17,7 +17,7 @@ class SimpleMessageSnackbar extends Component {
       <Snackbar
         open={this.state.open}
         message={message}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={this.handleClose}
         onExited={this.handleExited}
         action={

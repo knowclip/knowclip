@@ -92,13 +92,15 @@ export const openMediaFileSuccess = (
   filePath: MediaFilePath,
   constantBitrateFilePath: MediaFilePath,
   metadata: MediaFileMetadata,
-  projectId: ProjectId // kind of unnecessary... maybe should change state shape
+  projectId: ProjectId, // kind of unnecessary... maybe should change state shape
+  subtitlesTracksStreamIndexes: Array<number>
 ): Action => ({
   type: 'OPEN_MEDIA_FILE_SUCCESS',
   filePath,
   constantBitrateFilePath,
   metadata,
   projectId,
+  subtitlesTracksStreamIndexes,
 })
 
 export const openMediaFileFailure = (errorMessage: string): Action => ({

@@ -15,6 +15,27 @@ declare type ClipsState = {
   idsByMediaFileId: { [MediaFileId]: Array<ClipId> },
 }
 
+declare type FlashcardFieldName =
+  | 'transcription'
+  | 'pronunciation'
+  | 'meaning'
+  | 'notes'
+
+// declare type FlashcardFields =
+//   | SimpleNoteTypeFields
+//   | TransliterationNoteTypeFields
+// declare type SimpleNoteTypeFields = {|
+//   transcription: string,
+//   meaning: string,
+//   notes: string,
+// |}
+// declare type TransliterationNoteTypeFields = {|
+//   transcription: string,
+//   pronunciation: string,
+//   meaning: string,
+//   notes: string,
+// |}
+
 declare type Flashcard =
   | {
       // change to note?
@@ -40,8 +61,6 @@ declare type PendingClip = {
   start: WaveformX,
   end: WaveformX,
 }
-
-// export
 
 declare type ClipSpecs = {
   sourceFilePath: string,

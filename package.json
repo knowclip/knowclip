@@ -28,8 +28,11 @@
     "redux-observable": "^1.0.0",
     "reselect": "^3.0.1",
     "rxjs": "^6.2.2",
+    "subsrt": "^1.0.0",
+    "subtitle": "^2.0.3",
     "tempy": "^0.2.1",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "xss": "^1.0.6"
   },
   "main": "./main.js",
   "homepage": "./",
