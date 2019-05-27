@@ -23,6 +23,8 @@ import {
   Subtitles,
   Hearing,
   Layers,
+  PlayArrow,
+  Pause,
 } from '@material-ui/icons'
 
 const capitalize = string =>
@@ -213,7 +215,7 @@ class FlashcardSection extends Component {
           {!showing ? (
             <CardContent className={css.intro}>
               <p className={css.introText}>
-                You can create clips in a few different ways:
+                You can <strong>create clips</strong> in a few different ways:
               </p>
               <ul className={css.introList}>
                 <li>
@@ -221,18 +223,25 @@ class FlashcardSection extends Component {
                 </li>
 
                 <li>
-                  Use <Hearing /> <strong>silence detection</strong> to
-                  automatically make clips from audio containing little
-                  background noise.
+                  Use <Hearing className={css.icon} />{' '}
+                  <strong>silence detection</strong> to automatically make clips
+                  from audio containing little background noise.
                 </li>
                 <li>
-                  Use <Subtitles /> <strong>subtitles</strong> to automatically
-                  create both clips and flashcards.
+                  Use <Subtitles className={css.icon} />{' '}
+                  <strong>subtitles</strong> to automatically create both clips
+                  and flashcards.
                 </li>
               </ul>
               <p className={css.introText}>
-                When you're done, press the <Layers />{' '}
+                When you're done, press the <Layers className={css.icon} />{' '}
                 <strong>export button</strong>.
+              </p>
+
+              <p className={css.introText}>
+                You can <PlayArrow className={css.icon} /> /{' '}
+                <Pause className={css.icon} /> <b>play</b>/<b>pause</b> media
+                with <i>Ctrl + space</i>.
               </p>
             </CardContent>
           ) : (

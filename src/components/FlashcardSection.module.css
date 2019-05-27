@@ -14,12 +14,13 @@
 .introText {
   text-align: center;
 }
-.introText:first-child {
-  /* padding-top: 15%; */
-}
 
 .introText,.introList {
-  line-height: 1.5;
+  line-height: 2;
+}
+
+.icon {
+  vertical-align: sub;
 }
 
 .navButton {

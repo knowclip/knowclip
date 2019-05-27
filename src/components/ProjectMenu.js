@@ -64,7 +64,6 @@ class ProjectMenu extends Component {
           {editing ? (
             <form onSubmit={this.handleSubmit} style={{ width: '100%' }}>
               <TextField
-                fullWidth
                 inputRef={this.inputRef}
                 classes={{ root: css.projectNameInput }}
                 value={text}
