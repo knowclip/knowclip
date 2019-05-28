@@ -17,9 +17,10 @@ import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
 
 const getOpenProjectByFilePath = openProjectByFilePath => async () => {
-  const filePaths = await showOpenDialog[
-    { name: 'AFCA project file', extensions: ['afca'] }
-  ]
+  const filePaths = await showOpenDialog({
+    name: 'AFCA project file',
+    extensions: ['afca'],
+  })
 
   if (filePaths) {
     openProjectByFilePath(filePaths[0])
