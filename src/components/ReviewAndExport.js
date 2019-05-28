@@ -116,75 +116,76 @@ let MediaTable = ({
   onSelectAll,
   toggleOpen,
   highlightedClipId,
-}) => (
-  <Paper>
-    <Toolbar
-      className={cn(css.toolbar, { [css.openToolbar]: open })}
-      onClick={toggleOpen}
-    >
-      <Checkbox
-        checked={clips.every(c => selectedIds.includes(c.id))}
-        onChange={() => onSelectAll(clips.map(c => c.id))}
-        onClick={e => e.stopPropagation()}
-        className={css.selectAllClipsCheckbox}
-      />
+}) =>
+  !clips.length ? null : (
+    <Paper>
+      <Toolbar
+        className={cn(css.toolbar, { [css.openToolbar]: open })}
+        onClick={toggleOpen}
+      >
+        <Checkbox
+          checked={clips.every(c => selectedIds.includes(c.id))}
+          onChange={() => onSelectAll(clips.map(c => c.id))}
+          onClick={e => e.stopPropagation()}
+          className={css.selectAllClipsCheckbox}
+        />
 
-      <div className={css.selectedClipsCount}>
-        {clips.filter(c => selectedIds.includes(c.id)).length || '--'} of{' '}
-        {clips.length}
-      </div>
+        <div className={css.selectedClipsCount}>
+          {clips.filter(c => selectedIds.includes(c.id)).length || '--'} of{' '}
+          {clips.length}
+        </div>
 
-      <h2 className={css.mediaFileName}>
-        {mediaFileMetadata.name}{' '}
-        <small>
-          {formatDuration(
-            moment.duration({ seconds: mediaFileMetadata.durationSeconds })
-          )}
-        </small>
-      </h2>
+        <h2 className={css.mediaFileName}>
+          {mediaFileMetadata.name}{' '}
+          <small>
+            {formatDuration(
+              moment.duration({ seconds: mediaFileMetadata.durationSeconds })
+            )}
+          </small>
+        </h2>
 
-      <div className={css.fileTagChips}>
-        {open
-          ? ' '
-          : [
-              ...clips.reduce((tags, clip) => {
-                clip.flashcard.tags.forEach(tag => tags.add(tag))
-                return tags
-              }, new Set()),
-            ].map(tag => (
-              <span key={tag} className={css.smallTag}>{`${tag}`}</span>
+        <div className={css.fileTagChips}>
+          {open
+            ? ' '
+            : [
+                ...clips.reduce((tags, clip) => {
+                  clip.flashcard.tags.forEach(tag => tags.add(tag))
+                  return tags
+                }, new Set()),
+              ].map(tag => (
+                <span key={tag} className={css.smallTag}>{`${tag}`}</span>
+              ))}
+        </div>
+
+        <IconButton>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
+      </Toolbar>
+
+      <Table className={css.table}>
+        <colgroup>
+          <col width="1%" />
+          <col width="15%" />
+          <col width="70%" />
+          <col width="10%" />
+          <col width="10%" />
+        </colgroup>
+        {open && (
+          <TableBody>
+            {clips.map(({ id, flashcard }, i) => (
+              <FlashcardRow
+                id={id}
+                flashcard={flashcard}
+                key={flashcard.id}
+                closeModal={closeDialog}
+                onSelect={onSelect}
+                isHighlighted={highlightedClipId === id}
+                isSelected={selectedIds.includes(id)}
+              />
             ))}
-      </div>
-
-      <IconButton>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
-    </Toolbar>
-
-    <Table className={css.table}>
-      <colgroup>
-        <col width="1%" />
-        <col width="15%" />
-        <col width="70%" />
-        <col width="10%" />
-        <col width="10%" />
-      </colgroup>
-      {open && (
-        <TableBody>
-          {clips.map(({ id, flashcard }, i) => (
-            <FlashcardRow
-              id={id}
-              flashcard={flashcard}
-              key={flashcard.id}
-              closeModal={closeDialog}
-              onSelect={onSelect}
-              isHighlighted={highlightedClipId === id}
-              isSelected={selectedIds.includes(id)}
-            />
-          ))}
-        </TableBody>
-      )}
-    </Table>
-  </Paper>
-)
+          </TableBody>
+        )}
+      </Table>
+    </Paper>
+  )
 MediaTable = connect((state, { open, mediaFileMetadata }) => ({
   clips: r.getClips(state, mediaFileMetadata.id),
   highlightedClipId: r.getHighlightedClipId(state),

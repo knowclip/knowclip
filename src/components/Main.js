@@ -1,18 +1,9 @@
 import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
-import {
-  IconButton,
-  CircularProgress,
-  Tooltip,
-  Card,
-  CardContent,
-  Fab,
-} from '@material-ui/core'
+import { IconButton, CircularProgress, Tooltip, Fab } from '@material-ui/core'
 import {
   Hearing as HearingIcon,
   Delete as DeleteIcon,
-  ChevronLeft,
-  ChevronRight,
   Layers,
 } from '@material-ui/icons'
 import { Redirect } from 'react-router-dom'

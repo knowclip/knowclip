@@ -7,7 +7,6 @@ import fs from 'fs'
 import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
-import { getSubtitlesFromMedia } from './subtitles'
 
 const getSubtitlesStreamIndexes = ffprobeMetadata =>
   ffprobeMetadata.streams

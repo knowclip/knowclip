@@ -1,5 +1,5 @@
 // @flow
-import { getNoteTypeFields, getBlankFlashcard } from '../utils/noteType'
+import { getBlankFlashcard } from '../utils/noteType'
 
 const initialState: ClipsState = {
   byId: {},

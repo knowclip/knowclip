@@ -8,12 +8,8 @@ import { connect } from 'react-redux'
 import * as r from '../redux'
 import {
   IconButton,
-  CircularProgress,
   Tooltip,
-  Card,
-  CardContent,
   Menu,
-  MenuList,
   MenuItem,
   ListItemText,
   ListItemSecondaryAction,

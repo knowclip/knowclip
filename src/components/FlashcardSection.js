@@ -192,7 +192,6 @@ class FlashcardSection extends Component {
       toggleLoop,
       isLoopOn,
       showing,
-      clipsHaveBeenMade,
       prevId,
       nextId,
       highlightClip,
@@ -381,7 +380,6 @@ const mapDispatchToProps = {
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
   toggleLoop: r.toggleLoop,
-  highlightClip: r.highlightClip,
 }
 
 export default connect(

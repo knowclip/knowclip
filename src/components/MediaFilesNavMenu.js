@@ -1,10 +1,9 @@
-import React, { Fragment, useCallback, useState, useRef } from 'react'
+import React, { useCallback, useState, useRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import {
   Button,
   IconButton,
   Tooltip,
-  Menu,
   MenuItem,
   MenuList,
   ListItemText,
@@ -12,7 +11,12 @@ import {
   Divider,
   Popover,
 } from '@material-ui/core'
-import { Loop, Delete as DeleteIcon } from '@material-ui/icons'
+import {
+  Loop,
+  Delete as DeleteIcon,
+  PlayArrow,
+  Pause,
+} from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import { showOpenDialog } from '../utils/electron'
 import truncate from '../utils/truncate'
@@ -48,6 +52,31 @@ const MediaFilesNavMenu = ({
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const openMenu = e => setMenuIsOpen(true)
   const closeMenu = e => setMenuIsOpen(false)
+
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    const startPlaying = () => setPlaying(true)
+
+    document.addEventListener('play', startPlaying, true)
+    return () => document.removeEventListener('play', startPlaying)
+  }, [])
+  useEffect(() => {
+    const stopPlaying = () => setPlaying(false)
+
+    document.addEventListener('pause', stopPlaying, true)
+    return () => document.removeEventListener('pause', stopPlaying)
+  }, [])
+
+  const playOrPauseAudio = useRef(() => {
+    const player = document.getElementById('audioPlayer')
+    player.paused ? player.play() : player.pause()
+  })
+
+  useEffect(() => {
+    const resetPlayButton = () => setPlaying(false)
+    document.addEventListener('loadeddata', resetPlayButton, true)
+    return () => document.removeEventListener('loadeddata', resetPlayButton)
+  }, [])
 
   return (
     <DarkTheme>
@@ -111,6 +140,13 @@ const MediaFilesNavMenu = ({
         <Tooltip title="Loop audio (Ctrl + L)">
           <IconButton onClick={toggleLoop} color={loop ? 'primary' : 'default'}>
             <Loop />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
+        >
+          <IconButton onClick={playOrPauseAudio.current}>
+            {playing ? <Pause /> : <PlayArrow />}
           </IconButton>
         </Tooltip>{' '}
       </section>

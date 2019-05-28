@@ -1,6 +1,6 @@
 import { flatMap, tap, map } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { from, of, empty } from 'rxjs'
+import { of, empty } from 'rxjs'
 import * as r from '../redux'
 import { join } from 'path'
 import { readFileSync, writeFileSync } from 'fs'
