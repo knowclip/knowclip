@@ -8,11 +8,15 @@ import Snackbar from './components/Snackbar'
 import Dialog from './components/Dialog'
 import Main from './components/Main'
 import ProjectsMenu from './components/ProjectsMenu'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import themeSpecs from './themeSpecs'
+
+const theme = createMuiTheme(themeSpecs)
 
 class App extends Component {
   render() {
     return (
-      <>
+      <MuiThemeProvider theme={theme}>
         <HashRouter>
           <Switch>
             <Route exact path="/" component={Main} />
@@ -21,7 +25,7 @@ class App extends Component {
         </HashRouter>
         <Snackbar />
         <Dialog />
-      </>
+      </MuiThemeProvider>
     )
   }
 }

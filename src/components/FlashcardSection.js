@@ -200,14 +200,20 @@ class FlashcardSection extends Component {
 
     return (
       <section className={css.container}>
-        <Tooltip title="Previous clip (Ctrl + comma)">
-          <IconButton
-            className={css.navButton}
-            disabled={!prevId}
-            onClick={() => highlightClip(prevId)}
-          >
-            <ChevronLeft />
-          </IconButton>
+        <Tooltip
+          title="Previous clip (Ctrl + comma)"
+          PopperProps={{ style: { fontSize: '1.4em !important' } }}
+        >
+          <span>
+            {' '}
+            <IconButton
+              className={css.navButton}
+              disabled={!prevId}
+              onClick={() => highlightClip(prevId)}
+            >
+              <ChevronLeft />
+            </IconButton>
+          </span>
         </Tooltip>
 
         <Card className={css.form}>
@@ -345,13 +351,15 @@ class FlashcardSection extends Component {
         </Card>
 
         <Tooltip title="Next clip (Ctrl + period)">
-          <IconButton
-            className={css.navButton}
-            disabled={!nextId}
-            onClick={() => highlightClip(nextId)}
-          >
-            <ChevronRight />
-          </IconButton>
+          <span>
+            <IconButton
+              className={css.navButton}
+              disabled={!nextId}
+              onClick={() => highlightClip(nextId)}
+            >
+              <ChevronRight />
+            </IconButton>
+          </span>
         </Tooltip>
       </section>
     )

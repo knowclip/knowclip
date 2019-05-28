@@ -127,7 +127,7 @@ class Main extends Component {
                 </Tooltip>
               </li>
               <li className={headerCss.menuItem}>
-                <Tooltip title="Delete all clips for this file">
+                <Tooltip title="Delete all clips for this media">
                   <IconButton onClick={deleteAllCurrentFileClipsRequest}>
                     <DeleteIcon />
                   </IconButton>
