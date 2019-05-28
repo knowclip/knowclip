@@ -8,14 +8,11 @@ import {
   Menu,
   MenuItem,
   Tooltip,
-  Paper,
 } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
-import ChipInput from 'material-ui-chip-input'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
-import Autosuggest from 'react-autosuggest'
 import { getNoteTypeFields } from '../utils/noteType'
 import {
   ChevronLeft,
@@ -26,6 +23,7 @@ import {
   PlayArrow,
   Pause,
 } from '@material-ui/icons'
+import TagsInput from './TagsInput'
 
 const capitalize = string =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
@@ -49,96 +47,8 @@ let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
 class FlashcardSection extends Component {
   state = {
     moreMenuAnchorEl: null,
-    textFieldInput: '', // ???? necessary?
-    suggestions: [],
+    // textFieldInput: '', // ???? necessary?
   }
-
-  onSuggestionHighlighted = ({ suggestion }) => {
-    const el =
-      suggestion && document.querySelector(`#tag__${suggestion}:not(:hover)`)
-    if (el) {
-      el.scrollIntoView(false)
-    }
-  }
-
-  onSuggestionSelected = (e, { suggestionValue }) => {
-    this.handleAddChip(suggestionValue)
-    e.preventDefault()
-  }
-
-  onSuggestionsFetchRequested = ({ value }) => {
-    this.setState({
-      suggestions: this.getSuggestions(value),
-    })
-  }
-  onSuggestionsClearRequested = () => {
-    this.setState({
-      suggestions: [],
-    })
-  }
-
-  getSuggestions = value => {
-    const inputValue = value.trim().toLowerCase()
-
-    return inputValue.length === 0
-      ? []
-      : this.props.allTags.filter(tag =>
-          tag.toLowerCase().startsWith(inputValue)
-        )
-  }
-
-  renderSuggestionsContainer = ({ children, containerProps }) => (
-    <Paper {...containerProps} square className={css.suggestionsContainer}>
-      {children}
-    </Paper>
-  )
-  getSuggestionValue = a => a
-  renderSuggestion = (suggestion, { query, isHighlighted, ...other }) => {
-    // const matches = match(suggestion.name, query)
-    // const parts = parse(suggestion.name, matches)
-    const preventDefault = e => e.preventDefault() // prevent the click causing the input to be blurred
-    return (
-      <MenuItem
-        selected={isHighlighted}
-        onMouseDown={preventDefault}
-        id={`tag__${suggestion}`}
-        {...other}
-      >
-        {/* {parts.map((part, index) => {
-            return part.highlight ? (
-              <span key={String(index)} style={{ fontWeight: 500 }}>
-                {part.text}
-              </span>
-            ) : (
-              <span key={String(index)}>{part.text}</span>
-            )
-          })} */}
-        {suggestion}
-      </MenuItem>
-    )
-  }
-
-  renderChipsInput = ({ value, onChange, chips, ref, ...other }) => (
-    <ChipInput
-      margin="dense"
-      label="Tags"
-      placeholder="Type your tag and press 'enter'"
-      className={css.tagsField}
-      fullWidth
-      onAdd={chip => this.handleAddChip(chip)}
-      onDelete={(chip, index) => this.handleDeleteChip(chip, index)}
-      dataSource={this.props.allTags}
-      newChipKeyCodes={[13, 9, 32]}
-      onUpdateInput={onChange}
-      value={chips}
-      clearInputValueOnChange
-      inputRef={ref}
-      {...other}
-    />
-  )
-
-  handletextFieldInputChange = (e, { newValue }) =>
-    this.setState({ textFieldInput: newValue })
 
   handleClickMoreButton = event => {
     this.setState({ moreMenuAnchorEl: event.currentTarget })
@@ -166,23 +76,12 @@ class FlashcardSection extends Component {
   // setFlashcardTagsText = text =>
   // this.props.setFlashcardTagsText(this.props.selectedClipId, text)
 
-  handleAddChip = text => {
-    this.setState({ textFieldInput: '' })
-    this.props.addFlashcardTag(this.props.selectedClipId, text)
-  }
-  handleDeleteChip = (text, index) => {
-    this.props.deleteFlashcardTag(this.props.selectedClipId, index, text)
-    this.autosuggest && this.autosuggest.input.focus()
-  }
-
   deleteCard = () => {
     const { deleteCard, highlightedClipId } = this.props
     if (highlightedClipId) {
       deleteCard(highlightedClipId)
     }
   }
-
-  autosuggestRef = c => (this.autosuggest = c)
 
   render() {
     const {
@@ -195,8 +94,12 @@ class FlashcardSection extends Component {
       prevId,
       nextId,
       highlightClip,
+      allTags,
+      addFlashcardTag,
+      selectedClipId,
+      deleteFlashcardTag,
     } = this.props
-    const { moreMenuAnchorEl, suggestions } = this.state
+    const { moreMenuAnchorEl } = this.state
 
     return (
       <section className={css.container}>
@@ -275,37 +178,13 @@ class FlashcardSection extends Component {
                       setFlashcardText={this.setFlashcardText}
                     />
                   ))}
-
-                  <Autosuggest
-                    theme={{
-                      suggestionsList: css.suggestionsList,
-                      suggestionsContainer: css.suggestionsContainer,
-                    }}
-                    suggestions={suggestions}
-                    onSuggestionHighlighted={this.onSuggestionHighlighted}
-                    onSuggestionSelected={this.onSuggestionSelected}
-                    onSuggestionsFetchRequested={
-                      this.onSuggestionsFetchRequested
+                  <TagsInput
+                    allTags={allTags}
+                    tags={currentFlashcard.tags}
+                    onAddChip={text => addFlashcardTag(selectedClipId, text)}
+                    onDeleteChip={(index, text) =>
+                      deleteFlashcardTag(selectedClipId, index, text)
                     }
-                    onSuggestionsClearRequested={
-                      this.onSuggestionsClearRequested
-                    }
-                    renderSuggestionsContainer={this.renderSuggestionsContainer}
-                    getSuggestionValue={this.getSuggestionValue}
-                    renderSuggestion={this.renderSuggestion}
-                    focusInputOnSuggestionClick={false}
-                    shouldRenderSuggestions={value =>
-                      value && value.trim().length > 0
-                    }
-                    inputProps={{
-                      chips: currentFlashcard.tags || [],
-                      value: this.state.textFieldInput,
-                      onChange: this.handletextFieldInputChange,
-                      onAdd: this.handleAddChip,
-                      onDelete: this.handleDeleteChip,
-                    }}
-                    renderInputComponent={this.renderChipsInput}
-                    ref={this.autosuggestRef}
                   />
 
                   <section className={css.bottom}>
@@ -367,14 +246,14 @@ class FlashcardSection extends Component {
 }
 
 const mapStateToProps = state => ({
+  allTags: r.getAllTags(state),
   currentFlashcard: r.getCurrentFlashcard(state),
-  selectedClipTime: r.getSelectedClipTime(state),
   selectedClipId: r.getSelectedClipId(state),
+  selectedClipTime: r.getSelectedClipTime(state),
   highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: r.getClipsTimes(state),
   currentNoteType: r.getCurrentNoteType(state),
   isLoopOn: r.isLoopOn(state),
-  allTags: r.getAllTags(state),
   prevId: r.getFlashcardIdBeforeCurrent(state),
   nextId: r.getFlashcardIdAfterCurrent(state),
 })

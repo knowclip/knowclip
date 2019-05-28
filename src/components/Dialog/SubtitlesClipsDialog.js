@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { connect } from 'react-redux'
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
 import * as r from '../../redux'
 import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
+import TagsInput from '../TagsInput'
 
 const getOnClickLoadExternal = loadSubtitlesFromFile => async () => {
   const filePaths = await showOpenDialog([
@@ -49,10 +50,18 @@ const SubtitlesClipsDialog = ({
   currentFileId,
   makeClipsFromSubtitles,
   loadSubtitlesFromFile,
+  allTags,
 }) => {
   const [fields, setFields] = useState(() =>
     getDefaultFields(currentNoteTypeFields, subtitlesTracks[0].id)
   )
+  const [tags, setTags] = useState([])
+  const onAddChip = useRef(text =>
+    setTags(tags => (tags.includes(text) ? tags : tags.concat(text)))
+  ).current
+  const onDeleteChip = useRef((index, text) =>
+    setTags(tags => tags.filter((t, i) => i !== index))
+  ).current
 
   const onSubmit = () => {
     const fieldsWithoutBlankValues = {}
@@ -62,7 +71,6 @@ const SubtitlesClipsDialog = ({
         fieldsWithoutBlankValues[fieldName] = fields[fieldName]
       })
     closeDialog()
-    const tags = []
     return makeClipsFromSubtitles(currentFileId, fieldsWithoutBlankValues, tags)
   }
   const setField = (key, value) => {
@@ -143,6 +151,12 @@ const SubtitlesClipsDialog = ({
               {externalSubtitlesTracks.map(trackMenuItem)}
             </Select>
           </FormControl>
+          <TagsInput
+            allTags={allTags}
+            tags={tags}
+            onAddChip={onAddChip}
+            onDeleteChip={onDeleteChip}
+          />
         </form>
       </DialogContent>
       <DialogActions>
@@ -159,6 +173,7 @@ const mapStateToProps = state => ({
   embeddedSubtitlesTracks: r.getEmbeddedSubtitlesTracks(state),
   subtitlesTracks: r.getSubtitlesTracks(state),
   currentFileId: r.getCurrentFileId(state),
+  allTags: r.getAllTags(state),
 })
 
 const mapDispatchToProps = {
