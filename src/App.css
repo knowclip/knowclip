@@ -10,13 +10,13 @@ body,
 }
 
 video {
-  padding-bottom: 32px; /* mess with these and then the controls could be at the bottom of the waveform. but then movie the audi oelement. */
+  padding-bottom: 32px; /* mess with these and then the controls could be at the bottom of the waveform. but then move the audio element. */
 }
 
 video::-webkit-media-controls-panel {
   display: flex !important;
   opacity: 1 !important;
-  margin-top: 32px; /* mess with these and then the controls could be at the bottom of the waveform. but then movie the audi oelement. */
+  margin-top: 36px; /* mess with these and then the controls could be at the bottom of the waveform. but then move the audio element. */
 }
 
 .App {
@@ -51,7 +51,7 @@ audio.audioPlayer {
 }
 video.audioPlayer {
   height: calc(100% - 36px);
-  padding: 1rem;
+  padding: 0 1rem 0 0;
   box-sizing: border-box;
 }
 
