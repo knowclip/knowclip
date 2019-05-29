@@ -2,7 +2,7 @@ const themeSpecs = {
   overrides: {
     MuiTooltip: {
       tooltip: {
-        fontSize: '1rem',
+        fontSize: '.8rem',
       },
     },
   },
