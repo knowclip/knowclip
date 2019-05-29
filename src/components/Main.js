@@ -10,6 +10,7 @@ import { Redirect } from 'react-router-dom'
 import Waveform from '../components/Waveform'
 import FlashcardSection from '../components/FlashcardSection'
 import MediaFilesNavMenu from '../components/MediaFilesNavMenu'
+import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import ProjectMenu from '../components/ProjectMenu'
 import DarkTheme from '../components/DarkTheme'
 import headerCss from '../components/Header.module.css'
@@ -165,6 +166,7 @@ class Main extends Component {
             </Fab>
           </Tooltip>
         )}
+        <KeyboardShortcuts />
       </div>
     )
   }
