@@ -20,8 +20,6 @@ import {
   Subtitles,
   Hearing,
   Layers,
-  PlayArrow,
-  Pause,
 } from '@material-ui/icons'
 import TagsInput from './TagsInput'
 
@@ -144,12 +142,6 @@ class FlashcardSection extends Component {
               <p className={css.introText}>
                 When you're done, press the <Layers className={css.icon} />{' '}
                 <strong>export button</strong>.
-              </p>
-
-              <p className={css.introText}>
-                You can <PlayArrow className={css.icon} /> /{' '}
-                <Pause className={css.icon} /> <b>play</b>/<b>pause</b> media
-                with <i>Ctrl + space</i>.
               </p>
             </CardContent>
           ) : (
