@@ -19,6 +19,11 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         ? { ...state, highlightedClipId: null }
         : state
 
+    case 'DELETE_CARDS':
+      return action.ids.includes(id => id === state.highlightedClipId)
+        ? { ...state, highlightedClipId: null }
+        : state
+
     case 'DELETE_MEDIA_FROM_PROJECT':
       return action.mediaFileId === state.currentMediaFileId
         ? {

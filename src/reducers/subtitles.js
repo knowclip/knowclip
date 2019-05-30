@@ -70,6 +70,14 @@ const subtitles: Reducer<SubtitlesState> = (
         loadedTracks: state.loadedTracks.filter(track => track.id !== id),
       }
     }
+    case 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK':
+      return {
+        ...state,
+        flashcardFieldLinks: {
+          ...state.flashcardFieldLinks,
+          [action.flashcardFieldName]: action.subtitlesTrackId,
+        },
+      }
     default:
       return state
   }

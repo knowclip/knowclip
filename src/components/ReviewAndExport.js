@@ -260,8 +260,9 @@ const Export = ({
           <section className={css.introText}>
             <p>Export a Comma-Separated-Values file along with MP3s.</p>
             <p>
-              This format is best for updating some flashcards you've previously
-              exported.
+              This format is best for{' '}
+              <strong>updating or adding to a deck</strong> which you've
+              previously exported.
             </p>
           </section>
         )}
@@ -269,7 +270,10 @@ const Export = ({
         {currentTabIndex === 2 && (
           <section className={css.introText}>
             <p>Export a Markdown file.</p>
-            <p>This lets you review all your notes in a handy text format.</p>
+            <p>
+              This lets you <strong>review all your notes</strong> in a handy
+              text format.
+            </p>
           </section>
         )}
         {selectionHasStarted &&

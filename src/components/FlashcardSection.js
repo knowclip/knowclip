@@ -1,4 +1,4 @@
-import React, { Component, useRef } from 'react'
+import React, { Component, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import {
   TextField,
@@ -9,7 +9,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import { Delete as DeleteIcon, Loop, MoreVert } from '@material-ui/icons'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
@@ -23,20 +23,127 @@ import {
 } from '@material-ui/icons'
 import TagsInput from './TagsInput'
 
+const FieldMenu = ({
+  embeddedSubtitlesTracks,
+  externalSubtitlesTracks,
+  linkToSubtitlesTrack,
+  linkedSubtitlesTrack,
+}) => {
+  const menuAnchorEl = useRef(null)
+  const [menuIsOpen, setMenuIsOpen] = useState(false)
+  const openMenu = e => {
+    setMenuIsOpen(true)
+    e.stopPropagation()
+  }
+  const closeMenu = e => {
+    e.stopPropagation()
+    setMenuIsOpen(false)
+  }
+  return (
+    <React.Fragment>
+      <Tooltip
+        title={
+          linkedSubtitlesTrack
+            ? 'Link/unlink subtitles track'
+            : 'Link subtitles track'
+        }
+      >
+        <IconButton
+          tabIndex="-1"
+          className={css.fieldMenuButton}
+          buttonRef={menuAnchorEl}
+          onClick={openMenu}
+        >
+          <MoreVert />
+        </IconButton>
+      </Tooltip>
+      {menuIsOpen && (
+        <Menu
+          anchorEl={menuAnchorEl.current}
+          open={menuIsOpen}
+          onClose={closeMenu}
+        >
+          {embeddedSubtitlesTracks.map((track, i) => {
+            const selected = linkedSubtitlesTrack === track.id
+            return (
+              <MenuItem
+                onClick={() => linkToSubtitlesTrack(selected ? null : track.id)}
+                selected={selected}
+              >
+                Embedded subtitles track {i + 1}
+              </MenuItem>
+            )
+          })}
+          {externalSubtitlesTracks.map((track, i) => {
+            const selected = linkedSubtitlesTrack === track.id
+            return (
+              <MenuItem
+                onClick={() => linkToSubtitlesTrack(selected ? null : track.id)}
+                selected={selected}
+              >
+                External subtitles track {i + 1}
+              </MenuItem>
+            )
+          })}
+          ))}
+        </Menu>
+      )}
+    </React.Fragment>
+  )
+}
+
 const capitalize = string =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
 
-let Field = ({ id, currentFlashcard, name, setFlashcardText }) => {
+const getSubtitlesTrackLabel = (embedded, external, trackId) => {
+  const embeddedIndex = embedded.findIndex(t => t.id === trackId)
+  return embeddedIndex !== -1
+    ? `Embedded subtitles track ${embeddedIndex + 1}`
+    : `External subtitles track ${external.findIndex(t => t.id === trackId) +
+        1}`
+}
+
+let Field = ({
+  id,
+  currentFlashcard,
+  name,
+  setFlashcardText,
+  embeddedSubtitlesTracks,
+  externalSubtitlesTracks,
+  linkedSubtitlesTrack,
+  linkToSubtitlesTrack,
+}) => {
   const handleChange = useRef(e => setFlashcardText(id, e.target.value))
+
+  const linkedTrackName = linkedSubtitlesTrack
+    ? `—${getSubtitlesTrackLabel(
+        embeddedSubtitlesTracks,
+        externalSubtitlesTracks,
+        linkedSubtitlesTrack
+      )}`
+    : ''
+
   return (
-    <section>
+    <section className={css.field}>
+      {Boolean(
+        embeddedSubtitlesTracks.length + externalSubtitlesTracks.length
+      ) && (
+        <FieldMenu
+          {...{
+            embeddedSubtitlesTracks,
+            externalSubtitlesTracks,
+            linkToSubtitlesTrack,
+            linkedSubtitlesTrack,
+          }}
+        />
+      )}
       <TextField
         onChange={handleChange.current}
         value={currentFlashcard.fields[id] || ''}
         fullWidth
         multiline
         margin="dense"
-        label={name}
+        label={name + linkedTrackName}
       />
     </section>
   )
@@ -96,15 +203,16 @@ class FlashcardSection extends Component {
       addFlashcardTag,
       selectedClipId,
       deleteFlashcardTag,
+      embeddedSubtitlesTracks,
+      externalSubtitlesTracks,
+      subtitlesFlashcardFieldLinks,
+      linkFlashcardFieldToSubtitlesTrack,
     } = this.props
     const { moreMenuAnchorEl } = this.state
 
     return (
       <section className={css.container}>
-        <Tooltip
-          title="Previous clip (Ctrl + comma)"
-          PopperProps={{ style: { fontSize: '1.4em !important' } }}
-        >
+        <Tooltip title="Previous clip (Ctrl + comma)">
           <span>
             {' '}
             <IconButton
@@ -168,6 +276,12 @@ class FlashcardSection extends Component {
                       currentFlashcard={currentFlashcard}
                       name={capitalize(id)}
                       setFlashcardText={this.setFlashcardText}
+                      embeddedSubtitlesTracks={embeddedSubtitlesTracks}
+                      externalSubtitlesTracks={externalSubtitlesTracks}
+                      linkedSubtitlesTrack={subtitlesFlashcardFieldLinks[id]}
+                      linkToSubtitlesTrack={trackId =>
+                        linkFlashcardFieldToSubtitlesTrack(id, trackId)
+                      }
                     />
                   ))}
                   <TagsInput
@@ -248,6 +362,9 @@ const mapStateToProps = state => ({
   isLoopOn: r.isLoopOn(state),
   prevId: r.getFlashcardIdBeforeCurrent(state),
   nextId: r.getFlashcardIdAfterCurrent(state),
+  embeddedSubtitlesTracks: r.getEmbeddedSubtitlesTracks(state),
+  externalSubtitlesTracks: r.getExternalSubtitlesTracks(state),
+  subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
 })
 
 const mapDispatchToProps = {
@@ -259,6 +376,7 @@ const mapDispatchToProps = {
   addFlashcardTag: r.addFlashcardTag,
   deleteFlashcardTag: r.deleteFlashcardTag,
   toggleLoop: r.toggleLoop,
+  linkFlashcardFieldToSubtitlesTrack: r.linkFlashcardFieldToSubtitlesTrack,
 }
 
 export default connect(

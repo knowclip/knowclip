@@ -19,6 +19,11 @@ video::-webkit-media-controls-panel {
   margin-top: 36px; /* mess with these and then the controls could be at the bottom of the waveform. but then move the audio element. */
 }
 
+video::-webkit-media-controls-toggle-closed-captions-button {
+  display: none;
+}
+
+
 .App {
   display: flex;
   min-height: 100%;
@@ -75,10 +80,6 @@ video.audioPlayer {
 .formBody {
   max-width: 20em;
   margin: auto;
-}
-
-.tagsField {
-  /* margin-top: .5em !important; */
 }
 
 @keyframes App-logo-spin {

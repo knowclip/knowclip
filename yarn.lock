@@ -1777,10 +1777,10 @@ alphanum-sort@^1.0.0:
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
   integrity sha1-l6ERlkmyEa0zaR2fn0hqjsn74KM=
 
-anki-apkg-export-multi-field@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/anki-apkg-export-multi-field/-/anki-apkg-export-multi-field-0.0.0.tgz#d5f08268454f0a32c76ed503a8ee3a0573aefc22"
-  integrity sha512-o84a9d1GthO+hkMQc+n7u4hjKhNWooEz1jEtSjRTraXnKDJVxwX+f+HIbcDwm0eaNhn8ylPzkup5jfn1RTio2w==
+anki-apkg-export-multi-field@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/anki-apkg-export-multi-field/-/anki-apkg-export-multi-field-0.1.0.tgz#43d65294466d504a652a3cf7a1227dc498849dac"
+  integrity sha512-OiqkqNF0D9YVC4mFsoB9Q5m4OiEsKolQOF1apA12bbTGSu3RpefWHCiuKeBJznSgsH04pVskD1sncJ8uoxJDAw==
   dependencies:
     jszip "^3.1.2"
     sha1 "^1.1.1"

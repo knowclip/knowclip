@@ -112,7 +112,9 @@ export const getApkgExportData = (
 
     const startTime = r.getMillisecondsAtX(state, clip.start)
     const endTime = r.getMillisecondsAtX(state, clip.end)
-    const outputFilename = `${filenameWithoutExtension}___${toTimestamp(
+    const outputFilename = `${filenameWithoutExtension
+      .replace(/\[/g, '__br__')
+      .replace(/\]/g, '__rb__')}___${toTimestamp(
       startTime,
       SAFE_SEPARATOR
     )}-${toTimestamp(

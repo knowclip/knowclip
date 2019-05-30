@@ -183,34 +183,36 @@ const makeClipsFromSubtitles = (action$, state$) =>
       const currentNoteType = r.getCurrentNoteType(state$.value)
       const currentNoteTypeFields = getNoteTypeFields(currentNoteType)
 
-      const clips = transcriptionTrack.chunks.map(chunk => {
-        const fields = {
-          transcription: chunk.text,
-        }
-        currentNoteTypeFields.forEach(fieldName => {
-          const trackId = fieldNamesToTrackIds[fieldName]
-          fields[fieldName] = trackId
-            ? r
-                .getSubtitlesChunksWithinRange(
-                  state$.value,
-                  trackId,
-                  chunk.start,
-                  chunk.end
-                )
-                .map(chunk => chunk.text)
-                .join('\n')
-            : ''
-        })
+      const clips = transcriptionTrack.chunks
+        .sort(({ start: a }, { start: b }) => a - b)
+        .map(chunk => {
+          const fields = {
+            transcription: chunk.text,
+          }
+          currentNoteTypeFields.forEach(fieldName => {
+            const trackId = fieldNamesToTrackIds[fieldName]
+            fields[fieldName] = trackId
+              ? r
+                  .getSubtitlesChunksWithinRange(
+                    state$.value,
+                    trackId,
+                    chunk.start,
+                    chunk.end
+                  )
+                  .map(chunk => chunk.text)
+                  .join('\n')
+              : ''
+          })
 
-        return newClip(
-          chunk,
-          fileId,
-          uuid(),
-          r.getCurrentNoteType(state$.value),
-          tags,
-          fields
-        )
-      })
+          return newClip(
+            chunk,
+            fileId,
+            uuid(),
+            r.getCurrentNoteType(state$.value),
+            tags,
+            fields
+          )
+        })
 
       return from([
         r.deleteCards(
@@ -219,7 +221,11 @@ const makeClipsFromSubtitles = (action$, state$) =>
             r.getCurrentFileId(state$.value)
           )
         ),
+        ...Object.entries(fieldNamesToTrackIds).map(([fieldName, trackId]) =>
+          r.linkFlashcardFieldToSubtitlesTrack(fieldName, trackId)
+        ),
         r.addClips(clips, fileId),
+        r.highlightClip(clips[0].id),
       ])
     })
   )
@@ -238,7 +244,8 @@ const subtitlesClipsDialogRequest = (action$, state$) =>
         return r.simpleMessageSnackbar(
           'Please locate this media file and try again.'
         )
-      if (!r.getCurrentFileClips(state$.value)) return r.subtitlesClipDialog()
+      if (!r.getCurrentFileClips(state$.value).length)
+        return r.subtitlesClipDialog()
       return r.confirmationDialog(
         'This action will delete any clips and cards you made for this current file. Are you sure you want to continue?',
         r.subtitlesClipDialog()

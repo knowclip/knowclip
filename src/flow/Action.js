@@ -83,7 +83,6 @@ declare type ProjectAction =
   | {|
       type: 'CREATE_PROJECT',
       projectMetadata: ProjectMetadata,
-      noteType: NoteType,
     |}
   | {| type: 'REMOVE_PROJECT_FROM_RECENTS', id: ProjectId |}
   | {| type: 'SET_PROJECT_ERROR', error: ?string |}

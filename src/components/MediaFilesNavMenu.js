@@ -137,18 +137,25 @@ const MediaFilesNavMenu = ({
         ) : (
           <Button onClick={chooseMediaFiles}>Choose source file</Button>
         )}
-        <Tooltip title="Loop audio (Ctrl + L)">
-          <IconButton onClick={toggleLoop} color={loop ? 'primary' : 'default'}>
-            <Loop />
-          </IconButton>
-        </Tooltip>
-        <Tooltip
-          title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
-        >
-          <IconButton onClick={playOrPauseAudio.current}>
-            {playing ? <Pause /> : <PlayArrow />}
-          </IconButton>
-        </Tooltip>{' '}
+        {currentFileId && (
+          <Tooltip title="Loop audio (Ctrl + L)">
+            <IconButton
+              onClick={toggleLoop}
+              color={loop ? 'primary' : 'default'}
+            >
+              <Loop />
+            </IconButton>
+          </Tooltip>
+        )}
+        {currentFileId && (
+          <Tooltip
+            title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
+          >
+            <IconButton onClick={playOrPauseAudio.current}>
+              {playing ? <Pause /> : <PlayArrow />}
+            </IconButton>
+          </Tooltip>
+        )}
       </section>
     </DarkTheme>
   )

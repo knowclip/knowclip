@@ -117,7 +117,7 @@ const SubtitlesChunk = ({ chunk, trackIndex, chunkIndex, trackId }) => (
       data-trackId={trackId}
       className={css.subtitlesText}
       x={chunk.start + 4}
-      y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 4}
+      y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6}
       width={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - chunk.start}
     >
       {chunk.text}

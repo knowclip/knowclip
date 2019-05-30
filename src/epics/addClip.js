@@ -86,7 +86,11 @@ const addClipEpic = (action$, state$) => {
                   r.getCurrentFileId(state$.value),
                   uuid(),
                   currentNoteType,
-                  r.getDefaultTags(state$.value)
+                  r.getDefaultTags(state$.value),
+                  r.getNewFieldsFromLinkedSubtitles(
+                    state$.value,
+                    r.getPendingClip(state$.value)
+                  )
                 )
               )
         })

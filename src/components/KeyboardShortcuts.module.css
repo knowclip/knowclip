@@ -1,0 +1,53 @@
+.container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: .4rem;
+  cursor: pointer;
+  font-size: .8rem;
+}
+
+.card {
+  padding-bottom: 16px !important;
+  width: 20em;
+}
+
+.closed {
+  opacity: .88;
+  font-size: .8rem;
+  background: rgba(200,200,200,.5);
+  padding: .2em .3em;
+  border-radius: .2em;
+}
+
+.closed:hover {
+  background: rgb(200,200,200);
+    color: #000000;
+}
+
+.group {
+  margin-bottom: 1em;
+}
+.group:last-child {
+   margin-bottom: 0;
+}
+
+.shortcut {
+  display: flex;
+  padding: 0;
+  margin: .2em 0 .4em 0;
+}
+.keyCombination {
+  display: block;
+  width: 30%;
+  color: #3f51b5;
+}
+.action {
+  display: block;
+  width: 70%;
+}
+
+.heading {
+  margin: 0 0 .4em 0;
+  font-size: inherit;
+}

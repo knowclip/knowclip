@@ -71,7 +71,25 @@ export const getSubtitlesChunksWithinRange = (
   )
 }
 
-export const getSubtitlesFashcardFieldLinks = (
+export const getSubtitlesFlashcardFieldLinks = (
   state: AppState
-): { [FlashcardFieldName]: SubtitlesTrackId } =>
+): { [FlashcardFieldName]: SubtitlesTrackId } => // should probably be ?id
   state.subtitles.flashcardFieldLinks
+
+// export const getSubtitlesTrackName = (
+
+export const getNewFieldsFromLinkedSubtitles = (
+  state: AppState,
+  { start, end }: PendingClip
+): { [FlashcardFieldName]: string } => {
+  const links = getSubtitlesFlashcardFieldLinks(state)
+  const result = {}
+  for (const fieldName in links) {
+    const temp: any = fieldName
+    const coerced: FlashcardFieldName = temp
+    const trackId = links[coerced]
+    const chunks = getSubtitlesChunksWithinRange(state, trackId, start, end)
+    result[fieldName] = chunks.map(chunk => chunk.text).join('\n')
+  }
+  return result
+}

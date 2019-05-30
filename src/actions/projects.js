@@ -1,12 +1,8 @@
 // @flow
 
-export const createProject = (
-  projectMetadata: ProjectMetadata,
-  noteType: NoteType
-): Action => ({
+export const createProject = (projectMetadata: ProjectMetadata): Action => ({
   type: 'CREATE_PROJECT',
   projectMetadata,
-  noteType,
 })
 
 export const openProjectByFilePath = (filePath: string): Action => ({

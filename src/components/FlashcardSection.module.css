@@ -63,3 +63,19 @@
   max-height: 10em !important;
   overflow-y: auto;
 }
+
+.field {
+  position: relative;
+}
+
+.fieldMenuButton {
+  position: absolute !important;
+  left: -53px;
+  top: .6em;
+  opacity: 0;
+}
+
+.field:focus .fieldMenuButton,
+  .field:hover .fieldMenuButton {
+  opacity: 1;
+}
