@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react'
+import React, { Component, Fragment, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { IconButton, CircularProgress, Tooltip, Fab } from '@material-ui/core'
 import {
@@ -117,23 +117,28 @@ class Main extends Component {
               <MediaFilesNavMenu className={headerCss.leftMenu} />
             </section>
             <ul className={headerCss.rightMenu}>
-              <li className={headerCss.menuItem}>
-                <SubtitlesMenu />
-              </li>
-              <li className={headerCss.menuItem}>
-                <Tooltip title="Detect silences">
-                  <IconButton onClick={detectSilenceRequest}>
-                    <HearingIcon />
-                  </IconButton>
-                </Tooltip>
-              </li>
-              <li className={headerCss.menuItem}>
-                <Tooltip title="Delete all clips for this media">
-                  <IconButton onClick={deleteAllCurrentFileClipsRequest}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              </li>
+              {' '}
+              {currentMediaMetadata && (
+                <Fragment>
+                  <li className={headerCss.menuItem}>
+                    <SubtitlesMenu />
+                  </li>
+                  <li className={headerCss.menuItem}>
+                    <Tooltip title="Detect silences">
+                      <IconButton onClick={detectSilenceRequest}>
+                        <HearingIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </li>
+                  <li className={headerCss.menuItem}>
+                    <Tooltip title="Delete all clips for this media">
+                      <IconButton onClick={deleteAllCurrentFileClipsRequest}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </li>
+                </Fragment>
+              )}
             </ul>
           </header>
         </DarkTheme>

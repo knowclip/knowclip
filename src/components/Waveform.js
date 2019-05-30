@@ -5,6 +5,7 @@ import * as r from '../redux'
 import css from './Waveform.module.css'
 
 const { SELECTION_BORDER_WIDTH } = r
+const HEIGHT = 70
 
 const Cursor = ({ x, y }) => (
   // null
@@ -13,7 +14,7 @@ const Cursor = ({ x, y }) => (
     x1={x}
     y1="-1"
     x2={x}
-    y2="100"
+    y2={HEIGHT}
     shapeRendering="crispEdges"
   />
 )
@@ -21,30 +22,34 @@ const Cursor = ({ x, y }) => (
 const getClipPath = (startRaw, endRaw, stepsPerSecond) => {
   const start = startRaw
   const end = endRaw
-  return `M${start} 0 L${end} 0 L${end} 100 L${start} 100 L${start} 0`
+  return `M${start} 0 L${end} 0 L${end} ${HEIGHT} L${start} ${HEIGHT} L${start} 0`
 }
 
 const Clip = ({ id, start, end, stepsPerSecond, isHighlighted, flashcard }) => {
   return (
     <g id={id}>
       <path
-        className={cn('waveform-clip', { isHighlighted })}
+        className={cn('waveform-clip', { highlightedClip: isHighlighted })}
         d={getClipPath(start, end, stepsPerSecond)}
       />
       {/*<text x={start} y={90} width={end - start}>{Object.values(flashcard.fields)[0]}</text>*/}
       <rect
-        className="waveform-clip-border"
+        className={cn('waveform-clip-border', {
+          highlightedClipBorder: isHighlighted,
+        })}
         x={start}
         y="0"
         width={SELECTION_BORDER_WIDTH}
-        height="100"
+        height={HEIGHT}
       />
       <rect
-        className="waveform-clip-border"
+        className={cn('waveform-clip-border', {
+          highlightedClipBorder: isHighlighted,
+        })}
         x={end - SELECTION_BORDER_WIDTH}
         y="0"
         width={SELECTION_BORDER_WIDTH}
-        height="100"
+        height={HEIGHT}
       />
     </g>
   )
@@ -65,7 +70,7 @@ const PendingStretch = ({ start, end, stepsPerSecond }) => (
   />
 )
 
-const getViewBoxString = xMin => `${xMin} 0 3000 100`
+const getViewBoxString = xMin => `${xMin} 0 3000 ${HEIGHT}`
 const getSubtitlesViewBoxString = (xMin, yMax) => `${xMin} 0 3000 ${yMax}`
 
 const Clips = React.memo(({ clips, highlightedClipId, stepsPerSecond }) => (
@@ -181,7 +186,7 @@ class Waveform extends Component {
           preserveAspectRatio="xMinYMin slice"
           className="waveform-svg"
           width="100%"
-          height="100"
+          height={HEIGHT}
         >
           {path && <image xlinkHref={`file://${path}`} />}
           <Cursor {...cursor} />

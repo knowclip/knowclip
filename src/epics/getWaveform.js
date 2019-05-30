@@ -26,9 +26,9 @@ const getWaveformPng = async (state: AppState, constantBitrateFilePath) => {
         [
           `[0:a]aformat=channel_layouts=mono,`,
           `compand=gain=-6,`,
-          `showwavespic=s=${width + 20}x100:colors=${WAVE_COLOR}[fg];`,
-          `color=s=${width + 20}x100:color=${BG_COLOR}[bg];`,
-          `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=1:color=${WAVE_COLOR}`,
+          `showwavespic=s=${width + 20}x70:colors=${WAVE_COLOR}[fg];`,
+          `color=s=${width + 20}x70:color=${BG_COLOR}[bg];`,
+          `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
         ].join('')
       )
       .outputOptions('-frames:v 1')

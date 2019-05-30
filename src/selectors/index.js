@@ -5,7 +5,7 @@ import * as audioSelectors from './audio'
 import formatTime from '../utils/formatTime'
 
 export const WAVEFORM_HEIGHT = 50
-export const SELECTION_BORDER_WIDTH = 10
+export const SELECTION_BORDER_WIDTH = 5
 export const CLIP_THRESHOLD = 40
 
 export * from './waveformTime'

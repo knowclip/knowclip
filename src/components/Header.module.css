@@ -4,6 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: -.5em 0;
 }
 
 .block {
@@ -13,6 +14,7 @@
 .projectName {
   display: inline;
   padding: .5rem;
+  font-size: 1.2em;
 }
 
 .leftMenu,
@@ -28,6 +30,7 @@
   list-style-type: none;
   justify-content: flex-end;
   padding: .5rem;
+  min-width: 15%;
 }
 .menuItem {
   padding: .5rem;
@@ -51,7 +54,7 @@
 }
 
 .projectNameInput input {
-  font-size: 1.5rem !important;
+  font-size: 1.2rem !important;
 }
 
 .subtitlesMenuListItemText,

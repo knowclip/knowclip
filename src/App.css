@@ -105,18 +105,18 @@ video.audioPlayer {
 }
 
 .waveform-clip {
-  stroke: rgba(80, 200, 50, .2);
-  fill: rgba(80, 200, 50, .2);
+  stroke: rgba(255, 245, 187, 0.2);
+  fill: rgba(255, 237, 133, 0.2);
 }
 
 .waveform-clip-border {
-  fill: rgba(0, 255, 0, .2);
+  fill: rgba(255, 230, 146, 0.4);
   stroke: none;
   cursor: ew-resize;
 }
 
 .waveform-pending-clip {
-  stroke: rgba(255, 255, 0, .2);
+  stroke: rgba(255, 255, 0, 0.2);
   fill: rgba(255, 255, 0, .2);
 }
 
@@ -125,7 +125,13 @@ video.audioPlayer {
   fill: rgba(0, 255, 255, 0.4);
 }
 
-.isHighlighted {
+.highlightedClip {
   stroke: rgba(100, 255, 0, .5);
-  fill: rgba(0, 255, 0, .5);
+  fill: rgba(0, 255, 0, 0.26);
+}
+
+.highlightedClipBorder {
+  fill: rgba(0, 255, 0, 0.26);
+  stroke: none;
+  cursor: ew-resize;
 }
