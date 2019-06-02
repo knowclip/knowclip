@@ -3,13 +3,19 @@ import { ofType, combineEpics } from 'redux-observable'
 import { of, empty } from 'rxjs'
 import * as r from '../redux'
 import { join } from 'path'
-import { readFileSync, writeFileSync } from 'fs'
+import fs from 'fs'
 import Exporter from 'anki-apkg-export-multi-field/dist/exporter'
 import createTemplate from 'anki-apkg-export-multi-field/dist/template'
 import tempy from 'tempy'
 import { showSaveDialog } from '../utils/electron'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
+import { promisify } from 'util'
+
+const wait = ms => new Promise(res => setTimeout(res, ms))
+
+const writeFile = promisify(fs.writeFile)
+const readFile = promisify(fs.readFile)
 
 const exportApkgFailure = (action$, state$) =>
   action$.pipe(
@@ -37,11 +43,13 @@ const exportApkg = (action$, state$) =>
     ofType('EXPORT_APKG_REQUEST'),
     flatMap(async ({ clipIds }) => {
       const directory = tempy.directory()
+
+      document.body.style.cursor = 'progress'
+      await wait(10)
+
       const outputFilePath = await showSaveDialog('Anki deck file', ['apkg'])
 
       if (!outputFilePath) return r.exportApkgFailure()
-
-      document.body.style.cursor = 'progress'
 
       try {
         const currentProjectMetadata = r.getCurrentProject(state$.value)
@@ -76,7 +84,7 @@ const exportApkg = (action$, state$) =>
               endTime,
               clipOutputFilePath
             )
-            apkg.addMedia(outputFilename, readFileSync(clipOutputFilePath)) // async this?
+            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath)) // async this?
           })
         )
 
@@ -92,9 +100,10 @@ const exportApkg = (action$, state$) =>
             base64: false,
             compression: 'DEFLATE',
           })
-          .then(zip => {
-            writeFileSync(outputFilePath, zip, 'binary')
+          .then(async zip => {
+            const promise = writeFile(outputFilePath, zip, 'binary')
             console.log(`Package has been generated: ${outputFilePath}`)
+            return promise
           })
 
         return r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
