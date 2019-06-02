@@ -200,7 +200,7 @@ const makeClipsFromSubtitles = (action$, state$) =>
                     chunk.end
                   )
                   .map(chunk => chunk.text)
-                  .join('\n')
+                  .join(' ')
               : ''
           })
 

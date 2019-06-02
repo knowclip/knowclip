@@ -16,6 +16,7 @@ const wait = ms => new Promise(res => setTimeout(res, ms))
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
+const deleteFile = promisify(fs.unlink)
 
 const exportApkgFailure = (action$, state$) =>
   action$.pipe(
@@ -84,7 +85,9 @@ const exportApkg = (action$, state$) =>
               endTime,
               clipOutputFilePath
             )
-            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath)) // async this?
+            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
+
+            await deleteFile(clipOutputFilePath)
           })
         )
 
