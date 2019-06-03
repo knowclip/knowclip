@@ -194,7 +194,7 @@ MediaTable = connect((state, { open, mediaFileMetadata }) => ({
 const Export = ({
   closeDialog,
   flashcards,
-  currentFileIndex,
+  currentFileId,
   highlightClip,
   csvAndMp3ExportDialog,
   exportApkgRequest,
@@ -227,7 +227,9 @@ const Export = ({
         ? selectedIds.filter(id => !ids.includes(id))
         : [...new Set([...selectedIds, ...ids])]
     )
-  const [expandedTableIndex, setExpandedTableIndex] = useState(-1)
+  const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
+    projectMediaMetadata.findIndex(metadata => metadata.id === currentFileId)
+  )
   const onClickTable = index => {
     const mediaMetadata = projectMediaMetadata[index]
     if (mediaMetadata && mediaMetadata.id !== currentMedia.id)
@@ -339,6 +341,7 @@ const mapStateToProps = state => ({
     state,
     r.getCurrentProjectId(state)
   ),
+  currentFileId: r.getCurrentFileId(state),
 })
 
 const mapDispatchToProps = {

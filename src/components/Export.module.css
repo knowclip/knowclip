@@ -11,7 +11,7 @@
 .mediaFileName {
   margin: 1em;
   flex: 1 1;
-  
+  font-size: inherit;
 }
 .mediaFileName small {
   font-weight: normal;
