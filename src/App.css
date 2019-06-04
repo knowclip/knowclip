@@ -50,10 +50,11 @@ video::-webkit-media-controls-toggle-closed-captions-button {
   overflow-y: auto;
   resize: vertical;
   max-width: 100%;
-  display: inline-block;
+  display: block;
 }
 audio.audioPlayer {
   width: 100%;
+  display: block;
 }
 video.audioPlayer {
   height: calc(100% - 36px);

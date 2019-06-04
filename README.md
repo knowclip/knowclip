@@ -1,8 +1,17 @@
 # Audio Flashcard Assistant
 
-A desktop application for making flashcards out of audio files. You choose an audio file, select clips from it, and export your audio flashcards for use in [Anki](https://apps.ankiweb.net/).
+A cross-platform desktop application for turning audio and video files into flashcards.
 
-Currently being built with [Electron](https://electronjs.org), [Create React App](https://github.com/facebookincubator/create-react-app), [Redux](https://redux.js.org/) and [RxJS](https://rxjs-dev.firebaseapp.com/).
+It works like this:
+
+1. Choose a media file.
+2. Make your clips (manually or automatically).
+3. Export your audio flashcards for use in [Anki](https://apps.ankiweb.net/).
+
+Currently being built with [Electron](https://electronjs.org), [Create React App](https://github.com/facebookincubator/create-react-app), [Redux](https://redux.js.org/) and [RxJS](https://rxjs-dev.firebaseapp.com/). Audio processing is done with [ffmpeg](https://ffmpeg.org/) for audio processing.
+
+### Demo: [Making cards automatically with subtitled video](https://www.youtube.com/watch?v=H_NFSVkK8kM)
+[![Audio Flashcard Assistant](img/screenshot_190604.png)](https://www.youtube.com/watch?v=H_NFSVkK8kM)
 
 
 ### Development
@@ -20,7 +29,7 @@ yarn start
 ```
 
 
-Then open the Electron app:
+Then, in another tab, open the Electron app:
 
 ```
 yarn electron
