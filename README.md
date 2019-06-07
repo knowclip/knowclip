@@ -34,3 +34,13 @@ Then, in another tab, open the Electron app:
 ```
 yarn electron
 ```
+### Docker
+
+To run this in a docker container:
+
+´´´bash
+./docker.sh build
+./docker.sh run
+´´´
+
+This will also mount the ´projects´- directory inside the container.
