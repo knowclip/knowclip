@@ -4,18 +4,15 @@ import { fromEvent } from 'rxjs'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 
-const elementWidth = element => {
-  const boundingClientRect = element.getBoundingClientRect()
-  return boundingClientRect.right - boundingClientRect.left
-}
-
-const audioElement = () => document.getElementById('audioPlayer')
-
-const setWaveformCursorEpic = (action$, state$) =>
+const setWaveformCursorEpic = (
+  action$,
+  state$,
+  { document, getWaveformSvgWidth }
+) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
-      fromEvent(audioElement(), 'timeupdate').pipe(
+      fromEvent(document, 'timeupdate', true).pipe(
         // takeUntil(
         // merge(
         //   action$.pipe(
@@ -52,9 +49,8 @@ const setWaveformCursorEpic = (action$, state$) =>
               ? highlightedClip.start
               : e.target.currentTime && e.target.currentTime * 50
           )
-          const svgElement = document.getElementById('waveform-svg')
           // if (!svgElement) return { type: 'WHOOPS CaNT UPDATE CURSOR NOW' }
-          const svgWidth = elementWidth(svgElement)
+          const svgWidth = getWaveformSvgWidth()
           if (newX < viewBox.xMin) {
             return setWaveformCursor(newX, {
               ...viewBox,

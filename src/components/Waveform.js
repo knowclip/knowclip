@@ -3,6 +3,7 @@ import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
 import css from './Waveform.module.css'
+import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -221,8 +222,12 @@ const mapStateToProps = state => ({
   highlightedClipId: r.getHighlightedClipId(state),
   subtitles: r.getSubtitlesTracks(state),
 })
+const mapDispatchToProps = {
+  highlightClip: r.highlightClip,
+  goToSubtitlesChunk: r.goToSubtitlesChunk,
+}
 
 export default connect(
   mapStateToProps,
-  { highlightClip: r.highlightClip, goToSubtitlesChunk: r.goToSubtitlesChunk }
+  mapDispatchToProps
 )(Waveform)

@@ -18,11 +18,11 @@ const pendingClipIsBigEnough = state => {
   return Math.abs(end - start) >= r.CLIP_THRESHOLD
 }
 
-const addClipEpic = (action$, state$) => {
+const addClipEpic = (action$, state$, { window, getWaveformSvgElement }) => {
   const loadAudioActions = action$.pipe(ofType('OPEN_MEDIA_FILE_SUCCESS'))
   const mousedowns = loadAudioActions.pipe(
     flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+      fromEvent(getWaveformSvgElement(), 'mousedown').pipe(
         takeUntil(loadAudioActions)
       )
     )
@@ -40,14 +40,14 @@ const addClipEpic = (action$, state$) => {
     // then start stretchy epic instead of clip epic
     filter(({ x }) => !r.getClipEdgeAt(state$.value, x)),
     flatMap(waveformMousedown => {
-      const audioElement = document.getElementById('audioPlayer')
-      const svgElement = document.getElementById('waveform-svg')
+      const mediaMetadata = r.getCurrentMediaMetadata(state$.value)
+      if (!mediaMetadata) throw new Error('No current media metadata')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =
         state$.value.waveform.stepsPerSecond * state$.value.waveform.stepLength
       const withinValidTime = x =>
-        Math.max(0, Math.min(x, audioElement.duration * factor))
+        Math.max(0, Math.min(x, mediaMetadata.durationSeconds * factor))
 
       const pendingClips = fromEvent(window, 'mousemove').pipe(
         map(mousemove => {
@@ -57,7 +57,7 @@ const addClipEpic = (action$, state$) => {
             end: withinValidTime(
               toWaveformX(
                 mousemove,
-                svgElement,
+                getWaveformSvgElement(),
                 r.getWaveformViewBoxXMin(state$.value)
               )
             ),

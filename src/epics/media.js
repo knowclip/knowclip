@@ -36,16 +36,13 @@ const coerceMp3ToConstantBitrate = (path, oldConstantBitratePath) => {
   })
 }
 
-const audioElement = () => document.getElementById('audioPlayer')
-const openMedia = (action$, state$) =>
+const openMedia = (action$, state$, { pauseMedia }) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_REQUEST'),
     switchMap(async ({ id }) => {
-      const mediaPlayer = audioElement()
-      mediaPlayer.pause()
-      mediaPlayer.src = ''
+      pauseMedia()
+      // mediaPlayer.src = ''
 
-      // const currentProject = r.getCurrentProject(state$.value)
       const filePath = r.getMediaFilePathFromCurrentProject(state$.value, id)
       const metadata = r.getMediaMetadataFromCurrentProject(state$.value, id)
       if (!metadata)

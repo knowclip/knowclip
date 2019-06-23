@@ -1,12 +1,7 @@
 import { ignoreElements, tap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
-export const persistState = (state: AppState) => {
-  window.localStorage.setItem('projects', JSON.stringify(state.projects))
-  window.localStorage.setItem('audio', JSON.stringify(state.audio))
-}
-
-const persistStateEpic = (action$, state$) =>
+const persistStateEpic = (action$, state$, { setLocalStorage }) =>
   action$.pipe(
     ofType(
       'OPEN_PROJECT',
@@ -17,7 +12,8 @@ const persistStateEpic = (action$, state$) =>
       'SET_MEDIA_FOLDER_LOCATION'
     ),
     tap(() => {
-      persistState(state$.value)
+      setLocalStorage('projects', JSON.stringify(state$.value.projects))
+      setLocalStorage('audio', JSON.stringify(state$.value.audio))
     }),
     ignoreElements()
   )

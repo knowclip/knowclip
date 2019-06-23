@@ -50,8 +50,8 @@ const detectSilenceEpic = (action$, state$) =>
   action$.pipe(
     ofType('DETECT_SILENCE'),
     flatMap(() => {
-      const audioElement = document.getElementById('audioPlayer')
       const currentFilePath = r.getCurrentFilePath(state$.value)
+      const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
       return detectSilence(currentFilePath).then(silences => {
         if (!silences.length)
           return [
@@ -68,7 +68,7 @@ const detectSilenceEpic = (action$, state$) =>
           if (nextSilence) {
             chunks.push({ start: silenceEnd, end: nextSilence.start })
           } else {
-            const durationMs = audioElement.duration * 1000
+            const durationMs = currentMediaMetadata.durationSeconds * 1000
             if (silenceEnd !== durationMs)
               chunks.push({ start: silenceEnd, end: durationMs })
           }

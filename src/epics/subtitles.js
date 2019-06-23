@@ -253,7 +253,7 @@ const subtitlesClipsDialogRequest = (action$, state$) =>
     })
   )
 
-const goToSubtitlesChunk = (action$, state$) =>
+const goToSubtitlesChunk = (action$, state$, { setCurrentTime }) =>
   action$.pipe(
     ofType('GO_TO_SUBTITLES_CHUNK'),
     map(({ chunkIndex, subtitlesTrackId }) => {
@@ -263,10 +263,7 @@ const goToSubtitlesChunk = (action$, state$) =>
         return { type: 'Subtitles track not found' }
       }
       const { start } = track.chunks[chunkIndex]
-      document.getElementById('audioPlayer').currentTime = r.getSecondsAtX(
-        state$.value,
-        start
-      )
+      setCurrentTime(r.getSecondsAtX(state$.value, start))
       return { type: 'moved to', start }
     })
   )

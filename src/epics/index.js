@@ -39,24 +39,6 @@ const defaultTagsEpic = (action$, state$) =>
 //     }))
 //   )
 
-const waveformMousedownEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
-        tap(e => e.preventDefault()),
-        map(mousedown => ({
-          type: 'WAVEFORM_MOUSEDOWN',
-          ...toWaveformCoordinates(
-            mousedown,
-            mousedown.currentTarget,
-            r.getWaveformViewBoxXMin(state$.value)
-          ),
-        }))
-      )
-    )
-  )
-
 const closeEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', () => {
     if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
@@ -83,7 +65,6 @@ export default combineEpics(
   media,
   getWaveformEpic,
   setWaveformCursorEpic,
-  waveformMousedownEpic,
   addClip,
   stretchClip,
   detectSilenceEpic,

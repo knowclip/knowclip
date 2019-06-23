@@ -12,17 +12,20 @@ import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 
-const audioElement = () => document.getElementById('audioPlayer')
 const elementWidth = element => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
 
-const highlightEpic = (action$, state$) =>
+const highlightEpic = (
+  action$,
+  state$,
+  { setCurrentTime, getWaveformSvgElement }
+) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
-      fromEvent(document.getElementById('waveform-svg'), 'mousedown').pipe(
+      fromEvent(getWaveformSvgElement(), 'mousedown').pipe(
         flatMap(mouseDown => {
           if (r.getPendingStretch(state$.value)) return empty()
 
@@ -36,7 +39,7 @@ const highlightEpic = (action$, state$) =>
             clipIdAtX: r.getClipIdAt(state$.value, waveformMouseDown.x),
           })
         }),
-        sample(fromEvent(document.getElementById('waveform-svg'), 'mouseup'))
+        sample(fromEvent(getWaveformSvgElement(), 'mouseup'))
       )
     ),
     map(({ waveformMouseDown, clipIdAtX }) => {
@@ -45,7 +48,7 @@ const highlightEpic = (action$, state$) =>
         ? r.getClip(state, clipIdAtX).start
         : waveformMouseDown.x
       const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
-      document.getElementById('audioPlayer').currentTime = newTime
+      setCurrentTime(newTime)
       return clipIdAtX ? r.highlightClip(clipIdAtX) : r.highlightClip(null)
     })
   )
@@ -56,14 +59,14 @@ const highlightClipsOnAddEpic = (action$, state$) =>
     map(({ clip: { id } }) => r.highlightClip(id))
   )
 
-const playClipsOnHighlightEpic = (action$, state$) =>
+const playClipsOnHighlightEpic = (action$, state$, { setCurrentTime }) =>
   action$.pipe(
     ofType('HIGHLIGHT_CLIP'),
     filter(({ id }) => Boolean(id)),
     tap(({ id: clipId }) => {
       const { start } = r.getClip(state$.value, clipId)
       const newTime = r.getSecondsAtX(state$.value, start)
-      audioElement().currentTime = newTime
+      setCurrentTime(newTime)
       //
       //
       //
@@ -98,7 +101,7 @@ const selectClipOnStretch = (action$, state$) =>
   )
 
 const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
-const centerSelectedClip = (action$, state$) =>
+const centerSelectedClip = (action$, state$, { getWaveformSvgElement }) =>
   action$.pipe(
     ofType('HIGHLIGHT_CLIP'),
     flatMap(({ id }) => {
@@ -106,7 +109,7 @@ const centerSelectedClip = (action$, state$) =>
       const clip = r.getClip(state$.value, id)
       if (!clip) return empty()
 
-      const svgElement = document.getElementById('waveform-svg')
+      const svgElement = getWaveformSvgElement()
       const svgWidth = elementWidth(svgElement)
 
       const svgFits = clip.end - clip.start <= svgWidth
@@ -137,11 +140,15 @@ const centerSelectedClip = (action$, state$) =>
   )
 
 const LOOP_BUFFER = 25
-const deselectClipOnManualChangeTime = (action$, state$) =>
+const deselectClipOnManualChangeTime = (
+  action$,
+  state$,
+  { document, getCurrentTime }
+) =>
   action$.pipe(
     ofType('OPEN_MEDIA_FILE_SUCCESS'),
     flatMap(() =>
-      fromEvent(audioElement(), 'seeking').pipe(
+      fromEvent(document, 'seeking', true).pipe(
         takeWhile(() => r.getCurrentMediaFileConstantBitratePath(state$.value))
       )
     ),
@@ -152,10 +159,7 @@ const deselectClipOnManualChangeTime = (action$, state$) =>
       if (!highlightedClipId) return false
 
       const highlightedClip = r.getClip(state$.value, highlightedClipId)
-      const x = r.getXAtMilliseconds(
-        state$.value,
-        audioElement().currentTime * 1000
-      )
+      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
       return x < highlightedClip.start || x > highlightedClip.end + LOOP_BUFFER
     }),
     map(() => r.highlightClip(null))

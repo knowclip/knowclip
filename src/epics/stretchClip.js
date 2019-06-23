@@ -4,7 +4,11 @@ import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 
-const stretchClipEpic = (action$, state$) => {
+const stretchClipEpic = (
+  action$,
+  state$,
+  { window, getWaveformSvgElement }
+) => {
   const clipMousedowns = action$.pipe(
     ofType('WAVEFORM_MOUSEDOWN'),
     switchMap(({ x }) => {
@@ -24,7 +28,7 @@ const stretchClipEpic = (action$, state$) => {
             originKey: key,
             end: toWaveformX(
               mousemove,
-              document.getElementById('waveform-svg'),
+              getWaveformSvgElement(),
               r.getWaveformViewBoxXMin(state$.value)
             ),
           })
