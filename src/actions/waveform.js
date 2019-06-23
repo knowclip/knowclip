@@ -19,9 +19,15 @@ export const setPendingClip = (clip: Clip): WaveformAction => ({
   clip,
 })
 
-export const setPendingStretch = (stretch: PendingStretch): WaveformAction => ({
+export const setPendingStretch = (
+  stretch: PendingStretch
+): SetPendingStretch => ({
   type: 'SET_PENDING_STRETCH',
   stretch,
+})
+
+export const clearPendingStretch = (): ClearPendingStretch => ({
+  type: 'CLEAR_PENDING_STRETCH',
 })
 
 export const setWaveformViewBox = (

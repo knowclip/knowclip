@@ -40,7 +40,8 @@ const subtitles: Reducer<SubtitlesState> = (
     case 'OPEN_PROJECT':
     case 'CLOSE_PROJECT':
       return initialState
-    case 'LOAD_SUBTITLES_SUCCESS':
+    case 'LOAD_EMBEDDED_SUBTITLES_SUCCESS':
+    case 'LOAD_EXTERNAL_SUBTITLES_SUCCESS':
       return {
         ...state,
         loadedTracks: [...state.loadedTracks, ...action.subtitlesTracks],

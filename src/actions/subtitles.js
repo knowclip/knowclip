@@ -16,42 +16,21 @@ export const loadSubtitlesFromFileRequest = (
   filePath,
 })
 
-export const loadSubtitlesSuccess = (
-  subtitlesTracks: Array<SubtitlesTrack>
-) => ({
-  type: 'LOAD_SUBTITLES_SUCCESS',
+export const loadEmbeddedSubtitlesSuccess = (
+  subtitlesTracks: Array<EmbeddedSubtitlesTrack>
+): LoadEmbeddedSubtitlesSuccess => ({
+  type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS',
   subtitlesTracks,
 })
 
-export const newEmbeddedSubtitlesTrack = (
-  id: string,
-  chunks: Array<SubtitlesChunk>,
-  streamIndex: number,
-  tmpFilePath: string
-): EmbeddedSubtitlesTrack => ({
-  type: 'EmbeddedSubtitlesTrack',
-  id,
-  mode: 'showing',
-  chunks,
-  streamIndex,
-  tmpFilePath,
+export const loadExternalSubtitlesSuccess = (
+  subtitlesTracks: Array<ExternalSubtitlesTrack>
+): LoadExternalSubtitlesSuccess => ({
+  type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS',
+  subtitlesTracks,
 })
 
-export const newExternalSubtitlesTrack = (
-  id: string,
-  chunks: Array<SubtitlesChunk>,
-  filePath: SubtitlesFilePath,
-  vttFilePath: SubtitlesFilePath
-): ExternalSubtitlesTrack => ({
-  mode: 'showing',
-  type: 'ExternalSubtitlesTrack',
-  id,
-  chunks,
-  filePath,
-  vttFilePath,
-})
-
-export const loadSubtitlesFailure = (error: string): SubtitlesAction => ({
+export const loadSubtitlesFailure = (error: string): LoadSubtitlesFailure => ({
   type: 'LOAD_SUBTITLES_FAILURE',
   error,
 })

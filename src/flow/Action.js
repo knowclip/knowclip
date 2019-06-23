@@ -58,11 +58,39 @@ declare type ClipAction =
   | {| type: 'HIGHLIGHT_CLIP', id: ?ClipId |}
 
 declare type WaveformAction =
-  | {| type: 'SET_WAVEFORM_IMAGE_PATH', path: ?string |}
-  | {| type: 'SET_CURSOR_POSITION', x: number, newViewBox: ?WaveformViewBox |}
-  | {| type: 'SET_WAVEFORM_VIEW_BOX', viewBox: WaveformViewBox |}
-  | {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
-  | {| type: 'SET_PENDING_STRETCH', stretch: PendingStretch |}
+  | SetWaveformImagePath
+  | SetCursorPosition
+  | SetWaveformViewBox
+  | SetPendingClip
+  | SetPendingStretch
+  | ClearPendingStretch
+  | WaveformMousedown
+declare type SetWaveformImagePath = {|
+  type: 'SET_WAVEFORM_IMAGE_PATH',
+  path: ?string,
+|}
+declare type SetCursorPosition = {|
+  type: 'SET_CURSOR_POSITION',
+  x: number,
+  newViewBox: ?WaveformViewBox,
+|}
+declare type SetWaveformViewBox = {|
+  type: 'SET_WAVEFORM_VIEW_BOX',
+  viewBox: WaveformViewBox,
+|}
+declare type SetPendingClip = {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
+declare type SetPendingStretch = {|
+  type: 'SET_PENDING_STRETCH',
+  stretch: PendingStretch,
+|}
+declare type ClearPendingStretch = {|
+  type: 'CLEAR_PENDING_STRETCH',
+|}
+declare type WaveformMousedown = {|
+  type: 'WAVEFORM_MOUSEDOWN',
+  x: number,
+  y: number,
+|}
 
 declare type DialogAction =
   | {| type: 'ENQUEUE_DIALOG', dialog: DialogData, skipQueue: boolean |}
@@ -100,14 +128,7 @@ declare type ProjectAction =
 
 declare type MediaAction =
   | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
-  | {|
-      type: 'OPEN_MEDIA_FILE_SUCCESS',
-      filePath: MediaFilePath,
-      constantBitrateFilePath: MediaFilePath,
-      metadata: MediaFileMetadata,
-      projectId: ProjectId,
-      subtitlesTracksStreamIndexes: Array<number>,
-    |}
+  | OpenMediaFileSuccess
   | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
   | {|
       type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
@@ -142,29 +163,70 @@ declare type MediaAction =
       filePath: MediaFilePath,
     |}
   | {| type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: boolean |}
+declare type OpenMediaFileSuccess = {|
+  type: 'OPEN_MEDIA_FILE_SUCCESS',
+  filePath: MediaFilePath,
+  constantBitrateFilePath: MediaFilePath,
+  metadata: MediaFileMetadata,
+  projectId: ProjectId,
+  subtitlesTracksStreamIndexes: Array<number>,
+|}
 
 declare type SubtitlesAction =
-  | {| type: 'LOAD_SUBTITLES_FROM_VIDEO_REQUEST', streamIndex: number |}
-  | {| type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST', filePath: SubtitlesFilePath |}
-  | {| type: 'LOAD_SUBTITLES_SUCCESS', subtitlesTracks: Array<SubtitlesTrack> |}
-  | {| type: 'LOAD_SUBTITLES_FAILURE', error: string |}
-  | {| type: 'DELETE_SUBTITLES_TRACK', id: SubtitlesTrackId |}
-  | {| type: 'SHOW_SUBTITLES', id: SubtitlesTrackId |}
-  | {| type: 'HIDE_SUBTITLES', id: SubtitlesTrackId |}
-  | {|
-      type: 'MAKE_CLIPS_FROM_SUBTITLES',
-      fileId: MediaFileId,
-      fieldNamesToTrackIds: { [FlashcardFieldName]: SubtitlesTrackId },
-      tags: Array<string>,
-    |}
-  | {| type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST' |}
-  | {|
-      type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
-      flashcardFieldName: FlashcardFieldName,
-      subtitlesTrackId: SubtitlesTrackId,
-    |}
-  | {|
-      type: 'GO_TO_SUBTITLES_CHUNK',
-      subtitlesTrackId: SubtitlesTrackId,
-      chunkIndex: number,
-    |}
+  | LoadSubtitlesFromVideoRequest
+  | LoadSubtitlesFromFileRequest
+  | LoadExternalSubtitlesSuccess
+  | LoadEmbeddedSubtitlesSuccess
+  | LoadSubtitlesFailure
+  | DeleteSubtitlesTrack
+  | ShowSubtitles
+  | HideSubtitles
+  | MakeClipsFromSubtitles
+  | ShowSubtitleSClipsDialogRequest
+  | LinkFlashcardFieldToSubtitlesTrack
+  | GoToSubtitlesChunk
+declare type LoadSubtitlesFromVideoRequest = {|
+  type: 'LOAD_SUBTITLES_FROM_VIDEO_REQUEST',
+  streamIndex: number,
+|}
+declare type LoadSubtitlesFromFileRequest = {|
+  type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST',
+  filePath: SubtitlesFilePath,
+|}
+declare type LoadExternalSubtitlesSuccess = {|
+  type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS',
+  subtitlesTracks: Array<ExternalSubtitlesTrack>,
+|}
+declare type LoadEmbeddedSubtitlesSuccess = {|
+  type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS',
+  subtitlesTracks: Array<EmbeddedSubtitlesTrack>,
+|}
+declare type LoadSubtitlesFailure = {|
+  type: 'LOAD_SUBTITLES_FAILURE',
+  error: string,
+|}
+declare type DeleteSubtitlesTrack = {|
+  type: 'DELETE_SUBTITLES_TRACK',
+  id: SubtitlesTrackId,
+|}
+declare type ShowSubtitles = {| type: 'SHOW_SUBTITLES', id: SubtitlesTrackId |}
+declare type HideSubtitles = {| type: 'HIDE_SUBTITLES', id: SubtitlesTrackId |}
+declare type MakeClipsFromSubtitles = {|
+  type: 'MAKE_CLIPS_FROM_SUBTITLES',
+  fileId: MediaFileId,
+  fieldNamesToTrackIds: { [FlashcardFieldName]: SubtitlesTrackId },
+  tags: Array<string>,
+|}
+declare type ShowSubtitleSClipsDialogRequest = {|
+  type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST',
+|}
+declare type LinkFlashcardFieldToSubtitlesTrack = {|
+  type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
+  flashcardFieldName: FlashcardFieldName,
+  subtitlesTrackId: SubtitlesTrackId,
+|}
+declare type GoToSubtitlesChunk = {|
+  type: 'GO_TO_SUBTITLES_CHUNK',
+  subtitlesTrackId: SubtitlesTrackId,
+  chunkIndex: number,
+|}
