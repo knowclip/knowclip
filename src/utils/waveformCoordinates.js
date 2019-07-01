@@ -1,7 +1,16 @@
-export const toWaveformX = (mouseEvent, svgElement, xMin = 0) =>
-  mouseEvent.clientX - svgElement.getBoundingClientRect().left + xMin
+// @flow
 
-export const toWaveformCoordinates = (mouseEvent, svgElement, xMin = 0) => {
+export const toWaveformX = (
+  mouseEvent: MouseEvent,
+  svgElement: HTMLElement,
+  xMin: number = 0
+) => mouseEvent.clientX - svgElement.getBoundingClientRect().left + xMin
+
+export const toWaveformCoordinates = (
+  mouseEvent: MouseEvent,
+  svgElement: HTMLElement,
+  xMin: number = 0
+) => {
   const { clientX, clientY } = mouseEvent
   const { left, top } = svgElement.getBoundingClientRect()
   return {

@@ -1,31 +1,29 @@
 // @flow
-export const showSubtitles = (id: SubtitlesTrackId): SubtitlesAction => ({
+export const showSubtitles = (id: SubtitlesTrackId) => ({
   type: 'SHOW_SUBTITLES',
   id,
 })
 
-export const hideSubtitles = (id: SubtitlesTrackId): SubtitlesAction => ({
+export const hideSubtitles = (id: SubtitlesTrackId) => ({
   type: 'HIDE_SUBTITLES',
   id,
 })
 
-export const loadSubtitlesFromFileRequest = (
-  filePath: string
-): SubtitlesAction => ({
+export const loadSubtitlesFromFileRequest = (filePath: string) => ({
   type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST',
   filePath,
 })
 
 export const loadEmbeddedSubtitlesSuccess = (
   subtitlesTracks: Array<EmbeddedSubtitlesTrack>
-): LoadEmbeddedSubtitlesSuccess => ({
+) => ({
   type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS',
   subtitlesTracks,
 })
 
 export const loadExternalSubtitlesSuccess = (
   subtitlesTracks: Array<ExternalSubtitlesTrack>
-): LoadExternalSubtitlesSuccess => ({
+) => ({
   type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS',
   subtitlesTracks,
 })
@@ -35,9 +33,7 @@ export const loadSubtitlesFailure = (error: string): LoadSubtitlesFailure => ({
   error,
 })
 
-export const deleteSubtitlesTrack = (
-  id: SubtitlesTrackId
-): SubtitlesAction => ({
+export const deleteSubtitlesTrack = (id: SubtitlesTrackId) => ({
   type: 'DELETE_SUBTITLES_TRACK',
   id,
 })
@@ -46,14 +42,14 @@ export const makeClipsFromSubtitles = (
   fileId: MediaFileId,
   fieldNamesToTrackIds: { [FlashcardFieldName]: SubtitlesTrackId },
   tags: Array<string>
-): SubtitlesAction => ({
+) => ({
   type: 'MAKE_CLIPS_FROM_SUBTITLES',
   fileId,
   fieldNamesToTrackIds,
   tags,
 })
 
-export const subtitlesClipsDialogRequest = (): SubtitlesAction => ({
+export const subtitlesClipsDialogRequest = () => ({
   type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST',
 })
 
@@ -69,7 +65,7 @@ export const linkFlashcardFieldToSubtitlesTrack = (
 export const goToSubtitlesChunk = (
   subtitlesTrackId: SubtitlesTrackId,
   chunkIndex: number
-): SubtitlesAction => ({
+) => ({
   type: 'GO_TO_SUBTITLES_CHUNK',
   subtitlesTrackId,
   chunkIndex,

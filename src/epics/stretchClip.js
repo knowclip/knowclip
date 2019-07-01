@@ -1,6 +1,5 @@
 // @flow
-import { map, switchMap, takeUntil, takeLast } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
+import { map, switchMap, takeUntil, takeLast, filter } from 'rxjs/operators'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
@@ -11,7 +10,9 @@ const stretchClipEpic: Epic<Action> = (
   { window, getWaveformSvgElement }
 ) => {
   const clipMousedowns = action$.pipe(
-    ofType('WAVEFORM_MOUSEDOWN'),
+    filter<*, WaveformMousedown>(
+      action => action.type === 'WAVEFORM_MOUSEDOWN'
+    ),
     switchMap(({ x }) => {
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()
@@ -22,18 +23,20 @@ const stretchClipEpic: Epic<Action> = (
       } = mousedownData
       const pendingStretches = fromEvent(window, 'mousemove').pipe(
         takeUntil(fromEvent(window, 'mouseup')),
-        map(mousemove =>
-          r.setPendingStretch({
+        map(mousemove => {
+          const svgElement = getWaveformSvgElement()
+          if (!svgElement) throw new Error('Waveform disappeared')
+          return r.setPendingStretch({
             id,
             // start: mousedownData.x,
             originKey: key,
             end: toWaveformX(
               mousemove,
-              getWaveformSvgElement(),
+              svgElement,
               r.getWaveformViewBoxXMin(state$.value)
             ),
           })
-        )
+        })
       )
 
       return merge(

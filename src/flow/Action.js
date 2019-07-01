@@ -62,6 +62,7 @@ declare type WaveformAction =
   | SetCursorPosition
   | SetWaveformViewBox
   | SetPendingClip
+  | ClearPendingClip
   | SetPendingStretch
   | ClearPendingStretch
   | WaveformMousedown
@@ -78,7 +79,10 @@ declare type SetWaveformViewBox = {|
   type: 'SET_WAVEFORM_VIEW_BOX',
   viewBox: WaveformViewBox,
 |}
-declare type SetPendingClip = {| type: 'SET_PENDING_CLIP', clip: ?PendingClip |}
+declare type SetPendingClip = {| type: 'SET_PENDING_CLIP', clip: PendingClip |}
+declare type ClearPendingClip = {|
+  type: 'CLEAR_PENDING_CLIP',
+|}
 declare type SetPendingStretch = {|
   type: 'SET_PENDING_STRETCH',
   stretch: PendingStretch,

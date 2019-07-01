@@ -1,22 +1,23 @@
 // @flow
 
-export const setWaveformImagePath = (path: ?string): WaveformAction => ({
+export const setWaveformImagePath = (path: ?string) => ({
   type: 'SET_WAVEFORM_IMAGE_PATH',
   path,
 })
 
-export const setWaveformCursor = (
-  x: number,
-  newViewBox: Object
-): WaveformAction => ({
+export const setWaveformCursor = (x: number, newViewBox: Object) => ({
   type: 'SET_CURSOR_POSITION',
   x,
   newViewBox,
 })
 
-export const setPendingClip = (clip: Clip): WaveformAction => ({
+export const setPendingClip = (clip: PendingClip): SetPendingClip => ({
   type: 'SET_PENDING_CLIP',
   clip,
+})
+
+export const clearPendingClip = (): ClearPendingClip => ({
+  type: 'CLEAR_PENDING_CLIP',
 })
 
 export const setPendingStretch = (
@@ -30,9 +31,7 @@ export const clearPendingStretch = (): ClearPendingStretch => ({
   type: 'CLEAR_PENDING_STRETCH',
 })
 
-export const setWaveformViewBox = (
-  viewBox: WaveformViewBox
-): WaveformAction => ({
+export const setWaveformViewBox = (viewBox: WaveformViewBox) => ({
   type: 'SET_WAVEFORM_VIEW_BOX',
   viewBox,
 })
