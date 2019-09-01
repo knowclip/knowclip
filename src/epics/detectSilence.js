@@ -1,3 +1,4 @@
+// @flow
 import { flatMap, map } from 'rxjs/operators'
 import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
@@ -52,6 +53,9 @@ const detectSilenceEpic = (action$, state$) =>
     flatMap(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
+      if (!currentMediaMetadata)
+        throw new Error('Illegal: no media file loaded')
+
       return detectSilence(currentFilePath).then(silences => {
         if (!silences.length)
           return [
@@ -76,6 +80,9 @@ const detectSilenceEpic = (action$, state$) =>
 
         const fileId = r.getCurrentFileId(state$.value)
         const currentNoteType = r.getCurrentNoteType(state$.value)
+        if (!fileId) throw new Error('Illegal: no media file loaded')
+        if (!currentNoteType) throw new Error('Illegal: no note type found')
+
         const newClips = chunks.map(({ start, end }) =>
           newClip(
             // shoudl have fewer arguments

@@ -146,7 +146,7 @@ export const loadEmbeddedSubtitles: Epic<Action> = (action$, state$) =>
     filter<OpenMediaFileSuccess, any>(({ subtitlesTracksStreamIndexes }) =>
       Boolean(subtitlesTracksStreamIndexes.length)
     ),
-    flatMap<OpenMediaFileSuccess, any>(
+    flatMap<OpenMediaFileSuccess, *>(
       async ({ subtitlesTracksStreamIndexes, filePath }) => {
         try {
           const subtitles = await Promise.all(

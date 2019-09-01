@@ -1,3 +1,4 @@
+// 2flow
 import { map } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'

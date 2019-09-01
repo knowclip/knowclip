@@ -1,3 +1,4 @@
+// @flow
 import { basename } from 'path'
 
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
@@ -18,9 +19,9 @@ export default ffmpeg
 const zeroPad = (zeroes, value) => String(value).padStart(zeroes, '0')
 
 export const toTimestamp = (
-  milliseconds,
-  unitsSeparator = ':',
-  millisecondsSeparator = '.'
+  milliseconds: number,
+  unitsSeparator: string = ':',
+  millisecondsSeparator: string = '.'
 ) => {
   const millisecondsStamp = zeroPad(3, Math.round(milliseconds % 1000))
   const secondsStamp = zeroPad(2, Math.floor(milliseconds / 1000) % 60)
@@ -29,8 +30,13 @@ export const toTimestamp = (
   return `${hoursStamp}${unitsSeparator}${minutesStamp}${unitsSeparator}${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }
 
-export const getMediaMetadata = path => {
-  return new Promise((res, rej) => {
+type FfProbeMetadata = {
+  format: { duration: number, format_name: string },
+  streams: Array<{ index: number, codec_type: string }>,
+}
+
+export const getMediaMetadata = (path: MediaFilePath) => {
+  return new Promise<FfProbeMetadata>((res, rej) => {
     ffmpeg.ffprobe(path, (err, metadata) => {
       if (err) rej(err)
 
@@ -40,9 +46,9 @@ export const getMediaMetadata = path => {
 }
 
 export const convertMediaMetadata = (
-  ffprobeMetadata,
-  filePath,
-  id
+  ffprobeMetadata: FfProbeMetadata,
+  filePath: MediaFilePath,
+  id: MediaFileId
 ): MediaFileMetadata => ({
   id,
   name: basename(filePath),

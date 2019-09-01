@@ -90,7 +90,7 @@ export const openMediaFileSuccess = (
   metadata: MediaFileMetadata,
   projectId: ProjectId, // kind of unnecessary... maybe should change state shape
   subtitlesTracksStreamIndexes: Array<number>
-): Action => ({
+): OpenMediaFileSuccess => ({
   type: 'OPEN_MEDIA_FILE_SUCCESS',
   filePath,
   constantBitrateFilePath,
@@ -99,7 +99,9 @@ export const openMediaFileSuccess = (
   subtitlesTracksStreamIndexes,
 })
 
-export const openMediaFileFailure = (errorMessage: string): Action => ({
+export const openMediaFileFailure = (
+  errorMessage: string
+): OpenMediaFileFailure => ({
   type: 'OPEN_MEDIA_FILE_FAILURE',
   errorMessage,
 })

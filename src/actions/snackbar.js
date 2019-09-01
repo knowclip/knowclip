@@ -1,6 +1,6 @@
 // @flow
 
-export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
+export const enqueueSnackbar = (snackbar: SnackbarData) => ({
   type: 'ENQUEUE_SNACKBAR',
   snackbar,
 })

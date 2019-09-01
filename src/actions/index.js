@@ -98,11 +98,13 @@ export const exportMp3 = (exportData: ApkgExportData): Action => ({
 
 export const exportCsv = (
   clipIds: Array<ClipId>,
-  csvFilePath: string
+  csvFilePath: string,
+  mediaFolderLocation: string
 ): Action => ({
   type: 'EXPORT_CSV',
   clipIds,
   csvFilePath,
+  mediaFolderLocation,
 })
 
 export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({

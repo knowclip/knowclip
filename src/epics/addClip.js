@@ -8,7 +8,6 @@ import {
   take,
   switchMap,
 } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
 import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
 import {
@@ -26,7 +25,7 @@ const pendingClipIsBigEnough = state => {
   return Math.abs(end - start) >= r.CLIP_THRESHOLD
 }
 
-const addClipEpic: Epic<*> = (
+const addClipEpic: Epic<Action> = (
   action$,
   state$,
   { window, getWaveformSvgElement }

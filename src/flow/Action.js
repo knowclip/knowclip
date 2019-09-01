@@ -128,45 +128,29 @@ declare type ProjectAction =
   | {| type: 'EXPORT_APKG_FAILURE', errorMessage: ?string |}
   | {| type: 'EXPORT_APKG_SUCCESS', successMessage: string |}
   | {| type: 'EXPORT_MARKDOWN', clipIds: Array<ClipId> |}
-  | {| type: 'EXPORT_CSV', clipIds: Array<ClipId>, csvFilePath: string |}
+  | {|
+      type: 'EXPORT_CSV',
+      clipIds: Array<ClipId>,
+      csvFilePath: string,
+      mediaFolderLocation: string,
+    |}
 
 declare type MediaAction =
-  | {| type: 'OPEN_MEDIA_FILE_REQUEST', id: MediaFileId |}
+  | OpenMediaFileRequest
   | OpenMediaFileSuccess
-  | {| type: 'OPEN_MEDIA_FILE_FAILURE', errorMessage: string |}
-  | {|
-      type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
-      projectId: ProjectId,
-      filePaths: Array<MediaFilePath>,
-    |}
-  | {|
-      type: 'ADD_MEDIA_TO_PROJECT',
-      projectId: ProjectId,
-      mediaFilePaths: Array<AudioMetadataAndPath>,
-    |}
-  | {|
-      type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST',
-      projectId: ProjectId,
-      mediaFileId: MediaFileId,
-    |}
-  | {|
-      type: 'DELETE_MEDIA_FROM_PROJECT',
-      projectId: ProjectId,
-      mediaFileId: MediaFileId,
-    |}
-  | {|
-      type: 'LOCATE_MEDIA_FILE_REQUEST',
-      id: MediaFileId,
-      filePath: MediaFilePath,
-    |}
-  | {|
-      type: 'LOCATE_MEDIA_FILE_SUCCESS',
-      projectId: ProjectId,
-      id: MediaFileId,
-      metadata: MediaFileMetadata,
-      filePath: MediaFilePath,
-    |}
-  | {| type: 'SET_WORK_IS_UNSAVED', workIsUnsaved: boolean |}
+  | OpenMp3Request
+  | OpenMediaFileFailure
+  | AddMediaToProjectRequest
+  | AddMediaToProject
+  | DeleteMediaFromProjectRequest
+  | DeleteMediaFromProject
+  | LocateMediaFileRequest
+  | LocateMediaFileSuccess
+  | SetWorkIsUnsaved
+declare type OpenMediaFileRequest = {|
+  type: 'OPEN_MEDIA_FILE_REQUEST',
+  id: MediaFileId,
+|}
 declare type OpenMediaFileSuccess = {|
   type: 'OPEN_MEDIA_FILE_SUCCESS',
   filePath: MediaFilePath,
@@ -174,6 +158,52 @@ declare type OpenMediaFileSuccess = {|
   metadata: MediaFileMetadata,
   projectId: ProjectId,
   subtitlesTracksStreamIndexes: Array<number>,
+|}
+declare type OpenMediaFileFailure = {|
+  type: 'OPEN_MEDIA_FILE_FAILURE',
+  errorMessage: string,
+|}
+declare type OpenMp3Request = {|
+  type: 'OPEN_MP3_REQUEST',
+  id: MediaFileId,
+  filePath: MediaFilePath,
+|}
+declare type AddMediaToProjectRequest = {|
+  type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
+  projectId: ProjectId,
+  filePaths: Array<MediaFilePath>,
+|}
+declare type AddMediaToProject = {|
+  type: 'ADD_MEDIA_TO_PROJECT',
+  projectId: ProjectId,
+  mediaFilePaths: Array<AudioMetadataAndPath>,
+|}
+declare type DeleteMediaFromProjectRequest = {|
+  type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST',
+  projectId: ProjectId,
+  mediaFileId: MediaFileId,
+|}
+declare type DeleteMediaFromProject = {|
+  type: 'DELETE_MEDIA_FROM_PROJECT',
+  projectId: ProjectId,
+  mediaFileId: MediaFileId,
+|}
+
+declare type LocateMediaFileRequest = {|
+  type: 'LOCATE_MEDIA_FILE_REQUEST',
+  id: MediaFileId,
+  filePath: MediaFilePath,
+|}
+declare type LocateMediaFileSuccess = {|
+  type: 'LOCATE_MEDIA_FILE_SUCCESS',
+  projectId: ProjectId,
+  id: MediaFileId,
+  metadata: MediaFileMetadata,
+  filePath: MediaFilePath,
+|}
+declare type SetWorkIsUnsaved = {|
+  type: 'SET_WORK_IS_UNSAVED',
+  workIsUnsaved: boolean,
 |}
 
 declare type SubtitlesAction =
