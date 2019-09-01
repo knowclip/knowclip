@@ -5,7 +5,7 @@ import { promisify } from 'util'
 import fs from 'fs'
 import * as r from '../redux'
 import { showSaveDialog } from '../utils/electron'
-import projectToMarkdown from '../utils/projectToMarkdown'
+import projectToMarkdown from '../utils/sanzijingMarkdown'
 
 const writeFile = promisify(fs.writeFile)
 
@@ -25,6 +25,7 @@ const exportMarkdown = (action$, state$) =>
           currentProjectMetadata.id,
           clipIds
         )
+        console.log(markdown)
         await writeFile(filename, markdown, 'utf8')
         return from([
           r.simpleMessageSnackbar(`Markdown file saved in ${filename}`),
