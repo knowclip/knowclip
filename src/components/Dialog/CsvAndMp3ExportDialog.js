@@ -33,7 +33,7 @@ const CsvAndMp3ExportDialog = ({
     const { csvFilePath, mediaFolderLocation } = fields
     if (csvFilePath && mediaFolderLocation) {
       closeDialog()
-      return exportCsv(clipIds, csvFilePath)
+      return exportCsv(clipIds, csvFilePath, mediaFolderLocation)
     }
     const errors = {}
     if (!csvFilePath)

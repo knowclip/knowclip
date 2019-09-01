@@ -17,7 +17,7 @@ const exportFailureSnackbar = err =>
 const exportCsv = (action$, state$) =>
   action$.pipe(
     ofType('EXPORT_CSV'),
-    flatMap(async ({ clipIds, csvFilePath }) => {
+    flatMap(async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
       try {
         const currentProjectMetadata = r.getCurrentProject(state$.value)
         if (!currentProjectMetadata)
@@ -32,6 +32,7 @@ const exportCsv = (action$, state$) =>
         await writeFile(csvFilePath, csvText, 'utf8')
         return from([
           r.simpleMessageSnackbar(`Flashcards saved in ${csvFilePath}`),
+          r.setMediaFolderLocation(mediaFolderLocation), // should probably just get rid of this action
           r.exportMp3(exportData),
         ])
       } catch (err) {
