@@ -4,6 +4,7 @@ const url = require('url')
 const { app, ipcMain } = electron
 const { isPackaged } = app
 const { BrowserWindow } = electron
+const setUpMenu = require('./src/utils/electronMenu')
 
 const installDevtools = require('./devtools')
 
@@ -66,6 +67,8 @@ async function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow()
+
+  setUpMenu(app)
 
   // Register a 'CommandOrControl+X' shortcut listener.
   const ret = electron.globalShortcut.register('CommandOrControl+K', () => {
