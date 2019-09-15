@@ -59,6 +59,12 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         pendingClip: action.clip,
       }
 
+    case 'CLEAR_PENDING_CLIP':
+      return {
+        ...state,
+        pendingClip: null,
+      }
+
     case 'HIGHLIGHT_CLIP':
       return {
         ...state,
@@ -69,6 +75,12 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       return {
         ...state,
         pendingStretch: action.stretch,
+      }
+
+    case 'CLEAR_PENDING_STRETCH':
+      return {
+        ...state,
+        pendingStretch: null,
       }
 
     case 'SET_DEFAULT_TAGS':

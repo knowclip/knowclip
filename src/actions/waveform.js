@@ -35,3 +35,8 @@ export const setWaveformViewBox = (viewBox: WaveformViewBox) => ({
   type: 'SET_WAVEFORM_VIEW_BOX',
   viewBox,
 })
+
+export const waveformMousedown = (x: number): WaveformMousedown => ({
+  type: 'WAVEFORM_MOUSEDOWN',
+  x,
+})

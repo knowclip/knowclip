@@ -93,7 +93,6 @@ declare type ClearPendingStretch = {|
 declare type WaveformMousedown = {|
   type: 'WAVEFORM_MOUSEDOWN',
   x: number,
-  y: number,
 |}
 
 declare type DialogAction =
