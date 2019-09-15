@@ -25,7 +25,6 @@ const exportMarkdown = (action$, state$) =>
           currentProjectMetadata.id,
           clipIds
         )
-        console.log(markdown)
         await writeFile(filename, markdown, 'utf8')
         return from([
           r.simpleMessageSnackbar(`Markdown file saved in ${filename}`),

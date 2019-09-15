@@ -21,21 +21,22 @@ const projectToMarkdown = (
             const { fields } = clip.flashcard
             if (!fields.pronunciation)
               throw new Error('Pronunciation field missing')
-            return [
-              ...(!clips[i - 1] ||
-              clips[i - 1].flashcard.tags.sort().toString() !==
-                clip.flashcard.tags.sort().toString()
-                ? [`# ${clip.flashcard.tags.join(' ')}`]
-                : []),
-              `## 三字經 ${i}`,
-              fields.pronunciation.replace('/\n/g', '  \n'),
-              fields.transcription.replace('/\n/g', '  \n'),
-              fields.meaning.replace('/\n/g', '  \n'),
-              ...(fields.notes
-                ? ['> ' + fields.notes.replace(/\n/g, '  \n> ')]
-                : []),
-              '',
-            ].join('\n\n')
+            return (
+              [
+                ...(!clips[i - 1] ||
+                clips[i - 1].flashcard.tags.sort().toString() !==
+                  clip.flashcard.tags.sort().toString()
+                  ? [`# ${clip.flashcard.tags.join(' ')}`]
+                  : []),
+                `## 三字經 ${i}`,
+                fields.pronunciation.replace(/\n/g, '  \n'),
+                fields.transcription.replace(/\n/g, '  \n'),
+                fields.meaning.replace(/\n/g, '  \n'),
+                ...(fields.notes
+                  ? ['> ' + fields.notes.replace(/\n/g, '  \n> ')]
+                  : []),
+              ].join('\n\n') + '\n'
+            )
           }),
         ]
       })
