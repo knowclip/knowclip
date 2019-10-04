@@ -1,15 +1,14 @@
-
 declare type WaveformState = {
-  stepsPerSecond: number,
-  stepLength: number,
+  stepsPerSecond: number
+  stepLength: number
   cursor: {
-    x: number,
+    x: number
     y: number
-  },
-  viewBox: WaveformViewBox,
+  }
+  viewBox: WaveformViewBox
   path: string | null
-};
+}
 
 declare type WaveformViewBox = {
   xMin: number
-};
+}

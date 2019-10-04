@@ -1,4 +1,4 @@
-import { Reducer } from "redux"
+import { Reducer } from 'redux'
 
 export const initialState = {
   loop: true,
@@ -6,10 +6,7 @@ export const initialState = {
   mediaFolderLocation: null,
 }
 
-const audio: Reducer<MediaState, Action> = (
-  state = initialState,
-  action
-) => {
+const audio: Reducer<MediaState, Action> = (state = initialState, action) => {
   switch (action.type) {
     case 'TOGGLE_LOOP':
       return {

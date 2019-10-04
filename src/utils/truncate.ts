@@ -1,4 +1,4 @@
-const truncate = (str  :string      , maxLength: number        )         => {
+const truncate = (str: string, maxLength: number) => {
   if (str.length > maxLength) {
     return (
       str.substr(0, ~~(maxLength / 2) - 3) +

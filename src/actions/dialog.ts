@@ -1,8 +1,10 @@
-
-export const enqueueDialog = (dialog: DialogData, skipQueue: boolean = false): DialogAction => ({
+export const enqueueDialog = (
+  dialog: DialogData,
+  skipQueue: boolean = false
+): DialogAction => ({
   type: 'ENQUEUE_DIALOG',
   dialog,
-  skipQueue
+  skipQueue,
 })
 
 export const confirmationDialog = (message: string, action: Action) =>
@@ -11,23 +13,29 @@ export const confirmationDialog = (message: string, action: Action) =>
     props: { message, action },
   })
 
-export const editNoteTypeDialog = (noteTypeId: NoteTypeId): DialogAction => enqueueDialog({
-  type: 'NoteTypeForm',
-  props: { noteTypeId },
-})
+export const editNoteTypeDialog = (noteTypeId: NoteTypeId): DialogAction =>
+  enqueueDialog({
+    type: 'NoteTypeForm',
+    props: { noteTypeId },
+  })
 
-export const newNoteTypeDialog = (): DialogAction => enqueueDialog({
-  type: 'NoteTypeForm',
-  props: { noteTypeId: null },
-})
+export const newNoteTypeDialog = (): DialogAction =>
+  enqueueDialog({
+    type: 'NoteTypeForm',
+    props: { noteTypeId: null },
+  })
 
-export const mediaFolderLocationFormDialog = (action: Action | null, skipQueue: boolean): DialogAction => enqueueDialog(
-  {
-    type: 'MediaFolderLocationForm',
-    props: { action },
-  },
-  skipQueue
-)
+export const mediaFolderLocationFormDialog = (
+  action: Action | null,
+  skipQueue: boolean
+): DialogAction =>
+  enqueueDialog(
+    {
+      type: 'MediaFolderLocationForm',
+      props: { action },
+    },
+    skipQueue
+  )
 
 export const reviewAndExportDialog = () =>
   enqueueDialog({
@@ -37,12 +45,15 @@ export const reviewAndExportDialog = () =>
 export const newProjectFormDialog = () =>
   enqueueDialog({ type: 'NewProjectForm' })
 
-export const openMediaFileFailureDialog = (message: string): DialogAction => enqueueDialog({ type: 'OpenMediaFileFailure', props: { message } })
+export const openMediaFileFailureDialog = (message: string): DialogAction =>
+  enqueueDialog({ type: 'OpenMediaFileFailure', props: { message } })
 
 export const closeDialog = (): DialogAction => ({
-  type: 'CLOSE_DIALOG'
+  type: 'CLOSE_DIALOG',
 })
 
-export const csvAndMp3ExportDialog = (clipIds: Array<ClipId>): DialogAction => enqueueDialog({ type: 'CsvAndMp3Export', props: { clipIds } }, true)
+export const csvAndMp3ExportDialog = (clipIds: Array<ClipId>): DialogAction =>
+  enqueueDialog({ type: 'CsvAndMp3Export', props: { clipIds } }, true)
 
-export const subtitlesClipDialog = (): DialogAction => enqueueDialog({ type: 'SubtitlesClips' })
+export const subtitlesClipDialog = (): DialogAction =>
+  enqueueDialog({ type: 'SubtitlesClips' })

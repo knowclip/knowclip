@@ -1,11 +1,18 @@
 import stripHtml from '../utils/stripHtml'
 import { getXAtMilliseconds } from './waveformTime'
 
-export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> => state.subtitles.loadedTracks
+export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
+  state.subtitles.loadedTracks
 
-export const getSubtitlesTrack = (state: AppState, id: SubtitlesTrackId): SubtitlesTrack | null => state.subtitles.loadedTracks.find(track => track.id === id) || null
+export const getSubtitlesTrack = (
+  state: AppState,
+  id: SubtitlesTrackId
+): SubtitlesTrack | null =>
+  state.subtitles.loadedTracks.find(track => track.id === id) || null
 
-export const getEmbeddedSubtitlesTracks = (state: AppState): Array<EmbeddedSubtitlesTrack> => {
+export const getEmbeddedSubtitlesTracks = (
+  state: AppState
+): Array<EmbeddedSubtitlesTrack> => {
   const result: Array<EmbeddedSubtitlesTrack> = []
   state.subtitles.loadedTracks.forEach(track => {
     if (track.type === 'EmbeddedSubtitlesTrack') result.push(track)
@@ -13,7 +20,9 @@ export const getEmbeddedSubtitlesTracks = (state: AppState): Array<EmbeddedSubti
   return result
 }
 
-export const getExternalSubtitlesTracks = (state: AppState): Array<ExternalSubtitlesTrack> => {
+export const getExternalSubtitlesTracks = (
+  state: AppState
+): Array<ExternalSubtitlesTrack> => {
   const result: Array<ExternalSubtitlesTrack> = []
   state.subtitles.loadedTracks.forEach(track => {
     if (track.type === 'ExternalSubtitlesTrack') result.push(track)
@@ -26,16 +35,16 @@ export const readVttChunk = (
   {
     start,
     end,
-    text
+    text,
   }: {
-    start: number,
-    end: number,
+    start: number
+    end: number
     text: string
   }
 ): SubtitlesChunk => ({
   start: getXAtMilliseconds(state, start),
   end: getXAtMilliseconds(state, end),
-  text:(stripHtml(text) || '').trim()
+  text: (stripHtml(text) || '').trim(),
 })
 
 export const readSubsrtChunk = readVttChunk
@@ -45,8 +54,9 @@ const overlap = (
   start: WaveformX,
   end: WaveformX,
   halfSecond: WaveformX
-): boolean => (start >= chunk.start && chunk.end - start >= halfSecond) ||
-(end <= chunk.end && end - chunk.start >= halfSecond) ||
+): boolean =>
+  (start >= chunk.start && chunk.end - start >= halfSecond) ||
+  (end <= chunk.end && end - chunk.start >= halfSecond) ||
   (chunk.start >= start && chunk.end <= end)
 
 export const getSubtitlesChunksWithinRange = (
@@ -56,9 +66,8 @@ export const getSubtitlesChunksWithinRange = (
   end: WaveformX
 ): Array<SubtitlesChunk> => {
   const track = getSubtitlesTrack(state, subtitlesTrackId)
-  if (!track)
-    return []
-    // throw new Error(`Could not find subtitles track ${subtitlesTrackId}`)
+  if (!track) return []
+  // throw new Error(`Could not find subtitles track ${subtitlesTrackId}`)
   return track.chunks.filter(chunk =>
     overlap(
       chunk,
@@ -69,24 +78,21 @@ export const getSubtitlesChunksWithinRange = (
   )
 }
 
-export const getSubtitlesFlashcardFieldLinks = (state: AppState)// should probably be ?id
-  : {
-    [K in FlashcardFieldName]: SubtitlesTrackId;
-  } => state.subtitles.flashcardFieldLinks
+export const getSubtitlesFlashcardFieldLinks = (
+  state: AppState // should probably be ?id
+): { [K in FlashcardFieldName]: SubtitlesTrackId } =>
+  state.subtitles.flashcardFieldLinks
 
 // export const getSubtitlesTrackName = (
 
 export const getNewFieldsFromLinkedSubtitles = (
   state: AppState,
-  {
-    start,
-    end
-  }: PendingClip
+  { start, end }: PendingClip
 ): FlashcardFields => {
   const links = getSubtitlesFlashcardFieldLinks(state)
   const result = {} as FlashcardFields
   for (const fieldName in links) {
-    const coerced  = fieldName as FlashcardFieldName
+    const coerced = fieldName as FlashcardFieldName
     const trackId = links[coerced]
     const chunks = getSubtitlesChunksWithinRange(state, trackId, start, end)
     // @ts-ignore

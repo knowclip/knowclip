@@ -29,7 +29,7 @@ export const loadExternalSubtitlesSuccess = (
 
 export const loadSubtitlesFailure = (error: string): LoadSubtitlesFailure => ({
   type: 'LOAD_SUBTITLES_FAILURE',
-  error
+  error,
 })
 
 export const deleteSubtitlesTrack = (id: SubtitlesTrackId) => ({
@@ -39,9 +39,7 @@ export const deleteSubtitlesTrack = (id: SubtitlesTrackId) => ({
 
 export const makeClipsFromSubtitles = (
   fileId: MediaFileId,
-  fieldNamesToTrackIds: {
-    [K in FlashcardFieldName]: SubtitlesTrackId;
-  },
+  fieldNamesToTrackIds: { [K in FlashcardFieldName]: SubtitlesTrackId },
   tags: Array<string>
 ) => ({
   type: 'MAKE_CLIPS_FROM_SUBTITLES',

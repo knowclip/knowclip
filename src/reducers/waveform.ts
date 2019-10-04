@@ -1,4 +1,4 @@
-import { Reducer } from "redux"
+import { Reducer } from 'redux'
 
 const initialState: WaveformState = {
   stepsPerSecond: 25,
@@ -8,7 +8,10 @@ const initialState: WaveformState = {
   path: null,
 }
 
-const waveform: Reducer<WaveformState, Action> = (state = initialState, action) => {
+const waveform: Reducer<WaveformState, Action> = (
+  state = initialState,
+  action
+) => {
   switch (action.type) {
     case 'SET_WAVEFORM_IMAGE_PATH':
       return {

@@ -1,24 +1,24 @@
-declare type ProjectFilePath = string;
+declare type ProjectFilePath = string
 
 declare type AudioMetadataAndPath = {
-  metadata: MediaFileMetadata,
-  filePath: MediaFilePath | null,
-  constantBitrateFilePath: MediaFilePath | null,
+  metadata: MediaFileMetadata
+  filePath: MediaFilePath | null
+  constantBitrateFilePath: MediaFilePath | null
   error: string | null
-};
+}
 
 declare type ProjectMetadata = {
-  id: ProjectId,
-  filePath: ProjectFilePath,
-  name: string,
-  noteType: NoteType,
-  mediaFilePaths: Array<AudioMetadataAndPath>,
+  id: ProjectId
+  filePath: ProjectFilePath
+  name: string
+  noteType: NoteType
+  mediaFilePaths: Array<AudioMetadataAndPath>
   error: string | null
-};
+}
 
 declare type ProjectsState = {
   byId: {
-    [ProjectId: string]: ProjectMetadata;
-  },
+    [ProjectId: string]: ProjectMetadata
+  }
   allIds: Array<ProjectId>
-};
+}

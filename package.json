@@ -48,7 +48,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "lint": "eslint src",
-    "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.js\"",
+    "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.[tj]s\"",
     "format:write": "yarn format --write",
     "build-electron:mac": "NODE_ENV=production electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icons/icon.icns --prune=true --out=release-builds",
     "build-electron:win": "electron-packager . audio-flashcard-assistant --asar.unpackDir=\"**/node_modules/{ffmpeg-static/bin/win32,ffprobe-static/bin/win32}*\" --overwrite --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Audio Flashcard Assistant\"",

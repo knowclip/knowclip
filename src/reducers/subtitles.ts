@@ -1,4 +1,4 @@
-import { Reducer } from "redux"
+import { Reducer } from 'redux'
 
 const initialState: SubtitlesState = {
   loadedTracks: [],
@@ -11,11 +11,13 @@ const initialState: SubtitlesState = {
   },
 }
 
-const editTrack: <T extends SubtitlesTrack>(track: T, overrides: Partial<T>) => T =
-  (track, overrides) => ({
-    ...track,
-    ...overrides
-  })
+const editTrack: <T extends SubtitlesTrack>(
+  track: T,
+  overrides: Partial<T>
+) => T = (track, overrides) => ({
+  ...track,
+  ...overrides,
+})
 
 const subtitles: Reducer<SubtitlesState> = (
   state: SubtitlesState = initialState,

@@ -1,7 +1,10 @@
 import { getMillisecondsAtX } from './waveformTime'
 
-export const getClipMilliseconds = (state: AppState, id: ClipId): {
-  start: number,
+export const getClipMilliseconds = (
+  state: AppState,
+  id: ClipId
+): {
+  start: number
   end: number
 } => {
   const clip = state.clips.byId[id]
@@ -12,6 +15,10 @@ export const getClipMilliseconds = (state: AppState, id: ClipId): {
   }
 }
 
-export const getClipIdsByMediaFileId = (state: AppState, mediaFileId: string): Array<ClipId> => state.clips.idsByMediaFileId[mediaFileId]
+export const getClipIdsByMediaFileId = (
+  state: AppState,
+  mediaFileId: string
+): Array<ClipId> => state.clips.idsByMediaFileId[mediaFileId]
 
-export const getDefaultTags = (state: AppState): Array<string> => state.user.defaultTags
+export const getDefaultTags = (state: AppState): Array<string> =>
+  state.user.defaultTags

@@ -1,13 +1,10 @@
-import { Reducer } from "redux"
+import { Reducer } from 'redux'
 
 const initialState: DialogState = {
   queue: [],
 }
 
-const dialog: Reducer<DialogState, Action> = (
-  state = initialState,
-  action
-) => {
+const dialog: Reducer<DialogState, Action> = (state = initialState, action) => {
   switch (action.type) {
     case 'ENQUEUE_DIALOG':
       return {

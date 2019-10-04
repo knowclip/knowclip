@@ -6,7 +6,10 @@ const initialState: ClipsState = {
   idsByMediaFileId: {},
 }
 
-const byStart = (clips: { [clipId: string]: Clip }) => (aId: ClipId, bId: ClipId) => {
+const byStart = (clips: { [clipId: string]: Clip }) => (
+  aId: ClipId,
+  bId: ClipId
+) => {
   const { start: a } = clips[aId]
   const { start: b } = clips[bId]
   if (a < b) return -1
@@ -20,7 +23,7 @@ const addIdToIdsByMediaFileId = (
   clip: Clip
 ) => {
   return oldIdsByMediaFileId
-    .map((id) => oldById[id])
+    .map(id => oldById[id])
     .concat(clip)
     .sort((a, b) => a.start - b.start)
     .map(clip => clip.id)
@@ -39,11 +42,16 @@ const addIdstoIdsByMediaFileId = (
     .concat(oldIdsByMediaFileId.slice(newIndex))
 }
 
-const arrayToMapById: (arr: Array<Clip>) => { [clipId: string]: Clip } = (array) =>
-  array.reduce((all, item) => {
-    all[item.id] = item
-    return all
-  }, {} as { [clipId: string]: Clip })
+const arrayToMapById: (
+  arr: Array<Clip>
+) => { [clipId: string]: Clip } = array =>
+  array.reduce(
+    (all, item) => {
+      all[item.id] = item
+      return all
+    },
+    {} as { [clipId: string]: Clip }
+  )
 
 const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
   switch (action.type) {
@@ -143,7 +151,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const { ids } = action // should all have same filepath
       const { fileId } = state.byId[ids[0]]
       const [finalId, ...idsToBeDiscarded] = ids
-      const clipsOrder = (Object.values(state.byId))
+      const clipsOrder = Object.values(state.byId)
         .sort((a, b) => a.start - b.start)
         .map(s => s.id)
       const newClipsOrder = clipsOrder.filter(

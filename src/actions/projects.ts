@@ -1,71 +1,85 @@
-
 export const createProject = (projectMetadata: ProjectMetadata): Action => ({
   type: 'CREATE_PROJECT',
-  projectMetadata
+  projectMetadata,
 })
 
 export const openProjectByFilePath = (filePath: string): Action => ({
   type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH',
-  filePath
+  filePath,
 })
 
 export const openProjectById = (id: ProjectId): Action => ({
   type: 'OPEN_PROJECT_REQUEST_BY_ID',
-  id
+  id,
 })
 
-export const openProject = (project: Project3_0_0, projectMetadata: ProjectMetadata): Action => ({
+export const openProject = (
+  project: Project3_0_0,
+  projectMetadata: ProjectMetadata
+): Action => ({
   type: 'OPEN_PROJECT',
   project,
-  projectMetadata
+  projectMetadata,
 })
 
 export const removeProjectFromRecents = (id: ProjectId): Action => ({
   type: 'REMOVE_PROJECT_FROM_RECENTS',
-  id
+  id,
 })
 
 export const closeProject = (): Action => ({
-  type: 'CLOSE_PROJECT'
+  type: 'CLOSE_PROJECT',
 })
 
 export const closeProjectRequest = (): Action => ({
-  type: 'CLOSE_PROJECT_REQUEST'
+  type: 'CLOSE_PROJECT_REQUEST',
 })
 
 export const setProjectName = (id: ProjectId, name: string): Action => ({
   type: 'SET_PROJECT_NAME',
   id,
-  name
+  name,
 })
 
-export const addMediaToProjectRequest = (projectId: ProjectId, filePaths: Array<MediaFilePath>) => ({
+export const addMediaToProjectRequest = (
+  projectId: ProjectId,
+  filePaths: Array<MediaFilePath>
+) => ({
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST',
   projectId,
-  filePaths
+  filePaths,
 })
 
-export const addMediaToProject = (projectId: ProjectId, mediaFilePaths: Array<AudioMetadataAndPath>): Action => ({
+export const addMediaToProject = (
+  projectId: ProjectId,
+  mediaFilePaths: Array<AudioMetadataAndPath>
+): Action => ({
   type: 'ADD_MEDIA_TO_PROJECT',
   projectId,
-  mediaFilePaths
+  mediaFilePaths,
 })
 
-export const deleteMediaFromProjectRequest = (projectId: ProjectId, mediaFileId: MediaFileId): Action => ({
+export const deleteMediaFromProjectRequest = (
+  projectId: ProjectId,
+  mediaFileId: MediaFileId
+): Action => ({
   type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST',
   projectId,
-  mediaFileId
+  mediaFileId,
 })
 
-export const deleteMediaFromProject = (projectId: ProjectId, mediaFileId: MediaFileId): Action => ({
+export const deleteMediaFromProject = (
+  projectId: ProjectId,
+  mediaFileId: MediaFileId
+): Action => ({
   type: 'DELETE_MEDIA_FROM_PROJECT',
   projectId,
-  mediaFileId
+  mediaFileId,
 })
 
 export const openMediaFileRequest = (id: MediaFileId): Action => ({
   type: 'OPEN_MEDIA_FILE_REQUEST',
-  id
+  id,
 })
 
 export const openMediaFileSuccess = (
@@ -81,18 +95,23 @@ export const openMediaFileSuccess = (
   constantBitrateFilePath,
   metadata,
   projectId,
-  subtitlesTracksStreamIndexes
+  subtitlesTracksStreamIndexes,
 })
 
-export const openMediaFileFailure = (errorMessage: string): OpenMediaFileFailure => ({
+export const openMediaFileFailure = (
+  errorMessage: string
+): OpenMediaFileFailure => ({
   type: 'OPEN_MEDIA_FILE_FAILURE',
-  errorMessage
+  errorMessage,
 })
 
-export const locateMediaFileRequest = (id: MediaFileId, filePath: MediaFilePath): Action => ({
+export const locateMediaFileRequest = (
+  id: MediaFileId,
+  filePath: MediaFilePath
+): Action => ({
   type: 'LOCATE_MEDIA_FILE_REQUEST',
   id,
-  filePath
+  filePath,
 })
 
 export const locateMediaFileSuccess = (
@@ -106,18 +125,18 @@ export const locateMediaFileSuccess = (
   id,
   metadata,
   projectId,
-  filePath
+  filePath,
 })
 
 export const saveProjectRequest = (): Action => ({
-  type: 'SAVE_PROJECT_REQUEST'
+  type: 'SAVE_PROJECT_REQUEST',
 })
 
 export const saveProjectAsRequest = (): Action => ({
-  type: 'SAVE_PROJECT_AS_REQUEST'
+  type: 'SAVE_PROJECT_AS_REQUEST',
 })
 
 export const setWorkIsUnsaved = (workIsUnsaved: boolean): Action => ({
   type: 'SET_WORK_IS_UNSAVED',
-  workIsUnsaved
+  workIsUnsaved,
 })

@@ -1,27 +1,29 @@
-
 export const addClip = (clip: Clip): ClipAction => ({
   type: 'ADD_CLIP',
-  clip
+  clip,
 })
 
-export const addClips = (clips: Array<Clip>, fileId: MediaFileId): ClipAction => ({
+export const addClips = (
+  clips: Array<Clip>,
+  fileId: MediaFileId
+): ClipAction => ({
   type: 'ADD_CLIPS',
   clips,
-  fileId
+  fileId,
 })
 
 export const highlightClip = (id: ClipId | null): ClipAction => ({
   type: 'HIGHLIGHT_CLIP',
-  id
+  id,
 })
 
 export const editClip = (id: ClipId, override: Partial<Clip>): ClipAction => ({
   type: 'EDIT_CLIP',
   id,
-  override
+  override,
 })
 
 export const mergeClips = (ids: Array<ClipId>): ClipAction => ({
   type: 'MERGE_CLIPS',
-  ids
+  ids,
 })

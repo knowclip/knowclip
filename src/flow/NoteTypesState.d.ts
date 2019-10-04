@@ -1,24 +1,23 @@
-
-declare type NoteType = "Simple" | "Transliteration";
+declare type NoteType = 'Simple' | 'Transliteration'
 
 // type NoteTypesState = {
 //   byId: { [NoteTypeId]: NoteType },
 //   allIds: Array<NoteTypeId>,
 // }
 
-declare type NoteTypeId = string;
+declare type NoteTypeId = string
 
 declare type NoteTypePre3_0_0 = {
-  id: NoteTypeId,
-  name: string,
-  fields: Array<NoteTypeField>,
+  id: NoteTypeId
+  name: string
+  fields: Array<NoteTypeField>
   useTagsField: boolean
-};
+}
 
-declare type NoteFieldId = string;
-declare type NoteFieldName = string;
+declare type NoteFieldId = string
+declare type NoteFieldName = string
 
 declare type NoteTypeField = {
-  id: NoteFieldId,
+  id: NoteFieldId
   name: NoteFieldName
-};
+}

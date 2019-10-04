@@ -2,8 +2,8 @@ import { Reducer } from 'redux'
 import deleteKey from '../utils/deleteKey'
 
 const initialState: ProjectsState = {
-  byId: ({}),
-  allIds: ([]),
+  byId: {},
+  allIds: [],
 }
 
 const editMediaFilePath = (
@@ -24,7 +24,10 @@ const editMediaFilePath = (
   },
 })
 
-const projects: Reducer<ProjectsState, Action> = (state = initialState, action) => {
+const projects: Reducer<ProjectsState, Action> = (
+  state = initialState,
+  action
+) => {
   switch (action.type) {
     case 'OPEN_PROJECT':
       return {

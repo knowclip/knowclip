@@ -27,9 +27,9 @@ const user: Reducer<UserState> = (state = initialState, action) => {
     case 'DELETE_MEDIA_FROM_PROJECT':
       return action.mediaFileId === state.currentMediaFileId
         ? {
-          ...state,
-          currentMediaFileId: null,
-        }
+            ...state,
+            currentMediaFileId: null,
+          }
         : state
 
     case 'OPEN_PROJECT':
@@ -117,9 +117,9 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       )
       const newTagsToClipIds = newIds.length
         ? {
-          ...state.tagsToClipIds,
-          [tag]: newIds,
-        }
+            ...state.tagsToClipIds,
+            [tag]: newIds,
+          }
         : deleteKey({ ...state.tagsToClipIds }, tag)
 
       return {

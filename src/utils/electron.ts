@@ -29,7 +29,7 @@ export const showOpenDialog = (
       dialog.showOpenDialog(
         win,
         {
-          properties: multiSelections 
+          properties: multiSelections
             ? ['openFile', 'multiSelections']
             : ['openFile'],
           filters,
@@ -41,10 +41,8 @@ export const showOpenDialog = (
     }
   })
 
-export const showOpenDirectoryDialog = (
-  showHiddenFiles = true
-) =>
-// ): Promise<Array<string | null> | null> =>
+export const showOpenDirectoryDialog = (showHiddenFiles = true) =>
+  // ): Promise<Array<string | null> | null> =>
   new Promise((res, rej) => {
     try {
       dialog.showOpenDialog(
