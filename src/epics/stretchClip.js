@@ -1,18 +1,15 @@
-// @flow
 import { map, switchMap, takeUntil, takeLast, filter } from 'rxjs/operators'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 
-const stretchClipEpic: Epic<Action> = (
+const stretchClipEpic = (
   action$,
   state$,
   { window, getWaveformSvgElement }
 ) => {
   const clipMousedowns = action$.pipe(
-    filter<*, WaveformMousedown>(
-      action => action.type === 'WAVEFORM_MOUSEDOWN'
-    ),
+    filter(action => action.type === 'WAVEFORM_MOUSEDOWN'),
     switchMap(({ x }) => {
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()

@@ -1,22 +1,8 @@
-// @flow
-
 const ascending = (a, b) => a - b
 
 const sortClipPoints = ({ start, end }) => [start, end].sort(ascending)
 
-const newClip = (
-  pendingClip: PendingClip,
-  fileId: MediaFileId,
-  id: ClipId,
-  noteType: NoteType,
-  tags: Array<string> = [],
-  fields: ?{
-    transcription: string,
-    pronunciation: string,
-    meaning: string,
-    notes: string,
-  }
-): Clip => {
+const newClip = (pendingClip, fileId, id, noteType, tags = [], fields) => {
   const [start, end] = sortClipPoints(pendingClip)
 
   const { transcription = '', pronunciation = '', meaning = '', notes = '' } =

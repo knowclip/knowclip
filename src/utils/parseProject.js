@@ -1,11 +1,10 @@
-// @flow
 import uuid from 'uuid/v4'
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 
-const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
+const convertProject0_0_0___1_0_0 = project => {
   const { clips: oldClips } = project
-  const newClips: { [ClipId]: ClipPre3_0_0 } = {}
+  const newClips = {}
   const fileId = uuid()
   for (const clipId in oldClips) {
     const clip = oldClips[clipId]
@@ -31,7 +30,7 @@ const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
     audioFileId: fileId,
   }
 }
-const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
+const convertProject1_0_0___2_0_0 = project => {
   const clips = {}
   for (const clipId in project.clips) {
     const clip = project.clips[clipId]
@@ -61,13 +60,13 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
   }
 }
 
-const getNoteType = (oldProject: Project2_0_0): NoteType =>
+const getNoteType = oldProject =>
   oldProject.noteType.fields.length > 3 ? 'Transliteration' : 'Simple'
 const getFlashcard = (
-  noteType: NoteType,
-  oldFlashcard: FlashcardPre3_0_0,
-  [noteField1, noteField2, noteField3, ...noteFieldsRest]: Array<NoteTypeField>
-): Flashcard =>
+  noteType,
+  oldFlashcard,
+  [noteField1, noteField2, noteField3, ...noteFieldsRest]
+) =>
   noteType === 'Simple'
     ? {
         id: oldFlashcard.id,
@@ -92,9 +91,9 @@ const getFlashcard = (
             .join('\n\n'),
         },
       }
-const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
+const convertProject2_0_0___3_0_0 = project => {
   const noteType = getNoteType(project)
-  const clips: { [ClipId]: Clip } = {}
+  const clips = {}
   for (const clipId in project.clips) {
     const clip = project.clips[clipId]
     clips[clipId] = {
@@ -121,8 +120,8 @@ const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
   }
 }
 
-const parseProject = (jsonFileContents: string): ?Project3_0_0 => {
-  const project: Project = JSON.parse(jsonFileContents)
+const parseProject = jsonFileContents => {
+  const project = JSON.parse(jsonFileContents)
   switch (project.version) {
     case '0.0.0':
       return convertProject2_0_0___3_0_0(
@@ -142,11 +141,11 @@ const parseProject = (jsonFileContents: string): ?Project3_0_0 => {
 export default parseProject
 
 export const getMediaFilePaths = (
-  originalProjectJson: ?Project,
-  project: Project3_0_0,
-  projectFilePath: string,
-  mediaFilePaths: Array<AudioMetadataAndPath>
-): Array<AudioMetadataAndPath> => {
+  originalProjectJson,
+  project,
+  projectFilePath,
+  mediaFilePaths
+) => {
   if (
     originalProjectJson &&
     (originalProjectJson.version === '0.0.0' ||

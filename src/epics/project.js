@@ -27,7 +27,8 @@ const openProject = async (filePath, projectId, state$) => {
       filePath,
       r.getMediaFilePaths(state$.value, project.id)
     )
-    const projectMetadata: ProjectMetadata = r.getProjectMetadata(
+    const projectMetadata = r.getProjectMetadata(
+      // const projectMetadata: ProjectMetadata = r.getProjectMetadata(
       state$.value,
       project.id
     )
@@ -188,7 +189,7 @@ const openMediaFileRequestOnOpenProject = (action$, state$) =>
         []
       )
 
-      const tagsToClipIds = clips.reduce((tags, clipId: ClipId) => {
+      const tagsToClipIds = clips.reduce((tags, clipId) => {
         const clip = r.getClip(state$.value, clipId)
         clip.flashcard.tags.forEach(tag => {
           tags[tag] = tags[tag] || []

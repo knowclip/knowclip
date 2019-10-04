@@ -1,4 +1,3 @@
-// @flow
 import clips from './clips'
 import newClip from '../utils/newClip'
 import * as r from '../redux'
@@ -6,7 +5,7 @@ import * as r from '../redux'
 describe('clips reducer', () => {
   const fileId = 'fileId'
   const noteType = 'Transliteration'
-  const oldState: ClipsState = clips(
+  const oldState = clips(
     {
       byId: {
         a: newClip({ start: 1, end: 1.5 }, fileId, 'a', noteType),
@@ -64,7 +63,7 @@ describe('clips reducer', () => {
   })
 
   it('merges clips', () => {
-    const state: ClipsState = clips(
+    const state = clips(
       {
         byId: {
           a: newClip({ start: 1, end: 1.5 }, fileId, 'a', noteType),

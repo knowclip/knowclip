@@ -1,20 +1,15 @@
-// @flow
 import * as r from '../redux'
 import formatTime from '../utils/formatTime'
 
 const flatten = [(a, b) => a.concat(b), []]
 
-const projectToMarkdown = (
-  state: AppState,
-  projectId: ProjectId,
-  noteType: NoteType
-): string => {
+const projectToMarkdown = (state, projectId, noteType) => {
   const projectMetadata = r.getProjectMetadata(state, projectId)
   if (!projectMetadata) throw new Error('Could not find project')
 
   const mediaMetadata = r.getProjectMediaMetadata(state, projectId)
 
-  return ([
+  return [
     `# ${projectMetadata.name}`,
     ...mediaMetadata
       .map(metadata => {
@@ -51,7 +46,7 @@ const projectToMarkdown = (
         ]
       })
       .reduce(...flatten),
-  ]: Array<string>).join('\n')
+  ].join('\n')
 }
 
 export default projectToMarkdown

@@ -1,4 +1,3 @@
-// @flow
 import * as r from '../redux'
 import { toTimestamp } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
@@ -22,9 +21,7 @@ const NOTES = `{{#notes}}
 </p>
 {{/notes}}`
 
-const getCards = (
-  noteType: NoteType
-): Array<{| name: string, questionFormat: string, answerFormat: string |}> => [
+const getCards = noteType => [
   {
     name: 'Listening',
     questionFormat: `♫{{sound}}`,
@@ -51,11 +48,7 @@ const getCards = (
   },
 ]
 
-export const getApkgExportData = (
-  state: AppState,
-  projectMetadata: ProjectMetadata,
-  clipIds: Array<ClipId>
-): ApkgExportData => {
+export const getApkgExportData = (state, projectMetadata, clipIds) => {
   const fieldNames = getNoteTypeFields(projectMetadata.noteType)
   const mediaFilePaths = r.getMediaFilePaths(state, projectMetadata.id)
 
@@ -185,10 +178,9 @@ export const getApkgExportData = (
   }
 }
 
-export const getCsvText = (exportData: ApkgExportData): string => {
-  const csvData: Array<Array<string>> = exportData.clips.map(
-    ({ flashcardSpecs }) =>
-      [...flashcardSpecs.fields].concat(flashcardSpecs.tags.join(' '))
+export const getCsvText = exportData => {
+  const csvData = exportData.clips.map(({ flashcardSpecs }) =>
+    [...flashcardSpecs.fields].concat(flashcardSpecs.tags.join(' '))
   )
 
   return unparse(csvData)

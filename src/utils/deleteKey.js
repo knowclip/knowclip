@@ -1,5 +1,4 @@
-// @flow
-const deleteKey = (obj: Object, key: string) => {
+const deleteKey = (obj, key) => {
   const clone = { ...obj }
   delete clone[key]
   return clone

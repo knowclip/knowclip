@@ -2,8 +2,9 @@ import tempy from 'tempy'
 import { existsSync } from 'fs'
 
 export const getWaveformPngPath = (
-  constantBitrateFilePath: MediaFilePath
-): string => {
+  constantBitrateFilePath
+  // constantBitrateFilePath: MediaFilePath
+) => {
   const pngId = 'waveform_png_for_' + constantBitrateFilePath
   let outputFilename = localStorage.getItem(pngId)
   if (outputFilename && existsSync(outputFilename)) {
@@ -14,6 +15,7 @@ export const getWaveformPngPath = (
   return outputFilename
 }
 
-export const saveProjectToLocalStorage = (project: Project2_0_0) => {
+export const saveProjectToLocalStorage = project => {
+  // export const saveProjectToLocalStorage = (project: Project2_0_0) => {
   localStorage.getItem('project_' + project.id, project)
 }

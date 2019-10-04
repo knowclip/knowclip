@@ -1,4 +1,3 @@
-// @flow
 import { flatMap, map, switchMap, filter } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from } from 'rxjs'
@@ -37,194 +36,173 @@ const coerceMp3ToConstantBitrate = (path, oldConstantBitratePath) => {
   })
 }
 
-const openMedia: Epic<Action> = (action$, state$, { pauseMedia }) =>
+const openMedia = (action$, state$, { pauseMedia }) =>
   action$.pipe(
     filter(({ type }) => type === 'OPEN_MEDIA_FILE_REQUEST'),
-    switchMap<OpenMediaFileRequest, *, *>(
-      async ({ id }): Promise<rxjs$Observable<Action>> => {
-        pauseMedia()
-        // mediaPlayer.src = ''
+    switchMap(async ({ id }) => {
+      pauseMedia()
+      // mediaPlayer.src = ''
 
-        const filePath = r.getMediaFilePathFromCurrentProject(state$.value, id)
-        const metadata = r.getMediaMetadataFromCurrentProject(state$.value, id)
-        const currentProjectId = r.getCurrentProjectId(state$.value)
+      const filePath = r.getMediaFilePathFromCurrentProject(state$.value, id)
+      const metadata = r.getMediaMetadataFromCurrentProject(state$.value, id)
+      const currentProjectId = r.getCurrentProjectId(state$.value)
 
-        if (!metadata)
-          return await of(r.openMediaFileFailure('Could not open media file.'))
+      if (!metadata)
+        return await of(r.openMediaFileFailure('Could not open media file.'))
 
-        if (!currentProjectId)
-          return of(r.openMediaFileFailure('Could not open media file.'))
+      if (!currentProjectId)
+        return of(r.openMediaFileFailure('Could not open media file.'))
 
-        if (!filePath) {
-          // also should open dialog
-          return of(
-            r.openMediaFileFailure(
-              `Before opening this media file: \n\n"${
-                metadata.name
-              }"\n\nYou'll first have to locate manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
-            )
-          )
-        }
-
-        if (!fs.existsSync(filePath)) {
-          return of(
-            r.openMediaFileFailure(
-              'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
-            )
-          )
-        }
-
-        const ffprobeMetadata = await getMediaMetadata(filePath)
-        const subtitlesStreamIndexes = getSubtitlesStreamIndexes(
-          ffprobeMetadata
-        )
-        console.log('ffprobeMetadata', ffprobeMetadata)
-        const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
-        const existingMetadata = r.getCurrentMediaMetadata(state$.value)
-        if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
-          const differenceMessage = getDifferenceMessage(
-            existingMetadata,
-            newMetadata
-          )
-          if (differenceMessage && differenceMessage.length)
-            return from([
-              r.simpleMessageSnackbar(differenceMessage),
-              r.openMediaFileSuccess(
-                filePath,
-                filePath,
-                newMetadata,
-                currentProjectId,
-                subtitlesStreamIndexes
-              ),
-            ])
-        }
-
-        if (extname(filePath) === '.mp3') {
-          const constantBitrateFilePath = r.getMediaFileConstantBitratePathFromCurrentProject(
-            state$.value,
-            id
-          )
-
-          const openMp3Request: OpenMp3Request = {
-            type: 'OPEN_MP3_REQUEST',
-            id,
-            filePath,
-          }
-
-          return constantBitrateFilePath != null &&
-            fs.existsSync(constantBitrateFilePath)
-            ? of(openMp3Request)
-            : from([
-                r.simpleMessageSnackbar(
-                  'Due to variable bitrate, MP3 files may take a bit longer to open. Please be patient!'
-                ),
-                openMp3Request,
-              ])
-        }
-
-        // newMetadata might actually be same? :| but if not it overrides 'UNKNOWN' format
+      if (!filePath) {
+        // also should open dialog
         return of(
-          r.openMediaFileSuccess(
-            filePath,
-            filePath,
-            newMetadata,
-            currentProjectId,
-            subtitlesStreamIndexes
+          r.openMediaFileFailure(
+            `Before opening this media file: \n\n"${
+              metadata.name
+            }"\n\nYou'll first have to locate manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
           )
         )
       }
-    ),
-    flatMap<rxjs$Observable<Action>, Action>(x => x)
+
+      if (!fs.existsSync(filePath)) {
+        return of(
+          r.openMediaFileFailure(
+            'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
+          )
+        )
+      }
+
+      const ffprobeMetadata = await getMediaMetadata(filePath)
+      const subtitlesStreamIndexes = getSubtitlesStreamIndexes(ffprobeMetadata)
+      console.log('ffprobeMetadata', ffprobeMetadata)
+      const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
+      const existingMetadata = r.getCurrentMediaMetadata(state$.value)
+      if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
+        const differenceMessage = getDifferenceMessage(
+          existingMetadata,
+          newMetadata
+        )
+        if (differenceMessage && differenceMessage.length)
+          return from([
+            r.simpleMessageSnackbar(differenceMessage),
+            r.openMediaFileSuccess(
+              filePath,
+              filePath,
+              newMetadata,
+              currentProjectId,
+              subtitlesStreamIndexes
+            ),
+          ])
+      }
+
+      if (extname(filePath) === '.mp3') {
+        const constantBitrateFilePath = r.getMediaFileConstantBitratePathFromCurrentProject(
+          state$.value,
+          id
+        )
+
+        const openMp3Request = {
+          type: 'OPEN_MP3_REQUEST',
+          id,
+          filePath,
+        }
+
+        return constantBitrateFilePath != null &&
+          fs.existsSync(constantBitrateFilePath)
+          ? of(openMp3Request)
+          : from([
+              r.simpleMessageSnackbar(
+                'Due to variable bitrate, MP3 files may take a bit longer to open. Please be patient!'
+              ),
+              openMp3Request,
+            ])
+      }
+
+      // newMetadata might actually be same? :| but if not it overrides 'UNKNOWN' format
+      return of(
+        r.openMediaFileSuccess(
+          filePath,
+          filePath,
+          newMetadata,
+          currentProjectId,
+          subtitlesStreamIndexes
+        )
+      )
+    }),
+    flatMap(x => x)
     // takeWhile<*, *>(x => r.getCurrentProjectId(state$.value))
     // flatMap(x)
   )
 
-const openMp3: Epic<Action> = (action$, state$) =>
+const openMp3 = (action$, state$) =>
   action$.pipe(
     filter(({ type }) => type === 'OPEN_MP3_REQUEST'),
-    flatMap<OpenMp3Request, *, *>(
-      async ({ id, filePath }): Promise<Action> => {
-        const currentProjectId = r.getCurrentProjectId(state$.value)
-        if (!currentProjectId)
-          return r.openMediaFileFailure('Could not open media--no project open')
-        try {
-          const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
-            filePath,
-            r.getMediaFileConstantBitratePathFromCurrentProject(
-              state$.value,
-              id
-            )
-          )
+    flatMap(async ({ id, filePath }) => {
+      const currentProjectId = r.getCurrentProjectId(state$.value)
+      if (!currentProjectId)
+        return r.openMediaFileFailure('Could not open media--no project open')
+      try {
+        const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
+          filePath,
+          r.getMediaFileConstantBitratePathFromCurrentProject(state$.value, id)
+        )
 
-          const ffprobeMetadata = await getMediaMetadata(filePath)
-          const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
+        const ffprobeMetadata = await getMediaMetadata(filePath)
+        const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
 
-          return r.openMediaFileSuccess(
-            filePath,
-            constantBitrateFilePath,
-            metadata,
-            currentProjectId,
-            getSubtitlesStreamIndexes(ffprobeMetadata)
-          )
-        } catch (err) {
-          return r.openMediaFileFailure(
-            `Error opening media file: ${
-              err.message
-            }\n\n Try to locate it manually?`
-          )
-        }
+        return r.openMediaFileSuccess(
+          filePath,
+          constantBitrateFilePath,
+          metadata,
+          currentProjectId,
+          getSubtitlesStreamIndexes(ffprobeMetadata)
+        )
+      } catch (err) {
+        return r.openMediaFileFailure(
+          `Error opening media file: ${
+            err.message
+          }\n\n Try to locate it manually?`
+        )
       }
-    )
+    })
   )
 
-const openMediaFileFailure: Epic<Action> = (action$, state$) =>
+const openMediaFileFailure = (action$, state$) =>
   action$.pipe(
-    filter<Action, OpenMediaFileFailure>(
-      ({ type }) => type === 'OPEN_MEDIA_FILE_FAILURE'
-    ),
-    map<*, Action>(({ errorMessage }) =>
-      r.openMediaFileFailureDialog(errorMessage)
-    )
+    filter(({ type }) => type === 'OPEN_MEDIA_FILE_FAILURE'),
+    map(({ errorMessage }) => r.openMediaFileFailureDialog(errorMessage))
   )
 
 const addMediaToProject = (action$, state$) =>
   action$.pipe(
-    filter<Action, AddMediaToProjectRequest>(
-      ({ type }) => type === 'ADD_MEDIA_TO_PROJECT_REQUEST'
-    ),
-    flatMap<AddMediaToProjectRequest, *, *>(
-      async ({ projectId, filePaths }) => {
-        try {
-          // use ffprobe to get metadata for all files
-          const metadatas = await Promise.all(
-            filePaths.map(async filePath => {
-              const ffprobeMetadata = await getMediaMetadata(filePath)
-              console.log(ffprobeMetadata)
-              return {
-                filePath,
-                constantBitrateFilePath:
-                  extname(filePath) === '.mp3' ? null : filePath,
-                error: null,
-                metadata: convertMediaMetadata(
-                  ffprobeMetadata,
-                  filePath,
-                  uuid()
-                ),
-              }
-            })
-          )
-          return await r.addMediaToProject(projectId, metadatas)
-        } catch (err) {
-          console.log(err)
-          return await r.simpleMessageSnackbar(
-            `Error adding media file: ${err.message}`
-          )
-        }
+    filter(({ type }) => type === 'ADD_MEDIA_TO_PROJECT_REQUEST'),
+    flatMap(async ({ projectId, filePaths }) => {
+      try {
+        // use ffprobe to get metadata for all files
+        const metadatas = await Promise.all(
+          filePaths.map(async filePath => {
+            const ffprobeMetadata = await getMediaMetadata(filePath)
+            console.log(ffprobeMetadata)
+            return {
+              filePath,
+              constantBitrateFilePath:
+                extname(filePath) === '.mp3' ? null : filePath,
+              error: null,
+              metadata: convertMediaMetadata(ffprobeMetadata, filePath, uuid()),
+            }
+          })
+        )
+        return await r.addMediaToProject(projectId, metadatas)
+      } catch (err) {
+        console.log(err)
+        return await r.simpleMessageSnackbar(
+          `Error adding media file: ${err.message}`
+        )
       }
-    )
+    })
   )
 
-const openMediaOnAdd: Epic<Action> = (action$, state$) =>
+const openMediaOnAdd = (action$, state$) =>
   action$.pipe(
     ofType('ADD_MEDIA_TO_PROJECT'),
     map(({ mediaFilePaths }) => {
@@ -252,7 +230,7 @@ const getDifferenceMessage = (existingMetadata, newMetadata) => {
   }
 }
 
-const locateMediaFile: Epic<Action> = (action$, state$) =>
+const locateMediaFile = (action$, state$) =>
   action$.pipe(
     ofType('LOCATE_MEDIA_FILE_REQUEST'),
     flatMap(async ({ id, filePath }) => {
@@ -294,7 +272,7 @@ const locateMediaFile: Epic<Action> = (action$, state$) =>
     })
   )
 
-const openMediaOnLocate: Epic<Action> = (action$, state$) =>
+const openMediaOnLocate = (action$, state$) =>
   action$.pipe(
     ofType('LOCATE_MEDIA_FILE_SUCCESS'),
     map(({ id }) => r.openMediaFileRequest(id))

@@ -1,6 +1,5 @@
-// @flow
-export const getPersistedState = (): $Shape<AppState> => {
-  const persistedState: $Shape<AppState> = {}
+export const getPersistedState = () => {
+  const persistedState = {}
   try {
     const projects = JSON.parse(window.localStorage.getItem('projects'))
     if (projects) persistedState.projects = projects

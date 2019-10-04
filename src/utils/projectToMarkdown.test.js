@@ -1,20 +1,20 @@
-//@flow
+//
 import projectToMarkdown from './projectToMarkdown'
 import reducer from '../reducers'
 import newClip from '../utils/newClip'
 
 describe('projectToMarkdown', () => {
-  const baseState: AppState = reducer(undefined, { type: '@@INIT' })
+  const baseState = reducer(undefined, { type: '@@INIT' })
   const mediaFileId = 'mediaFileId'
 
-  const noteType: NoteType = 'Transliteration'
+  const noteType = 'Transliteration'
   const newClipWithCard = (
     id,
     start,
     end,
     [transcription, pronunciation, meaning, notes],
     tags
-  ): Clip => ({
+  ) => ({
     ...newClip({ start, end }, mediaFileId, id, noteType, []),
     flashcard: {
       id,
@@ -24,7 +24,7 @@ describe('projectToMarkdown', () => {
     },
   })
 
-  const projectMetadata: ProjectMetadata = {
+  const projectMetadata = {
     error: null,
     id: 'xxx',
     filePath: '/xxx.afca',
@@ -46,7 +46,7 @@ describe('projectToMarkdown', () => {
     ],
   }
 
-  const state: AppState = {
+  const state = {
     ...baseState,
     projects: {
       allIds: [projectMetadata.id],

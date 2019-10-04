@@ -29,7 +29,7 @@ const ctrlRightBracket = (action$, state$, { window, getCurrentTime }) =>
     flatMap(e => {
       e.preventDefault()
 
-      const state: AppState = state$.value
+      const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
 
@@ -65,7 +65,7 @@ const ctrlLeftBracket = (action$, state$, { window, getCurrentTime }) =>
     flatMap(e => {
       e.preventDefault()
 
-      const state: AppState = state$.value
+      const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
 

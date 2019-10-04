@@ -1,19 +1,6 @@
-// @flow
 import deleteKey from '../utils/deleteKey'
 
-type FormFields = { [string]: string }
-type FormErrors = { [string]: string }
-
-type FormState = Exact<{
-  fields: FormFields,
-  errors: FormErrors,
-}>
-
-type FormAction =
-  | {| type: 'SET_FIELD_VALUE', key: string, value: string |}
-  | {| type: 'SET_ERRORS', errors: FormErrors |}
-
-export const reducer = (state: FormState, action: FormAction) => {
+export const reducer = (state, action) => {
   switch (action.type) {
     case 'SET_FIELD_VALUE':
       return {
@@ -32,7 +19,7 @@ export const reducer = (state: FormState, action: FormAction) => {
       return state
   }
 }
-export const getFormState = (fieldKeys: Array<string>) => {
+export const getFormState = fieldKeys => {
   const state = { fields: {}, errors: {} }
   fieldKeys.forEach(key => {
     state.fields[key] = ''
@@ -40,17 +27,15 @@ export const getFormState = (fieldKeys: Array<string>) => {
   return state
 }
 
-export const getFieldValue = (state: FormState, key: string) =>
-  state.fields[key]
-export const getFieldError = (state: FormState, key: string) =>
-  state.errors[key]
+export const getFieldValue = (state, key) => state.fields[key]
+export const getFieldError = (state, key) => state.errors[key]
 
-export const setFieldValue = (key: string, value: string): FormAction => ({
+export const setFieldValue = (key, value) => ({
   type: 'SET_FIELD_VALUE',
   key,
   value,
 })
-export const setErrors = (errors: FormErrors): FormAction => ({
+export const setErrors = errors => ({
   type: 'SET_ERRORS',
   errors,
 })

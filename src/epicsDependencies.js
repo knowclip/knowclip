@@ -1,6 +1,4 @@
-// @flow
-
-const elementWidth = (element: HTMLElement) => {
+const elementWidth = element => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
@@ -12,7 +10,7 @@ const getAudioElement = () => {
 }
 const getWaveformSvgElement = () => document.getElementById('waveform-svg')
 
-const dependencies: EpicsDependencies = {
+const dependencies = {
   document,
   window,
   setLocalStorage: (key, value) => window.localStorage.setItem(key, value),

@@ -8,7 +8,7 @@ import { existsSync } from 'fs'
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
 
-const getWaveformPng = async (state: AppState, constantBitrateFilePath) => {
+const getWaveformPng = async (state, constantBitrateFilePath) => {
   const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
   const {
     format: { duration },
