@@ -165,7 +165,10 @@ export const getFlashcardIdAfterCurrent = (state: AppState): ClipId | null => {
   return getNextClipId(state, flashcardId)
 }
 
-export const getClipEdgeAt = (state: AppState, x: WaveformX) => {
+export const getClipEdgeAt = (
+  state: AppState,
+  x: WaveformX
+): { key: 'start' | 'end'; id: ClipId } | null => {
   const clipIdAtX = getClipIdAt(state, x)
   if (!clipIdAtX) return null
   const clip = getClip(state, clipIdAtX)
@@ -175,6 +178,8 @@ export const getClipEdgeAt = (state: AppState, x: WaveformX) => {
     return { key: 'start', id: clipIdAtX }
   if (x >= end - SELECTION_BORDER_WIDTH && x <= end)
     return { key: 'end', id: clipIdAtX }
+
+  return null
 }
 
 export const getWaveformViewBoxXMin = (state: AppState) =>

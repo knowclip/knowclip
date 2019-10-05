@@ -12,7 +12,7 @@ export const addClips = (
   fileId,
 })
 
-export const highlightClip = (id: ClipId | null): ClipAction => ({
+export const highlightClip = (id: ClipId | null): HighlightClip => ({
   type: 'HIGHLIGHT_CLIP',
   id,
 })

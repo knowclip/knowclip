@@ -1,18 +1,28 @@
+import { fromEvent, Observable, of, empty } from 'rxjs'
 import { map, flatMap, takeWhile, startWith } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
-import { fromEvent } from 'rxjs'
+import { Epic, ofType } from 'redux-observable'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 
-const setWaveformCursorEpic = (
+const setWaveformCursorEpic: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (
   action$,
   state$,
-  { document, getWaveformSvgWidth }
+  { document, getWaveformSvgWidth, setCurrentTime, getCurrentTime }
 ) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    flatMap(() =>
-      fromEvent(document, 'timeupdate', true).pipe(
+    ofType<Action, OpenMediaFileSuccess>('OPEN_MEDIA_FILE_SUCCESS'),
+    flatMap<OpenMediaFileSuccess, Observable<Action>>(() =>
+      fromEvent<Event>(
+        document,
+        'timeupdate',
+        // @ts-ignore
+        true
+      ).pipe(
         // takeUntil(
         // merge(
         //   action$.pipe(
@@ -25,8 +35,10 @@ const setWaveformCursorEpic = (
         //   )
         // ),
         // ),
-        takeWhile(() => r.getCurrentMediaFileConstantBitratePath(state$.value)),
-        map(e => {
+        takeWhile(() =>
+          Boolean(r.getCurrentMediaFileConstantBitratePath(state$.value))
+        ),
+        map(() => {
           const viewBox = state$.value.waveform.viewBox
 
           const highlightedId = r.getHighlightedClipId(state$.value)
@@ -35,19 +47,16 @@ const setWaveformCursorEpic = (
           const timeToLoop =
             highlightedClip &&
             r.isLoopOn(state$.value) &&
-            e.target.currentTime >=
+            getCurrentTime() >=
               r.getSecondsAtX(state$.value, highlightedClip.end)
-          if (timeToLoop) {
-            e.target.currentTime = r.getSecondsAtX(
-              state$.value,
-              highlightedClip.start
-            )
+          if (highlightedClip && timeToLoop) {
+            setCurrentTime(r.getSecondsAtX(state$.value, highlightedClip.start))
           }
 
           const newX = Math.round(
-            timeToLoop
+            highlightedClip && timeToLoop
               ? highlightedClip.start
-              : e.target.currentTime && e.target.currentTime * 50
+              : getCurrentTime() * 50
           )
           // if (!svgElement) return { type: 'WHOOPS CaNT UPDATE CURSOR NOW' }
           const svgWidth = getWaveformSvgWidth()

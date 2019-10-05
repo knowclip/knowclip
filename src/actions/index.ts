@@ -71,7 +71,7 @@ export const deleteCard = (id: ClipId): Action => ({
   id,
 })
 
-export const deleteCards = (ids: Array<ClipId>): Action => ({
+export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
   type: 'DELETE_CARDS',
   ids,
 })
@@ -124,7 +124,7 @@ export const detectSilence = (): Action => ({
   type: 'DETECT_SILENCE',
 })
 
-export const deleteAllCurrentFileClipsRequest = (): Action => ({
+export const deleteAllCurrentFileClipsRequest = () => ({
   type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
 })
 

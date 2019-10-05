@@ -1,6 +1,11 @@
 import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 
-const clipAudio = (sourceFilePath, startTime, endTime, outputFilename) => {
+const clipAudio = (
+  sourceFilePath: string,
+  startTime: number,
+  endTime: number,
+  outputFilename: string
+): Promise<string> => {
   return new Promise((res, rej) => {
     ffmpeg(sourceFilePath)
       // .audioCodec('copy') // later, do this and change hardcoded '.mp3' for audio-only input

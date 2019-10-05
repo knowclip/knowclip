@@ -1,16 +1,16 @@
 import { flatMap, map } from 'rxjs/operators'
-import { from } from 'rxjs'
-import { ofType, combineEpics } from 'redux-observable'
+import { from, Observable } from 'rxjs'
+import { ofType, combineEpics, Epic } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 
 const detectSilence = (
-  path,
+  path: string,
   silenceDuration = 1,
   silenceNoiseTolerance = -40
-) =>
+): Promise<{ start: number; end: number }[]> =>
   new Promise((res, rej) => {
     ffmpeg(path, { stdoutLines: 0 })
       .audioFilters(
@@ -24,7 +24,7 @@ const detectSilence = (
         function(_, string) {
           const preparedString = string.replace(/\s/g, ' ')
           const regex = /silence_start:\s(\d+\.\d+|\d+).+?silence_end:\s(\d+\.\d+|\d+)/g
-          window.preparedString = preparedString
+          // window.preparedString = preparedString
 
           const matchData = []
           let addition
@@ -46,13 +46,16 @@ const detectSilence = (
       .run()
   })
 
-const detectSilenceEpic = (action$, state$) =>
+const detectSilenceEpic: Epic<Action, Action, AppState, EpicsDependencies> = (
+  action$,
+  state$
+) =>
   action$.pipe(
-    ofType('DETECT_SILENCE'),
-    flatMap(() => {
+    ofType<Action, DetectSilence>('DETECT_SILENCE'),
+    flatMap<DetectSilence, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
-      if (!currentMediaMetadata)
+      if (!currentMediaMetadata || !currentFilePath)
         throw new Error('Illegal: no media file loaded')
 
       return detectSilence(currentFilePath).then(silences => {
@@ -63,7 +66,7 @@ const detectSilenceEpic = (action$, state$) =>
             ),
           ]
 
-        const chunks = []
+        const chunks: Array<{ start: number; end: number }> = []
         if (silences[0].start > 0)
           chunks.push({ start: 0, end: silences[0].start })
         silences.forEach(({ end: silenceEnd }, i) => {
@@ -91,23 +94,39 @@ const detectSilenceEpic = (action$, state$) =>
             },
             fileId,
             uuid(),
-            currentNoteType,
-            r.getDefaultTags(state$.value)
+            r.getDefaultTags(state$.value),
+            currentNoteType === 'Simple'
+              ? {
+                  transcription: '',
+                  meaning: '',
+                  notes: '',
+                }
+              : {
+                  transcription: '',
+                  meaning: '',
+                  notes: '',
+                  pronunciation: '',
+                }
           )
         )
 
-        return from([
+        return [
           r.deleteCards(r.getClipIdsByMediaFileId(state$.value, fileId)),
           r.addClips(newClips, fileId),
-        ])
+        ]
       })
     }),
-    flatMap(val => from(val))
+    flatMap<Array<Action>, Observable<Action>>(val => from(val))
   )
 
-const detectSilenceRequestEpic = (action$, state$) =>
+const detectSilenceRequestEpic: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (action$, state$) =>
   action$.pipe(
-    ofType('DETECT_SILENCE_REQUEST'),
+    ofType<Action, DetectSilenceRequest>('DETECT_SILENCE_REQUEST'),
     map(() =>
       r.doesCurrentFileHaveClips(state$.value)
         ? r.confirmationDialog(

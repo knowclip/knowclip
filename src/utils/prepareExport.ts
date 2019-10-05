@@ -6,7 +6,7 @@ import { getNoteTypeFields } from '../utils/noteType'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
-const roughEscape = text => text.replace(/\n/g, '<br />')
+const roughEscape = (text: string) => text.replace(/\n/g, '<br />')
 
 const FRONT_SIDE = '{{FrontSide}}'
 const HR = '<hr id="answer" />'
@@ -21,7 +21,7 @@ const NOTES = `{{#notes}}
 </p>
 {{/notes}}`
 
-const getCards = noteType => [
+const getCards = (noteType: NoteType) => [
   {
     name: 'Listening',
     questionFormat: `♫{{sound}}`,
@@ -48,7 +48,11 @@ const getCards = noteType => [
   },
 ]
 
-export const getApkgExportData = (state, projectMetadata, clipIds) => {
+export const getApkgExportData = (
+  state: AppState,
+  projectMetadata: ProjectMetadata,
+  clipIds: Array<ClipId>
+): ApkgExportData => {
   const fieldNames = getNoteTypeFields(projectMetadata.noteType)
   const mediaFilePaths = r.getMediaFilePaths(state, projectMetadata.id)
 
@@ -76,9 +80,10 @@ export const getApkgExportData = (state, projectMetadata, clipIds) => {
       throw new Error(`Couldn't find media metadata for clip ${id}`)
 
     const fileIndex1 = mediaFilePaths.indexOf(metadataAndPath)
-    const fileIndex2 = mediaFilePaths.indexOf(
-      mediaFilePaths.find(mAndP => mAndP.metadata.id === clip2.fileId)
+    const fileIndex2 = mediaFilePaths.findIndex(
+      mAndP => mAndP.metadata.id === clip2.fileId
     )
+
     if (fileIndex1 < fileIndex2) return -1
     if (fileIndex1 > fileIndex2) return 1
 
@@ -116,11 +121,7 @@ export const getApkgExportData = (state, projectMetadata, clipIds) => {
       SAFE_MILLISECONDS_SEPARATOR
     )}___afcaId${id}${'.mp3'}`
 
-    const fieldValues = []
-    for (const fieldName in clip.flashcard.fields) {
-      const value = roughEscape(clip.flashcard.fields[fieldName]) || ''
-      fieldValues.push(value)
-    }
+    const fieldValues = Object.values(clip.flashcard.fields).map(roughEscape)
 
     return {
       sourceFilePath: filePath,
@@ -178,7 +179,7 @@ export const getApkgExportData = (state, projectMetadata, clipIds) => {
   }
 }
 
-export const getCsvText = exportData => {
+export const getCsvText = (exportData: ApkgExportData) => {
   const csvData = exportData.clips.map(({ flashcardSpecs }) =>
     [...flashcardSpecs.fields].concat(flashcardSpecs.tags.join(' '))
   )

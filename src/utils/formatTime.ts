@@ -1,4 +1,4 @@
-export default function formatTime(seconds) {
+export default function formatTime(seconds: number) {
   const minutes = ~~(seconds / 60)
   const secondsRemainder = ~~(seconds % 60)
 

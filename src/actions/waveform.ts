@@ -3,10 +3,13 @@ export const setWaveformImagePath = (path: string | null) => ({
   path,
 })
 
-export const setWaveformCursor = (x: number, newViewBox: Object) => ({
+export const setWaveformCursor = (
+  x: number,
+  newViewBox?: WaveformViewBox
+): SetCursorPosition => ({
   type: 'SET_CURSOR_POSITION',
   x,
-  newViewBox,
+  newViewBox: newViewBox || null,
 })
 
 export const setPendingClip = (clip: PendingClip): SetPendingClip => ({

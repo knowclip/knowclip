@@ -1,6 +1,7 @@
 import { basename } from 'path'
 
-const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg')
+import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
+const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
 const setFfmpegAndFfprobePath = () => {
   if (process.env.JEST_WORKER_ID) return
@@ -15,10 +16,11 @@ setFfmpegAndFfprobePath()
 
 export default ffmpeg
 
-const zeroPad = (zeroes, value) => String(value).padStart(zeroes, '0')
+const zeroPad = (zeroes: number, value: any) =>
+  String(value).padStart(zeroes, '0')
 
 export const toTimestamp = (
-  milliseconds,
+  milliseconds: number,
   unitsSeparator = ':',
   millisecondsSeparator = '.'
 ) => {
@@ -29,7 +31,7 @@ export const toTimestamp = (
   return `${hoursStamp}${unitsSeparator}${minutesStamp}${unitsSeparator}${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }
 
-export const getMediaMetadata = path => {
+export const getMediaMetadata = (path: string): Promise<FfprobeData> => {
   return new Promise((res, rej) => {
     ffmpeg.ffprobe(path, (err, metadata) => {
       if (err) rej(err)
@@ -39,12 +41,18 @@ export const getMediaMetadata = path => {
   })
 }
 
-export const convertMediaMetadata = (ffprobeMetadata, filePath, id) => ({
+export const convertMediaMetadata = (
+  ffprobeMetadata: FfprobeData,
+  filePath: string,
+  id: string
+) => ({
   id,
   name: basename(filePath),
   durationSeconds: ffprobeMetadata.format.duration,
   format: ffprobeMetadata.format.format_name,
   isVideo:
     ffprobeMetadata.format.format_name !== 'mp3' &&
-    ffprobeMetadata.streams.some(({ codec_type }) => /video/i.test(codec_type)),
+    ffprobeMetadata.streams.some(
+      ({ codec_type }) => codec_type && /video/i.test(codec_type)
+    ),
 })

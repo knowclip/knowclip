@@ -1,9 +1,11 @@
 import * as r from '../redux'
 import formatTime from '../utils/formatTime'
 
-const flatten = [(a, b) => a.concat(b), []]
-
-const projectToMarkdown = (state, projectId, noteType) => {
+const projectToMarkdown = (
+  state: AppState,
+  projectId: ProjectId,
+  noteType: NoteType
+): string => {
   const projectMetadata = r.getProjectMetadata(state, projectId)
   if (!projectMetadata) throw new Error('Could not find project')
 
@@ -18,7 +20,7 @@ const projectToMarkdown = (state, projectId, noteType) => {
           ...r
             .getClips(state, metadata.id)
             .map(clip => {
-              const clipTime = r.getClipTime(state, clip.id) || {}
+              const clipTime = r.getClipTime(state, clip.id)
               return [
                 clipTime
                   ? `\n**${formatTime(clipTime.start)} - ${formatTime(
@@ -42,10 +44,10 @@ const projectToMarkdown = (state, projectId, noteType) => {
                 ).map(rawString => rawString.replace(/\n/g, '<br>')),
               ]
             })
-            .reduce(...flatten),
+            .reduce((a, b) => a.concat(b), []),
         ]
       })
-      .reduce(...flatten),
+      .reduce((a, b) => a.concat(b), []),
   ].join('\n')
 }
 

@@ -19,16 +19,20 @@ declare type ClipsState = {
   }
 }
 
-declare type FlashcardFieldName =
-  | TransliterationFlashcardFieldName
-  | SimpleFlashcardFieldName
+// declare type FlashcardFieldName =
+//   | TransliterationFlashcardFieldName
+//   | SimpleFlashcardFieldName
 
-declare type TransliterationFlashcardFieldName =
-  | 'transcription'
-  | 'pronunciation'
-  | 'meaning'
-  | 'notes'
-declare type SimpleFlashcardFieldName = 'transcription' | 'meaning' | 'notes'
+// declare type TransliterationFlashcardFieldName =
+//   | 'transcription'
+//   | 'pronunciation'
+//   | 'meaning'
+//   | 'notes'
+// declare type SimpleFlashcardFieldNames = [
+//   FlashcardFieldName.transcription,
+//   FlashcardFieldName.meaning,
+//   FlashcardFieldName.notes,
+// ]
 
 // type FlashcardFields =
 //   | SimpleNoteTypeFields
@@ -45,13 +49,35 @@ declare type SimpleFlashcardFieldName = 'transcription' | 'meaning' | 'notes'
 //   notes: string,
 // |}
 
+enum FlashcardFieldName {
+  transcription = 'transcription',
+  pronunciation = 'pronunciation',
+  meaning = 'meaning',
+  notes = 'notes',
+}
+
 declare type FlashcardFields =
   | SimpleFlashcardFields
   | TransliterationFlashcardFields
 
-declare type SimpleFlashcardFields = { [K in SimpleFlashcardFieldName]: string }
+// declare type SimpleFlashcardFields = { [K in SimpleFlashcardFieldName]: string }
+// declare type TransliterationFlashcardFields = {
+//   [K in TransliterationFlashcardFieldName]: string
+// }
+
+declare type SimpleFlashcardFields = {
+  [FlashcardFieldName.transcription]: string
+  [FlashcardFieldName.transliteration]: string
+  [FlashcardFieldName.notes]: string
+  [FlashcardFieldName.meaning]: string
+}
+
 declare type TransliterationFlashcardFields = {
-  [K in TransliterationFlashcardFieldName]: string
+  [FlashcardFieldName.transcription]: string
+  [FlashcardFieldName.transliteration]: string
+  [FlashcardFieldName.meaning]: string
+  [FlashcardFieldName.notes]: string
+  [FlashcardFieldName.pronunciation]: string
 }
 
 declare type Flashcard =
@@ -97,6 +123,7 @@ declare type ApkgExportData = {
       questionFormat: string
       answerFormat: string
     }>
+    css: string
   }
   clips: Array<ClipSpecs>
 }

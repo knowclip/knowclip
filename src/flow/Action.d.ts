@@ -1,5 +1,3 @@
-// @flow
-
 declare type Action =
   | { type: '@@INIT' }
   | SnackbarAction
@@ -21,14 +19,25 @@ declare type Action =
   | { type: 'SET_LOOP'; loop: boolean }
   | { type: 'INITIALIZE_APP' }
   | { type: 'SET_MEDIA_FOLDER_LOCATION'; directoryPath: string | null }
-  | { type: 'DETECT_SILENCE' }
-  | { type: 'DETECT_SILENCE_REQUEST' }
-  | { type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST' }
-  | { type: 'SET_ALL_TAGS'; tagsToClipIds: { [tag: string]: Array<ClipId> } }
+  | DetectSilence
+  | DetectSilenceRequest
+  | DeleteAllCurrentFileClipsRequest
+  | SetAllTags
+
+declare type DetectSilence = { type: 'DETECT_SILENCE' }
+
+declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }
+declare type DeleteAllCurrentFileClipsRequest = {
+  type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST'
+}
+declare type SetAllTags = {
+  type: 'SET_ALL_TAGS'
+  tagsToClipIds: { [tag: string]: Array<ClipId> }
+}
 
 declare type ClipAction =
-  | { type: 'DELETE_CARD'; id: ClipId }
-  | { type: 'DELETE_CARDS'; ids: Array<ClipId> }
+  | DeleteCard
+  | DeleteCards
   | {
       type: 'SET_FLASHCARD_FIELD'
       id: ClipId
@@ -55,7 +64,11 @@ declare type ClipAction =
     }
   | { type: 'EDIT_CLIP'; id: ClipId; override: Partial<Clip> }
   | { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
-  | { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
+  | HighlightClip
+
+declare type DeleteCard = { type: 'DELETE_CARD'; id: ClipId }
+declare type DeleteCards = { type: 'DELETE_CARDS'; ids: Array<ClipId> }
+declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
 
 declare type WaveformAction =
   | SetWaveformImagePath

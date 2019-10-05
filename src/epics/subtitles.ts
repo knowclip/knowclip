@@ -2,25 +2,24 @@ import { promisify } from 'util'
 import tempy from 'tempy'
 import fs from 'fs'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
-import { combineEpics } from 'redux-observable'
+import { Epic, ofType, combineEpics } from 'redux-observable'
 import { filter, flatMap, map } from 'rxjs/operators'
-import { of } from 'rxjs'
+import { of, Observable } from 'rxjs'
 import uuid from 'uuid/v4'
 import * as r from '../redux'
 import { extname } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import newClip from '../utils/newClip'
-import { getNoteTypeFields } from '../utils/noteType'
 import { from } from 'rxjs'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
 export const getSubtitlesFilePathFromMedia = async (
-  mediaFilePath,
-  streamIndex
-) => {
+  mediaFilePath: MediaFilePath,
+  streamIndex: number
+): Promise<string | null> => {
   const mediaMetadata = await getMediaMetadata(mediaFilePath)
   if (
     !mediaMetadata.streams[streamIndex] ||
@@ -46,9 +45,9 @@ export const getSubtitlesFilePathFromMedia = async (
 }
 
 export const getSubtitlesFromMedia = async (
-  mediaFilePath,
-  streamIndex,
-  state
+  mediaFilePath: MediaFilePath,
+  streamIndex: number,
+  state: AppState
 ) => {
   const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
     mediaFilePath,
@@ -62,12 +61,12 @@ export const getSubtitlesFromMedia = async (
   return {
     tmpFilePath: subtitlesFilePath,
     chunks: parse(vttText)
-      .map(vttChunk => r.readVttChunk(state, vttChunk))
+      .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
       .filter(({ text }) => text),
   }
 }
 
-export const convertAssToVtt = (filePath, vttFilePath) =>
+export const convertAssToVtt = (filePath: string, vttFilePath: string) =>
   new Promise((res, rej) =>
     ffmpeg(filePath)
       .output(vttFilePath)
@@ -81,7 +80,11 @@ export const convertAssToVtt = (filePath, vttFilePath) =>
       .run()
   )
 
-const parseSubtitles = (state, fileContents, extension) =>
+const parseSubtitles = (
+  state: AppState,
+  fileContents: string,
+  extension: string
+) =>
   extension === '.ass'
     ? subsrt
         .parse(fileContents)
@@ -89,10 +92,13 @@ const parseSubtitles = (state, fileContents, extension) =>
         .map(chunk => r.readSubsrtChunk(state, chunk))
         .filter(({ text }) => text)
     : parse(fileContents)
-        .map(vttChunk => r.readVttChunk(state, vttChunk))
+        .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
         .filter(({ text }) => text)
 
-export const getSubtitlesFromFile = async (filePath, state) => {
+export const getSubtitlesFromFile = async (
+  filePath: string,
+  state: AppState
+) => {
   const extension = extname(filePath).toLowerCase()
   const vttFilePath =
     extension === '.vtt' ? filePath : tempy.file({ extension: 'vtt' })
@@ -108,7 +114,12 @@ export const getSubtitlesFromFile = async (filePath, state) => {
   }
 }
 
-const newEmbeddedSubtitlesTrack = (id, chunks, streamIndex, tmpFilePath) => ({
+const newEmbeddedSubtitlesTrack = (
+  id: string,
+  chunks: Array<SubtitlesChunk>,
+  streamIndex: number,
+  tmpFilePath: string
+): EmbeddedSubtitlesTrack => ({
   type: 'EmbeddedSubtitlesTrack',
   id,
   mode: 'showing',
@@ -118,11 +129,11 @@ const newEmbeddedSubtitlesTrack = (id, chunks, streamIndex, tmpFilePath) => ({
 })
 
 export const newExternalSubtitlesTrack = (
-  id,
-  chunks,
-  filePath,
-  vttFilePath
-) => ({
+  id: string,
+  chunks: Array<SubtitlesChunk>,
+  filePath: string,
+  vttFilePath: string
+): ExternalSubtitlesTrack => ({
   mode: 'showing',
   type: 'ExternalSubtitlesTrack',
   id,
@@ -131,9 +142,14 @@ export const newExternalSubtitlesTrack = (
   vttFilePath,
 })
 
-export const loadEmbeddedSubtitles = (action$, state$) =>
+export const loadEmbeddedSubtitles: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (action$, state$) =>
   action$.pipe(
-    filter(action => action.type === 'OPEN_MEDIA_FILE_SUCCESS'),
+    ofType<Action, OpenMediaFileSuccess>('OPEN_MEDIA_FILE_SUCCESS'),
     filter(({ subtitlesTracksStreamIndexes }) =>
       Boolean(subtitlesTracksStreamIndexes.length)
     ),
@@ -162,17 +178,29 @@ export const loadEmbeddedSubtitles = (action$, state$) =>
     })
   )
 
-export const loadSubtitlesFailure = (action$, state$) =>
+export const loadSubtitlesFailure: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (action$, state$) =>
   action$.pipe(
-    filter(action => action.type === 'LOAD_SUBTITLES_FAILURE'),
+    ofType<Action, LoadSubtitlesFailure>('LOAD_SUBTITLES_FAILURE'),
     map(({ error }) =>
       r.simpleMessageSnackbar(`Could not load subtitles: ${error}`)
     )
   )
 
-export const loadSubtitlesFile = (action$, state$) =>
+export const loadSubtitlesFile: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (action$, state$) =>
   action$.pipe(
-    filter(action => action.type === 'LOAD_SUBTITLES_FROM_FILE_REQUEST'),
+    ofType<Action, LoadSubtitlesFromFileRequest>(
+      'LOAD_SUBTITLES_FROM_FILE_REQUEST'
+    ),
     flatMap(async ({ filePath }) => {
       try {
         const { chunks, vttFilePath } = await getSubtitlesFromFile(
@@ -190,71 +218,97 @@ export const loadSubtitlesFile = (action$, state$) =>
     })
   )
 
-const makeClipsFromSubtitles = (action$, state$) =>
+const makeClipsFromSubtitles: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (action$, state$) =>
   action$.pipe(
-    filter(action => action.type === 'MAKE_CLIPS_FROM_SUBTITLES'),
-    flatMap(({ fileId, fieldNamesToTrackIds, tags }) => {
-      const transcriptionTrackId = fieldNamesToTrackIds.transcription
-      const transcriptionTrack = r.getSubtitlesTrack(
-        state$.value,
-        transcriptionTrackId
-      )
-      if (!transcriptionTrack)
-        return of(
-          r.simpleMessageSnackbar(
-            'Could not find subtitles track to match with transcription field.'
-          )
+    ofType<Action, MakeClipsFromSubtitles>('MAKE_CLIPS_FROM_SUBTITLES'),
+    flatMap<MakeClipsFromSubtitles, Observable<Action>>(
+      ({ fileId, fieldNamesToTrackIds, tags }) => {
+        const transcriptionTrackId = fieldNamesToTrackIds.transcription
+        const transcriptionTrack = r.getSubtitlesTrack(
+          state$.value,
+          transcriptionTrackId
         )
+        if (!transcriptionTrack)
+          return of(
+            r.simpleMessageSnackbar(
+              'Could not find subtitles track to match with transcription field.'
+            )
+          )
 
-      const currentNoteType = r.getCurrentNoteType(state$.value)
-      const currentFile = r.getCurrentMediaMetadata(state$.value)
-      if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
-      if (!currentFile) throw new Error('Could not find media file.') // should be impossible
-      const currentNoteTypeFields = getNoteTypeFields(currentNoteType)
+        const currentNoteType = r.getCurrentNoteType(state$.value)
+        const currentFile = r.getCurrentMediaMetadata(state$.value)
+        if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
+        if (!currentFile) throw new Error('Could not find media file.') // should be impossible
 
-      const clips = transcriptionTrack.chunks
-        .sort(({ start: a }, { start: b }) => a - b)
-        .map(chunk => {
-          const fields = {
-            transcription: chunk.text,
-          }
-          currentNoteTypeFields.forEach(fieldName => {
-            const trackId = fieldNamesToTrackIds[fieldName]
-            fields[fieldName] = trackId
-              ? r
-                  .getSubtitlesChunksWithinRange(
-                    state$.value,
-                    trackId,
-                    chunk.start,
-                    chunk.end
-                  )
-                  .map(chunk => chunk.text)
-                  .join(' ')
-              : ''
+        const clips = transcriptionTrack.chunks
+          .sort(({ start: a }, { start: b }) => a - b)
+          .map(chunk => {
+            const fields =
+              currentNoteType === 'Simple'
+                ? {
+                    transcription: chunk.text,
+                    meaning: '',
+                    notes: '',
+                  }
+                : {
+                    transcription: chunk.text,
+                    meaning: '',
+                    notes: '',
+                    pronunciation: '',
+                  }
+            ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(
+              fieldName => {
+                const trackId = fieldNamesToTrackIds[fieldName]
+                fields[fieldName] = trackId
+                  ? r
+                      .getSubtitlesChunksWithinRange(
+                        state$.value,
+                        trackId,
+                        chunk.start,
+                        chunk.end
+                      )
+                      .map(chunk => chunk.text)
+                      .join(' ')
+                  : ''
+              }
+            )
+
+            return newClip(chunk, fileId, uuid(), tags, fields)
           })
 
-          return newClip(chunk, fileId, uuid(), currentNoteType, tags, fields)
-        })
-
-      return from([
-        r.deleteCards(r.getClipIdsByMediaFileId(state$.value, currentFile.id)),
-        ...Object.keys(fieldNamesToTrackIds).map(badTypefieldName => {
-          const cast = badTypefieldName
-          const fieldName = cast
-          return r.linkFlashcardFieldToSubtitlesTrack(
-            fieldName,
-            fieldNamesToTrackIds[fieldName]
-          )
-        }),
-        r.addClips(clips, fileId),
-        r.highlightClip(clips[0].id),
-      ])
-    })
+        return from([
+          r.deleteCards(
+            r.getClipIdsByMediaFileId(state$.value, currentFile.id)
+          ),
+          ...Object.keys(fieldNamesToTrackIds).map(badTypefieldName => {
+            const fieldName = badTypefieldName as FlashcardFieldName
+            return r.linkFlashcardFieldToSubtitlesTrack(
+              fieldName,
+              fieldNamesToTrackIds[fieldName]
+            )
+          }),
+          r.addClips(clips, fileId),
+          r.highlightClip(clips[0].id),
+        ])
+      }
+    )
   )
 
-const subtitlesClipsDialogRequest = (action$, state$) =>
+const subtitlesClipsDialogRequest: Epic<
+  Action,
+  Action,
+  AppState,
+  EpicsDependencies
+> = (action$, state$) =>
   action$.pipe(
-    filter(action => action.type === 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'),
+    ofType<Action, ShowSubtitleSClipsDialogRequest>(
+      'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'
+    ),
     map(() => {
       const tracks = r.getSubtitlesTracks(state$.value)
       if (!tracks.length)
@@ -275,9 +329,13 @@ const subtitlesClipsDialogRequest = (action$, state$) =>
     })
   )
 
-const goToSubtitlesChunk = (action$, state$, { setCurrentTime }) =>
+const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
+  action$,
+  state$,
+  { setCurrentTime }
+) =>
   action$.pipe(
-    filter(action => action.type === 'GO_TO_SUBTITLES_CHUNK'),
+    ofType<Action, GoToSubtitlesChunk>('GO_TO_SUBTITLES_CHUNK'),
     map(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
       if (!track) {

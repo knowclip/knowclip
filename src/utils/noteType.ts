@@ -1,7 +1,27 @@
+const SIMPLE_FIELDS: [
+  FlashcardFieldName.transcription,
+  FlashcardFieldName.notes,
+  FlashcardFieldName.meaning
+] = [
+  FlashcardFieldName.transcription,
+  FlashcardFieldName.notes,
+  FlashcardFieldName.meaning,
+]
+
+const TRANSLITERATION_FIELDS: [
+  FlashcardFieldName.transcription,
+  FlashcardFieldName.notes,
+  FlashcardFieldName.meaning,
+  FlashcardFieldName.pronunciation
+] = [
+  FlashcardFieldName.transcription,
+  FlashcardFieldName.notes,
+  FlashcardFieldName.meaning,
+  FlashcardFieldName.pronunciation,
+]
+
 export const getNoteTypeFields = (noteType: NoteType) =>
-  noteType === 'Transliteration'
-    ? ['transcription', 'pronunciation', 'meaning', 'notes']
-    : ['transcription', 'meaning', 'notes']
+  noteType === 'Transliteration' ? TRANSLITERATION_FIELDS : SIMPLE_FIELDS
 
 export const getBlankFlashcard: <T extends FlashcardFields>(
   id: ClipId,

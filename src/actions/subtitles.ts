@@ -15,14 +15,14 @@ export const loadSubtitlesFromFileRequest = (filePath: string) => ({
 
 export const loadEmbeddedSubtitlesSuccess = (
   subtitlesTracks: Array<EmbeddedSubtitlesTrack>
-) => ({
+): LoadEmbeddedSubtitlesSuccess => ({
   type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS',
   subtitlesTracks,
 })
 
 export const loadExternalSubtitlesSuccess = (
   subtitlesTracks: Array<ExternalSubtitlesTrack>
-) => ({
+): LoadExternalSubtitlesSuccess => ({
   type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS',
   subtitlesTracks,
 })
@@ -41,7 +41,7 @@ export const makeClipsFromSubtitles = (
   fileId: MediaFileId,
   fieldNamesToTrackIds: { [K in FlashcardFieldName]: SubtitlesTrackId },
   tags: Array<string>
-) => ({
+): MakeClipsFromSubtitles => ({
   type: 'MAKE_CLIPS_FROM_SUBTITLES',
   fileId,
   fieldNamesToTrackIds,
@@ -55,7 +55,7 @@ export const subtitlesClipsDialogRequest = () => ({
 export const linkFlashcardFieldToSubtitlesTrack = (
   flashcardFieldName: FlashcardFieldName,
   subtitlesTrackId: SubtitlesTrackId
-) => ({
+): LinkFlashcardFieldToSubtitlesTrack => ({
   type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK',
   flashcardFieldName,
   subtitlesTrackId,

@@ -2,9 +2,9 @@ import uuid from 'uuid/v4'
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 
-const convertProject0_0_0___1_0_0 = project => {
+const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   const { clips: oldClips } = project
-  const newClips = {}
+  const newClips: { [clipId: string]: ClipPre3_0_0 } = {}
   const fileId = uuid()
   for (const clipId in oldClips) {
     const clip = oldClips[clipId]
@@ -30,8 +30,8 @@ const convertProject0_0_0___1_0_0 = project => {
     audioFileId: fileId,
   }
 }
-const convertProject1_0_0___2_0_0 = project => {
-  const clips = {}
+const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
+  const clips: { [clipId: string]: ClipPre3_0_0 } = {}
   for (const clipId in project.clips) {
     const clip = project.clips[clipId]
     clips[clipId] = {
@@ -45,6 +45,7 @@ const convertProject1_0_0___2_0_0 = project => {
     id: uuid(),
     timestamp: moment.utc().format(),
     name: `Clips from ${project.audioFileName}`,
+    // @ts-ignore
     tags: [...getAllTags(project.clips)],
     mediaFilesMetadata: [
       {
@@ -60,13 +61,13 @@ const convertProject1_0_0___2_0_0 = project => {
   }
 }
 
-const getNoteType = oldProject =>
+const getNoteType = (oldProject: Project0_0_0 | Project1_0_0 | Project2_0_0) =>
   oldProject.noteType.fields.length > 3 ? 'Transliteration' : 'Simple'
 const getFlashcard = (
-  noteType,
-  oldFlashcard,
-  [noteField1, noteField2, noteField3, ...noteFieldsRest]
-) =>
+  noteType: NoteType,
+  oldFlashcard: FlashcardPre3_0_0,
+  [noteField1, noteField2, noteField3, ...noteFieldsRest]: Array<{ id: string }>
+): Flashcard =>
   noteType === 'Simple'
     ? {
         id: oldFlashcard.id,
@@ -91,9 +92,9 @@ const getFlashcard = (
             .join('\n\n'),
         },
       }
-const convertProject2_0_0___3_0_0 = project => {
+const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
   const noteType = getNoteType(project)
-  const clips = {}
+  const clips: { [clipId: string]: Clip } = {}
   for (const clipId in project.clips) {
     const clip = project.clips[clipId]
     clips[clipId] = {
@@ -120,8 +121,8 @@ const convertProject2_0_0___3_0_0 = project => {
   }
 }
 
-const parseProject = jsonFileContents => {
-  const project = JSON.parse(jsonFileContents)
+const parseProject = (jsonFileContents: string) => {
+  const project = JSON.parse(jsonFileContents) as Project
   switch (project.version) {
     case '0.0.0':
       return convertProject2_0_0___3_0_0(
@@ -141,10 +142,10 @@ const parseProject = jsonFileContents => {
 export default parseProject
 
 export const getMediaFilePaths = (
-  originalProjectJson,
-  project,
-  projectFilePath,
-  mediaFilePaths
+  originalProjectJson: Project,
+  project: Project,
+  projectFilePath: ProjectFilePath,
+  mediaFilePaths: AudioMetadataAndPath[]
 ) => {
   if (
     originalProjectJson &&
@@ -153,6 +154,7 @@ export const getMediaFilePaths = (
   ) {
     return [
       {
+        // @ts-ignore
         metadata: project.mediaFilesMetadata[0],
         filePath: projectFilePath.replace(/\.afca$/, ''),
         constantBitrateFilePath: null,
@@ -160,19 +162,21 @@ export const getMediaFilePaths = (
       },
     ]
   }
-  return project.mediaFilesMetadata.map(metadata => {
-    const existingMetadataAndFilePath = mediaFilePaths.find(
-      ({ metadata: { id }, filePath }) => id === metadata.id
-    )
-    return {
-      metadata,
-      constantBitrateFilePath: existingMetadataAndFilePath
-        ? existingMetadataAndFilePath.constantBitrateFilePath
-        : null,
-      filePath: existingMetadataAndFilePath
-        ? existingMetadataAndFilePath.filePath
-        : null,
-      error: null,
+  return (project as Project3_0_0 | Project2_0_0).mediaFilesMetadata.map(
+    metadata => {
+      const existingMetadataAndFilePath = mediaFilePaths.find(
+        ({ metadata: { id }, filePath }) => id === metadata.id
+      )
+      return {
+        metadata,
+        constantBitrateFilePath: existingMetadataAndFilePath
+          ? existingMetadataAndFilePath.constantBitrateFilePath
+          : null,
+        filePath: existingMetadataAndFilePath
+          ? existingMetadataAndFilePath.filePath
+          : null,
+        error: null,
+      }
     }
-  })
+  )
 }

@@ -1,4 +1,4 @@
-export const enqueueSnackbar = (snackbar: SnackbarData) => ({
+export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
   type: 'ENQUEUE_SNACKBAR',
   snackbar,
 })

@@ -7,8 +7,9 @@ import {
   take,
   switchMap,
 } from 'rxjs/operators'
-import { fromEvent, merge } from 'rxjs'
+import { fromEvent, merge, of, empty } from 'rxjs'
 import * as r from '../redux'
+import { Epic, ofType } from 'redux-observable'
 import {
   toWaveformX,
   toWaveformCoordinates,
@@ -16,7 +17,7 @@ import {
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 
-const pendingClipIsBigEnough = state => {
+const pendingClipIsBigEnough = (state: AppState) => {
   const pendingClip = r.getPendingClip(state)
   if (!pendingClip) return false
 
@@ -24,15 +25,24 @@ const pendingClipIsBigEnough = state => {
   return Math.abs(end - start) >= r.CLIP_THRESHOLD
 }
 
-const addClipEpic = (action$, state$, { window, getWaveformSvgElement }) =>
+const addClipEpic: Epic<Action, Action, AppState, EpicsDependencies> = (
+  action$,
+  state$,
+  { window, getWaveformSvgElement }
+) =>
   action$.pipe(
-    filter(action => action.type === 'OPEN_MEDIA_FILE_SUCCESS'),
-    switchMap(() =>
-      fromEvent(getWaveformSvgElement(), 'mousedown').pipe(
+    ofType<Action, OpenMediaFileSuccess>('OPEN_MEDIA_FILE_SUCCESS'),
+    flatMap(() => {
+      const svg = getWaveformSvgElement()
+      if (!svg) console.error('No svg element')
+      return svg ? of(svg) : empty()
+    }),
+    switchMap(svg =>
+      fromEvent<MouseEvent>(svg, 'mousedown').pipe(
         map(mousedown =>
           toWaveformCoordinates(
             mousedown,
-            mousedown.currentTarget,
+            mousedown.currentTarget as SVGElement,
             r.getWaveformViewBoxXMin(state$.value)
           )
         ),
@@ -52,13 +62,13 @@ const addClipEpic = (action$, state$, { window, getWaveformSvgElement }) =>
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =
         state$.value.waveform.stepsPerSecond * state$.value.waveform.stepLength
-      const withinValidTime = x =>
+      const withinValidTime = (x: number) =>
         Math.max(0, Math.min(x, mediaMetadata.durationSeconds * factor))
 
       const svgElement = getWaveformSvgElement()
       if (!svgElement) throw new Error('Waveform disappeared')
 
-      const pendingClips = fromEvent(window, 'mousemove').pipe(
+      const pendingClips = fromEvent<MouseEvent>(window, 'mousemove').pipe(
         map(mousemove => {
           mousemove.preventDefault()
           return r.setPendingClip({
@@ -83,11 +93,11 @@ const addClipEpic = (action$, state$, { window, getWaveformSvgElement }) =>
           const pendingClipOverlaps = [
             r.getClipIdAt(state$.value, pendingClip.start),
             r.getClipIdAt(state$.value, pendingClip.end),
-          ].some(id => clipsOrder.includes(id))
+          ].some(id => id && clipsOrder.includes(id))
           const currentNoteType = r.getCurrentNoteType(state$.value)
           const currentFileId = r.getCurrentFileId(state$.value)
           if (!currentNoteType)
-            throw new Error('Could not find current file id')
+            throw new Error('Could not find current file id') // necessary?
           if (!currentFileId)
             throw new Error('Could not find current note type')
 
@@ -99,7 +109,6 @@ const addClipEpic = (action$, state$, { window, getWaveformSvgElement }) =>
                   pendingClip,
                   currentFileId,
                   uuid(),
-                  currentNoteType,
                   r.getDefaultTags(state$.value),
                   r.getNewFieldsFromLinkedSubtitles(state$.value, pendingClip)
                 )
