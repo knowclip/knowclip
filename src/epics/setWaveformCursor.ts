@@ -3,7 +3,7 @@ import { map, flatMap, takeWhile, startWith } from 'rxjs/operators'
 import { Epic, ofType } from 'redux-observable'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const setWaveformCursorEpic: AppEpic = (
   action$,

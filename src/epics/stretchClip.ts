@@ -3,7 +3,7 @@ import { fromEvent, from, of, merge, empty } from 'rxjs'
 import { Epic, ofType } from 'redux-observable'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const stretchClipEpic: AppEpic = (
   action$,

@@ -11,7 +11,7 @@ import {
 import { fromEvent, from, of, empty, merge, OperatorFunction } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const spaceEpic: AppEpic = (action$, state$, { window, toggleMediaPaused }) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(

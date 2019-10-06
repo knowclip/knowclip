@@ -18,7 +18,7 @@ import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
 import subtitles from './subtitles'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const defaultTagsEpic: AppEpic = (action$, state$) =>
   action$.pipe(

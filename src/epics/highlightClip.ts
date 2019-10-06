@@ -11,7 +11,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 import { TextareaHTMLAttributes } from 'react'
 
 const elementWidth = (element: Element) => {

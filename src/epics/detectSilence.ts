@@ -5,7 +5,7 @@ import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const detectSilence = (
   path: string,

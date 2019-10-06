@@ -4,7 +4,7 @@ import * as r from '../redux'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import { getWaveformPngPath } from '../utils/localStorage'
 import { existsSync } from 'fs'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'

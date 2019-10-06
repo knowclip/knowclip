@@ -8,7 +8,7 @@ import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
 import { FfprobeData } from 'fluent-ffmpeg'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const getSubtitlesStreamIndexes = (ffprobeMetadata: FfprobeData) =>
   ffprobeMetadata.streams

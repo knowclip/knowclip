@@ -12,7 +12,7 @@ import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import newClip from '../utils/newClip'
 import { from } from 'rxjs'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)

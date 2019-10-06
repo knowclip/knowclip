@@ -6,7 +6,7 @@ import { promisify } from 'util'
 import fs from 'fs'
 import parseProject, { getMediaFilePaths } from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)

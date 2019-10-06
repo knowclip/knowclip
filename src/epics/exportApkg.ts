@@ -11,7 +11,7 @@ import { showSaveDialog } from '../utils/electron'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 import { promisify } from 'util'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const wait = (ms: number) => new Promise(res => setTimeout(res, ms))
 

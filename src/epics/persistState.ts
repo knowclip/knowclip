@@ -1,6 +1,6 @@
 import { ignoreElements, tap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import { AppEpic } from '../flow/AppEpic'
+import { AppEpic } from '../types/AppEpic'
 
 const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
   action$.pipe(
