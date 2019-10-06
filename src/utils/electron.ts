@@ -5,7 +5,10 @@ const {
 } = electron
 
 const win = getCurrentWindow()
-export const showSaveDialog = (name: string, extensions: Array<string>) =>
+export const showSaveDialog = (
+  name: string,
+  extensions: Array<string>
+): Promise<string | null> =>
   new Promise((res, rej) => {
     try {
       dialog.showSaveDialog(

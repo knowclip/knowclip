@@ -6,7 +6,7 @@ const initialState: DialogState = {
 
 const dialog: Reducer<DialogState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case 'ENQUEUE_DIALOG':
+    case A.ENQUEUE_DIALOG:
       return {
         ...state,
         queue: action.skipQueue
@@ -14,7 +14,7 @@ const dialog: Reducer<DialogState, Action> = (state = initialState, action) => {
           : state.queue.concat(action.dialog),
       }
 
-    case 'CLOSE_DIALOG': {
+    case A.CLOSE_DIALOG: {
       const [, ...queue] = state.queue
       return {
         ...state,

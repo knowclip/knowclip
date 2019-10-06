@@ -1,5 +1,5 @@
 export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
-  type: 'ENQUEUE_SNACKBAR',
+  type: A.ENQUEUE_SNACKBAR,
   snackbar,
 })
 
@@ -10,5 +10,5 @@ export const simpleMessageSnackbar = (message: string) =>
   })
 
 export const closeSnackbar = (): SnackbarAction => ({
-  type: 'CLOSE_SNACKBAR',
+  type: A.CLOSE_SNACKBAR,
 })

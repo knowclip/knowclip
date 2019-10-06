@@ -1,29 +1,32 @@
 import { flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import { of, from } from 'rxjs'
+import { of, from, Observable } from 'rxjs'
 import { promisify } from 'util'
 import fs from 'fs'
 import * as r from '../redux'
 import { showSaveDialog } from '../utils/electron'
 import projectToMarkdown from '../utils/projectToMarkdown'
+import { AppEpic } from '../flow/AppEpic'
 
 const writeFile = promisify(fs.writeFile)
 
-const exportMarkdown = (action$, state$) =>
+const exportMarkdown: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_MARKDOWN'),
-    flatMap(async ({ clipIds }) => {
+    ofType<Action, ExportMarkdown>(A.EXPORT_MARKDOWN),
+    flatMap<ExportMarkdown, Promise<Observable<Action>>>(async () => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
-        if (!filename) return { type: 'NOOP_EXPORT_MARKDOWN' }
+        if (!filename)
+          return of(({ type: 'NOOP_EXPORT_MARKDOWN' } as unknown) as Action)
         const currentProjectMetadata = r.getCurrentProject(state$.value)
         if (!currentProjectMetadata)
           return of(r.simpleMessageSnackbar('Could not find project'))
-
+        const currentNoteType = r.getCurrentNoteType(state$.value)
+        if (!currentNoteType) throw new Error('No note type found')
         const markdown = projectToMarkdown(
           state$.value,
           currentProjectMetadata.id,
-          clipIds
+          currentNoteType
         )
         await writeFile(filename, markdown, 'utf8')
         return from([
@@ -37,7 +40,7 @@ const exportMarkdown = (action$, state$) =>
         )
       }
     }),
-    flatMap(x => x)
+    flatMap<Observable<Action>, Observable<Action>>(x => x)
   )
 
 export default exportMarkdown

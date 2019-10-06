@@ -106,26 +106,28 @@ declare type ClipSpecs = {
   outputFilename: string
   startTime: number
   endTime: number
-  flashcardSpecs: {
-    fields: Array<string>
-    tags: Array<string>
-    due: number
-    sortField: string
-  }
+  flashcardSpecs: FlashcardSpecs
+}
+declare type FlashcardSpecs = {
+  fields: Array<string>
+  tags: Array<string>
+  due: number
+  sortField: string
 }
 
 declare type ApkgExportData = {
   deckName: string
-  template: {
-    fields: Array<string> // field names,
-    cards: Array<{
-      name: string
-      questionFormat: string
-      answerFormat: string
-    }>
-    css: string
-  }
+  template: ApkgExportTemplate
   clips: Array<ClipSpecs>
+}
+declare type ApkgExportTemplate = {
+  fields: Array<string> // field names,
+  cards: Array<{
+    name: string
+    questionFormat: string
+    answerFormat: string
+  }>
+  css: string
 }
 
 declare type ClipPre3_0_0 = {

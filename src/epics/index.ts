@@ -1,4 +1,4 @@
-import { map, ignoreElements } from 'rxjs/operators'
+import { map, ignoreElements, flatMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'
@@ -18,19 +18,33 @@ import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
 import subtitles from './subtitles'
+import { AppEpic } from '../flow/AppEpic'
 
-const defaultTagsEpic = (action$, state$) =>
+const defaultTagsEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('ADD_FLASHCARD_TAG', 'DELETE_FLASHCARD_TAG'),
-    map(({ id }) => ({
-      type: 'SET_DEFAULT_TAGS',
-      tags: r.getClip(state$.value, id).flashcard.tags,
-    }))
+    ofType<Action, AddFlashcardTag | DeleteFlashcardTag>(
+      A.ADD_FLASHCARD_TAG,
+      A.DELETE_FLASHCARD_TAG
+    ),
+    map(({ id }) => {
+      const clip = r.getClip(state$.value, id)
+      if (!clip) {
+        // should this happen or should we set empty default tags?
+        console.error('No clip found')
+        return r.simpleMessageSnackbar(
+          'Could not set default tags: no clip found'
+        )
+      }
+      return {
+        type: 'SET_DEFAULT_TAGS',
+        tags: clip.flashcard.tags,
+      } as SetDefaultTags
+    })
   )
 
-// const defaultTagsAudioEpic = (action$, state$) =>
+// const defaultTagsAudioEpic: AppEpic = (action$, state$) =>
 //   action$.pipe(
-//     ofType('LOAD_AUDIO_SUCCESS'),
+//     ofType(A.LOAD_AUDIO_SUCCESS),
 //     filter(({ file }) => file),
 //     map(({ id }) => ({
 //       type: 'SET_DEFAULT_TAGS',
@@ -38,7 +52,7 @@ const defaultTagsEpic = (action$, state$) =>
 //     }))
 //   )
 
-const closeEpic = (action$, state$) =>
+const closeEpic: AppEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', () => {
     if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
       ipcRenderer.send('closed')

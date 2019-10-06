@@ -1,15 +1,16 @@
 import { ignoreElements, tap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
+import { AppEpic } from '../flow/AppEpic'
 
-const persistStateEpic = (action$, state$, { setLocalStorage }) =>
+const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
   action$.pipe(
     ofType(
-      'OPEN_PROJECT',
-      'ADD_MEDIA_TO_PROJECT',
-      'DELETE_MEDIA_FROM_PROJECT',
-      'OPEN_MEDIA_FILE_SUCCESS',
-      'LOCATE_MEDIA_FILE_SUCCESS',
-      'SET_MEDIA_FOLDER_LOCATION'
+      A.OPEN_PROJECT,
+      A.ADD_MEDIA_TO_PROJECT,
+      A.DELETE_MEDIA_FROM_PROJECT,
+      A.OPEN_MEDIA_FILE_SUCCESS,
+      A.LOCATE_MEDIA_FILE_SUCCESS,
+      A.SET_MEDIA_FOLDER_LOCATION
     ),
     tap(() => {
       setLocalStorage('projects', JSON.stringify(state$.value.projects))

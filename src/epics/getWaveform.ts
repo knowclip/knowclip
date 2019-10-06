@@ -4,14 +4,18 @@ import * as r from '../redux'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import { getWaveformPngPath } from '../utils/localStorage'
 import { existsSync } from 'fs'
+import { AppEpic } from '../flow/AppEpic'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
 
-const getWaveformPng = async (state, constantBitrateFilePath) => {
+const getWaveformPng = async (
+  state: AppState,
+  constantBitrateFilePath: string
+): Promise<string> => {
   const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
   const {
-    format: { duration },
+    format: { duration = 0 },
   } = ffprobeMetadata
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
@@ -22,6 +26,7 @@ const getWaveformPng = async (state, constantBitrateFilePath) => {
   return await new Promise((res, rej) => {
     ffmpeg(constantBitrateFilePath)
       // .audioCodec('copy') // later, do this and change hardcoded '.mp3' for audio-only input
+      // @ts-ignore why does it ask for a second argument?
       .complexFilter(
         [
           `[0:a]aformat=channel_layouts=mono,`,
@@ -36,32 +41,34 @@ const getWaveformPng = async (state, constantBitrateFilePath) => {
       .on('end', function() {
         res(outputFilename)
       })
-      .on('error', err => {
+      .on('error', (err: any) => {
         rej(err)
       })
       .run()
   })
 }
 
-const getWaveformEpic = (action$, state$) =>
+const getWaveformEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('OPEN_MEDIA_FILE_SUCCESS'),
-    switchMap(async ({ filePath, constantBitrateFilePath }) => {
-      try {
-        if (!filePath) {
-          return r.setWaveformImagePath(null)
-        }
+    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+    switchMap<OpenMediaFileSuccess, Promise<Action>>(
+      async ({ filePath, constantBitrateFilePath }) => {
+        try {
+          if (!filePath) {
+            return r.setWaveformImagePath(null)
+          }
 
-        const imagePath = await getWaveformPng(
-          state$.value,
-          constantBitrateFilePath
-        )
-        return r.setWaveformImagePath(imagePath)
-      } catch (err) {
-        console.error(err)
-        return r.simpleMessageSnackbar(err.message)
+          const imagePath = await getWaveformPng(
+            state$.value,
+            constantBitrateFilePath
+          )
+          return r.setWaveformImagePath(imagePath)
+        } catch (err) {
+          console.error(err)
+          return r.simpleMessageSnackbar(err.message)
+        }
       }
-    })
+    )
   )
 
 export default getWaveformEpic

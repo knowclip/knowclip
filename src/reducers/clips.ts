@@ -55,10 +55,10 @@ const arrayToMapById: (
 
 const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case 'CLOSE_PROJECT':
+    case A.CLOSE_PROJECT:
       return initialState
 
-    case 'OPEN_PROJECT': {
+    case A.OPEN_PROJECT: {
       const newState: ClipsState = { byId: {}, idsByMediaFileId: {} }
       const { idsByMediaFileId, byId } = newState
       action.project.mediaFilesMetadata.forEach(({ id }) => {
@@ -76,7 +76,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case 'CHOOSE_AUDIO_FILES':
+    case A.CHOOSE_AUDIO_FILES:
       return {
         ...state,
         idsByMediaFileId: action.ids.reduce(
@@ -88,14 +88,14 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         ),
       }
 
-    case 'REMOVE_AUDIO_FILES':
+    case A.REMOVE_AUDIO_FILES:
       return {
         ...state,
         idsByMediaFileId: {},
         byId: {},
       }
 
-    case 'ADD_CLIP': {
+    case A.ADD_CLIP: {
       const { clip } = action
       const { fileId } = clip
       return {
@@ -115,7 +115,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'ADD_CLIPS': {
+    case A.ADD_CLIPS: {
       const { clips, fileId } = action
       return {
         ...state,
@@ -134,7 +134,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'EDIT_CLIP':
+    case A.EDIT_CLIP:
       return {
         ...state,
         byId: {
@@ -147,7 +147,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         },
       }
 
-    case 'MERGE_CLIPS': {
+    case A.MERGE_CLIPS: {
       const { ids } = action // should all have same filepath
       const { fileId } = state.byId[ids[0]]
       const [finalId, ...idsToBeDiscarded] = ids
@@ -207,7 +207,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       } as ClipsState
     }
 
-    case 'DELETE_CARD': {
+    case A.DELETE_CARD: {
       const { id } = action
       const { fileId } = state.byId[id]
       const byId = { ...state.byId }
@@ -224,7 +224,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'DELETE_CARDS': {
+    case A.DELETE_CARDS: {
       const { ids } = action
       const byId = { ...state.byId }
       if (!ids.length) return state
@@ -245,7 +245,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'SET_FLASHCARD_FIELD': {
+    case A.SET_FLASHCARD_FIELD: {
       const { id, key, value } = action
 
       // @ts-ignore
@@ -265,7 +265,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'ADD_FLASHCARD_TAG': {
+    case A.ADD_FLASHCARD_TAG: {
       const { id, text } = action
 
       return {
@@ -286,7 +286,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'DELETE_FLASHCARD_TAG': {
+    case A.DELETE_FLASHCARD_TAG: {
       const { id, index } = action
       const newTags = [...state.byId[id].flashcard.tags]
       newTags.splice(index, 1)
@@ -306,7 +306,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'ADD_MEDIA_TO_PROJECT': {
+    case A.ADD_MEDIA_TO_PROJECT: {
       const idsByMediaFileId = { ...state.idsByMediaFileId }
       action.mediaFilePaths.forEach(({ metadata }) => {
         idsByMediaFileId[metadata.id] = []
@@ -317,7 +317,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case 'DELETE_MEDIA_FROM_PROJECT': {
+    case A.DELETE_MEDIA_FROM_PROJECT: {
       const clipIds = state.idsByMediaFileId[action.mediaFileId] || []
       console.log('mediaFileId', action.mediaFileId)
 

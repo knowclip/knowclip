@@ -3,19 +3,15 @@ import { map, flatMap, takeWhile, startWith } from 'rxjs/operators'
 import { Epic, ofType } from 'redux-observable'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
+import { AppEpic } from '../flow/AppEpic'
 
-const setWaveformCursorEpic: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (
+const setWaveformCursorEpic: AppEpic = (
   action$,
   state$,
   { document, getWaveformSvgWidth, setCurrentTime, getCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>('OPEN_MEDIA_FILE_SUCCESS'),
+    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
     flatMap<OpenMediaFileSuccess, Observable<Action>>(() =>
       fromEvent<Event>(
         document,
@@ -29,7 +25,7 @@ const setWaveformCursorEpic: Epic<
         //     ofType('CLOSE_PROJECT', 'OPEN_MEDIA_FILE_REQUEST' /* CLOSE_MEDIA_FILE */),
         //   ),
         //   action$.pipe(
-        //     ofType('DELETE_MEDIA_FROM_PROJECT'),
+        //     ofType(A.DELETE_MEDIA_FROM_PROJECT),
         //     withLatestFrom('OPEN_MEDIA_FILE_SUCCESS'),
         //     filter(([deleteMedia, openMediaFileSuccess]) => deleteMedia.mediaFileId === openMediaFileSuccess.id)
         //   )

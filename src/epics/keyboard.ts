@@ -8,12 +8,13 @@ import {
   takeUntil,
   take,
 } from 'rxjs/operators'
-import { fromEvent, from, of, empty, merge } from 'rxjs'
+import { fromEvent, from, of, empty, merge, OperatorFunction } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
+import { AppEpic } from '../flow/AppEpic'
 
-const spaceEpic = (action$, state$, { window, toggleMediaPaused }) =>
-  fromEvent(window, 'keydown').pipe(
+const spaceEpic: AppEpic = (action$, state$, { window, toggleMediaPaused }) =>
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
     tap(e => {
       e.preventDefault()
@@ -23,8 +24,12 @@ const spaceEpic = (action$, state$, { window, toggleMediaPaused }) =>
     ignoreElements()
   )
 
-const ctrlRightBracket = (action$, state$, { window, getCurrentTime }) =>
-  fromEvent(window, 'keydown').pipe(
+const ctrlRightBracket: AppEpic = (
+  action$,
+  state$,
+  { window, getCurrentTime }
+) =>
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 190 && ctrlKey),
     flatMap(e => {
       e.preventDefault()
@@ -36,22 +41,24 @@ const ctrlRightBracket = (action$, state$, { window, getCurrentTime }) =>
       const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
 
       const highlightedClipId = r.getHighlightedClipId(state)
-      const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
-      const lastIndex = currentFileClipIds.length - 1
-      const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
-      if (highlightedClipId && nextId) return of(r.highlightClip(nextId))
+      if (highlightedClipId) {
+        const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
+        const lastIndex = currentFileClipIds.length - 1
+        const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
+        if (nextId) return of(r.highlightClip(nextId))
+      }
 
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
       const nextClipId = currentFileClipIds.find(
-        clipId => r.getClip(state, clipId).start >= x
+        clipId => (r.getClip(state, clipId) || { start: 0 }).start >= x
       )
 
       return nextClipId ? of(r.highlightClip(nextClipId)) : empty()
     })
   )
 
-const findLast = (array, predicate) => {
+const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
   if (!array.length) return null
   for (let i = array.length - 1; i >= 0; i -= 1) {
     const item = array[i]
@@ -59,8 +66,12 @@ const findLast = (array, predicate) => {
   }
 }
 
-const ctrlLeftBracket = (action$, state$, { window, getCurrentTime }) =>
-  fromEvent(window, 'keydown').pipe(
+const ctrlLeftBracket: AppEpic = (
+  action$,
+  state$,
+  { window, getCurrentTime }
+) =>
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 188 && ctrlKey),
     flatMap(e => {
       e.preventDefault()
@@ -87,25 +98,25 @@ const ctrlLeftBracket = (action$, state$, { window, getCurrentTime }) =>
       const prevClipId =
         findLast(
           currentFileClipIds,
-          clipId => r.getClip(state, clipId).end <= x
+          clipId => (r.getClip(state, clipId) || { end: Infinity }).end <= x
         ) || currentFileClipIds[currentFileClipIds.length - 1]
 
       return prevClipId ? of(r.highlightClip(prevClipId)) : empty()
     })
   )
 
-const escEpic = (action$, state$, { window }) =>
-  fromEvent(window, 'keydown').pipe(
+const escEpic: AppEpic = (action$, state$, { window }) =>
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 27),
     map(e => {
       return r.getCurrentDialog(state$.value)
-        ? { type: 'NOOP_ESC_KEY' }
+        ? (({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
         : r.highlightClip(null)
     })
   )
 
-const lEpic = (action$, state$, { window, getCurrentTime }) =>
-  fromEvent(window, 'keydown').pipe(
+const lEpic: AppEpic = (action$, state$, { window, getCurrentTime }) =>
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 76 && ctrlKey),
     flatMap(e => {
       //
@@ -140,32 +151,34 @@ const lEpic = (action$, state$, { window, getCurrentTime }) =>
     })
   )
 
-const cmd = filter(({ keyCode }) => keyCode === 91)
-const saveKey = window =>
+const cmd: OperatorFunction<KeyboardEvent, KeyboardEvent> = filter(
+  ({ keyCode }) => keyCode === 91
+)
+const saveKey = (window: Window) =>
   merge(
-    fromEvent(window, 'keydown').pipe(
+    fromEvent<KeyboardEvent>(window, 'keydown').pipe(
       filter(({ ctrlKey, keyCode }) => keyCode === 83 && ctrlKey) // ctrl + S
     ),
-    fromEvent(window, 'keydown').pipe(
+    fromEvent<KeyboardEvent>(window, 'keydown').pipe(
       cmd,
       switchMap(() =>
-        fromEvent(window, 'keydown').pipe(
+        fromEvent<KeyboardEvent>(window, 'keydown').pipe(
           filter(({ keyCode }) => keyCode === 83), // S
-          takeUntil(fromEvent(window, 'keyup').pipe(cmd)),
+          takeUntil(fromEvent<KeyboardEvent>(window, 'keyup').pipe(cmd)),
           take(1)
         )
       )
     )
   )
 
-const saveEpic = (action$, state$, { window }) =>
-  action$.ofType('OPEN_PROJECT').pipe(
+const saveEpic: AppEpic = (action$, state$, { window }) =>
+  action$.ofType(A.OPEN_PROJECT).pipe(
     switchMap(() =>
       saveKey(window).pipe(
         map(({ shiftKey }) =>
           shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
         ),
-        takeUntil(action$.ofType('CLOSE_PROJECT'))
+        takeUntil(action$.ofType(A.CLOSE_PROJECT))
       )
     )
   )

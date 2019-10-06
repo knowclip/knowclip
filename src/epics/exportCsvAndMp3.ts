@@ -1,6 +1,6 @@
 import { flatMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, from } from 'rxjs'
+import { of, from, Observable } from 'rxjs'
 import { promisify } from 'util'
 import fs from 'fs'
 import { join } from 'path'
@@ -8,46 +8,49 @@ import * as r from '../redux'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
+import { AppEpic } from '../flow/AppEpic'
 
 const writeFile = promisify(fs.writeFile)
 
-const exportFailureSnackbar = err =>
+const exportFailureSnackbar = (err: Error) =>
   r.simpleMessageSnackbar(`There was a problem making clips: ${err.message}`)
 
-const exportCsv = (action$, state$) =>
+const exportCsv: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_CSV'),
-    flatMap(async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
-      try {
-        const currentProjectMetadata = r.getCurrentProject(state$.value)
-        if (!currentProjectMetadata)
-          return of(r.simpleMessageSnackbar('Could not find project'))
+    ofType<Action, ExportCsv>(A.EXPORT_CSV),
+    flatMap<ExportCsv, Promise<Observable<Action>>>(
+      async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
+        try {
+          const currentProjectMetadata = r.getCurrentProject(state$.value)
+          if (!currentProjectMetadata)
+            return of(r.simpleMessageSnackbar('Could not find project'))
 
-        const exportData = getApkgExportData(
-          state$.value,
-          currentProjectMetadata,
-          clipIds
-        )
-        const csvText = getCsvText(exportData)
-        await writeFile(csvFilePath, csvText, 'utf8')
-        return from([
-          r.simpleMessageSnackbar(`Flashcards saved in ${csvFilePath}`),
-          r.setMediaFolderLocation(mediaFolderLocation), // should probably just get rid of this action
-          r.exportMp3(exportData),
-        ])
-      } catch (err) {
-        return of(
-          r.simpleMessageSnackbar(`Problem saving flashcard: ${err.message}`)
-        )
+          const exportData = getApkgExportData(
+            state$.value,
+            currentProjectMetadata,
+            clipIds
+          )
+          const csvText = getCsvText(exportData)
+          await writeFile(csvFilePath, csvText, 'utf8')
+          return from([
+            r.simpleMessageSnackbar(`Flashcards saved in ${csvFilePath}`),
+            r.setMediaFolderLocation(mediaFolderLocation), // should probably just get rid of this action
+            r.exportMp3(exportData),
+          ])
+        } catch (err) {
+          return of(
+            r.simpleMessageSnackbar(`Problem saving flashcard: ${err.message}`)
+          )
+        }
       }
-    }),
-    flatMap(x => x)
+    ),
+    flatMap<Observable<Action>, Observable<Action>>(x => x)
   )
 
-const exportMp3 = (action$, state$) =>
+const exportMp3: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_MP3'),
-    flatMap(async ({ format, exportData }) => {
+    ofType<Action, ExportMp3>(A.EXPORT_MP3),
+    flatMap<ExportMp3, Promise<Observable<Action>>>(async ({ exportData }) => {
       const directory = r.getMediaFolderLocation(state$.value)
 
       if (!directory)

@@ -16,6 +16,7 @@ import {
 } from '../utils/waveformCoordinates'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
+import { AppEpic } from '../flow/AppEpic'
 
 const pendingClipIsBigEnough = (state: AppState) => {
   const pendingClip = r.getPendingClip(state)
@@ -25,13 +26,13 @@ const pendingClipIsBigEnough = (state: AppState) => {
   return Math.abs(end - start) >= r.CLIP_THRESHOLD
 }
 
-const addClipEpic: Epic<Action, Action, AppState, EpicsDependencies> = (
+const addClipEpic: AppEpic = (
   action$,
   state$,
   { window, getWaveformSvgElement }
 ) =>
   action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>('OPEN_MEDIA_FILE_SUCCESS'),
+    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
     flatMap(() => {
       const svg = getWaveformSvgElement()
       if (!svg) console.error('No svg element')

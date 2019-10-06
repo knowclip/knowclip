@@ -11,16 +11,17 @@ import { showSaveDialog } from '../utils/electron'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 import { promisify } from 'util'
+import { AppEpic } from '../flow/AppEpic'
 
-const wait = ms => new Promise(res => setTimeout(res, ms))
+const wait = (ms: number) => new Promise(res => setTimeout(res, ms))
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 const deleteFile = promisify(fs.unlink)
 
-const exportApkgFailure = (action$, state$) =>
+const exportApkgFailure: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_APKG_FAILURE'),
+    ofType<Action, ExportApkgFailure>(A.EXPORT_APKG_FAILURE),
     tap(() => (document.body.style.cursor = 'default')),
     flatMap(({ errorMessage }) =>
       errorMessage
@@ -32,16 +33,16 @@ const exportApkgFailure = (action$, state$) =>
         : empty()
     )
   )
-const exportApkgSuccess = (action$, state$) =>
+const exportApkgSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_APKG_SUCCESS'),
+    ofType<Action, ExportApkgSuccess>(A.EXPORT_APKG_SUCCESS),
     tap(() => (document.body.style.cursor = 'default')),
     map(({ successMessage }) => r.simpleMessageSnackbar(successMessage))
   )
 
-const exportApkg = (action$, state$) =>
+const exportApkg: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType('EXPORT_APKG_REQUEST'),
+    ofType<Action, ExportApkgRequest>(A.EXPORT_APKG_REQUEST),
     flatMap(async ({ clipIds }) => {
       const directory = tempy.directory()
 
@@ -66,6 +67,7 @@ const exportApkg = (action$, state$) =>
         )
 
         const apkg = new Exporter(exportData.deckName, {
+          // @ts-ignore
           sql: window.SQL,
           template: createTemplate(exportData.template),
         })
@@ -103,7 +105,7 @@ const exportApkg = (action$, state$) =>
             base64: false,
             compression: 'DEFLATE',
           })
-          .then(async zip => {
+          .then(async (zip: Buffer) => {
             const promise = writeFile(outputFilePath, zip, 'binary')
             console.log(`Package has been generated: ${outputFilePath}`)
             return promise

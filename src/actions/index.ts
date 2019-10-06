@@ -6,7 +6,7 @@ export * from './projects'
 export * from './subtitles'
 
 export const initializeApp = (): Action => ({
-  type: 'INITIALIZE_APP',
+  type: A.INITIALIZE_APP,
 })
 
 export const chooseMediaFiles = (
@@ -14,14 +14,14 @@ export const chooseMediaFiles = (
   ids: Array<MediaFileId>,
   noteTypeId: NoteTypeId
 ): Action => ({
-  type: 'CHOOSE_AUDIO_FILES',
+  type: A.CHOOSE_AUDIO_FILES,
   filePaths,
   ids,
   noteTypeId,
 })
 
 export const removeMediaFiles = (): Action => ({
-  type: 'REMOVE_AUDIO_FILES',
+  type: A.REMOVE_AUDIO_FILES,
 })
 
 export const setFlashcardField = (
@@ -29,14 +29,14 @@ export const setFlashcardField = (
   key: string,
   value: string
 ): Action => ({
-  type: 'SET_FLASHCARD_FIELD',
+  type: A.SET_FLASHCARD_FIELD,
   id,
   key,
   value,
 })
 
 export const addFlashcardTag = (id: ClipId, text: string): Action => ({
-  type: 'ADD_FLASHCARD_TAG',
+  type: A.ADD_FLASHCARD_TAG,
   id,
   text,
 })
@@ -46,53 +46,53 @@ export const deleteFlashcardTag = (
   index: number,
   tag: string
 ): Action => ({
-  type: 'DELETE_FLASHCARD_TAG',
+  type: A.DELETE_FLASHCARD_TAG,
   id,
   index,
   tag,
 })
 
 export const setCurrentFile = (index: number): Action => ({
-  type: 'SET_CURRENT_FILE',
+  type: A.SET_CURRENT_FILE,
   index,
 })
 
 export const toggleLoop = (): Action => ({
-  type: 'TOGGLE_LOOP',
+  type: A.TOGGLE_LOOP,
 })
 
 export const setLoop = (loop: boolean): Action => ({
-  type: 'SET_LOOP',
+  type: A.SET_LOOP,
   loop,
 })
 
 export const deleteCard = (id: ClipId): Action => ({
-  type: 'DELETE_CARD',
+  type: A.DELETE_CARD,
   id,
 })
 
 export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
-  type: 'DELETE_CARDS',
+  type: A.DELETE_CARDS,
   ids,
 })
 
 export const exportApkgRequest = (clipIds: Array<ClipId>): Action => ({
-  type: 'EXPORT_APKG_REQUEST',
+  type: A.EXPORT_APKG_REQUEST,
   clipIds,
 })
 
-export const exportApkgFailure = (errorMessage: string | null): Action => ({
-  type: 'EXPORT_APKG_FAILURE',
-  errorMessage,
+export const exportApkgFailure = (errorMessage?: string): Action => ({
+  type: A.EXPORT_APKG_FAILURE,
+  errorMessage: errorMessage || null,
 })
 
 export const exportApkgSuccess = (successMessage: string): Action => ({
-  type: 'EXPORT_APKG_SUCCESS',
+  type: A.EXPORT_APKG_SUCCESS,
   successMessage,
 })
 
 export const exportMp3 = (exportData: ApkgExportData): Action => ({
-  type: 'EXPORT_MP3',
+  type: A.EXPORT_MP3,
   exportData,
 })
 
@@ -101,36 +101,36 @@ export const exportCsv = (
   csvFilePath: string,
   mediaFolderLocation: string
 ): Action => ({
-  type: 'EXPORT_CSV',
+  type: A.EXPORT_CSV,
   clipIds,
   csvFilePath,
   mediaFolderLocation,
 })
 
 export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({
-  type: 'EXPORT_MARKDOWN',
+  type: A.EXPORT_MARKDOWN,
   clipIds,
 })
 
 export const setMediaFolderLocation = (directoryPath: string): Action => ({
-  type: 'SET_MEDIA_FOLDER_LOCATION',
+  type: A.SET_MEDIA_FOLDER_LOCATION,
   directoryPath,
 })
 
 export const detectSilenceRequest = (): Action => ({
-  type: 'DETECT_SILENCE_REQUEST',
+  type: A.DETECT_SILENCE_REQUEST,
 })
 export const detectSilence = (): Action => ({
-  type: 'DETECT_SILENCE',
+  type: A.DETECT_SILENCE,
 })
 
-export const deleteAllCurrentFileClipsRequest = () => ({
-  type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST',
+export const deleteAllCurrentFileClipsRequest = (): DeleteAllCurrentFileClipsRequest => ({
+  type: A.DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST,
 })
 
 export const setAllTags = (tagsToClipIds: {
-  [K: string]: Array<ClipId>
+  [tag: string]: Array<ClipId>
 }): Action => ({
-  type: 'SET_ALL_TAGS',
+  type: A.SET_ALL_TAGS,
   tagsToClipIds,
 })

@@ -29,7 +29,7 @@ const projects: Reducer<ProjectsState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case 'OPEN_PROJECT':
+    case A.OPEN_PROJECT:
       return {
         ...state,
         byId: { ...state.byId, [action.project.id]: action.projectMetadata },
@@ -39,7 +39,7 @@ const projects: Reducer<ProjectsState, Action> = (
         ],
       }
 
-    case 'SET_PROJECT_NAME':
+    case A.SET_PROJECT_NAME:
       return {
         ...state,
         byId: {
@@ -51,7 +51,7 @@ const projects: Reducer<ProjectsState, Action> = (
         },
       }
 
-    case 'CREATE_PROJECT':
+    case A.CREATE_PROJECT:
       return {
         ...state,
         byId: {
@@ -61,7 +61,7 @@ const projects: Reducer<ProjectsState, Action> = (
         allIds: [action.projectMetadata.id, ...state.allIds],
       }
 
-    case 'ADD_MEDIA_TO_PROJECT':
+    case A.ADD_MEDIA_TO_PROJECT:
       return {
         ...state,
         byId: {
@@ -76,7 +76,7 @@ const projects: Reducer<ProjectsState, Action> = (
         },
       }
 
-    case 'DELETE_MEDIA_FROM_PROJECT':
+    case A.DELETE_MEDIA_FROM_PROJECT:
       return {
         ...state,
         byId: {
@@ -90,7 +90,7 @@ const projects: Reducer<ProjectsState, Action> = (
         },
       }
 
-    case 'LOCATE_MEDIA_FILE_SUCCESS':
+    case A.LOCATE_MEDIA_FILE_SUCCESS:
       return editMediaFilePath(
         state,
         action.projectId,
@@ -102,7 +102,7 @@ const projects: Reducer<ProjectsState, Action> = (
         })
       )
 
-    case 'OPEN_MEDIA_FILE_SUCCESS':
+    case A.OPEN_MEDIA_FILE_SUCCESS:
       return editMediaFilePath(
         state,
         action.projectId,
@@ -115,7 +115,7 @@ const projects: Reducer<ProjectsState, Action> = (
         })
       )
 
-    case 'REMOVE_PROJECT_FROM_RECENTS':
+    case A.REMOVE_PROJECT_FROM_RECENTS:
       return {
         ...state,
         byId: deleteKey(state.byId, action.id),

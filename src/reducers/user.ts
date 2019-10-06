@@ -14,17 +14,17 @@ const initialState: UserState = {
 
 const user: Reducer<UserState> = (state = initialState, action) => {
   switch (action.type) {
-    case 'DELETE_CARD':
+    case A.DELETE_CARD:
       return action.id === state.highlightedClipId
         ? { ...state, highlightedClipId: null }
         : state
 
-    case 'DELETE_CARDS':
+    case A.DELETE_CARDS:
       return action.ids.includes(state.highlightedClipId)
         ? { ...state, highlightedClipId: null }
         : state
 
-    case 'DELETE_MEDIA_FROM_PROJECT':
+    case A.DELETE_MEDIA_FROM_PROJECT:
       return action.mediaFileId === state.currentMediaFileId
         ? {
             ...state,
@@ -32,70 +32,70 @@ const user: Reducer<UserState> = (state = initialState, action) => {
           }
         : state
 
-    case 'OPEN_PROJECT':
+    case A.OPEN_PROJECT:
       return {
         ...state,
         currentProjectId: action.project.id,
       }
 
-    case 'CLOSE_PROJECT':
+    case A.CLOSE_PROJECT:
       return initialState
 
-    case 'OPEN_MEDIA_FILE_REQUEST':
+    case A.OPEN_MEDIA_FILE_REQUEST:
       return {
         ...state,
         currentMediaFileId: action.id,
       }
 
-    case 'ADD_CLIP':
+    case A.ADD_CLIP:
       return {
         ...state,
         pendingClip: null,
       }
 
-    case 'SET_PENDING_CLIP':
+    case A.SET_PENDING_CLIP:
       return {
         ...state,
         pendingClip: action.clip,
       }
 
-    case 'CLEAR_PENDING_CLIP':
+    case A.CLEAR_PENDING_CLIP:
       return {
         ...state,
         pendingClip: null,
       }
 
-    case 'HIGHLIGHT_CLIP':
+    case A.HIGHLIGHT_CLIP:
       return {
         ...state,
         highlightedClipId: action.id,
       }
 
-    case 'SET_PENDING_STRETCH':
+    case A.SET_PENDING_STRETCH:
       return {
         ...state,
         pendingStretch: action.stretch,
       }
 
-    case 'CLEAR_PENDING_STRETCH':
+    case A.CLEAR_PENDING_STRETCH:
       return {
         ...state,
         pendingStretch: null,
       }
 
-    case 'SET_DEFAULT_TAGS':
+    case A.SET_DEFAULT_TAGS:
       return {
         ...state,
         defaultTags: action.tags,
       }
 
-    case 'SET_ALL_TAGS':
+    case A.SET_ALL_TAGS:
       return {
         ...state,
         tagsToClipIds: action.tagsToClipIds,
       }
 
-    case 'ADD_FLASHCARD_TAG': {
+    case A.ADD_FLASHCARD_TAG: {
       const { text, id } = action
       const ids = state.tagsToClipIds[text] || []
 
@@ -110,7 +110,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       }
     }
 
-    case 'DELETE_FLASHCARD_TAG': {
+    case A.DELETE_FLASHCARD_TAG: {
       const { tag } = action
       const newIds = (state.tagsToClipIds[tag] || []).filter(
         (id: String) => id !== action.id
@@ -147,7 +147,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
     //   tagsToClipIds,
     // }
 
-    case 'SET_WORK_IS_UNSAVED':
+    case A.SET_WORK_IS_UNSAVED:
       return {
         ...state,
         workIsUnsaved: action.workIsUnsaved,

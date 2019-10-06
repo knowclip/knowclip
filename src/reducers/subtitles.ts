@@ -24,23 +24,23 @@ const subtitles: Reducer<SubtitlesState> = (
   action: Action
 ) => {
   switch (action.type) {
-    case 'OPEN_MEDIA_FILE_SUCCESS':
+    case A.OPEN_MEDIA_FILE_SUCCESS:
       return {
         ...state,
         mediaFileTracksStreamIndexes: action.subtitlesTracksStreamIndexes,
         loadedTracks: [],
       }
-    case 'OPEN_MEDIA_FILE_REQUEST':
-    case 'OPEN_PROJECT':
-    case 'CLOSE_PROJECT':
+    case A.OPEN_MEDIA_FILE_REQUEST:
+    case A.OPEN_PROJECT:
+    case A.CLOSE_PROJECT:
       return initialState
-    case 'LOAD_EMBEDDED_SUBTITLES_SUCCESS':
-    case 'LOAD_EXTERNAL_SUBTITLES_SUCCESS':
+    case A.LOAD_EMBEDDED_SUBTITLES_SUCCESS:
+    case A.LOAD_EXTERNAL_SUBTITLES_SUCCESS:
       return {
         ...state,
         loadedTracks: [...state.loadedTracks, ...action.subtitlesTracks],
       }
-    case 'SHOW_SUBTITLES': {
+    case A.SHOW_SUBTITLES: {
       const { id } = action
       return {
         ...state,
@@ -49,7 +49,7 @@ const subtitles: Reducer<SubtitlesState> = (
         ),
       }
     }
-    case 'HIDE_SUBTITLES': {
+    case A.HIDE_SUBTITLES: {
       const { id } = action
       return {
         ...state,
@@ -58,14 +58,14 @@ const subtitles: Reducer<SubtitlesState> = (
         ),
       }
     }
-    case 'DELETE_SUBTITLES_TRACK': {
+    case A.DELETE_SUBTITLES_TRACK: {
       const { id } = action
       return {
         ...state,
         loadedTracks: state.loadedTracks.filter(track => track.id !== id),
       }
     }
-    case 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK':
+    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
       return {
         ...state,
         flashcardFieldLinks: {

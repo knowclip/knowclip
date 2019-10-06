@@ -2,7 +2,7 @@ export const enqueueDialog = (
   dialog: DialogData,
   skipQueue: boolean = false
 ): DialogAction => ({
-  type: 'ENQUEUE_DIALOG',
+  type: A.ENQUEUE_DIALOG,
   dialog,
   skipQueue,
 })
@@ -49,7 +49,7 @@ export const openMediaFileFailureDialog = (message: string): DialogAction =>
   enqueueDialog({ type: 'OpenMediaFileFailure', props: { message } })
 
 export const closeDialog = (): DialogAction => ({
-  type: 'CLOSE_DIALOG',
+  type: A.CLOSE_DIALOG,
 })
 
 export const csvAndMp3ExportDialog = (clipIds: Array<ClipId>): DialogAction =>

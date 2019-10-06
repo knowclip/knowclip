@@ -12,6 +12,7 @@ import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import newClip from '../utils/newClip'
 import { from } from 'rxjs'
+import { AppEpic } from '../flow/AppEpic'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -142,14 +143,9 @@ export const newExternalSubtitlesTrack = (
   vttFilePath,
 })
 
-export const loadEmbeddedSubtitles: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (action$, state$) =>
+export const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>('OPEN_MEDIA_FILE_SUCCESS'),
+    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
     filter(({ subtitlesTracksStreamIndexes }) =>
       Boolean(subtitlesTracksStreamIndexes.length)
     ),
@@ -178,28 +174,18 @@ export const loadEmbeddedSubtitles: Epic<
     })
   )
 
-export const loadSubtitlesFailure: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (action$, state$) =>
+export const loadSubtitlesFailure: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, LoadSubtitlesFailure>('LOAD_SUBTITLES_FAILURE'),
+    ofType<Action, LoadSubtitlesFailure>(A.LOAD_SUBTITLES_FAILURE),
     map(({ error }) =>
       r.simpleMessageSnackbar(`Could not load subtitles: ${error}`)
     )
   )
 
-export const loadSubtitlesFile: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (action$, state$) =>
+export const loadSubtitlesFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, LoadSubtitlesFromFileRequest>(
-      'LOAD_SUBTITLES_FROM_FILE_REQUEST'
+      A.LOAD_SUBTITLES_FROM_FILE_REQUEST
     ),
     flatMap(async ({ filePath }) => {
       try {
@@ -218,14 +204,9 @@ export const loadSubtitlesFile: Epic<
     })
   )
 
-const makeClipsFromSubtitles: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (action$, state$) =>
+const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, MakeClipsFromSubtitles>('MAKE_CLIPS_FROM_SUBTITLES'),
+    ofType<Action, MakeClipsFromSubtitles>(A.MAKE_CLIPS_FROM_SUBTITLES),
     flatMap<MakeClipsFromSubtitles, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags }) => {
         const transcriptionTrackId = fieldNamesToTrackIds.transcription
@@ -299,15 +280,10 @@ const makeClipsFromSubtitles: Epic<
     )
   )
 
-const subtitlesClipsDialogRequest: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (action$, state$) =>
+const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ShowSubtitleSClipsDialogRequest>(
-      'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'
+      A.SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST
     ),
     map(() => {
       const tracks = r.getSubtitlesTracks(state$.value)
@@ -335,7 +311,7 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
   { setCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, GoToSubtitlesChunk>('GO_TO_SUBTITLES_CHUNK'),
+    ofType<Action, GoToSubtitlesChunk>(A.GO_TO_SUBTITLES_CHUNK),
     map(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
       if (!track) {

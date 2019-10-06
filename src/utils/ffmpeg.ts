@@ -45,11 +45,11 @@ export const convertMediaMetadata = (
   ffprobeMetadata: FfprobeData,
   filePath: string,
   id: string
-) => ({
+): MediaFileMetadata => ({
   id,
   name: basename(filePath),
-  durationSeconds: ffprobeMetadata.format.duration,
-  format: ffprobeMetadata.format.format_name,
+  durationSeconds: ffprobeMetadata.format.duration || 0,
+  format: ffprobeMetadata.format.format_name || 'UNKNOWN_FORMAT',
   isVideo:
     ffprobeMetadata.format.format_name !== 'mp3' &&
     ffprobeMetadata.streams.some(

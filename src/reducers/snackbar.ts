@@ -9,13 +9,13 @@ const snackbar: Reducer<SnackbarState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case 'ENQUEUE_SNACKBAR':
+    case A.ENQUEUE_SNACKBAR:
       return {
         ...state,
         queue: state.queue.concat(action.snackbar),
       }
 
-    case 'CLOSE_SNACKBAR': {
+    case A.CLOSE_SNACKBAR: {
       const [, ...queue] = state.queue
       return {
         ...state,

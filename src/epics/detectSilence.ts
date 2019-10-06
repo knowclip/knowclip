@@ -5,6 +5,7 @@ import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
+import { AppEpic } from '../flow/AppEpic'
 
 const detectSilence = (
   path: string,
@@ -46,12 +47,9 @@ const detectSilence = (
       .run()
   })
 
-const detectSilenceEpic: Epic<Action, Action, AppState, EpicsDependencies> = (
-  action$,
-  state$
-) =>
+const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DetectSilence>('DETECT_SILENCE'),
+    ofType<Action, DetectSilence>(A.DETECT_SILENCE),
     flatMap<DetectSilence, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
@@ -119,14 +117,9 @@ const detectSilenceEpic: Epic<Action, Action, AppState, EpicsDependencies> = (
     flatMap<Array<Action>, Observable<Action>>(val => from(val))
   )
 
-const detectSilenceRequestEpic: Epic<
-  Action,
-  Action,
-  AppState,
-  EpicsDependencies
-> = (action$, state$) =>
+const detectSilenceRequestEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DetectSilenceRequest>('DETECT_SILENCE_REQUEST'),
+    ofType<Action, DetectSilenceRequest>(A.DETECT_SILENCE_REQUEST),
     map(() =>
       r.doesCurrentFileHaveClips(state$.value)
         ? r.confirmationDialog(
