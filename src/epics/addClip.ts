@@ -9,7 +9,7 @@ import {
 } from 'rxjs/operators'
 import { fromEvent, merge, of, empty } from 'rxjs'
 import * as r from '../redux'
-import { Epic, ofType } from 'redux-observable'
+import { ofType } from 'redux-observable'
 import {
   toWaveformX,
   toWaveformCoordinates,
