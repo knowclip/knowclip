@@ -1,6 +1,6 @@
 import { flatMap, debounce, map, filter } from 'rxjs/operators'
 import { timer, of, from, Observable } from 'rxjs'
-import { Epic, ofType, combineEpics, StateObservable } from 'redux-observable'
+import { ofType, combineEpics, StateObservable } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
@@ -140,7 +140,7 @@ const saveProject: AppEpic = (action$, state$) =>
     flatMap(x => x)
   )
 
-const PROJECT_EDIT_ACTIONS: A[] = [
+const PROJECT_EDIT_ACTIONS = [
   A.DELETE_CARD,
   A.MAKE_CLIPS_FROM_SUBTITLES,
   A.DELETE_CARDS,
@@ -155,7 +155,7 @@ const PROJECT_EDIT_ACTIONS: A[] = [
   A.DELETE_MEDIA_FROM_PROJECT,
   A.LOCATE_MEDIA_FILE_SUCCESS,
   // 'CREATED NEW PROJECT METADATA',
-]
+] as const
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
   action$.pipe(

@@ -12,7 +12,6 @@ import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import { AppEpic } from '../types/AppEpic'
-import { TextareaHTMLAttributes } from 'react'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()

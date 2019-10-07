@@ -1,3 +1,17 @@
+declare global {
+  enum FlashcardFieldName {
+    transcription = 'transcription',
+    pronunciation = 'pronunciation',
+    meaning = 'meaning',
+    notes = 'notes',
+  }
+}
+enum FlashcardFieldName {
+  transcription = 'transcription',
+  pronunciation = 'pronunciation',
+  meaning = 'meaning',
+  notes = 'notes',
+}
 const SIMPLE_FIELDS: [
   FlashcardFieldName.transcription,
   FlashcardFieldName.notes,

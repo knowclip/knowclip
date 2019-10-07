@@ -1,4 +1,4 @@
-import { flatMap, map, switchMap, filter } from 'rxjs/operators'
+import { flatMap, map, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
 import * as r from '../redux'

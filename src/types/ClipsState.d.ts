@@ -49,13 +49,6 @@ declare type ClipsState = {
 //   notes: string,
 // |}
 
-enum FlashcardFieldName {
-  transcription = 'transcription',
-  pronunciation = 'pronunciation',
-  meaning = 'meaning',
-  notes = 'notes',
-}
-
 declare type FlashcardFields =
   | SimpleFlashcardFields
   | TransliterationFlashcardFields
