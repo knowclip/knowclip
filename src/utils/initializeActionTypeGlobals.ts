@@ -1,4 +1,4 @@
-import actionTypes from '../types/ActionType'
+import * as actionTypes from '../types/ActionType'
 
 declare global {
   type ActionType = typeof actionTypes

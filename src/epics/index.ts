@@ -74,7 +74,7 @@ const closeEpic: AppEpic = (action$, state$) =>
     }
   }).pipe(ignoreElements())
 
-export default combineEpics(
+const rootEpic: AppEpic = combineEpics(
   media,
   getWaveformEpic,
   setWaveformCursorEpic,
@@ -93,3 +93,5 @@ export default combineEpics(
   closeEpic,
   subtitles
 )
+
+export default rootEpic
