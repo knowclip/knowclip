@@ -1,4 +1,3 @@
-//
 import projectToMarkdown from './projectToMarkdown'
 import reducer from '../reducers'
 import newClip from '../utils/newClip'
@@ -14,15 +13,13 @@ describe('projectToMarkdown', () => {
     end,
     [transcription, pronunciation, meaning, notes],
     tags
-  ) => ({
-    ...newClip({ start, end }, mediaFileId, id, noteType, []),
-    flashcard: {
-      id,
-      type: 'Transliteration',
-      fields: { transcription, pronunciation, meaning, notes },
-      tags,
-    },
-  })
+  ) =>
+    newClip({ start, end }, mediaFileId, id, tags, {
+      transcription,
+      pronunciation,
+      meaning,
+      notes,
+    })
 
   const projectMetadata = {
     error: null,
@@ -100,12 +97,8 @@ describe('projectToMarkdown', () => {
     },
   }
 
-  console.log(state.clips.byId.clip1)
-
   it('makes markdown file', () => {
     const result = projectToMarkdown(state, projectMetadata.id, noteType)
-
-    console.log(result)
 
     expect(result).toEqual(
       [

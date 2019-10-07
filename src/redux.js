@@ -1,3 +1,4 @@
+import './utils/initializeActionTypeGlobals' // make action type constants available globally
 import * as actions from './actions'
 
 export * from './selectors'

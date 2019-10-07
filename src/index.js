@@ -2,7 +2,6 @@ import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import './utils/initializeActionTypeGlobals' // make action type constants available globally
 import App from './App'
 import getStore from './getStore'
 import './index.css'
