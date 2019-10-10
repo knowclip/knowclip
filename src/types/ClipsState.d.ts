@@ -19,75 +19,39 @@ declare type ClipsState = {
   }
 }
 
-// declare type FlashcardFieldName =
-//   | TransliterationFlashcardFieldName
-//   | SimpleFlashcardFieldName
-
-// declare type TransliterationFlashcardFieldName =
-//   | 'transcription'
-//   | 'pronunciation'
-//   | 'meaning'
-//   | 'notes'
-// declare type SimpleFlashcardFieldNames = [
-//   FlashcardFieldName.transcription,
-//   FlashcardFieldName.meaning,
-//   FlashcardFieldName.notes,
-// ]
-
-// type FlashcardFields =
-//   | SimpleNoteTypeFields
-//   | TransliterationNoteTypeFields
-// type SimpleNoteTypeFields = {|
-//   transcription: string,
-//   meaning: string,
-//   notes: string,
-// |}
-// type TransliterationNoteTypeFields = {|
-//   transcription: string,
-//   pronunciation: string,
-//   meaning: string,
-//   notes: string,
-// |}
-
 declare type FlashcardFields =
   | SimpleFlashcardFields
   | TransliterationFlashcardFields
 
-// declare type SimpleFlashcardFields = { [K in SimpleFlashcardFieldName]: string }
-// declare type TransliterationFlashcardFields = {
-//   [K in TransliterationFlashcardFieldName]: string
-// }
+declare type FlashcardFieldName =
+  | SimpleFlashcardFieldName
+  | TransliterationFlashcardFieldName
+declare type SimpleFlashcardFieldName = 'transcription' | 'meaning' | 'notes'
+declare type TransliterationFlashcardFieldName =
+  | 'transcription'
+  | 'meaning'
+  | 'notes'
+  | 'pronunciation'
 
-declare type SimpleFlashcardFields = {
-  [FlashcardFieldName.transcription]: string
-  [FlashcardFieldName.transliteration]: string
-  [FlashcardFieldName.notes]: string
-  [FlashcardFieldName.meaning]: string
+// change to note?
+declare type Flashcard = SimpleFlashcard | TransliterationFlashcard
+declare type SimpleFlashcard = {
+  id: ClipId
+  type: 'Simple'
+  fields: SimpleFlashcardFields
+  tags: Array<string>
 }
-
-declare type TransliterationFlashcardFields = {
-  [FlashcardFieldName.transcription]: string
-  [FlashcardFieldName.transliteration]: string
-  [FlashcardFieldName.meaning]: string
-  [FlashcardFieldName.notes]: string
-  [FlashcardFieldName.pronunciation]: string
+declare type TransliterationFlashcard = {
+  id: ClipId
+  type: 'Transliteration'
+  fields: TransliterationFlashcardFields
+  tags: Array<string>
 }
-
-declare type Flashcard =
-  | {
-      // change to note?
-      // make exact
-      id: ClipId
-      type: 'Simple'
-      fields: SimpleFlashcardFields
-      tags: Array<string>
-    }
-  | {
-      id: ClipId
-      type: 'Transliteration'
-      fields: TransliterationFlashcardFields
-      tags: Array<string>
-    }
+declare type SimpleFlashcardFields = Record<SimpleFlashcardFieldName, string>
+declare type TransliterationFlashcardFields = Record<
+  TransliterationFlashcardFieldName,
+  string
+>
 
 declare type PendingClip = {
   start: WaveformX
@@ -95,6 +59,7 @@ declare type PendingClip = {
 }
 
 declare type ClipSpecs = {
+  // for export?
   sourceFilePath: string
   outputFilename: string
   startTime: number

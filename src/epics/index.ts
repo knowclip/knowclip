@@ -1,4 +1,4 @@
-import { map, ignoreElements, flatMap } from 'rxjs/operators'
+import { map, ignoreElements } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'

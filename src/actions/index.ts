@@ -26,9 +26,9 @@ export const removeMediaFiles = (): Action => ({
 
 export const setFlashcardField = (
   id: ClipId,
-  key: string,
+  key: FlashcardFieldName,
   value: string
-): Action => ({
+): SetFlashcardField => ({
   type: A.SET_FLASHCARD_FIELD,
   id,
   key,

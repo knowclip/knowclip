@@ -259,7 +259,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
               }
             )
 
-            return newClip(chunk, fileId, uuid(), tags, fields)
+            return newClip(chunk, fileId, uuid(), fields, tags)
           })
 
         return from([

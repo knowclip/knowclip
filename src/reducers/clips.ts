@@ -1,5 +1,6 @@
-import { getBlankFlashcard } from '../utils/noteType'
 import { Reducer } from 'redux'
+import newFlashcard from '../utils/newFlashcard'
+import { getNoteTypeFields } from '../utils/noteType'
 
 const initialState: ClipsState = {
   byId: {},
@@ -167,18 +168,19 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         .sort(byStart(state.byId))
         .map(id => state.byId[id])
 
-      const flashcard = getBlankFlashcard(
+      const flashcard = newFlashcard(
         finalId,
         state.byId[finalId].flashcard.fields,
         [
           ...sortedClipsToMerge.reduce((all, { flashcard: { tags } }) => {
-            tags.forEach(tag => all.add(tag))
+            tags.forEach((tag: string) => all.add(tag))
             return all
           }, new Set<string>()),
         ]
       )
+      const fieldNames = getNoteTypeFields(flashcard.type)
 
-      for (const fieldName in flashcard.fields) {
+      for (const fieldName of fieldNames) {
         const value = sortedClipsToMerge
           // @ts-ignore
           .map(({ flashcard: { fields } }) => fields[fieldName])
@@ -192,7 +194,6 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         ...state.byId[finalId],
         start: sortedClipsToMerge[0].start,
         end: sortedClipsToMerge[sortedClipsToMerge.length - 1].end,
-        // @ts-ignore
         flashcard,
       }
       return {
@@ -247,15 +248,17 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
     case A.SET_FLASHCARD_FIELD: {
       const { id, key, value } = action
+      const clip = state.byId[id]
+      const card: Flashcard = clip.flashcard
 
       // @ts-ignore
       const byId: { [clipId: string]: Clip } = {
         ...state.byId,
         [id]: {
-          ...state.byId[id],
+          ...clip,
           flashcard: {
-            ...state.byId[id].flashcard,
-            fields: { ...state.byId[id].flashcard.fields, [key]: value },
+            ...card,
+            fields: { ...card.fields, [key]: value },
           },
         },
       }

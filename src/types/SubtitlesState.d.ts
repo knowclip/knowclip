@@ -1,7 +1,7 @@
 declare type SubtitlesState = {
   loadedTracks: Array<SubtitlesTrack>
   mediaFileTracksStreamIndexes: Array<number>
-  flashcardFieldLinks: { [K in FlashcardFieldName]: SubtitlesTrackId }
+  flashcardFieldLinks: Record<FlashcardFieldName, SubtitlesTrackId>
 }
 
 declare type SubtitlesTrack = EmbeddedSubtitlesTrack | ExternalSubtitlesTrack

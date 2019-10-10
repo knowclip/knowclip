@@ -1,3 +1,5 @@
+import newFlashcard from './newFlashcard'
+
 const ascending = (a: number, b: number) => a - b
 
 interface ClipPoints {
@@ -11,39 +13,17 @@ const sortClipPoints = ({ start, end }: ClipPoints) =>
 const newClip = (
   pendingClip: PendingClip,
   fileId: string,
-  id: string,
-  tags: string[] = [],
-  fields: FlashcardFields
+  id: ClipId,
+  fields: FlashcardFields,
+  tags?: string[]
 ): Clip => {
   const [start, end] = sortClipPoints(pendingClip)
-
   return {
     start: +start.toFixed(2),
     end: +end.toFixed(2),
     id,
     fileId,
-    flashcard: !('pronunciation' in fields)
-      ? {
-          id,
-          tags,
-          type: 'Simple',
-          fields: {
-            transcription: fields.transcription,
-            meaning: fields.meaning,
-            notes: fields.notes,
-          },
-        }
-      : {
-          id,
-          tags,
-          type: 'Transliteration',
-          fields: {
-            transcription: fields.transcription,
-            pronunciation: fields.pronunciation,
-            meaning: fields.meaning,
-            notes: fields.notes,
-          },
-        },
+    flashcard: newFlashcard(id, fields, tags),
   }
 }
 

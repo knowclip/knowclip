@@ -4,7 +4,7 @@ import * as r from '../redux'
 
 describe('clips reducer', () => {
   const fileId = 'fileId'
-  const transliterationFields: TransliterationFlashcardFields = {
+  const transliterationFields = {
     pronunciation: 'a',
     meaning: 'aaa',
     transcription: 'asdf',
@@ -17,22 +17,22 @@ describe('clips reducer', () => {
           { start: 1, end: 1.5 },
           fileId,
           'a',
-          undefined,
-          transliterationFields
+          transliterationFields,
+          undefined
         ),
         b: newClip(
           { start: 2, end: 2.5 },
           fileId,
           'b',
-          undefined,
-          transliterationFields
+          transliterationFields,
+          undefined
         ),
         c: newClip(
           { start: 3, end: 3.5 },
           fileId,
           'c',
-          undefined,
-          transliterationFields
+          transliterationFields,
+          undefined
         ),
       },
       idsByMediaFileId: {
@@ -47,8 +47,8 @@ describe('clips reducer', () => {
       { start: 2.75, end: 3 },
       fileId,
       'b-c',
-      undefined,
-      transliterationFields
+      transliterationFields,
+      undefined
     )
     const action = r.addClip(clip)
     const newState = clips(oldState, action)
@@ -64,8 +64,8 @@ describe('clips reducer', () => {
       { start: 4, end: 4.5 },
       fileId,
       'd',
-      undefined,
-      transliterationFields
+      transliterationFields,
+      undefined
     )
     const action = r.addClip(clip)
     const newState = clips(oldState, action)
@@ -81,15 +81,15 @@ describe('clips reducer', () => {
       { start: 2.75, end: 2.8 },
       fileId,
       'b-c1',
-      undefined,
-      transliterationFields
+      transliterationFields,
+      undefined
     )
     const bC2 = newClip(
       { start: 2.85, end: 3 },
       fileId,
       'b-c2',
-      undefined,
-      transliterationFields
+      transliterationFields,
+      undefined
     )
 
     const newClips = [bC1, bC2]
@@ -123,22 +123,22 @@ describe('clips reducer', () => {
             { start: 1, end: 1.5 },
             fileId,
             'a',
-            undefined,
-            transliterationFields
+            transliterationFields,
+            undefined
           ),
           b: newClip(
             { start: 2, end: 2.5 },
             fileId,
             'b',
-            undefined,
-            transliterationFields
+            transliterationFields,
+            undefined
           ),
           c: newClip(
             { start: 3, end: 3.5 },
             fileId,
             'c',
-            undefined,
-            transliterationFields
+            transliterationFields,
+            undefined
           ),
         },
         idsByMediaFileId: {
@@ -156,15 +156,15 @@ describe('clips reducer', () => {
               { start: 1, end: 2.5 },
               fileId,
               'a',
-              undefined,
-              mergedFields
+              mergedFields,
+              undefined
             ),
             c: newClip(
               { start: 3, end: 3.5 },
               fileId,
               'c',
-              undefined,
-              transliterationFields
+              transliterationFields,
+              undefined
             ),
           },
           idsByMediaFileId: {

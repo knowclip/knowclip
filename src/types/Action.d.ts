@@ -52,7 +52,7 @@ declare type DeleteCards = { type: 'DELETE_CARDS'; ids: Array<ClipId> }
 declare type SetFlashcardField = {
   type: 'SET_FLASHCARD_FIELD'
   id: ClipId
-  key: string
+  key: FlashcardFieldName
   value: string
 }
 declare type AddFlashcardTag = {
@@ -317,7 +317,7 @@ declare type HideSubtitles = { type: 'HIDE_SUBTITLES'; id: SubtitlesTrackId }
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId
-  fieldNamesToTrackIds: { [K in FlashcardFieldName]: SubtitlesTrackId }
+  fieldNamesToTrackIds: Record<FlashcardFieldName, string>
   tags: Array<string>
 }
 declare type ShowSubtitleSClipsDialogRequest = {

@@ -80,7 +80,7 @@ export const getSubtitlesChunksWithinRange = (
 
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
-): { [K in FlashcardFieldName]: SubtitlesTrackId } =>
+): Record<FlashcardFieldName, SubtitlesTrackId> =>
   state.subtitles.flashcardFieldLinks
 
 // export const getSubtitlesTrackName = (

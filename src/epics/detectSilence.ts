@@ -1,6 +1,6 @@
 import { flatMap, map } from 'rxjs/operators'
 import { from, Observable } from 'rxjs'
-import { ofType, combineEpics, Epic } from 'redux-observable'
+import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import uuid from 'uuid/v4'
@@ -92,7 +92,6 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
             },
             fileId,
             uuid(),
-            r.getDefaultTags(state$.value),
             currentNoteType === 'Simple'
               ? {
                   transcription: '',
@@ -104,7 +103,8 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
                   meaning: '',
                   notes: '',
                   pronunciation: '',
-                }
+                },
+            r.getDefaultTags(state$.value)
           )
         )
 

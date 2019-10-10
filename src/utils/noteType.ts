@@ -1,66 +1,15 @@
-declare global {
-  enum FlashcardFieldName {
-    transcription = 'transcription',
-    pronunciation = 'pronunciation',
-    meaning = 'meaning',
-    notes = 'notes',
-  }
-}
-enum FlashcardFieldName {
-  transcription = 'transcription',
-  pronunciation = 'pronunciation',
-  meaning = 'meaning',
-  notes = 'notes',
-}
-const SIMPLE_FIELDS: [
-  FlashcardFieldName.transcription,
-  FlashcardFieldName.notes,
-  FlashcardFieldName.meaning
-] = [
-  FlashcardFieldName.transcription,
-  FlashcardFieldName.notes,
-  FlashcardFieldName.meaning,
+const SIMPLE_FIELDS: Array<SimpleFlashcardFieldName> = [
+  'transcription',
+  'notes',
+  'meaning',
 ]
 
-const TRANSLITERATION_FIELDS: [
-  FlashcardFieldName.transcription,
-  FlashcardFieldName.notes,
-  FlashcardFieldName.meaning,
-  FlashcardFieldName.pronunciation
-] = [
-  FlashcardFieldName.transcription,
-  FlashcardFieldName.notes,
-  FlashcardFieldName.meaning,
-  FlashcardFieldName.pronunciation,
+const TRANSLITERATION_FIELDS: Array<TransliterationFlashcardFieldName> = [
+  'transcription',
+  'notes',
+  'meaning',
+  'pronunciation',
 ]
 
 export const getNoteTypeFields = (noteType: NoteType) =>
-  noteType === 'Transliteration' ? TRANSLITERATION_FIELDS : SIMPLE_FIELDS
-
-export const getBlankFlashcard: <T extends FlashcardFields>(
-  id: ClipId,
-  flashcardFieldsExample: T,
-  tags: Array<string>
-) => Flashcard = (id, flashcardFieldsExample, tags) =>
-  flashcardFieldsExample.hasOwnProperty('pronunciation')
-    ? {
-        id,
-        type: 'Transliteration',
-        fields: {
-          transcription: '',
-          pronunciation: '',
-          meaning: '',
-          notes: '',
-        },
-        tags: tags,
-      }
-    : {
-        id,
-        type: 'Simple',
-        fields: {
-          transcription: '',
-          meaning: '',
-          notes: '',
-        },
-        tags: tags,
-      }
+  noteType === 'Simple' ? SIMPLE_FIELDS : TRANSLITERATION_FIELDS

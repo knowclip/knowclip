@@ -14,12 +14,18 @@ describe('projectToMarkdown', () => {
     [transcription, pronunciation, meaning, notes],
     tags
   ) =>
-    newClip({ start, end }, mediaFileId, id, tags, {
-      transcription,
-      pronunciation,
-      meaning,
-      notes,
-    })
+    newClip(
+      { start, end },
+      mediaFileId,
+      id,
+      {
+        transcription,
+        pronunciation,
+        meaning,
+        notes,
+      },
+      tags
+    )
 
   const projectMetadata = {
     error: null,

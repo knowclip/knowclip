@@ -39,7 +39,7 @@ export const deleteSubtitlesTrack = (id: SubtitlesTrackId) => ({
 
 export const makeClipsFromSubtitles = (
   fileId: MediaFileId,
-  fieldNamesToTrackIds: { [K in FlashcardFieldName]: SubtitlesTrackId },
+  fieldNamesToTrackIds: Record<FlashcardFieldName, SubtitlesTrackId>,
   tags: Array<string>
 ): MakeClipsFromSubtitles => ({
   type: A.MAKE_CLIPS_FROM_SUBTITLES,
