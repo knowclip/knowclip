@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4'
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
+import { compose } from 'redux'
 
 const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   const { clips: oldClips } = project
@@ -120,19 +121,44 @@ const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
     clips,
   }
 }
+const convertProject3_0_0___4_0_0 = (project: Project3_0_0): Project4_0_0 => {
+  console.log('converting!!', {
+    ...project,
+    version: '4.0.0',
+    clips: Object.values(project.clips),
+  })
+
+  return {
+    ...project,
+    version: '4.0.0',
+    clips: Object.values(project.clips),
+  }
+}
 
 const parseProject = (jsonFileContents: string) => {
   const project = JSON.parse(jsonFileContents) as Project
   switch (project.version) {
     case '0.0.0':
-      return convertProject2_0_0___3_0_0(
-        convertProject1_0_0___2_0_0(convertProject0_0_0___1_0_0(project))
-      )
+      return compose<Project4_0_0>(
+        convertProject3_0_0___4_0_0,
+        convertProject2_0_0___3_0_0,
+        convertProject1_0_0___2_0_0,
+        convertProject0_0_0___1_0_0
+      )(project)
     case '1.0.0':
-      return convertProject2_0_0___3_0_0(convertProject1_0_0___2_0_0(project))
+      return compose<Project4_0_0>(
+        convertProject3_0_0___4_0_0,
+        convertProject2_0_0___3_0_0,
+        convertProject1_0_0___2_0_0
+      )(project)
     case '2.0.0':
-      return convertProject2_0_0___3_0_0(project)
+      return compose<Project4_0_0>(
+        convertProject3_0_0___4_0_0,
+        convertProject2_0_0___3_0_0
+      )(project)
     case '3.0.0':
+      return convertProject3_0_0___4_0_0(project)
+    case '4.0.0':
       return project
     default:
       return null
@@ -162,21 +188,22 @@ export const getMediaFilePaths = (
       },
     ]
   }
-  return (project as Project3_0_0 | Project2_0_0).mediaFilesMetadata.map(
-    metadata => {
-      const existingMetadataAndFilePath = mediaFilePaths.find(
-        ({ metadata: { id }, filePath }) => id === metadata.id
-      )
-      return {
-        metadata,
-        constantBitrateFilePath: existingMetadataAndFilePath
-          ? existingMetadataAndFilePath.constantBitrateFilePath
-          : null,
-        filePath: existingMetadataAndFilePath
-          ? existingMetadataAndFilePath.filePath
-          : null,
-        error: null,
-      }
+  return (project as
+    | Project4_0_0
+    | Project3_0_0
+    | Project2_0_0).mediaFilesMetadata.map(metadata => {
+    const existingMetadataAndFilePath = mediaFilePaths.find(
+      ({ metadata: { id }, filePath }) => id === metadata.id
+    )
+    return {
+      metadata,
+      constantBitrateFilePath: existingMetadataAndFilePath
+        ? existingMetadataAndFilePath.constantBitrateFilePath
+        : null,
+      filePath: existingMetadataAndFilePath
+        ? existingMetadataAndFilePath.filePath
+        : null,
+      error: null,
     }
-  )
+  })
 }

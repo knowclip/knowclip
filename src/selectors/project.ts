@@ -1,11 +1,12 @@
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
+import { getClips } from '.'
 
 export const getProject = (
   state: AppState,
   projectMetadata: ProjectMetadata
-): Project3_0_0 => ({
-  version: '3.0.0',
+): Project4_0_0 => ({
+  version: '4.0.0',
   timestamp: moment.utc().format(),
   name: projectMetadata.name,
   id: projectMetadata.id,
@@ -16,7 +17,10 @@ export const getProject = (
   ),
 
   tags: [...getAllTags(state.clips.byId)],
-  clips: state.clips.byId,
+  clips: projectMetadata.mediaFilePaths.reduce(
+    (clips, { metadata: { id } }) => [...clips, ...getClips(state, id)],
+    [] as Clip[]
+  ),
 })
 
 export const getProjects = (state: AppState): Array<ProjectMetadata> =>

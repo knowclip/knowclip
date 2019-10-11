@@ -1,4 +1,9 @@
-declare type Project = Project0_0_0 | Project1_0_0 | Project2_0_0 | Project3_0_0
+declare type Project =
+  | Project0_0_0
+  | Project1_0_0
+  | Project2_0_0
+  | Project3_0_0
+  | Project4_0_0
 
 declare type ProjectId = string
 
@@ -35,6 +40,17 @@ declare type Project3_0_0 = {
   mediaFilesMetadata: Array<MediaFileMetadata>
   noteType: NoteType
   clips: { [K in ClipId]: Clip }
+  tags: Array<string>
+  timestamp: string
+}
+
+declare type Project4_0_0 = {
+  version: '4.0.0'
+  id: ProjectId
+  name: string
+  mediaFilesMetadata: Array<MediaFileMetadata>
+  noteType: NoteType
+  clips: Array<Clip>
   tags: Array<string>
   timestamp: string
 }

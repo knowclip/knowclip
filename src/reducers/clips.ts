@@ -66,9 +66,8 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         idsByMediaFileId[id] = []
       })
 
-      for (const id in action.project.clips) {
-        const clip = action.project.clips[id]
-        byId[id] = clip
+      for (const clip of action.project.clips) {
+        byId[clip.id] = clip
         idsByMediaFileId[clip.fileId].push(clip.id)
       }
       for (const fileId in idsByMediaFileId) {

@@ -11,12 +11,8 @@ declare type Clip = {
 }
 
 declare type ClipsState = {
-  byId: {
-    [ClipId: string]: Clip
-  }
-  idsByMediaFileId: {
-    [mediaFileId: string]: Array<ClipId>
-  }
+  byId: Record<ClipId, Clip>
+  idsByMediaFileId: Record<MediaFileId, ClipId[]>
 }
 
 declare type FlashcardFields =

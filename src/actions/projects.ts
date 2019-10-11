@@ -14,7 +14,7 @@ export const openProjectById = (id: ProjectId): Action => ({
 })
 
 export const openProject = (
-  project: Project3_0_0,
+  project: Project4_0_0,
   projectMetadata: ProjectMetadata
 ): Action => ({
   type: A.OPEN_PROJECT,

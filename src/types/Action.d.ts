@@ -156,7 +156,7 @@ declare type OpenProjectRequestByFilePath = {
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
-  project: Project3_0_0
+  project: Project4_0_0
   projectMetadata: ProjectMetadata
 }
 declare type CreateProject = {
