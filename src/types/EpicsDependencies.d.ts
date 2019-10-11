@@ -8,4 +8,11 @@ declare type EpicsDependencies = {
   setCurrentTime: ((arg0: number) => void)
   pauseMedia: (() => void)
   toggleMediaPaused: (() => void)
+  getMediaMetadata: (
+    path: string
+  ) => Promise<{
+    streams: FfprobeStream[]
+    format: FfprobeFormat
+    chapters: any[]
+  }>
 }

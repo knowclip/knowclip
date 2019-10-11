@@ -1,4 +1,6 @@
-const elementWidth = element => {
+import { getMediaMetadata } from './utils/ffmpeg'
+
+const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
@@ -10,16 +12,17 @@ const getAudioElement = () => {
 }
 const getWaveformSvgElement = () => document.getElementById('waveform-svg')
 
-const dependencies = {
+const dependencies: EpicsDependencies = {
   document,
   window,
   setLocalStorage: (key, value) => window.localStorage.setItem(key, value),
-  getWaveformSvgElement: () => document.getElementById('waveform-svg'),
+  getWaveformSvgElement: () =>
+    (document.getElementById('waveform-svg') as SVGElement | null) || null,
   getWaveformSvgWidth: () => {
     const el = getWaveformSvgElement()
     return el ? elementWidth(el) : 0
   },
-  setCurrentTime: time => {
+  setCurrentTime: (time: number) => {
     const media = getAudioElement()
     if (media) {
       media.currentTime = time
@@ -41,5 +44,6 @@ const dependencies = {
     if (el.paused) el.play()
     else el.pause()
   },
+  getMediaMetadata,
 }
 export default dependencies
