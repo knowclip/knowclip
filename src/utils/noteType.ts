@@ -1,14 +1,14 @@
 const SIMPLE_FIELDS: Array<SimpleFlashcardFieldName> = [
   'transcription',
-  'notes',
   'meaning',
+  'notes',
 ]
 
 const TRANSLITERATION_FIELDS: Array<TransliterationFlashcardFieldName> = [
   'transcription',
-  'notes',
-  'meaning',
   'pronunciation',
+  'meaning',
+  'notes',
 ]
 
 export const getNoteTypeFields = (noteType: NoteType) =>
