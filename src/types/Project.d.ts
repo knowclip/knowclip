@@ -11,7 +11,7 @@ declare type Project0_0_0 = {
   version: '0.0.0'
   audioFileName: MediaFileName
   noteType: NoteTypePre3_0_0
-  clips: { [K in ClipId]: ClipWithoutFilePath }
+  clips: Record<ClipId, ClipWithoutFilePath>
 }
 
 declare type Project1_0_0 = {
@@ -19,7 +19,7 @@ declare type Project1_0_0 = {
   audioFileName: MediaFileName
   audioFileId: MediaFileId
   noteType: NoteTypePre3_0_0
-  clips: { [K in ClipId]: ClipPre3_0_0 }
+  clips: Record<ClipId, ClipPre3_0_0>
 }
 
 declare type Project2_0_0 = {
@@ -28,7 +28,7 @@ declare type Project2_0_0 = {
   name: string
   mediaFilesMetadata: Array<MediaFileMetadata>
   noteType: NoteTypePre3_0_0
-  clips: { [K in ClipId]: ClipPre3_0_0 }
+  clips: Record<ClipId, ClipPre3_0_0>
   tags: Array<string>
   timestamp: string
 }
@@ -39,7 +39,7 @@ declare type Project3_0_0 = {
   name: string
   mediaFilesMetadata: Array<MediaFileMetadata>
   noteType: NoteType
-  clips: { [K in ClipId]: Clip }
+  clips: Record<ClipId, Clip>
   tags: Array<string>
   timestamp: string
 }
