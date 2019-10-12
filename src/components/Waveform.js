@@ -1,8 +1,9 @@
-import React, { Component, Fragment, memo, useRef } from 'react'
+import React, { Component, Fragment, memo, useRef, useCallback } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
 import css from './Waveform.module.css'
+import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -163,54 +164,60 @@ const SubtitlesTimelines = memo(
   }
 )
 
-class Waveform extends Component {
-  render() {
-    const {
-      show,
-      clips,
-      pendingClip,
-      pendingStretch,
-      highlightedClipId,
-      waveform,
-      subtitles,
-      goToSubtitlesChunk,
-    } = this.props
-    const { viewBox, cursor, stepsPerSecond, path } = waveform
-    const viewBoxString = getViewBoxString(viewBox.xMin)
-    return (
-      <Fragment>
-        <svg
-          style={show ? {} : { display: 'none' }}
-          id="waveform-svg"
-          viewBox={viewBoxString}
-          preserveAspectRatio="xMinYMin slice"
-          className="waveform-svg"
-          width="100%"
-          height={HEIGHT}
-        >
-          {path && <image xlinkHref={`file://${path}`} />}
-          <Cursor {...cursor} />
-          <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
-          {pendingClip && (
-            <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
-          )}
-          {pendingStretch && (
-            <PendingStretch
-              {...pendingStretch}
-              stepsPerSecond={stepsPerSecond}
-            />
-          )}
-        </svg>
-        {Boolean(subtitles.length) && (
-          <SubtitlesTimelines
-            subtitles={subtitles}
-            viewBox={viewBox}
-            goToSubtitlesChunk={goToSubtitlesChunk}
-          />
+const Waveform = ({
+  show,
+  clips,
+  pendingClip,
+  pendingStretch,
+  highlightedClipId,
+  waveform,
+  subtitles,
+  goToSubtitlesChunk,
+  onWaveformMousedown,
+}) => {
+  const { viewBox, cursor, stepsPerSecond, path } = waveform
+  const viewBoxString = getViewBoxString(viewBox.xMin)
+  const svgRef = useRef(null)
+  const onMouseDown = useCallback(
+    e =>
+      onWaveformMousedown(
+        toWaveformCoordinates(e, e.currentTarget, waveform.viewBox.xMin).x
+      ),
+    [waveform.viewBox.xMin, onWaveformMousedown]
+  )
+
+  return (
+    <Fragment>
+      <svg
+        ref={svgRef}
+        style={show ? {} : { display: 'none' }}
+        id="waveform-svg"
+        viewBox={viewBoxString}
+        preserveAspectRatio="xMinYMin slice"
+        className="waveform-svg"
+        width="100%"
+        onMouseDown={onMouseDown}
+        height={HEIGHT}
+      >
+        {path && <image xlinkHref={`file://${path}`} />}
+        <Cursor {...cursor} />
+        <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
+        {pendingClip && (
+          <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
         )}
-      </Fragment>
-    )
-  }
+        {pendingStretch && (
+          <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />
+        )}
+      </svg>
+      {Boolean(subtitles.length) && (
+        <SubtitlesTimelines
+          subtitles={subtitles}
+          viewBox={viewBox}
+          goToSubtitlesChunk={goToSubtitlesChunk}
+        />
+      )}
+    </Fragment>
+  )
 }
 
 const mapStateToProps = state => ({
@@ -221,8 +228,13 @@ const mapStateToProps = state => ({
   highlightedClipId: r.getHighlightedClipId(state),
   subtitles: r.getSubtitlesTracks(state),
 })
+const mapDispatchToProps = {
+  highlightClip: r.highlightClip,
+  goToSubtitlesChunk: r.goToSubtitlesChunk,
+  onWaveformMousedown: r.waveformMousedown,
+}
 
 export default connect(
   mapStateToProps,
-  { highlightClip: r.highlightClip, goToSubtitlesChunk: r.goToSubtitlesChunk }
+  mapDispatchToProps
 )(Waveform)

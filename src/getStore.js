@@ -4,6 +4,7 @@ import reducer from './reducers'
 import epic from './epics'
 import { getPersistedState } from './utils/statePersistence'
 import { initialState as initialMediaState } from './reducers/audio'
+import epicsDependencies from './epicsDependencies'
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
@@ -11,7 +12,9 @@ const composeEnhancers =
     : compose
 
 export default function getStore() {
-  const epicMiddleware = createEpicMiddleware()
+  const epicMiddleware = createEpicMiddleware({
+    dependencies: epicsDependencies,
+  })
 
   const persistedState = getPersistedState()
   console.log('persisted state', persistedState)

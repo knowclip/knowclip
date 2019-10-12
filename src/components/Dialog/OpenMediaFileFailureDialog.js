@@ -43,7 +43,8 @@ const OpenMediaFileFailureDialog = ({
   locateMediaFileRequest,
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { name, isVideo, id }: MediaFileMetadata = currentMediaMetadata
+  const { name, isVideo, id } = currentMediaMetadata
+  // const { name, isVideo, id }: MediaFileMetadata = currentMediaMetadata
 
   const onTextFocus = useCallback(
     async () => {
