@@ -1,5 +1,6 @@
 declare type Action =
   | { type: '@@INIT' }
+  | InitializeApp
   | SnackbarAction
   | DialogAction
   | WaveformAction
@@ -7,22 +8,11 @@ declare type Action =
   | ProjectAction
   | MediaAction
   | SubtitlesAction
-  | {
-      type: 'CHOOSE_AUDIO_FILES'
-      filePaths: Array<MediaFilePath>
-      ids: Array<MediaFileId>
-      noteTypeId: NoteTypeId
-    }
-  | { type: 'REMOVE_AUDIO_FILES' }
-  | { type: 'SET_CURRENT_FILE'; index: number }
-  | { type: 'TOGGLE_LOOP' }
-  | { type: 'SET_LOOP'; loop: boolean }
-  | { type: 'INITIALIZE_APP' }
-  | { type: 'SET_MEDIA_FOLDER_LOCATION'; directoryPath: string | null }
   | DetectSilence
   | DetectSilenceRequest
   | DeleteAllCurrentFileClipsRequest
   | SetAllTags
+declare type InitializeApp = { type: 'INITIALIZE_APP' }
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
 declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }
@@ -119,13 +109,20 @@ declare type WaveformMousedown = {
   x: number
 }
 
-declare type DialogAction =
-  | { type: 'ENQUEUE_DIALOG'; dialog: DialogData; skipQueue: boolean }
-  | { type: 'CLOSE_DIALOG' }
+declare type DialogAction = EnqueueDialog | CloseDialog
+type EnqueueDialog = {
+  type: 'ENQUEUE_DIALOG'
+  dialog: DialogData
+  skipQueue: boolean
+}
+type CloseDialog = { type: 'CLOSE_DIALOG' }
 
-declare type SnackbarAction =
-  | { type: 'ENQUEUE_SNACKBAR'; snackbar: SnackbarData }
-  | { type: 'CLOSE_SNACKBAR' }
+declare type SnackbarAction = EnqueueSnackbar | CloseSnackbar
+type EnqueueSnackbar = {
+  type: 'ENQUEUE_SNACKBAR'
+  snackbar: SnackbarData
+}
+type CloseSnackbar = { type: 'CLOSE_SNACKBAR' }
 
 declare type ProjectAction =
   | OpenProjectRequestById
@@ -145,6 +142,7 @@ declare type ProjectAction =
   | ExportApkgSuccess
   | ExportMarkdown
   | ExportCsv
+  | SetWorkIsUnsaved
 
 declare type OpenProjectRequestById = {
   type: 'OPEN_PROJECT_REQUEST_BY_ID'
@@ -203,6 +201,10 @@ declare type ExportCsv = {
   csvFilePath: string
   mediaFolderLocation: string
 }
+declare type SetWorkIsUnsaved = {
+  type: 'SET_WORK_IS_UNSAVED'
+  workIsUnsaved: boolean
+}
 
 declare type MediaAction =
   | OpenMediaFileRequest
@@ -215,7 +217,13 @@ declare type MediaAction =
   | DeleteMediaFromProject
   | LocateMediaFileRequest
   | LocateMediaFileSuccess
-  | SetWorkIsUnsaved
+  | ChooseMediaFiles
+  | RemoveMediaFiles
+  | SetCurrentFile
+  | ToggleLoop
+  | SetLoop
+  | SetMediaFolderLocation
+
 declare type OpenMediaFileRequest = {
   type: 'OPEN_MEDIA_FILE_REQUEST'
   id: MediaFileId
@@ -270,9 +278,20 @@ declare type LocateMediaFileSuccess = {
   metadata: MediaFileMetadata
   filePath: MediaFilePath
 }
-declare type SetWorkIsUnsaved = {
-  type: 'SET_WORK_IS_UNSAVED'
-  workIsUnsaved: boolean
+
+declare type ChooseMediaFiles = {
+  type: 'CHOOSE_MEDIA_FILES'
+  filePaths: Array<MediaFilePath>
+  ids: Array<MediaFileId>
+  noteTypeId: NoteTypeId
+}
+declare type RemoveMediaFiles = { type: 'REMOVE_MEDIA_FILES' }
+declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
+declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
+declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
+declare type SetMediaFolderLocation = {
+  type: 'SET_MEDIA_FOLDER_LOCATION'
+  directoryPath: string | null
 }
 
 declare type SubtitlesAction =
@@ -285,7 +304,7 @@ declare type SubtitlesAction =
   | ShowSubtitles
   | HideSubtitles
   | MakeClipsFromSubtitles
-  | ShowSubtitleSClipsDialogRequest
+  | ShowSubtitlesClipsDialogRequest
   | LinkFlashcardFieldToSubtitlesTrack
   | GoToSubtitlesChunk
 declare type LoadSubtitlesFromVideoRequest = {
@@ -320,7 +339,7 @@ declare type MakeClipsFromSubtitles = {
   fieldNamesToTrackIds: Record<FlashcardFieldName, string>
   tags: Array<string>
 }
-declare type ShowSubtitleSClipsDialogRequest = {
+declare type ShowSubtitlesClipsDialogRequest = {
   type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'
 }
 declare type LinkFlashcardFieldToSubtitlesTrack = {

@@ -3,12 +3,7 @@ import { Reducer } from 'redux'
 const initialState: SubtitlesState = {
   loadedTracks: [],
   mediaFileTracksStreamIndexes: [],
-  flashcardFieldLinks: {
-    transcription: '',
-    pronunciation: '',
-    meaning: '',
-    notes: '',
-  },
+  flashcardFieldLinks: {},
 }
 
 const editTrack: <T extends SubtitlesTrack>(

@@ -19,18 +19,6 @@ const setWaveformCursorEpic: AppEpic = (
         // @ts-ignore
         true
       ).pipe(
-        // takeUntil(
-        // merge(
-        //   action$.pipe(
-        //     ofType('CLOSE_PROJECT', 'OPEN_MEDIA_FILE_REQUEST' /* CLOSE_MEDIA_FILE */),
-        //   ),
-        //   action$.pipe(
-        //     ofType(A.DELETE_MEDIA_FROM_PROJECT),
-        //     withLatestFrom('OPEN_MEDIA_FILE_SUCCESS'),
-        //     filter(([deleteMedia, openMediaFileSuccess]) => deleteMedia.mediaFileId === openMediaFileSuccess.id)
-        //   )
-        // ),
-        // ),
         takeWhile(() =>
           Boolean(r.getCurrentMediaFileConstantBitratePath(state$.value))
         ),
@@ -54,7 +42,6 @@ const setWaveformCursorEpic: AppEpic = (
               ? highlightedClip.start
               : getCurrentTime() * 50
           )
-          // if (!svgElement) return { type: 'WHOOPS CaNT UPDATE CURSOR NOW' }
           const svgWidth = getWaveformSvgWidth()
           if (newX < viewBox.xMin) {
             return setWaveformCursor(newX, {

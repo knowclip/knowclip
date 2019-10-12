@@ -1,7 +1,7 @@
 export const enqueueDialog = (
   dialog: DialogData,
   skipQueue: boolean = false
-): DialogAction => ({
+): EnqueueDialog => ({
   type: A.ENQUEUE_DIALOG,
   dialog,
   skipQueue,

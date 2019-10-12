@@ -13,7 +13,6 @@ const readFile = promisify(fs.readFile)
 
 const openProject = async (
   filePath: string,
-  // projectId: ProjectId,
   state$: StateObservable<AppState>
 ): Promise<Observable<Action>> => {
   try {
@@ -32,11 +31,7 @@ const openProject = async (
       filePath,
       r.getMediaFilePaths(state$.value, project.id)
     )
-    const projectMetadata = r.getProjectMetadata(
-      // const projectMetadata: ProjectMetadata = r.getProjectMetadata(
-      state$.value,
-      project.id
-    )
+    const projectMetadata = r.getProjectMetadata(state$.value, project.id)
     return from([
       r.openProject(project, {
         id: project.id,
@@ -188,7 +183,7 @@ const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
     flatMap(({ projectMetadata }) => {
       if (!projectMetadata.mediaFilePaths.length)
         return of(({
-          type: 'NOOP_OPEN_PROJECT_NO_AUDIO_FILES',
+          type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
         } as unknown) as Action)
 
       const [

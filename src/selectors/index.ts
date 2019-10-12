@@ -18,12 +18,12 @@ export * from './subtitles'
 export const getClip = (state: AppState, id: ClipId): Clip | null =>
   state.clips.byId[id]
 
-export const getClipsObject = (state: AppState): { [K in ClipId]: Clip } =>
+export const getClipsObject = (state: AppState): Record<ClipId, Clip> =>
   state.clips.byId
 
 const getClipsByIds = (
   clipsOrder: Array<ClipId>,
-  clips: { [K in ClipId]: Clip }
+  clips: Record<ClipId, Clip>
 ): Array<Clip> =>
   clipsOrder.map(id => {
     const clip = clips[id]

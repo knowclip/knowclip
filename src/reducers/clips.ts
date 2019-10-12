@@ -7,10 +7,7 @@ const initialState: ClipsState = {
   idsByMediaFileId: {},
 }
 
-const byStart = (clips: { [clipId: string]: Clip }) => (
-  aId: ClipId,
-  bId: ClipId
-) => {
+const byStart = (clips: Record<ClipId, Clip>) => (aId: ClipId, bId: ClipId) => {
   const { start: a } = clips[aId]
   const { start: b } = clips[bId]
   if (a < b) return -1
@@ -19,7 +16,7 @@ const byStart = (clips: { [clipId: string]: Clip }) => (
 }
 
 const addIdToIdsByMediaFileId = (
-  oldById: { [clipId: string]: Clip },
+  oldById: Record<ClipId, Clip>,
   oldIdsByMediaFileId: Array<ClipId>,
   clip: Clip
 ) => {
@@ -31,7 +28,7 @@ const addIdToIdsByMediaFileId = (
 }
 
 const addIdstoIdsByMediaFileId = (
-  oldById: { [clipId: string]: Clip },
+  oldById: Record<ClipId, Clip>,
   oldIdsByMediaFileId: Array<ClipId>,
   sortedClips: Array<Clip>
 ) => {
@@ -43,15 +40,13 @@ const addIdstoIdsByMediaFileId = (
     .concat(oldIdsByMediaFileId.slice(newIndex))
 }
 
-const arrayToMapById: (
-  arr: Array<Clip>
-) => { [clipId: string]: Clip } = array =>
+const arrayToMapById: (arr: Array<Clip>) => Record<ClipId, Clip> = array =>
   array.reduce(
     (all, item) => {
       all[item.id] = item
       return all
     },
-    {} as { [clipId: string]: Clip }
+    {} as Record<ClipId, Clip>
   )
 
 const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
@@ -76,7 +71,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.CHOOSE_AUDIO_FILES:
+    case A.CHOOSE_MEDIA_FILES:
       return {
         ...state,
         idsByMediaFileId: action.ids.reduce(
@@ -88,7 +83,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         ),
       }
 
-    case A.REMOVE_AUDIO_FILES:
+    case A.REMOVE_MEDIA_FILES:
       return {
         ...state,
         idsByMediaFileId: {},
@@ -157,7 +152,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const newClipsOrder = clipsOrder.filter(
         id => !idsToBeDiscarded.includes(id)
       )
-      const newClips: { [clipId: string]: Clip } = {}
+      const newClips: Record<ClipId, Clip> = {}
       newClipsOrder.forEach(id => {
         const clip = state.byId[id]
         if (!clip) throw new Error('impossible')
@@ -251,7 +246,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const card: Flashcard = clip.flashcard
 
       // @ts-ignore
-      const byId: { [clipId: string]: Clip } = {
+      const byId: Record<ClipId, Clip> = {
         ...state.byId,
         [id]: {
           ...clip,

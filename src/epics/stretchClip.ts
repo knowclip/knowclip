@@ -1,6 +1,6 @@
-import { map, switchMap, takeUntil, takeLast, filter } from 'rxjs/operators'
+import { map, switchMap, takeUntil, takeLast } from 'rxjs/operators'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
-import { Epic, ofType } from 'redux-observable'
+import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import { AppEpic } from '../types/AppEpic'
@@ -27,7 +27,6 @@ const stretchClipEpic: AppEpic = (
           if (!svgElement) throw new Error('Waveform disappeared')
           return r.setPendingStretch({
             id,
-            // start: mousedownData.x,
             originKey: key,
             end: toWaveformX(
               mousemove,

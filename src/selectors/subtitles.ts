@@ -1,5 +1,9 @@
 import stripHtml from '../utils/stripHtml'
 import { getXAtMilliseconds } from './waveformTime'
+import {
+  blankSimpleFields,
+  blankTransliterationFields,
+} from '../utils/newFlashcard'
 
 export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
   state.subtitles.loadedTracks
@@ -66,8 +70,9 @@ export const getSubtitlesChunksWithinRange = (
   end: WaveformX
 ): Array<SubtitlesChunk> => {
   const track = getSubtitlesTrack(state, subtitlesTrackId)
-  if (!track) return []
-  // throw new Error(`Could not find subtitles track ${subtitlesTrackId}`)
+  // if (!track) return []
+  if (!track)
+    throw new Error(`Could not find subtitles track ${subtitlesTrackId}`)
   return track.chunks.filter(chunk =>
     overlap(
       chunk,
@@ -80,21 +85,24 @@ export const getSubtitlesChunksWithinRange = (
 
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
-): Record<FlashcardFieldName, SubtitlesTrackId> =>
-  state.subtitles.flashcardFieldLinks
-
-// export const getSubtitlesTrackName = (
+): SubtitlesFlashcardFieldsLinks => state.subtitles.flashcardFieldLinks
 
 export const getNewFieldsFromLinkedSubtitles = (
   state: AppState,
+  noteType: NoteType,
   { start, end }: PendingClip
 ): FlashcardFields => {
   const links = getSubtitlesFlashcardFieldLinks(state)
-  const result = {} as FlashcardFields
+  const result =
+    noteType === 'Simple'
+      ? { ...blankSimpleFields }
+      : { ...blankTransliterationFields }
   for (const fieldName in links) {
     const coerced = fieldName as FlashcardFieldName
     const trackId = links[coerced]
-    const chunks = getSubtitlesChunksWithinRange(state, trackId, start, end)
+    const chunks = trackId
+      ? getSubtitlesChunksWithinRange(state, trackId, start, end)
+      : []
     // @ts-ignore
     result[fieldName] = chunks.map(chunk => chunk.text).join('\n')
   }

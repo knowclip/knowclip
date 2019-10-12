@@ -14,14 +14,14 @@ export const chooseMediaFiles = (
   ids: Array<MediaFileId>,
   noteTypeId: NoteTypeId
 ): Action => ({
-  type: A.CHOOSE_AUDIO_FILES,
+  type: A.CHOOSE_MEDIA_FILES,
   filePaths,
   ids,
   noteTypeId,
 })
 
 export const removeMediaFiles = (): Action => ({
-  type: A.REMOVE_AUDIO_FILES,
+  type: A.REMOVE_MEDIA_FILES,
 })
 
 export const setFlashcardField = (
@@ -76,7 +76,7 @@ export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
   ids,
 })
 
-export const exportApkgRequest = (clipIds: Array<ClipId>): Action => ({
+export const exportApkgRequest = (clipIds: Array<ClipId>) => ({
   type: A.EXPORT_APKG_REQUEST,
   clipIds,
 })

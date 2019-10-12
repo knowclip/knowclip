@@ -1,9 +1,9 @@
-const blankSimpleFields: SimpleFlashcardFields = {
+export const blankSimpleFields: SimpleFlashcardFields = {
   transcription: '',
   meaning: '',
   notes: '',
 } as const
-const blankTransliterationFields: TransliterationFlashcardFields = {
+export const blankTransliterationFields: TransliterationFlashcardFields = {
   transcription: '',
   meaning: '',
   notes: '',

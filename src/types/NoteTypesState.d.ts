@@ -1,10 +1,5 @@
 declare type NoteType = 'Simple' | 'Transliteration'
 
-// type NoteTypesState = {
-//   byId: { [NoteTypeId]: NoteType },
-//   allIds: Array<NoteTypeId>,
-// }
-
 declare type NoteTypeId = string
 
 declare type NoteTypePre3_0_0 = {

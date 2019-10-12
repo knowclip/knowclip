@@ -110,7 +110,11 @@ const addClipEpic: AppEpic = (
                   pendingClip,
                   currentFileId,
                   uuid(),
-                  r.getNewFieldsFromLinkedSubtitles(state$.value, pendingClip),
+                  r.getNewFieldsFromLinkedSubtitles(
+                    state$.value,
+                    currentNoteType,
+                    pendingClip
+                  ),
                   r.getDefaultTags(state$.value)
                 )
               )

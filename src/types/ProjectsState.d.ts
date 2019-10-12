@@ -17,8 +17,6 @@ declare type ProjectMetadata = {
 }
 
 declare type ProjectsState = {
-  byId: {
-    [ProjectId: string]: ProjectMetadata
-  }
+  byId: Record<ProjectId, ProjectMetadata>
   allIds: Array<ProjectId>
 }

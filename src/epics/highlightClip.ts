@@ -87,7 +87,7 @@ const playClipsOnHighlightEpic: AppEpic = (
 
       const input = document.querySelector(
         'textarea:not([aria-hidden=true])'
-      ) as HTMLInputElement
+      ) as HTMLTextAreaElement | null
       input && input.focus()
       //
       //

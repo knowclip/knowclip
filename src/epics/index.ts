@@ -44,7 +44,7 @@ const defaultTagsEpic: AppEpic = (action$, state$) =>
 
 // const defaultTagsAudioEpic: AppEpic = (action$, state$) =>
 //   action$.pipe(
-//     ofType(A.LOAD_AUDIO_SUCCESS),
+//     ofType(A.LOAD_MEDIA_SUCCESS),
 //     filter(({ file }) => file),
 //     map(({ id }) => ({
 //       type: 'SET_DEFAULT_TAGS',

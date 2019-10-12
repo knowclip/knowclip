@@ -282,7 +282,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
 
 const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ShowSubtitleSClipsDialogRequest>(
+    ofType<Action, ShowSubtitlesClipsDialogRequest>(
       A.SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST
     ),
     map(() => {

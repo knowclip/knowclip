@@ -95,7 +95,7 @@ const getFlashcard = (
       }
 const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
   const noteType = getNoteType(project)
-  const clips: { [clipId: string]: Clip } = {}
+  const clips: Record<ClipId, Clip> = {}
   for (const clipId in project.clips) {
     const clip = project.clips[clipId]
     clips[clipId] = {
@@ -121,19 +121,11 @@ const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
     clips,
   }
 }
-const convertProject3_0_0___4_0_0 = (project: Project3_0_0): Project4_0_0 => {
-  console.log('converting!!', {
-    ...project,
-    version: '4.0.0',
-    clips: Object.values(project.clips),
-  })
-
-  return {
-    ...project,
-    version: '4.0.0',
-    clips: Object.values(project.clips),
-  }
-}
+const convertProject3_0_0___4_0_0 = (project: Project3_0_0): Project4_0_0 => ({
+  ...project,
+  version: '4.0.0',
+  clips: Object.values(project.clips),
+})
 
 const parseProject = (jsonFileContents: string) => {
   const project = JSON.parse(jsonFileContents) as Project

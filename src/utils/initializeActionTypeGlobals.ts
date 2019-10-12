@@ -9,3 +9,7 @@ declare global {
   }
 }
 window.A = actionTypes
+
+export const checkForUnusedActionTypes: {
+  [t: string]: Action['type']
+} = actionTypes
