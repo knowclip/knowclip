@@ -104,13 +104,13 @@ const SUBTITLES_CHUNK_HEIGHT = 24
 const SubtitlesChunk = ({ chunk, trackIndex, chunkIndex, trackId }) => (
   <g
     className={css.subtitlesChunk}
-    data-chunkIndex={chunkIndex}
+    data-chunk-index={chunkIndex}
     data-trackId={trackId}
   >
     <path
       className={css.subtitlesChunkRectangle}
       data-trackId={trackId}
-      data-chunkIndex={chunkIndex}
+      data-chunk-index={chunkIndex}
       d={getSubtitlesPath(
         chunk.start,
         chunk.end,
@@ -119,7 +119,7 @@ const SubtitlesChunk = ({ chunk, trackIndex, chunkIndex, trackId }) => (
       )}
     />
     <text
-      data-chunkIndex={chunkIndex}
+      data-chunk-index={chunkIndex}
       data-trackId={trackId}
       className={css.subtitlesText}
       x={chunk.start + 4}

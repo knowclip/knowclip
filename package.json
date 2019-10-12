@@ -56,11 +56,11 @@
     }
   },
   "browserslist": [
-    "electron >= 3.0.6"
+    "electron >= 6.0.12"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.3.2",
-    "electron": "3.0.6",
+    "electron": "6.0.12",
     "electron-packager": "^12.2.0",
     "eslint-plugin-react-hooks": "^1.6.0",
     "husky": "^1.1.3",

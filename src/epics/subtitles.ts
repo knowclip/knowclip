@@ -13,6 +13,7 @@ import subsrt from 'subsrt'
 import newClip from '../utils/newClip'
 import { from } from 'rxjs'
 import { AppEpic } from '../types/AppEpic'
+import { getMillisecondsAtX } from '../selectors'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -108,7 +109,17 @@ export const getSubtitlesFromFile = async (
 
   if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
   if (extension === '.srt')
-    await writeFile(vttFilePath, stringifyVtt(chunks), 'utf8')
+    await writeFile(
+      vttFilePath,
+      stringifyVtt(
+        chunks.map(chunk => ({
+          start: getMillisecondsAtX(state, chunk.start),
+          end: getMillisecondsAtX(state, chunk.end),
+          text: chunk.text,
+        }))
+      ),
+      'utf8'
+    )
   return {
     vttFilePath,
     chunks,

@@ -1,6 +1,6 @@
 export const getSecondsAtX = (state: AppState, x: number): number => {
   const { stepsPerSecond, stepLength } = state.waveform
-  return x / (stepsPerSecond * stepLength)
+  return +(x / (stepsPerSecond * stepLength)).toFixed(5)
 }
 export const getMillisecondsAtX = (state: AppState, x: number): number => {
   return 1000 * getSecondsAtX(state, x)

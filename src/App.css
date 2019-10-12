@@ -46,7 +46,6 @@ video::-webkit-media-controls-toggle-closed-captions-button {
 }
 
 .videoContainer {
-  height: 25rem;
   overflow-y: auto;
   resize: vertical;
   max-width: 100%;
@@ -57,7 +56,7 @@ audio.audioPlayer {
   display: block;
 }
 video.audioPlayer {
-  height: calc(100% - 36px);
+  height: 100%;
   padding: 0 1rem 0 0;
   box-sizing: border-box;
   max-width: 100%;

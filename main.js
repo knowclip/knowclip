@@ -26,7 +26,7 @@ async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    webPreferences: { webSecurity: isPackaged },
+    webPreferences: { webSecurity: isPackaged, nodeIntegration: true },
   })
 
   // and load the index.html of the app.

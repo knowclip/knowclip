@@ -1,4 +1,4 @@
-import { map, ignoreElements } from 'rxjs/operators'
+import { map, ignoreElements, flatMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'
@@ -53,26 +53,29 @@ const defaultTagsEpic: AppEpic = (action$, state$) =>
 //   )
 
 const closeEpic: AppEpic = (action$, state$) =>
-  fromEvent(ipcRenderer, 'app-close', () => {
+  fromEvent(ipcRenderer, 'app-close', async () => {
     if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
       ipcRenderer.send('closed')
-      return { type: 'QUIT_APP' }
+      return await { type: 'QUIT_APP' }
     }
 
-    const choice = remote.dialog.showMessageBox({
+    const choice = await remote.dialog.showMessageBox({
       type: 'question',
       buttons: ['Yes', 'No'],
       title: 'Confirm',
       message: 'Are you sure you want to quit without saving your work?',
     })
-    if (choice === 1) {
+    if (choice.response === 1) {
       // e.preventDefault()
-      return { type: "DON'T QUIT ON ME!!" }
+      return await { type: "DON'T QUIT ON ME!!" }
     } else {
       ipcRenderer.send('closed')
-      return { type: 'QUIT_APP' }
+      return await { type: 'QUIT_APP' }
     }
-  }).pipe(ignoreElements())
+  }).pipe(
+    flatMap(x => x),
+    ignoreElements()
+  )
 
 const rootEpic: AppEpic = combineEpics(
   media,

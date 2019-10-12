@@ -47,11 +47,12 @@ const Media = ({
     loop: loop,
     ref: audioRef,
     controls: true,
+    disablePictureInPicture: true,
     id: 'audioPlayer',
     className: 'audioPlayer',
     controlsList: 'nodownload nofullscreen',
     src: filePath ? `file://${filePath}` : null,
-    playbackspeed: 1.5,
+    playbackspeed: 1,
   }
   useEffect(
     () => {

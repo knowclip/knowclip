@@ -9,17 +9,14 @@ export const showSaveDialog = (
   name: string,
   extensions: Array<string>
 ): Promise<string | null> =>
-  new Promise((res, rej) => {
+  new Promise(async (res, rej) => {
     try {
-      dialog.showSaveDialog(
-        win,
-        { filters: [{ name, extensions }] },
-        filename => {
-          res(filename)
-        }
-      )
+      const { filePath } = await dialog.showSaveDialog(win, {
+        filters: [{ name, extensions }],
+      })
+      return await res(filePath)
     } catch (err) {
-      rej(err)
+      return await rej(err)
     }
   })
 
@@ -27,38 +24,32 @@ export const showOpenDialog = (
   filters: Array<FileFilter> = [],
   multiSelections = false
 ): Promise<Array<string> | null> =>
-  new Promise((res, rej) => {
+  new Promise(async (res, rej) => {
     try {
-      dialog.showOpenDialog(
-        win,
-        {
-          properties: multiSelections
-            ? ['openFile', 'multiSelections']
-            : ['openFile'],
-          filters,
-        },
-        filePaths => res(filePaths)
-      )
+      const { filePaths } = await dialog.showOpenDialog(win, {
+        properties: multiSelections
+          ? ['openFile', 'multiSelections']
+          : ['openFile'],
+        filters,
+      })
+      return await res(filePaths)
     } catch (err) {
-      rej(err)
+      return await rej(err)
     }
   })
 
 export const showOpenDirectoryDialog = (
   showHiddenFiles = true
 ): Promise<string | null> =>
-  new Promise((res, rej) => {
+  new Promise(async (res, rej) => {
     try {
-      dialog.showOpenDialog(
-        win,
-        {
-          properties: showHiddenFiles
-            ? ['openDirectory', 'showHiddenFiles']
-            : ['openDirectory'],
-        },
-        directoryPaths => res(directoryPaths ? directoryPaths[0] : null)
-      )
+      const { filePaths: directoryPaths } = await dialog.showOpenDialog(win, {
+        properties: showHiddenFiles
+          ? ['openDirectory', 'showHiddenFiles']
+          : ['openDirectory'],
+      })
+      return await res(directoryPaths ? directoryPaths[0] : null)
     } catch (err) {
-      rej(err)
+      return await rej(err)
     }
   })
