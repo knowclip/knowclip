@@ -32,7 +32,7 @@ export const showOpenDialog = (
           : ['openFile'],
         filters,
       })
-      return await res(filePaths)
+      return await res(filePaths && filePaths.length ? filePaths : null)
     } catch (err) {
       return await rej(err)
     }
