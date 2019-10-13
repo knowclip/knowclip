@@ -21,10 +21,9 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
           ...state.byId,
           ...Object.values(action.project.mediaFilesMetadata).reduce(
             (all, metadata) => {
-              const existing: MediaFile | { [any: string]: any } =
-                state.byId[metadata.id] || {}
+              const existing: Partial<MediaFile> = state.byId[metadata.id] || {}
 
-              all[metadata.id] = {
+              const newMedia: MediaFile = {
                 filePath: existing.filePath || null,
                 constantBitrateFilePath:
                   existing.constantBitrateFilePath || null,
@@ -32,8 +31,12 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
                 flashcardFieldsToSubtitlesTracks:
                   existing.flashcardFieldsToSubtitlesTracks || {},
                 error: existing.error || null,
-                metadata: existing.metadata || null,
+                metadata: {
+                  ...existing.metadata,
+                  ...metadata,
+                },
               }
+              all[metadata.id] = newMedia
               return all
             },
             {} as Record<MediaFileId, MediaFile>
