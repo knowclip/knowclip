@@ -128,6 +128,22 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
         },
       }
 
+    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.mediaFileId]: {
+            ...state.byId[action.mediaFileId],
+            flashcardFieldsToSubtitlesTracks: {
+              ...state.byId[action.mediaFileId]
+                .flashcardFieldsToSubtitlesTracks,
+              [action.flashcardFieldName]: action.subtitlesTrackId,
+            },
+          },
+        },
+      }
+
     default:
       return state
   }

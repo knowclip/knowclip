@@ -207,6 +207,7 @@ class FlashcardSection extends Component {
       externalSubtitlesTracks,
       subtitlesFlashcardFieldLinks,
       linkFlashcardFieldToSubtitlesTrack,
+      currentMediaFileId,
     } = this.props
     const { moreMenuAnchorEl } = this.state
 
@@ -280,7 +281,11 @@ class FlashcardSection extends Component {
                       externalSubtitlesTracks={externalSubtitlesTracks}
                       linkedSubtitlesTrack={subtitlesFlashcardFieldLinks[id]}
                       linkToSubtitlesTrack={trackId =>
-                        linkFlashcardFieldToSubtitlesTrack(id, trackId)
+                        linkFlashcardFieldToSubtitlesTrack(
+                          id,
+                          currentMediaFileId,
+                          trackId
+                        )
                       }
                     />
                   ))}
@@ -354,6 +359,7 @@ class FlashcardSection extends Component {
 const mapStateToProps = state => ({
   allTags: r.getAllTags(state),
   currentFlashcard: r.getCurrentFlashcard(state),
+  currentMediaFileId: r.getCurrentFileId(state),
   selectedClipId: r.getSelectedClipId(state),
   selectedClipTime: r.getSelectedClipTime(state),
   highlightedClipId: r.getHighlightedClipId(state),

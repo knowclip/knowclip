@@ -7,13 +7,7 @@ import fs from 'fs'
 import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
-import { FfprobeData } from 'fluent-ffmpeg'
 import { AppEpic } from '../types/AppEpic'
-
-const getSubtitlesStreamIndexes = (ffprobeMetadata: FfprobeData) =>
-  ffprobeMetadata.streams
-    .filter(stream => stream.codec_type === 'subtitle')
-    .map(stream => stream.index)
 
 const coerceMp3ToConstantBitrate = (
   path: string,
@@ -51,13 +45,9 @@ const openMedia: AppEpic = (action$, state$, { pauseMedia }) =>
 
         const filePath = r.getMediaFilePathFromCurrentProject(state$.value, id)
         const metadata = r.getMediaMetadataFromCurrentProject(state$.value, id)
-        const currentProjectId = r.getCurrentProjectId(state$.value)
 
         if (!metadata)
           return await of(r.openMediaFileFailure('Could not open media file.'))
-
-        if (!currentProjectId)
-          return of(r.openMediaFileFailure('Could not open media file.'))
 
         if (!filePath) {
           // also should open dialog
@@ -79,10 +69,7 @@ const openMedia: AppEpic = (action$, state$, { pauseMedia }) =>
         }
 
         const ffprobeMetadata = await getMediaMetadata(filePath)
-        const subtitlesStreamIndexes = getSubtitlesStreamIndexes(
-          ffprobeMetadata
-        )
-        console.log('ffprobeMetadata', ffprobeMetadata)
+
         const newMetadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
         const existingMetadata = r.getCurrentMediaMetadata(state$.value)
         if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
@@ -93,13 +80,7 @@ const openMedia: AppEpic = (action$, state$, { pauseMedia }) =>
           if (differenceMessage && differenceMessage.length)
             return from([
               r.simpleMessageSnackbar(differenceMessage),
-              r.openMediaFileSuccess(
-                filePath,
-                filePath,
-                newMetadata,
-                currentProjectId,
-                subtitlesStreamIndexes
-              ),
+              r.openMediaFileSuccess(filePath, filePath, newMetadata),
             ])
         }
 
@@ -121,20 +102,10 @@ const openMedia: AppEpic = (action$, state$, { pauseMedia }) =>
         }
 
         // newMetadata might actually be same? :| but if not it overrides 'UNKNOWN' format
-        return of(
-          r.openMediaFileSuccess(
-            filePath,
-            filePath,
-            newMetadata,
-            currentProjectId,
-            subtitlesStreamIndexes
-          )
-        )
+        return of(r.openMediaFileSuccess(filePath, filePath, newMetadata))
       }
     ),
     flatMap(x => x)
-    // takeWhile<*, *>(x => r.getCurrentProjectId(state$.value))
-    // flatMap(x)
   )
 
 const openMp3: AppEpic = (action$, state$) =>
@@ -156,9 +127,7 @@ const openMp3: AppEpic = (action$, state$) =>
         return r.openMediaFileSuccess(
           filePath,
           constantBitrateFilePath,
-          metadata,
-          currentProjectId,
-          getSubtitlesStreamIndexes(ffprobeMetadata)
+          metadata
         )
       } catch (err) {
         return r.openMediaFileFailure(
@@ -193,6 +162,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
               error: null,
               metadata: convertMediaMetadata(ffprobeMetadata, filePath, uuid()),
               subtitles: [],
+              flashcardFieldsToSubtitlesTracks: {},
             }
           })
         )
@@ -229,14 +199,17 @@ const getDifferenceMessage = (
     differences.push('duration')
   if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
     differences.push('format')
+  if (
+    existingMetadata.subtitlesTracksStreamIndexes !==
+    newMetadata.subtitlesTracksStreamIndexes
+  )
+    differences.push('subtitles tracks')
 
   if (differences.length) {
     return `This media file differs from the one on record by: ${differences.join(
       ', '
     )}.`
   }
-
-  // TODO: streams/subtitles tracks
 }
 
 const locateMediaFile: AppEpic = (action$, state$) =>

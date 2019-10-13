@@ -55,4 +55,7 @@ export const convertMediaMetadata = (
     ffprobeMetadata.streams.some(
       ({ codec_type }) => codec_type && /video/i.test(codec_type)
     ),
+  subtitlesTracksStreamIndexes: ffprobeMetadata.streams
+    .filter(stream => stream.codec_type === 'subtitle')
+    .map(stream => stream.index),
 })

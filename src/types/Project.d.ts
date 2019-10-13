@@ -26,7 +26,7 @@ declare type Project2_0_0 = {
   version: '2.0.0'
   id: ProjectId
   name: string
-  mediaFilesMetadata: Array<MediaFileMetadata>
+  mediaFilesMetadata: Array<MediaFileMetadata_Pre_4>
   noteType: NoteTypePre3_0_0
   clips: Record<ClipId, ClipPre3_0_0>
   tags: Array<string>
@@ -37,7 +37,7 @@ declare type Project3_0_0 = {
   version: '3.0.0'
   id: ProjectId
   name: string
-  mediaFilesMetadata: Array<MediaFileMetadata>
+  mediaFilesMetadata: Array<MediaFileMetadata_Pre_4>
   noteType: NoteType
   clips: Record<ClipId, Clip>
   tags: Array<string>

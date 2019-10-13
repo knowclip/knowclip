@@ -84,25 +84,16 @@ export const getProjectMediaMetadata = (
 ): Array<MediaFileMetadata> =>
   getMediaFiles(state, projectId).map(({ metadata }) => metadata)
 
+export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
+  const { currentMediaFileId } = state.user
+  return currentMediaFileId ? state.media.byId[currentMediaFileId] : null
+}
+
 export const getCurrentMediaMetadata = (
   state: AppState
 ): MediaFileMetadata | null => {
-  const currentProjectId = getCurrentProjectId(state)
-  if (!currentProjectId) return null
-
-  const currentProjectMediaMetadata = getProjectMediaMetadata(
-    state,
-    currentProjectId
-  )
-  if (!currentProjectMediaMetadata) return null
-
-  const { currentMediaFileId } = state.user
-  if (!currentMediaFileId) return null
-
-  return (
-    currentProjectMediaMetadata.find(({ id }) => id === currentMediaFileId) ||
-    null
-  )
+  const currentMediaFile = getCurrentMediaFile(state)
+  return currentMediaFile ? currentMediaFile.metadata : null
 }
 
 export const isWorkUnsaved = (state: AppState): boolean =>

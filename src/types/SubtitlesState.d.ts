@@ -1,13 +1,7 @@
-declare type SubtitlesState = {
-  mediaFileTracksStreamIndexes: Array<number>
-  flashcardFieldLinks: SubtitlesFlashcardFieldsLinks
-}
+declare type SubtitlesState = {}
 
 declare type SubtitlesTrack = EmbeddedSubtitlesTrack | ExternalSubtitlesTrack
 declare type TextTrackMode = 'disabled' | 'hidden' | 'showing'
-declare type SubtitlesFlashcardFieldsLinks = Partial<
-  Record<FlashcardFieldName, SubtitlesTrackId>
->
 
 declare type EmbeddedSubtitlesTrack = {
   type: 'EmbeddedSubtitlesTrack'

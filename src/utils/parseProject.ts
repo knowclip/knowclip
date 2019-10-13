@@ -125,6 +125,10 @@ const convertProject3_0_0___4_0_0 = (project: Project3_0_0): Project4_0_0 => ({
   ...project,
   version: '4.0.0',
   clips: Object.values(project.clips),
+  mediaFilesMetadata: project.mediaFilesMetadata.map(metadata => ({
+    ...metadata,
+    subtitlesTracksStreamIndexes: [],
+  })),
 })
 
 const parseProject = (jsonFileContents: string) => {
@@ -172,24 +176,34 @@ export const buildMediaFiles = (
   ) {
     return [
       {
-        // @ts-ignore
-        metadata: project.mediaFilesMetadata[0],
+        metadata: {
+          id: 'id',
+          durationSeconds: 0,
+          format: 'UNKNOWN',
+          name: 'media file',
+          isVideo: false,
+          subtitlesTracksStreamIndexes: [],
+        },
         filePath: projectFilePath.replace(/\.afca$/, ''),
         constantBitrateFilePath: null,
         error: null,
         subtitles: [],
+        flashcardFieldsToSubtitlesTracks: {},
       },
     ]
   }
-  return (project as
-    | Project4_0_0
-    | Project3_0_0
-    | Project2_0_0).mediaFilesMetadata.map(metadata => {
+  const metadatas: Array<
+    MediaFileMetadata_Pre_4 | MediaFileMetadata
+  > = (project as Project4_0_0 | Project3_0_0 | Project2_0_0).mediaFilesMetadata
+  return metadatas.map(metadata => {
     const existingMetadataAndFilePath = mediaFilePaths.find(
       ({ metadata: { id }, filePath }) => id === metadata.id
     )
     return {
-      metadata,
+      metadata: {
+        ...metadata,
+        subtitlesTracksStreamIndexes: [],
+      },
       constantBitrateFilePath: existingMetadataAndFilePath
         ? existingMetadataAndFilePath.constantBitrateFilePath
         : null,
@@ -198,6 +212,7 @@ export const buildMediaFiles = (
         : null,
       error: null,
       subtitles: [],
+      flashcardFieldsToSubtitlesTracks: {},
     }
   })
 }

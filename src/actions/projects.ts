@@ -85,17 +85,12 @@ export const openMediaFileRequest = (id: MediaFileId): Action => ({
 export const openMediaFileSuccess = (
   filePath: MediaFilePath,
   constantBitrateFilePath: MediaFilePath,
-  metadata: MediaFileMetadata,
-  // kind of unnecessary... maybe should change state shape
-  projectId: ProjectId,
-  subtitlesTracksStreamIndexes: Array<number>
+  metadata: MediaFileMetadata
 ): OpenMediaFileSuccess => ({
   type: A.OPEN_MEDIA_FILE_SUCCESS,
   filePath,
   constantBitrateFilePath,
   metadata,
-  projectId,
-  subtitlesTracksStreamIndexes,
 })
 
 export const openMediaFileFailure = (

@@ -233,8 +233,6 @@ declare type OpenMediaFileSuccess = {
   filePath: MediaFilePath
   constantBitrateFilePath: MediaFilePath
   metadata: MediaFileMetadata
-  projectId: ProjectId
-  subtitlesTracksStreamIndexes: Array<number>
 }
 declare type OpenMediaFileFailure = {
   type: 'OPEN_MEDIA_FILE_FAILURE'
@@ -357,8 +355,9 @@ declare type ShowSubtitlesClipsDialogRequest = {
 }
 declare type LinkFlashcardFieldToSubtitlesTrack = {
   type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK'
+  mediaFileId: MediaFileId
   flashcardFieldName: FlashcardFieldName
-  subtitlesTrackId: SubtitlesTrackId
+  subtitlesTrackId: SubtitlesTrackId | null
 }
 declare type GoToSubtitlesChunk = {
   type: 'GO_TO_SUBTITLES_CHUNK'
