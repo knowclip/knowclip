@@ -54,14 +54,9 @@ export const getMediaFiles = (
   projectId: ProjectId
 ): Array<MediaFile> => {
   const projectMetadata = getProjectMetadata(state, projectId)
-  console.log({
-    projectMetadataMediaFiles: projectMetadata && projectMetadata.mediaFiles,
-    projectMetadata,
-  })
   return projectMetadata
     ? projectMetadata.mediaFiles.map(id => state.media.byId[id])
-    : // .filter(x => Boolean(x)) // why does this fix it
-      []
+    : []
 }
 
 export const getCurrentProjectMediaFiles = (

@@ -1,4 +1,6 @@
-export const createProject = (projectMetadata: ProjectMetadata): Action => ({
+export const createProject = (
+  projectMetadata: ProjectMetadata
+): CreateProject => ({
   type: A.CREATE_PROJECT,
   projectMetadata,
 })

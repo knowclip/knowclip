@@ -34,7 +34,7 @@ export const getProjectIdByFilePath = (
 export const getProjectMetadata = (
   state: AppState,
   id: ProjectId
-): ProjectMetadata | null => state.projects.byId[id]
+): ProjectMetadata | null => state.projects.byId[id] || null
 
 export const getCurrentProjectId = (state: AppState): ProjectId | null =>
   state.user.currentProjectId

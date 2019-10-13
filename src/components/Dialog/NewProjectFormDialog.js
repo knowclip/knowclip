@@ -104,9 +104,9 @@ class NewProjectFormDialog extends Component {
       id: uuid(),
       filePath,
       name,
-      mediaFilePaths: [],
-      error: null,
       noteType: this.state.fieldValues.noteType,
+      mediaFiles: [],
+      error: null,
     })
     this.props.closeDialog()
   }
