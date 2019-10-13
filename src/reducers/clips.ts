@@ -305,7 +305,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
     case A.ADD_MEDIA_TO_PROJECT: {
       const idsByMediaFileId = { ...state.idsByMediaFileId }
-      action.mediaFilePaths.forEach(({ metadata }) => {
+      action.mediaFiles.forEach(({ metadata }) => {
         idsByMediaFileId[metadata.id] = []
       })
       return {

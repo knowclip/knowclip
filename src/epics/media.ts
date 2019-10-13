@@ -192,6 +192,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
                 extname(filePath) === '.mp3' ? null : filePath,
               error: null,
               metadata: convertMediaMetadata(ffprobeMetadata, filePath, uuid()),
+              subtitles: [],
             }
           })
         )
@@ -208,8 +209,8 @@ const addMediaToProject: AppEpic = (action$, state$) =>
 const openMediaOnAdd: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddMediaToProject>(A.ADD_MEDIA_TO_PROJECT),
-    map(({ mediaFilePaths }) => {
-      const [{ metadata }] = mediaFilePaths
+    map(({ mediaFiles }) => {
+      const [{ metadata }] = mediaFiles
       return r.openMediaFileRequest(metadata.id)
     })
   )
@@ -234,6 +235,8 @@ const getDifferenceMessage = (
       ', '
     )}.`
   }
+
+  // TODO: streams/subtitles tracks
 }
 
 const locateMediaFile: AppEpic = (action$, state$) =>
@@ -249,18 +252,7 @@ const locateMediaFile: AppEpic = (action$, state$) =>
             id
           )
 
-          const currentProjectId = r.getCurrentProjectId(state$.value)
-          if (!currentProjectId)
-            return r.openMediaFileFailure(
-              'Could not open media--no project open'
-            )
-
-          const success = r.locateMediaFileSuccess(
-            id,
-            newMetadata,
-            currentProjectId,
-            filePath
-          )
+          const success = r.locateMediaFileSuccess(id, newMetadata, filePath)
 
           const existingMetadata = r.getCurrentMediaMetadata(state$.value)
           if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {

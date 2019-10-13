@@ -3,12 +3,14 @@ import { createEpicMiddleware } from 'redux-observable'
 import reducer from './reducers'
 import epic from './epics'
 import { getPersistedState } from './utils/statePersistence'
-import { initialState as initialMediaState } from './reducers/audio'
+import { initialState as initialSettingsState } from './reducers/settings'
 import epicsDependencies from './epicsDependencies'
 
 const composeEnhancers =
   process.env.NODE_ENV === 'development'
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? ((window as unknown) as {
+        __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
+      }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     : compose
 
 export default function getStore() {
@@ -19,14 +21,14 @@ export default function getStore() {
   const persistedState = getPersistedState()
   console.log('persisted state', persistedState)
 
-  const { audio: persistedAudio } = persistedState
-  const state = {
+  const { settings: persistedSettings } = persistedState
+  const state: Partial<AppState> = {
     ...persistedState,
-    audio: {
-      ...initialMediaState,
-      ...(persistedAudio
+    settings: {
+      ...initialSettingsState,
+      ...(persistedSettings
         ? {
-            mediaFolderLocation: persistedAudio.mediaFolderLocation,
+            mediaFolderLocation: persistedSettings.mediaFolderLocation,
           }
         : null),
     },
@@ -38,10 +40,12 @@ export default function getStore() {
     composeEnhancers(applyMiddleware(epicMiddleware))
   )
 
-  epicMiddleware.run(epic)
+  epicMiddleware.run(epic as any)
 
   // should this go before running epic middleware?
+  // @ts-ignore
   if (module.hot) {
+    // @ts-ignore
     module.hot.accept('./reducers', () => {
       store.replaceReducer(reducer)
     })

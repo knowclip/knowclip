@@ -1,6 +1,7 @@
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 import { getClips } from '.'
+import { getMediaFiles } from './audio'
 
 export const getProject = (
   state: AppState,
@@ -11,13 +12,9 @@ export const getProject = (
   name: projectMetadata.name,
   id: projectMetadata.id,
   noteType: projectMetadata.noteType,
-
-  mediaFilesMetadata: projectMetadata.mediaFilePaths.map(
-    ({ metadata }) => metadata
-  ),
-
+  mediaFilesMetadata: getProjectMediaMetadata(state, projectMetadata.id),
   tags: [...getAllTags(state.clips.byId)],
-  clips: projectMetadata.mediaFilePaths.reduce(
+  clips: getMediaFiles(state, projectMetadata.id).reduce(
     (clips, { metadata: { id } }) => [...clips, ...getClips(state, id)],
     [] as Clip[]
   ),
@@ -50,38 +47,19 @@ export const getCurrentProject = (state: AppState): ProjectMetadata | null => {
 export const getMediaMetadataFromCurrentProject = (
   state: AppState,
   id: MediaFileId
-): MediaFileMetadata | null => {
-  const currentProject = getCurrentProject(state)
-  if (!currentProject) return null
-  const fileMetadata = currentProject.mediaFilePaths.find(
-    mediaMetadata => mediaMetadata.metadata.id === id
-  )
-  return fileMetadata ? fileMetadata.metadata : null
-}
+): MediaFileMetadata | null => state.audio.byId[id].metadata || null
 
 export const getMediaFilePathFromCurrentProject = (
   state: AppState,
   id: MediaFileId
-): MediaFilePath | null => {
-  const currentProject = getCurrentProject(state)
-  if (!currentProject) return null
-  const fileMetadata = currentProject.mediaFilePaths.find(
-    mediaMetadata => mediaMetadata.metadata.id === id
-  )
-  return fileMetadata ? fileMetadata.filePath : null
-}
+): MediaFilePath | null =>
+  state.audio.byId[id] ? state.audio.byId[id].filePath : null
 
 export const getMediaFileConstantBitratePathFromCurrentProject = (
   state: AppState,
   id: MediaFileId
-): MediaFilePath | null => {
-  const currentProject = getCurrentProject(state)
-  if (!currentProject) return null
-  const fileMetadata = currentProject.mediaFilePaths.find(
-    mediaMetadata => mediaMetadata.metadata.id === id
-  )
-  return fileMetadata ? fileMetadata.constantBitrateFilePath : null
-}
+): MediaFilePath | null =>
+  state.audio.byId[id] ? state.audio.byId[id].constantBitrateFilePath : null
 
 export const getCurrentMediaFileConstantBitratePath = (
   state: AppState
@@ -103,10 +81,8 @@ export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
 export const getProjectMediaMetadata = (
   state: AppState,
   projectId: ProjectId
-): Array<MediaFileMetadata> => {
-  const project = getProjectMetadata(state, projectId)
-  return project ? project.mediaFilePaths.map(({ metadata }) => metadata) : []
-}
+): Array<MediaFileMetadata> =>
+  getMediaFiles(state, projectId).map(({ metadata }) => metadata)
 
 export const getCurrentMediaMetadata = (
   state: AppState

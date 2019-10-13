@@ -20,4 +20,6 @@ declare type UserState = {
   currentProjectId: ProjectId | null
   currentMediaFileId: MediaFileId | null
   workIsUnsaved: boolean
+  loopMedia: boolean
+  mediaIsLoading: boolean
 }

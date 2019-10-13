@@ -4,7 +4,7 @@ import { ofType, combineEpics, StateObservable } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
-import parseProject, { getMediaFilePaths } from '../utils/parseProject'
+import parseProject, { buildMediaFiles } from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
 
@@ -25,11 +25,11 @@ const openProject = async (
         )
       )
     let originalProjectJson = JSON.parse(projectJson)
-    const mediaFilePaths = getMediaFilePaths(
+    const mediaFiles = buildMediaFiles(
       originalProjectJson,
       project,
       filePath,
-      r.getMediaFilePaths(state$.value, project.id)
+      r.getMediaFiles(state$.value, project.id)
     )
     const projectMetadata = r.getProjectMetadata(state$.value, project.id)
     return from([
@@ -37,7 +37,7 @@ const openProject = async (
         id: project.id,
         filePath: filePath,
         name: project.name,
-        mediaFilePaths,
+        mediaFiles: mediaFiles.map(({ metadata }) => metadata.id),
         error: null,
         noteType: project.noteType,
       }),
@@ -181,16 +181,12 @@ const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProject>(A.OPEN_PROJECT),
     flatMap(({ projectMetadata }) => {
-      if (!projectMetadata.mediaFilePaths.length)
+      if (!projectMetadata.mediaFiles.length)
         return of(({
           type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
         } as unknown) as Action)
 
-      const [
-        {
-          metadata: { id: firstMediaFileId },
-        },
-      ] = projectMetadata.mediaFilePaths
+      const [firstMediaFileId] = projectMetadata.mediaFiles
 
       const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
         (a, b) => a.concat(b),

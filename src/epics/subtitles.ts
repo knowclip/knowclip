@@ -128,6 +128,7 @@ export const getSubtitlesFromFile = async (
 
 const newEmbeddedSubtitlesTrack = (
   id: string,
+  mediaFileId: MediaFileId,
   chunks: Array<SubtitlesChunk>,
   streamIndex: number,
   tmpFilePath: string
@@ -136,12 +137,14 @@ const newEmbeddedSubtitlesTrack = (
   id,
   mode: 'showing',
   chunks,
+  mediaFileId,
   streamIndex,
   tmpFilePath,
 })
 
 export const newExternalSubtitlesTrack = (
   id: string,
+  mediaFileId: MediaFileId,
   chunks: Array<SubtitlesChunk>,
   filePath: string,
   vttFilePath: string
@@ -149,6 +152,7 @@ export const newExternalSubtitlesTrack = (
   mode: 'showing',
   type: 'ExternalSubtitlesTrack',
   id,
+  mediaFileId,
   chunks,
   filePath,
   vttFilePath,
@@ -160,7 +164,7 @@ export const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
     filter(({ subtitlesTracksStreamIndexes }) =>
       Boolean(subtitlesTracksStreamIndexes.length)
     ),
-    flatMap(async ({ subtitlesTracksStreamIndexes, filePath }) => {
+    flatMap(async ({ subtitlesTracksStreamIndexes, filePath, metadata }) => {
       try {
         const subtitles = await Promise.all(
           subtitlesTracksStreamIndexes.map(async streamIndex => {
@@ -171,13 +175,14 @@ export const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
             )
             return newEmbeddedSubtitlesTrack(
               uuid(),
+              metadata.id,
               chunks,
               streamIndex,
               tmpFilePath
             )
           })
         )
-        return r.loadEmbeddedSubtitlesSuccess(subtitles)
+        return r.loadEmbeddedSubtitlesSuccess(subtitles, metadata.id)
       } catch (err) {
         console.error(err)
         return r.loadSubtitlesFailure(err.message || err.toString())
@@ -204,10 +209,20 @@ export const loadSubtitlesFile: AppEpic = (action$, state$) =>
           filePath,
           state$.value
         )
-
-        return await r.loadExternalSubtitlesSuccess([
-          newExternalSubtitlesTrack(uuid(), chunks, filePath, vttFilePath),
-        ])
+        const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
+        if (!currentMediaMetadata) throw new Error('No media loaded')
+        return await r.loadExternalSubtitlesSuccess(
+          [
+            newExternalSubtitlesTrack(
+              uuid(),
+              currentMediaMetadata.id,
+              chunks,
+              filePath,
+              vttFilePath
+            ),
+          ],
+          currentMediaMetadata.id
+        )
       } catch (err) {
         console.error(err.message)
         return await r.loadSubtitlesFailure(err.message || err.toString())

@@ -52,11 +52,11 @@ export const addMediaToProjectRequest = (
 
 export const addMediaToProject = (
   projectId: ProjectId,
-  mediaFilePaths: Array<AudioMetadataAndPath>
-): Action => ({
+  mediaFiles: Array<MediaFile>
+): AddMediaToProject => ({
   type: A.ADD_MEDIA_TO_PROJECT,
   projectId,
-  mediaFilePaths,
+  mediaFiles,
 })
 
 export const deleteMediaFromProjectRequest = (
@@ -117,14 +117,11 @@ export const locateMediaFileRequest = (
 export const locateMediaFileSuccess = (
   id: MediaFileId,
   metadata: MediaFileMetadata,
-  // kind of unnecessary... maybe should change state shape
-  projectId: ProjectId,
   filePath: MediaFilePath
 ): Action => ({
   type: A.LOCATE_MEDIA_FILE_SUCCESS,
   id,
   metadata,
-  projectId,
   filePath,
 })
 

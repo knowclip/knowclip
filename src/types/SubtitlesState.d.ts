@@ -1,5 +1,4 @@
 declare type SubtitlesState = {
-  loadedTracks: Array<SubtitlesTrack>
   mediaFileTracksStreamIndexes: Array<number>
   flashcardFieldLinks: SubtitlesFlashcardFieldsLinks
 }
@@ -15,6 +14,7 @@ declare type EmbeddedSubtitlesTrack = {
   id: SubtitlesTrackId
   mode: TextTrackMode
   chunks: Array<SubtitlesChunk>
+  mediaFileId: MediaFileId
   streamIndex: number
   tmpFilePath: string
 }
@@ -24,6 +24,7 @@ declare type ExternalSubtitlesTrack = {
   id: SubtitlesTrackId
   mode: TextTrackMode
   chunks: Array<SubtitlesChunk>
+  mediaFileId: MediaFileId
   filePath: SubtitlesFilePath
   vttFilePath: string
 }

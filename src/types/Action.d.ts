@@ -253,7 +253,7 @@ declare type AddMediaToProjectRequest = {
 declare type AddMediaToProject = {
   type: 'ADD_MEDIA_TO_PROJECT'
   projectId: ProjectId
-  mediaFilePaths: Array<AudioMetadataAndPath>
+  mediaFiles: Array<MediaFile>
 }
 declare type DeleteMediaFromProjectRequest = {
   type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST'
@@ -273,7 +273,7 @@ declare type LocateMediaFileRequest = {
 }
 declare type LocateMediaFileSuccess = {
   type: 'LOCATE_MEDIA_FILE_SUCCESS'
-  projectId: ProjectId
+  // projectId: ProjectId
   id: MediaFileId
   metadata: MediaFileMetadata
   filePath: MediaFilePath
@@ -309,18 +309,22 @@ declare type SubtitlesAction =
   | GoToSubtitlesChunk
 declare type LoadSubtitlesFromVideoRequest = {
   type: 'LOAD_SUBTITLES_FROM_VIDEO_REQUEST'
+  mediaFileId: MediaFileId
   streamIndex: number
 }
 declare type LoadSubtitlesFromFileRequest = {
   type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST'
+  mediaFileId: MediaFileId
   filePath: SubtitlesFilePath
 }
 declare type LoadExternalSubtitlesSuccess = {
   type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS'
+  mediaFileId: MediaFileId
   subtitlesTracks: Array<ExternalSubtitlesTrack>
 }
 declare type LoadEmbeddedSubtitlesSuccess = {
   type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS'
+  mediaFileId: MediaFileId
   subtitlesTracks: Array<EmbeddedSubtitlesTrack>
 }
 declare type LoadSubtitlesFailure = {
@@ -329,10 +333,19 @@ declare type LoadSubtitlesFailure = {
 }
 declare type DeleteSubtitlesTrack = {
   type: 'DELETE_SUBTITLES_TRACK'
+  mediaFileId: MediaFileId
   id: SubtitlesTrackId
 }
-declare type ShowSubtitles = { type: 'SHOW_SUBTITLES'; id: SubtitlesTrackId }
-declare type HideSubtitles = { type: 'HIDE_SUBTITLES'; id: SubtitlesTrackId }
+declare type ShowSubtitles = {
+  type: 'SHOW_SUBTITLES'
+  mediaFileId: MediaFileId
+  id: SubtitlesTrackId
+}
+declare type HideSubtitles = {
+  type: 'HIDE_SUBTITLES'
+  mediaFileId: MediaFileId
+  id: SubtitlesTrackId
+}
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId

@@ -5,7 +5,7 @@ import {
   getCurrentProject,
 } from './project'
 
-export const isLoopOn = (state: AppState) => state.audio.loop
+export const isLoopOn = (state: AppState) => state.user.loopMedia
 
 export const getCurrentFileName = (state: AppState): MediaFileName | null => {
   const filePath = getCurrentFilePath(state)
@@ -49,10 +49,21 @@ export const getCurrentNoteType = (state: AppState): NoteType | null => {
   return currentProject ? currentProject.noteType : null
 }
 
-export const getMediaFilePaths = (
+export const getMediaFiles = (
   state: AppState,
   projectId: ProjectId
-): Array<AudioMetadataAndPath> => {
+): Array<MediaFile> => {
   const projectMetadata = getProjectMetadata(state, projectId)
-  return projectMetadata ? projectMetadata.mediaFilePaths : []
+  return projectMetadata
+    ? projectMetadata.mediaFiles.map(id => state.audio.byId[id])
+    : []
+}
+
+export const getCurrentProjectMediaFiles = (
+  state: AppState
+): Array<MediaFile> => {
+  const projectMetadata = getCurrentProject(state)
+  return projectMetadata
+    ? projectMetadata.mediaFiles.map(id => state.audio.byId[id])
+    : []
 }

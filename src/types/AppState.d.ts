@@ -3,6 +3,7 @@ declare type AppState = {
   clips: ClipsState
   audio: MediaState
   user: UserState
+  settings: SettingsState
   snackbar: SnackbarState
   dialog: DialogState
   projects: ProjectsState

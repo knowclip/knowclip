@@ -1,49 +1,131 @@
 import { Reducer } from 'redux'
 
-export const initialState = {
-  loop: true,
-  isLoading: false,
-  mediaFolderLocation: null,
+export const initialState: MediaState = {
+  byId: {},
 }
+
+const editTrack: <T extends SubtitlesTrack>(
+  track: T,
+  overrides: Partial<T>
+) => T = (track, overrides) => ({
+  ...track,
+  ...overrides,
+})
 
 const audio: Reducer<MediaState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case A.TOGGLE_LOOP:
+    case A.CLOSE_PROJECT:
+      return {
+        ...initialState,
+        byId: initialState.byId,
+      }
+    case A.ADD_MEDIA_TO_PROJECT:
       return {
         ...state,
-        loop: !state.loop,
+        byId: {
+          ...state.byId,
+          ...action.mediaFiles.reduce(
+            (map, file) => {
+              map[file.metadata.id] = file
+              return map
+            },
+            {} as Record<MediaFileId, MediaFile>
+          ),
+        },
       }
 
-    case A.SET_LOOP:
+    case A.DELETE_MEDIA_FROM_PROJECT: {
+      const newById = { ...state.byId }
+      delete newById[action.mediaFileId]
       return {
         ...state,
-        loop: action.loop,
+        byId: newById,
       }
-
-    case A.CLOSE_PROJECT: // maybe better as action for closed media specifically
+    }
+    case A.LOCATE_MEDIA_FILE_SUCCESS:
       return {
         ...state,
-        loop: true,
-        isLoading: false,
+        byId: {
+          ...state.byId,
+          [action.metadata.id]: {
+            ...state.byId[action.metadata.id],
+            filePath: action.filePath,
+            metadata: action.metadata,
+          },
+        },
       }
 
-    case A.OPEN_MEDIA_FILE_REQUEST:
-      return {
-        ...state,
-        isLoading: true,
-      }
-
-    case A.OPEN_MEDIA_FILE_FAILURE:
     case A.OPEN_MEDIA_FILE_SUCCESS:
       return {
         ...state,
-        isLoading: false,
+        byId: {
+          ...state.byId,
+          [action.metadata.id]: {
+            ...state.byId[action.metadata.id],
+            filePath: action.filePath,
+            metadata: action.metadata,
+            constantBitrateFilePath: action.constantBitrateFilePath,
+          },
+        },
       }
 
-    case A.SET_MEDIA_FOLDER_LOCATION:
+    case A.LOAD_EMBEDDED_SUBTITLES_SUCCESS:
+    case A.LOAD_EXTERNAL_SUBTITLES_SUCCESS:
       return {
         ...state,
-        mediaFolderLocation: action.directoryPath,
+        byId: {
+          ...state.byId,
+          [action.mediaFileId]: {
+            ...state.byId[action.mediaFileId],
+            subtitles: [
+              ...state.byId[action.mediaFileId].subtitles,
+              ...action.subtitlesTracks,
+            ],
+          },
+        },
+      }
+    case A.SHOW_SUBTITLES: {
+      const { id, mediaFileId } = action
+      return {
+        ...state,
+        byId: {
+          [mediaFileId]: {
+            ...state.byId[mediaFileId],
+            subtitles: state.byId[mediaFileId].subtitles.map(track =>
+              track.id === id ? editTrack(track, { mode: 'showing' }) : track
+            ),
+          },
+        },
+      }
+    }
+
+    case A.HIDE_SUBTITLES: {
+      const { id, mediaFileId } = action
+      return {
+        ...state,
+        byId: {
+          [mediaFileId]: {
+            ...state.byId[mediaFileId],
+            subtitles: state.byId[mediaFileId].subtitles.map(track =>
+              track.id === id ? editTrack(track, { mode: 'hidden' }) : track
+            ),
+          },
+        },
+      }
+    }
+
+    case A.DELETE_SUBTITLES_TRACK:
+      return {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.mediaFileId]: {
+            ...state.byId[action.mediaFileId],
+            subtitles: state.byId[action.mediaFileId].subtitles.filter(
+              ({ id }) => id !== action.id
+            ),
+          },
+        },
       }
 
     default:

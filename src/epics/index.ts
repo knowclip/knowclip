@@ -1,5 +1,5 @@
-import { map, ignoreElements, flatMap } from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
+import { ignoreElements, flatMap } from 'rxjs/operators'
+import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'
 import * as r from '../redux'
@@ -18,39 +18,8 @@ import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
 import subtitles from './subtitles'
+import defaultTags from './defaultTags'
 import { AppEpic } from '../types/AppEpic'
-
-const defaultTagsEpic: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, AddFlashcardTag | DeleteFlashcardTag>(
-      A.ADD_FLASHCARD_TAG,
-      A.DELETE_FLASHCARD_TAG
-    ),
-    map(({ id }) => {
-      const clip = r.getClip(state$.value, id)
-      if (!clip) {
-        // should this happen or should we set empty default tags?
-        console.error('No clip found')
-        return r.simpleMessageSnackbar(
-          'Could not set default tags: no clip found'
-        )
-      }
-      return {
-        type: 'SET_DEFAULT_TAGS',
-        tags: clip.flashcard.tags,
-      } as SetDefaultTags
-    })
-  )
-
-// const defaultTagsAudioEpic: AppEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType(A.LOAD_MEDIA_SUCCESS),
-//     filter(({ file }) => file),
-//     map(({ id }) => ({
-//       type: 'SET_DEFAULT_TAGS',
-//       tags: [basename(r.getCurrentFileName(state$.value))],
-//     }))
-//   )
 
 const closeEpic: AppEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', async () => {
@@ -90,7 +59,7 @@ const rootEpic: AppEpic = combineEpics(
   exportMarkdown,
   deleteAllCurrentFileClips,
   project,
-  defaultTagsEpic,
+  defaultTags,
   keyboard,
   highlightClip,
   closeEpic,

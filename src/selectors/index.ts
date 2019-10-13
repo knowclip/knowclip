@@ -208,10 +208,10 @@ export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
     .map(id => getClipTimes(state, id))
 
 export const isAudioLoading = (state: AppState): boolean =>
-  state.audio.isLoading
+  state.user.mediaIsLoading
 
 export const getMediaFolderLocation = (state: AppState): string | null =>
-  state.audio.mediaFolderLocation
+  state.settings.mediaFolderLocation
 
 export const getAllTags = (state: AppState): Array<string> => {
   const tags = Object.keys(state.user.tagsToClipIds)

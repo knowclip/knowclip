@@ -8,8 +8,9 @@ import snackbar from './snackbar'
 import dialog from './dialog'
 import projects from './projects'
 import subtitles from './subtitles'
+import settings from './settings'
 
-export default combineReducers({
+export default combineReducers<AppState>({
   audio,
   waveform,
   clips,
@@ -18,4 +19,5 @@ export default combineReducers({
   dialog,
   projects,
   subtitles,
+  settings,
 })

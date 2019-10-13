@@ -10,6 +10,8 @@ const initialState: UserState = {
   currentProjectId: null,
   workIsUnsaved: false,
   tagsToClipIds: {},
+  mediaIsLoading: false,
+  loopMedia: true,
 }
 
 const user: Reducer<UserState> = (state = initialState, action) => {
@@ -45,6 +47,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       return {
         ...state,
         currentMediaFileId: action.id,
+        mediaIsLoading: true,
       }
 
     case A.ADD_CLIP:
@@ -151,6 +154,25 @@ const user: Reducer<UserState> = (state = initialState, action) => {
       return {
         ...state,
         workIsUnsaved: action.workIsUnsaved,
+      }
+
+    case A.TOGGLE_LOOP:
+      return {
+        ...state,
+        loopMedia: !state.loopMedia,
+      }
+
+    case A.SET_LOOP:
+      return {
+        ...state,
+        loopMedia: action.loopMedia,
+      }
+
+    case A.OPEN_MEDIA_FILE_FAILURE:
+    case A.OPEN_MEDIA_FILE_SUCCESS:
+      return {
+        ...state,
+        mediaIsLoading: false,
       }
 
     default:

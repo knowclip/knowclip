@@ -7,9 +7,11 @@ export const getPersistedState = (): Partial<AppState> => {
       : null
     if (projects) persistedState.projects = projects
 
-    const audioText = window.localStorage.getItem('audio')
-    const audio = audioText ? (JSON.parse(audioText) as MediaState) : null
-    if (audio) persistedState.audio = audio
+    const settingsText = window.localStorage.getItem('settings')
+    const settings = settingsText
+      ? (JSON.parse(settingsText) as SettingsState)
+      : null
+    if (settings) persistedState.settings = settings
   } catch (err) {
     console.error(err)
   }

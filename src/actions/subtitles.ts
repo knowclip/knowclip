@@ -14,17 +14,21 @@ export const loadSubtitlesFromFileRequest = (filePath: string) => ({
 })
 
 export const loadEmbeddedSubtitlesSuccess = (
-  subtitlesTracks: Array<EmbeddedSubtitlesTrack>
+  subtitlesTracks: Array<EmbeddedSubtitlesTrack>,
+  mediaFileId: MediaFileId
 ): LoadEmbeddedSubtitlesSuccess => ({
   type: A.LOAD_EMBEDDED_SUBTITLES_SUCCESS,
   subtitlesTracks,
+  mediaFileId,
 })
 
 export const loadExternalSubtitlesSuccess = (
-  subtitlesTracks: Array<ExternalSubtitlesTrack>
+  subtitlesTracks: Array<ExternalSubtitlesTrack>,
+  mediaFileId: MediaFileId
 ): LoadExternalSubtitlesSuccess => ({
   type: A.LOAD_EXTERNAL_SUBTITLES_SUCCESS,
   subtitlesTracks,
+  mediaFileId,
 })
 
 export const loadSubtitlesFailure = (error: string): LoadSubtitlesFailure => ({

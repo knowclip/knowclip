@@ -4,35 +4,32 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
+import { getCurrentMediaMetadata } from './project'
 
-export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
-  state.subtitles.loadedTracks
+export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> => {
+  const currentMediaMetadata = getCurrentMediaMetadata(state)
+  return currentMediaMetadata
+    ? state.audio.byId[currentMediaMetadata.id].subtitles
+    : []
+}
 
 export const getSubtitlesTrack = (
   state: AppState,
   id: SubtitlesTrackId
 ): SubtitlesTrack | null =>
-  state.subtitles.loadedTracks.find(track => track.id === id) || null
+  getSubtitlesTracks(state).find(track => track.id === id) || null
 
+const isEmbedded = (track: SubtitlesTrack): track is EmbeddedSubtitlesTrack =>
+  track.type === 'EmbeddedSubtitlesTrack'
+const isExternal = (track: SubtitlesTrack): track is ExternalSubtitlesTrack =>
+  track.type === 'ExternalSubtitlesTrack'
 export const getEmbeddedSubtitlesTracks = (
   state: AppState
-): Array<EmbeddedSubtitlesTrack> => {
-  const result: Array<EmbeddedSubtitlesTrack> = []
-  state.subtitles.loadedTracks.forEach(track => {
-    if (track.type === 'EmbeddedSubtitlesTrack') result.push(track)
-  })
-  return result
-}
+): Array<EmbeddedSubtitlesTrack> => getSubtitlesTracks(state).filter(isEmbedded)
 
 export const getExternalSubtitlesTracks = (
   state: AppState
-): Array<ExternalSubtitlesTrack> => {
-  const result: Array<ExternalSubtitlesTrack> = []
-  state.subtitles.loadedTracks.forEach(track => {
-    if (track.type === 'ExternalSubtitlesTrack') result.push(track)
-  })
-  return result
-}
+): Array<ExternalSubtitlesTrack> => getSubtitlesTracks(state).filter(isExternal)
 
 export const readVttChunk = (
   state: AppState,

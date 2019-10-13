@@ -19,7 +19,7 @@ const store = getStore()
 
 registerServiceWorker()
 
-const render = Component =>
+const render = (Component: typeof React.Component.constructor) =>
   ReactDOM.render(
     <AppContainer>
       <Provider store={store}>
@@ -31,7 +31,9 @@ const render = Component =>
 
 render(App)
 
+// @ts-ignore
 if (module.hot) {
+  // @ts-ignore
   module.hot.accept('./App', () => {
     const NextApp = require('./App').default
     render(NextApp)

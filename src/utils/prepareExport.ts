@@ -54,7 +54,7 @@ export const getApkgExportData = (
   clipIds: Array<ClipId>
 ): ApkgExportData => {
   const fieldNames = getNoteTypeFields(projectMetadata.noteType)
-  const mediaFilePaths = r.getMediaFilePaths(state, projectMetadata.id)
+  const mediaFilePaths = r.getMediaFiles(state, projectMetadata.id)
 
   // sort and validate
   clipIds.sort((id, id2) => {
