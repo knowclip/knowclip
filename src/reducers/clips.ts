@@ -316,7 +316,6 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
     case A.DELETE_MEDIA_FROM_PROJECT: {
       const clipIds = state.idsByMediaFileId[action.mediaFileId] || []
-      console.log('mediaFileId', action.mediaFileId)
 
       const byId = { ...state.byId }
       clipIds.forEach(id => {

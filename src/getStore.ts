@@ -4,6 +4,7 @@ import reducer from './reducers'
 import epic from './epics'
 import { getPersistedState } from './utils/statePersistence'
 import { initialState as initialSettingsState } from './reducers/settings'
+import { initialState as initialMediaState } from './reducers/media'
 import epicsDependencies from './epicsDependencies'
 
 const composeEnhancers =
@@ -21,16 +22,16 @@ export default function getStore() {
   const persistedState = getPersistedState()
   console.log('persisted state', persistedState)
 
-  const { settings: persistedSettings } = persistedState
+  const { settings: persistedSettings, media: persistedMedia } = persistedState
   const state: Partial<AppState> = {
     ...persistedState,
+    media: {
+      ...initialMediaState,
+      ...persistedMedia,
+    },
     settings: {
       ...initialSettingsState,
-      ...(persistedSettings
-        ? {
-            mediaFolderLocation: persistedSettings.mediaFolderLocation,
-          }
-        : null),
+      ...persistedSettings,
     },
   }
 

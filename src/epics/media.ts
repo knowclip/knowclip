@@ -200,8 +200,8 @@ const getDifferenceMessage = (
   if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
     differences.push('format')
   if (
-    existingMetadata.subtitlesTracksStreamIndexes !==
-    newMetadata.subtitlesTracksStreamIndexes
+    existingMetadata.subtitlesTracksStreamIndexes.sort().toString() !==
+    newMetadata.subtitlesTracksStreamIndexes.sort().toString()
   )
     differences.push('subtitles tracks')
 

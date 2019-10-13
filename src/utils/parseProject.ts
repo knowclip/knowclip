@@ -167,7 +167,7 @@ export const buildMediaFiles = (
   originalProjectJson: Project,
   project: Project,
   projectFilePath: ProjectFilePath,
-  mediaFilePaths: MediaFile[]
+  mediaFiles: MediaFile[]
 ): MediaFile[] => {
   if (
     originalProjectJson &&
@@ -196,7 +196,7 @@ export const buildMediaFiles = (
     MediaFileMetadata_Pre_4 | MediaFileMetadata
   > = (project as Project4_0_0 | Project3_0_0 | Project2_0_0).mediaFilesMetadata
   return metadatas.map(metadata => {
-    const existingMetadataAndFilePath = mediaFilePaths.find(
+    const existingMediaFile = mediaFiles.find(
       ({ metadata: { id }, filePath }) => id === metadata.id
     )
     return {
@@ -204,12 +204,10 @@ export const buildMediaFiles = (
         ...metadata,
         subtitlesTracksStreamIndexes: [],
       },
-      constantBitrateFilePath: existingMetadataAndFilePath
-        ? existingMetadataAndFilePath.constantBitrateFilePath
+      constantBitrateFilePath: existingMediaFile
+        ? existingMediaFile.constantBitrateFilePath
         : null,
-      filePath: existingMetadataAndFilePath
-        ? existingMetadataAndFilePath.filePath
-        : null,
+      filePath: existingMediaFile ? existingMediaFile.filePath : null,
       error: null,
       subtitles: [],
       flashcardFieldsToSubtitlesTracks: {},

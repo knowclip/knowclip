@@ -51,6 +51,11 @@ declare type Project4_0_0 = {
   mediaFilesMetadata: Array<MediaFileMetadata>
   noteType: NoteType
   clips: Array<Clip>
-  tags: Array<string>
+  tags: Array<string> // maybe shouldnt be saved here
   timestamp: string
+}
+
+declare type ProjectExport = {
+  project: ProjectMetadata
+  clips: Array<Clip>
 }

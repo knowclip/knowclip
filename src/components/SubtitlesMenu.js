@@ -104,14 +104,10 @@ const SubtitlesMenu = ({
     </Fragment>
   )
 }
-export const getExternalSubtitlesTracks = state =>
-  state.subtitles.loadedTracks.filter(
-    track => track.type === 'ExternalSubtitlesTrack'
-  )
 
 const mapStateToProps = state => ({
   embeddedTracks: r.getEmbeddedSubtitlesTracks(state),
-  externalTracks: getExternalSubtitlesTracks(state),
+  externalTracks: r.getExternalSubtitlesTracks(state),
 })
 
 const mapDispatchToProps = {

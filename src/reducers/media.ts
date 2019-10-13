@@ -14,11 +14,37 @@ const editTrack: <T extends SubtitlesTrack>(
 
 const media: Reducer<MediaState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case A.CLOSE_PROJECT:
+    case A.OPEN_PROJECT:
       return {
-        ...initialState,
-        byId: initialState.byId,
+        ...state,
+        byId: {
+          ...state.byId,
+          ...Object.values(action.project.mediaFilesMetadata).reduce(
+            (all, metadata) => {
+              const existing: MediaFile | { [any: string]: any } =
+                state.byId[metadata.id] || {}
+
+              all[metadata.id] = {
+                filePath: existing.filePath || null,
+                constantBitrateFilePath:
+                  existing.constantBitrateFilePath || null,
+                subtitles: existing.subtitles || [],
+                flashcardFieldsToSubtitlesTracks:
+                  existing.flashcardFieldsToSubtitlesTracks || {},
+                error: existing.error || null,
+                metadata: existing.metadata || null,
+              }
+              return all
+            },
+            {} as Record<MediaFileId, MediaFile>
+          ),
+        },
       }
+    // case A.CLOSE_PROJECT:
+    //   return {
+    //     ...initialState,
+    //     byId: initialState.byId,
+    //   }
     case A.ADD_MEDIA_TO_PROJECT:
       return {
         ...state,

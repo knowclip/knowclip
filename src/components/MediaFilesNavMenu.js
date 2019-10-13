@@ -94,7 +94,6 @@ const MediaFilesNavMenu = ({
                 onClose={closeMenu}
               >
                 <MenuList style={{ maxHeight: '40em', overflowY: 'auto' }}>
-                  <MenuItem>boop</MenuItem>
                   {projectMediaMetadata.map(({ name, id }) => (
                     <MenuItem
                       dense

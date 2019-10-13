@@ -118,7 +118,6 @@ class NewProjectFormDialog extends Component {
     }))
 
   setFilePathText = text => {
-    console.log('boop!', text)
     this.setState(state => ({
       fieldValues: { ...state.fieldValues, filePath: text },
       errors: deleteKey(state.errors, 'filePath'),
@@ -135,7 +134,6 @@ class NewProjectFormDialog extends Component {
 
   showSaveDialog = async () => {
     const filePath = await showSaveDialog('AFCA Project File', ['afca'])
-    console.log('filePath', filePath)
     return filePath ? this.setFilePathText(filePath) : null
   }
 
