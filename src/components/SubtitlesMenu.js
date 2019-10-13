@@ -40,6 +40,7 @@ const SubtitlesMenu = ({
   hideSubtitles,
   loadSubtitlesFromFile,
   subtitlesClipsDialogRequest,
+  currentFileId,
 }) => {
   const menuAnchorEl = useRef(null)
   const [menuIsOpen, setMenuIsOpen] = useState(false)
@@ -72,8 +73,8 @@ const SubtitlesMenu = ({
             <ListItemSecondaryAction>
               <VisibilityButton
                 visible={track.mode === 'showing'}
-                showSubtitles={() => showSubtitles(track.id)}
-                hideSubtitles={() => hideSubtitles(track.id)}
+                showSubtitles={() => showSubtitles(track.id, currentFileId)}
+                hideSubtitles={() => hideSubtitles(track.id, currentFileId)}
               />
             </ListItemSecondaryAction>
           </MenuItem>
@@ -87,8 +88,8 @@ const SubtitlesMenu = ({
             <ListItemSecondaryAction>
               <VisibilityButton
                 visible={track.mode === 'showing'}
-                showSubtitles={() => showSubtitles(track.id)}
-                hideSubtitles={() => hideSubtitles(track.id)}
+                showSubtitles={() => showSubtitles(track.id, currentFileId)}
+                hideSubtitles={() => hideSubtitles(track.id, currentFileId)}
               />
             </ListItemSecondaryAction>
           </MenuItem>
@@ -108,6 +109,7 @@ const SubtitlesMenu = ({
 const mapStateToProps = state => ({
   embeddedTracks: r.getEmbeddedSubtitlesTracks(state),
   externalTracks: r.getExternalSubtitlesTracks(state),
+  currentFileId: r.getCurrentFileId(state),
 })
 
 const mapDispatchToProps = {

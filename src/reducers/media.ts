@@ -115,6 +115,7 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
       return {
         ...state,
         byId: {
+          ...state.byId,
           [mediaFileId]: {
             ...state.byId[mediaFileId],
             subtitles: state.byId[mediaFileId].subtitles.map(track =>
@@ -130,6 +131,7 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
       return {
         ...state,
         byId: {
+          ...state.byId,
           [mediaFileId]: {
             ...state.byId[mediaFileId],
             subtitles: state.byId[mediaFileId].subtitles.map(track =>
