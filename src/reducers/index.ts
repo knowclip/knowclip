@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import audio from './audio'
+import media from './media'
 import waveform from './waveform'
 import clips from './clips'
 import user from './user'
@@ -11,7 +11,7 @@ import subtitles from './subtitles'
 import settings from './settings'
 
 export default combineReducers<AppState>({
-  audio,
+  media,
   waveform,
   clips,
   user,

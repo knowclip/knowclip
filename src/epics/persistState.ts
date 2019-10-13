@@ -14,7 +14,7 @@ const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
     ),
     tap(() => {
       setLocalStorage('projects', JSON.stringify(state$.value.projects))
-      setLocalStorage('audio', JSON.stringify(state$.value.audio))
+      setLocalStorage('audio', JSON.stringify(state$.value.media))
     }),
     ignoreElements()
   )

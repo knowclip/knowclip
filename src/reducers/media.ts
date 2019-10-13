@@ -12,7 +12,7 @@ const editTrack: <T extends SubtitlesTrack>(
   ...overrides,
 })
 
-const audio: Reducer<MediaState, Action> = (state = initialState, action) => {
+const media: Reducer<MediaState, Action> = (state = initialState, action) => {
   switch (action.type) {
     case A.CLOSE_PROJECT:
       return {
@@ -133,4 +133,4 @@ const audio: Reducer<MediaState, Action> = (state = initialState, action) => {
   }
 }
 
-export default audio
+export default media

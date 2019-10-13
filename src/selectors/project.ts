@@ -1,7 +1,7 @@
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 import { getClips } from '.'
-import { getMediaFiles } from './audio'
+import { getMediaFiles } from './media'
 
 export const getProject = (
   state: AppState,
@@ -47,19 +47,19 @@ export const getCurrentProject = (state: AppState): ProjectMetadata | null => {
 export const getMediaMetadataFromCurrentProject = (
   state: AppState,
   id: MediaFileId
-): MediaFileMetadata | null => state.audio.byId[id].metadata || null
+): MediaFileMetadata | null => state.media.byId[id].metadata || null
 
 export const getMediaFilePathFromCurrentProject = (
   state: AppState,
   id: MediaFileId
 ): MediaFilePath | null =>
-  state.audio.byId[id] ? state.audio.byId[id].filePath : null
+  state.media.byId[id] ? state.media.byId[id].filePath : null
 
 export const getMediaFileConstantBitratePathFromCurrentProject = (
   state: AppState,
   id: MediaFileId
 ): MediaFilePath | null =>
-  state.audio.byId[id] ? state.audio.byId[id].constantBitrateFilePath : null
+  state.media.byId[id] ? state.media.byId[id].constantBitrateFilePath : null
 
 export const getCurrentMediaFileConstantBitratePath = (
   state: AppState

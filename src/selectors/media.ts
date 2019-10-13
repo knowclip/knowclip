@@ -55,7 +55,7 @@ export const getMediaFiles = (
 ): Array<MediaFile> => {
   const projectMetadata = getProjectMetadata(state, projectId)
   return projectMetadata
-    ? projectMetadata.mediaFiles.map(id => state.audio.byId[id])
+    ? projectMetadata.mediaFiles.map(id => state.media.byId[id])
     : []
 }
 
@@ -64,6 +64,6 @@ export const getCurrentProjectMediaFiles = (
 ): Array<MediaFile> => {
   const projectMetadata = getCurrentProject(state)
   return projectMetadata
-    ? projectMetadata.mediaFiles.map(id => state.audio.byId[id])
+    ? projectMetadata.mediaFiles.map(id => state.media.byId[id])
     : []
 }

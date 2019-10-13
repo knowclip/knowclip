@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { getSecondsAtX } from './waveformTime'
-import * as audioSelectors from './audio'
+import * as mediaSelectors from './media'
 import formatTime from '../utils/formatTime'
 
 export const WAVEFORM_HEIGHT = 50
@@ -9,7 +9,7 @@ export const CLIP_THRESHOLD = 40
 
 export * from './waveformTime'
 export * from './clips'
-export * from './audio'
+export * from './media'
 export * from './snackbar'
 export * from './dialog'
 export * from './project'
@@ -49,7 +49,7 @@ export const getAllProjectClipsIds: ((
 export const getCurrentFileClips: ((
   state: AppState
 ) => Array<Clip>) = createSelector(
-  audioSelectors.getCurrentFileClipsOrder,
+  mediaSelectors.getCurrentFileClipsOrder,
   getClipsObject,
   getClipsByIds
 )
@@ -126,7 +126,7 @@ export const getSelectedClipTime = (state: AppState): TimeSpan | null => {
 }
 
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
-  audioSelectors.getCurrentFileClipsOrder(state).map(id => {
+  mediaSelectors.getCurrentFileClipsOrder(state).map(id => {
     const flashcard = getFlashcard(state, id)
     if (!flashcard) throw new Error('flashcard not found ' + id)
     return flashcard
@@ -135,7 +135,7 @@ export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
 export const getPendingClip = (state: AppState): PendingClip | null =>
   state.user.pendingClip
 export const getClipIdAt = (state: AppState, x: number): ClipId | null =>
-  audioSelectors.getCurrentFileClipsOrder(state).find(clipId => {
+  mediaSelectors.getCurrentFileClipsOrder(state).find(clipId => {
     const clip = state.clips.byId[clipId]
     const { start, end } = clip
     return x >= start && x <= end
@@ -145,11 +145,11 @@ export const getPreviousClipId = (
   state: AppState,
   id: ClipId
 ): ClipId | null => {
-  const clipsOrder = audioSelectors.getCurrentFileClipsOrder(state)
+  const clipsOrder = mediaSelectors.getCurrentFileClipsOrder(state)
   return clipsOrder[clipsOrder.indexOf(id) - 1]
 }
 export const getNextClipId = (state: AppState, id: ClipId): ClipId | null => {
-  const clipsOrder = audioSelectors.getCurrentFileClipsOrder(state)
+  const clipsOrder = mediaSelectors.getCurrentFileClipsOrder(state)
   return clipsOrder[clipsOrder.indexOf(id) + 1]
 }
 
@@ -203,7 +203,7 @@ export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
 }
 
 export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
-  audioSelectors
+  mediaSelectors
     .getCurrentFileClipsOrder(state)
     .map(id => getClipTimes(state, id))
 

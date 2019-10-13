@@ -9,7 +9,7 @@ import { getCurrentMediaMetadata } from './project'
 export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> => {
   const currentMediaMetadata = getCurrentMediaMetadata(state)
   return currentMediaMetadata
-    ? state.audio.byId[currentMediaMetadata.id].subtitles
+    ? state.media.byId[currentMediaMetadata.id].subtitles
     : []
 }
 
