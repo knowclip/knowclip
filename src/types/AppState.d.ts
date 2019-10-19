@@ -8,4 +8,6 @@ declare type AppState = {
   dialog: DialogState
   projects: ProjectsState
   subtitles: SubtitlesState
+  loadedFiles: LoadedFilesState
+  fileRecords: FileRecordsState
 }

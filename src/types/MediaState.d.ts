@@ -9,6 +9,7 @@ declare type MediaState = {
 declare type MediaFile = {
   metadata: MediaFileMetadata
   filePath: MediaFilePath | null
+  constantBitrateFilePath: MediaFilePath | null // TODO: delete field, use loadedFiles
   error: string | null // maybe move to user state
   subtitles: Array<SubtitlesTrack>
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks

@@ -2,7 +2,7 @@ declare type ProjectFilePath = string
 
 declare type ProjectMetadata = {
   id: ProjectId
-  // filePath: ProjectFilePath
+  filePath: ProjectFilePath // TODO: delete field, use loadedFiles
   name: string
   noteType: NoteType
   mediaFiles: Array<MediaFileId>

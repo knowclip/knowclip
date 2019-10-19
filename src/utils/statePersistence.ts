@@ -16,6 +16,28 @@ export const getPersistedState = (): Partial<AppState> => {
       ? (JSON.parse(settingsText) as SettingsState)
       : null
     if (settings) persistedState.settings = settings
+
+    const fileRecordsText = window.localStorage.getItem('fileRecords')
+    const fileRecords = fileRecordsText
+      ? (JSON.parse(fileRecordsText) as FileRecordsState)
+      : null
+    if (fileRecords) persistedState.fileRecords = fileRecords
+
+    const loadedFilesText = window.localStorage.getItem('loadedFiles')
+    const loadedFiles = loadedFilesText
+      ? (JSON.parse(loadedFilesText) as LoadedFilesState)
+      : null
+    if (loadedFiles)
+      persistedState.loadedFiles = Object.entries(loadedFiles).reduce(
+        (all, [id, loadedFile]) => {
+          all[id] = {
+            ...loadedFile,
+            loaded: false,
+          }
+          return all
+        },
+        {} as LoadedFilesState
+      )
   } catch (err) {
     console.error(err)
   }

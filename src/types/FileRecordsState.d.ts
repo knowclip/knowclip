@@ -1,4 +1,4 @@
-declare type FilesMetadataState = {
+declare type FileRecordsState = {
   byId: Record<FileId, FileRecord>
   idsByBaseFileId: Record<BaseFileId, Array<FileId>>
 }

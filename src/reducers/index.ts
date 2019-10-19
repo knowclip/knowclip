@@ -9,6 +9,8 @@ import dialog from './dialog'
 import projects from './projects'
 import subtitles from './subtitles'
 import settings from './settings'
+import loadedFiles from './loadedFiles'
+import fileRecords from './fileRecords'
 
 export default combineReducers<AppState>({
   media,
@@ -20,4 +22,6 @@ export default combineReducers<AppState>({
   projects,
   subtitles,
   settings,
+  loadedFiles,
+  fileRecords,
 })
