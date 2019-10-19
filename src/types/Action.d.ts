@@ -364,3 +364,54 @@ declare type GoToSubtitlesChunk = {
   subtitlesTrackId: SubtitlesTrackId
   chunkIndex: number
 }
+
+declare type CreateFileRecord = {
+  type: 'CREATE_FILE_RECORD'
+}
+
+declare type DeleteFileRecordRequest = {
+  type: 'DELETE_FILE_RECORD_REQUEST'
+}
+
+declare type DeleteFileRecordSuccess = {
+  type: 'DELETE_FILE_RECORD_SUCCESS'
+}
+
+declare type CreateLoadedFile = {
+  type: 'CREATE_LOADED_FILE'
+}
+
+declare type LoadFileRequest = {
+  type: 'LOAD_FILE_REQUEST'
+  id: FileId
+}
+
+declare type LoadFileSuccess = {
+  type: 'LOAD_FILE_SUCCESS'
+  id: FileId
+  filePath: FilePath
+}
+
+declare type LoadFileFailure = {
+  type: 'LOAD_FILE_FAILURE'
+  id: FileId
+  errorMessage: string
+}
+
+declare type LocateFileRequest = {
+  type: 'LOCATE_FILE_REQUEST'
+  id: FileId
+}
+
+declare type LocateFileSuccess = {
+  type: 'LOCATE_FILE_SUCCESS'
+  id: FileId
+  filePath: FilePath
+}
+
+declare type LocateFileFailure = {
+  // needed?
+  type: 'LOCATE_FILE_FAILURE'
+  id: FileId
+  errorMessage: string
+}

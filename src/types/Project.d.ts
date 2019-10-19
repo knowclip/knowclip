@@ -55,6 +55,18 @@ declare type Project4_0_0 = {
   timestamp: string
 }
 
+declare type Project4_1_0 = {
+  version: '4.1.0'
+  id: ProjectId
+  name: string
+  mediaFilesMetadata: Array<MediaFileMetadata>
+  noteType: NoteType
+  clips: Array<Clip>
+  tags: Array<string> // maybe shouldnt be saved here
+  timestamp: string
+  subtitles: Array<SubtitlesTrack>
+}
+
 declare type ProjectExport = {
   project: ProjectMetadata
   clips: Array<Clip>
