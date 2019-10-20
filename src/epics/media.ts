@@ -112,9 +112,6 @@ const openMp3: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenMp3Request>(A.OPEN_MP3_REQUEST),
     flatMap(async ({ id, filePath }) => {
-      const currentProjectId = r.getCurrentProjectId(state$.value)
-      if (!currentProjectId)
-        return r.openMediaFileFailure('Could not open media--no project open')
       try {
         const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
           filePath,

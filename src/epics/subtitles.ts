@@ -200,37 +200,47 @@ export const loadSubtitlesFailure: AppEpic = (action$, state$) =>
     )
   )
 
-export const loadSubtitlesFile: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, LoadSubtitlesFromFileRequest>(
-      A.LOAD_SUBTITLES_FROM_FILE_REQUEST
-    ),
-    flatMap(async ({ filePath }) => {
-      try {
-        const { chunks, vttFilePath } = await getSubtitlesFromFile(
-          filePath,
-          state$.value
-        )
-        const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
-        if (!currentMediaMetadata) throw new Error('No media loaded')
-        return await r.loadExternalSubtitlesSuccess(
-          [
-            newExternalSubtitlesTrack(
-              uuid(),
-              currentMediaMetadata.id,
-              chunks,
-              filePath,
-              vttFilePath
-            ),
-          ],
-          currentMediaMetadata.id
-        )
-      } catch (err) {
-        console.error(err.message)
-        return await r.loadSubtitlesFailure(err.message || err.toString())
-      }
-    })
-  )
+// export const locateSubtitlesFile: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     filter<Action, LocateFileRequest>(
+//       isLocateFileRequest<ExternalSubtitlesFileRecord>('ExternalSubtitlesFile')
+//     ),
+//     flatMap<LocateFileRequest, Promise<Action>>(async ({ fileRecord }) => {
+//       return fileRecord.id
+//     })
+//   )
+
+// export const loadSubtitlesFile: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, LoadSubtitlesFromFileRequest>(
+//       A.LOAD_SUBTITLES_FROM_FILE_REQUEST
+//     ),
+//     flatMap(async ({ filePath }) => {
+//       try {
+//         const { chunks, vttFilePath } = await getSubtitlesFromFile(
+//           filePath,
+//           state$.value
+//         )
+//         const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
+//         if (!currentMediaMetadata) throw new Error('No media loaded')
+//         return await r.loadExternalSubtitlesSuccess(
+//           [
+//             newExternalSubtitlesTrack(
+//               uuid(),
+//               currentMediaMetadata.id,
+//               chunks,
+//               filePath,
+//               vttFilePath
+//             ),
+//           ],
+//           currentMediaMetadata.id
+//         )
+//       } catch (err) {
+//         console.error(err.message)
+//         return await r.loadSubtitlesFailure(err.message || err.toString())
+//       }
+//     })
+//   )
 
 const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(

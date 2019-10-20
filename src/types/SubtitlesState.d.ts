@@ -1,7 +1,7 @@
-declare type SubtitlesState = {
-  // byId: { [SubtitlesTrackId: string]: SubtitlesTrack }
-  // idsByMediaFileId: { [mediaFileId: string]: Array<SubtitlesTrackId> }
-}
+declare type SubtitlesState = Record<SubtitlesTrackId, SubtitlesTrack>
+//  {
+// byId: { [SubtitlesTrackId: string]: SubtitlesTrack } sTrackId> }
+// }
 
 declare type SubtitlesTrack = EmbeddedSubtitlesTrack | ExternalSubtitlesTrack
 declare type TextTrackMode = 'disabled' | 'hidden' | 'showing'

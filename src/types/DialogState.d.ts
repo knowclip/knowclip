@@ -31,6 +31,12 @@ declare type DialogData =
       }
     }
   | {
+      type: 'OpenLoadedFileFailure'
+      props: {
+        message: string
+      }
+    }
+  | {
       type: 'CsvAndMp3Export'
       props: {
         clipIds: Array<ClipId>

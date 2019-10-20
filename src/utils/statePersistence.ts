@@ -28,16 +28,40 @@ export const getPersistedState = (): Partial<AppState> => {
       ? (JSON.parse(loadedFilesText) as LoadedFilesState)
       : null
     if (loadedFiles)
-      persistedState.loadedFiles = Object.entries(loadedFiles).reduce(
-        (all, [id, loadedFile]) => {
-          all[id] = {
-            ...loadedFile,
-            loaded: false,
+      persistedState.loadedFiles = Object.entries(loadedFiles)
+        .map(
+          ([id, loadedFilev]): NotCurrentlyLoadedFile => {
+            const loadedFile: LoadedFile = loadedFilev as LoadedFile
+
+            switch (loadedFile.status) {
+              case 'CURRENTLY_LOADED':
+                return {
+                  id,
+                  status: 'REMEMBERED',
+                  filePath: loadedFile.filePath,
+                }
+              case 'REMEMBERED':
+                return {
+                  id,
+                  status: loadedFile.status,
+                  filePath: loadedFile.filePath,
+                }
+              case 'NOT_LOADED':
+                return {
+                  id,
+                  status: loadedFile.status,
+                  filePath: loadedFile.filePath,
+                }
+            }
           }
-          return all
-        },
-        {} as LoadedFilesState
-      )
+        )
+        .reduce(
+          (all, newLoadedFile) => {
+            all[newLoadedFile.id] = newLoadedFile
+            return all
+          },
+          {} as LoadedFilesState
+        )
   } catch (err) {
     console.error(err)
   }

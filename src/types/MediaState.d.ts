@@ -11,7 +11,7 @@ declare type MediaFile = {
   filePath: MediaFilePath | null
   constantBitrateFilePath: MediaFilePath | null // TODO: delete field, use loadedFiles
   error: string | null // maybe move to user state
-  subtitles: Array<SubtitlesTrack>
+  subtitles: Array<SubtitlesTrackId>
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 }
 

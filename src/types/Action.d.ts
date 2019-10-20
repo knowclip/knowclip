@@ -8,6 +8,7 @@ declare type Action =
   | ProjectAction
   | MediaAction
   | SubtitlesAction
+  | FileAction
   | DetectSilence
   | DetectSilenceRequest
   | DeleteAllCurrentFileClipsRequest
@@ -293,7 +294,6 @@ declare type SetMediaFolderLocation = {
 }
 
 declare type SubtitlesAction =
-  | LoadSubtitlesFromVideoRequest
   | LoadSubtitlesFromFileRequest
   | LoadExternalSubtitlesSuccess
   | LoadEmbeddedSubtitlesSuccess
@@ -305,11 +305,7 @@ declare type SubtitlesAction =
   | ShowSubtitlesClipsDialogRequest
   | LinkFlashcardFieldToSubtitlesTrack
   | GoToSubtitlesChunk
-declare type LoadSubtitlesFromVideoRequest = {
-  type: 'LOAD_SUBTITLES_FROM_VIDEO_REQUEST'
-  mediaFileId: MediaFileId
-  streamIndex: number
-}
+
 declare type LoadSubtitlesFromFileRequest = {
   type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST'
   mediaFileId: MediaFileId
@@ -365,53 +361,104 @@ declare type GoToSubtitlesChunk = {
   chunkIndex: number
 }
 
+declare type FileAction =
+  | CreateFileRecord
+  // | CreateFileRecordSuccess
+  // | CreateFileRecordFailure
+  | DeleteFileRecordRequest
+  | DeleteFileRecordSuccess
+  | LoadFileRequest
+  | LoadFileSuccess
+  | LoadFileFailure
+  | LocateFileRequest
+  | LocateFileSuccess
+  | LocateFileFailure
 declare type CreateFileRecord = {
   type: 'CREATE_FILE_RECORD'
+  fileRecord: FileRecord
+  filePath: FilePath
 }
-
+// declare type CreateFileRecordSuccess = {
+//   type: 'CREATE_FILE_RECORD_SUCCESS'
+//   fileRecord: FileRecord
+//   filePath: FilePath
+// }
+// declare type CreateFileRecordFailure = {
+//   type: 'CREATE_FILE_RECORD_FAILURE'
+//   fileRecord: FileRecord
+//   filePath: FilePath
+// }
 declare type DeleteFileRecordRequest = {
   type: 'DELETE_FILE_RECORD_REQUEST'
+  fileRecord: FileRecord
 }
-
 declare type DeleteFileRecordSuccess = {
   type: 'DELETE_FILE_RECORD_SUCCESS'
+  fileRecord: FileRecord
 }
-
-declare type CreateLoadedFile = {
-  type: 'CREATE_LOADED_FILE'
-}
-
 declare type LoadFileRequest = {
   type: 'LOAD_FILE_REQUEST'
-  id: FileId
+  fileRecord: FileRecord
 }
-
 declare type LoadFileSuccess = {
   type: 'LOAD_FILE_SUCCESS'
-  id: FileId
+  fileRecord: FileRecord
   filePath: FilePath
 }
-
 declare type LoadFileFailure = {
   type: 'LOAD_FILE_FAILURE'
-  id: FileId
+  fileRecord: FileRecord
+  filePath: FilePath | null
   errorMessage: string
 }
-
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
-  id: FileId
-}
-
-declare type LocateFileSuccess = {
-  type: 'LOCATE_FILE_SUCCESS'
-  id: FileId
+  fileRecord: FileRecord
   filePath: FilePath
 }
-
+declare type LocateFileSuccess = {
+  type: 'LOCATE_FILE_SUCCESS'
+  fileRecord: FileRecord
+  filePath: FilePath
+  loadedFileData: LoadedFileData
+}
 declare type LocateFileFailure = {
   // needed?
   type: 'LOCATE_FILE_FAILURE'
-  id: FileId
+  fileRecord: FileRecord
   errorMessage: string
 }
+
+// CYCLE:   *includes state update
+// CreateFileRecord* -> LoadFileRequest /// SHOULD CreateFileRecord and LocateFileSuccess/request? be merged???
+//                            or check valid later?
+// LoadFileRequest -> present & valid? LoadFileSuccess
+//                                     LoadFileFailure
+// LoadFileFailure -> invalid?
+//                    absent? LocateFileRequest
+// LocateFileRequest -> located? LocateFileSuccess*
+//                   -> not located? LocateFileFailure
+// LocateFileSuccess* -> LoadFileRequest
+
+// loading new external VTT file:
+//                                                       switched?
+// CreateFileRecord* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
+
+// loading new external SRT file:
+//                                                       switched?
+// CreateFileRecord* -> LoadFileRequest -> LoadFileSuccess -> CreateFileRecord* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
+
+// loading external VTT file from project file:
+// LoadFileRequest -> LoadFileFailure(absent) -> LocateFileRequest -> LocateFileSuccess -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
+
+// loading external SRT file from project file:
+// LoadFileRequest -> LoadFileFailure -> LocateFileRequest -> LocateFileSucess -> ???
+
+// loading previously loaded external VTT File:
+// LoadFileRequest -> LocateFileRequest -> LocateFileSuccess -> LoadSubtitles
+
+// loading previously loaded external SRT File:
+
+//
+//
+//

@@ -13,34 +13,48 @@ declare type BaseFileId = string
 //maybe have a onNotFound: Action field?
 declare type FilePath = string
 
-declare type FileRecord = {
+declare type FileRecord =
+  | ProjectFileRecord
+  | MediaFileRecord
+  | ExternalSubtitlesFileRecord
+  | ConvertedVttFileRecord
+  | WaveformPngRecord
+  | ConstantBitrateMp3Record
+  | VideoStillImageRecord
+
+declare type ProjectFileRecord = {
+  type: 'ProjectFile'
   id: FileId
-} & (
-  | {
-      type: 'ProjectFile'
-      parentId: null
-    }
-  | {
-      type: 'MediaFile'
-      parentId: ProjectId
-    }
-  | {
-      type: 'ExternalSubtitlesFile'
-      parentId: SubtitlesTrackId // should it be MediaFileId?
-    }
-  | {
-      type: 'ConvertedVttFile'
-      parentId: SubtitlesTrackId
-    }
-  | {
-      type: 'WaveformPng'
-      parentId: MediaFileId
-    }
-  | {
-      type: 'ConstantBitrateMp3'
-      parentId: MediaFileId
-    }
-  | {
-      type: 'VideoStillImage'
-      parentId: ClipId
-    })
+  parentId: null
+}
+declare type MediaFileRecord = {
+  type: 'MediaFile'
+  id: FileId
+  parentId: ProjectId
+}
+declare type ExternalSubtitlesFileRecord = {
+  type: 'ExternalSubtitlesFile'
+  // parentId: SubtitlesTrackId // should it be MediaFileId?
+  id: FileId
+  parentId: MediaFileId // should it be SubtitlesTrackId?
+}
+declare type ConvertedVttFileRecord = {
+  type: 'ConvertedVttFile'
+  id: FileId
+  parentId: SubtitlesTrackId
+}
+declare type WaveformPngRecord = {
+  type: 'WaveformPng'
+  id: FileId
+  parentId: MediaFileId
+}
+declare type ConstantBitrateMp3Record = {
+  type: 'ConstantBitrateMp3'
+  id: FileId
+  parentId: MediaFileId
+}
+declare type VideoStillImageRecord = {
+  type: 'VideoStillImage'
+  id: FileId
+  parentId: ClipId
+}

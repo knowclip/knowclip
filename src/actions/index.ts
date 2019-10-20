@@ -4,6 +4,7 @@ export * from './snackbar'
 export * from './dialog'
 export * from './projects'
 export * from './subtitles'
+export * from './files'
 
 export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
