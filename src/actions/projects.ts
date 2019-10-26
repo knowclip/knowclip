@@ -16,7 +16,7 @@ export const openProjectById = (id: ProjectId): Action => ({
 })
 
 export const openProject = (
-  project: Project4_0_0,
+  project: Project4_1_0,
   projectMetadata: ProjectMetadata
 ): OpenProject => ({
   type: A.OPEN_PROJECT,
@@ -52,14 +52,14 @@ export const addMediaToProjectRequest = (
   filePaths,
 })
 
-export const addMediaToProject = (
-  projectId: ProjectId,
-  mediaFiles: Array<MediaFile>
-): AddMediaToProject => ({
-  type: A.ADD_MEDIA_TO_PROJECT,
-  projectId,
-  mediaFiles,
-})
+// export const addMediaToProject = (
+//   projectId: ProjectId,
+//   mediaFiles: Array<MediaFile>
+// ): AddMediaToProject => ({
+//   type: A.ADD_MEDIA_TO_PROJECT,
+//   projectId,
+//   mediaFiles,
+// })
 
 export const deleteMediaFromProjectRequest = (
   projectId: ProjectId,
@@ -79,10 +79,10 @@ export const deleteMediaFromProject = (
   mediaFileId,
 })
 
-export const openMediaFileRequest = (id: MediaFileId): Action => ({
-  type: A.OPEN_MEDIA_FILE_REQUEST,
-  id,
-})
+// export const openMediaFileRequest = (id: MediaFileId): Action => ({
+//   type: A.OPEN_MEDIA_FILE_REQUEST,
+//   id,
+// })
 
 export const openMediaFileSuccess = (
   filePath: MediaFilePath,

@@ -14,7 +14,7 @@ const initialState: UserState = {
   loopMedia: true,
 }
 
-const user: Reducer<UserState> = (state = initialState, action) => {
+const user: Reducer<UserState, Action> = (state = initialState, action) => {
   switch (action.type) {
     case A.DELETE_CARD:
       return action.id === state.highlightedClipId
@@ -22,7 +22,8 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         : state
 
     case A.DELETE_CARDS:
-      return action.ids.includes(state.highlightedClipId)
+      return state.highlightedClipId &&
+        action.ids.includes(state.highlightedClipId)
         ? { ...state, highlightedClipId: null }
         : state
 
@@ -43,12 +44,16 @@ const user: Reducer<UserState> = (state = initialState, action) => {
     case A.CLOSE_PROJECT:
       return initialState
 
-    case A.OPEN_MEDIA_FILE_REQUEST:
-      return {
-        ...state,
-        currentMediaFileId: action.id,
-        mediaIsLoading: true,
-      }
+    // case A.OPEN_MEDIA_FILE_REQUEST:
+    case A.LOAD_FILE_REQUEST:
+      if (action.fileRecord.type === 'MediaFile')
+        return {
+          ...state,
+          currentMediaFileId: action.fileRecord.id,
+          mediaIsLoading: true,
+        }
+
+      return state
 
     case A.ADD_CLIP:
       return {
@@ -165,11 +170,12 @@ const user: Reducer<UserState> = (state = initialState, action) => {
     case A.SET_LOOP:
       return {
         ...state,
-        loopMedia: action.loopMedia,
+        loopMedia: action.loop,
       }
 
     case A.OPEN_MEDIA_FILE_FAILURE:
     case A.OPEN_MEDIA_FILE_SUCCESS:
+    case A.LOAD_FILE_SUCCESS: // temp
       return {
         ...state,
         mediaIsLoading: false,

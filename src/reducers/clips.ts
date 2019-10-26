@@ -57,7 +57,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     case A.OPEN_PROJECT: {
       const newState: ClipsState = { byId: {}, idsByMediaFileId: {} }
       const { idsByMediaFileId, byId } = newState
-      action.project.mediaFilesMetadata.forEach(({ id }) => {
+      action.project.mediaFiles.forEach(({ id }) => {
         idsByMediaFileId[id] = []
       })
 
@@ -71,18 +71,16 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.CHOOSE_MEDIA_FILES:
-      return {
-        ...state,
-        idsByMediaFileId: action.ids.reduce(
-          (all, id) => ({
-            ...all,
-            [id]: [],
-          }),
-          {}
-        ),
-      }
-
+    // case A.CHOOSE_MEDIA_FILES:
+    case A.ADD_FILE:
+      if (action.fileRecord.type === 'MediaFile')
+        return {
+          ...state,
+          idsByMediaFileId: {
+            [action.fileRecord.id]: [],
+          },
+        }
+      return state
     case A.REMOVE_MEDIA_FILES:
       return {
         ...state,

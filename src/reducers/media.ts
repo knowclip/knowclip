@@ -19,7 +19,7 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
         ...state,
         byId: {
           ...state.byId,
-          ...Object.values(action.project.mediaFilesMetadata).reduce(
+          ...Object.values(action.project.mediaFiles).reduce(
             (all, metadata) => {
               const existing: Partial<MediaFile> = state.byId[metadata.id] || {}
 

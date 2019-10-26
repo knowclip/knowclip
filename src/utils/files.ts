@@ -1,8 +1,7 @@
-export const isCreateFileRecord = <F extends FileRecord>(
-  fileRecordType: F['type']
-) => (action: Action): action is CreateFileRecordWith<F> =>
-  action.type === A.CREATE_FILE_RECORD &&
-  action.fileRecord.type === fileRecordType
+export const isAddFile = <F extends FileRecord>(fileRecordType: F['type']) => (
+  action: Action
+): action is AddFileWith<F> =>
+  action.type === A.ADD_FILE && action.fileRecord.type === fileRecordType
 
 export const isLoadFileRequest = <F extends FileRecord>(
   fileRecordType: F['type']

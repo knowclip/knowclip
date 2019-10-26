@@ -19,7 +19,7 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.CREATE_FILE_RECORD:
+    case A.ADD_FILE:
       return {
         ...state,
         [action.fileRecord.type]: {

@@ -4,6 +4,7 @@ import {
   getProjectMetadata,
   getCurrentProject,
 } from './project'
+import { getFileRecord } from './files'
 
 export const isLoopOn = (state: AppState) => state.user.loopMedia
 
@@ -60,10 +61,44 @@ export const getMediaFiles = (
 }
 
 export const getCurrentProjectMediaFiles = (
+  //remove
   state: AppState
 ): Array<MediaFile> => {
   const projectMetadata = getCurrentProject(state)
   return projectMetadata
     ? projectMetadata.mediaFiles.map(id => state.media.byId[id])
+    : []
+}
+
+export const getCurrentProjectMediaFileRecords = (
+  state: AppState
+): Array<MediaFileRecord> => {
+  const projectMetadata = getCurrentProject(state)
+  return projectMetadata
+    ? projectMetadata.mediaFiles.map(
+        id =>
+          getFileRecord<MediaFileRecord>(
+            state,
+            'MediaFile',
+            id
+          ) as MediaFileRecord
+      )
+    : []
+}
+
+export const getProjectMediaFileRecords = (
+  state: AppState,
+  id: ProjectId
+): Array<MediaFileRecord> => {
+  const projectMetadata = getProjectMetadata(state, id)
+  return projectMetadata
+    ? projectMetadata.mediaFiles.map(
+        id =>
+          getFileRecord<MediaFileRecord>(
+            state,
+            'MediaFile',
+            id
+          ) as MediaFileRecord
+      )
     : []
 }

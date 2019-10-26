@@ -1,9 +1,10 @@
 import { fromEvent, Observable, of, empty } from 'rxjs'
-import { map, flatMap, takeWhile, startWith } from 'rxjs/operators'
+import { map, flatMap, takeWhile, startWith, filter } from 'rxjs/operators'
 import { Epic, ofType } from 'redux-observable'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
+import { isLoadFileSuccess } from '../utils/files'
 
 const setWaveformCursorEpic: AppEpic = (
   action$,
@@ -11,8 +12,10 @@ const setWaveformCursorEpic: AppEpic = (
   { document, getWaveformSvgWidth, setCurrentTime, getCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-    flatMap<OpenMediaFileSuccess, Observable<Action>>(() =>
+    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
+      isLoadFileSuccess('MediaFile')
+    ),
+    flatMap<LoadFileSuccessWith<MediaFileRecord>, Observable<Action>>(() =>
       fromEvent<Event>(
         document,
         'timeupdate',

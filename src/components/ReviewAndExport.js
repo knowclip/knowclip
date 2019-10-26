@@ -22,6 +22,7 @@ import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
 import moment from 'moment'
+import { loadFileRequest } from '../actions'
 
 let FlashcardRow = ({
   flashcard: { fields, id, tags },
@@ -201,9 +202,9 @@ const Export = ({
   exportMarkdown,
   noteType,
   open,
-  projectMediaMetadata,
+  projectMedia,
   allProjectClipsIds,
-  openMediaFileRequest,
+  loadFileRequest,
   currentMedia,
 }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
@@ -228,12 +229,12 @@ const Export = ({
         : [...new Set([...selectedIds, ...ids])]
     )
   const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
-    projectMediaMetadata.findIndex(metadata => metadata.id === currentFileId)
+    projectMedia.findIndex(metadata => metadata.id === currentFileId)
   )
   const onClickTable = index => {
-    const mediaMetadata = projectMediaMetadata[index]
+    const mediaMetadata = projectMedia[index]
     if (mediaMetadata && mediaMetadata.id !== currentMedia.id)
-      openMediaFileRequest(mediaMetadata.id)
+      loadFileRequest(mediaMetadata)
     setExpandedTableIndex(index)
   }
   // PaperProps={{ style: { minWidth: '600px', minHeight: '300px' } }}
@@ -279,7 +280,7 @@ const Export = ({
           </section>
         )}
         {selectionHasStarted &&
-          projectMediaMetadata.map((metadata, i) => (
+          projectMedia.map((metadata, i) => (
             <MediaTable
               key={metadata.id}
               open={i === expandedTableIndex}
@@ -337,11 +338,12 @@ const mapStateToProps = state => ({
   allProjectClipsIds: r.getAllProjectClipsIds(state),
   noteType: r.getCurrentNoteType(state),
   currentMedia: r.getCurrentMediaMetadata(state),
-  projectMediaMetadata: r.getProjectMediaMetadata(
-    state,
-    r.getCurrentProjectId(state)
-  ),
+  // projectMediaMetadata: r.getProjectMediaMetadata(
+  //   state,
+  //   r.getCurrentProjectId(state)
+  // ),
   currentFileId: r.getCurrentFileId(state),
+  projectMedia: r.getCurrentProjectMediaFileRecords(state),
 })
 
 const mapDispatchToProps = {
@@ -350,7 +352,7 @@ const mapDispatchToProps = {
   exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
-  openMediaFileRequest: r.openMediaFileRequest,
+  loadFileRequest: r.loadFileRequest,
 }
 
 export default connect(

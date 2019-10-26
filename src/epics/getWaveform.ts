@@ -9,7 +9,7 @@ import { AppEpic } from '../types/AppEpic'
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
 
-const getWaveformPng = async (
+export const getWaveformPng = async (
   state: AppState,
   constantBitrateFilePath: string
 ): Promise<string> => {
@@ -48,7 +48,10 @@ const getWaveformPng = async (
   })
 }
 
-const getWaveformEpic: AppEpic = (action$, state$) =>
+const getWaveformEpic: AppEpic = (
+  action$,
+  state$ // remove
+) =>
   action$.pipe(
     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
     switchMap<OpenMediaFileSuccess, Promise<Action>>(

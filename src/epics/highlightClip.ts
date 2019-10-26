@@ -12,6 +12,7 @@ import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import { AppEpic } from '../types/AppEpic'
+import { isLoadFileSuccess } from '../utils/files'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -24,7 +25,9 @@ const highlightEpic: AppEpic = (
   { setCurrentTime, getWaveformSvgElement }
 ) =>
   action$.pipe(
-    ofType(A.OPEN_MEDIA_FILE_SUCCESS),
+    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
+      isLoadFileSuccess('MediaFile')
+    ),
     flatMap(() =>
       fromEvent<MouseEvent>(
         getWaveformSvgElement() as SVGElement,
@@ -160,7 +163,9 @@ const deselectClipOnManualChangeTime: AppEpic = (
   { document, getCurrentTime }
 ) =>
   action$.pipe(
-    ofType(A.OPEN_MEDIA_FILE_SUCCESS),
+    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
+      isLoadFileSuccess('MediaFile')
+    ),
     flatMap(() =>
       // @ts-ignore
       fromEvent(document, 'seeking', true).pipe(
@@ -184,7 +189,7 @@ const deselectClipOnManualChangeTime: AppEpic = (
 
 const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.OPEN_MEDIA_FILE_REQUEST),
+    ofType(A.LOAD_FILE_REQUEST), // just for media files though
     map(() => r.highlightClip(null))
   )
 

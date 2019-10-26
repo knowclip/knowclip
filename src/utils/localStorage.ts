@@ -12,6 +12,6 @@ export const getWaveformPngPath = (constantBitrateFilePath: MediaFilePath) => {
   return outputFilename
 }
 
-export const saveProjectToLocalStorage = (project: Project4_0_0) => {
+export const saveProjectToLocalStorage = (project: Project4_1_0) => {
   localStorage.setItem('project_' + project.id, JSON.stringify(project))
 }

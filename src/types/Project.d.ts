@@ -4,6 +4,7 @@ declare type Project =
   | Project2_0_0
   | Project3_0_0
   | Project4_0_0
+  | Project4_1_0
 
 declare type ProjectId = string
 
@@ -59,7 +60,7 @@ declare type Project4_1_0 = {
   version: '4.1.0'
   id: ProjectId
   name: string
-  mediaFilesMetadata: Array<MediaFileMetadata>
+  mediaFiles: Array<MediaFileRecord>
   noteType: NoteType
   clips: Array<Clip>
   tags: Array<string> // maybe shouldnt be saved here

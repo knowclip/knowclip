@@ -37,6 +37,15 @@ declare type MediaFileRecord = {
   type: 'MediaFile'
   id: FileId
   parentId: ProjectId
+
+  subtitles: Array<SubtitlesTrackId>
+  flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
+
+  name: MediaFileName
+  durationSeconds: number
+  format: 'UNKNOWN' | string
+  isVideo: boolean
+  subtitlesTracksStreamIndexes: number[]
 }
 declare type ExternalSubtitlesFileRecord = {
   type: 'ExternalSubtitlesFile'

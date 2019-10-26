@@ -131,30 +131,57 @@ const convertProject3_0_0___4_0_0 = (project: Project3_0_0): Project4_0_0 => ({
   })),
 })
 
+const convertProject4_0_0___4_1_0 = (project: Project4_0_0): Project4_1_0 => ({
+  ...project,
+  version: '4.1.0',
+  clips: Object.values(project.clips),
+  mediaFiles: project.mediaFilesMetadata.map(metadata => ({
+    id: metadata.id,
+    type: 'MediaFile',
+    parentId: project.id,
+    name: metadata.name,
+    durationSeconds: metadata.durationSeconds,
+    isVideo: metadata.isVideo,
+    format: metadata.format,
+    flashcardFieldsToSubtitlesTracks: {},
+    subtitles: [],
+    subtitlesTracksStreamIndexes: [],
+  })),
+  subtitles: [],
+})
+
 const parseProject = (jsonFileContents: string) => {
   const project = JSON.parse(jsonFileContents) as Project
   switch (project.version) {
     case '0.0.0':
-      return compose<Project4_0_0>(
+      return compose<Project4_1_0>(
+        convertProject4_0_0___4_1_0,
         convertProject3_0_0___4_0_0,
         convertProject2_0_0___3_0_0,
         convertProject1_0_0___2_0_0,
         convertProject0_0_0___1_0_0
       )(project)
     case '1.0.0':
-      return compose<Project4_0_0>(
+      return compose<Project4_1_0>(
+        convertProject4_0_0___4_1_0,
         convertProject3_0_0___4_0_0,
         convertProject2_0_0___3_0_0,
         convertProject1_0_0___2_0_0
       )(project)
     case '2.0.0':
-      return compose<Project4_0_0>(
+      return compose<Project4_1_0>(
+        convertProject4_0_0___4_1_0,
         convertProject3_0_0___4_0_0,
         convertProject2_0_0___3_0_0
       )(project)
     case '3.0.0':
-      return convertProject3_0_0___4_0_0(project)
+      return compose<Project4_1_0>(
+        convertProject4_0_0___4_1_0,
+        convertProject3_0_0___4_0_0
+      )(project)
     case '4.0.0':
+      return compose<Project4_1_0>(convertProject4_0_0___4_1_0)(project)
+    case '4.1.0':
       return project
     default:
       return null

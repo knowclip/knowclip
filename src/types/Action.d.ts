@@ -155,7 +155,7 @@ declare type OpenProjectRequestByFilePath = {
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
-  project: Project4_0_0
+  project: Project4_1_0
   projectMetadata: ProjectMetadata
 }
 declare type CreateProject = {
@@ -294,10 +294,6 @@ declare type SetMediaFolderLocation = {
 }
 
 declare type SubtitlesAction =
-  | LoadSubtitlesFromFileRequest
-  | LoadExternalSubtitlesSuccess
-  | LoadEmbeddedSubtitlesSuccess
-  | LoadSubtitlesFailure
   | AddSubtitlesTrack
   | DeleteSubtitlesTrack
   | ShowSubtitles
@@ -307,21 +303,6 @@ declare type SubtitlesAction =
   | LinkFlashcardFieldToSubtitlesTrack
   | GoToSubtitlesChunk
 
-declare type LoadSubtitlesFromFileRequest = {
-  type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST'
-  mediaFileId: MediaFileId
-  filePath: SubtitlesFilePath
-}
-declare type LoadExternalSubtitlesSuccess = {
-  type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS'
-  mediaFileId: MediaFileId
-  subtitlesTracks: Array<ExternalSubtitlesTrack>
-}
-declare type LoadEmbeddedSubtitlesSuccess = {
-  type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS'
-  mediaFileId: MediaFileId
-  subtitlesTracks: Array<EmbeddedSubtitlesTrack>
-}
 declare type LoadSubtitlesFailure = {
   type: 'LOAD_SUBTITLES_FAILURE'
   error: string
@@ -367,9 +348,9 @@ declare type GoToSubtitlesChunk = {
 }
 
 declare type FileAction =
-  | CreateFileRecord
-  // | CreateFileRecordSuccess
-  // | CreateFileRecordFailure
+  | AddFile
+  // | AddFileSuccess
+  // | AddFileFailure
   | DeleteFileRecordRequest
   | DeleteFileRecordSuccess
   | LoadFileRequest
@@ -378,18 +359,18 @@ declare type FileAction =
   | LocateFileRequest
   | LocateFileSuccess
   | LocateFileFailure
-declare type CreateFileRecord = {
-  type: 'CREATE_FILE_RECORD'
+declare type AddFile = {
+  type: 'ADD_FILE'
   fileRecord: FileRecord
   filePath: FilePath | null
 }
-// declare type CreateFileRecordSuccess = {
-//   type: 'CREATE_FILE_RECORD_SUCCESS'
+// declare type AddFileSuccess = {
+//   type: 'ADD_FILE_SUCCESS'
 //   fileRecord: FileRecord
 //   filePath: FilePath
 // }
-// declare type CreateFileRecordFailure = {
-//   type: 'CREATE_FILE_RECORD_FAILURE'
+// declare type AddFileFailure = {
+//   type: 'ADD_FILE_FAILURE'
 //   fileRecord: FileRecord
 //   filePath: FilePath
 // }
@@ -451,14 +432,11 @@ type LoadFileFailureWith<F extends FileRecord> = Omit<
   'fileRecord'
 > &
   WithRecordType<F>
-type CreateFileRecordWith<F extends FileRecord> = Omit<
-  CreateFileRecord,
-  'fileRecord'
-> &
+type AddFileWith<F extends FileRecord> = Omit<AddFile, 'fileRecord'> &
   WithRecordType<F>
 
 // CYCLE:   *includes state update
-// CreateFileRecord* -> LoadFileRequest /// SHOULD CreateFileRecord and LocateFileSuccess/request? be merged???
+// AddFile* -> LoadFileRequest /// SHOULD AddFile and LocateFileSuccess/request? be merged???
 //                            or check valid later?
 // LoadFileRequest -> present & valid? LoadFileSuccess
 //                    present & invalid? LoadFileFailure*
@@ -472,11 +450,11 @@ type CreateFileRecordWith<F extends FileRecord> = Omit<
 
 // loading new external VTT file:
 //                                                       switched?
-// CreateFileRecord* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
+// AddFile* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
 
 // loading new external SRT file:
 //                                                       switched?
-// CreateFileRecord* -> LoadFileRequest -> LoadFileSuccess -> CreateFileRecord* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
+// AddFile* -> LoadFileRequest -> LoadFileSuccess -> AddFile* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
 
 // loading external VTT file from project file:
 // LoadFileRequest -> LoadFileFailure(absent) -> LocateFileRequest -> LocateFileSuccess -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles

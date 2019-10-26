@@ -25,19 +25,21 @@ const openProject = async (
         )
       )
     let originalProjectJson = JSON.parse(projectJson)
-    const mediaFiles = buildMediaFiles(
-      originalProjectJson,
-      project,
-      filePath,
-      r.getMediaFiles(state$.value, project.id)
-    )
+    // const mediaFiles = buildMediaFiles(
+    //   originalProjectJson,
+    //   project,
+    //   filePath,
+    //   r.getMediaFiles(state$.value, project.id)
+    // )
+    const mediaFiles = project.mediaFiles.map(({ id }) => id)
+
     const projectMetadata = r.getProjectMetadata(state$.value, project.id)
     return from([
       r.openProject(project, {
         id: project.id,
         filePath: filePath,
         name: project.name,
-        mediaFiles: mediaFiles.map(({ metadata }) => metadata.id),
+        mediaFiles,
         error: null,
         noteType: project.noteType,
       }),
@@ -127,6 +129,7 @@ const saveProject: AppEpic = (action$, state$) =>
           ),
         ])
       } catch (err) {
+        console.error(err)
         return of(
           r.simpleMessageSnackbar(`Problem saving project file: ${err.message}`)
         )
@@ -167,9 +170,12 @@ const autoSaveProject: AppEpic = (action$, state$) =>
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
         if (!projectMetadata) throw new Error('No project metadata found')
+
         saveProjectToLocalStorage(r.getProject(state$.value, projectMetadata))
+
         return ({ type: 'AUTOSAVE' } as unknown) as Action
       } catch (err) {
+        console.error(err)
         return r.simpleMessageSnackbar(
           `Problem saving project file: ${err.message}`
         )
@@ -180,13 +186,13 @@ const autoSaveProject: AppEpic = (action$, state$) =>
 const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProject>(A.OPEN_PROJECT),
-    flatMap(({ projectMetadata }) => {
+    flatMap(({ projectMetadata, project }) => {
       if (!projectMetadata.mediaFiles.length)
         return of(({
           type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
         } as unknown) as Action)
 
-      const [firstMediaFileId] = projectMetadata.mediaFiles
+      const [firstMediaFile] = project.mediaFiles
 
       const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
         (a, b) => a.concat(b),
@@ -207,7 +213,7 @@ const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
       )
 
       return from([
-        r.openMediaFileRequest(firstMediaFileId),
+        r.loadFileRequest(firstMediaFile),
         r.setAllTags(tagsToClipIds),
       ])
     })

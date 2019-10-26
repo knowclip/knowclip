@@ -43,20 +43,25 @@ const projects: Reducer<ProjectsState, Action> = (
         allIds: [action.projectMetadata.id, ...state.allIds],
       }
 
-    case A.ADD_MEDIA_TO_PROJECT:
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [action.projectId]: {
-            ...state.byId[action.projectId],
-            mediaFiles: [
-              ...state.byId[action.projectId].mediaFiles,
-              ...action.mediaFiles.map(file => file.metadata.id),
-            ],
+    // case A.ADD_MEDIA_TO_PROJECT:
+    case A.ADD_FILE:
+      if (action.fileRecord.type === 'MediaFile') {
+        const projectId = action.fileRecord.parentId
+        return {
+          ...state,
+          byId: {
+            ...state.byId,
+            [projectId]: {
+              ...state.byId[projectId],
+              mediaFiles: [
+                ...state.byId[projectId].mediaFiles,
+                action.fileRecord.id,
+              ],
+            },
           },
-        },
+        }
       }
+      return state
 
     case A.DELETE_MEDIA_FROM_PROJECT:
       return {

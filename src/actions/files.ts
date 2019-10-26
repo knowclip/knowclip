@@ -1,25 +1,25 @@
-export const createFileRecord = <F extends FileRecord>(
+export const addFile = <F extends FileRecord>(
   fileRecord: F,
   filePath: FilePath | null
-): CreateFileRecordWith<F> => ({
-  type: A.CREATE_FILE_RECORD,
+): AddFileWith<F> => ({
+  type: A.ADD_FILE,
   fileRecord,
   filePath,
 })
 
-// export const createFileRecordSuccess = <F extends FileRecord>(
+// export const AddFileSuccess = <F extends FileRecord>(
 //   fileRecord: F,
 //   filePath: FilePath
-// ): CreateFileRecordSuccessWith<F> => ({
-//   type: A.CREATE_FILE_RECORD_SUCCESS,
+// ): AddFileSuccessWith<F> => ({
+//   type: A.ADD_FILE_SUCCESS,
 //   fileRecord,
 //   filePath,
 // })
-// export const createFileRecordFailure = <F extends FileRecord>(
+// export const AddFileFailure = <F extends FileRecord>(
 //   fileRecord: F,
 //   filePath: FilePath
-// ): CreateFileRecordFailureWith<F> => ({
-//   type: A.CREATE_FILE_RECORD_FAILURE,
+// ): AddFileFailureWith<F> => ({
+//   type: A.ADD_FILE_FAILURE,
 //   fileRecord,
 //   filePath,
 // })

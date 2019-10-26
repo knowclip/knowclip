@@ -9,7 +9,6 @@ import {
 } from 'rxjs/operators'
 import { fromEvent, merge, of, empty } from 'rxjs'
 import * as r from '../redux'
-import { ofType } from 'redux-observable'
 import {
   toWaveformX,
   toWaveformCoordinates,
@@ -17,6 +16,7 @@ import {
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
+import { isLoadFileSuccess } from '../utils/files'
 
 const pendingClipIsBigEnough = (state: AppState) => {
   const pendingClip = r.getPendingClip(state)
@@ -32,7 +32,9 @@ const addClipEpic: AppEpic = (
   { window, getWaveformSvgElement }
 ) =>
   action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
+      isLoadFileSuccess('MediaFile')
+    ),
     flatMap(() => {
       const svg = getWaveformSvgElement()
       if (!svg) console.error('No svg element')
@@ -57,14 +59,14 @@ const addClipEpic: AppEpic = (
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
     flatMap(waveformMousedown => {
-      const mediaMetadata = r.getCurrentMediaMetadata(state$.value)
-      if (!mediaMetadata) throw new Error('No current media metadata')
+      const mediaFileRecord = r.getCurrentMediaFileRecord(state$.value)
+      if (!mediaFileRecord) throw new Error('No current media metadata')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =
         state$.value.waveform.stepsPerSecond * state$.value.waveform.stepLength
       const withinValidTime = (x: number) =>
-        Math.max(0, Math.min(x, mediaMetadata.durationSeconds * factor))
+        Math.max(0, Math.min(x, mediaFileRecord.durationSeconds * factor))
 
       const svgElement = getWaveformSvgElement()
       if (!svgElement) throw new Error('Waveform disappeared')

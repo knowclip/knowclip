@@ -25,7 +25,7 @@ const loadedFiles: Reducer<LoadedFilesState, Action> = (
     //     },
     //   }
 
-    case A.CREATE_FILE_RECORD: {
+    case A.ADD_FILE: {
       const loadedFile: LoadedFile = action.filePath
         ? {
             id: action.fileRecord.id,

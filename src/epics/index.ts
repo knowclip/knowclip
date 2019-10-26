@@ -3,7 +3,7 @@ import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'
 import * as r from '../redux'
-import getWaveformEpic from './getWaveform'
+// import getWaveformEpic from './getWaveform'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
 import stretchClip from './stretchClip'
@@ -49,7 +49,7 @@ const closeEpic: AppEpic = (action$, state$) =>
 
 const rootEpic: AppEpic = combineEpics(
   media,
-  getWaveformEpic,
+  // getWaveformEpic,
   setWaveformCursorEpic,
   addClip,
   stretchClip,

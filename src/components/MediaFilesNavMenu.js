@@ -34,8 +34,8 @@ const MediaFilesNavMenu = ({
   loop,
   addMediaToProjectRequest,
   currentProjectId,
-  projectMediaMetadata,
-  openMediaFileRequest,
+  projectMediaFiles,
+  loadFileRequest,
   confirmationDialog,
   deleteMediaFromProjectRequest,
 }) => {
@@ -81,7 +81,7 @@ const MediaFilesNavMenu = ({
   return (
     <DarkTheme>
       <section className={className} ref={menuAnchorEl}>
-        {projectMediaMetadata.length > 0 ? (
+        {projectMediaFiles.length > 0 ? (
           <span className="mediaFileName" title={currentFileName}>
             <Button className={css.audioButton} onClick={openMenu}>
               {currentFileName ? truncate(currentFileName, 40) : 'Select media'}
@@ -94,18 +94,18 @@ const MediaFilesNavMenu = ({
                 onClose={closeMenu}
               >
                 <MenuList style={{ maxHeight: '40em', overflowY: 'auto' }}>
-                  {projectMediaMetadata.map(({ name, id }) => (
+                  {projectMediaFiles.map(media => (
                     <MenuItem
                       dense
-                      key={id}
-                      selected={id === currentFileId}
-                      onClick={() => openMediaFileRequest(id)}
+                      key={media.id}
+                      selected={media.id === currentFileId}
+                      onClick={() => loadFileRequest(media)}
                     >
                       <ListItemText
-                        title={name}
+                        title={media.name}
                         className={css.mediaFilesMenuListItemText}
                       >
-                        {truncate(name, 40)}
+                        {truncate(media.name, 40)}
                       </ListItemText>
                       <ListItemSecondaryAction>
                         <IconButton
@@ -114,7 +114,7 @@ const MediaFilesNavMenu = ({
                               CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
                               r.deleteMediaFromProjectRequest(
                                 currentProjectId,
-                                id
+                                media.id
                               )
                             )
                           }
@@ -166,16 +166,13 @@ const mapStateToProps = state => ({
   currentFileName: r.getCurrentFileName(state),
   currentFileId: r.getCurrentFileId(state),
   currentProjectId: r.getCurrentProjectId(state),
-  projectMediaMetadata: r.getProjectMediaMetadata(
-    state,
-    r.getCurrentProjectId(state)
-  ),
+  projectMediaFiles: r.getCurrentProjectMediaFileRecords(state),
 })
 
 const mapDispatchToProps = {
   toggleLoop: r.toggleLoop,
   addMediaToProjectRequest: r.addMediaToProjectRequest,
-  openMediaFileRequest: r.openMediaFileRequest,
+  loadFileRequest: r.loadFileRequest,
   deleteMediaFromProjectRequest: r.deleteMediaFromProjectRequest,
   confirmationDialog: r.confirmationDialog,
 }

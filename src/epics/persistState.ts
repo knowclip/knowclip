@@ -10,7 +10,8 @@ const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
       A.DELETE_MEDIA_FROM_PROJECT,
       A.OPEN_MEDIA_FILE_SUCCESS,
       A.LOCATE_MEDIA_FILE_SUCCESS,
-      A.SET_MEDIA_FOLDER_LOCATION
+      A.SET_MEDIA_FOLDER_LOCATION,
+      A.LOAD_FILE_SUCCESS
     ),
     tap(() => {
       setLocalStorage('projects', JSON.stringify(state$.value.projects))

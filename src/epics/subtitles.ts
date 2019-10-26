@@ -158,47 +158,47 @@ export const newExternalSubtitlesTrack = (
   vttFilePath,
 })
 
-const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-    filter(({ metadata }) =>
-      Boolean(metadata.subtitlesTracksStreamIndexes.length)
-    ),
-    flatMap(
-      async ({ metadata: { subtitlesTracksStreamIndexes, id }, filePath }) => {
-        try {
-          const subtitles = await Promise.all(
-            subtitlesTracksStreamIndexes.map(async streamIndex => {
-              const { tmpFilePath, chunks } = await getSubtitlesFromMedia(
-                filePath,
-                streamIndex,
-                state$.value
-              )
-              return newEmbeddedSubtitlesTrack(
-                uuid(),
-                id,
-                chunks,
-                streamIndex,
-                tmpFilePath
-              )
-            })
-          )
-          return r.loadEmbeddedSubtitlesSuccess(subtitles, id)
-        } catch (err) {
-          console.error(err)
-          return r.loadSubtitlesFailure(err.message || err.toString())
-        }
-      }
-    )
-  )
+// const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+//     filter(({ metadata }) =>
+//       Boolean(metadata.subtitlesTracksStreamIndexes.length)
+//     ),
+//     flatMap(
+//       async ({ metadata: { subtitlesTracksStreamIndexes, id }, filePath }) => {
+//         try {
+//           const subtitles = await Promise.all(
+//             subtitlesTracksStreamIndexes.map(async streamIndex => {
+//               const { tmpFilePath, chunks } = await getSubtitlesFromMedia(
+//                 filePath,
+//                 streamIndex,
+//                 state$.value
+//               )
+//               return newEmbeddedSubtitlesTrack(
+//                 uuid(),
+//                 id,
+//                 chunks,
+//                 streamIndex,
+//                 tmpFilePath
+//               )
+//             })
+//           )
+//           return r.loadEmbeddedSubtitlesSuccess(subtitles, id)
+//         } catch (err) {
+//           console.error(err)
+//           return r.loadSubtitlesFailure(err.message || err.toString())
+//         }
+//       }
+//     )
+//   )
 
-const loadSubtitlesFailure: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, LoadSubtitlesFailure>(A.LOAD_SUBTITLES_FAILURE),
-    map(({ error }) =>
-      r.simpleMessageSnackbar(`Could not load subtitles: ${error}`)
-    )
-  )
+// const loadSubtitlesFailure: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, LoadSubtitlesFailure>(A.LOAD_SUBTITLES_FAILURE),
+//     map(({ error }) =>
+//       r.simpleMessageSnackbar(`Could not load subtitles: ${error}`)
+//     )
+//   )
 
 // export const locateSubtitlesFile: AppEpic = (action$, state$) =>
 //   action$.pipe(
@@ -364,9 +364,9 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
   )
 
 export default combineEpics(
-  loadEmbeddedSubtitles,
+  // loadEmbeddedSubtitles,
   // loadSubtitlesFile,
-  loadSubtitlesFailure,
+  // loadSubtitlesFailure,
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
   goToSubtitlesChunk

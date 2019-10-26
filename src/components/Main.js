@@ -105,7 +105,7 @@ class Main extends Component {
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
       constantBitrateFilePath,
-      currentMediaMetadata,
+      currentMediaFile,
       subtitles,
     } = this.props
 
@@ -119,7 +119,7 @@ class Main extends Component {
             </section>
             <ul className={headerCss.rightMenu}>
               {' '}
-              {currentMediaMetadata && (
+              {currentMediaFile && (
                 <Fragment>
                   <li className={headerCss.menuItem}>
                     <SubtitlesMenu />
@@ -150,7 +150,7 @@ class Main extends Component {
             filePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
             loop={loop}
-            metadata={currentMediaMetadata}
+            metadata={currentMediaFile}
             subtitles={subtitles}
           />
         </section>
@@ -186,7 +186,7 @@ const mapStateToProps = state => ({
   audioIsLoading: r.isAudioLoading(state),
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getCurrentMediaFileConstantBitratePath(state),
-  currentMediaMetadata: r.getCurrentMediaMetadata(state),
+  currentMediaFile: r.getCurrentMediaFileRecord(state),
   subtitles: r.getSubtitlesTracks(state),
 })
 

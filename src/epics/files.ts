@@ -1,5 +1,5 @@
-import { filter, flatMap, map } from 'rxjs/operators'
-import { of, Observable } from 'rxjs'
+import { filter, flatMap, map, catchError } from 'rxjs/operators'
+import { of, Observable, merge, empty } from 'rxjs'
 import * as r from '../redux'
 import { from } from 'rxjs'
 import { AppEpic } from '../types/AppEpic'
@@ -7,66 +7,71 @@ import {
   getSubtitlesFromFile,
   newExternalSubtitlesTrack,
   newEmbeddedSubtitlesTrack,
+  getSubtitlesFromMedia,
 } from './subtitles'
 import { existsSync } from 'fs'
 import {
-  isCreateFileRecord,
   isLoadFileRequest,
   isLoadFileFailure,
-  isLoadFileSuccess,
   isLocateFileRequest,
 } from '../utils/files'
 import { combineEpics, ofType } from 'redux-observable'
 import { extname, basename } from 'path'
+import uuid from 'uuid'
+import { getWaveformPng } from './getWaveform'
 
-const createFileRecord: AppEpic = (action$, state$) =>
+const addFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, CreateFileRecord>(A.CREATE_FILE_RECORD),
-    map<CreateFileRecord, Action>(({ fileRecord }) =>
-      r.loadFileRequest(fileRecord)
-    )
+    ofType<Action, AddFile>(A.ADD_FILE),
+    map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
   )
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
-const loadFileRequest: AppEpic = (action$, state$) =>
+const loadFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    // filter<Action, LoadFileRequest>(isLoadSubtitlesRequest),
-    filter(
-      isLoadFileRequest<ExternalSubtitlesFileRecord>('ExternalSubtitlesFile')
-    ),
+    ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
+
     // if filepath provided, try to locate file
     //   if filepath valid, loadFileSuccess
     //   if filepath invalid, do file-generating or file-finding action for particular file type
     // if no filepath provided, do file-generating or file-finding action for particular file type
-    flatMap<LoadFileRequestWith<ExternalSubtitlesFileRecord>, Promise<Action>>(
-      async a => {
-        const { fileRecord } = a
-        const file = r.getPreviouslyLoadedFile(state$.value, fileRecord)
-        if (!file || !file.filePath)
-          // correct second part of condition?
-          return await r.loadFileFailure(
-            fileRecord,
-            null,
-            'You must first locate this file.'
-          )
-        if (!existsSync(file.filePath))
-          return await r.loadFileFailure(
-            fileRecord,
-            file.filePath,
-            `This file appears to have moved or been renamed.`
-          )
-        try {
-          return await r.loadFileSuccess(fileRecord, file.filePath)
-        } catch (err) {
-          return await r.loadFileFailure(
-            fileRecord,
-            file ? file.filePath : null,
-            err.message || err.toString()
-          )
+    flatMap<LoadFileRequest, Promise<Action>>(async ({ fileRecord }) => {
+      const file = r.getPreviouslyLoadedFile(state$.value, fileRecord)
+      if (!file || !file.filePath)
+        // correct second part of condition?
+        return await r.loadFileFailure(
+          fileRecord,
+          null,
+          'You must first locate this file.'
+        )
+      if (!existsSync(file.filePath))
+        return await r.loadFileFailure(
+          fileRecord,
+          file.filePath,
+          `This file appears to have moved or been renamed.`
+        )
+      try {
+        switch (fileRecord.type) {
+          case 'MediaFile': {
+            effects.pauseMedia()
+            // mediaPlayer.src = ''
+            return await r.loadFileSuccess(fileRecord, file.filePath)
+          }
+
+          case 'ExternalSubtitlesFile':
+          case 'TemporaryVttFile':
+          default:
+            return await r.loadFileSuccess(fileRecord, file.filePath)
         }
+      } catch (err) {
+        return await r.loadFileFailure(
+          fileRecord,
+          file ? file.filePath : null,
+          err.message || err.toString()
+        )
       }
-    )
+    })
   )
 
 const loadSubtitlesFileFailure: AppEpic = (action$, state$) =>
@@ -90,35 +95,84 @@ const loadSubtitlesFileFailure: AppEpic = (action$, state$) =>
 const loadFileSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, LoadFileSuccess>(A.LOAD_FILE_SUCCESS),
-    flatMap<LoadFileSuccess, Promise<Action>>(
-      async ({ fileRecord, filePath }) => {
-        switch (fileRecord.type) {
-          case 'ExternalSubtitlesFile': {
-            if (isVtt(filePath)) {
-              const { chunks, vttFilePath } = await getSubtitlesFromFile(
-                filePath,
-                state$.value
-              )
+    flatMap<LoadFileSuccess, Observable<Action>>(({ fileRecord, filePath }) => {
+      switch (fileRecord.type) {
+        case 'MediaFile': {
+          const { subtitlesTracksStreamIndexes, id } = fileRecord
+          const addSubtitlesFiles = from(
+            subtitlesTracksStreamIndexes
+              // .filter(
+              //   streamIndex =>
+              //     !Object.values(state$.value.fileRecords.TemporaryVttFile).some(
+              //       a =>
+              //         a.type === 'TemporaryVttFile' &&
+              //         a.parentType === 'EmbeddedSubtitlesTrack' &&
+              //         a.streamIndex === streamIndex
+              //     )
+              // )
+              .map(async streamIndex => {
+                const { tmpFilePath, chunks } = await getSubtitlesFromMedia(
+                  filePath,
+                  streamIndex,
+                  state$.value
+                )
+                return r.addFile(
+                  {
+                    type: 'TemporaryVttFile',
+                    parentId: id,
+                    id: uuid(),
+                    streamIndex,
+                    parentType: 'EmbeddedSubtitlesTrack',
+                  },
+                  tmpFilePath
+                )
+                // or load existing
+              })
+          ).pipe(flatMap(x => x))
+          const cbrPath = r.getMediaFileConstantBitratePathFromCurrentProject(
+            state$.value,
+            fileRecord.id
+          ) as string
 
-              return await r.addSubtitlesTrack(
-                newExternalSubtitlesTrack(
-                  fileRecord.id,
-                  fileRecord.parentId,
-                  chunks,
-                  vttFilePath,
-                  filePath
+          const getWaveform = cbrPath
+            ? from(getWaveformPng(state$.value, cbrPath)).pipe(
+                map(imagePath => r.setWaveformImagePath(imagePath)),
+                catchError(err => of(r.simpleMessageSnackbar(err.message)))
+              )
+            : empty()
+          return merge(
+            addSubtitlesFiles,
+            getWaveform
+            // of(r.addMedi)
+          )
+        }
+
+        case 'ExternalSubtitlesFile': {
+          if (isVtt(filePath)) {
+            return from(getSubtitlesFromFile(filePath, state$.value)).pipe(
+              map(({ chunks, vttFilePath }) =>
+                r.addSubtitlesTrack(
+                  newExternalSubtitlesTrack(
+                    fileRecord.id,
+                    fileRecord.parentId,
+                    chunks,
+                    vttFilePath,
+                    filePath
+                  )
                 )
               )
-            } else {
-              const TemporaryVttFileRecord = r.getFileRecord(
-                state$.value,
-                'TemporaryVttFile',
-                fileRecord.id
-              )
+            )
+          } else {
+            const temporaryVttFileRecord = r.getFileRecord(
+              state$.value,
+              'TemporaryVttFile',
+              fileRecord.id
+            )
 
-              return TemporaryVttFileRecord
-                ? await r.loadFileRequest(TemporaryVttFileRecord)
-                : await r.createFileRecord(
+            return temporaryVttFileRecord
+              ? of(r.loadFileRequest(temporaryVttFileRecord))
+              : of(
+                  r.addFile(
                     {
                       type: 'TemporaryVttFile',
                       id: fileRecord.id,
@@ -127,89 +181,90 @@ const loadFileSuccess: AppEpic = (action$, state$) =>
                     },
                     null
                   )
-            }
+                )
           }
-          case 'TemporaryVttFile': {
-            const { chunks, vttFilePath } = await getSubtitlesFromFile(
-              filePath,
-              state$.value
-            )
-            // const parentFileRecord = r.getFileRecord(
-            //   state$.value,
-            //   fileRecord.parentType,
-            //   fileRecord.id
-            // ) //wronh\g
-            // const parentFile = r.getPreviouslyLoadedFile(state$.value)
-
-            return r.addSubtitlesTrack(
-              fileRecord.parentType === 'ExternalSubtitlesTrack'
-                ? newExternalSubtitlesTrack(
-                    fileRecord.id,
-                    fileRecord.parentId,
-                    chunks,
-                    vttFilePath,
-                    filePath
-                  )
-                : newEmbeddedSubtitlesTrack(
-                    fileRecord.id,
-                    fileRecord.parentId,
-                    chunks,
-                    fileRecord.streamIndex,
-                    vttFilePath
-                  )
-            )
-          }
-          default:
-            return r.simpleMessageSnackbar(
-              'Unimplemented file load success hook'
-            )
         }
-
-        // switch (loadedFileData.type) {
-        //   case 'VttExternalSubtitlesFile':
-        //     return r.addSubtitlesTrack(loadedFileData.subtitles)
-        //   case 'NotVttExternalSubtitlesFile': {
-        //     const TemporaryVttFileRecord = r.getFileRecord(
-        //       state$.value,
-        //       'TemporaryVttFile',
-        //       fileRecord.id
-        //     )
-
-        //     return TemporaryVttFileRecord
-        //       ? r.loadFileRequest(TemporaryVttFileRecord)
-        //       : r.createFileRecord(
-        //           {
-        //             type: 'TemporaryVttFile',
-        //             id: fileRecord.id,
-        //             parentId: fileRecord.id, // not needed?
-        //             parentType: 'ExternalSubtitlesTrack',
-        //           },
-        //           null
-        //         )
-        //   }
-        //   default:
-        //     return r.simpleMessageSnackbar('boop')
-        //   // case 'VttConvertedSubtitlesFile':
-        //   //   return r.addSubtitlesTrack({
-        //   //     type:
-        //   //   })
-        // }
+        case 'TemporaryVttFile': {
+          return (
+            from(getSubtitlesFromFile(filePath, state$.value))
+              // const parentFileRecord = r.getFileRecord(
+              //   state$.value,
+              //   fileRecord.parentType,
+              //   fileRecord.id
+              // ) //wronh\g
+              // const parentFile = r.getPreviouslyLoadedFile(state$.value)
+              .pipe(
+                map(({ chunks, vttFilePath }) =>
+                  r.addSubtitlesTrack(
+                    fileRecord.parentType === 'ExternalSubtitlesTrack'
+                      ? newExternalSubtitlesTrack(
+                          fileRecord.id,
+                          fileRecord.parentId,
+                          chunks,
+                          vttFilePath,
+                          filePath
+                        )
+                      : newEmbeddedSubtitlesTrack(
+                          fileRecord.id,
+                          fileRecord.parentId,
+                          chunks,
+                          fileRecord.streamIndex,
+                          vttFilePath
+                        )
+                  )
+                )
+              )
+          )
+        }
+        default:
+          return of(
+            r.simpleMessageSnackbar('Unimplemented file load success hook')
+          )
       }
-    )
+
+      // switch (loadedFileData.type) {
+      //   case 'VttExternalSubtitlesFile':
+      //     return r.addSubtitlesTrack(loadedFileData.subtitles)
+      //   case 'NotVttExternalSubtitlesFile': {
+      //     const TemporaryVttFileRecord = r.getFileRecord(
+      //       state$.value,
+      //       'TemporaryVttFile',
+      //       fileRecord.id
+      //     )
+
+      //     return TemporaryVttFileRecord
+      //       ? r.loadFileRequest(TemporaryVttFileRecord)
+      //       : r.addFile(
+      //           {
+      //             type: 'TemporaryVttFile',
+      //             id: fileRecord.id,
+      //             parentId: fileRecord.id, // not needed?
+      //             parentType: 'ExternalSubtitlesTrack',
+      //           },
+      //           null
+      //         )
+      //   }
+      //   default:
+      //     return r.simpleMessageSnackbar('boop')
+      //   // case 'VttConvertedSubtitlesFile':
+      //   //   return r.addSubtitlesTrack({
+      //   //     type:
+      //   //   })
+      // }
+    })
   )
 
 // or should be loadSubtitlesFromFileRequest?
 const locateSubtitlesFileRequest: AppEpic = (action$, state$) =>
   action$.pipe(
-    // filter<Action, CreateFileRecordRequest<ExternalSubtitlesFileRecord>>(
-    //   isCreateFileRecord<ExternalSubtitlesFileRecord>('ExternalSubtitlesFile')
+    // filter<Action, AddFileRequest<ExternalSubtitlesFileRecord>>(
+    //   isAddFile<ExternalSubtitlesFileRecord>('ExternalSubtitlesFile')
     // ),
     filter(isLocateFileRequest('ExternalSubtitlesFile')),
     flatMap<
       LocateFileRequest & { fileRecord: ExternalSubtitlesFileRecord },
       Promise<Observable<Action>>
-    >(async a => {
-      const { filePath, fileRecord } = a
+    >(async ({ filePath, fileRecord }) => {
       try {
         const { chunks, vttFilePath } = await getSubtitlesFromFile(
           filePath,
@@ -220,7 +275,7 @@ const locateSubtitlesFileRequest: AppEpic = (action$, state$) =>
           // r.loadExternalSubtitlesSuccess(fileRecord),
           // r.locateFileSuccess(fileRecord, filePat)
           //
-          // r.createFileRecord<ExternalSubtitlesFileRecord>(
+          // r.addFile<ExternalSubtitlesFileRecord>(
           //   {
           //     type: 'ExternalSubtitlesFile',
           //     id: uuid(),
@@ -403,7 +458,7 @@ const loadConvertedVttSubtitlesFileFailure: AppEpic = (action$, state$) =>
 // }
 
 export default combineEpics(
-  createFileRecord,
+  addFile,
   loadFileRequest,
   loadSubtitlesFileFailure,
   loadFileSuccess,
