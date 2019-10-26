@@ -3,6 +3,8 @@ declare type SubtitlesState = Record<SubtitlesTrackId, SubtitlesTrack>
 // byId: { [SubtitlesTrackId: string]: SubtitlesTrack } sTrackId> }
 // }
 
+declare type SubtitlesFileExtension = 'vtt' | 'ass' | 'srt'
+
 declare type SubtitlesTrack = EmbeddedSubtitlesTrack | ExternalSubtitlesTrack
 declare type TextTrackMode = 'disabled' | 'hidden' | 'showing'
 

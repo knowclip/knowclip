@@ -1,28 +1,28 @@
-export const createFileRecordRequest = <F extends FileRecord>(
+export const createFileRecord = <F extends FileRecord>(
   fileRecord: F,
-  filePath: FilePath
-): CreateFileRecord<F> => ({
-  type: A.CREATE_FILE_RECORD_REQUEST,
+  filePath: FilePath | null
+): CreateFileRecordWith<F> => ({
+  type: A.CREATE_FILE_RECORD,
   fileRecord,
   filePath,
 })
 
-export const createFileRecordSuccess = <F extends FileRecord>(
-  fileRecord: F,
-  filePath: FilePath
-): CreateFileRecordSuccess<F> => ({
-  type: A.CREATE_FILE_RECORD_SUCCESS,
-  fileRecord,
-  filePath,
-})
-export const createFileRecordFailure = <F extends FileRecord>(
-  fileRecord: F,
-  filePath: FilePath
-): CreateFileRecordFailure<F> => ({
-  type: A.CREATE_FILE_RECORD_FAILURE,
-  fileRecord,
-  filePath,
-})
+// export const createFileRecordSuccess = <F extends FileRecord>(
+//   fileRecord: F,
+//   filePath: FilePath
+// ): CreateFileRecordSuccessWith<F> => ({
+//   type: A.CREATE_FILE_RECORD_SUCCESS,
+//   fileRecord,
+//   filePath,
+// })
+// export const createFileRecordFailure = <F extends FileRecord>(
+//   fileRecord: F,
+//   filePath: FilePath
+// ): CreateFileRecordFailureWith<F> => ({
+//   type: A.CREATE_FILE_RECORD_FAILURE,
+//   fileRecord,
+//   filePath,
+// })
 
 export const deleteFileRecordRequest = (
   fileRecord: FileRecord
@@ -68,13 +68,11 @@ export const locateFileRequest = (
 })
 export const locateFileSuccess = (
   fileRecord: FileRecord,
-  filePath: FilePath,
-  loadedFileData: LoadedFileData
+  filePath: FilePath
 ): LocateFileSuccess => ({
   type: 'LOCATE_FILE_SUCCESS',
   fileRecord,
   filePath,
-  loadedFileData,
 })
 export const locateFileFailure = (
   fileRecord: FileRecord,

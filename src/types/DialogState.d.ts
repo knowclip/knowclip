@@ -31,7 +31,7 @@ declare type DialogData =
       }
     }
   | {
-      type: 'OpenLoadedFileFailure'
+      type: 'FileSelection'
       props: {
         message: string
       }

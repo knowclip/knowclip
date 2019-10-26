@@ -8,6 +8,7 @@ import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
 import { AppEpic } from '../types/AppEpic'
+import { getSubtitlesFromMedia } from './subtitles'
 
 const coerceMp3ToConstantBitrate = (
   path: string,
@@ -254,6 +255,53 @@ const openMediaOnLocate: AppEpic = (action$, state$) =>
     map(({ id }) => r.openMediaFileRequest(id))
   )
 
+const createEmbeddedSubtitlesFileRecords: AppEpic = (action$, state$) =>
+  action$.pipe(
+    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+    flatMap<OpenMediaFileSuccess, Observable<Promise<Action>>>(
+      ({ metadata: { subtitlesTracksStreamIndexes, id }, filePath }) =>
+        from(
+          subtitlesTracksStreamIndexes
+            // .filter(
+            //   streamIndex =>
+            //     !Object.values(state$.value.fileRecords.TemporaryVttFile).some(
+            //       a =>
+            //         a.type === 'TemporaryVttFile' &&
+            //         a.parentType === 'EmbeddedSubtitlesTrack' &&
+            //         a.streamIndex === streamIndex
+            //     )
+            // )
+            .map(async streamIndex => {
+              const { tmpFilePath, chunks } = await getSubtitlesFromMedia(
+                filePath,
+                streamIndex,
+                state$.value
+              )
+              return await r.createFileRecord(
+                {
+                  type: 'TemporaryVttFile',
+                  parentId: id,
+                  id: uuid(),
+                  streamIndex,
+                  parentType: 'EmbeddedSubtitlesTrack',
+                },
+                tmpFilePath
+              )
+              // or load existing
+            })
+        )
+    ),
+    flatMap(promise => promise)
+  )
+
+// const loadSubtitles: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+//     flatMap<OpenMediaFileSuccess, Observable<Action>>(({ id }) => {
+
+//     })
+//   )
+
 export default combineEpics(
   openMedia,
   openMp3,
@@ -261,5 +309,6 @@ export default combineEpics(
   addMediaToProject,
   openMediaOnAdd,
   locateMediaFile,
-  openMediaOnLocate
+  openMediaOnLocate,
+  createEmbeddedSubtitlesFileRecords
 )

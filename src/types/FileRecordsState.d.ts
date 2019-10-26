@@ -1,11 +1,17 @@
-declare type FileRecordsState = {
-  byId: Record<FileId, FileRecord>
-  idsByBaseFileId: Record<BaseFileId, Array<FileId>>
-}
+// declare type FileRecordsState = {
+//   // byId: Record<FileId, FileRecord>
+//   idsByBaseFileId: Record<ParentFileId, Array<FileId>>
+//   byType: Record<FileRecord['type'], Record<FileId, FileRecord>>
+// }
+declare type FileRecordsState = Record<
+  FileRecord['type'],
+  // { [fileId: string]:? FileRecord }
+  Record<FileId, FileRecord>
+>
 declare type FileId = string
 declare type FilePath = string
 
-declare type BaseFileId = string
+declare type ParentFileId = string
 
 // parent can be a file or any entity, to trigger
 // loadedfile's deletion on deleted/removed from state
@@ -17,7 +23,7 @@ declare type FileRecord =
   | ProjectFileRecord
   | MediaFileRecord
   | ExternalSubtitlesFileRecord
-  | ConvertedVttFileRecord
+  | TemporaryVttFileRecord
   | WaveformPngRecord
   | ConstantBitrateMp3Record
   | VideoStillImageRecord
@@ -34,27 +40,36 @@ declare type MediaFileRecord = {
 }
 declare type ExternalSubtitlesFileRecord = {
   type: 'ExternalSubtitlesFile'
-  // parentId: SubtitlesTrackId // should it be MediaFileId?
+  // parentId: SubtitlesTrackId // should it be MediaFileId? or even needed?
   id: FileId
-  parentId: MediaFileId // should it be SubtitlesTrackId?
+  parentId: MediaFileId // should it be SubtitlesTrackId? or even needed?
 }
-declare type ConvertedVttFileRecord = {
-  type: 'ConvertedVttFile'
-  id: FileId
-  parentId: SubtitlesTrackId
-}
+declare type TemporaryVttFileRecord =
+  | {
+      type: 'TemporaryVttFile'
+      id: FileId // can just be subtitles track/original file id?
+      parentId: SubtitlesTrackId
+      parentType: 'ExternalSubtitlesTrack'
+    }
+  | {
+      type: 'TemporaryVttFile'
+      id: FileId // can just be subtitles track/original file id?
+      parentId: MediaFileId
+      streamIndex: number
+      parentType: 'EmbeddedSubtitlesTrack'
+    }
 declare type WaveformPngRecord = {
   type: 'WaveformPng'
-  id: FileId
+  id: FileId // can just be mediafileid?
   parentId: MediaFileId
 }
 declare type ConstantBitrateMp3Record = {
   type: 'ConstantBitrateMp3'
-  id: FileId
+  id: FileId // can just be mediafileid?
   parentId: MediaFileId
 }
 declare type VideoStillImageRecord = {
   type: 'VideoStillImage'
-  id: FileId
+  id: FileId // can just be cliipid?
   parentId: ClipId
 }

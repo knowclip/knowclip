@@ -48,8 +48,8 @@ export const newProjectFormDialog = () =>
 export const openMediaFileFailureDialog = (message: string): DialogAction =>
   enqueueDialog({ type: 'OpenMediaFileFailure', props: { message } })
 
-export const openLoadedFileFailureDialog = (message: string): DialogAction =>
-  enqueueDialog({ type: 'OpenLoadedFileFailure', props: { message } })
+export const fileSelectionDialog = (message: string): DialogAction =>
+  enqueueDialog({ type: 'FileSelection', props: { message } })
 
 export const closeDialog = (): DialogAction => ({
   type: A.CLOSE_DIALOG,

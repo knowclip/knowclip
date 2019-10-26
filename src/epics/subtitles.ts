@@ -126,7 +126,7 @@ export const getSubtitlesFromFile = async (
   }
 }
 
-const newEmbeddedSubtitlesTrack = (
+export const newEmbeddedSubtitlesTrack = (
   id: string,
   mediaFileId: MediaFileId,
   chunks: Array<SubtitlesChunk>,
@@ -158,7 +158,7 @@ export const newExternalSubtitlesTrack = (
   vttFilePath,
 })
 
-export const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
+const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
     filter(({ metadata }) =>
@@ -192,7 +192,7 @@ export const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
     )
   )
 
-export const loadSubtitlesFailure: AppEpic = (action$, state$) =>
+const loadSubtitlesFailure: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, LoadSubtitlesFailure>(A.LOAD_SUBTITLES_FAILURE),
     map(({ error }) =>
@@ -365,7 +365,7 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
 
 export default combineEpics(
   loadEmbeddedSubtitles,
-  loadSubtitlesFile,
+  // loadSubtitlesFile,
   loadSubtitlesFailure,
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,

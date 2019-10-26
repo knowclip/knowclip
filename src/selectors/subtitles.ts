@@ -6,12 +6,8 @@ import {
 } from '../utils/newFlashcard'
 import { getCurrentMediaMetadata, getCurrentMediaFile } from './project'
 
-export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> => {
-  const currentMediaMetadata = getCurrentMediaMetadata(state)
-  return currentMediaMetadata
-    ? state.media.byId[currentMediaMetadata.id].subtitles
-    : []
-}
+export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
+  Object.values(state.subtitles)
 
 export const getSubtitlesTrack = (
   state: AppState,

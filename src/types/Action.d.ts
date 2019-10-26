@@ -298,6 +298,7 @@ declare type SubtitlesAction =
   | LoadExternalSubtitlesSuccess
   | LoadEmbeddedSubtitlesSuccess
   | LoadSubtitlesFailure
+  | AddSubtitlesTrack
   | DeleteSubtitlesTrack
   | ShowSubtitles
   | HideSubtitles
@@ -324,6 +325,10 @@ declare type LoadEmbeddedSubtitlesSuccess = {
 declare type LoadSubtitlesFailure = {
   type: 'LOAD_SUBTITLES_FAILURE'
   error: string
+}
+declare type AddSubtitlesTrack = {
+  type: 'ADD_SUBTITLES_TRACK'
+  track: SubtitlesTrack
 }
 declare type DeleteSubtitlesTrack = {
   type: 'DELETE_SUBTITLES_TRACK'
@@ -376,7 +381,7 @@ declare type FileAction =
 declare type CreateFileRecord = {
   type: 'CREATE_FILE_RECORD'
   fileRecord: FileRecord
-  filePath: FilePath
+  filePath: FilePath | null
 }
 // declare type CreateFileRecordSuccess = {
 //   type: 'CREATE_FILE_RECORD_SUCCESS'
@@ -420,7 +425,6 @@ declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
   fileRecord: FileRecord
   filePath: FilePath
-  loadedFileData: LoadedFileData
 }
 declare type LocateFileFailure = {
   // needed?
@@ -429,13 +433,39 @@ declare type LocateFileFailure = {
   errorMessage: string
 }
 
+interface WithRecordType<F extends FileRecord> {
+  fileRecord: F
+}
+type LoadFileRequestWith<F extends FileRecord> = Omit<
+  LoadFileRequest,
+  'fileRecord'
+> &
+  WithRecordType<F>
+type LoadFileSuccessWith<F extends FileRecord> = Omit<
+  LoadFileSuccess,
+  'fileRecord'
+> &
+  WithRecordType<F>
+type LoadFileFailureWith<F extends FileRecord> = Omit<
+  LoadFileFailure,
+  'fileRecord'
+> &
+  WithRecordType<F>
+type CreateFileRecordWith<F extends FileRecord> = Omit<
+  CreateFileRecord,
+  'fileRecord'
+> &
+  WithRecordType<F>
+
 // CYCLE:   *includes state update
 // CreateFileRecord* -> LoadFileRequest /// SHOULD CreateFileRecord and LocateFileSuccess/request? be merged???
 //                            or check valid later?
 // LoadFileRequest -> present & valid? LoadFileSuccess
-//                                     LoadFileFailure
-// LoadFileFailure -> invalid?
-//                    absent? LocateFileRequest
+//                    present & invalid? LoadFileFailure*
+//                    absent? ShowLocateFileDialog/GenerateFile
+// ShowLocateFileDialog/GenerateFile -> success/confirmation? LocateFileRequest
+//                                      failure/nothing? LoadFileFailure*
+// LoadFileFailure* -> ___
 // LocateFileRequest -> located? LocateFileSuccess*
 //                   -> not located? LocateFileFailure
 // LocateFileSuccess* -> LoadFileRequest

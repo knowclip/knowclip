@@ -1,3 +1,5 @@
+import uuid from 'uuid'
+
 export const showSubtitles = (
   id: SubtitlesTrackId,
   mediaFileId: MediaFileId
@@ -16,13 +18,24 @@ export const hideSubtitles = (
   mediaFileId,
 })
 
+export const addSubtitlesTrack = (
+  track: SubtitlesTrack
+): AddSubtitlesTrack => ({
+  type: A.ADD_SUBTITLES_TRACK,
+  track,
+})
+
 export const loadSubtitlesFromFileRequest = (
   filePath: string,
   mediaFileId: MediaFileId
-): LoadSubtitlesFromFileRequest => ({
-  type: A.LOAD_SUBTITLES_FROM_FILE_REQUEST,
+): CreateFileRecordWith<ExternalSubtitlesFileRecord> => ({
+  type: A.CREATE_FILE_RECORD,
+  fileRecord: {
+    type: 'ExternalSubtitlesFile',
+    parentId: mediaFileId,
+    id: uuid(),
+  },
   filePath,
-  mediaFileId,
 })
 
 export const loadEmbeddedSubtitlesSuccess = (

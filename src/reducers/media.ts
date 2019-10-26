@@ -98,66 +98,66 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
         },
       }
 
-    case A.LOAD_EMBEDDED_SUBTITLES_SUCCESS:
-    case A.LOAD_EXTERNAL_SUBTITLES_SUCCESS:
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [action.mediaFileId]: {
-            ...state.byId[action.mediaFileId],
-            subtitles: [
-              ...state.byId[action.mediaFileId].subtitles,
-              ...action.subtitlesTracks,
-            ],
-          },
-        },
-      }
-    case A.SHOW_SUBTITLES: {
-      const { id, mediaFileId } = action
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [mediaFileId]: {
-            ...state.byId[mediaFileId],
-            subtitles: state.byId[mediaFileId].subtitles.map(track =>
-              track.id === id ? editTrack(track, { mode: 'showing' }) : track
-            ),
-          },
-        },
-      }
-    }
+    // case A.LOAD_EMBEDDED_SUBTITLES_SUCCESS:
+    // case A.LOAD_EXTERNAL_SUBTITLES_SUCCESS:
+    //   return {
+    //     ...state,
+    //     byId: {
+    //       ...state.byId,
+    //       [action.mediaFileId]: {
+    //         ...state.byId[action.mediaFileId],
+    //         subtitles: [
+    //           ...state.byId[action.mediaFileId].subtitles,
+    //           ...action.subtitlesTracks,
+    //         ],
+    //       },
+    //     },
+    //   }
+    // case A.SHOW_SUBTITLES: {
+    //   const { id, mediaFileId } = action
+    //   return {
+    //     ...state,
+    //     byId: {
+    //       ...state.byId,
+    //       [mediaFileId]: {
+    //         ...state.byId[mediaFileId],
+    //         subtitles: state.byId[mediaFileId].subtitles.map(track =>
+    //           track.id === id ? editTrack(track, { mode: 'showing' }) : track
+    //         ),
+    //       },
+    //     },
+    //   }
+    // }
 
-    case A.HIDE_SUBTITLES: {
-      const { id, mediaFileId } = action
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [mediaFileId]: {
-            ...state.byId[mediaFileId],
-            subtitles: state.byId[mediaFileId].subtitles.map(track =>
-              track.id === id ? editTrack(track, { mode: 'hidden' }) : track
-            ),
-          },
-        },
-      }
-    }
+    // case A.HIDE_SUBTITLES: {
+    //   const { id, mediaFileId } = action
+    //   return {
+    //     ...state,
+    //     byId: {
+    //       ...state.byId,
+    //       [mediaFileId]: {
+    //         ...state.byId[mediaFileId],
+    //         subtitles: state.byId[mediaFileId].subtitles.map(track =>
+    //           track.id === id ? editTrack(track, { mode: 'hidden' }) : track
+    //         ),
+    //       },
+    //     },
+    //   }
+    // }
 
-    case A.DELETE_SUBTITLES_TRACK:
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [action.mediaFileId]: {
-            ...state.byId[action.mediaFileId],
-            subtitles: state.byId[action.mediaFileId].subtitles.filter(
-              ({ id }) => id !== action.id
-            ),
-          },
-        },
-      }
+    // case A.DELETE_SUBTITLES_TRACK:
+    //   return {
+    //     ...state,
+    //     byId: {
+    //       ...state.byId,
+    //       [action.mediaFileId]: {
+    //         ...state.byId[action.mediaFileId],
+    //         subtitles: state.byId[action.mediaFileId].subtitles.filter(
+    //           ({ id }) => id !== action.id
+    //         ),
+    //       },
+    //     },
+    //   }
 
     case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
       return {
