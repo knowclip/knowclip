@@ -109,97 +109,92 @@ const coerceMp3ToConstantBitrate = (
 //     flatMap(x => x)
 //   )
 
-const openMp3: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenMp3Request>(A.OPEN_MP3_REQUEST),
-    flatMap(async ({ id, filePath }) => {
-      try {
-        const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
-          filePath,
-          r.getMediaFileConstantBitratePathFromCurrentProject(state$.value, id)
-        )
+// const openMp3: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, OpenMp3Request>(A.OPEN_MP3_REQUEST),
+//     flatMap(async ({ id, filePath }) => {
+//       try {
+//         const constantBitrateFilePath = await coerceMp3ToConstantBitrate(
+//           filePath,
+//           r.getMediaFileConstantBitratePathFromCurrentProject(state$.value, id)
+//         )
 
-        const ffprobeMetadata = await getMediaMetadata(filePath)
-        const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
+//         const ffprobeMetadata = await getMediaMetadata(filePath)
+//         const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
 
-        return r.openMediaFileSuccess(
-          filePath,
-          constantBitrateFilePath,
-          metadata
-        )
-      } catch (err) {
-        return r.openMediaFileFailure(
-          `Error opening media file: ${
-            err.message
-          }\n\n Try to locate it manually?`
-        )
-      }
-    })
-  )
+//         return r.openMediaFileSuccess(
+//           filePath,
+//           constantBitrateFilePath,
+//           metadata
+//         )
+//       } catch (err) {
+//         return r.openMediaFileFailure(
+//           `Error opening media file: ${
+//             err.message
+//           }\n\n Try to locate it manually?`
+//         )
+//       }
+//     })
+//   )
 
-const openMediaFileFailure: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenMediaFileFailure>(A.OPEN_MEDIA_FILE_FAILURE),
-    map(({ errorMessage }) => r.openMediaFileFailureDialog(errorMessage))
-  )
+// const openMediaFileFailure: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, OpenMediaFileFailure>(A.OPEN_MEDIA_FILE_FAILURE),
+//     map(({ errorMessage }) => r.openMediaFileFailureDialog(errorMessage))
+//   )
 
 const addMediaToProject: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddMediaToProjectRequest>(A.ADD_MEDIA_TO_PROJECT_REQUEST),
-    flatMap<AddMediaToProjectRequest, Promise<Observable<Action>>>(
-      async ({ projectId, filePaths }) => {
-        try {
-          // use ffprobe to get metadata for all files
-          const metadatas = await Promise.all(
-            filePaths.map(async filePath => {
-              const ffprobeMetadata = await getMediaMetadata(filePath)
-              console.log(ffprobeMetadata)
-              return {
+    flatMap<AddMediaToProjectRequest, Promise<Observable<Action>>>(async a => {
+      const { projectId, filePaths } = a
+      try {
+        // use ffprobe to get metadata for all files
+        const metadatas = await Promise.all(
+          filePaths.map(async filePath => {
+            const ffprobeMetadata = await getMediaMetadata(filePath)
+            console.log(ffprobeMetadata)
+            return {
+              filePath,
+              constantBitrateFilePath:
+                extname(filePath) === '.mp3' ? null : filePath,
+              // error: null,
+              metadata: convertMediaMetadata(ffprobeMetadata, filePath, uuid()),
+              //   subtitles: [],
+              //   flashcardFieldsToSubtitlesTracks: {},
+            }
+          })
+        )
+        return await from(
+          metadatas.map(({ filePath, metadata }) =>
+            r.addFile(
+              {
+                id: metadata.id,
+                type: 'MediaFile',
+                parentId: projectId,
+
+                subtitles: [],
+                flashcardFieldsToSubtitlesTracks: {},
+
+                name: metadata.name,
+                durationSeconds: metadata.durationSeconds,
+                format: metadata.format,
+                isVideo: metadata.isVideo,
+                subtitlesTracksStreamIndexes:
+                  metadata.subtitlesTracksStreamIndexes,
                 filePath,
-                constantBitrateFilePath:
-                  extname(filePath) === '.mp3' ? null : filePath,
-                // error: null,
-                metadata: convertMediaMetadata(
-                  ffprobeMetadata,
-                  filePath,
-                  uuid()
-                ),
-                //   subtitles: [],
-                //   flashcardFieldsToSubtitlesTracks: {},
-              }
-            })
-          )
-          return await from(
-            metadatas.map(({ filePath, metadata }) =>
-              r.addFile(
-                {
-                  id: metadata.id,
-                  type: 'MediaFile',
-                  parentId: projectId,
-
-                  subtitles: [],
-                  flashcardFieldsToSubtitlesTracks: {},
-
-                  name: metadata.name,
-                  durationSeconds: metadata.durationSeconds,
-                  format: metadata.format,
-                  isVideo: metadata.isVideo,
-                  subtitlesTracksStreamIndexes:
-                    metadata.subtitlesTracksStreamIndexes,
-                  filePath,
-                },
-                filePath
-              )
+              },
+              filePath
             )
           )
-        } catch (err) {
-          console.log(err)
-          return await of(
-            r.simpleMessageSnackbar(`Error adding media file: ${err.message}`)
-          )
-        }
+        )
+      } catch (err) {
+        console.log(err)
+        return await of(
+          r.simpleMessageSnackbar(`Error adding media file: ${err.message}`)
+        )
       }
-    ),
+    }),
     flatMap(x => x)
   )
 
@@ -239,44 +234,44 @@ const getDifferenceMessage = (
   }
 }
 
-const locateMediaFile: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, LocateMediaFileRequest>(A.LOCATE_MEDIA_FILE_REQUEST),
-    flatMap<LocateMediaFileRequest, Promise<Action>>(
-      async ({ id, filePath }) => {
-        try {
-          const ffprobeMetadata = await getMediaMetadata(filePath)
-          const newMetadata = convertMediaMetadata(
-            ffprobeMetadata,
-            filePath,
-            id
-          )
+// const locateMediaFile: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, LocateMediaFileRequest>(A.LOCATE_MEDIA_FILE_REQUEST),
+//     flatMap<LocateMediaFileRequest, Promise<Action>>(
+//       async ({ id, filePath }) => {
+//         try {
+//           const ffprobeMetadata = await getMediaMetadata(filePath)
+//           const newMetadata = convertMediaMetadata(
+//             ffprobeMetadata,
+//             filePath,
+//             id
+//           )
 
-          const success = r.locateMediaFileSuccess(id, newMetadata, filePath)
+//           const success = r.locateMediaFileSuccess(id, newMetadata, filePath)
 
-          const existingMetadata = r.getCurrentMediaMetadata(state$.value)
-          if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
-            const differenceMessage = getDifferenceMessage(
-              existingMetadata,
-              newMetadata
-            )
-            if (differenceMessage)
-              return r.confirmationDialog(
-                `${differenceMessage} Do you want to try using this file anyway?`,
-                success
-              )
-          }
+//           const existingMetadata = r.getCurrentMediaMetadata(state$.value)
+//           if (existingMetadata && existingMetadata.format !== 'UNKNOWN') {
+//             const differenceMessage = getDifferenceMessage(
+//               existingMetadata,
+//               newMetadata
+//             )
+//             if (differenceMessage)
+//               return r.confirmationDialog(
+//                 `${differenceMessage} Do you want to try using this file anyway?`,
+//                 success
+//               )
+//           }
 
-          return success
-        } catch (err) {
-          console.error(err)
-          return r.simpleMessageSnackbar(
-            `There was a problem opening this media file. ${err.message}`
-          )
-        }
-      }
-    )
-  )
+//           return success
+//         } catch (err) {
+//           console.error(err)
+//           return r.simpleMessageSnackbar(
+//             `There was a problem opening this media file. ${err.message}`
+//           )
+//         }
+//       }
+//     )
+//   )
 
 // openMediaOnLocate // KEEEEEPSIESSS
 // openMediaOnLocate // KEEEEEPSIESSS
@@ -338,11 +333,11 @@ const locateMediaFile: AppEpic = (action$, state$) =>
 
 export default combineEpics(
   // openMedia,
-  openMp3,
-  openMediaFileFailure,
-  addMediaToProject,
+  // openMp3,
+  // openMediaFileFailure,
+  addMediaToProject
   // openMediaOnAdd,
-  locateMediaFile
+  // locateMediaFile
   // openMediaOnLocate // KEEEEEPSIESSS
   // createEmbeddedSubtitlesFileRecords
 )

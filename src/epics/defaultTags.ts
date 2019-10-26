@@ -26,16 +26,19 @@ const defaultTagsEpic: AppEpic = (action$, state$) =>
     })
   )
 
-const onOpenMedia: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-    map(action => {
-      const fileName = r.getCurrentFileName(state$.value)
-      return {
-        type: 'SET_DEFAULT_TAGS',
-        tags: fileName ? [basename(fileName)] : [],
-      } as SetDefaultTags
-    })
-  )
+// const onOpenMedia: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+//     map(action => {
+//       const fileName = r.getCurrentFileName(state$.value)
+//       return {
+//         type: 'SET_DEFAULT_TAGS',
+//         tags: fileName ? [basename(fileName)] : [],
+//       } as SetDefaultTags
+//     })
+//   )
 
-export default combineEpics(defaultTagsEpic, onOpenMedia)
+export default combineEpics(
+  defaultTagsEpic
+  //  onOpenMedia,
+)

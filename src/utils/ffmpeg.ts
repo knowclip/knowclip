@@ -41,11 +41,21 @@ export const getMediaMetadata = (path: string): Promise<FfprobeData> => {
   })
 }
 
+type Mxx = {
+  id: FileId
+
+  name: MediaFileName
+  durationSeconds: number
+  format: 'UNKNOWN' | string
+  isVideo: boolean
+  subtitlesTracksStreamIndexes: number[]
+}
+
 export const convertMediaMetadata = (
   ffprobeMetadata: FfprobeData,
   filePath: string,
   id: string
-): MediaFileMetadata => ({
+): Mxx => ({
   id,
   name: basename(filePath),
   durationSeconds: ffprobeMetadata.format.duration || 0,

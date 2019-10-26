@@ -48,30 +48,30 @@ export const getWaveformPng = async (
   })
 }
 
-const getWaveformEpic: AppEpic = (
-  action$,
-  state$ // remove
-) =>
-  action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-    switchMap<OpenMediaFileSuccess, Promise<Action>>(
-      async ({ filePath, constantBitrateFilePath }) => {
-        try {
-          if (!filePath) {
-            return r.setWaveformImagePath(null)
-          }
+// const getWaveformEpic: AppEpic = (
+//   action$,
+//   state$ // remove
+// ) =>
+//   action$.pipe(
+//     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
+//     switchMap<OpenMediaFileSuccess, Promise<Action>>(
+//       async ({ filePath, constantBitrateFilePath }) => {
+//         try {
+//           if (!filePath) {
+//             return r.setWaveformImagePath(null)
+//           }
 
-          const imagePath = await getWaveformPng(
-            state$.value,
-            constantBitrateFilePath
-          )
-          return r.setWaveformImagePath(imagePath)
-        } catch (err) {
-          console.error(err)
-          return r.simpleMessageSnackbar(err.message)
-        }
-      }
-    )
-  )
+//           const imagePath = await getWaveformPng(
+//             state$.value,
+//             constantBitrateFilePath
+//           )
+//           return r.setWaveformImagePath(imagePath)
+//         } catch (err) {
+//           console.error(err)
+//           return r.simpleMessageSnackbar(err.message)
+//         }
+//       }
+//     )
+//   )
 
-export default getWaveformEpic
+export default 'getWaveformEpic'

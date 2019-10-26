@@ -84,23 +84,23 @@ export const deleteMediaFromProject = (
 //   id,
 // })
 
-export const openMediaFileSuccess = (
-  filePath: MediaFilePath,
-  constantBitrateFilePath: MediaFilePath,
-  metadata: MediaFileMetadata
-): OpenMediaFileSuccess => ({
-  type: A.OPEN_MEDIA_FILE_SUCCESS,
-  filePath,
-  constantBitrateFilePath,
-  metadata,
-})
+// export const openMediaFileSuccess = (
+//   filePath: MediaFilePath,
+//   constantBitrateFilePath: MediaFilePath,
+//   metadata: MediaFileMetadata
+// ): OpenMediaFileSuccess => ({
+//   type: A.OPEN_MEDIA_FILE_SUCCESS,
+//   filePath,
+//   constantBitrateFilePath,
+//   metadata,
+// })
 
-export const openMediaFileFailure = (
-  errorMessage: string
-): OpenMediaFileFailure => ({
-  type: A.OPEN_MEDIA_FILE_FAILURE,
-  errorMessage,
-})
+// export const openMediaFileFailure = (
+//   errorMessage: string
+// ): OpenMediaFileFailure => ({
+//   type: A.OPEN_MEDIA_FILE_FAILURE,
+//   errorMessage,
+// })
 
 export const locateMediaFileRequest = (
   id: MediaFileId,

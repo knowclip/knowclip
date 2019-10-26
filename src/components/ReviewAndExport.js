@@ -108,7 +108,7 @@ const formatDuration = duration =>
     .filter(v => v)
     .join(':')
 let MediaTable = ({
-  mediaFileMetadata,
+  media,
   clips,
   open,
   closeDialog,
@@ -137,10 +137,10 @@ let MediaTable = ({
         </div>
 
         <h2 className={css.mediaFileName}>
-          {mediaFileMetadata.name}{' '}
+          {media.name}{' '}
           <small>
             {formatDuration(
-              moment.duration({ seconds: mediaFileMetadata.durationSeconds })
+              moment.duration({ seconds: media.durationSeconds })
             )}
           </small>
         </h2>
@@ -187,8 +187,8 @@ let MediaTable = ({
       </Table>
     </Paper>
   )
-MediaTable = connect((state, { open, mediaFileMetadata }) => ({
-  clips: r.getClips(state, mediaFileMetadata.id),
+MediaTable = connect((state, { open, media }) => ({
+  clips: r.getClips(state, media.id),
   highlightedClipId: r.getHighlightedClipId(state),
 }))(MediaTable)
 
@@ -285,7 +285,7 @@ const Export = ({
               key={metadata.id}
               open={i === expandedTableIndex}
               toggleOpen={e => onClickTable(i === expandedTableIndex ? -1 : i)}
-              mediaFileMetadata={metadata}
+              media={metadata}
               selectedIds={selectedIds}
               onSelect={onSelect}
               onSelectAll={onSelectAll}

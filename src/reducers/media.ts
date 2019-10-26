@@ -84,19 +84,19 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
         },
       }
 
-    case A.OPEN_MEDIA_FILE_SUCCESS:
-      return {
-        ...state,
-        byId: {
-          ...state.byId,
-          [action.metadata.id]: {
-            ...state.byId[action.metadata.id],
-            filePath: action.filePath,
-            metadata: action.metadata,
-            constantBitrateFilePath: action.constantBitrateFilePath,
-          },
-        },
-      }
+    // case A.OPEN_MEDIA_FILE_SUCCESS:
+    //   return {
+    //     ...state,
+    //     byId: {
+    //       ...state.byId,
+    //       [action.metadata.id]: {
+    //         ...state.byId[action.metadata.id],
+    //         filePath: action.filePath,
+    //         metadata: action.metadata,
+    //         constantBitrateFilePath: action.constantBitrateFilePath,
+    //       },
+    //     },
+    //   }
 
     // case A.LOAD_EMBEDDED_SUBTITLES_SUCCESS:
     // case A.LOAD_EXTERNAL_SUBTITLES_SUCCESS:

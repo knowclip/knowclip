@@ -173,8 +173,8 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         loopMedia: action.loop,
       }
 
-    case A.OPEN_MEDIA_FILE_FAILURE:
-    case A.OPEN_MEDIA_FILE_SUCCESS:
+    // case A.OPEN_MEDIA_FILE_FAILURE:
+    // case A.OPEN_MEDIA_FILE_SUCCESS:
     case A.LOAD_FILE_SUCCESS: // temp
       return {
         ...state,

@@ -140,9 +140,16 @@ const loadFileSuccess: AppEpic = (action$, state$) =>
                 catchError(err => of(r.simpleMessageSnackbar(err.message)))
               )
             : empty()
+
+          const fileName = r.getCurrentFileName(state$.value)
+
           return merge(
             addSubtitlesFiles,
-            getWaveform
+            getWaveform,
+            of({
+              type: 'SET_DEFAULT_TAGS',
+              tags: fileName ? [basename(fileName)] : [],
+            } as SetDefaultTags)
             // of(r.addMedi)
           )
         }
