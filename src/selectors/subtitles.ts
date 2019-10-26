@@ -4,7 +4,7 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { getCurrentMediaMetadata, getCurrentMediaFile } from './project'
+import { getCurrentMediaFileRecord } from './project'
 
 export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
   Object.values(state.subtitles)
@@ -79,7 +79,7 @@ export const getSubtitlesChunksWithinRange = (
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
 ): SubtitlesFlashcardFieldsLinks => {
-  const media = getCurrentMediaFile(state)
+  const media = getCurrentMediaFileRecord(state)
   return media ? media.flashcardFieldsToSubtitlesTracks : {}
 }
 

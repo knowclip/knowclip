@@ -260,7 +260,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
           )
 
         const currentNoteType = r.getCurrentNoteType(state$.value)
-        const currentFile = r.getCurrentMediaMetadata(state$.value)
+        const currentFile = r.getCurrentMediaFileRecord(state$.value)
         if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
         if (!currentFile) throw new Error('Could not find media file.') // should be impossible
 
@@ -330,7 +330,7 @@ const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
         return r.simpleMessageSnackbar(
           'Please add a subtitles track and try again.'
         )
-      const mediaFile = r.getCurrentMediaMetadata(state$.value)
+      const mediaFile = r.getCurrentMediaFileRecord(state$.value)
       if (!mediaFile || !r.getCurrentFilePath(state$.value))
         return r.simpleMessageSnackbar(
           'Please locate this media file and try again.'

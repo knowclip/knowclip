@@ -24,9 +24,9 @@ export const getPersistedState = (): Partial<AppState> => {
       : null
     if (projects) persistedState.projects = projects
 
-    const mediaText = window.localStorage.getItem('media')
-    const media = mediaText ? (JSON.parse(mediaText) as MediaState) : null
-    if (media) persistedState.media = media
+    // const mediaText = window.localStorage.getItem('media')
+    // const media = mediaText ? (JSON.parse(mediaText) as MediaState) : null
+    // if (media) persistedState.media = media
 
     const settingsText = window.localStorage.getItem('settings')
     const settings = settingsText

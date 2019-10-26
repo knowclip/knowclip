@@ -52,8 +52,8 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
     ofType<Action, DetectSilence>(A.DETECT_SILENCE),
     flatMap<DetectSilence, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
-      const currentMediaMetadata = r.getCurrentMediaMetadata(state$.value)
-      if (!currentMediaMetadata || !currentFilePath)
+      const currentMedia = r.getCurrentMediaFileRecord(state$.value)
+      if (!currentMedia || !currentFilePath)
         throw new Error('Illegal: no media file loaded')
 
       return detectSilence(currentFilePath).then(silences => {
@@ -72,7 +72,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
           if (nextSilence) {
             chunks.push({ start: silenceEnd, end: nextSilence.start })
           } else {
-            const durationMs = currentMediaMetadata.durationSeconds * 1000
+            const durationMs = currentMedia.durationSeconds * 1000
             if (silenceEnd !== durationMs)
               chunks.push({ start: silenceEnd, end: durationMs })
           }

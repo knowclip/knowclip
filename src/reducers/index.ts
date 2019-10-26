@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 
-import media from './media'
+// import media from './media'
 import waveform from './waveform'
 import clips from './clips'
 import user from './user'
@@ -13,7 +13,7 @@ import loadedFiles from './loadedFiles'
 import fileRecords from './fileRecords'
 
 export default combineReducers<AppState>({
-  media,
+  // media,
   waveform,
   clips,
   user,

@@ -1,7 +1,7 @@
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 import { getClips, getPreviouslyLoadedFile } from '.'
-import { getMediaFiles, getProjectMediaFileRecords } from './media'
+import { getProjectMediaFileRecords } from './media'
 import { getFileRecord } from './files'
 
 export const getProject = (
@@ -46,16 +46,16 @@ export const getCurrentProject = (state: AppState): ProjectMetadata | null => {
   return currentProjectId ? state.projects.byId[currentProjectId] : null
 }
 
-export const getMediaMetadataFromCurrentProject = (
-  state: AppState,
-  id: MediaFileId
-): MediaFileMetadata | null => state.media.byId[id].metadata || null
+// export const getMediaMetadataFromCurrentProject = (
+//   state: AppState,
+//   id: MediaFileId
+// ): MediaFileMetadata | null => state.media.byId[id].metadata || null
 
-export const getMediaFilePathFromCurrentProject = (
-  state: AppState,
-  id: MediaFileId
-): MediaFilePath | null =>
-  state.media.byId[id] ? state.media.byId[id].filePath : null
+// export const getMediaFilePathFromCurrentProject = (
+//   state: AppState,
+//   id: MediaFileId
+// ): MediaFilePath | null =>
+//   state.media.byId[id] ? state.media.byId[id].filePath : null
 
 export const getMediaFileConstantBitratePathFromCurrentProject = (
   state: AppState,
@@ -100,26 +100,26 @@ export const getCurrentMediaFileConstantBitratePath = (
 //     )
 //   : null
 
-export const getProjectMediaMetadata = (
-  // rename to just media files
-  state: AppState,
-  projectId: ProjectId
-): Array<MediaFileMetadata> =>
-  getMediaFiles(state, projectId).map(({ metadata }) => metadata)
+// export const getProjectMediaMetadata = (
+//   // rename to just media files
+//   state: AppState,
+//   projectId: ProjectId
+// ): Array<MediaFileMetadata> =>
+//   getMediaFiles(state, projectId).map(({ metadata }) => metadata)
 
-export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
-  // remove
-  const { currentMediaFileId } = state.user
-  return currentMediaFileId ? state.media.byId[currentMediaFileId] : null
-}
+// export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
+//   // remove
+//   const { currentMediaFileId } = state.user
+//   return currentMediaFileId ? state.media.byId[currentMediaFileId] : null
+// }
 
-export const getCurrentMediaMetadata = (
-  // remove
-  state: AppState
-): MediaFileMetadata | null => {
-  const currentMediaFile = getCurrentMediaFile(state)
-  return currentMediaFile ? currentMediaFile.metadata : null
-}
+// export const getCurrentMediaMetadata = (
+//   // remove
+//   state: AppState
+// ): MediaFileMetadata | null => {
+//   const currentMediaFile = getCurrentMediaFile(state)
+//   return currentMediaFile ? currentMediaFile.metadata : null
+// }
 
 export const getCurrentMediaFileRecord = (
   state: AppState
