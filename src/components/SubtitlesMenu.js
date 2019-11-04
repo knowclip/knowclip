@@ -24,13 +24,16 @@ const VisibilityButton = ({ visible, showSubtitles, hideSubtitles }) => (
   </IconButton>
 )
 
-const getOnClickLoadExternal = loadSubtitlesFromFile => async () => {
+const getOnClickLoadExternal = (
+  loadSubtitlesFromFile,
+  getCurrentFileId
+) => async () => {
   const filePaths = await showOpenDialog([
     { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
   ])
   if (!filePaths) return
 
-  loadSubtitlesFromFile(filePaths[0])
+  loadSubtitlesFromFile(filePaths[0], getCurrentFileId)
 }
 
 const SubtitlesMenu = ({
@@ -95,7 +98,10 @@ const SubtitlesMenu = ({
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem dense onClick={getOnClickLoadExternal(loadSubtitlesFromFile)}>
+        <MenuItem
+          dense
+          onClick={getOnClickLoadExternal(loadSubtitlesFromFile, currentFileId)}
+        >
           <ListItemText primary="Load external track" />
         </MenuItem>
         <MenuItem dense onClick={e => subtitlesClipsDialogRequest()}>

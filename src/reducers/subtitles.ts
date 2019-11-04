@@ -11,6 +11,23 @@ const subtitles: Reducer<SubtitlesState> = (
       return { ...state, [action.track.id]: action.track }
     case A.LOAD_FILE_REQUEST:
       return action.fileRecord.type === 'MediaFile' ? initialState : state
+    case A.HIDE_SUBTITLES:
+      return {
+        ...state,
+        [action.id]: {
+          ...state[action.id],
+          mode: 'hidden',
+        } as SubtitlesTrack,
+      }
+
+    case A.SHOW_SUBTITLES:
+      return {
+        ...state,
+        [action.id]: {
+          ...state[action.id],
+          mode: 'showing',
+        } as SubtitlesTrack,
+      }
     default:
       return state
   }

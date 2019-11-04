@@ -3,11 +3,16 @@
 //   idsByBaseFileId: Record<ParentFileId, Array<FileId>>
 //   byType: Record<FileRecord['type'], Record<FileId, FileRecord>>
 // }
-declare type FileRecordsState = Record<
-  FileRecord['type'],
-  // { [fileId: string]:? FileRecord }
-  Record<FileId, FileRecord>
->
+declare type FileRecordsState = {
+  ProjectFile: Record<FileId, ProjectFileRecord>
+  MediaFile: Record<FileId, MediaFileRecord>
+  TemporaryVttFile: Record<FileId, TemporaryVttFileRecord>
+  ExternalSubtitlesFile: Record<FileId, ExternalSubtitlesFileRecord>
+  WaveformPng: Record<FileId, WaveformPngRecord>
+  ConstantBitrateMp3: Record<FileId, ConstantBitrateMp3Record>
+  VideoStillImage: Record<FileId, VideoStillImageRecord>
+}
+
 declare type FileId = string
 declare type FilePath = string
 
