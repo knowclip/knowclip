@@ -38,29 +38,6 @@ export const loadSubtitlesFromFileRequest = (
   filePath,
 })
 
-// export const loadEmbeddedSubtitlesSuccess = (
-//   subtitlesTracks: Array<EmbeddedSubtitlesTrack>,
-//   mediaFileId: MediaFileId
-// ): LoadEmbeddedSubtitlesSuccess => ({
-//   type: A.LOAD_EMBEDDED_SUBTITLES_SUCCESS,
-//   subtitlesTracks,
-//   mediaFileId,
-// })
-
-// export const loadExternalSubtitlesSuccess = (
-//   subtitlesTracks: Array<ExternalSubtitlesTrack>,
-//   mediaFileId: MediaFileId
-// ): LoadExternalSubtitlesSuccess => ({
-//   type: A.LOAD_EXTERNAL_SUBTITLES_SUCCESS,
-//   subtitlesTracks,
-//   mediaFileId,
-// })
-
-// export const loadSubtitlesFailure = (error: string): LoadSubtitlesFailure => ({
-//   type: A.LOAD_SUBTITLES_FAILURE,
-//   error,
-// })
-
 export const deleteSubtitlesTrack = (
   id: SubtitlesTrackId,
   mediaFileId: MediaFileId

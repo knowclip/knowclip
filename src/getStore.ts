@@ -4,7 +4,6 @@ import reducer from './reducers'
 import epic from './epics'
 import { getPersistedState } from './utils/statePersistence'
 import { initialState as initialSettingsState } from './reducers/settings'
-import { initialState as initialMediaState } from './reducers/media'
 import epicsDependencies from './epicsDependencies'
 
 const composeEnhancers =
