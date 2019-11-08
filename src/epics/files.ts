@@ -8,6 +8,7 @@ import * as media from '../files/mediaFile'
 import * as temporaryVtt from '../files/temporaryVttFile'
 import * as externalSubtitles from '../files/externalSubtitlesFile'
 import * as waveformPng from '../files/waveformPngFile'
+import * as constantBitrateMp3 from '../files/constantBitrateMp3File'
 
 const addFile: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -68,6 +69,14 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
               effects
             )
 
+          case 'ConstantBitrateMp3':
+            return constantBitrateMp3.loadRequest(
+              fileRecord,
+              filePath,
+              state$.value,
+              effects
+            )
+
           case 'ExternalSubtitlesFile':
           default:
             return await r.loadFileSuccess(fileRecord, filePath)
@@ -110,6 +119,14 @@ const loadFileSuccess: AppEpic = (action$, state$, effects) =>
 
         case 'WaveformPng':
           return waveformPng.loadSuccess(
+            fileRecord,
+            filePath,
+            state$.value,
+            effects
+          )
+
+        case 'ConstantBitrateMp3':
+          return constantBitrateMp3.loadSuccess(
             fileRecord,
             filePath,
             state$.value,

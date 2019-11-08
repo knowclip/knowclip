@@ -18,11 +18,7 @@ export const loadRequest: LoadRequestHandler<WaveformPngRecord> = async (
   const file = r.getPreviouslyLoadedFile(state, fileRecord)
 
   if (!file || !file.filePath) {
-    const parentFile = r.getLoadedFileById(
-      state,
-      'MediaFile',
-      fileRecord.parentId
-    )
+    const parentFile = r.getLoadedFileById(state, 'MediaFile', fileRecord.id)
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
       return await r.loadFileFailure(
         fileRecord,

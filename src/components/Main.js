@@ -40,7 +40,13 @@ const Subtitles = ({ track, isDefault }) =>
     />
   )
 
-const Media = ({ filePath, loop, handleAudioEnded, metadata, subtitles }) => {
+const Media = ({
+  constantBitrateFilePath,
+  loop,
+  handleAudioEnded,
+  metadata,
+  subtitles,
+}) => {
   const mediaRef = useRef()
   const props = {
     onEnded: handleAudioEnded,
@@ -51,7 +57,7 @@ const Media = ({ filePath, loop, handleAudioEnded, metadata, subtitles }) => {
     id: 'audioPlayer',
     className: 'audioPlayer',
     controlsList: 'nodownload nofullscreen',
-    src: filePath ? `file://${filePath}` : null,
+    src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : null,
     playbackspeed: 1,
   }
   useEffect(
@@ -157,7 +163,7 @@ class Main extends Component {
         <section className="media">
           <Media
             key={String(constantBitrateFilePath)}
-            filePath={constantBitrateFilePath}
+            constantBitrateFilePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
             loop={loop}
             metadata={currentMediaFile}

@@ -40,6 +40,8 @@ export const getPersistedState = (): Partial<AppState> => {
       : null
     if (fileRecords) persistedState.fileRecords = fileRecords
 
+    // should also check for orphans?
+
     // if (persistedState.fileRecords)
     //   persistedState.loadedFiles =
 

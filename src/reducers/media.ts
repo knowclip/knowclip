@@ -63,14 +63,14 @@ const media: Reducer<MediaState, Action> = (state = initialState, action) => {
         },
       }
 
-    case A.DELETE_MEDIA_FROM_PROJECT: {
-      const newById = { ...state.byId }
-      delete newById[action.mediaFileId]
-      return {
-        ...state,
-        byId: newById,
-      }
-    }
+    // case A.DELETE_MEDIA_FROM_PROJECT: {
+    //   const newById = { ...state.byId }
+    //   delete newById[action.mediaFileId]
+    //   return {
+    //     ...state,
+    //     byId: newById,
+    //   }
+    // }
     case A.LOCATE_MEDIA_FILE_SUCCESS:
       return {
         ...state,

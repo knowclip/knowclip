@@ -2,7 +2,8 @@ import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 import { getClips, getPreviouslyLoadedFile } from '.'
 import { getProjectMediaFileRecords } from './media'
-import { getFileRecord } from './files'
+import { getFileRecord, getLoadedFileById } from './files'
+import { extname } from 'path'
 
 export const getProject = (
   state: AppState,
@@ -63,15 +64,21 @@ export const getMediaFileConstantBitratePathFromCurrentProject = (
 ): MediaFilePath | null =>
   // state.media.byId[id] ? state.media.byId[id].constantBitrateFilePath : null
   {
-    const fileRecord: FileRecord | null = id
-      ? state.fileRecords.MediaFile[id]
-      : null
-    const loadedFile = fileRecord
-      ? getPreviouslyLoadedFile(state, fileRecord)
-      : null
-    return loadedFile && loadedFile.status === 'CURRENTLY_LOADED'
-      ? loadedFile.filePath
-      : null
+    const loadedFile = getLoadedFileById(state, 'MediaFile', id)
+    if (
+      loadedFile &&
+      loadedFile.filePath &&
+      extname(loadedFile.filePath) !== '.mp3'
+    )
+      return loadedFile.status === 'CURRENTLY_LOADED'
+        ? loadedFile.filePath
+        : null
+
+    const loadedCbr = getLoadedFileById(state, 'ConstantBitrateMp3', id)
+    if (loadedCbr && loadedCbr.filePath)
+      return loadedCbr.status === 'CURRENTLY_LOADED' ? loadedCbr.filePath : null
+
+    return null
   }
 export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
   const currentFileId = state.user.currentMediaFileId

@@ -31,13 +31,15 @@ export const getSubtitlesLoadedFile = (state: AppState, id: string) => {
 //   return loadedFile ? loadedFile.status === 'CURRENTLY_LOADED' : false
 // }
 
+const getSubtitles = (state: AppState) => state.subtitles
+
 export const getSubtitlesTracks = createSelector(
-  x => x,
   getCurrentMediaFileRecord,
-  (state, currentFile): Array<SubtitlesTrack> => {
+  getSubtitles,
+  (currentFile, subtitles): Array<SubtitlesTrack> => {
     if (!currentFile) return []
     return currentFile.subtitles
-      .map(id => getSubtitlesTrack(state, id))
+      .map(id => subtitles[id])
       .filter((track): track is SubtitlesTrack => Boolean(track))
   }
 )

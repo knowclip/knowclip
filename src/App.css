@@ -47,6 +47,7 @@ video::-webkit-media-controls-toggle-closed-captions-button {
 
 .videoContainer {
   overflow-y: auto;
+  height: 20em;
   resize: vertical;
   max-width: 100%;
   display: block;

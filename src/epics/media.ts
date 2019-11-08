@@ -9,7 +9,7 @@ import { extname } from 'path'
 import uuid from 'uuid/v4'
 import { AppEpic } from '../types/AppEpic'
 
-const coerceMp3ToConstantBitrate = (
+export const coerceMp3ToConstantBitrate = (
   path: string,
   oldConstantBitratePath: string | null
 ): Promise<string> => {

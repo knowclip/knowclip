@@ -1,7 +1,6 @@
 import {
   filter,
   map,
-  flatMap,
   takeUntil,
   takeLast,
   take,
@@ -35,7 +34,7 @@ const addClipEpic: AppEpic = (
     filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
       isLoadFileSuccess('MediaFile')
     ),
-    flatMap(() => {
+    switchMap(() => {
       const svg = getWaveformSvgElement()
       if (!svg) console.error('No svg element')
       return svg ? of(svg) : empty()
@@ -58,7 +57,7 @@ const addClipEpic: AppEpic = (
 
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
-    flatMap(waveformMousedown => {
+    switchMap(waveformMousedown => {
       const mediaFileRecord = r.getCurrentMediaFileRecord(state$.value)
       if (!mediaFileRecord) throw new Error('No current media metadata')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))

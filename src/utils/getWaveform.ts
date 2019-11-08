@@ -1,10 +1,6 @@
-import { switchMap } from 'rxjs/operators'
-import { ofType } from 'redux-observable'
-import * as r from '../redux'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import { getWaveformPngPath } from '../utils/localStorage'
 import { existsSync } from 'fs'
-import { AppEpic } from '../types/AppEpic'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
@@ -47,31 +43,3 @@ export const getWaveformPng = async (
       .run()
   })
 }
-
-// const getWaveformEpic: AppEpic = (
-//   action$,
-//   state$ // remove
-// ) =>
-//   action$.pipe(
-//     ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-//     switchMap<OpenMediaFileSuccess, Promise<Action>>(
-//       async ({ filePath, constantBitrateFilePath }) => {
-//         try {
-//           if (!filePath) {
-//             return r.setWaveformImagePath(null)
-//           }
-
-//           const imagePath = await getWaveformPng(
-//             state$.value,
-//             constantBitrateFilePath
-//           )
-//           return r.setWaveformImagePath(imagePath)
-//         } catch (err) {
-//           console.error(err)
-//           return r.simpleMessageSnackbar(err.message)
-//         }
-//       }
-//     )
-//   )
-
-export default 'getWaveformEpic'

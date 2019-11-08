@@ -74,13 +74,13 @@ declare type TemporaryVttFileRecord =
     }
 declare type WaveformPngRecord = {
   type: 'WaveformPng'
-  id: FileId // can just be mediafileid?
-  parentId: MediaFileId
+  id: FileId
+  // parentId: MediaFileId
 }
 declare type ConstantBitrateMp3Record = {
   type: 'ConstantBitrateMp3'
-  id: FileId // can just be mediafileid?
-  parentId: MediaFileId
+  id: FileId
+  // parentId: MediaFileId
 }
 declare type VideoStillImageRecord = {
   type: 'VideoStillImage'

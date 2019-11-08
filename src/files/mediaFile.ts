@@ -4,11 +4,7 @@ import * as r from '../redux'
 import { from } from 'rxjs'
 import { basename } from 'path'
 import uuid from 'uuid'
-import {
-  LoadRequestHandler,
-  LoadSuccessHandler,
-  LoadFailureHandler,
-} from './types'
+import { LoadRequestHandler, LoadSuccessHandler } from './types'
 
 export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
   fileRecord,
@@ -18,6 +14,7 @@ export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
 ) => {
   effects.pauseMedia()
   // mediaPlayer.src = ''
+
   return await r.loadFileSuccess(fileRecord, filePath)
 }
 
@@ -106,10 +103,24 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
       )
     : empty()
   const fileName = r.getCurrentFileName(state)
+  const getCbr = fileRecord.format.toLowerCase().includes('mp3')
+    ? from(effects.getConstantBitrateMediaPath(filePath, null)).pipe(
+        map(cbrFile =>
+          r.addFile(
+            {
+              type: 'ConstantBitrateMp3',
+              id: fileRecord.id,
+            },
+            cbrFile
+          )
+        )
+      )
+    : empty()
 
   return merge(
     addSubtitlesFiles,
     reloadRememberedSubtitles,
+    getCbr,
     getWaveform,
 
     of({

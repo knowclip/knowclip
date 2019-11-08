@@ -34,5 +34,9 @@ declare type EpicsDependencies = {
     state: AppState,
     constantBitrateFilePath: string
   ) => Promise<string>
+  getConstantBitrateMediaPath: (
+    path: string,
+    oldConstantBitratePath: string | null // not needed
+  ) => Promise<string>
   existsSync: (string) => boolean
 }

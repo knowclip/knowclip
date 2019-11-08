@@ -1,7 +1,8 @@
 import { getMediaMetadata } from './utils/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFromMedia } from './utils/subtitles'
 import { existsSync } from 'fs'
-import { getWaveformPng } from './epics/getWaveform'
+import { getWaveformPng } from './utils/getWaveform'
+import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './epics/media'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -51,6 +52,7 @@ const dependencies: EpicsDependencies = {
   getSubtitlesFromFile,
   getSubtitlesFromMedia,
   getWaveformPng,
+  getConstantBitrateMediaPath,
   existsSync,
 }
 export default dependencies
