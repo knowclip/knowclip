@@ -62,15 +62,15 @@ declare type TemporaryVttFileRecord =
   | {
       type: 'TemporaryVttFile'
       id: FileId // can just be subtitles track/original file id?
-      parentId: SubtitlesTrackId
-      parentType: 'ExternalSubtitlesTrack'
+      parentId: FileId
+      parentType: 'ExternalSubtitlesFile'
     }
   | {
       type: 'TemporaryVttFile'
       id: FileId // can just be subtitles track/original file id?
       parentId: MediaFileId
       streamIndex: number
-      parentType: 'EmbeddedSubtitlesTrack'
+      parentType: 'MediaFile'
     }
 declare type WaveformPngRecord = {
   type: 'WaveformPng'

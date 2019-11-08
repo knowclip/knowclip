@@ -1,4 +1,10 @@
-import React, { Component, Fragment, useEffect } from 'react'
+import React, {
+  Component,
+  Fragment,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+} from 'react'
 import { connect } from 'react-redux'
 import { IconButton, CircularProgress, Tooltip, Fab } from '@material-ui/core'
 import {
@@ -17,35 +23,29 @@ import headerCss from '../components/Header.module.css'
 import * as r from '../redux'
 import SubtitlesMenu from '../components/SubtitlesMenu.js'
 
-const Subtitles = ({ track }) =>
+const Subtitles = ({ track, isDefault }) =>
   track.type === 'EmbeddedSubtitlesTrack' ? (
     <track
       kind="subtitles"
       src={`file://${track.tmpFilePath}`}
       mode={track.mode}
-      default={track.mode === 'showing'}
+      default={isDefault}
     />
   ) : (
     <track
       kind="subtitles"
       src={`file://${track.vttFilePath}`}
       mode={track.mode}
-      default={track.mode === 'showing'}
+      default={isDefault}
     />
   )
 
-const Media = ({
-  filePath,
-  loop,
-  audioRef,
-  handleAudioEnded,
-  metadata,
-  subtitles,
-}) => {
+const Media = ({ filePath, loop, handleAudioEnded, metadata, subtitles }) => {
+  const mediaRef = useRef()
   const props = {
     onEnded: handleAudioEnded,
     loop: loop,
-    ref: audioRef,
+    ref: mediaRef,
     controls: true,
     disablePictureInPicture: true,
     id: 'audioPlayer',
@@ -64,13 +64,23 @@ const Media = ({
     },
     [props.src]
   )
+  useEffect(
+    () => {
+      const { textTracks } = mediaRef.current
+      if (textTracks)
+        [...textTracks].forEach(
+          (track, index) => (track.mode = subtitles[index].mode)
+        )
+    },
+    [subtitles, mediaRef]
+  )
 
   return metadata && metadata.isVideo ? (
     <div className="videoContainer">
       <video {...props}>
-        {subtitles.map(track =>
+        {subtitles.map((track, index) =>
           track.mode === 'showing' ? (
-            <Subtitles track={track} key={track.id} />
+            <Subtitles track={track} key={track.id} isDefault={index === 0} />
           ) : null
         )}
       </video>

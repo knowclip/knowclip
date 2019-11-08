@@ -1,9 +1,9 @@
-export const setWaveformImagePath = (
-  path: string | null
-): SetWaveformImagePath => ({
-  type: A.SET_WAVEFORM_IMAGE_PATH,
-  path,
-})
+// export const setWaveformImagePath = (
+//   path: string | null
+// ): SetWaveformImagePath => ({
+//   type: A.SET_WAVEFORM_IMAGE_PATH,
+//   path,
+// })
 
 export const setWaveformCursor = (
   x: number,

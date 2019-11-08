@@ -171,11 +171,12 @@ const Waveform = ({
   pendingStretch,
   highlightedClipId,
   waveform,
+  path,
   subtitles,
   goToSubtitlesChunk,
   onWaveformMousedown,
 }) => {
-  const { viewBox, cursor, stepsPerSecond, path } = waveform
+  const { viewBox, cursor, stepsPerSecond } = waveform
   const viewBoxString = getViewBoxString(viewBox.xMin)
   const svgRef = useRef(null)
   const onMouseDown = useCallback(
@@ -222,6 +223,7 @@ const Waveform = ({
 
 const mapStateToProps = state => ({
   waveform: r.getWaveform(state),
+  path: r.getWaveformPath(state),
   clips: r.getCurrentFileClips(state),
   pendingClip: r.getPendingClip(state),
   pendingStretch: r.getPendingStretch(state),

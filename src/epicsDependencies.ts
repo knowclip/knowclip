@@ -1,4 +1,7 @@
 import { getMediaMetadata } from './utils/ffmpeg'
+import { getSubtitlesFromFile, getSubtitlesFromMedia } from './utils/subtitles'
+import { existsSync } from 'fs'
+import { getWaveformPng } from './epics/getWaveform'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -45,5 +48,9 @@ const dependencies: EpicsDependencies = {
     else el.pause()
   },
   getMediaMetadata,
+  getSubtitlesFromFile,
+  getSubtitlesFromMedia,
+  getWaveformPng,
+  existsSync,
 }
 export default dependencies

@@ -7,6 +7,7 @@ import { combineEpics, ofType } from 'redux-observable'
 import * as media from '../files/mediaFile'
 import * as temporaryVtt from '../files/temporaryVttFile'
 import * as externalSubtitles from '../files/externalSubtitlesFile'
+import * as waveformPng from '../files/waveformPngFile'
 
 const addFile: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -39,7 +40,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
         return await r.loadFileFailure(
           fileRecord,
           filePath,
-          `This file appears to have moved or been renamed.`
+          `This file appears to have moved or been renamed. x`
         )
       try {
         switch (fileRecord.type) {
@@ -53,6 +54,14 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
 
           case 'TemporaryVttFile':
             return temporaryVtt.loadRequest(
+              fileRecord,
+              filePath,
+              state$.value,
+              effects
+            )
+
+          case 'WaveformPng':
+            return waveformPng.loadRequest(
               fileRecord,
               filePath,
               state$.value,
@@ -98,6 +107,15 @@ const loadFileSuccess: AppEpic = (action$, state$, effects) =>
             effects
           )
         }
+
+        case 'WaveformPng':
+          return waveformPng.loadSuccess(
+            fileRecord,
+            filePath,
+            state$.value,
+            effects
+          )
+
         default:
           return of(
             r.simpleMessageSnackbar('Unimplemented file load success hook')
@@ -170,6 +188,16 @@ const loadFileFailure: AppEpic = (action$, state$, effects) =>
               effects
             )
           }
+
+          case 'WaveformPng':
+            return waveformPng.loadFailure(
+              fileRecord,
+              filePath,
+              errorMessage,
+              state$.value,
+              effects
+            )
+
           default:
             return of(
               r.simpleMessageSnackbar(

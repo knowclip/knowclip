@@ -73,7 +73,7 @@ declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
 
 declare type WaveformAction =
-  | SetWaveformImagePath
+  // | SetWaveformImagePath
   | SetCursorPosition
   | SetWaveformViewBox
   | SetPendingClip
@@ -81,10 +81,10 @@ declare type WaveformAction =
   | SetPendingStretch
   | ClearPendingStretch
   | WaveformMousedown
-declare type SetWaveformImagePath = {
-  type: 'SET_WAVEFORM_IMAGE_PATH'
-  path: string | null
-}
+// declare type SetWaveformImagePath = {
+//   type: 'SET_WAVEFORM_IMAGE_PATH'
+//   path: string | null
+// }
 declare type SetCursorPosition = {
   type: 'SET_CURSOR_POSITION'
   x: number
@@ -362,7 +362,7 @@ declare type FileAction =
 declare type AddFile = {
   type: 'ADD_FILE'
   fileRecord: FileRecord
-  filePath: FilePath | null
+  filePath: FilePath
 }
 // declare type AddFileSuccess = {
 //   type: 'ADD_FILE_SUCCESS'
@@ -400,7 +400,7 @@ declare type LoadFileFailure = {
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
   fileRecord: FileRecord
-  filePath: FilePath
+  // filePath: FilePath
 }
 declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'

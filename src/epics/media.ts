@@ -1,4 +1,4 @@
-import { flatMap, map, switchMap } from 'rxjs/operators'
+import { flatMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
 import * as r from '../redux'
@@ -8,7 +8,6 @@ import ffmpeg, { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import { extname } from 'path'
 import uuid from 'uuid/v4'
 import { AppEpic } from '../types/AppEpic'
-import { getSubtitlesFromMedia } from './subtitles'
 
 const coerceMp3ToConstantBitrate = (
   path: string,

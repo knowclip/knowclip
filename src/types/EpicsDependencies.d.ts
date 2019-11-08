@@ -15,4 +15,24 @@ declare type EpicsDependencies = {
     format: FfprobeFormat
     chapters: any[]
   }>
+  getSubtitlesFromFile: (
+    filePath: string,
+    state: AppState
+  ) => Promise<{
+    vttFilePath: string
+    chunks: SubtitlesChunk[]
+  }>
+  getSubtitlesFromMedia: (
+    mediaFilePath: string,
+    streamIndex: number,
+    state: AppState
+  ) => Promise<{
+    tmpFilePath: string
+    chunks: SubtitlesChunk[]
+  }>
+  getWaveformPng: (
+    state: AppState,
+    constantBitrateFilePath: string
+  ) => Promise<string>
+  existsSync: (string) => boolean
 }

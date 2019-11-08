@@ -5,15 +5,47 @@ import {
   blankTransliterationFields,
 } from '../utils/newFlashcard'
 import { getCurrentMediaFileRecord } from './project'
+import { getPreviouslyLoadedFile } from './files'
+import { createSelector } from 'reselect'
 
-export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
-  Object.values(state.subtitles)
+export const getSubtitlesFileRecord = (
+  state: AppState,
+  id: string
+): TemporaryVttFileRecord | ExternalSubtitlesFileRecord | null =>
+  state.fileRecords.TemporaryVttFile[id] ||
+  state.fileRecords.ExternalSubtitlesFile[id] ||
+  null
+
+export const getSubtitlesLoadedFile = (state: AppState, id: string) => {
+  const record = getSubtitlesFileRecord(state, id)
+
+  return record ? getPreviouslyLoadedFile(state, record) : null
+}
+
+// export const trackWasLoaded = (state: AppState, id: string) => {
+//   const loadedFile = getSubtitlesLoadedFile(state, id)
+//   if (!loadedFile || !loadedFile.status === 'CURRENTLY_LOADED') return false
+//   const record = getSubtitlesFileRecord(state, id)
+
+//   // const
+//   return loadedFile ? loadedFile.status === 'CURRENTLY_LOADED' : false
+// }
+
+export const getSubtitlesTracks = createSelector(
+  x => x,
+  getCurrentMediaFileRecord,
+  (state, currentFile): Array<SubtitlesTrack> => {
+    if (!currentFile) return []
+    return currentFile.subtitles
+      .map(id => getSubtitlesTrack(state, id))
+      .filter((track): track is SubtitlesTrack => Boolean(track))
+  }
+)
 
 export const getSubtitlesTrack = (
   state: AppState,
   id: SubtitlesTrackId
-): SubtitlesTrack | null =>
-  getSubtitlesTracks(state).find(track => track.id === id) || null
+): SubtitlesTrack | null => state.subtitles[id] || null
 
 const isEmbedded = (track: SubtitlesTrack): track is EmbeddedSubtitlesTrack =>
   track.type === 'EmbeddedSubtitlesTrack'

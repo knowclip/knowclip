@@ -1,5 +1,4 @@
 import { Reducer } from 'redux'
-import { HIDE_SUBTITLES } from '../types/ActionType'
 
 export const initialState: FileRecordsState = {
   // byId: {},
@@ -13,6 +12,25 @@ export const initialState: FileRecordsState = {
   ConstantBitrateMp3: {},
   VideoStillImage: {},
   // },
+}
+
+const edit = <F extends FileRecord>(
+  state: FileRecordsState,
+  type: F['type'],
+  id: string,
+  transform: (file: F) => F
+) => {
+  const substate: Record<string, F> = (state[type] as unknown) as Record<
+    string,
+    F
+  >
+  return {
+    ...state,
+    [type]: {
+      ...substate,
+      [id]: transform(state[type][id] as F),
+    },
+  }
 }
 
 const fileRecords: Reducer<FileRecordsState, Action> = (
@@ -29,19 +47,30 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
         },
       }
     case A.ADD_SUBTITLES_TRACK:
-      return {
-        ...state,
-        MediaFile: {
-          ...state.MediaFile,
-          [action.track.mediaFileId]: {
-            ...state.MediaFile[action.track.mediaFileId],
-            subtitles: [
-              ...state.MediaFile[action.track.mediaFileId].subtitles,
-              action.track.id,
-            ],
+      return edit<MediaFileRecord>(
+        state,
+        'MediaFile',
+        action.track.mediaFileId,
+        file => ({
+          ...file,
+          subtitles: [...new Set([...file.subtitles, action.track.id])],
+        })
+      )
+
+    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
+      return edit<MediaFileRecord>(
+        state,
+        'MediaFile',
+        action.mediaFileId,
+        file => ({
+          ...file,
+          flashcardFieldsToSubtitlesTracks: {
+            ...file.flashcardFieldsToSubtitlesTracks,
+            [action.flashcardFieldName]: action.subtitlesTrackId,
           },
-        },
-      }
+        })
+      )
+
     default:
       return state
   }

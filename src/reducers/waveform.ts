@@ -5,7 +5,6 @@ const initialState: WaveformState = {
   stepLength: 2,
   cursor: { x: 0, y: 0 },
   viewBox: { xMin: 0 },
-  path: null,
 }
 
 const waveform: Reducer<WaveformState, Action> = (
@@ -13,12 +12,6 @@ const waveform: Reducer<WaveformState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.SET_WAVEFORM_IMAGE_PATH:
-      return {
-        ...state,
-        path: action.path,
-      }
-
     case A.SET_CURSOR_POSITION: {
       return {
         ...state,
