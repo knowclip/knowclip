@@ -52,15 +52,6 @@ export const addMediaToProjectRequest = (
   filePaths,
 })
 
-// export const addMediaToProject = (
-//   projectId: ProjectId,
-//   mediaFiles: Array<MediaFile>
-// ): AddMediaToProject => ({
-//   type: A.ADD_MEDIA_TO_PROJECT,
-//   projectId,
-//   mediaFiles,
-// })
-
 export const deleteMediaFromProjectRequest = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
@@ -78,29 +69,6 @@ export const deleteMediaFromProject = (
   projectId,
   mediaFileId,
 })
-
-// export const openMediaFileRequest = (id: MediaFileId): Action => ({
-//   type: A.OPEN_MEDIA_FILE_REQUEST,
-//   id,
-// })
-
-// export const openMediaFileSuccess = (
-//   filePath: MediaFilePath,
-//   constantBitrateFilePath: MediaFilePath,
-//   metadata: MediaFileMetadata
-// ): OpenMediaFileSuccess => ({
-//   type: A.OPEN_MEDIA_FILE_SUCCESS,
-//   filePath,
-//   constantBitrateFilePath,
-//   metadata,
-// })
-
-// export const openMediaFileFailure = (
-//   errorMessage: string
-// ): OpenMediaFileFailure => ({
-//   type: A.OPEN_MEDIA_FILE_FAILURE,
-//   errorMessage,
-// })
 
 export const locateMediaFileRequest = (
   id: MediaFileId,
