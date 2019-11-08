@@ -44,7 +44,6 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
     case A.CLOSE_PROJECT:
       return initialState
 
-    // case A.OPEN_MEDIA_FILE_REQUEST:
     case A.LOAD_FILE_REQUEST:
       if (action.fileRecord.type === 'MediaFile')
         return {
@@ -173,13 +172,13 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         loopMedia: action.loop,
       }
 
-    // case A.OPEN_MEDIA_FILE_FAILURE:
-    // case A.OPEN_MEDIA_FILE_SUCCESS:
     case A.LOAD_FILE_SUCCESS: // temp
-      return {
-        ...state,
-        mediaIsLoading: false,
-      }
+      return action.fileRecord.type === 'MediaFile'
+        ? {
+            ...state,
+            mediaIsLoading: false,
+          }
+        : state // what about cbr
 
     default:
       return state

@@ -208,10 +208,6 @@ declare type SetWorkIsUnsaved = {
 }
 
 declare type MediaAction =
-  | OpenMediaFileRequest
-  | OpenMediaFileSuccess
-  | OpenMp3Request
-  | OpenMediaFileFailure
   | AddMediaToProjectRequest
   | AddMediaToProject
   | DeleteMediaFromProjectRequest
@@ -224,26 +220,6 @@ declare type MediaAction =
   | ToggleLoop
   | SetLoop
   | SetMediaFolderLocation
-
-declare type OpenMediaFileRequest = {
-  type: 'OPEN_MEDIA_FILE_REQUEST'
-  id: MediaFileId
-}
-declare type OpenMediaFileSuccess = {
-  type: 'OPEN_MEDIA_FILE_SUCCESS'
-  filePath: MediaFilePath
-  constantBitrateFilePath: MediaFilePath
-  metadata: MediaFileMetadata
-}
-declare type OpenMediaFileFailure = {
-  type: 'OPEN_MEDIA_FILE_FAILURE'
-  errorMessage: string
-}
-declare type OpenMp3Request = {
-  type: 'OPEN_MP3_REQUEST'
-  id: MediaFileId
-  filePath: MediaFilePath
-}
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId

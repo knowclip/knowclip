@@ -90,15 +90,6 @@ export const locateMediaFileSuccess = (
   filePath,
 })
 
-export const openMp3Request = (
-  id: string,
-  filePath: string
-): OpenMp3Request => ({
-  type: A.OPEN_MP3_REQUEST,
-  id,
-  filePath,
-})
-
 export const saveProjectRequest = (): Action => ({
   type: A.SAVE_PROJECT_REQUEST,
 })
