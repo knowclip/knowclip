@@ -54,4 +54,4 @@ export const loadFailure: LoadFailureHandler<WaveformPngRecord> = (
   errorMessage,
   state,
   effects
-) => of(r.fileSelectionDialog(errorMessage))
+) => of(r.fileSelectionDialog(errorMessage, fileRecord))

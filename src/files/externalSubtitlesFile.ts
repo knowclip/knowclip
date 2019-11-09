@@ -56,7 +56,7 @@ export const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
   errorMessage,
   state,
   effects
-) => of(r.fileSelectionDialog(errorMessage))
+) => of(r.fileSelectionDialog(errorMessage, fileRecord))
 
 // const locateSubtitlesFileRequest: AppEpic = (action$, state$) =>
 //   action$.pipe(

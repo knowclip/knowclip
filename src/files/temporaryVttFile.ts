@@ -9,6 +9,7 @@ import {
   LoadRequestHandler,
   LoadSuccessHandler,
   LoadFailureHandler,
+  LocateRequestHandler,
 } from './types'
 
 export const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
@@ -168,3 +169,7 @@ export const loadFailure: LoadFailureHandler<TemporaryVttFileRecord> = (
     return of(r.simpleMessageSnackbar(errorMessage))
   }
 }
+
+// export const locateRequest : LocateRequestHandler= (fileRecord, state, effects) => {
+//   const source =
+// }

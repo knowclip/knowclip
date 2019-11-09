@@ -29,19 +29,31 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
       // if (!file)
       if (!file || !file.filePath)
         // correct second part of condition?
-        return await r.loadFileFailure(
+        // return await r.loadFileFailure(
+        //   fileRecord,
+        //   null,
+        //   'You must first locate this file. x'
+        // )
+        return await r.locateFileRequest(
           fileRecord,
-          null,
-          'You must first locate this file. x'
+          `Before opening this ${
+            fileRecord.type
+          }, you'll first have to locate it manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
         )
 
       const { filePath } = file
 
       if (filePath && !existsSync(filePath))
-        return await r.loadFileFailure(
+        // return await r.loadFileFailure(
+        //   fileRecord,
+        //   filePath,
+        //   `This file appears to have moved or been renamed. x`
+        // )
+        return r.locateFileRequest(
           fileRecord,
-          filePath,
-          `This file appears to have moved or been renamed. x`
+          `This ${
+            fileRecord.type
+          } appears to have moved or been renamed. Try locating it manually?`
         )
       try {
         switch (fileRecord.type) {
@@ -268,9 +280,66 @@ const loadFileFailure: AppEpic = (action$, state$, effects) =>
 //   }
 // }
 
+const locateFileRequest: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType<Action, LocateFileRequest>(A.LOCATE_FILE_REQUEST),
+    flatMap<LocateFileRequest, Promise<Action>>(
+      async ({ fileRecord, message }) => {
+        switch (fileRecord.type) {
+          case 'MediaFile': {
+            return await media.locateRequest(fileRecord, state$.value, effects)
+          }
+
+          // case 'ExternalSubtitlesFile': {
+          //   return externalSubtitles.loadFailure(
+          //     fileRecord,
+          //     filePath,
+          //     errorMessage,
+          //     state$.value,
+          //     effects
+          //   )
+          // }
+          // case 'TemporaryVttFile': {
+          //   return temporaryVtt.loadFailure(
+          //     fileRecord,
+          //     filePath,
+          //     errorMessage,
+          //     state$.value,
+          //     effects
+          //   )
+          // }
+
+          // case 'WaveformPng':
+          //   return waveformPng.loadFailure(
+          //     fileRecord,
+          //     filePath,
+          //     errorMessage,
+          //     state$.value,
+          //     effects
+          //   )
+
+          default:
+            return await r.simpleMessageSnackbar(
+              'Unimplemented file locate request hook ' + fileRecord
+            )
+        }
+      }
+    )
+  )
+
+const locateFileSuccess: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType<Action, LocateFileSuccess>(A.LOCATE_FILE_SUCCESS),
+    map<LocateFileSuccess, Action>(({ fileRecord, filePath }) =>
+      r.loadFileRequest(fileRecord)
+    )
+  )
+
 export default combineEpics(
   addFile,
   loadFileRequest,
   loadFileSuccess,
-  loadFileFailure
+  loadFileFailure,
+  locateFileRequest,
+  locateFileSuccess
 )

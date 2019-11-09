@@ -62,6 +62,25 @@ const loadedFiles: Reducer<LoadedFilesState, Action> = (
       }
     }
 
+    case A.LOCATE_FILE_SUCCESS: {
+      const currentFile = state[action.fileRecord.type][action.fileRecord.id]
+      const loadedFile: LoadedFile = {
+        ...currentFile,
+        status:
+          currentFile.status === 'NOT_LOADED'
+            ? 'REMEMBERED'
+            : currentFile.status,
+        filePath: action.filePath,
+      }
+      return {
+        ...state,
+        [action.fileRecord.type]: {
+          ...state[action.fileRecord.type],
+          [action.fileRecord.id]: loadedFile,
+        },
+      }
+    }
+
     default:
       return state
   }

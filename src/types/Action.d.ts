@@ -376,6 +376,7 @@ declare type LoadFileFailure = {
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
   fileRecord: FileRecord
+  message: string
   // filePath: FilePath
 }
 declare type LocateFileSuccess = {

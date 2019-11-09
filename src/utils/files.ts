@@ -26,3 +26,22 @@ export const isLocateFileRequest = <F extends FileRecord>(
 ) => (action: Action): action is LocateFileRequest & { fileRecord: F } =>
   action.type === A.LOCATE_FILE_REQUEST &&
   action.fileRecord.type === fileRecordType
+
+export const getExtensions = (fileRecord: FileRecord) => {
+  switch (fileRecord.type) {
+    case 'ConstantBitrateMp3':
+      return ['mp3']
+    case 'ExternalSubtitlesFile':
+      return ['vtt', 'srt', 'ass']
+    case 'MediaFile':
+      return []
+    case 'ProjectFile':
+      return ['afca']
+    case 'TemporaryVttFile':
+      return ['vtt']
+    case 'VideoStillImage':
+      return ['png'] // ??
+    case 'WaveformPng':
+      return ['png']
+  }
+}

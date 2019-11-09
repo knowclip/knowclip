@@ -4,7 +4,11 @@ import * as r from '../redux'
 import { from } from 'rxjs'
 import { basename } from 'path'
 import uuid from 'uuid'
-import { LoadRequestHandler, LoadSuccessHandler } from './types'
+import {
+  LoadRequestHandler,
+  LoadSuccessHandler,
+  LocateRequestHandler,
+} from './types'
 
 export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
   fileRecord,
@@ -14,6 +18,25 @@ export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
 ) => {
   effects.pauseMedia()
   // mediaPlayer.src = ''
+
+  //   if (!filePath) {
+  //   // also should open dialog
+  //   return of(
+  //     r.openMediaFileFailure(
+  //       `Before opening this media file: \n\n"${
+  //         metadata.name
+  //       }"\n\nYou'll first have to locate manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
+  //     )
+  //   )
+  // }
+
+  // if (!fs.existsSync(filePath)) {
+  //   return of(
+  //     r.openMediaFileFailure(
+  //       'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
+  //     )
+  //   )
+  // }
 
   return await r.loadFileSuccess(fileRecord, filePath)
 }
@@ -127,6 +150,19 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
       type: 'SET_DEFAULT_TAGS',
       tags: fileName ? [basename(fileName)] : [],
     } as SetDefaultTags)
+  )
+}
+
+export const locateRequest: LocateRequestHandler<MediaFileRecord> = async (
+  fileRecord,
+  state,
+  effects
+) => {
+  return await r.fileSelectionDialog(
+    `This media file ${
+      fileRecord.name
+    } appears to have moved or been renamed. Try locating it manually?`,
+    fileRecord
   )
 }
 

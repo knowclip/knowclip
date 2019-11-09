@@ -28,3 +28,9 @@ export type LoadFailureHandler<F extends FileRecord> = (
   state: AppState,
   effects: EpicsDependencies
 ) => Observable<Action>
+
+export type LocateRequestHandler<F extends FileRecord> = (
+  fileRecord: F,
+  state: AppState,
+  effects: EpicsDependencies
+) => Promise<Action>

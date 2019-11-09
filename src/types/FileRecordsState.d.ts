@@ -57,6 +57,7 @@ declare type ExternalSubtitlesFileRecord = {
   // parentId: SubtitlesTrackId // should it be MediaFileId? or even needed?
   id: FileId
   parentId: MediaFileId // should it be SubtitlesTrackId? or even needed?
+  name: string
 }
 declare type TemporaryVttFileRecord =
   | {

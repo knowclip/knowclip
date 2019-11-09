@@ -1,4 +1,5 @@
 import uuid from 'uuid'
+import { basename } from 'path'
 
 export const showSubtitles = (
   id: SubtitlesTrackId,
@@ -34,6 +35,7 @@ export const loadSubtitlesFromFileRequest = (
     type: 'ExternalSubtitlesFile',
     parentId: mediaFileId,
     id: uuid(),
+    name: basename(filePath),
   },
   filePath,
 })

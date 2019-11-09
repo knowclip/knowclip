@@ -4,14 +4,14 @@ import { TextField, Button } from '@material-ui/core'
 import { shell } from 'electron'
 import * as r from '../redux'
 import * as css from './MediaFolderLocationForm.module.css'
-import { showOpenDirectoryDialog } from '../utils/electron'
+import { showOpenDialog } from '../utils/electron'
 
 const openInBrowser = e => {
   e.preventDefault()
   shell.openExternal(e.target.href)
 }
 
-export default class MediaFolderLocationForm extends Component {
+export default class FileSelectionForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -21,7 +21,9 @@ export default class MediaFolderLocationForm extends Component {
   }
 
   onLocationTextFocus = async e => {
-    const filePaths = await showOpenDirectoryDialog()
+    const filePaths = await showOpenDialog(
+      this.props.extensions.map(ext => ({ name: 'File', extensions: ext }))
+    )
 
     if (!filePaths) return
 
@@ -31,7 +33,7 @@ export default class MediaFolderLocationForm extends Component {
 
   handleSubmit = e => {
     if (this.state.locationText) {
-      this.props.onSubmit()
+      this.props.onSubmit(this.state.locationText)
     } else {
       this.showSubmitError()
     }
@@ -43,7 +45,7 @@ export default class MediaFolderLocationForm extends Component {
     this.setState({ errorText: 'Please choose a location to continue.' })
 
   render() {
-    const { message } = this.props
+    const { message, cancel } = this.props
     const { locationText, errorText } = this.state
     const { onLocationTextFocus, handleSubmit } = this
     return (
@@ -62,6 +64,7 @@ export default class MediaFolderLocationForm extends Component {
             <Button onClick={handleSubmit} fullWidth>
               Continue
             </Button>
+            <Button onClick={cancel}>Cancel</Button>
           </p>
         </form>
       </section>
