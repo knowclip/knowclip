@@ -13,7 +13,10 @@ import * as constantBitrateMp3 from '../files/constantBitrateMp3File'
 const addFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddFile>(A.ADD_FILE),
-    map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
+    // map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
+    map<AddFile, Action>(({ fileRecord, filePath }) =>
+      r.locateFileSuccess(fileRecord, filePath)
+    )
   )
 
 const loadFileRequest: AppEpic = (action$, state$, effects) =>
@@ -27,40 +30,15 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
     flatMap<LoadFileRequest, Promise<Action>>(async ({ fileRecord }) => {
       const file = r.getPreviouslyLoadedFile(state$.value, fileRecord)
       // if (!file)
-      if (!file || !file.filePath)
-        // correct second part of condition?
-        // return await r.loadFileFailure(
-        //   fileRecord,
-        //   null,
-        //   'You must first locate this file. x'
-        // )
-        return await r.locateFileRequest(
-          fileRecord,
-          `Before opening this ${
-            fileRecord.type
-          }, you'll first have to locate it manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
-        )
+      if (!file || !file.filePath || !existsSync(file.filePath))
+        return await r.locateFileRequest(fileRecord, 'File not found')
 
-      const { filePath } = file
-
-      if (filePath && !existsSync(filePath))
-        // return await r.loadFileFailure(
-        //   fileRecord,
-        //   filePath,
-        //   `This file appears to have moved or been renamed. x`
-        // )
-        return r.locateFileRequest(
-          fileRecord,
-          `This ${
-            fileRecord.type
-          } appears to have moved or been renamed. Try locating it manually?`
-        )
       try {
         switch (fileRecord.type) {
           case 'MediaFile':
             return media.loadRequest(
               fileRecord,
-              filePath,
+              file.filePath,
               state$.value,
               effects
             )
@@ -68,7 +46,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
           case 'TemporaryVttFile':
             return temporaryVtt.loadRequest(
               fileRecord,
-              filePath,
+              file.filePath,
               state$.value,
               effects
             )
@@ -76,7 +54,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
           case 'WaveformPng':
             return waveformPng.loadRequest(
               fileRecord,
-              filePath,
+              file.filePath,
               state$.value,
               effects
             )
@@ -84,14 +62,14 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
           case 'ConstantBitrateMp3':
             return constantBitrateMp3.loadRequest(
               fileRecord,
-              filePath,
+              file.filePath,
               state$.value,
               effects
             )
 
           case 'ExternalSubtitlesFile':
           default:
-            return await r.loadFileSuccess(fileRecord, filePath)
+            return await r.loadFileSuccess(fileRecord, file.filePath)
         }
       } catch (err) {
         return await r.loadFileFailure(
@@ -286,19 +264,16 @@ const locateFileRequest: AppEpic = (action$, state$, effects) =>
     flatMap<LocateFileRequest, Promise<Action>>(
       async ({ fileRecord, message }) => {
         switch (fileRecord.type) {
-          case 'MediaFile': {
+          case 'MediaFile':
             return await media.locateRequest(fileRecord, state$.value, effects)
-          }
 
-          // case 'ExternalSubtitlesFile': {
-          //   return externalSubtitles.loadFailure(
-          //     fileRecord,
-          //     filePath,
-          //     errorMessage,
-          //     state$.value,
-          //     effects
-          //   )
-          // }
+          case 'ExternalSubtitlesFile':
+            return await externalSubtitles.locateRequest(
+              fileRecord,
+              state$.value,
+              effects
+            )
+
           // case 'TemporaryVttFile': {
           //   return temporaryVtt.loadFailure(
           //     fileRecord,

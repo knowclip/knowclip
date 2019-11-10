@@ -97,9 +97,8 @@ export const getSubtitlesChunksWithinRange = (
   end: WaveformX
 ): Array<SubtitlesChunk> => {
   const track = getSubtitlesTrack(state, subtitlesTrackId)
-  // if (!track) return []
-  if (!track)
-    throw new Error(`Could not find subtitles track ${subtitlesTrackId}`)
+  if (!track) return []
+
   return track.chunks.filter(chunk =>
     overlap(
       chunk,

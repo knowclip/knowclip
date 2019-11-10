@@ -60,12 +60,13 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
     subtitles: existingSubtitlesIds,
   } = fileRecord
   const addSubtitlesFiles = from(
+    // orphans?
     subtitlesTracksStreamIndexes
       .filter(
         streamIndex =>
           !existingSubtitlesIds.some(id =>
             streamIndexMatchesExistingTrack(
-              state.fileRecords.TemporaryVttFile[id], // orphans?
+              state.fileRecords.TemporaryVttFile[id],
               streamIndex
             )
           )
@@ -92,15 +93,15 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
 
   const reloadRememberedSubtitles = from(
     existingSubtitlesIds.map(id => {
-      const embeddedSubtitles = r.getFileRecord(state, 'TemporaryVttFile', id)
-      if (embeddedSubtitles) return r.loadFileRequest(embeddedSubtitles)
-
       const externalSubtitles = r.getFileRecord(
         state,
         'ExternalSubtitlesFile',
         id
       )
       if (externalSubtitles) return r.loadFileRequest(externalSubtitles)
+
+      const embeddedSubtitles = r.getFileRecord(state, 'TemporaryVttFile', id)
+      if (embeddedSubtitles) return r.loadFileRequest(embeddedSubtitles)
 
       return ({ type: 'whoops couldnt find file' } as unknown) as Action
     })

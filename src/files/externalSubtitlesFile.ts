@@ -2,7 +2,11 @@ import { map } from 'rxjs/operators'
 import * as r from '../redux'
 import { from, of } from 'rxjs'
 import { newExternalSubtitlesTrack } from '../utils/subtitles'
-import { LoadSuccessHandler, LoadFailureHandler } from './types'
+import {
+  LoadSuccessHandler,
+  LoadFailureHandler,
+  LocateRequestHandler,
+} from './types'
 import { extname } from 'path'
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
@@ -57,6 +61,17 @@ export const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
   state,
   effects
 ) => of(r.fileSelectionDialog(errorMessage, fileRecord))
+
+export const locateRequest: LocateRequestHandler<
+  ExternalSubtitlesFileRecord
+> = async (fileRecord, state, effects) => {
+  return await r.fileSelectionDialog(
+    `This subtitles file ${
+      fileRecord.name
+    } appears to have moved or been renamed. Try locating it manually?`,
+    fileRecord
+  )
+}
 
 // const locateSubtitlesFileRequest: AppEpic = (action$, state$) =>
 //   action$.pipe(

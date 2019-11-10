@@ -181,7 +181,6 @@ const addMediaToProject: AppEpic = (action$, state$) =>
                 isVideo: metadata.isVideo,
                 subtitlesTracksStreamIndexes:
                   metadata.subtitlesTracksStreamIndexes,
-                filePath,
               },
               filePath
             )
