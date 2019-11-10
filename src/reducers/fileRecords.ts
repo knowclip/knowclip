@@ -39,6 +39,7 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
 ) => {
   switch (action.type) {
     case A.ADD_FILE:
+    case A.LOCATE_FILE_SUCCESS:
       return {
         ...state,
         [action.fileRecord.type]: {

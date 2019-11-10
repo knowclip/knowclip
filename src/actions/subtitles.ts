@@ -29,8 +29,8 @@ export const addSubtitlesTrack = (
 export const loadSubtitlesFromFileRequest = (
   filePath: string,
   mediaFileId: MediaFileId
-): AddFileWith<ExternalSubtitlesFileRecord> => ({
-  type: A.ADD_FILE,
+): LocateFileSuccess => ({
+  type: A.LOCATE_FILE_SUCCESS,
   fileRecord: {
     type: 'ExternalSubtitlesFile',
     parentId: mediaFileId,

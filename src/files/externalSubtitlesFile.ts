@@ -18,38 +18,27 @@ export const loadSuccess: LoadSuccessHandler<ExternalSubtitlesFileRecord> = (
   effects
 ) => {
   if (isVtt(filePath)) {
-    return from(effects.getSubtitlesFromFile(filePath, state)).pipe(
-      map(({ chunks, vttFilePath }) =>
+    return from(effects.getSubtitlesFromFile(state, filePath)).pipe(
+      map(chunks =>
         r.addSubtitlesTrack(
           newExternalSubtitlesTrack(
             fileRecord.id,
             fileRecord.parentId,
             chunks,
-            vttFilePath,
+            filePath,
             filePath
           )
         )
       )
     )
   } else {
-    const temporaryVttFileRecord = r.getFileRecord(
-      state,
-      'TemporaryVttFile',
-      fileRecord.id
-    )
-
-    return from(effects.getSubtitlesFromFile(filePath, state)).pipe(
-      map(({ chunks, vttFilePath }) =>
-        r.addFile(
-          {
-            type: 'TemporaryVttFile',
-            id: fileRecord.id,
-            parentId: fileRecord.id, // not needed?
-            parentType: 'ExternalSubtitlesFile',
-          },
-          vttFilePath
-        )
-      )
+    return of(
+      r.addFile({
+        type: 'TemporaryVttFile',
+        id: fileRecord.id,
+        parentId: fileRecord.id, // not needed?
+        parentType: 'ExternalSubtitlesFile',
+      })
     )
   }
 }
@@ -65,55 +54,12 @@ export const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
 export const locateRequest: LocateRequestHandler<
   ExternalSubtitlesFileRecord
 > = async (fileRecord, state, effects) => {
-  return await r.fileSelectionDialog(
-    `This subtitles file ${
-      fileRecord.name
-    } appears to have moved or been renamed. Try locating it manually?`,
-    fileRecord
-  )
+  return [
+    r.fileSelectionDialog(
+      `This subtitles file ${
+        fileRecord.name
+      } appears to have moved or been renamed. Try locating it manually?`,
+      fileRecord
+    ),
+  ]
 }
-
-// const locateSubtitlesFileRequest: AppEpic = (action$, state$) =>
-//   action$.pipe(
-//     // filter<Action, AddFileRequest<ExternalSubtitlesFileRecord>>(
-//     //   isAddFile<ExternalSubtitlesFileRecord>('ExternalSubtitlesFile')
-//     // ),
-//     filter(isLocateFileRequest('ExternalSubtitlesFile')),
-//     flatMap<
-//       LocateFileRequest & { fileRecord: ExternalSubtitlesFileRecord },
-//       Promise<Observable<Action>>
-//     >(async ({ filePath, fileRecord }) => {
-//       try {
-//         const { chunks, vttFilePath } = await getSubtitlesFromFile(
-//           filePath,
-//           state$.value
-//         )
-
-//         const actions: Action[] = [
-//           // r.loadExternalSubtitlesSuccess(fileRecord),
-//           // r.locateFileSuccess(fileRecord, filePat)
-//           //
-//           // r.addFile<ExternalSubtitlesFileRecord>(
-//           //   {
-//           //     type: 'ExternalSubtitlesFile',
-//           //     id: uuid(),
-//           //     parentId: fileRecord.parentId,
-//           //   },
-//           //   fileaAth // vttFilePath
-//           // ),
-//           // r.loadFileRequest,
-//         ]
-
-//         return await from(actions)
-//       } catch (err) {
-//         console.error(err.message)
-//         return await of(
-//           //
-//           r.simpleMessageSnackbar(
-//             `Could not load subtitles:${err.message || err.toString()}`
-//           )
-//         )
-//       }
-//     }),
-//     flatMap(x => x)
-//   )

@@ -45,6 +45,7 @@ const projects: Reducer<ProjectsState, Action> = (
 
     // case A.ADD_MEDIA_TO_PROJECT:
     case A.ADD_FILE:
+    case A.LOCATE_FILE_SUCCESS:
       if (action.fileRecord.type === 'MediaFile') {
         const projectId = action.fileRecord.parentId
         return {

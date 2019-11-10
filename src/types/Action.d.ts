@@ -338,7 +338,7 @@ declare type FileAction =
 declare type AddFile = {
   type: 'ADD_FILE'
   fileRecord: FileRecord
-  filePath: FilePath
+  filePath: FilePath | null
 }
 // declare type AddFileSuccess = {
 //   type: 'ADD_FILE_SUCCESS'
@@ -376,7 +376,7 @@ declare type LoadFileFailure = {
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
   fileRecord: FileRecord
-  message: string
+  // message: string
   // filePath: FilePath
 }
 declare type LocateFileSuccess = {

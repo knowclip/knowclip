@@ -165,7 +165,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
           })
         )
         return await from(
-          metadatas.map(({ filePath, metadata }) =>
+          metadatas.map(({ metadata, filePath }) =>
             r.addFile(
               {
                 id: metadata.id,

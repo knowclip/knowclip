@@ -33,4 +33,4 @@ export type LocateRequestHandler<F extends FileRecord> = (
   fileRecord: F,
   state: AppState,
   effects: EpicsDependencies
-) => Promise<Action>
+) => Promise<Array<Action>>

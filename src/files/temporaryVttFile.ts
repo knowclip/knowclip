@@ -1,6 +1,6 @@
-import { map, catchError } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import * as r from '../redux'
-import { from, of, empty } from 'rxjs'
+import { from } from 'rxjs'
 import {
   newExternalSubtitlesTrack,
   newEmbeddedSubtitlesTrack,
@@ -18,37 +18,25 @@ export const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
   state,
   effects
 ) => {
-  const file = r.getPreviouslyLoadedFile(state, fileRecord)
-
-  if (!file || !file.filePath) {
-    const parentFile = r.getLoadedFileById(
-      state,
-      fileRecord.parentType,
-      fileRecord.parentId
-    )
-    if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-      return await r.loadFileFailure(
-        fileRecord,
-        null,
-        'You must first locate this file.'
-      )
-
-    const { chunks, vttFilePath } = await effects.getSubtitlesFromFile(
-      parentFile.filePath,
-      state
-    )
-
-    return r.loadFileSuccess(fileRecord, vttFilePath)
-  }
-
-  if (!file.filePath || !effects.existsSync(file.filePath))
+  const parentFile = r.getLoadedFileById(
+    state,
+    fileRecord.parentType,
+    fileRecord.parentId
+  )
+  if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
     return await r.loadFileFailure(
       fileRecord,
-      file.filePath,
-      `This file appears to have moved or been renamed. y`
+      null,
+      'You must first locate this file.'
     )
 
-  return await r.loadFileSuccess(fileRecord, file.filePath)
+  const vttFilePath = await effects.getSubtitlesFilePath(
+    state,
+    parentFile.filePath,
+    fileRecord
+  )
+
+  return r.loadFileSuccess(fileRecord, vttFilePath)
 }
 
 export const loadSuccess: LoadSuccessHandler<TemporaryVttFileRecord> = (
@@ -56,52 +44,45 @@ export const loadSuccess: LoadSuccessHandler<TemporaryVttFileRecord> = (
   filePath,
   state,
   effects
-) =>
-  from(effects.getSubtitlesFromFile(filePath, state))
-    // const parentFileRecord = r.getFileRecord(
-    //   state,
-    //   fileRecord.parentType,
-    //   fileRecord.id
-    // ) //wronh\g
-    // const parentFile = r.getPreviouslyLoadedFile(state
-    .pipe(
-      map(({ chunks, vttFilePath }) => {
-        if (fileRecord.parentType === 'MediaFile')
-          return r.addSubtitlesTrack(
-            newEmbeddedSubtitlesTrack(
-              fileRecord.id,
-              fileRecord.parentId,
-              chunks,
-              fileRecord.streamIndex,
-              vttFilePath
-            )
-          )
-
-        const external = r.getFileRecord(
-          state,
-          'ExternalSubtitlesFile',
-          fileRecord.parentId
-        ) as ExternalSubtitlesFileRecord
-        console.log({ external })
+) => {
+  const sourceFile = r.getLoadedFileById(
+    state,
+    fileRecord.parentType,
+    fileRecord.parentId
+  ) as CurrentlyLoadedFile
+  return from(effects.getSubtitlesFromFile(state, filePath)).pipe(
+    map(chunks => {
+      if (fileRecord.parentType === 'MediaFile')
         return r.addSubtitlesTrack(
-          newExternalSubtitlesTrack(
+          newEmbeddedSubtitlesTrack(
             fileRecord.id,
-            external.parentId,
+            fileRecord.parentId,
             chunks,
-            vttFilePath,
+            fileRecord.streamIndex,
             filePath
           )
         )
-      })
-    )
 
-export const loadFailure: LoadFailureHandler<TemporaryVttFileRecord> = (
-  fileRecord,
-  filePath,
-  errorMessage,
-  state,
-  effects
-) => {
+      const external = r.getFileRecord(
+        state,
+        'ExternalSubtitlesFile',
+        fileRecord.parentId
+      ) as ExternalSubtitlesFileRecord
+      return r.addSubtitlesTrack(
+        newExternalSubtitlesTrack(
+          fileRecord.id,
+          external.parentId,
+          chunks,
+          sourceFile.filePath,
+          filePath
+        )
+      )
+    })
+  )
+}
+export const locateRequest: LocateRequestHandler<
+  TemporaryVttFileRecord
+> = async (fileRecord, state, effects) => {
   // if parent file/media track exists
   const source = r.getLoadedFileById(
     state,
@@ -119,57 +100,37 @@ export const loadFailure: LoadFailureHandler<TemporaryVttFileRecord> = (
       fileRecord.parentId
     )
     // how to prevent infinite loop?
-    if (!sourceRecord) return of(r.simpleMessageSnackbar(errorMessage))
+    if (!sourceRecord)
+      return [r.simpleMessageSnackbar('No source subtitles file ')]
 
     switch (fileRecord.parentType) {
-      case 'MediaFile':
-        return from(
-          effects.getSubtitlesFromMedia(
-            source.filePath,
-            fileRecord.streamIndex,
-            state
+      case 'MediaFile': {
+        return await Promise.all(
+          (sourceRecord as MediaFileRecord).subtitlesTracksStreamIndexes.map(
+            async streamIndex => {
+              const tmpFilePath = await effects.getSubtitlesFilePath(
+                state,
+                source.filePath,
+                fileRecord
+              )
+              return r.locateFileSuccess(fileRecord, tmpFilePath)
+            }
           )
-        ).pipe(
-          map(({ tmpFilePath, chunks }) =>
-            r.addFile(
-              // should probably not be repeated in mediaFile.ts
-              {
-                type: 'TemporaryVttFile',
-                parentId: fileRecord.parentId,
-                id: fileRecord.id,
-                streamIndex: fileRecord.streamIndex,
-                parentType: 'MediaFile',
-              },
-              tmpFilePath
-            )
-          )
-          // catchError((err) => r.)
         )
+      }
       case 'ExternalSubtitlesFile':
-        return from(effects.getSubtitlesFromFile(source.filePath, state)).pipe(
-          map(({ vttFilePath, chunks }) =>
-            r.addFile(
-              // should probably not be repeated in mediaFile.ts
-              {
-                type: 'TemporaryVttFile',
-                id: fileRecord.id,
-                parentId: fileRecord.id, // not needed?
-                parentType: 'ExternalSubtitlesFile',
-              },
-              vttFilePath
-            )
-          )
+        const tmpFilePath = await effects.getSubtitlesFilePath(
+          state,
+          source.filePath,
+          fileRecord
         )
+        return [r.locateFileSuccess(fileRecord, tmpFilePath)]
       default:
-        return empty()
-    }
-    // else
-  } else {
-    //   delete file record, suggest retry?
-    return of(r.simpleMessageSnackbar(errorMessage))
-  }
-}
+        //   delete file record, suggest retry?
+        return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
 
-// export const locateRequest : LocateRequestHandler= (fileRecord, state, effects) => {
-//   const source =
-// }
+      // else
+    }
+  }
+  return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
+}

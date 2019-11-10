@@ -39,25 +39,52 @@ export const getSubtitlesFilePathFromMedia = async (
   )
 }
 
-export const getSubtitlesFromMedia = async (
-  mediaFilePath: MediaFilePath,
-  streamIndex: number,
-  state: AppState
+export const getExternalSubtitlesVttPath = async (
+  state: AppState,
+  filePath: string
 ) => {
-  const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
-    mediaFilePath,
-    streamIndex
-  )
-  if (!subtitlesFilePath) {
-    throw new Error('There was a problem loading embedded subtitles')
-  }
-  const vttText = await readFile(subtitlesFilePath, 'utf8')
+  const extension = extname(filePath).toLowerCase()
+  const vttFilePath =
+    extension === '.vtt' ? filePath : tempy.file({ extension: 'vtt' })
+  const fileContents = await readFile(filePath, 'utf8')
+  const chunks = parseSubtitles(state, fileContents, extension)
 
-  return {
-    tmpFilePath: subtitlesFilePath,
-    chunks: parse(vttText)
-      .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
-      .filter(({ text }) => text),
+  if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
+  if (extension === '.srt')
+    await writeFile(
+      vttFilePath,
+      stringifyVtt(
+        chunks.map(chunk => ({
+          start: getMillisecondsAtX(state, chunk.start),
+          end: getMillisecondsAtX(state, chunk.end),
+          text: chunk.text,
+        }))
+      ),
+      'utf8'
+    )
+  return vttFilePath
+}
+
+export const getSubtitlesFilePath = async (
+  state: AppState,
+  sourceFilePath: string,
+  fileRecord: ExternalSubtitlesFileRecord | TemporaryVttFileRecord
+) => {
+  if (fileRecord.type === 'ExternalSubtitlesFile') {
+    return await getExternalSubtitlesVttPath(state, sourceFilePath)
+  }
+  switch (fileRecord.parentType) {
+    case 'ExternalSubtitlesFile':
+      return await getExternalSubtitlesVttPath(state, sourceFilePath)
+    case 'MediaFile':
+      const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
+        sourceFilePath,
+        fileRecord.streamIndex
+      )
+      if (!subtitlesFilePath) {
+        throw new Error('There was a problem loading embedded subtitles')
+      }
+      return subtitlesFilePath
   }
 }
 
@@ -91,32 +118,12 @@ const parseSubtitles = (
         .filter(({ text }) => text)
 
 export const getSubtitlesFromFile = async (
-  filePath: string,
-  state: AppState
+  state: AppState,
+  sourceFilePath: string
 ) => {
-  const extension = extname(filePath).toLowerCase()
-  const vttFilePath =
-    extension === '.vtt' ? filePath : tempy.file({ extension: 'vtt' })
-  const fileContents = await readFile(filePath, 'utf8')
-  const chunks = parseSubtitles(state, fileContents, extension)
-
-  if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
-  if (extension === '.srt')
-    await writeFile(
-      vttFilePath,
-      stringifyVtt(
-        chunks.map(chunk => ({
-          start: getMillisecondsAtX(state, chunk.start),
-          end: getMillisecondsAtX(state, chunk.end),
-          text: chunk.text,
-        }))
-      ),
-      'utf8'
-    )
-  return {
-    vttFilePath,
-    chunks,
-  }
+  const extension = extname(sourceFilePath).toLowerCase()
+  const fileContents = await readFile(sourceFilePath, 'utf8')
+  return parseSubtitles(state, fileContents, extension)
 }
 
 export const newEmbeddedSubtitlesTrack = (

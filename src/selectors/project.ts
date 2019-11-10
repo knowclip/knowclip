@@ -1,6 +1,6 @@
 import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
-import { getClips, getPreviouslyLoadedFile } from '.'
+import { getClips } from '.'
 import { getProjectMediaFileRecords } from './media'
 import { getFileRecord, getLoadedFileById } from './files'
 import { extname } from 'path'
@@ -68,7 +68,7 @@ export const getMediaFileConstantBitratePathFromCurrentProject = (
     if (
       loadedFile &&
       loadedFile.filePath &&
-      extname(loadedFile.filePath) !== '.mp3'
+      extname(loadedFile.filePath).toLowerCase() !== '.mp3'
     )
       return loadedFile.status === 'CURRENTLY_LOADED'
         ? loadedFile.filePath
@@ -82,30 +82,23 @@ export const getMediaFileConstantBitratePathFromCurrentProject = (
   }
 export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
   const currentFileId = state.user.currentMediaFileId
-  const currentFileRecord: FileRecord | null = currentFileId
-    ? state.fileRecords.MediaFile[currentFileId]
-    : null
-  const currentFile = currentFileRecord
-    ? getPreviouslyLoadedFile(state, currentFileRecord)
-    : null
+  if (!currentFileId) return null
+
+  const currentFile = getLoadedFileById(state, 'MediaFile', currentFileId)
   return currentFile && currentFile.status === 'CURRENTLY_LOADED'
     ? currentFile.filePath
     : null
-
-  // return currentFileId
-  // ? getMediaFilePathFromCurrentProject(state, currentFileId)
-  // : null
 }
 
 export const getCurrentMediaFileConstantBitratePath = (
   state: AppState
-): MediaFilePath | null => getCurrentFilePath(state)
-// state.user.currentMediaFileId
-//   ? getMediaFileConstantBitratePathFromCurrentProject(
-//       state,
-//       state.user.currentMediaFileId
-//     )
-//   : null
+): MediaFilePath | null =>
+  state.user.currentMediaFileId
+    ? getMediaFileConstantBitratePathFromCurrentProject(
+        state,
+        state.user.currentMediaFileId
+      )
+    : null
 
 // export const getProjectMediaMetadata = (
 //   // rename to just media files

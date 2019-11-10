@@ -1,4 +1,3 @@
-import { flatMap, map, catchError } from 'rxjs/operators'
 import { of, merge, empty } from 'rxjs'
 import * as r from '../redux'
 import { from } from 'rxjs'
@@ -18,25 +17,6 @@ export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
 ) => {
   effects.pauseMedia()
   // mediaPlayer.src = ''
-
-  //   if (!filePath) {
-  //   // also should open dialog
-  //   return of(
-  //     r.openMediaFileFailure(
-  //       `Before opening this media file: \n\n"${
-  //         metadata.name
-  //       }"\n\nYou'll first have to locate manually on your filesystem.\n\nThis is probably due to using a shared project file, or an older project file format.`
-  //     )
-  //   )
-  // }
-
-  // if (!fs.existsSync(filePath)) {
-  //   return of(
-  //     r.openMediaFileFailure(
-  //       'Could not find media file. It must have moved since the last time you opened it. Try to locate it manually?'
-  //     )
-  //   )
-  // }
 
   return await r.loadFileSuccess(fileRecord, filePath)
 }
@@ -71,25 +51,17 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
             )
           )
       )
-      .map(async streamIndex => {
-        const { tmpFilePath, chunks } = await effects.getSubtitlesFromMedia(
-          filePath,
+      .map(streamIndex => {
+        return r.addFile({
+          type: 'TemporaryVttFile',
+          parentId: id,
+          id: uuid(),
           streamIndex,
-          state
-        )
-        return r.addFile(
-          {
-            type: 'TemporaryVttFile',
-            parentId: id,
-            id: uuid(),
-            streamIndex,
-            parentType: 'MediaFile',
-          },
-          tmpFilePath
-        )
+          parentType: 'MediaFile',
+        })
         // or load existing
       })
-  ).pipe(flatMap(x => x))
+  )
 
   const reloadRememberedSubtitles = from(
     existingSubtitlesIds.map(id => {
@@ -106,38 +78,20 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
       return ({ type: 'whoops couldnt find file' } as unknown) as Action
     })
   )
-  const cbrPath = r.getMediaFileConstantBitratePathFromCurrentProject(
-    state,
-    fileRecord.id
-  ) as string
-  const getWaveform = cbrPath
-    ? from(effects.getWaveformPng(state, cbrPath)).pipe(
-        //       map(imagePath => r.setWaveformImagePath(imagePath)),
-        map(imagePath =>
-          r.addFile(
-            {
-              type: 'WaveformPng',
-              parentId: fileRecord.id,
-              id: fileRecord.id,
-            },
-            imagePath
-          )
-        ),
-        catchError(err => of(r.simpleMessageSnackbar(err.message)))
-      )
-    : empty()
+  const getWaveform = of(
+    r.addFile({
+      type: 'WaveformPng',
+      parentId: fileRecord.id,
+      id: fileRecord.id,
+    })
+  )
   const fileName = r.getCurrentFileName(state)
   const getCbr = fileRecord.format.toLowerCase().includes('mp3')
-    ? from(effects.getConstantBitrateMediaPath(filePath, null)).pipe(
-        map(cbrFile =>
-          r.addFile(
-            {
-              type: 'ConstantBitrateMp3',
-              id: fileRecord.id,
-            },
-            cbrFile
-          )
-        )
+    ? of(
+        r.addFile({
+          type: 'ConstantBitrateMp3',
+          id: fileRecord.id,
+        })
       )
     : empty()
 
@@ -159,12 +113,14 @@ export const locateRequest: LocateRequestHandler<MediaFileRecord> = async (
   state,
   effects
 ) => {
-  return await r.fileSelectionDialog(
-    `This media file ${
-      fileRecord.name
-    } appears to have moved or been renamed. Try locating it manually?`,
-    fileRecord
-  )
+  return [
+    r.fileSelectionDialog(
+      `This media file ${
+        fileRecord.name
+      } appears to have moved or been renamed. Try locating it manually?`,
+      fileRecord
+    ),
+  ]
 }
 
 // export const loadFailure : LoadFailureHandler<MediaFile> = (

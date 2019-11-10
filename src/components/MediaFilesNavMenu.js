@@ -58,13 +58,13 @@ const MediaFilesNavMenu = ({
     const startPlaying = () => setPlaying(true)
 
     document.addEventListener('play', startPlaying, true)
-    return () => document.removeEventListener('play', startPlaying)
+    return () => document.removeEventListener('play', startPlaying, true)
   }, [])
   useEffect(() => {
     const stopPlaying = () => setPlaying(false)
 
     document.addEventListener('pause', stopPlaying, true)
-    return () => document.removeEventListener('pause', stopPlaying)
+    return () => document.removeEventListener('pause', stopPlaying, true)
   }, [])
 
   const playOrPauseAudio = useRef(() => {

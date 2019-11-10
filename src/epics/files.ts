@@ -1,5 +1,5 @@
 import { flatMap, map } from 'rxjs/operators'
-import { of, Observable } from 'rxjs'
+import { of, Observable, from } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { existsSync } from 'fs'
@@ -14,9 +14,8 @@ const addFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddFile>(A.ADD_FILE),
     // map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
-    map<AddFile, Action>(({ fileRecord, filePath }) =>
-      r.locateFileSuccess(fileRecord, filePath)
-    )
+    // should succeed because add file adds file to loaded files state ??
+    map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
   )
 
 const loadFileRequest: AppEpic = (action$, state$, effects) =>
@@ -28,10 +27,10 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
     //   if filepath invalid, do file-generating or file-finding action for particular file type
     // if no filepath provided, do file-generating or file-finding action for particular file type
     flatMap<LoadFileRequest, Promise<Action>>(async ({ fileRecord }) => {
-      const file = r.getPreviouslyLoadedFile(state$.value, fileRecord)
+      const file = r.getPreviouslyLoadedFile(state$.value, fileRecord) // rename
       // if (!file)
       if (!file || !file.filePath || !existsSync(file.filePath))
-        return await r.locateFileRequest(fileRecord, 'File not found')
+        return await r.locateFileRequest(fileRecord)
 
       try {
         switch (fileRecord.type) {
@@ -186,29 +185,30 @@ const loadFileFailure: AppEpic = (action$, state$, effects) =>
               effects
             )
           }
-          case 'TemporaryVttFile': {
-            return temporaryVtt.loadFailure(
-              fileRecord,
-              filePath,
-              errorMessage,
-              state$.value,
-              effects
-            )
-          }
+          // case 'TemporaryVttFile': {
+          //   return temporaryVtt.loadFailure(
+          //     fileRecord,
+          //     filePath,
+          //     errorMessage,
+          //     state$.value,
+          //     effects
+          //   )
+          // }
 
-          case 'WaveformPng':
-            return waveformPng.loadFailure(
-              fileRecord,
-              filePath,
-              errorMessage,
-              state$.value,
-              effects
-            )
+          // case 'WaveformPng':
+          //   return waveformPng.loadFailure(
+          //     fileRecord,
+          //     filePath,
+          //     errorMessage,
+          //     state$.value,
+          //     effects
+          //   )
 
           default:
             return of(
               r.simpleMessageSnackbar(
-                'Unimplemented file load failure hook ' + fileRecord
+                'Unimplemented file load failure hook ' +
+                  JSON.stringify(fileRecord)
               )
             )
         }
@@ -258,48 +258,46 @@ const loadFileFailure: AppEpic = (action$, state$, effects) =>
 //   }
 // }
 
+const flatten = (asyncArray: Promise<Action[]>) =>
+  from(asyncArray).pipe(flatMap(array => from(array)))
+
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileRequest>(A.LOCATE_FILE_REQUEST),
-    flatMap<LocateFileRequest, Promise<Action>>(
-      async ({ fileRecord, message }) => {
-        switch (fileRecord.type) {
-          case 'MediaFile':
-            return await media.locateRequest(fileRecord, state$.value, effects)
+    flatMap<LocateFileRequest, Observable<Action>>(({ fileRecord }) => {
+      switch (fileRecord.type) {
+        case 'MediaFile':
+          return flatten(media.locateRequest(fileRecord, state$.value, effects))
 
-          case 'ExternalSubtitlesFile':
-            return await externalSubtitles.locateRequest(
-              fileRecord,
-              state$.value,
-              effects
+        case 'ExternalSubtitlesFile':
+          return flatten(
+            externalSubtitles.locateRequest(fileRecord, state$.value, effects)
+          )
+
+        case 'TemporaryVttFile':
+          return flatten(
+            temporaryVtt.locateRequest(fileRecord, state$.value, effects)
+          )
+
+        case 'WaveformPng':
+          return flatten(
+            waveformPng.locateRequest(fileRecord, state$.value, effects)
+          )
+
+        case 'ConstantBitrateMp3':
+          return flatten(
+            constantBitrateMp3.locateRequest(fileRecord, state$.value, effects)
+          )
+
+        default:
+          return of(
+            r.simpleMessageSnackbar(
+              'Unimplemented file locate request hook ' +
+                JSON.stringify(fileRecord)
             )
-
-          // case 'TemporaryVttFile': {
-          //   return temporaryVtt.loadFailure(
-          //     fileRecord,
-          //     filePath,
-          //     errorMessage,
-          //     state$.value,
-          //     effects
-          //   )
-          // }
-
-          // case 'WaveformPng':
-          //   return waveformPng.loadFailure(
-          //     fileRecord,
-          //     filePath,
-          //     errorMessage,
-          //     state$.value,
-          //     effects
-          //   )
-
-          default:
-            return await r.simpleMessageSnackbar(
-              'Unimplemented file locate request hook ' + fileRecord
-            )
-        }
+          )
       }
-    )
+    })
   )
 
 const locateFileSuccess: AppEpic = (action$, state$, effects) =>

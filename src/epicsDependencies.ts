@@ -1,5 +1,5 @@
 import { getMediaMetadata } from './utils/ffmpeg'
-import { getSubtitlesFromFile, getSubtitlesFromMedia } from './utils/subtitles'
+import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './epics/media'
@@ -50,7 +50,7 @@ const dependencies: EpicsDependencies = {
   },
   getMediaMetadata,
   getSubtitlesFromFile,
-  getSubtitlesFromMedia,
+  getSubtitlesFilePath,
   getWaveformPng,
   getConstantBitrateMediaPath,
   existsSync,
