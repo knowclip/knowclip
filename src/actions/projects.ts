@@ -70,26 +70,6 @@ export const deleteMediaFromProject = (
   mediaFileId,
 })
 
-export const locateMediaFileRequest = (
-  id: MediaFileId,
-  filePath: MediaFilePath
-): Action => ({
-  type: A.LOCATE_MEDIA_FILE_REQUEST,
-  id,
-  filePath,
-})
-
-export const locateMediaFileSuccess = (
-  id: MediaFileId,
-  metadata: MediaFileMetadata,
-  filePath: MediaFilePath
-): Action => ({
-  type: A.LOCATE_MEDIA_FILE_SUCCESS,
-  id,
-  metadata,
-  filePath,
-})
-
 export const saveProjectRequest = (): Action => ({
   type: A.SAVE_PROJECT_REQUEST,
 })

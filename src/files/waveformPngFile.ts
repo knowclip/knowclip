@@ -2,7 +2,6 @@ import * as r from '../redux'
 import { empty } from 'rxjs'
 import {
   LoadSuccessHandler,
-  LoadFailureHandler,
   LoadRequestHandler,
   LocateRequestHandler,
 } from './types'

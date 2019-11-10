@@ -1,13 +1,5 @@
-import { fromEvent, Observable, of, empty } from 'rxjs'
-import {
-  map,
-  flatMap,
-  takeWhile,
-  startWith,
-  filter,
-  switchMap,
-} from 'rxjs/operators'
-import { Epic, ofType } from 'redux-observable'
+import { fromEvent, Observable } from 'rxjs'
+import { map, startWith, filter, switchMap } from 'rxjs/operators'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'

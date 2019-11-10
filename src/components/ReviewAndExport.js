@@ -22,7 +22,6 @@ import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
 import moment from 'moment'
-import { loadFileRequest } from '../actions'
 
 let FlashcardRow = ({
   flashcard: { fields, id, tags },

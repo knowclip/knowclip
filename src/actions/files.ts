@@ -1,7 +1,7 @@
 export const addFile = <F extends FileRecord>(
   fileRecord: F,
   filePath?: FilePath
-): AddFileWith<F> => ({
+): AddFile => ({
   type: A.ADD_FILE,
   fileRecord,
   filePath: filePath || null,
@@ -54,13 +54,4 @@ export const locateFileSuccess = (
   type: 'LOCATE_FILE_SUCCESS',
   fileRecord,
   filePath,
-})
-export const locateFileFailure = (
-  fileRecord: FileRecord,
-  errorMessage: string
-): LocateFileFailure => ({
-  // needed?
-  type: 'LOCATE_FILE_FAILURE',
-  fileRecord,
-  errorMessage,
 })

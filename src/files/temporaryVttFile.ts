@@ -8,7 +8,6 @@ import {
 import {
   LoadRequestHandler,
   LoadSuccessHandler,
-  LoadFailureHandler,
   LocateRequestHandler,
 } from './types'
 

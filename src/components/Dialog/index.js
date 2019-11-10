@@ -5,7 +5,6 @@ import Confirmation from './Confirmation'
 import MediaFolderLocationForm from './MediaFolderLocationFormDialog'
 import ReviewAndExport from '../ReviewAndExport'
 import NewProjectForm from './NewProjectFormDialog'
-import OpenMediaFileFailure from './OpenMediaFileFailureDialog'
 import CsvAndMp3Export from './CsvAndMp3ExportDialog'
 import SubtitlesClips from './SubtitlesClipsDialog'
 import FileSelection from './FileSelectionDialog'
@@ -15,7 +14,6 @@ const DIALOGS = {
   MediaFolderLocationForm,
   ReviewAndExport,
   NewProjectForm,
-  OpenMediaFileFailure,
   CsvAndMp3Export,
   SubtitlesClips,
   FileSelection,

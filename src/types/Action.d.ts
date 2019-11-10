@@ -212,8 +212,6 @@ declare type MediaAction =
   | AddMediaToProject
   | DeleteMediaFromProjectRequest
   | DeleteMediaFromProject
-  | LocateMediaFileRequest
-  | LocateMediaFileSuccess
   | ChooseMediaFiles
   | RemoveMediaFiles
   | SetCurrentFile
@@ -239,19 +237,6 @@ declare type DeleteMediaFromProject = {
   type: 'DELETE_MEDIA_FROM_PROJECT'
   projectId: ProjectId
   mediaFileId: MediaFileId
-}
-
-declare type LocateMediaFileRequest = {
-  type: 'LOCATE_MEDIA_FILE_REQUEST'
-  id: MediaFileId
-  filePath: MediaFilePath
-}
-declare type LocateMediaFileSuccess = {
-  type: 'LOCATE_MEDIA_FILE_SUCCESS'
-  // projectId: ProjectId
-  id: MediaFileId
-  metadata: MediaFileMetadata
-  filePath: MediaFilePath
 }
 
 declare type ChooseMediaFiles = {
@@ -325,8 +310,6 @@ declare type GoToSubtitlesChunk = {
 
 declare type FileAction =
   | AddFile
-  // | AddFileSuccess
-  // | AddFileFailure
   | DeleteFileRecordRequest
   | DeleteFileRecordSuccess
   | LoadFileRequest
@@ -334,22 +317,11 @@ declare type FileAction =
   | LoadFileFailure
   | LocateFileRequest
   | LocateFileSuccess
-  | LocateFileFailure
 declare type AddFile = {
   type: 'ADD_FILE'
   fileRecord: FileRecord
   filePath: FilePath | null
 }
-// declare type AddFileSuccess = {
-//   type: 'ADD_FILE_SUCCESS'
-//   fileRecord: FileRecord
-//   filePath: FilePath
-// }
-// declare type AddFileFailure = {
-//   type: 'ADD_FILE_FAILURE'
-//   fileRecord: FileRecord
-//   filePath: FilePath
-// }
 declare type DeleteFileRecordRequest = {
   type: 'DELETE_FILE_RECORD_REQUEST'
   fileRecord: FileRecord
@@ -376,38 +348,19 @@ declare type LoadFileFailure = {
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
   fileRecord: FileRecord
-  // message: string
-  // filePath: FilePath
 }
 declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
   fileRecord: FileRecord
   filePath: FilePath
 }
-declare type LocateFileFailure = {
-  // needed?
-  type: 'LOCATE_FILE_FAILURE'
-  fileRecord: FileRecord
-  errorMessage: string
-}
 
 interface WithRecordType<F extends FileRecord> {
   fileRecord: F
 }
-type LoadFileRequestWith<F extends FileRecord> = Omit<
-  LoadFileRequest,
-  'fileRecord'
-> &
-  WithRecordType<F>
+
 type LoadFileSuccessWith<F extends FileRecord> = Omit<
   LoadFileSuccess,
   'fileRecord'
 > &
-  WithRecordType<F>
-type LoadFileFailureWith<F extends FileRecord> = Omit<
-  LoadFileFailure,
-  'fileRecord'
-> &
-  WithRecordType<F>
-type AddFileWith<F extends FileRecord> = Omit<AddFile, 'fileRecord'> &
   WithRecordType<F>
