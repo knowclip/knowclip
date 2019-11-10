@@ -16,7 +16,7 @@ import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
-// import subtitles from './subtitles'
+import subtitles from './subtitles'
 import files from './files'
 import defaultTags from './defaultTags'
 import { AppEpic } from '../types/AppEpic'
@@ -63,7 +63,7 @@ const rootEpic: AppEpic = combineEpics(
   keyboard,
   highlightClip,
   closeEpic,
-  // subtitles
+  subtitles,
   files
 )
 

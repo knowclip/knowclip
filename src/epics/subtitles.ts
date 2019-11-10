@@ -129,9 +129,6 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
   )
 
 export default combineEpics(
-  // loadEmbeddedSubtitles,
-  // loadSubtitlesFile,
-  // loadSubtitlesFailure,
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
   goToSubtitlesChunk
