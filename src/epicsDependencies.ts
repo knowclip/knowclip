@@ -2,7 +2,7 @@ import { getMediaMetadata } from './utils/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
-import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './epics/media'
+import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()

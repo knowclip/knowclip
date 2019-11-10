@@ -7,23 +7,6 @@ export const addFile = <F extends FileRecord>(
   filePath: filePath || null,
 })
 
-// export const AddFileSuccess = <F extends FileRecord>(
-//   fileRecord: F,
-//   filePath: FilePath
-// ): AddFileSuccessWith<F> => ({
-//   type: A.ADD_FILE_SUCCESS,
-//   fileRecord,
-//   filePath,
-// })
-// export const AddFileFailure = <F extends FileRecord>(
-//   fileRecord: F,
-//   filePath: FilePath
-// ): AddFileFailureWith<F> => ({
-//   type: A.ADD_FILE_FAILURE,
-//   fileRecord,
-//   filePath,
-// })
-
 export const deleteFileRecordRequest = (
   fileRecord: FileRecord
 ): DeleteFileRecordRequest => ({

@@ -50,26 +50,6 @@ export const getCurrentNoteType = (state: AppState): NoteType | null => {
   return currentProject ? currentProject.noteType : null
 }
 
-// export const getMediaFiles = (
-//   state: AppState,
-//   projectId: ProjectId
-// ): Array<MediaFile> => {
-//   const projectMetadata = getProjectMetadata(state, projectId)
-//   return projectMetadata
-//     ? projectMetadata.mediaFiles.map(id => state.media.byId[id])
-//     : []
-// }
-
-// export const getCurrentProjectMediaFiles = (
-//   //remove
-//   state: AppState
-// ): Array<MediaFile> => {
-//   const projectMetadata = getCurrentProject(state)
-//   return projectMetadata
-//     ? projectMetadata.mediaFiles.map(id => state.media.byId[id])
-//     : []
-// }
-
 export const getCurrentProjectMediaFileRecords = (
   state: AppState
 ): Array<MediaFileRecord> => {

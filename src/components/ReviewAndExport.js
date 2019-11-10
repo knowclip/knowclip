@@ -338,10 +338,6 @@ const mapStateToProps = state => ({
   allProjectClipsIds: r.getAllProjectClipsIds(state),
   noteType: r.getCurrentNoteType(state),
   currentMedia: r.getCurrentMediaFileRecord(state),
-  // projectMediaMetadata: r.getProjectMediaMetadata(
-  //   state,
-  //   r.getCurrentProjectId(state)
-  // ),
   currentFileId: r.getCurrentFileId(state),
   projectMedia: r.getCurrentProjectMediaFileRecords(state),
 })

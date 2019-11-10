@@ -22,15 +22,6 @@ export const getSubtitlesLoadedFile = (state: AppState, id: string) => {
   return record ? getPreviouslyLoadedFile(state, record) : null
 }
 
-// export const trackWasLoaded = (state: AppState, id: string) => {
-//   const loadedFile = getSubtitlesLoadedFile(state, id)
-//   if (!loadedFile || !loadedFile.status === 'CURRENTLY_LOADED') return false
-//   const record = getSubtitlesFileRecord(state, id)
-
-//   // const
-//   return loadedFile ? loadedFile.status === 'CURRENTLY_LOADED' : false
-// }
-
 const getSubtitles = (state: AppState) => state.subtitles
 
 export const getSubtitlesTracks = createSelector(

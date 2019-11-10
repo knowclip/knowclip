@@ -411,39 +411,3 @@ type LoadFileFailureWith<F extends FileRecord> = Omit<
   WithRecordType<F>
 type AddFileWith<F extends FileRecord> = Omit<AddFile, 'fileRecord'> &
   WithRecordType<F>
-
-// CYCLE:   *includes state update
-// AddFile* -> LoadFileRequest /// SHOULD AddFile and LocateFileSuccess/request? be merged???
-//                            or check valid later?
-// LoadFileRequest -> present & valid? LoadFileSuccess
-//                    present & invalid? LoadFileFailure*
-//                    absent? ShowLocateFileDialog/GenerateFile
-// ShowLocateFileDialog/GenerateFile -> success/confirmation? LocateFileRequest
-//                                      failure/nothing? LoadFileFailure*
-// LoadFileFailure* -> ___
-// LocateFileRequest -> located? LocateFileSuccess*
-//                   -> not located? LocateFileFailure
-// LocateFileSuccess* -> LoadFileRequest
-
-// loading new external VTT file:
-//                                                       switched?
-// AddFile* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
-
-// loading new external SRT file:
-//                                                       switched?
-// AddFile* -> LoadFileRequest -> LoadFileSuccess -> AddFile* -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
-
-// loading external VTT file from project file:
-// LoadFileRequest -> LoadFileFailure(absent) -> LocateFileRequest -> LocateFileSuccess -> LoadFileRequest -> LoadFileSuccess -> LoadSubtitles
-
-// loading external SRT file from project file:
-// LoadFileRequest -> LoadFileFailure -> LocateFileRequest -> LocateFileSucess -> ???
-
-// loading previously loaded external VTT File:
-// LoadFileRequest -> LocateFileRequest -> LocateFileSuccess -> LoadSubtitles
-
-// loading previously loaded external SRT File:
-
-//
-//
-//

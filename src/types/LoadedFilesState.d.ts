@@ -29,17 +29,3 @@ declare type NotLoadedFile = {
   status: 'NOT_LOADED'
   filePath: null
 }
-
-// declare type LoadedFileData =
-//   | {
-//       type: 'VttExternalSubtitlesFile'
-//       subtitles: ExternalSubtitlesTrack
-//     }
-//   | {
-//       type: 'NotVttExternalSubtitlesFile'
-//       // should include vttFilePath or vttId??
-//     }
-//   | {
-//       type: 'VttConvertedSubtitlesFile'
-//       chunks: List<SubtitlesChunk>
-//     }

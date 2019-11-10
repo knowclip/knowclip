@@ -47,39 +47,24 @@ export const getCurrentProject = (state: AppState): ProjectMetadata | null => {
   return currentProjectId ? state.projects.byId[currentProjectId] : null
 }
 
-// export const getMediaMetadataFromCurrentProject = (
-//   state: AppState,
-//   id: MediaFileId
-// ): MediaFileMetadata | null => state.media.byId[id].metadata || null
-
-// export const getMediaFilePathFromCurrentProject = (
-//   state: AppState,
-//   id: MediaFileId
-// ): MediaFilePath | null =>
-//   state.media.byId[id] ? state.media.byId[id].filePath : null
-
 export const getMediaFileConstantBitratePathFromCurrentProject = (
   state: AppState,
   id: MediaFileId
-): MediaFilePath | null =>
-  // state.media.byId[id] ? state.media.byId[id].constantBitrateFilePath : null
-  {
-    const loadedFile = getLoadedFileById(state, 'MediaFile', id)
-    if (
-      loadedFile &&
-      loadedFile.filePath &&
-      extname(loadedFile.filePath).toLowerCase() !== '.mp3'
-    )
-      return loadedFile.status === 'CURRENTLY_LOADED'
-        ? loadedFile.filePath
-        : null
+): MediaFilePath | null => {
+  const loadedFile = getLoadedFileById(state, 'MediaFile', id)
+  if (
+    loadedFile &&
+    loadedFile.filePath &&
+    extname(loadedFile.filePath).toLowerCase() !== '.mp3'
+  )
+    return loadedFile.status === 'CURRENTLY_LOADED' ? loadedFile.filePath : null
 
-    const loadedCbr = getLoadedFileById(state, 'ConstantBitrateMp3', id)
-    if (loadedCbr && loadedCbr.filePath)
-      return loadedCbr.status === 'CURRENTLY_LOADED' ? loadedCbr.filePath : null
+  const loadedCbr = getLoadedFileById(state, 'ConstantBitrateMp3', id)
+  if (loadedCbr && loadedCbr.filePath)
+    return loadedCbr.status === 'CURRENTLY_LOADED' ? loadedCbr.filePath : null
 
-    return null
-  }
+  return null
+}
 export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
   const currentFileId = state.user.currentMediaFileId
   if (!currentFileId) return null
@@ -99,27 +84,6 @@ export const getCurrentMediaFileConstantBitratePath = (
         state.user.currentMediaFileId
       )
     : null
-
-// export const getProjectMediaMetadata = (
-//   // rename to just media files
-//   state: AppState,
-//   projectId: ProjectId
-// ): Array<MediaFileMetadata> =>
-//   getMediaFiles(state, projectId).map(({ metadata }) => metadata)
-
-// export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
-//   // remove
-//   const { currentMediaFileId } = state.user
-//   return currentMediaFileId ? state.media.byId[currentMediaFileId] : null
-// }
-
-// export const getCurrentMediaMetadata = (
-//   // remove
-//   state: AppState
-// ): MediaFileMetadata | null => {
-//   const currentMediaFile = getCurrentMediaFile(state)
-//   return currentMediaFile ? currentMediaFile.metadata : null
-// }
 
 export const getCurrentMediaFileRecord = (
   state: AppState
