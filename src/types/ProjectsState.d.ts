@@ -20,5 +20,6 @@ declare type ProjectMetadata_Pre_4 = {
   name: string
   noteType: NoteType
   mediaFiles: Array<MediaFileId>
+  // media: Array<DenormalizedMediaFile>
   error: string | null
 }

@@ -54,15 +54,15 @@ const exportApkg: AppEpic = (action$, state$) =>
       if (!outputFilePath) return r.exportApkgFailure()
 
       try {
-        const currentProjectMetadata = r.getCurrentProject(state$.value)
-        if (!currentProjectMetadata)
+        const currentProject = r.getCurrentProject(state$.value)
+        if (!currentProject)
           return r.exportApkgFailure('Could not find project')
         const noteType = r.getCurrentNoteType(state$.value)
         if (!noteType) return r.exportApkgFailure('Could not find note type')
 
         const exportData = getApkgExportData(
           state$.value,
-          currentProjectMetadata,
+          currentProject,
           clipIds
         )
 

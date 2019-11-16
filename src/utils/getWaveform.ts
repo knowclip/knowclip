@@ -4,9 +4,11 @@ import { existsSync } from 'fs'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
+const CORRECTION_OFFSET = 0
 
 export const getWaveformPng = async (
   state: AppState,
+  fileRecord: WaveformPngRecord,
   constantBitrateFilePath: string
 ): Promise<string> => {
   const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
@@ -16,9 +18,9 @@ export const getWaveformPng = async (
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 
-  const outputFilename = getWaveformPngPath(constantBitrateFilePath)
+  const outputFilename = getWaveformPngPath(state, fileRecord)
   if (outputFilename && existsSync(outputFilename)) return outputFilename
-
+  console.log({ constantBitrateFilePath })
   return await new Promise((res, rej) => {
     ffmpeg(constantBitrateFilePath)
       // .audioCodec('copy') // later, do this and change hardcoded '.mp3' for audio-only input
@@ -27,8 +29,9 @@ export const getWaveformPng = async (
         [
           `[0:a]aformat=channel_layouts=mono,`,
           `compand=gain=-6,`,
-          `showwavespic=s=${width + 20}x70:colors=${WAVE_COLOR}[fg];`,
-          `color=s=${width + 20}x70:color=${BG_COLOR}[bg];`,
+          `showwavespic=s=${width +
+            CORRECTION_OFFSET}x70:colors=${WAVE_COLOR}[fg];`,
+          `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
           `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
         ].join('')
       )

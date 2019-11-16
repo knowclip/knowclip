@@ -26,6 +26,7 @@ declare type EpicsDependencies = {
   ) => Promise<string>
   getWaveformPng: (
     state: AppState,
+    fileRecord: WaveformPngRecord,
     constantBitrateFilePath: string
   ) => Promise<string>
   getConstantBitrateMediaPath: (

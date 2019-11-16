@@ -10,7 +10,7 @@ export const initialState: FileRecordsState = {
   TemporaryVttFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
-  VideoStillImage: {},
+  // VideoStillImage: {},
   // },
 }
 
@@ -71,6 +71,27 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
           },
         })
       )
+
+    case A.OPEN_PROJECT:
+      return {
+        ...state,
+        MediaFile: {
+          ...state.MediaFile,
+          ...action.mediaFiles.reduce(
+            (all, media) => {
+              all[media.id] = media
+              return all
+            },
+            {} as Record<string, MediaFileRecord>
+          ),
+        },
+      }
+
+    case A.SET_PROJECT_NAME:
+      return edit<ProjectFileRecord>(state, 'ProjectFile', action.id, file => ({
+        ...file,
+        name: action.name,
+      }))
 
     default:
       return state

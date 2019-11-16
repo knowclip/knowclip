@@ -7,6 +7,7 @@ import fs from 'fs'
 import parseProject, { buildMediaFiles } from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
+import moment from 'moment'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
@@ -33,16 +34,30 @@ const openProject = async (
     // )
     const mediaFiles = project.mediaFiles.map(({ id }) => id)
 
-    const projectMetadata = r.getProjectMetadata(state$.value, project.id)
+    const projectMetadata = r.getFileRecord<ProjectFileRecord>(
+      state$.value,
+      'ProjectFile',
+      project.id
+    )
     return from([
-      r.openProject(project, {
-        id: project.id,
-        filePath: filePath,
-        name: project.name,
-        mediaFiles,
-        error: null,
-        noteType: project.noteType,
-      }),
+      r.openProject(
+        // project,
+        {
+          id: project.id,
+          type: 'ProjectFile',
+          lastSaved: project.timestamp,
+          lastOpened: moment()
+            .utc()
+            .format(),
+          // filePath: filePath,
+          name: project.name,
+          mediaFiles,
+          error: null,
+          noteType: project.noteType,
+        },
+        project.mediaFiles,
+        []
+      ),
       ({
         type: projectMetadata
           ? 'CREATED NEW PROJECT METADATA'
@@ -60,22 +75,24 @@ const openProject = async (
 const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.OPEN_PROJECT_REQUEST_BY_ID),
-    flatMap<OpenProjectRequestById, Promise<Observable<Action>>>(
-      async ({ id }) => {
-        const projectMetadata = r.getProjectMetadata(state$.value, id)
-        if (!projectMetadata)
-          return of(r.simpleMessageSnackbar(`Could not find project ${id}.`))
+    map(({ id }) => {
+      const project = r.getFileRecord<ProjectFileRecord>(
+        state$.value,
+        'ProjectFile',
+        id
+      )
+      if (!project)
+        return r.simpleMessageSnackbar(`Could not find project ${id}.`)
 
-        const { filePath } = projectMetadata
-        if (!filePath)
-          return of(
-            r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
-          )
+      // const { filePath } = project
+      // if (!filePath)
+      //   return of(
+      //     r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
+      //   )
 
-        return await openProject(filePath, state$)
-      }
-    ),
-    flatMap<Observable<Action>, Observable<Action>>(x => x)
+      return r.loadFileRequest(project)
+    })
+    // flatMap<Observable<Action>, Observable<Action>>(x => x)
   )
 
 const openProjectByFilePath: AppEpic = (action$, state$) =>
@@ -108,8 +125,16 @@ const saveProject: AppEpic = (action$, state$) =>
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
         return Boolean({ type: 'NOOP_SAVE_PROJECT_WITH_NONE_OPEN' })
-      const { filePath } = projectMetadata
-      return Boolean(filePath && fs.existsSync(filePath))
+      const projectFile = r.getLoadedFileById(
+        state$.value,
+        'ProjectFile',
+        projectMetadata.id
+      )
+      return Boolean(
+        projectFile &&
+          projectFile.filePath &&
+          fs.existsSync(projectFile.filePath)
+      )
     }), // while can't find project file path in local storage, or file doesn't exist
     flatMap(async () => {
       try {
@@ -120,13 +145,16 @@ const saveProject: AppEpic = (action$, state$) =>
           null,
           2
         )
-        await writeFile(projectMetadata.filePath, json, 'utf8')
+        const projectFile = r.getLoadedFileById(
+          state$.value,
+          'ProjectFile',
+          projectMetadata.id
+        ) as CurrentlyLoadedFile
+        await writeFile(projectFile.filePath, json, 'utf8')
 
         return from([
           r.setWorkIsUnsaved(false),
-          r.simpleMessageSnackbar(
-            `Project saved in ${projectMetadata.filePath}`
-          ),
+          r.simpleMessageSnackbar(`Project saved in ${projectFile.filePath}`),
         ])
       } catch (err) {
         console.error(err)
@@ -184,63 +212,65 @@ const autoSaveProject: AppEpic = (action$, state$) =>
     })
   )
 
-const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenProject>(A.OPEN_PROJECT),
-    flatMap(({ projectMetadata, project }) => {
-      if (!projectMetadata.mediaFiles.length)
-        return of(({
-          type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
-        } as unknown) as Action)
+// const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, OpenProject>(A.OPEN_PROJECT),
+//     flatMap(({ fileRecord, project }) => {
+//       if (!fileRecord.mediaFiles.length)
+//         return of(({
+//           type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
+//         } as unknown) as Action)
 
-      const [firstMediaFile] = project.mediaFiles
+//       const [firstMediaFile] = project.mediaFiles
 
-      const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
-        (a, b) => a.concat(b),
-        []
-      )
+//       const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
+//         (a, b) => a.concat(b),
+//         []
+//       )
 
-      const tagsToClipIds: { [tag: string]: ClipId[] } = clips.reduce(
-        (tagsToIds, clipId) => {
-          const clip = r.getClip(state$.value, clipId)
-          if (clip)
-            clip.flashcard.tags.forEach(tag => {
-              tagsToIds[tag] = (tagsToIds[tag] || []) as string[]
-              tagsToIds[tag].push(clip.id)
-            })
-          return tagsToIds
-        },
-        {} as { [tag: string]: ClipId[] }
-      )
+//       const tagsToClipIds: { [tag: string]: ClipId[] } = clips.reduce(
+//         (tagsToIds, clipId) => {
+//           const clip = r.getClip(state$.value, clipId)
+//           if (clip)
+//             clip.flashcard.tags.forEach(tag => {
+//               tagsToIds[tag] = (tagsToIds[tag] || []) as string[]
+//               tagsToIds[tag].push(clip.id)
+//             })
+//           return tagsToIds
+//         },
+//         {} as { [tag: string]: ClipId[] }
+//       )
 
-      return from([
-        r.loadFileRequest(firstMediaFile),
-        r.setAllTags(tagsToClipIds),
-      ])
-    })
-  )
+//       return from([
+//         r.loadFileRequest(firstMediaFile),
+//         r.setAllTags(tagsToClipIds),
+//       ])
+//     })
+//   )
 
-const openProjectOnCreate: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, CreateProject>(A.CREATE_PROJECT),
-    flatMap(async ({ projectMetadata }) => {
-      try {
-        const json = JSON.stringify(
-          r.getProject(state$.value, projectMetadata),
-          null,
-          2
-        )
-        await writeFile(projectMetadata.filePath, json, 'utf8')
+// ^ above more recently commented
 
-        return await r.openProjectById(projectMetadata.id)
-      } catch (err) {
-        console.error(err)
-        return await r.simpleMessageSnackbar(
-          `Could not create project file: ${err.message}`
-        )
-      }
-    })
-  )
+// const openProjectOnCreate: AppEpic = (action$, state$) =>
+//   action$.pipe(
+//     ofType<Action, CreateProject>(A.CREATE_PROJECT),
+//     flatMap(async ({ fileRecord }) => {
+//       try {
+//         const json = JSON.stringify(
+//           r.getProject(state$.value, fileRecord),
+//           null,
+//           2
+//         )
+//         await writeFile(fileRecord, json, 'utf8')
+
+//         return await r.openProjectById(fileRecord.id)
+//       } catch (err) {
+//         console.error(err)
+//         return await r.simpleMessageSnackbar(
+//           `Could not create project file: ${err.message}`
+//         )
+//       }
+//     })
+//   )
 
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -275,8 +305,8 @@ export default combineEpics(
   saveProject,
   registerUnsavedWork,
   autoSaveProject,
-  openMediaFileRequestOnOpenProject,
-  openProjectOnCreate,
+  // openMediaFileRequestOnOpenProject,
+  // openProjectOnCreate,
   deleteMediaFileFromProject,
   closeProject
 )

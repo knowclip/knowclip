@@ -1,9 +1,35 @@
+import { addFile } from './files'
+import moment from 'moment'
+
+// export const createProject = (
+//   projectMetadata: ProjectMetadata
+// ): CreateProject => ({
+//   type: A.CREATE_PROJECT,
+//   projectMetadata,
+// })
 export const createProject = (
-  projectMetadata: ProjectMetadata
-): CreateProject => ({
-  type: A.CREATE_PROJECT,
-  projectMetadata,
-})
+  id: string,
+  name: string,
+  noteType: NoteType,
+  filePath: string
+) =>
+  addFile(
+    {
+      type: 'ProjectFile',
+      id,
+      name,
+      noteType,
+      mediaFiles: [],
+      error: null,
+      lastOpened: moment()
+        .utc()
+        .format(),
+      lastSaved: moment()
+        .utc()
+        .format(),
+    },
+    filePath
+  )
 
 export const openProjectByFilePath = (filePath: string): Action => ({
   type: A.OPEN_PROJECT_REQUEST_BY_FILE_PATH,
@@ -16,12 +42,14 @@ export const openProjectById = (id: ProjectId): Action => ({
 })
 
 export const openProject = (
-  project: Project4_1_0,
-  projectMetadata: ProjectMetadata
+  project: ProjectFileRecord,
+  mediaFiles: MediaFileRecord[],
+  clips: Clip[]
 ): OpenProject => ({
   type: A.OPEN_PROJECT,
   project,
-  projectMetadata,
+  mediaFiles,
+  clips,
 })
 
 export const removeProjectFromRecents = (id: ProjectId): Action => ({

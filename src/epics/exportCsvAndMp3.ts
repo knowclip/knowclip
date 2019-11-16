@@ -21,13 +21,13 @@ const exportCsv: AppEpic = (action$, state$) =>
     flatMap<ExportCsv, Promise<Observable<Action>>>(
       async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
         try {
-          const currentProjectMetadata = r.getCurrentProject(state$.value)
-          if (!currentProjectMetadata)
+          const currentProject = r.getCurrentProject(state$.value)
+          if (!currentProject)
             return of(r.simpleMessageSnackbar('Could not find project'))
 
           const exportData = getApkgExportData(
             state$.value,
-            currentProjectMetadata,
+            currentProject,
             clipIds
           )
           const csvText = getCsvText(exportData)

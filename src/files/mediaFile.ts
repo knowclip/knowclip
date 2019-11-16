@@ -7,6 +7,7 @@ import {
   LoadRequestHandler,
   LoadSuccessHandler,
   LocateRequestHandler,
+  FileEventHandlers,
 } from './types'
 
 export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
@@ -18,7 +19,7 @@ export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
   effects.pauseMedia()
   // mediaPlayer.src = ''
 
-  return await r.loadFileSuccess(fileRecord, filePath)
+  return [r.loadFileSuccess(fileRecord, filePath)]
 }
 
 const streamIndexMatchesExistingTrack = (
@@ -87,12 +88,15 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
   )
   const fileName = r.getCurrentFileName(state)
   const getCbr = fileRecord.format.toLowerCase().includes('mp3')
-    ? of(
+    ? from([
+        r.simpleMessageSnackbar(
+          'Converting mp3 to a usable format. Please be patient!'
+        ),
         r.addFile({
           type: 'ConstantBitrateMp3',
           id: fileRecord.id,
-        })
-      )
+        }),
+      ])
     : empty()
 
   return merge(
@@ -130,3 +134,11 @@ export const locateRequest: LocateRequestHandler<MediaFileRecord> = async (
 //   state,
 //   effects
 // ) =>
+
+export default {
+  loadRequest,
+  loadSuccess,
+  loadFailure: null,
+  locateRequest,
+  locateSuccess: null,
+} as FileEventHandlers<MediaFileRecord>

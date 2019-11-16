@@ -16,8 +16,8 @@ export const getExtensions = (fileRecord: FileRecord) => {
       return ['afca']
     case 'TemporaryVttFile':
       return ['vtt']
-    case 'VideoStillImage':
-      return ['png'] // ??
+    // case 'VideoStillImage':
+    //   return ['png'] // ??
     case 'WaveformPng':
       return ['png']
   }

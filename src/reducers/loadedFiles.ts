@@ -7,7 +7,7 @@ export const initialState: LoadedFilesState = {
   TemporaryVttFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
-  VideoStillImage: {},
+  // VideoStillImage: {},
 }
 
 const loadedFiles: Reducer<LoadedFilesState, Action> = (

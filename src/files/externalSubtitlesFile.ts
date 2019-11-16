@@ -6,12 +6,21 @@ import {
   LoadSuccessHandler,
   LoadFailureHandler,
   LocateRequestHandler,
+  FileEventHandlers,
+  LoadRequestHandler,
 } from './types'
 import { extname } from 'path'
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
-export const loadSuccess: LoadSuccessHandler<ExternalSubtitlesFileRecord> = (
+const loadRequest: LoadRequestHandler<ExternalSubtitlesFileRecord> = async (
+  fileRecord,
+  filePath,
+  state,
+  effects
+) => [r.loadFileSuccess(fileRecord, filePath)]
+
+const loadSuccess: LoadSuccessHandler<ExternalSubtitlesFileRecord> = (
   fileRecord,
   filePath,
   state,
@@ -43,7 +52,7 @@ export const loadSuccess: LoadSuccessHandler<ExternalSubtitlesFileRecord> = (
   }
 }
 
-export const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
+const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
   fileRecord,
   filePath,
   errorMessage,
@@ -51,9 +60,11 @@ export const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
   effects
 ) => of(r.fileSelectionDialog(errorMessage, fileRecord))
 
-export const locateRequest: LocateRequestHandler<
-  ExternalSubtitlesFileRecord
-> = async (fileRecord, state, effects) => {
+const locateRequest: LocateRequestHandler<ExternalSubtitlesFileRecord> = async (
+  fileRecord,
+  state,
+  effects
+) => {
   return [
     r.fileSelectionDialog(
       `This subtitles file ${
@@ -63,3 +74,11 @@ export const locateRequest: LocateRequestHandler<
     ),
   ]
 }
+
+export default {
+  loadRequest,
+  loadSuccess,
+  loadFailure,
+  locateRequest,
+  locateSuccess: null,
+} as FileEventHandlers<ExternalSubtitlesFileRecord>

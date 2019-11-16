@@ -9,9 +9,10 @@ import {
   LoadRequestHandler,
   LoadSuccessHandler,
   LocateRequestHandler,
+  FileEventHandlers,
 } from './types'
 
-export const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
+const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
   fileRecord,
   filePath,
   state,
@@ -23,11 +24,13 @@ export const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
     fileRecord.parentId
   )
   if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-    return await r.loadFileFailure(
-      fileRecord,
-      null,
-      'You must first locate this file.'
-    )
+    return [
+      await r.loadFileFailure(
+        fileRecord,
+        null,
+        'You must first locate this file.'
+      ),
+    ]
 
   const vttFilePath = await effects.getSubtitlesFilePath(
     state,
@@ -35,10 +38,10 @@ export const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
     fileRecord
   )
 
-  return r.loadFileSuccess(fileRecord, vttFilePath)
+  return [r.loadFileSuccess(fileRecord, vttFilePath)]
 }
 
-export const loadSuccess: LoadSuccessHandler<TemporaryVttFileRecord> = (
+const loadSuccess: LoadSuccessHandler<TemporaryVttFileRecord> = (
   fileRecord,
   filePath,
   state,
@@ -79,9 +82,11 @@ export const loadSuccess: LoadSuccessHandler<TemporaryVttFileRecord> = (
     })
   )
 }
-export const locateRequest: LocateRequestHandler<
-  TemporaryVttFileRecord
-> = async (fileRecord, state, effects) => {
+const locateRequest: LocateRequestHandler<TemporaryVttFileRecord> = async (
+  fileRecord,
+  state,
+  effects
+) => {
   // if parent file/media track exists
   const source = r.getLoadedFileById(
     state,
@@ -133,3 +138,11 @@ export const locateRequest: LocateRequestHandler<
   }
   return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
 }
+
+export default {
+  loadRequest,
+  loadSuccess,
+  loadFailure: null,
+  locateRequest,
+  locateSuccess: null,
+} as FileEventHandlers<TemporaryVttFileRecord>

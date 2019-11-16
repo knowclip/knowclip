@@ -10,7 +10,7 @@ declare type FileRecordsState = {
   ExternalSubtitlesFile: Record<FileId, ExternalSubtitlesFileRecord>
   WaveformPng: Record<FileId, WaveformPngRecord>
   ConstantBitrateMp3: Record<FileId, ConstantBitrateMp3Record>
-  VideoStillImage: Record<FileId, VideoStillImageRecord>
+  // VideoStillImage: Record<FileId, VideoStillImageRecord>
 }
 
 declare type FileId = string
@@ -31,12 +31,18 @@ declare type FileRecord =
   | TemporaryVttFileRecord
   | WaveformPngRecord
   | ConstantBitrateMp3Record
-  | VideoStillImageRecord
+// | VideoStillImageRecord
 
 declare type ProjectFileRecord = {
   type: 'ProjectFile'
   id: FileId
-  parentId: null
+  name: string
+  noteType: NoteType
+  mediaFiles: Array<MediaFileId>
+  // sbutitles: Array<Sbtsdfjsid>
+  error: string | null
+  lastOpened: string
+  lastSaved: string
 }
 declare type MediaFileRecord = {
   type: 'MediaFile'

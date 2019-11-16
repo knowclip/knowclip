@@ -7,24 +7,24 @@ import { extname } from 'path'
 
 export const getProject = (
   state: AppState,
-  projectMetadata: ProjectMetadata
+  fileRecord: ProjectFileRecord
 ): Project4_1_0 => ({
   version: '4.1.0',
   timestamp: moment.utc().format(),
-  name: projectMetadata.name,
-  id: projectMetadata.id,
-  noteType: projectMetadata.noteType,
-  mediaFiles: getProjectMediaFileRecords(state, projectMetadata.id),
+  name: fileRecord.name,
+  id: fileRecord.id,
+  noteType: fileRecord.noteType,
+  mediaFiles: getProjectMediaFileRecords(state, fileRecord.id),
   tags: [...getAllTags(state.clips.byId)],
-  clips: getProjectMediaFileRecords(state, projectMetadata.id).reduce(
+  clips: getProjectMediaFileRecords(state, fileRecord.id).reduce(
     (clips, { id }) => [...clips, ...getClips(state, id)],
     [] as Clip[]
   ),
   subtitles: [],
 })
 
-export const getProjects = (state: AppState): Array<ProjectMetadata> =>
-  state.projects.allIds.map(id => state.projects.byId[id])
+export const getProjects = (state: AppState): Array<ProjectFileRecord> =>
+  Object.values(state.fileRecords.ProjectFile) // sort, memoize
 
 export const getProjectIdByFilePath = (
   state: AppState,
@@ -42,9 +42,13 @@ export const getProjectMetadata = (
 export const getCurrentProjectId = (state: AppState): ProjectId | null =>
   state.user.currentProjectId
 
-export const getCurrentProject = (state: AppState): ProjectMetadata | null => {
+export const getCurrentProject = (
+  state: AppState
+): ProjectFileRecord | null => {
   const currentProjectId = getCurrentProjectId(state)
-  return currentProjectId ? state.projects.byId[currentProjectId] : null
+  return currentProjectId
+    ? getFileRecord<ProjectFileRecord>(state, 'ProjectFile', currentProjectId)
+    : null
 }
 
 export const getMediaFileConstantBitratePathFromCurrentProject = (

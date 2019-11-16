@@ -129,7 +129,6 @@ declare type ProjectAction =
   | OpenProjectRequestById
   | OpenProjectRequestByFilePath
   | OpenProject
-  | CreateProject
   | RemoveProjectFromRecents
   | SetProjectError
   | SetProjectName
@@ -155,12 +154,10 @@ declare type OpenProjectRequestByFilePath = {
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
-  project: Project4_1_0
-  projectMetadata: ProjectMetadata
-}
-declare type CreateProject = {
-  type: 'CREATE_PROJECT'
-  projectMetadata: ProjectMetadata
+  // project: Project4_1_0
+  project: ProjectFileRecord
+  mediaFiles: MediaFileRecord[]
+  clips: Clip[]
 }
 declare type RemoveProjectFromRecents = {
   type: 'REMOVE_PROJECT_FROM_RECENTS'

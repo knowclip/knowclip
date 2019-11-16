@@ -100,14 +100,11 @@ class NewProjectFormDialog extends Component {
     if (Object.keys(errors).length) return this.setState({ errors })
 
     const { filePath, name } = this.state.fieldValues
-    this.props.createProject({
-      id: uuid(),
-      filePath,
+    this.props.createProject(
+      uuid(),
       name,
-      noteType: this.state.fieldValues.noteType,
-      mediaFiles: [],
-      error: null,
-    })
+      this.state.fieldValues.noteType,
+       filePath )
     this.props.closeDialog()
   }
 

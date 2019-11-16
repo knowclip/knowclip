@@ -28,7 +28,7 @@ const getOpenProjectByFilePath = openProjectByFilePath => async () => {
 }
 
 const ProjectMenuItem = ({
-  projectMetadata,
+  project,
   openProjectById,
   removeProjectFromRecents,
 }) => {
@@ -52,17 +52,17 @@ const ProjectMenuItem = ({
           anchorEl={menuAnchorEl.current}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <MenuItem onClick={e => removeProjectFromRecents(projectMetadata.id)}>
+          <MenuItem onClick={e => removeProjectFromRecents(project.id)}>
             Remove from recents
           </MenuItem>
         </Menu>
       )}
       <MenuItem
-        key={projectMetadata.id}
-        onClick={() => openProjectById(projectMetadata.id)}
+        key={project.id}
+        onClick={() => openProjectById(project.id)}
       >
         <RootRef rootRef={menuAnchorEl}>
-          <ListItemText>{projectMetadata.name}</ListItemText>
+          <ListItemText>{project.name}</ListItemText>
         </RootRef>
         <IconButton onClick={openMenu}>
           <MoreVertIcon />
@@ -99,10 +99,10 @@ const ProjectsMenu = ({
               {projects.length ? null : (
                 <MenuItem disabled>No recent projects.</MenuItem>
               )}
-              {projects.map(projectMetadata => (
+              {projects.map(project => (
                 <ProjectMenuItem
-                  key={projectMetadata.id}
-                  projectMetadata={projectMetadata}
+                  key={project.id}
+                  project={project}
                   openProjectById={openProjectById}
                   removeProjectFromRecents={removeProjectFromRecents}
                 />

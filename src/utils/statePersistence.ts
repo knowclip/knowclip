@@ -1,3 +1,6 @@
+import { initialState as initialFileRecordsState } from '../reducers/fileRecords'
+import moment from 'moment'
+
 type FilesyState<F> = Record<FileRecord['type'], { [fileId: string]: F }>
 
 const mapFileState = <F, G>(state: FilesyState<F>, transform: (f: F) => G) =>
@@ -22,11 +25,25 @@ export const getPersistedState = (): Partial<AppState> => {
     const projects = projectsText
       ? (JSON.parse(projectsText) as ProjectsState)
       : null
-    if (projects) persistedState.projects = projects
-
-    // const mediaText = window.localStorage.getItem('media')
-    // const media = mediaText ? (JSON.parse(mediaText) as MediaState) : null
-    // if (media) persistedState.media = media
+    const convertedProjectFileRecords: Record<string, ProjectFileRecord> = {
+      ...Object.values(projects ? projects.byId : {}).reduce(
+        (all, oldProject) => {
+          const newProject: ProjectFileRecord = {
+            type: 'ProjectFile',
+            lastOpened: moment.utc().format(),
+            lastSaved: '2015-11-16T09:44:45Z',
+            id: oldProject.id,
+            name: oldProject.name,
+            noteType: oldProject.noteType,
+            mediaFiles: oldProject.mediaFiles,
+            error: null,
+          }
+          all[oldProject.id] = newProject
+          return all
+        },
+        {} as Record<string, ProjectFileRecord>
+      ),
+    }
 
     const settingsText = window.localStorage.getItem('settings')
     const settings = settingsText
@@ -38,12 +55,24 @@ export const getPersistedState = (): Partial<AppState> => {
     const fileRecords = fileRecordsText
       ? (JSON.parse(fileRecordsText) as FileRecordsState)
       : null
-    if (fileRecords) persistedState.fileRecords = fileRecords
+
+    persistedState.fileRecords = fileRecords
+      ? {
+          ...fileRecords,
+          ProjectFile: {
+            ...convertedProjectFileRecords,
+            ...fileRecords.ProjectFile,
+          },
+        }
+      : {
+          ...initialFileRecordsState,
+          ProjectFile: {
+            ...initialFileRecordsState.ProjectFile,
+            ...convertedProjectFileRecords,
+          },
+        }
 
     // should also check for orphans?
-
-    // if (persistedState.fileRecords)
-    //   persistedState.loadedFiles =
 
     const loadedFilesText = window.localStorage.getItem('loadedFiles')
     const loadedFiles = loadedFilesText

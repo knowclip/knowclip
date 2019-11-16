@@ -4,6 +4,7 @@ import {
   LoadSuccessHandler,
   LoadRequestHandler,
   LocateRequestHandler,
+  FileEventHandlers,
 } from './types'
 
 export const loadRequest: LoadRequestHandler<WaveformPngRecord> = async (
@@ -12,7 +13,7 @@ export const loadRequest: LoadRequestHandler<WaveformPngRecord> = async (
   state,
   effects
 ) => {
-  return await r.loadFileSuccess(fileRecord, filePath)
+  return [await r.loadFileSuccess(fileRecord, filePath)]
 }
 
 export const loadSuccess: LoadSuccessHandler<WaveformPngRecord> = (
@@ -43,7 +44,7 @@ export const locateRequest: LocateRequestHandler<WaveformPngRecord> = async (
       ? [
           r.locateFileSuccess(
             fileRecord,
-            await effects.getWaveformPng(state, cbr)
+            await effects.getWaveformPng(state, fileRecord, cbr)
           ),
         ]
       : []
@@ -53,3 +54,11 @@ export const locateRequest: LocateRequestHandler<WaveformPngRecord> = async (
     ]
   }
 }
+
+export default {
+  loadRequest,
+  loadSuccess,
+  loadFailure: null,
+  locateRequest,
+  locateSuccess: null,
+} as FileEventHandlers<WaveformPngRecord>
