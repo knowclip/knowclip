@@ -135,3 +135,8 @@ export const setAllTags = (tagsToClipIds: {
   type: A.SET_ALL_TAGS,
   tagsToClipIds,
 })
+
+export const setDefaultTags = (tags: string[]): SetDefaultTags => ({
+  type: 'SET_DEFAULT_TAGS',
+  tags,
+})

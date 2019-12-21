@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+  height: 100%;
+  max-width: 30rem;
+  margin: auto;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+.prompt,
+.form {
+  flex: 1 0 100%;
+}
+
+.form {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.textField {
+  width: 100%;
+  margin: .5rem auto;
+}
+
+.buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}

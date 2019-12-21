@@ -1,4 +1,5 @@
 import { initialState as initialFileRecordsState } from '../reducers/fileRecords'
+import { initialState as initialLoadedFilesState } from '../reducers/loadedFiles'
 import moment from 'moment'
 
 type FilesyState<F> = Record<FileRecord['type'], { [fileId: string]: F }>
@@ -44,6 +45,20 @@ export const getPersistedState = (): Partial<AppState> => {
         {} as Record<string, ProjectFileRecord>
       ),
     }
+    const oldProjectLoadedFiles: Record<string, LoadedFile> = {
+      ...Object.values(projects ? projects.byId : {}).reduce(
+        (all, oldProject) => {
+          const newProject: LoadedFile = {
+            id: oldProject.id,
+            status: 'REMEMBERED',
+            filePath: oldProject.filePath,
+          }
+          all[oldProject.id] = newProject
+          return all
+        },
+        {} as Record<string, LoadedFile>
+      ),
+    }
 
     const settingsText = window.localStorage.getItem('settings')
     const settings = settingsText
@@ -75,33 +90,41 @@ export const getPersistedState = (): Partial<AppState> => {
     // should also check for orphans?
 
     const loadedFilesText = window.localStorage.getItem('loadedFiles')
-    const loadedFiles = loadedFilesText
+    const storedLoadedFiles = loadedFilesText
       ? (JSON.parse(loadedFilesText) as LoadedFilesState)
       : null
+    const loadedFiles = {
+      ...initialLoadedFilesState,
+      ...storedLoadedFiles,
+      ProjectFile: {
+        ...initialLoadedFilesState.ProjectFile,
+        ...oldProjectLoadedFiles,
+        ...(storedLoadedFiles ? storedLoadedFiles.ProjectFile : null),
+      },
+    }
 
-    if (loadedFiles)
-      persistedState.loadedFiles = mapFileState(loadedFiles, loadedFile => {
-        switch (loadedFile.status) {
-          case 'CURRENTLY_LOADED':
-            return {
-              id: loadedFile.id,
-              status: 'REMEMBERED',
-              filePath: loadedFile.filePath,
-            }
-          case 'REMEMBERED':
-            return {
-              id: loadedFile.id,
-              status: loadedFile.status,
-              filePath: loadedFile.filePath,
-            }
-          case 'NOT_LOADED':
-            return {
-              id: loadedFile.id,
-              status: loadedFile.status,
-              filePath: loadedFile.filePath,
-            }
-        }
-      })
+    persistedState.loadedFiles = mapFileState(loadedFiles, loadedFile => {
+      switch (loadedFile.status) {
+        case 'CURRENTLY_LOADED':
+          return {
+            id: loadedFile.id,
+            status: 'REMEMBERED',
+            filePath: loadedFile.filePath,
+          }
+        case 'REMEMBERED':
+          return {
+            id: loadedFile.id,
+            status: loadedFile.status,
+            filePath: loadedFile.filePath,
+          }
+        case 'NOT_LOADED':
+          return {
+            id: loadedFile.id,
+            status: loadedFile.status,
+            filePath: loadedFile.filePath,
+          }
+      }
+    })
   } catch (err) {
     console.error(err)
   }

@@ -6,7 +6,7 @@ import {
   LoadSuccessHandler,
   LocateRequestHandler,
   FileEventHandlers,
-} from './types'
+} from './eventHandlers'
 
 const loadRequest: LoadRequestHandler<ConstantBitrateMp3Record> = async (
   fileRecord,
@@ -24,7 +24,7 @@ const loadSuccess: LoadSuccessHandler<ConstantBitrateMp3Record> = (
   effects
 ) => {
   return of(
-    r.addFile({
+    r.addAndLoadFile({
       type: 'WaveformPng',
       parentId: fileRecord.id,
       id: fileRecord.id,
@@ -33,7 +33,7 @@ const loadSuccess: LoadSuccessHandler<ConstantBitrateMp3Record> = (
 }
 
 const locateRequest: LocateRequestHandler<ConstantBitrateMp3Record> = async (
-  fileRecord,
+  { fileRecord },
   state,
   effects
 ) => {

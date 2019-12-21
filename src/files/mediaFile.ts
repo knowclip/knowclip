@@ -8,9 +8,10 @@ import {
   LoadSuccessHandler,
   LocateRequestHandler,
   FileEventHandlers,
-} from './types'
+} from './eventHandlers'
+import { readMediaFileRecord } from '../utils/ffmpeg'
 
-export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
+const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
   fileRecord,
   filePath,
   state,
@@ -19,7 +20,12 @@ export const loadRequest: LoadRequestHandler<MediaFileRecord> = async (
   effects.pauseMedia()
   // mediaPlayer.src = ''
 
-  return [r.loadFileSuccess(fileRecord, filePath)]
+  const [errorMessage, validatedFileRecord] = await validateFile(fileRecord, filePath)
+  return [
+    errorMessage
+      ? r.confirmationDialog(errorMessage + '\n\nAre you sure this is the file you want to open?', r.loadFileSuccess(validatedFileRecord, filePath), r.loadFileFailure(fileRecord, filePath, `File was rejected: ${filePath}`))
+      : r.loadFileSuccess(validatedFileRecord, filePath)
+  ]
 }
 
 const streamIndexMatchesExistingTrack = (
@@ -29,7 +35,7 @@ const streamIndexMatchesExistingTrack = (
   vttFileRecord.parentType === 'MediaFile' &&
   vttFileRecord.streamIndex === streamIndex
 
-export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
+const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
   fileRecord,
   filePath,
   state,
@@ -40,7 +46,7 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
     id,
     subtitles: existingSubtitlesIds,
   } = fileRecord
-  const addSubtitlesFiles = from(
+  const addEmbeddedSubtitlesFiles = from(
     // orphans?
     subtitlesTracksStreamIndexes
       .filter(
@@ -53,7 +59,7 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
           )
       )
       .map(streamIndex => {
-        return r.addFile({
+        return r.addAndLoadFile({
           type: 'TemporaryVttFile',
           parentId: id,
           id: uuid(),
@@ -80,7 +86,7 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
     })
   )
   const getWaveform = of(
-    r.addFile({
+    r.addAndLoadFile({
       type: 'WaveformPng',
       parentId: fileRecord.id,
       id: fileRecord.id,
@@ -89,51 +95,72 @@ export const loadSuccess: LoadSuccessHandler<MediaFileRecord> = (
   const fileName = r.getCurrentFileName(state)
   const getCbr = fileRecord.format.toLowerCase().includes('mp3')
     ? from([
-        r.simpleMessageSnackbar(
-          'Converting mp3 to a usable format. Please be patient!'
-        ),
-        r.addFile({
-          type: 'ConstantBitrateMp3',
-          id: fileRecord.id,
-        }),
-      ])
+      r.simpleMessageSnackbar(
+        'Converting mp3 to a usable format. Please be patient!'
+      ),
+      r.addAndLoadFile({
+        type: 'ConstantBitrateMp3',
+        id: fileRecord.id,
+      }),
+    ])
     : empty()
 
   return merge(
-    addSubtitlesFiles,
+    addEmbeddedSubtitlesFiles,
     reloadRememberedSubtitles,
     getCbr,
     getWaveform,
 
-    of({
-      type: 'SET_DEFAULT_TAGS',
-      tags: fileName ? [basename(fileName)] : [],
-    } as SetDefaultTags)
+    of(r.setDefaultTags(fileName ? [basename(fileName)] : []))
   )
 }
 
-export const locateRequest: LocateRequestHandler<MediaFileRecord> = async (
-  fileRecord,
+const locateRequest: LocateRequestHandler<MediaFileRecord> = async (
+  action,
   state,
   effects
 ) => {
   return [
     r.fileSelectionDialog(
-      `This media file ${
-        fileRecord.name
-      } appears to have moved or been renamed. Try locating it manually?`,
-      fileRecord
+      action.message,
+      action.fileRecord
     ),
   ]
 }
 
-// export const loadFailure : LoadFailureHandler<MediaFile> = (
-//   fileRecord,
-//   filePath,
-//   errorMessage,
-//   state,
-//   effects
-// ) =>
+const validateFile = async (
+  existingFileRecord: MediaFileRecord,
+  filePath: string
+  // existingFileRecord: MediaFileMetadata,
+  // newFileRecord: MediaFileMetadata
+): Promise<[string | null, MediaFileRecord]> => {
+
+  const newFileRecord = await readMediaFileRecord(filePath, existingFileRecord.id, existingFileRecord.parentId, existingFileRecord.subtitles, existingFileRecord.flashcardFieldsToSubtitlesTracks)
+
+  if (existingFileRecord.id !== newFileRecord.id)
+    throw new Error("Metadata IDs don't match")
+
+  const differences = []
+
+  if (existingFileRecord.name !== newFileRecord.name) differences.push('name')
+  if (existingFileRecord.durationSeconds !== newFileRecord.durationSeconds)
+    differences.push('duration')
+  if (existingFileRecord.durationSeconds !== newFileRecord.durationSeconds)
+    differences.push('format')
+  if (
+    existingFileRecord.subtitlesTracksStreamIndexes.sort().toString() !==
+    newFileRecord.subtitlesTracksStreamIndexes.sort().toString()
+  )
+    differences.push('subtitles tracks')
+
+  if (differences.length) {
+    return [`This media file differs from the one on record by: ${differences.join(
+      ', '
+    )}.`, newFileRecord]
+  }
+
+  return [null, newFileRecord]
+}
 
 export default {
   loadRequest,

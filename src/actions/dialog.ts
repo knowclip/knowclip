@@ -7,10 +7,10 @@ export const enqueueDialog = (
   skipQueue,
 })
 
-export const confirmationDialog = (message: string, action: Action) =>
+export const confirmationDialog = (message: string, action: Action, onCancel: Action | null = null) =>
   enqueueDialog({
     type: 'Confirmation',
-    props: { message, action },
+    props: { message, action, onCancel },
   })
 
 export const editNoteTypeDialog = (noteTypeId: NoteTypeId): DialogAction =>

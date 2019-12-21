@@ -12,8 +12,6 @@ const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
       A.LOAD_FILE_SUCCESS // should  be only on save project?
     ),
     tap(() => {
-      // setLocalStorage('projects', JSON.stringify(state$.value.projects))
-      // setLocalStorage('media', JSON.stringify(state$.value.media))
       setLocalStorage('settings', JSON.stringify(state$.value.settings))
       setLocalStorage('loadedFiles', JSON.stringify(state$.value.loadedFiles))
       setLocalStorage('fileRecords', JSON.stringify(state$.value.fileRecords))

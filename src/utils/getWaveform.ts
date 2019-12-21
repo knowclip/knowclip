@@ -23,8 +23,6 @@ export const getWaveformPng = async (
   console.log({ constantBitrateFilePath })
   return await new Promise((res, rej) => {
     ffmpeg(constantBitrateFilePath)
-      // .audioCodec('copy') // later, do this and change hardcoded '.mp3' for audio-only input
-      // @ts-ignore why does it ask for a second argument?
       .complexFilter(
         [
           `[0:a]aformat=channel_layouts=mono,`,
@@ -33,7 +31,8 @@ export const getWaveformPng = async (
             CORRECTION_OFFSET}x70:colors=${WAVE_COLOR}[fg];`,
           `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
           `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
-        ].join('')
+        ].join(''),
+        [] // why needed?
       )
       .outputOptions('-frames:v 1')
       .output(outputFilename)

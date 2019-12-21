@@ -5,7 +5,6 @@ import clips from './clips'
 import user from './user'
 import snackbar from './snackbar'
 import dialog from './dialog'
-import projects from './projects'
 import subtitles from './subtitles'
 import settings from './settings'
 import loadedFiles from './loadedFiles'
@@ -17,7 +16,6 @@ export default combineReducers<AppState>({
   user,
   snackbar,
   dialog,
-  projects,
   subtitles,
   settings,
   loadedFiles,

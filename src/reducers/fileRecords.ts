@@ -1,9 +1,7 @@
 import { Reducer } from 'redux'
+import deleteKey from '../utils/deleteKey'
 
 export const initialState: FileRecordsState = {
-  // byId: {},
-  // idsByBaseFileId: {},
-  // byType: {
   ProjectFile: {},
   MediaFile: {},
   ExternalSubtitlesFile: {},
@@ -39,14 +37,30 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
 ) => {
   switch (action.type) {
     case A.ADD_FILE:
-    case A.LOCATE_FILE_SUCCESS:
-      return {
+    case A.ADD_AND_LOAD_FILE:
+    case A.LOCATE_FILE_SUCCESS: {
+      const newState = {
         ...state,
         [action.fileRecord.type]: {
           ...state[action.fileRecord.type],
           [action.fileRecord.id]: action.fileRecord,
         },
       }
+
+      return action.fileRecord.type === 'MediaFile'
+        ? edit<ProjectFileRecord>(
+            newState,
+            'ProjectFile',
+            action.fileRecord.parentId,
+            file => ({
+              ...file,
+              mediaFiles: [
+                ...new Set([...file.mediaFiles, action.fileRecord.id]),
+              ],
+            })
+          )
+        : newState
+    }
     case A.ADD_SUBTITLES_TRACK:
       return edit<MediaFileRecord>(
         state,
@@ -72,26 +86,28 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
         })
       )
 
-    case A.OPEN_PROJECT:
-      return {
-        ...state,
-        MediaFile: {
-          ...state.MediaFile,
-          ...action.mediaFiles.reduce(
-            (all, media) => {
-              all[media.id] = media
-              return all
-            },
-            {} as Record<string, MediaFileRecord>
-          ),
-        },
-      }
-
     case A.SET_PROJECT_NAME:
       return edit<ProjectFileRecord>(state, 'ProjectFile', action.id, file => ({
         ...file,
         name: action.name,
       }))
+
+    case A.DELETE_MEDIA_FROM_PROJECT:
+      return edit<ProjectFileRecord>(
+        state,
+        'ProjectFile',
+        action.projectId,
+        file => ({
+          ...file,
+          mediaFiles: file.mediaFiles.filter(id => id !== action.mediaFileId),
+        })
+      )
+
+    case A.REMOVE_PROJECT_FROM_RECENTS:
+      return {
+        ...state,
+        ProjectFile: deleteKey(state.ProjectFile, action.id),
+      }
 
     default:
       return state

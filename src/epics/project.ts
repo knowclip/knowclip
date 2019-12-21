@@ -4,7 +4,7 @@ import { ofType, combineEpics, StateObservable } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
-import parseProject, { buildMediaFiles } from '../utils/parseProject'
+import parseProject from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
 import moment from 'moment'
@@ -25,23 +25,11 @@ const openProject = async (
           'Could not read project file. Please make sure your software is up to date and try again.'
         )
       )
-    let originalProjectJson = JSON.parse(projectJson)
-    // const mediaFiles = buildMediaFiles(
-    //   originalProjectJson,
-    //   project,
-    //   filePath,
-    //   r.getMediaFiles(state$.value, project.id)
-    // )
+
     const mediaFiles = project.mediaFiles.map(({ id }) => id)
 
-    const projectMetadata = r.getFileRecord<ProjectFileRecord>(
-      state$.value,
-      'ProjectFile',
-      project.id
-    )
     return from([
       r.openProject(
-        // project,
         {
           id: project.id,
           type: 'ProjectFile',
@@ -49,20 +37,13 @@ const openProject = async (
           lastOpened: moment()
             .utc()
             .format(),
-          // filePath: filePath,
           name: project.name,
           mediaFiles,
           error: null,
           noteType: project.noteType,
         },
-        project.mediaFiles,
-        []
+        project.clips
       ),
-      ({
-        type: projectMetadata
-          ? 'CREATED NEW PROJECT METADATA'
-          : 'open old project metadata',
-      } as unknown) as Action,
     ])
   } catch (err) {
     console.error(err)
@@ -109,8 +90,8 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
         if (projectIdFromRecents)
           return of(r.openProjectById(projectIdFromRecents))
 
-        if (!fs.existsSync(filePath))
-          return of(r.simpleMessageSnackbar('Could not find project file.'))
+        // if (!fs.existsSync(filePath))
+        //   return of(r.simpleMessageSnackbar('Could not find project file.'))
 
         return await openProject(filePath, state$)
       }
@@ -179,7 +160,7 @@ const PROJECT_EDIT_ACTIONS = [
   A.MERGE_CLIPS,
   A.ADD_MEDIA_TO_PROJECT,
   A.DELETE_MEDIA_FROM_PROJECT,
-  A.ADD_FILE,
+  A.ADD_AND_LOAD_FILE,
   A.LOCATE_FILE_SUCCESS, //????
   // 'CREATED NEW PROJECT METADATA',
 ] as const

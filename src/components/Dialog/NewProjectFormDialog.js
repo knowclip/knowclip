@@ -104,7 +104,8 @@ class NewProjectFormDialog extends Component {
       uuid(),
       name,
       this.state.fieldValues.noteType,
-       filePath )
+      filePath
+    )
     this.props.closeDialog()
   }
 

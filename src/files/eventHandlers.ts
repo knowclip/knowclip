@@ -30,10 +30,12 @@ export type LoadFailureHandler<F extends FileRecord> = (
 ) => Observable<Action>
 
 export type LocateRequestHandler<F extends FileRecord> = (
-  fileRecord: F,
+  action: LocateFileRequest & { fileRecord: F },
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
+
+export type FileValidator = <F>(existingFileRecord: F, path: string) => Promise<string | F>
 
 export type FileEventHandlers<F extends FileRecord> = {
   // openRequest
@@ -46,5 +48,5 @@ export type FileEventHandlers<F extends FileRecord> = {
   locateRequest: LocateRequestHandler<F>
   // locate
   locateSuccess: LoadSuccessHandler<F> | null
-  validateFile?: (file: F, path: string) => string[] // check differences? or do this in another handler?
+  readFile: (filePath: string) => Promise<F>
 }

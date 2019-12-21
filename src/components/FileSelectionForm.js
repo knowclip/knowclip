@@ -1,15 +1,7 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { TextField, Button } from '@material-ui/core'
-import { shell } from 'electron'
-import * as r from '../redux'
-import * as css from './MediaFolderLocationForm.module.css'
+import * as css from './FileSelectionForm.module.css'
 import { showOpenDialog } from '../utils/electron'
-
-const openInBrowser = e => {
-  e.preventDefault()
-  shell.openExternal(e.target.href)
-}
 
 export default class FileSelectionForm extends Component {
   constructor(props) {
@@ -60,11 +52,9 @@ export default class FileSelectionForm extends Component {
             error={Boolean(errorText)}
             helperText={errorText}
           />
-          <p className={css.submitButton}>
-            <Button onClick={handleSubmit} fullWidth>
-              Continue
-            </Button>
+          <p className={css.buttons}>
             <Button onClick={cancel}>Cancel</Button>
+            <Button onClick={handleSubmit}>Continue</Button>
           </p>
         </form>
       </section>

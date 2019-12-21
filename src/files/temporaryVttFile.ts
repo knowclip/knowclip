@@ -10,7 +10,7 @@ import {
   LoadSuccessHandler,
   LocateRequestHandler,
   FileEventHandlers,
-} from './types'
+} from './eventHandlers'
 
 const loadRequest: LoadRequestHandler<TemporaryVttFileRecord> = async (
   fileRecord,
@@ -83,7 +83,7 @@ const loadSuccess: LoadSuccessHandler<TemporaryVttFileRecord> = (
   )
 }
 const locateRequest: LocateRequestHandler<TemporaryVttFileRecord> = async (
-  fileRecord,
+  { fileRecord },
   state,
   effects
 ) => {
@@ -99,10 +99,10 @@ const locateRequest: LocateRequestHandler<TemporaryVttFileRecord> = async (
       | MediaFileRecord
       | ExternalSubtitlesFileRecord
       | null = r.getFileRecord(
-      state,
-      fileRecord.parentType,
-      fileRecord.parentId
-    )
+        state,
+        fileRecord.parentType,
+        fileRecord.parentId
+      )
     // how to prevent infinite loop?
     if (!sourceRecord)
       return [r.simpleMessageSnackbar('No source subtitles file ')]

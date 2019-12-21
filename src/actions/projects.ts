@@ -1,4 +1,4 @@
-import { addFile } from './files'
+import { addAndLoadFile } from './files'
 import moment from 'moment'
 
 // export const createProject = (
@@ -13,7 +13,7 @@ export const createProject = (
   noteType: NoteType,
   filePath: string
 ) =>
-  addFile(
+  addAndLoadFile(
     {
       type: 'ProjectFile',
       id,
@@ -43,12 +43,10 @@ export const openProjectById = (id: ProjectId): Action => ({
 
 export const openProject = (
   project: ProjectFileRecord,
-  mediaFiles: MediaFileRecord[],
   clips: Clip[]
 ): OpenProject => ({
   type: A.OPEN_PROJECT,
   project,
-  mediaFiles,
   clips,
 })
 

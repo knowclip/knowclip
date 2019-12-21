@@ -1,12 +1,11 @@
 import * as r from '../redux'
-import { FileEventHandlers } from './types'
-import { of, empty, from } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { FileEventHandlers } from './eventHandlers'
+import { of, empty, from, merge } from 'rxjs'
+import { map, flatMap } from 'rxjs/operators'
+import parseProject from '../utils/parseProject'
+import { promises } from 'fs'
 
-const getClipsFromProjectFile = async (
-  project: ProjectFileRecord,
-  filePath: FilePath
-): Promise<Array<Clip>> => []
+const { readFile } = promises
 
 export default {
   loadRequest: async (fileRecord, filePath, state, effects) => [
@@ -14,44 +13,35 @@ export default {
     // update lastOpened?
     r.loadFileSuccess(fileRecord, filePath),
   ],
-  loadSuccess: (project, filePath, state, effects) => {
-    // const projectJson = ((await readFile(filePath)) as unknown) as string
-    // const project = parseProject(projectJson)
+  loadSuccess: (fileRecord, filePath, state, effects) => {
+    return from(readFile(filePath, 'utf8')).pipe(
+      map(projectJson => parseProject(projectJson)),
+      flatMap(project => {
+        if (!project)
+          return of(r.simpleMessageSnackbar('Could not open project'))
 
-    const mediaFiles = project.mediaFiles.map(
-      id => state.fileRecords.MediaFile[id]
+        const addNewMediaFiles = from(
+          project.mediaFiles
+            .filter(
+              fileRecord => !r.getFileRecord(state, 'MediaFile', fileRecord.id)
+            )
+            .map(fileRecord => r.addFile(fileRecord))
+        )
+
+        const loadFirstMediaFile = project.mediaFiles.length
+          ? of(r.loadFileRequest(project.mediaFiles[0]))
+          : empty()
+
+        return merge(
+          of(r.openProject(fileRecord, project.clips)),
+          addNewMediaFiles,
+          loadFirstMediaFile
+        )
+      })
     )
-
-    // rename to setCurrentProject?
-    return from(getClipsFromProjectFile(project, filePath)).pipe(
-      map(clips => r.openProject(project, mediaFiles, clips))
-    ) // also open first media file
-    // return from([
-    //   r.openProject(
-    //     project,
-    //     {
-    //       id: project.id,
-    //       type: 'ProjectFile',
-    //       lastOpened: moment()
-    //         .utc()
-    //         .format(),
-    //       // filePath: filePath,
-    //       name: project.name,
-    //       mediaFiles,
-    //       error: null,
-    //       noteType: project.noteType,
-    //     },
-    //     project.mediaFiles
-    //   ),
-    //   ({
-    //     type: projectMetadata
-    //       ? 'CREATED NEW PROJECT METADATA'
-    //       : 'open old project metadata',
-    //   } as unknown) as Action,
-    // ])
   },
   loadFailure: null,
-  locateRequest: async (fileRecord, state, effects) => [
+  locateRequest: async ({ fileRecord }, state, effects) => [
     r.fileSelectionDialog(
       `Please locate this project file ${fileRecord.name}`,
       fileRecord

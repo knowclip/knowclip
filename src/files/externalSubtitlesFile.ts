@@ -8,7 +8,7 @@ import {
   LocateRequestHandler,
   FileEventHandlers,
   LoadRequestHandler,
-} from './types'
+} from './eventHandlers'
 import { extname } from 'path'
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
@@ -42,7 +42,7 @@ const loadSuccess: LoadSuccessHandler<ExternalSubtitlesFileRecord> = (
     )
   } else {
     return of(
-      r.addFile({
+      r.addAndLoadFile({
         type: 'TemporaryVttFile',
         id: fileRecord.id,
         parentId: fileRecord.id, // not needed?
@@ -61,15 +61,13 @@ const loadFailure: LoadFailureHandler<ExternalSubtitlesFileRecord> = (
 ) => of(r.fileSelectionDialog(errorMessage, fileRecord))
 
 const locateRequest: LocateRequestHandler<ExternalSubtitlesFileRecord> = async (
-  fileRecord,
+  { fileRecord, message },
   state,
   effects
 ) => {
   return [
     r.fileSelectionDialog(
-      `This subtitles file ${
-        fileRecord.name
-      } appears to have moved or been renamed. Try locating it manually?`,
+      message,
       fileRecord
     ),
   ]

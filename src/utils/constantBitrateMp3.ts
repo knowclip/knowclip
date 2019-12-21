@@ -14,7 +14,7 @@ export const coerceMp3ToConstantBitrate = (
     if (oldConstantBitratePath && fs.existsSync(oldConstantBitratePath))
       return res(oldConstantBitratePath)
 
-    const constantBitratePath = tempy.file({ extension: 'mp3' })
+    const constantBitratePath = tempy.file({ extension: 'mp4' })
 
     // I guess by default it does CBR
     // though maybe we should check that

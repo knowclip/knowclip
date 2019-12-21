@@ -6,7 +6,11 @@ const projectToMarkdown = (
   projectId: ProjectId,
   noteType: NoteType
 ): string => {
-  const projectMetadata = r.getProjectMetadata(state, projectId)
+  const projectMetadata = r.getFileRecord<ProjectFileRecord>(
+    state,
+    'ProjectFile',
+    projectId
+  )
   if (!projectMetadata) throw new Error('Could not find project')
 
   const media = r.getProjectMediaFileRecords(state, projectId)

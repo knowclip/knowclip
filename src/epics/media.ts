@@ -5,6 +5,33 @@ import { getMediaMetadata, convertMediaMetadata } from '../utils/ffmpeg'
 import uuid from 'uuid/v4'
 import { AppEpic } from '../types/AppEpic'
 
+// when the user is creating a new file record, no validation.
+// when loading a file from an existing file record, validate the newly loaded file against the existing one.
+const loadMediaFileRecord = async (filePath: string, id: string, projectId: string): Promise<MediaFileRecord> => {
+  const ffprobeMetadata = await getMediaMetadata(filePath)
+  const metadata = convertMediaMetadata(
+    ffprobeMetadata,
+    filePath,
+    uuid()
+  )
+
+  return {
+    id: metadata.id,
+    type: 'MediaFile',
+    parentId: projectId,
+
+    subtitles: [],
+    flashcardFieldsToSubtitlesTracks: {},
+
+    name: metadata.name,
+    durationSeconds: metadata.durationSeconds,
+    format: metadata.format,
+    isVideo: metadata.isVideo,
+    subtitlesTracksStreamIndexes:
+      metadata.subtitlesTracksStreamIndexes,
+  }
+}
+
 const addMediaToProject: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddMediaToProjectRequest>(A.ADD_MEDIA_TO_PROJECT_REQUEST),
@@ -20,7 +47,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
               filePath,
               uuid()
             )
-            return r.addFile(
+            return r.addAndLoadFile(
               {
                 id: metadata.id,
                 type: 'MediaFile',
@@ -49,32 +76,5 @@ const addMediaToProject: AppEpic = (action$, state$) =>
     }),
     flatMap(x => x)
   )
-
-const getDifferenceMessage = (
-  existingMetadata: MediaFileMetadata,
-  newMetadata: MediaFileMetadata
-) => {
-  if (existingMetadata.id !== newMetadata.id)
-    throw new Error("Metadata IDs don't match")
-
-  const differences = []
-
-  if (existingMetadata.name !== newMetadata.name) differences.push('name')
-  if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
-    differences.push('duration')
-  if (existingMetadata.durationSeconds !== newMetadata.durationSeconds)
-    differences.push('format')
-  if (
-    existingMetadata.subtitlesTracksStreamIndexes.sort().toString() !==
-    newMetadata.subtitlesTracksStreamIndexes.sort().toString()
-  )
-    differences.push('subtitles tracks')
-
-  if (differences.length) {
-    return `This media file differs from the one on record by: ${differences.join(
-      ', '
-    )}.`
-  }
-}
 
 export default addMediaToProject

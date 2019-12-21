@@ -28,16 +28,11 @@ export const getProjects = (state: AppState): Array<ProjectFileRecord> =>
 
 export const getProjectIdByFilePath = (
   state: AppState,
-  filePath: MediaFilePath
+  filePath: string
 ): ProjectId | null =>
-  state.projects.allIds.find(
-    id => state.projects.byId[id].filePath === filePath
+  Object.keys(state.loadedFiles.ProjectFile).find(
+    id => state.loadedFiles.ProjectFile[id].filePath === filePath
   ) || null
-
-export const getProjectMetadata = (
-  state: AppState,
-  id: ProjectId
-): ProjectMetadata | null => state.projects.byId[id] || null
 
 export const getCurrentProjectId = (state: AppState): ProjectId | null =>
   state.user.currentProjectId

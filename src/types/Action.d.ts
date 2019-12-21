@@ -156,7 +156,7 @@ declare type OpenProject = {
   type: 'OPEN_PROJECT'
   // project: Project4_1_0
   project: ProjectFileRecord
-  mediaFiles: MediaFileRecord[]
+  // mediaFiles: MediaFileRecord[]
   clips: Clip[]
 }
 declare type RemoveProjectFromRecents = {
@@ -306,6 +306,7 @@ declare type GoToSubtitlesChunk = {
 }
 
 declare type FileAction =
+  | AddAndLoadFile
   | AddFile
   | DeleteFileRecordRequest
   | DeleteFileRecordSuccess
@@ -314,6 +315,11 @@ declare type FileAction =
   | LoadFileFailure
   | LocateFileRequest
   | LocateFileSuccess
+declare type AddAndLoadFile = {
+  type: 'ADD_AND_LOAD_FILE'
+  fileRecord: FileRecord
+  filePath: FilePath | null
+}
 declare type AddFile = {
   type: 'ADD_FILE'
   fileRecord: FileRecord
@@ -333,7 +339,7 @@ declare type LoadFileRequest = {
 }
 declare type LoadFileSuccess = {
   type: 'LOAD_FILE_SUCCESS'
-  fileRecord: FileRecord
+  validatedFileRecord: FileRecord
   filePath: FilePath
 }
 declare type LoadFileFailure = {
@@ -345,6 +351,7 @@ declare type LoadFileFailure = {
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
   fileRecord: FileRecord
+  message: string,
 }
 declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'

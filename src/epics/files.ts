@@ -1,5 +1,5 @@
-import { flatMap, map } from 'rxjs/operators'
-import { of, Observable, from } from 'rxjs'
+import { flatMap, map, catchError } from 'rxjs/operators'
+import { of, Observable, from, empty } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { existsSync } from 'fs'
@@ -11,14 +11,14 @@ import temporaryVtt from '../files/temporaryVttFile'
 import externalSubtitles from '../files/externalSubtitlesFile'
 import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
-import { FileEventHandlers } from '../files/types'
+import { FileEventHandlers, FileValidator } from '../files/eventHandlers'
 
-const addFile: AppEpic = (action$, state$) =>
+const addAndLoadFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, AddFile>(A.ADD_FILE),
-    // map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
-    // should succeed because add file adds file to loaded files state ??
-    map<AddFile, Action>(({ fileRecord }) => r.loadFileRequest(fileRecord))
+    ofType<Action, AddAndLoadFile>(A.ADD_AND_LOAD_FILE),
+    map<AddAndLoadFile, Action>(({ fileRecord }) =>
+      r.loadFileRequest(fileRecord)
+    )
   )
 
 const fileEventHandlers: Record<FileRecord['type'], FileEventHandlers<any>> = {
@@ -32,24 +32,50 @@ const fileEventHandlers: Record<FileRecord['type'], FileEventHandlers<any>> = {
   // },
 }
 
+const defaultValidator = async <T>(
+  fileRecord: T,
+  filePath: string
+): Promise<string | T> => fileRecord
+
 const loadFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
-
-    // if filepath provided, try to locate file
-    //   if filepath valid, loadFileSuccess
-    //   if filepath invalid, do file-generating or file-finding action for particular file type
-    // if no filepath provided, do file-generating or file-finding action for particular file type
     flatMap<LoadFileRequest, Observable<Action>>(({ fileRecord }) => {
       const file = r.getPreviouslyLoadedFile(state$.value, fileRecord) // rename
       // if (!file)
       if (!file || !file.filePath || !existsSync(file.filePath))
-        return of(r.locateFileRequest(fileRecord))
+        return of(r.locateFileRequest(fileRecord, `This file "${
+          'name' in fileRecord ? fileRecord.name : fileRecord.type
+          }" appears to have moved or been renamed. Try locating it manually?`))
+
+
+      // const validate =
+      //   from(
+      //     validator(fileRecord, file.filePath)).pipe(
+      //       map((errorOrRecord) => {
+      //         // MOVE THIS TO INDIVIDUAL 
+      //         if (typeof errorOrRecord === 'string')
+      //           return r.confirmationDialog(errorOrRecord, r.loadFileSuccess(fileRecord, file.filePath))
+
+      //         return r.loadFileSuccess(errorOrRecord, file.filePath)
+      //       }),
+      //       catchError((err) => {
+      //         return of(
+
+      //           r.loadFileFailure(
+      //             fileRecord,
+      //             file ? file.filePath : null,
+      //             err && 'message' in err ? err.message : err.toString()
+      //           )
+      //         )
+      //       }),
+      //     )
 
       try {
         return flatten(
           fileEventHandlers[fileRecord.type].loadRequest(
-            fileRecord,
+            fileRecord, // maybe we send the VALIDATED file to here?
+            // or should we just validate right inside the loadRequest handler?
             file.filePath,
             state$.value,
             effects
@@ -70,7 +96,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
 const loadFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LoadFileSuccess>(A.LOAD_FILE_SUCCESS),
-    flatMap<LoadFileSuccess, Observable<Action>>(({ fileRecord, filePath }) =>
+    flatMap<LoadFileSuccess, Observable<Action>>(({ validatedFileRecord: fileRecord, filePath }) =>
       fileEventHandlers[fileRecord.type].loadSuccess(
         fileRecord,
         filePath,
@@ -105,10 +131,10 @@ const flatten = (asyncArray: Promise<Action[]>) =>
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileRequest>(A.LOCATE_FILE_REQUEST),
-    flatMap<LocateFileRequest, Observable<Action>>(({ fileRecord }) =>
+    flatMap<LocateFileRequest, Observable<Action>>((action) =>
       flatten(
-        fileEventHandlers[fileRecord.type].locateRequest(
-          fileRecord,
+        fileEventHandlers[action.fileRecord.type].locateRequest(
+          action,
           state$.value,
           effects
         )
@@ -125,7 +151,7 @@ const locateFileSuccess: AppEpic = (action$, state$, effects) =>
   )
 
 export default combineEpics(
-  addFile,
+  addAndLoadFile,
   loadFileRequest,
   loadFileSuccess,
   loadFileFailure,

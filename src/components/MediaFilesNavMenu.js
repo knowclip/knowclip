@@ -3,19 +3,25 @@ import { connect } from 'react-redux'
 import {
   Button,
   IconButton,
+  Icon,
   Tooltip,
   MenuItem,
   MenuList,
   ListItemText,
+  ListItemIcon,
   ListItemSecondaryAction,
   Divider,
   Popover,
+  Menu,
 } from '@material-ui/core'
 import {
   Loop,
   Delete as DeleteIcon,
+  MoreVert as MoreVertIcon,
   PlayArrow,
   Pause,
+  Search,
+  FolderSpecial,
 } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import { showOpenDialog } from '../utils/electron'
@@ -25,6 +31,124 @@ import css from './Header.module.css'
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
+
+const usePopover = () => {
+  const [menuAnchorEl, setAnchorEl] = useState(null)
+  const openMenu = useRef(event => {
+    setAnchorEl(event.currentTarget)
+  }).current
+  const closeMenu = useRef(() => {
+    setAnchorEl(null)
+  }).current
+  const isOpen = Boolean(menuAnchorEl)
+  const toggleMenu = isOpen ? closeMenu : openMenu
+  return {
+    menuAnchorEl,
+    setAnchorEl,
+    openMenu,
+    closeMenu,
+    toggleMenu,
+    isOpen,
+  }
+}
+
+const MediaFileMenuItem = ({
+  mediaFile,
+  selected,
+  loadMediaFileRequest,
+  locateMediaFileRequest,
+  deleteMediaFile,
+  closeMenu: closeSupermenu,
+}) => {
+  const {
+    menuAnchorEl,
+    toggleMenu,
+    closeMenu: closeSubmenu,
+    isOpen,
+  } = usePopover()
+
+  const closeMenu = useRef(() => {
+    closeSubmenu()
+    closeSupermenu()
+  }).current
+
+  const loadAndClose = useRef(() => {
+    loadMediaFileRequest()
+    closeMenu()
+  }).current
+  const deleteAndClose = useRef(() => {
+    deleteMediaFile()
+    closeMenu()
+  }).current
+  const locateAndClose = useRef(() => {
+    locateMediaFileRequest()
+    closeMenu()
+  }).current
+
+  return (
+    <MenuItem
+      dense
+      key={mediaFile.id}
+      selected={selected}
+      onClick={loadAndClose}
+      ref={menuAnchorEl}
+    >
+      <ListItemText
+        title={mediaFile.name}
+        className={css.mediaFilesMenuListItemText}
+      >
+        {truncate(mediaFile.name, 40)}
+      </ListItemText>
+      <ListItemSecondaryAction>
+        <IconButton
+          onClick={e => {
+            e.stopPropagation()
+            toggleMenu(e)
+          }}
+        >
+          <MoreVertIcon />
+        </IconButton>
+      </ListItemSecondaryAction>
+      <Menu
+        open={isOpen}
+        anchorEl={menuAnchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={e => {
+          e.stopPropagation()
+          closeSubmenu()
+        }}
+        onClick={e => {
+          e.stopPropagation()
+        }}
+      >
+        <MenuList>
+          <MenuItem dense style={{ width: 200 }} onClick={loadAndClose}>
+            <ListItemIcon>
+              <PlayArrow />
+            </ListItemIcon>
+            <ListItemText>Open</ListItemText>
+          </MenuItem>
+          <MenuItem dense style={{ width: 200 }} onClick={deleteAndClose}>
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>Delete</ListItemText>
+          </MenuItem>
+          <MenuItem dense style={{ width: 200 }} onClick={locateAndClose}>
+            <ListItemIcon>
+              <FolderSpecial />
+            </ListItemIcon>
+            <ListItemText>Locate in file system</ListItemText>
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </MenuItem>
+
+    // <Menu anchorEl={menuAnchorEl} open={menuIsOpen}>
+    //   <MenuItem>Delete</MenuItem>
+    // </Menu>
+  )
+}
 
 const MediaFilesNavMenu = ({
   className,
@@ -36,6 +160,7 @@ const MediaFilesNavMenu = ({
   currentProjectId,
   projectMediaFiles,
   loadFileRequest,
+  locateFileRequest,
   confirmationDialog,
   deleteMediaFromProjectRequest,
 }) => {
@@ -48,10 +173,7 @@ const MediaFilesNavMenu = ({
     [addMediaToProjectRequest, currentProjectId]
   )
 
-  const menuAnchorEl = useRef(null)
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const openMenu = e => setMenuIsOpen(true)
-  const closeMenu = e => setMenuIsOpen(false)
+  const { menuAnchorEl, openMenu, closeMenu, isOpen: menuIsOpen } = usePopover()
 
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
@@ -89,40 +211,33 @@ const MediaFilesNavMenu = ({
 
             {menuIsOpen && (
               <Popover
-                anchorEl={menuAnchorEl.current}
+                anchorEl={menuAnchorEl}
                 open={menuIsOpen}
                 onClose={closeMenu}
               >
-                <MenuList style={{ maxHeight: '40em', overflowY: 'auto' }}>
+                <MenuList style={{ maxHeight: '20em', overflowY: 'auto' }}>
                   {projectMediaFiles.map(media => (
-                    <MenuItem
-                      dense
-                      key={media.id}
+                    <MediaFileMenuItem
+                      closeMenu={closeMenu}
+                      mediaFile={media}
                       selected={media.id === currentFileId}
-                      onClick={() => loadFileRequest(media)}
-                    >
-                      <ListItemText
-                        title={media.name}
-                        className={css.mediaFilesMenuListItemText}
-                      >
-                        {truncate(media.name, 40)}
-                      </ListItemText>
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          onClick={() =>
-                            confirmationDialog(
-                              CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
-                              r.deleteMediaFromProjectRequest(
-                                currentProjectId,
-                                media.id
-                              )
-                            )
-                          }
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </MenuItem>
+                      loadMediaFileRequest={() => loadFileRequest(media)}
+                      locateMediaFileRequest={() =>
+                        locateFileRequest(
+                          media,
+                          'Please locate this media file.'
+                        )
+                      }
+                      deleteMediaFile={() =>
+                        confirmationDialog(
+                          CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
+                          r.deleteMediaFromProjectRequest(
+                            currentProjectId,
+                            media.id
+                          )
+                        )
+                      }
+                    />
                   ))}
                 </MenuList>
                 <Divider />
@@ -173,6 +288,7 @@ const mapDispatchToProps = {
   toggleLoop: r.toggleLoop,
   addMediaToProjectRequest: r.addMediaToProjectRequest,
   loadFileRequest: r.loadFileRequest,
+  locateFileRequest: r.locateFileRequest,
   deleteMediaFromProjectRequest: r.deleteMediaFromProjectRequest,
   confirmationDialog: r.confirmationDialog,
 }

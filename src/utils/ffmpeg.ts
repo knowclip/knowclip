@@ -1,6 +1,8 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
+import uuid from 'uuid/v4'
+
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
 const setFfmpegAndFfprobePath = () => {
@@ -55,6 +57,7 @@ export const convertMediaMetadata = (
   ffprobeMetadata: FfprobeData,
   filePath: string,
   id: string
+  // REMOVE THIS TYPE Mxx!!!!
 ): Mxx => ({
   id,
   name: basename(filePath),
@@ -69,3 +72,29 @@ export const convertMediaMetadata = (
     .filter(stream => stream.codec_type === 'subtitle')
     .map(stream => stream.index),
 })
+
+
+export const readMediaFileRecord = async (filePath: string, id: string, projectId: string, subtitles: Array<string> | null, flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks | null): Promise<MediaFileRecord> => {
+  const ffprobeMetadata = await getMediaMetadata(filePath)
+  const metadata = convertMediaMetadata(
+    ffprobeMetadata,
+    filePath,
+    id
+    // uuid()
+  )
+
+  return {
+    id: metadata.id,
+    type: 'MediaFile',
+    parentId: projectId,
+    subtitles: subtitles || [],
+    flashcardFieldsToSubtitlesTracks: flashcardFieldsToSubtitlesTracks || {},
+
+    name: metadata.name,
+    durationSeconds: metadata.durationSeconds,
+    format: metadata.format,
+    isVideo: metadata.isVideo,
+    subtitlesTracksStreamIndexes:
+      metadata.subtitlesTracksStreamIndexes,
+  }
+}

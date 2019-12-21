@@ -57,10 +57,7 @@ const ProjectMenuItem = ({
           </MenuItem>
         </Menu>
       )}
-      <MenuItem
-        key={project.id}
-        onClick={() => openProjectById(project.id)}
-      >
+      <MenuItem key={project.id} onClick={() => openProjectById(project.id)}>
         <RootRef rootRef={menuAnchorEl}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>

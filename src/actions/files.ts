@@ -1,6 +1,15 @@
-export const addFile = <F extends FileRecord>(
+export const addAndLoadFile = <F extends FileRecord>(
   fileRecord: F,
   filePath?: FilePath
+): AddAndLoadFile => ({
+  type: A.ADD_AND_LOAD_FILE,
+  fileRecord,
+  filePath: filePath || null,
+})
+
+export const addFile = <F extends FileRecord>(
+  fileRecord: F,
+  filePath?: FilePath // optional?
 ): AddFile => ({
   type: A.ADD_FILE,
   fileRecord,
@@ -28,7 +37,7 @@ export const loadFileSuccess = (
   filePath: FilePath
 ): LoadFileSuccess => ({
   type: 'LOAD_FILE_SUCCESS',
-  fileRecord,
+  validatedFileRecord: fileRecord,
   filePath,
 })
 export const loadFileFailure = (
@@ -42,10 +51,12 @@ export const loadFileFailure = (
   errorMessage,
 })
 export const locateFileRequest = (
-  fileRecord: FileRecord
+  fileRecord: FileRecord,
+  message: string,
 ): LocateFileRequest => ({
   type: 'LOCATE_FILE_REQUEST',
   fileRecord,
+  message,
 })
 export const locateFileSuccess = (
   fileRecord: FileRecord,
