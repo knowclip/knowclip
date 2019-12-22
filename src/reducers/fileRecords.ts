@@ -36,6 +36,15 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
   action
 ) => {
   switch (action.type) {
+    case A.LOAD_FILE_SUCCESS:
+      // same logic as just below
+      return {
+        ...state,
+        [action.validatedFileRecord.type]: {
+          ...state[action.validatedFileRecord.type],
+          [action.validatedFileRecord.id]: action.validatedFileRecord,
+        },
+      }
     case A.ADD_FILE:
     case A.ADD_AND_LOAD_FILE:
     case A.LOCATE_FILE_SUCCESS: {
@@ -49,16 +58,16 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
 
       return action.fileRecord.type === 'MediaFile'
         ? edit<ProjectFileRecord>(
-            newState,
-            'ProjectFile',
-            action.fileRecord.parentId,
-            file => ({
-              ...file,
-              mediaFiles: [
-                ...new Set([...file.mediaFiles, action.fileRecord.id]),
-              ],
-            })
-          )
+          newState,
+          'ProjectFile',
+          action.fileRecord.parentId,
+          file => ({
+            ...file,
+            mediaFiles: [
+              ...new Set([...file.mediaFiles, action.fileRecord.id]),
+            ],
+          })
+        )
         : newState
     }
     case A.ADD_SUBTITLES_TRACK:

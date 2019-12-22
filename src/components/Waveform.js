@@ -1,9 +1,10 @@
-import React, { Component, Fragment, memo, useRef, useCallback } from 'react'
+import React, { Fragment, memo, useRef, useCallback } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
 import css from './Waveform.module.css'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -174,19 +175,20 @@ const Waveform = ({
   path,
   subtitles,
   goToSubtitlesChunk,
-  onWaveformMousedown,
 }) => {
   const { viewBox, cursor, stepsPerSecond } = waveform
   const viewBoxString = getViewBoxString(viewBox.xMin)
   const svgRef = useRef(null)
   const onMouseDown = useCallback(
     e =>
-      onWaveformMousedown(
-        toWaveformCoordinates(e, e.currentTarget, waveform.viewBox.xMin).x
+      document.dispatchEvent(
+        new WaveformMousedownEvent(
+          e.currentTarget,
+          toWaveformCoordinates(e, e.currentTarget, waveform.viewBox.xMin)
+        )
       ),
-    [waveform.viewBox.xMin, onWaveformMousedown]
+    [waveform.viewBox.xMin]
   )
-
   return (
     <Fragment>
       <svg
@@ -233,7 +235,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   highlightClip: r.highlightClip,
   goToSubtitlesChunk: r.goToSubtitlesChunk,
-  onWaveformMousedown: r.waveformMousedown,
 }
 
 export default connect(

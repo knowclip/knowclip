@@ -73,18 +73,12 @@ declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
 
 declare type WaveformAction =
-  // | SetWaveformImagePath
   | SetCursorPosition
   | SetWaveformViewBox
   | SetPendingClip
   | ClearPendingClip
   | SetPendingStretch
   | ClearPendingStretch
-  | WaveformMousedown
-// declare type SetWaveformImagePath = {
-//   type: 'SET_WAVEFORM_IMAGE_PATH'
-//   path: string | null
-// }
 declare type SetCursorPosition = {
   type: 'SET_CURSOR_POSITION'
   x: number
@@ -104,10 +98,6 @@ declare type SetPendingStretch = {
 }
 declare type ClearPendingStretch = {
   type: 'CLEAR_PENDING_STRETCH'
-}
-declare type WaveformMousedown = {
-  type: 'WAVEFORM_MOUSEDOWN'
-  x: number
 }
 
 declare type DialogAction = EnqueueDialog | CloseDialog

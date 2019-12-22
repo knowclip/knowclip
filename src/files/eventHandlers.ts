@@ -48,5 +48,6 @@ export type FileEventHandlers<F extends FileRecord> = {
   locateRequest: LocateRequestHandler<F>
   // locate
   locateSuccess: LoadSuccessHandler<F> | null
+
   readFile: (filePath: string) => Promise<F>
 }

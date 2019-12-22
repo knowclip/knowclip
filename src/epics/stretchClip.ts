@@ -4,14 +4,14 @@ import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import { AppEpic } from '../types/AppEpic'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const stretchClipEpic: AppEpic = (
   action$,
   state$,
-  { window, getWaveformSvgElement }
+  { window, getWaveformSvgElement, document }
 ) => {
-  const clipMousedowns = action$.pipe(
-    ofType<Action, WaveformMousedown>(A.WAVEFORM_MOUSEDOWN),
+  const clipMousedowns = fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
     switchMap(({ x }) => {
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()

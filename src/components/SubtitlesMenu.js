@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core'
 import { showOpenDialog } from '../utils/electron'
 import css from './Header.module.css'
+import usePopover from '../utils/usePopover'
 
 const VisibilityButton = ({ visible, showSubtitles, hideSubtitles }) => (
   <IconButton onClick={visible ? hideSubtitles : showSubtitles}>
@@ -45,23 +46,16 @@ const SubtitlesMenu = ({
   subtitlesClipsDialogRequest,
   currentFileId,
 }) => {
-  const menuAnchorEl = useRef(null)
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const openMenu = e => setMenuIsOpen(true)
-  const closeMenu = e => setMenuIsOpen(false)
+  const { anchorEl, open, close, isOpen } = usePopover()
 
   return (
     <Fragment>
       <Tooltip title="Subtitles">
-        <IconButton buttonRef={menuAnchorEl} onClick={openMenu}>
+        <IconButton buttonRef={anchorEl} onClick={open}>
           <SubtitlesIcon />
         </IconButton>
       </Tooltip>
-      <Menu
-        anchorEl={menuAnchorEl.current}
-        open={menuIsOpen}
-        onClose={closeMenu}
-      >
+      <Menu anchorEl={anchorEl} open={isOpen} onClose={close}>
         {!(embeddedTracks.length + externalTracks.length) && (
           <MenuItem dense disabled>
             No subtitles loaded.

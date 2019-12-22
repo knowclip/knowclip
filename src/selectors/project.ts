@@ -4,6 +4,7 @@ import { getClips } from '.'
 import { getProjectMediaFileRecords } from './media'
 import { getFileRecord, getLoadedFileById } from './files'
 import { extname } from 'path'
+import { createSelector } from 'reselect'
 
 export const getProject = (
   state: AppState,
@@ -23,8 +24,19 @@ export const getProject = (
   subtitles: [],
 })
 
-export const getProjects = (state: AppState): Array<ProjectFileRecord> =>
-  Object.values(state.fileRecords.ProjectFile) // sort, memoize
+const newestToOldest = (
+  { lastOpened: a }: ProjectFileRecord,
+  { lastOpened: b }: ProjectFileRecord
+) =>
+  moment(b).valueOf() - moment(a).valueOf()
+export const getProjects =
+  createSelector(
+    (state: AppState) => state.fileRecords.ProjectFile,
+    (projectFiles): Array<ProjectFileRecord> =>
+      Object.values(projectFiles)
+        .sort(newestToOldest)
+  )
+
 
 export const getProjectIdByFilePath = (
   state: AppState,
@@ -79,9 +91,9 @@ export const getCurrentMediaFileConstantBitratePath = (
 ): MediaFilePath | null =>
   state.user.currentMediaFileId
     ? getMediaFileConstantBitratePathFromCurrentProject(
-        state,
-        state.user.currentMediaFileId
-      )
+      state,
+      state.user.currentMediaFileId
+    )
     : null
 
 export const getCurrentMediaFileRecord = (

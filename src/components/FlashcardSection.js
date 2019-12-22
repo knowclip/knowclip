@@ -1,4 +1,4 @@
-import React, { Component, useRef, useState } from 'react'
+import React, { Component, useRef } from 'react'
 import { connect } from 'react-redux'
 import {
   TextField,
@@ -22,6 +22,7 @@ import {
   Layers,
 } from '@material-ui/icons'
 import TagsInput from './TagsInput'
+import usePopover from '../utils/usePopover'
 
 const FieldMenu = ({
   embeddedSubtitlesTracks,
@@ -29,16 +30,7 @@ const FieldMenu = ({
   linkToSubtitlesTrack,
   linkedSubtitlesTrack,
 }) => {
-  const menuAnchorEl = useRef(null)
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const openMenu = e => {
-    setMenuIsOpen(true)
-    e.stopPropagation()
-  }
-  const closeMenu = e => {
-    e.stopPropagation()
-    setMenuIsOpen(false)
-  }
+  const subtitlesPopover = usePopover()
   return (
     <React.Fragment>
       <Tooltip
@@ -51,17 +43,17 @@ const FieldMenu = ({
         <IconButton
           tabIndex="-1"
           className={css.fieldMenuButton}
-          buttonRef={menuAnchorEl}
-          onClick={openMenu}
+          buttonRef={subtitlesPopover.anchorEl}
+          onClick={subtitlesPopover.open}
         >
           <MoreVert />
         </IconButton>
       </Tooltip>
-      {menuIsOpen && (
+      {subtitlesPopover.isOpen && (
         <Menu
-          anchorEl={menuAnchorEl.current}
-          open={menuIsOpen}
-          onClose={closeMenu}
+          anchorEl={subtitlesPopover.anchorEl}
+          open={subtitlesPopover.isOpen}
+          onClose={subtitlesPopover.close}
         >
           {embeddedSubtitlesTracks.map((track, i) => {
             const selected = linkedSubtitlesTrack === track.id

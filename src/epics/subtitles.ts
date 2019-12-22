@@ -35,21 +35,21 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
             const fields =
               currentNoteType === 'Simple'
                 ? {
-                    transcription: chunk.text,
-                    meaning: '',
-                    notes: '',
-                  }
+                  transcription: chunk.text,
+                  meaning: '',
+                  notes: '',
+                }
                 : {
-                    transcription: chunk.text,
-                    meaning: '',
-                    notes: '',
-                    pronunciation: '',
-                  }
-            ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(
-              fieldName => {
-                const trackId = fieldNamesToTrackIds[fieldName]
-                fields[fieldName] = trackId
-                  ? r
+                  transcription: chunk.text,
+                  meaning: '',
+                  notes: '',
+                  pronunciation: '',
+                }
+              ; (Object.keys(fields) as Array<keyof typeof fields>).forEach(
+                fieldName => {
+                  const trackId = fieldNamesToTrackIds[fieldName]
+                  fields[fieldName] = trackId
+                    ? r
                       .getSubtitlesChunksWithinRange(
                         state$.value,
                         trackId,
@@ -58,9 +58,9 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
                       )
                       .map(chunk => chunk.text)
                       .join(' ')
-                  : ''
-              }
-            )
+                    : ''
+                }
+              )
 
             return newClip(chunk, fileId, uuid(), fields, tags)
           })
@@ -128,8 +128,22 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
     })
   )
 
+const deleteSubtitlesTrack: AppEpic = (action$, state$, dependencies) => action$.pipe(
+  ofType<Action, DeleteSubtitlesTrack>(A.DELETE_SUBTITLES_TRACK),
+  map(({ id, }) => {
+    const fileRecord = r.getFileRecord(state$.value, 'ExternalSubtitlesFile', id)
+
+    // TODO: report error
+    if (!fileRecord) return r.simpleMessageSnackbar('Could not delete subtitles track.')
+
+    return r.deleteFileRecordRequest(fileRecord)
+  })
+)
+
 export default combineEpics(
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
-  goToSubtitlesChunk
+  goToSubtitlesChunk,
+  deleteSubtitlesTrack
+
 )

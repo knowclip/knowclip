@@ -1,5 +1,6 @@
 import uuid from 'uuid'
 import { basename } from 'path'
+import { locateFileSuccess } from './files'
 
 export const showSubtitles = (
   id: SubtitlesTrackId,
@@ -29,16 +30,13 @@ export const addSubtitlesTrack = (
 export const loadSubtitlesFromFileRequest = (
   filePath: string,
   mediaFileId: MediaFileId
-): LocateFileSuccess => ({
-  type: A.LOCATE_FILE_SUCCESS,
-  fileRecord: {
+): LocateFileSuccess =>
+  locateFileSuccess({
     type: 'ExternalSubtitlesFile',
     parentId: mediaFileId,
     id: uuid(),
     name: basename(filePath),
-  },
-  filePath,
-})
+  }, filePath)
 
 export const deleteSubtitlesTrack = (
   id: SubtitlesTrackId,

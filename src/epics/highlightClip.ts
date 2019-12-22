@@ -11,59 +11,50 @@ import {
 import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of, from } from 'rxjs'
 import * as r from '../redux'
-import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import { AppEpic } from '../types/AppEpic'
 import { isLoadFileSuccess } from '../utils/files'
 import { setCursor } from './setWaveformCursor'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
 
-const highlightEpic: AppEpic = (action$, state$, effects) =>
-  action$.pipe(
-    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
-      isLoadFileSuccess('MediaFile')
-    ),
-    switchMap(() =>
-      fromEvent<MouseEvent>(
-        effects.getWaveformSvgElement() as SVGElement,
-        'mousedown'
-      ).pipe(
-        switchMap(mouseDown => {
-          if (r.getPendingStretch(state$.value)) return empty()
+const highlightEpic: AppEpic = (action$, state$, effects) => {
+  const waveformMousedowns = fromEvent<WaveformMousedownEvent>(
+    effects.document,
+    'waveformMousedown'
+  )
+  return waveformMousedowns.pipe(
+    switchMap(waveformMousedown => {
+      if (r.getPendingStretch(state$.value)) return empty()
 
-          const waveformMouseDown = toWaveformCoordinates(
-            mouseDown,
-            mouseDown.currentTarget as SVGElement,
-            r.getWaveformViewBoxXMin(state$.value)
-          )
-          return of({
-            waveformMouseDown,
-            clipIdAtX: r.getClipIdAt(state$.value, waveformMouseDown.x),
-          })
-        }),
-        sample(
-          fromEvent(effects.getWaveformSvgElement() as SVGElement, 'mouseup')
-        )
-      )
+      return of({
+        waveformMousedown,
+        clipIdAtX: r.getClipIdAt(state$.value, waveformMousedown.x),
+      })
+    }),
+    sample(
+      waveformMousedowns.pipe(switchMap((waveformMousedown) =>
+        fromEvent(waveformMousedown.svg, 'mouseup')))
     ),
-    flatMap(({ waveformMouseDown, clipIdAtX }) => {
+    flatMap(({ waveformMousedown, clipIdAtX }) => {
       const state = state$.value
       const mousePositionOrClipStart = clipIdAtX
         ? (r.getClip(state, clipIdAtX) as Clip).start
-        : waveformMouseDown.x
+        : waveformMousedown.x
       const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
       effects.setCurrentTime(newTime)
       return clipIdAtX
         ? of(r.highlightClip(clipIdAtX))
         : from([
-            setCursor(state$.value, effects.getCurrentTime(), effects),
-            r.highlightClip(null),
-          ])
+          setCursor(state$.value, effects.getCurrentTime(), effects),
+          r.highlightClip(null),
+        ])
     })
   )
+}
 
 const highlightClipsOnAddEpic: AppEpic = (action$, state$) =>
   action$.pipe(

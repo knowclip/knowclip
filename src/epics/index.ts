@@ -48,7 +48,6 @@ const closeEpic: AppEpic = (action$, state$) =>
 
 const rootEpic: AppEpic = combineEpics(
   media,
-  // getWaveformEpic,
   setWaveformCursorEpic,
   addClip,
   stretchClip,

@@ -6,16 +6,15 @@ import {
   take,
   switchMap,
 } from 'rxjs/operators'
-import { fromEvent, merge, of, empty } from 'rxjs'
+import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
 import {
   toWaveformX,
-  toWaveformCoordinates,
 } from '../utils/waveformCoordinates'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
-import { isLoadFileSuccess } from '../utils/files'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const pendingClipIsBigEnough = (state: AppState) => {
   const pendingClip = r.getPendingClip(state)
@@ -28,33 +27,14 @@ const pendingClipIsBigEnough = (state: AppState) => {
 const addClipEpic: AppEpic = (
   action$,
   state$,
-  { window, getWaveformSvgElement }
+  { window, getWaveformSvgElement, document }
 ) =>
-  action$.pipe(
-    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
-      isLoadFileSuccess('MediaFile')
-    ),
-    switchMap(() => {
-      const svg = getWaveformSvgElement()
-      if (!svg) console.error('No svg element')
-      return svg ? of(svg) : empty()
-    }),
-    switchMap(svg =>
-      fromEvent<MouseEvent>(svg, 'mousedown').pipe(
-        map(mousedown =>
-          toWaveformCoordinates(
-            mousedown,
-            mousedown.currentTarget as SVGElement,
-            r.getWaveformViewBoxXMin(state$.value)
-          )
-        ),
-        filter(
-          waveformMousedown =>
-            !r.getClipEdgeAt(state$.value, waveformMousedown.x)
-        )
-      )
-    ),
-
+  fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
+    filter(
+      waveformMousedown =>
+        !r.getClipEdgeAt(state$.value, waveformMousedown.x)
+    )
+    ,
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
     switchMap(waveformMousedown => {
@@ -105,20 +85,20 @@ const addClipEpic: AppEpic = (
 
           return pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
             ? // maybe later, do stretch + merge for overlaps.
-              r.clearPendingClip()
+            r.clearPendingClip()
             : r.addClip(
-                newClip(
-                  pendingClip,
-                  currentFileId,
-                  uuid(),
-                  r.getNewFieldsFromLinkedSubtitles(
-                    state$.value,
-                    currentNoteType,
-                    pendingClip
-                  ),
-                  r.getDefaultTags(state$.value)
-                )
+              newClip(
+                pendingClip,
+                currentFileId,
+                uuid(),
+                r.getNewFieldsFromLinkedSubtitles(
+                  state$.value,
+                  currentNoteType,
+                  pendingClip
+                ),
+                r.getDefaultTags(state$.value)
               )
+            )
         })
       )
       return merge(pendingClips, pendingClipEnds)

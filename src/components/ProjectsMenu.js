@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import {
@@ -15,6 +15,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
 import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
+import usePopover from '../utils/usePopover'
 
 const getOpenProjectByFilePath = openProjectByFilePath => async () => {
   const filePaths = await showOpenDialog({
@@ -32,24 +33,15 @@ const ProjectMenuItem = ({
   openProjectById,
   removeProjectFromRecents,
 }) => {
-  const menuAnchorEl = useRef(null)
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const openMenu = e => {
-    setMenuIsOpen(true)
-    e.stopPropagation()
-  }
-  const closeMenu = e => {
-    e.stopPropagation()
-    setMenuIsOpen(false)
-  }
+  const { anchorEl, open, close, isOpen } = usePopover()
 
   return (
     <Fragment>
-      {menuIsOpen && (
+      {isOpen && (
         <Menu
-          open={menuIsOpen}
-          onClose={closeMenu}
-          anchorEl={menuAnchorEl.current}
+          open={isOpen}
+          onClose={close}
+          anchorEl={anchorEl}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
           <MenuItem onClick={e => removeProjectFromRecents(project.id)}>
@@ -58,10 +50,10 @@ const ProjectMenuItem = ({
         </Menu>
       )}
       <MenuItem key={project.id} onClick={() => openProjectById(project.id)}>
-        <RootRef rootRef={menuAnchorEl}>
+        <RootRef rootRef={anchorEl}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>
-        <IconButton onClick={openMenu}>
+        <IconButton onClick={open}>
           <MoreVertIcon />
         </IconButton>
       </MenuItem>

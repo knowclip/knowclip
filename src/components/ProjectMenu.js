@@ -97,10 +97,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(ProjectMenu)
-
-// <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-//   <FastRewind />
-// </IconButton>
-// <IconButton onClick={onClickNext} disabled={!isNextButtonEnabled}>
-//   <FastForward />
-// </IconButton>

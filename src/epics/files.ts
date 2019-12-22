@@ -118,7 +118,8 @@ const loadFileFailure: AppEpic = (action$, state$, effects) =>
 
         return of(
           r.simpleMessageSnackbar(
-            'Unimplemented file load failure hook ' + JSON.stringify(fileRecord)
+            'Could not load file: ' + errorMessage
+            // 'Unimplemented file load failure hook ' + JSON.stringify(fileRecord)
           )
         )
       }

@@ -1,9 +1,8 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import {
   Button,
   IconButton,
-  Icon,
   Tooltip,
   MenuItem,
   MenuList,
@@ -20,37 +19,17 @@ import {
   MoreVert as MoreVertIcon,
   PlayArrow,
   Pause,
-  Search,
   FolderSpecial,
 } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import { showOpenDialog } from '../utils/electron'
+import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
 import css from './Header.module.css'
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
-
-const usePopover = () => {
-  const [menuAnchorEl, setAnchorEl] = useState(null)
-  const openMenu = useRef(event => {
-    setAnchorEl(event.currentTarget)
-  }).current
-  const closeMenu = useRef(() => {
-    setAnchorEl(null)
-  }).current
-  const isOpen = Boolean(menuAnchorEl)
-  const toggleMenu = isOpen ? closeMenu : openMenu
-  return {
-    menuAnchorEl,
-    setAnchorEl,
-    openMenu,
-    closeMenu,
-    toggleMenu,
-    isOpen,
-  }
-}
 
 const MediaFileMenuItem = ({
   mediaFile,
@@ -60,15 +39,10 @@ const MediaFileMenuItem = ({
   deleteMediaFile,
   closeMenu: closeSupermenu,
 }) => {
-  const {
-    menuAnchorEl,
-    toggleMenu,
-    closeMenu: closeSubmenu,
-    isOpen,
-  } = usePopover()
+  const submenu = usePopover()
 
   const closeMenu = useRef(() => {
-    closeSubmenu()
+    submenu.close()
     closeSupermenu()
   }).current
 
@@ -84,14 +58,30 @@ const MediaFileMenuItem = ({
     locateMediaFileRequest()
     closeMenu()
   }).current
+  const { loadedFile } = useSelector(state => ({
+    loadedFile: r.getLoadedFileById(state, 'MediaFile', mediaFile.id),
+  }))
+  const needsFilePath = !(loadedFile && loadedFile.filePath)
 
+  const actionsButton = (
+    <ListItemSecondaryAction>
+      <IconButton
+        onClick={e => {
+          e.stopPropagation()
+          submenu.toggle(e)
+        }}
+      >
+        {needsFilePath ? <FolderSpecial /> : <MoreVertIcon />}
+      </IconButton>
+    </ListItemSecondaryAction>
+  )
   return (
     <MenuItem
       dense
       key={mediaFile.id}
       selected={selected}
       onClick={loadAndClose}
-      ref={menuAnchorEl}
+      ref={submenu.anchorEl}
     >
       <ListItemText
         title={mediaFile.name}
@@ -99,23 +89,18 @@ const MediaFileMenuItem = ({
       >
         {truncate(mediaFile.name, 40)}
       </ListItemText>
-      <ListItemSecondaryAction>
-        <IconButton
-          onClick={e => {
-            e.stopPropagation()
-            toggleMenu(e)
-          }}
-        >
-          <MoreVertIcon />
-        </IconButton>
-      </ListItemSecondaryAction>
+      {needsFilePath ? (
+        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
+      ) : (
+        actionsButton
+      )}
       <Menu
-        open={isOpen}
-        anchorEl={menuAnchorEl}
+        open={submenu.isOpen}
+        anchorEl={submenu.anchorEl}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClose={e => {
           e.stopPropagation()
-          closeSubmenu()
+          submenu.close()
         }}
         onClick={e => {
           e.stopPropagation()
@@ -143,10 +128,6 @@ const MediaFileMenuItem = ({
         </MenuList>
       </Menu>
     </MenuItem>
-
-    // <Menu anchorEl={menuAnchorEl} open={menuIsOpen}>
-    //   <MenuItem>Delete</MenuItem>
-    // </Menu>
   )
 }
 
@@ -173,7 +154,7 @@ const MediaFilesNavMenu = ({
     [addMediaToProjectRequest, currentProjectId]
   )
 
-  const { menuAnchorEl, openMenu, closeMenu, isOpen: menuIsOpen } = usePopover()
+  const popover = usePopover()
 
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
@@ -202,23 +183,23 @@ const MediaFilesNavMenu = ({
 
   return (
     <DarkTheme>
-      <section className={className} ref={menuAnchorEl}>
+      <section className={className} ref={popover.anchorEl}>
         {projectMediaFiles.length > 0 ? (
           <span className="mediaFileName" title={currentFileName}>
-            <Button className={css.audioButton} onClick={openMenu}>
+            <Button className={css.audioButton} onClick={popover.open}>
               {currentFileName ? truncate(currentFileName, 40) : 'Select media'}
             </Button>
 
-            {menuIsOpen && (
+            {popover.isOpen && (
               <Popover
-                anchorEl={menuAnchorEl}
-                open={menuIsOpen}
-                onClose={closeMenu}
+                anchorEl={popover.anchorEl}
+                open={popover.isOpen}
+                onClose={popover.close}
               >
                 <MenuList style={{ maxHeight: '20em', overflowY: 'auto' }}>
                   {projectMediaFiles.map(media => (
                     <MediaFileMenuItem
-                      closeMenu={closeMenu}
+                      closeMenu={popover.close}
                       mediaFile={media}
                       selected={media.id === currentFileId}
                       loadMediaFileRequest={() => loadFileRequest(media)}

@@ -1,12 +1,6 @@
 import { addAndLoadFile } from './files'
 import moment from 'moment'
 
-// export const createProject = (
-//   projectMetadata: ProjectMetadata
-// ): CreateProject => ({
-//   type: A.CREATE_PROJECT,
-//   projectMetadata,
-// })
 export const createProject = (
   id: string,
   name: string,

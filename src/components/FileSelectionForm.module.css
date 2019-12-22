@@ -26,5 +26,6 @@
 .buttons {
   width: 100%;
   display: flex;
+  margin-bottom: 0;
   justify-content: space-between;
 }

@@ -176,6 +176,14 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
       return action.validatedFileRecord.type === 'MediaFile'
         ? {
           ...state,
+          mediaIsLoading: false, // should probably exist in loadedFiles state
+        }
+        : state // what about cbr
+
+    case A.LOAD_FILE_FAILURE:
+      return action.fileRecord.type === 'MediaFile'
+        ? {
+          ...state,
           mediaIsLoading: false,
         }
         : state // what about cbr

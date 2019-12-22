@@ -4,15 +4,22 @@ import { of, empty, from, merge } from 'rxjs'
 import { map, flatMap } from 'rxjs/operators'
 import parseProject from '../utils/parseProject'
 import { promises } from 'fs'
+import moment from 'moment'
 
 const { readFile } = promises
 
 export default {
-  loadRequest: async (fileRecord, filePath, state, effects) => [
-    // check differences?
-    // update lastOpened?
-    r.loadFileSuccess(fileRecord, filePath),
-  ],
+  loadRequest: async (fileRecord, filePath, state, effects) => {
+
+    const updated: ProjectFileRecord = {
+      ...fileRecord,
+      lastOpened: moment().utc().format()
+    }
+    return [
+      // check differences?
+      r.loadFileSuccess(updated, filePath),
+    ]
+  },
   loadSuccess: (fileRecord, filePath, state, effects) => {
     return from(readFile(filePath, 'utf8')).pipe(
       map(projectJson => parseProject(projectJson)),

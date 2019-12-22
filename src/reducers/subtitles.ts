@@ -9,8 +9,10 @@ const subtitles: Reducer<SubtitlesState> = (
   switch (action.type) {
     case A.ADD_SUBTITLES_TRACK:
       return { ...state, [action.track.id]: action.track }
+
     case A.LOAD_FILE_REQUEST:
       return action.fileRecord.type === 'MediaFile' ? initialState : state
+
     case A.HIDE_SUBTITLES:
       return {
         ...state,
@@ -28,6 +30,12 @@ const subtitles: Reducer<SubtitlesState> = (
           mode: 'showing',
         } as SubtitlesTrack,
       }
+
+    case A.DELETE_SUBTITLES_TRACK: {
+      const { [action.id]: _, ...newState } = state
+      return newState
+    }
+
     default:
       return state
   }
