@@ -1,10 +1,4 @@
-import React, {
-  Component,
-  Fragment,
-  useEffect,
-  useRef,
-  useLayoutEffect,
-} from 'react'
+import React, { Component, Fragment, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { IconButton, CircularProgress, Tooltip, Fab } from '@material-ui/core'
 import {

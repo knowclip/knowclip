@@ -11,7 +11,7 @@ import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
 import persistStateEpic from './persistState'
-import media from './media'
+import addMediaToProject from './addMediaToProject'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
@@ -47,7 +47,7 @@ const closeEpic: AppEpic = (action$, state$) =>
   )
 
 const rootEpic: AppEpic = combineEpics(
-  media,
+  addMediaToProject,
   setWaveformCursorEpic,
   addClip,
   stretchClip,

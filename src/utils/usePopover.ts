@@ -1,18 +1,24 @@
 import { useState, useRef } from 'react'
 
 const usePopover = () => {
-  const [anchorEl, setAnchorEl] = useState<EventTarget | null>(null)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const anchorCallbackRef = (el: any) => {
+    if (el !== anchorEl) setAnchorEl(el)
+  }
   const open = useRef((event: Event) => {
-    setAnchorEl(event.currentTarget)
+    event.stopPropagation()
+    setIsOpen(true)
   }).current
-  const close = useRef(() => {
-    setAnchorEl(null)
+  const close = useRef((event: Event) => {
+    event.stopPropagation()
+    setIsOpen(false)
   }).current
-  const isOpen = Boolean(anchorEl)
   const toggle = isOpen ? close : open
+
   return {
     anchorEl,
-    setAnchorEl,
+    anchorCallbackRef,
     open,
     close,
     toggle,

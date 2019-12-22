@@ -41,27 +41,33 @@ const MediaFileMenuItem = ({
 }) => {
   const submenu = usePopover()
 
-  const closeMenu = useRef(() => {
-    submenu.close()
-    closeSupermenu()
+  const closeMenu = useRef(e => {
+    submenu.close(e)
+    closeSupermenu(e)
   }).current
 
-  const loadAndClose = useRef(() => {
+  const loadAndClose = useRef(e => {
     loadMediaFileRequest()
-    closeMenu()
+    closeMenu(e)
   }).current
-  const deleteAndClose = useRef(() => {
+  const deleteAndClose = useRef(e => {
     deleteMediaFile()
-    closeMenu()
+    closeMenu(e)
   }).current
-  const locateAndClose = useRef(() => {
+  const locateAndClose = useRef(e => {
     locateMediaFileRequest()
-    closeMenu()
+    closeMenu(e)
   }).current
   const { loadedFile } = useSelector(state => ({
     loadedFile: r.getLoadedFileById(state, 'MediaFile', mediaFile.id),
   }))
   const needsFilePath = !(loadedFile && loadedFile.filePath)
+  useEffect(
+    () => {
+      if (selected && submenu.anchorEl) submenu.anchorEl.scrollIntoView()
+    },
+    [submenu.anchorEl, selected]
+  )
 
   const actionsButton = (
     <ListItemSecondaryAction>
@@ -70,6 +76,7 @@ const MediaFileMenuItem = ({
           e.stopPropagation()
           submenu.toggle(e)
         }}
+        buttonRef={submenu.anchorCallbackRef}
       >
         {needsFilePath ? <FolderSpecial /> : <MoreVertIcon />}
       </IconButton>
@@ -81,7 +88,6 @@ const MediaFileMenuItem = ({
       key={mediaFile.id}
       selected={selected}
       onClick={loadAndClose}
-      ref={submenu.anchorEl}
     >
       <ListItemText
         title={mediaFile.name}
@@ -100,7 +106,7 @@ const MediaFileMenuItem = ({
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         onClose={e => {
           e.stopPropagation()
-          submenu.close()
+          submenu.close(e)
         }}
         onClick={e => {
           e.stopPropagation()
@@ -183,7 +189,7 @@ const MediaFilesNavMenu = ({
 
   return (
     <DarkTheme>
-      <section className={className} ref={popover.anchorEl}>
+      <section className={className} ref={popover.anchorCallbackRef}>
         {projectMediaFiles.length > 0 ? (
           <span className="mediaFileName" title={currentFileName}>
             <Button className={css.audioButton} onClick={popover.open}>
@@ -196,7 +202,7 @@ const MediaFilesNavMenu = ({
                 open={popover.isOpen}
                 onClose={popover.close}
               >
-                <MenuList style={{ maxHeight: '20em', overflowY: 'auto' }}>
+                <MenuList style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
                   {projectMediaFiles.map(media => (
                     <MediaFileMenuItem
                       closeMenu={popover.close}

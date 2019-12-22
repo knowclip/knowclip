@@ -15,6 +15,7 @@ export const getProject = (
   name: fileRecord.name,
   id: fileRecord.id,
   noteType: fileRecord.noteType,
+  lastOpened: fileRecord.lastOpened,
   mediaFiles: getProjectMediaFileRecords(state, fileRecord.id),
   tags: [...getAllTags(state.clips.byId)],
   clips: getProjectMediaFileRecords(state, fileRecord.id).reduce(

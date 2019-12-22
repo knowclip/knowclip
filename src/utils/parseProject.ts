@@ -148,6 +148,9 @@ const convertProject4_0_0___4_1_0 = (project: Project4_0_0): Project4_1_0 => ({
     subtitlesTracksStreamIndexes: [],
   })),
   subtitles: [],
+  lastOpened: moment()
+    .utc()
+    .format(),
 })
 
 const parseProject = (jsonFileContents: string) => {

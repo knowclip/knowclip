@@ -1,8 +1,3 @@
-// declare type FileRecordsState = {
-//   // byId: Record<FileId, FileRecord>
-//   idsByBaseFileId: Record<ParentFileId, Array<FileId>>
-//   byType: Record<FileRecord['type'], Record<FileId, FileRecord>>
-// }
 declare type FileRecordsState = {
   ProjectFile: Record<FileId, ProjectFileRecord>
   MediaFile: Record<FileId, MediaFileRecord>
@@ -58,21 +53,20 @@ declare type MediaFileRecord = {
 }
 declare type ExternalSubtitlesFileRecord = {
   type: 'ExternalSubtitlesFile'
-  // parentId: SubtitlesTrackId // should it be MediaFileId? or even needed?
   id: FileId
-  parentId: MediaFileId // should it be SubtitlesTrackId? or even needed?
+  parentId: MediaFileId
   name: string
 }
 declare type TemporaryVttFileRecord =
   | {
       type: 'TemporaryVttFile'
-      id: FileId // can just be subtitles track/original file id?
-      parentId: FileId
+      id: FileId
+      parentId: FileId // TODO: verify that this shouldn't be media file id
       parentType: 'ExternalSubtitlesFile'
     }
   | {
       type: 'TemporaryVttFile'
-      id: FileId // can just be subtitles track/original file id?
+      id: FileId
       parentId: MediaFileId
       streamIndex: number
       parentType: 'MediaFile'
@@ -80,15 +74,15 @@ declare type TemporaryVttFileRecord =
 declare type WaveformPngRecord = {
   type: 'WaveformPng'
   id: FileId
-  // parentId: MediaFileId
+  // parentId: MediaFileId // TODO: verify whether this is needed
 }
 declare type ConstantBitrateMp3Record = {
   type: 'ConstantBitrateMp3'
   id: FileId
-  // parentId: MediaFileId
+  // parentId: MediaFileId  // TODO: verify whether this is needed
 }
-declare type VideoStillImageRecord = {
-  type: 'VideoStillImage'
-  id: FileId // can just be cliipid?
-  parentId: ClipId
-}
+// declare type VideoStillImageRecord = {
+//   type: 'VideoStillImage'
+//   id: FileId
+//   parentId: ClipId
+// }

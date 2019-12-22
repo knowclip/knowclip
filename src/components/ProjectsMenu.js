@@ -33,7 +33,7 @@ const ProjectMenuItem = ({
   openProjectById,
   removeProjectFromRecents,
 }) => {
-  const { anchorEl, open, close, isOpen } = usePopover()
+  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
 
   return (
     <Fragment>
@@ -50,7 +50,7 @@ const ProjectMenuItem = ({
         </Menu>
       )}
       <MenuItem key={project.id} onClick={() => openProjectById(project.id)}>
-        <RootRef rootRef={anchorEl}>
+        <RootRef rootRef={anchorCallbackRef}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>
         <IconButton onClick={open}>

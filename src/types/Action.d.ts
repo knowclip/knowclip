@@ -144,10 +144,9 @@ declare type OpenProjectRequestByFilePath = {
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
-  // project: Project4_1_0
   project: ProjectFileRecord
-  // mediaFiles: MediaFileRecord[]
   clips: Clip[]
+  now: string
 }
 declare type RemoveProjectFromRecents = {
   type: 'REMOVE_PROJECT_FROM_RECENTS'
@@ -196,7 +195,6 @@ declare type SetWorkIsUnsaved = {
 
 declare type MediaAction =
   | AddMediaToProjectRequest
-  | AddMediaToProject
   | DeleteMediaFromProjectRequest
   | DeleteMediaFromProject
   | RemoveMediaFiles
@@ -208,11 +206,6 @@ declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
   filePaths: Array<MediaFilePath>
-}
-declare type AddMediaToProject = {
-  type: 'ADD_MEDIA_TO_PROJECT'
-  projectId: ProjectId
-  mediaFiles: Array<MediaFile>
 }
 declare type DeleteMediaFromProjectRequest = {
   type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST'

@@ -10,15 +10,9 @@ const { readFile } = promises
 
 export default {
   loadRequest: async (fileRecord, filePath, state, effects) => {
-    const updated: ProjectFileRecord = {
-      ...fileRecord,
-      lastOpened: moment()
-        .utc()
-        .format(),
-    }
     return [
-      // check differences?
-      r.loadFileSuccess(updated, filePath),
+      // TODO: check differences/opened time
+      r.loadFileSuccess(fileRecord, filePath),
     ]
   },
   loadSuccess: (fileRecord, filePath, state, effects) => {
@@ -41,7 +35,15 @@ export default {
           : empty()
 
         return merge(
-          of(r.openProject(fileRecord, project.clips)),
+          of(
+            r.openProject(
+              fileRecord,
+              project.clips,
+              moment()
+                .utc()
+                .format()
+            )
+          ),
           addNewMediaFiles,
           loadFirstMediaFile
         )

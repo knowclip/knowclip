@@ -22,7 +22,7 @@ export default {
     const parentFile = r.getLoadedFileById(state, 'MediaFile', fileRecord.id)
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
       return await [
-        r.loadFileFailure(fileRecord, null, 'You must first locate this file.'), // test!!! maybe should delete?
+        r.loadFileFailure(fileRecord, null, 'You must first locate this file.'), // TODO: test!!! maybe should delete?
       ]
 
     const cbrFilePath = await effects.getConstantBitrateMediaPath(

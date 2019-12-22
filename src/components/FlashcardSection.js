@@ -43,7 +43,7 @@ const FieldMenu = ({
         <IconButton
           tabIndex="-1"
           className={css.fieldMenuButton}
-          buttonRef={subtitlesPopover.anchorEl}
+          buttonRef={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
         >
           <MoreVert />

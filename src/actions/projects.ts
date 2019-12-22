@@ -37,11 +37,13 @@ export const openProjectById = (id: ProjectId): Action => ({
 
 export const openProject = (
   project: ProjectFileRecord,
-  clips: Clip[]
+  clips: Clip[],
+  now: string
 ): OpenProject => ({
   type: A.OPEN_PROJECT,
   project,
   clips,
+  now,
 })
 
 export const removeProjectFromRecents = (id: ProjectId): Action => ({

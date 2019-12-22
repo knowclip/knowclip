@@ -36,7 +36,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
     ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
     flatMap<LoadFileRequest, Observable<Action>>(({ fileRecord }) => {
       const file = r.getPreviouslyLoadedFile(state$.value, fileRecord) // rename
-      // if (!file)
+
       if (!file || !file.filePath || !existsSync(file.filePath))
         return of(
           r.locateFileRequest(
@@ -50,8 +50,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
       try {
         return flatten(
           fileEventHandlers[fileRecord.type].loadRequest(
-            fileRecord, // maybe we send the VALIDATED file to here?
-            // or should we just validate right inside the loadRequest handler?
+            fileRecord,
             file.filePath,
             state$.value,
             effects

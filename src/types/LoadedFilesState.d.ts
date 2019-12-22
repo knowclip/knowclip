@@ -1,12 +1,6 @@
-// declare type LoadedFilesStatex = {
-//   [fileId: string]: LoadedFile
-// }
-
 declare type LoadedFilesState = Record<
   FileRecord['type'],
-  // { [fileId: string]: LoadedFile }
   Record<FileId, LoadedFile>
-  // { [fileId: string]:? LoadedFile }
 >
 
 declare type LoadedFile =

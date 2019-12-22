@@ -34,15 +34,16 @@ const openProject = async (
           id: project.id,
           type: 'ProjectFile',
           lastSaved: project.timestamp,
-          lastOpened: moment()
-            .utc()
-            .format(),
+          lastOpened: project.lastOpened,
           name: project.name,
           mediaFileIds: mediaFiles,
           error: null,
           noteType: project.noteType,
         },
-        project.clips
+        project.clips,
+        moment()
+          .utc()
+          .format()
       ),
     ])
   } catch (err) {
@@ -158,7 +159,6 @@ const PROJECT_EDIT_ACTIONS = [
   A.ADD_CLIPS,
   A.EDIT_CLIP,
   A.MERGE_CLIPS,
-  A.ADD_MEDIA_TO_PROJECT,
   A.DELETE_MEDIA_FROM_PROJECT,
   A.ADD_AND_LOAD_FILE,
   A.LOCATE_FILE_SUCCESS, //????

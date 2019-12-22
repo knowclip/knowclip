@@ -50,12 +50,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
         // @ts-ignore
         true
       ).pipe(
-        // takeWhile(() =>
-        //   Boolean(r.getCurrentMediaFileConstantBitratePath(state$.value))
-        // ),
-        map(() => {
-          return setCursor(state$.value, effects.getCurrentTime(), effects)
-        }),
+        map(() => setCursor(state$.value, effects.getCurrentTime(), effects)),
         startWith(setWaveformCursor(0, { xMin: 0 }))
       )
     )

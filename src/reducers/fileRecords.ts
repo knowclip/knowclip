@@ -70,6 +70,18 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
           )
         : newState
     }
+
+    case A.OPEN_PROJECT:
+      return edit<ProjectFileRecord>(
+        state,
+        'ProjectFile',
+        action.project.id,
+        file => ({
+          ...file,
+          lastOpened: action.now,
+        })
+      )
+
     case A.ADD_SUBTITLES_TRACK:
       return edit<MediaFileRecord>(
         state,
