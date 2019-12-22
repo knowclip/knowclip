@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment } from 'react'
 import {
   Subtitles as SubtitlesIcon,
   Visibility as VisibilityIcon,
