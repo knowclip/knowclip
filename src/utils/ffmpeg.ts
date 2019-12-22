@@ -73,15 +73,15 @@ export const convertMediaMetadata = (
     .map(stream => stream.index),
 })
 
-
-export const readMediaFileRecord = async (filePath: string, id: string, projectId: string, subtitles: Array<string> | null, flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks | null): Promise<MediaFileRecord> => {
+export const readMediaFileRecord = async (
+  filePath: string,
+  id: string,
+  projectId: string,
+  subtitles: Array<string> | null,
+  flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks | null
+): Promise<MediaFileRecord> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)
-  const metadata = convertMediaMetadata(
-    ffprobeMetadata,
-    filePath,
-    id
-    // uuid()
-  )
+  const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
 
   return {
     id: metadata.id,
@@ -94,7 +94,6 @@ export const readMediaFileRecord = async (filePath: string, id: string, projectI
     durationSeconds: metadata.durationSeconds,
     format: metadata.format,
     isVideo: metadata.isVideo,
-    subtitlesTracksStreamIndexes:
-      metadata.subtitlesTracksStreamIndexes,
+    subtitlesTracksStreamIndexes: metadata.subtitlesTracksStreamIndexes,
   }
 }

@@ -1,8 +1,8 @@
 export const isLoadFileSuccess = <F extends FileRecord>(
   fileRecordType: F['type']
 ) => (action: Action): action is LoadFileSuccessWith<F> =>
-    action.type === A.LOAD_FILE_SUCCESS &&
-    action.validatedFileRecord.type === fileRecordType
+  action.type === A.LOAD_FILE_SUCCESS &&
+  action.validatedFileRecord.type === fileRecordType
 
 export const getExtensions = (fileRecord: FileRecord) => {
   switch (fileRecord.type) {

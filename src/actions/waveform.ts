@@ -33,4 +33,3 @@ export const setWaveformViewBox = (
   type: A.SET_WAVEFORM_VIEW_BOX,
   viewBox,
 })
-

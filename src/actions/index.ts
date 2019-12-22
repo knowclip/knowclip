@@ -10,17 +10,6 @@ export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
 })
 
-export const chooseMediaFiles = (
-  filePaths: Array<MediaFilePath>,
-  ids: Array<MediaFileId>,
-  noteTypeId: NoteTypeId
-): Action => ({
-  type: A.CHOOSE_MEDIA_FILES,
-  filePaths,
-  ids,
-  noteTypeId,
-})
-
 export const removeMediaFiles = (): Action => ({
   type: A.REMOVE_MEDIA_FILES,
 })

@@ -35,18 +35,15 @@ export const locateRequest: LocateRequestHandler<WaveformPngRecord> = async (
         r.loadFileFailure(fileRecord, null, 'You must first locate this file.'),
       ]
 
-    const cbr = r.getMediaFileConstantBitratePathFromCurrentProject(
-      state,
-      parentFile.id
-    )
+    const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
 
     return cbr
       ? [
-        r.locateFileSuccess(
-          fileRecord,
-          await effects.getWaveformPng(state, fileRecord, cbr)
-        ),
-      ]
+          r.locateFileSuccess(
+            fileRecord,
+            await effects.getWaveformPng(state, fileRecord, cbr)
+          ),
+        ]
       : []
   } catch (err) {
     return [

@@ -8,9 +8,7 @@ import {
 } from 'rxjs/operators'
 import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
-import {
-  toWaveformX,
-} from '../utils/waveformCoordinates'
+import { toWaveformX } from '../utils/waveformCoordinates'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
@@ -31,10 +29,8 @@ const addClipEpic: AppEpic = (
 ) =>
   fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
     filter(
-      waveformMousedown =>
-        !r.getClipEdgeAt(state$.value, waveformMousedown.x)
-    )
-    ,
+      waveformMousedown => !r.getClipEdgeAt(state$.value, waveformMousedown.x)
+    ),
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
     switchMap(waveformMousedown => {
@@ -85,20 +81,20 @@ const addClipEpic: AppEpic = (
 
           return pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
             ? // maybe later, do stretch + merge for overlaps.
-            r.clearPendingClip()
+              r.clearPendingClip()
             : r.addClip(
-              newClip(
-                pendingClip,
-                currentFileId,
-                uuid(),
-                r.getNewFieldsFromLinkedSubtitles(
-                  state$.value,
-                  currentNoteType,
-                  pendingClip
-                ),
-                r.getDefaultTags(state$.value)
+                newClip(
+                  pendingClip,
+                  currentFileId,
+                  uuid(),
+                  r.getNewFieldsFromLinkedSubtitles(
+                    state$.value,
+                    currentNoteType,
+                    pendingClip
+                  ),
+                  r.getDefaultTags(state$.value)
+                )
               )
-            )
         })
       )
       return merge(pendingClips, pendingClipEnds)

@@ -35,7 +35,10 @@ export type LocateRequestHandler<F extends FileRecord> = (
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
-export type FileValidator = <F>(existingFileRecord: F, path: string) => Promise<string | F>
+export type FileValidator = <F>(
+  existingFileRecord: F,
+  path: string
+) => Promise<string | F>
 
 export type FileEventHandlers<F extends FileRecord> = {
   // openRequest

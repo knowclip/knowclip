@@ -13,7 +13,7 @@ export const createProject = (
       id,
       name,
       noteType,
-      mediaFiles: [],
+      mediaFileIds: [],
       error: null,
       lastOpened: moment()
         .utc()

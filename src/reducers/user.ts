@@ -30,9 +30,9 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
     case A.DELETE_MEDIA_FROM_PROJECT:
       return action.mediaFileId === state.currentMediaFileId
         ? {
-          ...state,
-          currentMediaFileId: null,
-        }
+            ...state,
+            currentMediaFileId: null,
+          }
         : state
 
     case A.OPEN_PROJECT:
@@ -124,9 +124,9 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
       )
       const newTagsToClipIds = newIds.length
         ? {
-          ...state.tagsToClipIds,
-          [tag]: newIds,
-        }
+            ...state.tagsToClipIds,
+            [tag]: newIds,
+          }
         : deleteKey({ ...state.tagsToClipIds }, tag)
 
       return {
@@ -175,17 +175,17 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
     case A.LOAD_FILE_SUCCESS: // temp
       return action.validatedFileRecord.type === 'MediaFile'
         ? {
-          ...state,
-          mediaIsLoading: false, // should probably exist in loadedFiles state
-        }
+            ...state,
+            mediaIsLoading: false, // should probably exist in loadedFiles state
+          }
         : state // what about cbr
 
     case A.LOAD_FILE_FAILURE:
       return action.fileRecord.type === 'MediaFile'
         ? {
-          ...state,
-          mediaIsLoading: false,
-        }
+            ...state,
+            mediaIsLoading: false,
+          }
         : state // what about cbr
 
     default:

@@ -10,10 +10,11 @@ const { readFile } = promises
 
 export default {
   loadRequest: async (fileRecord, filePath, state, effects) => {
-
     const updated: ProjectFileRecord = {
       ...fileRecord,
-      lastOpened: moment().utc().format()
+      lastOpened: moment()
+        .utc()
+        .format(),
     }
     return [
       // check differences?

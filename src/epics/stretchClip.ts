@@ -11,7 +11,10 @@ const stretchClipEpic: AppEpic = (
   state$,
   { window, getWaveformSvgElement, document }
 ) => {
-  const clipMousedowns = fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
+  const clipMousedowns = fromEvent<WaveformMousedownEvent>(
+    document,
+    'waveformMousedown'
+  ).pipe(
     switchMap(({ x }) => {
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()

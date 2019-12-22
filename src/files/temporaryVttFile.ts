@@ -99,10 +99,10 @@ const locateRequest: LocateRequestHandler<TemporaryVttFileRecord> = async (
       | MediaFileRecord
       | ExternalSubtitlesFileRecord
       | null = r.getFileRecord(
-        state,
-        fileRecord.parentType,
-        fileRecord.parentId
-      )
+      state,
+      fileRecord.parentType,
+      fileRecord.parentId
+    )
     // how to prevent infinite loop?
     if (!sourceRecord)
       return [r.simpleMessageSnackbar('No source subtitles file ')]

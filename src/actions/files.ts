@@ -52,7 +52,7 @@ export const loadFileFailure = (
 })
 export const locateFileRequest = (
   fileRecord: FileRecord,
-  message: string,
+  message: string
 ): LocateFileRequest => ({
   type: 'LOCATE_FILE_REQUEST',
   fileRecord,

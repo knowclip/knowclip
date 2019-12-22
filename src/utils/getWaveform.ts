@@ -20,7 +20,7 @@ export const getWaveformPng = async (
 
   const outputFilename = getWaveformPngPath(state, fileRecord)
   if (outputFilename && existsSync(outputFilename)) return outputFilename
-  console.log({ constantBitrateFilePath })
+
   return await new Promise((res, rej) => {
     ffmpeg(constantBitrateFilePath)
       .complexFilter(

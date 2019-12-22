@@ -36,8 +36,11 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
       })
     }),
     sample(
-      waveformMousedowns.pipe(switchMap((waveformMousedown) =>
-        fromEvent(waveformMousedown.svg, 'mouseup')))
+      waveformMousedowns.pipe(
+        switchMap(waveformMousedown =>
+          fromEvent(waveformMousedown.svg, 'mouseup')
+        )
+      )
     ),
     flatMap(({ waveformMousedown, clipIdAtX }) => {
       const state = state$.value
@@ -49,9 +52,9 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
       return clipIdAtX
         ? of(r.highlightClip(clipIdAtX))
         : from([
-          setCursor(state$.value, effects.getCurrentTime(), effects),
-          r.highlightClip(null),
-        ])
+            setCursor(state$.value, effects.getCurrentTime(), effects),
+            r.highlightClip(null),
+          ])
     })
   )
 }
@@ -162,7 +165,7 @@ const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
       // @ts-ignore
       fromEvent(effects.document, 'seeking', true).pipe(
         takeWhile(() =>
-          Boolean(r.getCurrentMediaFileConstantBitratePath(state$.value))
+          Boolean(r.getCurrentMediaConstantBitrateFilePath(state$.value))
         )
       )
     ),
@@ -184,7 +187,8 @@ const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
 
 const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.LOAD_FILE_REQUEST), // just for media files though
+    ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
+    filter(({ fileRecord }) => fileRecord.type === 'MediaFile'),
     map(() => r.highlightClip(null))
   )
 

@@ -18,10 +18,9 @@ declare type FilePath = string
 
 declare type ParentFileId = string
 
-// parent can be a file or any entity, to trigger
-// loadedfile's deletion on deleted/removed from state
+// parent can be a file or any entity
+// TODO: to trigger loadedfile's deletion on parent file deleted/removed from state
 
-//maybe have a onNotFound: Action field?
 declare type FilePath = string
 
 declare type FileRecord =
@@ -38,8 +37,7 @@ declare type ProjectFileRecord = {
   id: FileId
   name: string
   noteType: NoteType
-  mediaFiles: Array<MediaFileId>
-  // sbutitles: Array<Sbtsdfjsid>
+  mediaFileIds: Array<MediaFileId>
   error: string | null
   lastOpened: string
   lastSaved: string

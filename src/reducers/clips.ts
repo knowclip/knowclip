@@ -57,8 +57,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     case A.OPEN_PROJECT: {
       const newState: ClipsState = { byId: {}, idsByMediaFileId: {} }
       const { idsByMediaFileId, byId } = newState
-      // action.project.mediaFiles.forEach(({ id }) => {
-      action.project.mediaFiles.forEach(id => {
+      action.project.mediaFileIds.forEach(id => {
         idsByMediaFileId[id] = []
       })
 

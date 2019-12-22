@@ -5,7 +5,7 @@ declare type ProjectMetadata = {
   filePath: ProjectFilePath // TODO: delete field, use loadedFiles
   name: string
   noteType: NoteType
-  mediaFiles: Array<MediaFileId>
+  mediaFileIds: Array<MediaFileId>
   error: string | null
 }
 
@@ -20,6 +20,5 @@ declare type ProjectMetadata_Pre_4 = {
   name: string
   noteType: NoteType
   mediaFiles: Array<MediaFileId>
-  // media: Array<DenormalizedMediaFile>
   error: string | null
 }

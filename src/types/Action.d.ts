@@ -199,7 +199,6 @@ declare type MediaAction =
   | AddMediaToProject
   | DeleteMediaFromProjectRequest
   | DeleteMediaFromProject
-  | ChooseMediaFiles
   | RemoveMediaFiles
   | SetCurrentFile
   | ToggleLoop
@@ -226,12 +225,6 @@ declare type DeleteMediaFromProject = {
   mediaFileId: MediaFileId
 }
 
-declare type ChooseMediaFiles = {
-  type: 'CHOOSE_MEDIA_FILES'
-  filePaths: Array<MediaFilePath>
-  ids: Array<MediaFileId>
-  noteTypeId: NoteTypeId
-}
 declare type RemoveMediaFiles = { type: 'REMOVE_MEDIA_FILES' }
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
@@ -341,7 +334,7 @@ declare type LoadFileFailure = {
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
   fileRecord: FileRecord
-  message: string,
+  message: string
 }
 declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'

@@ -51,7 +51,7 @@ export const getCurrentProjectMediaFileRecords = (
 ): Array<MediaFileRecord> => {
   const projectMetadata = getCurrentProject(state)
   return projectMetadata
-    ? projectMetadata.mediaFiles.map(
+    ? projectMetadata.mediaFileIds.map(
         id =>
           getFileRecord<MediaFileRecord>(
             state,
@@ -69,6 +69,6 @@ export const getProjectMediaFileRecords = (
   const project = getFileRecord<ProjectFileRecord>(state, 'ProjectFile', id)
 
   return project
-    ? project.mediaFiles.map(id => state.fileRecords.MediaFile[id])
+    ? project.mediaFileIds.map(id => state.fileRecords.MediaFile[id])
     : []
 }

@@ -24,10 +24,6 @@ export default function getStore() {
   const { settings: persistedSettings } = persistedState
   const state: Partial<AppState> = {
     ...persistedState,
-    // media: {
-    //   ...initialMediaState,
-    //   ...persistedMedia,
-    // },
     settings: {
       ...initialSettingsState,
       ...persistedSettings,

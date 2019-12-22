@@ -38,7 +38,7 @@ const openProject = async (
             .utc()
             .format(),
           name: project.name,
-          mediaFiles,
+          mediaFileIds: mediaFiles,
           error: null,
           noteType: project.noteType,
         },

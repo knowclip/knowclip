@@ -36,7 +36,7 @@ export const getPersistedState = (): Partial<AppState> => {
             id: oldProject.id,
             name: oldProject.name,
             noteType: oldProject.noteType,
-            mediaFiles: oldProject.mediaFiles,
+            mediaFileIds: oldProject.mediaFileIds,
             error: null,
           }
           all[oldProject.id] = newProject

@@ -27,16 +27,12 @@ export const getProject = (
 const newestToOldest = (
   { lastOpened: a }: ProjectFileRecord,
   { lastOpened: b }: ProjectFileRecord
-) =>
-  moment(b).valueOf() - moment(a).valueOf()
-export const getProjects =
-  createSelector(
-    (state: AppState) => state.fileRecords.ProjectFile,
-    (projectFiles): Array<ProjectFileRecord> =>
-      Object.values(projectFiles)
-        .sort(newestToOldest)
-  )
-
+) => moment(b).valueOf() - moment(a).valueOf()
+export const getProjects = createSelector(
+  (state: AppState) => state.fileRecords.ProjectFile,
+  (projectFiles): Array<ProjectFileRecord> =>
+    Object.values(projectFiles).sort(newestToOldest)
+)
 
 export const getProjectIdByFilePath = (
   state: AppState,
@@ -58,7 +54,7 @@ export const getCurrentProject = (
     : null
 }
 
-export const getMediaFileConstantBitratePathFromCurrentProject = (
+export const getConstantBitrateFilePath = (
   state: AppState,
   id: MediaFileId
 ): MediaFilePath | null => {
@@ -86,14 +82,11 @@ export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
     : null
 }
 
-export const getCurrentMediaFileConstantBitratePath = (
+export const getCurrentMediaConstantBitrateFilePath = (
   state: AppState
 ): MediaFilePath | null =>
   state.user.currentMediaFileId
-    ? getMediaFileConstantBitratePathFromCurrentProject(
-      state,
-      state.user.currentMediaFileId
-    )
+    ? getConstantBitrateFilePath(state, state.user.currentMediaFileId)
     : null
 
 export const getCurrentMediaFileRecord = (

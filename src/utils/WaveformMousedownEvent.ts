@@ -3,7 +3,7 @@ export default class WaveformMousedownEvent extends Event {
   y: number
   svg: SVGElement
 
-  constructor(svg: SVGElement, { x, y }: { x: number, y: number }) {
+  constructor(svg: SVGElement, { x, y }: { x: number; y: number }) {
     super('waveformMousedown')
     this.svg = svg
     this.x = x

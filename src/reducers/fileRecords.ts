@@ -58,16 +58,16 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
 
       return action.fileRecord.type === 'MediaFile'
         ? edit<ProjectFileRecord>(
-          newState,
-          'ProjectFile',
-          action.fileRecord.parentId,
-          file => ({
-            ...file,
-            mediaFiles: [
-              ...new Set([...file.mediaFiles, action.fileRecord.id]),
-            ],
-          })
-        )
+            newState,
+            'ProjectFile',
+            action.fileRecord.parentId,
+            file => ({
+              ...file,
+              mediaFileIds: [
+                ...new Set([...file.mediaFileIds, action.fileRecord.id]),
+              ],
+            })
+          )
         : newState
     }
     case A.ADD_SUBTITLES_TRACK:
@@ -108,7 +108,9 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
         action.projectId,
         file => ({
           ...file,
-          mediaFiles: file.mediaFiles.filter(id => id !== action.mediaFileId),
+          mediaFileIds: file.mediaFileIds.filter(
+            id => id !== action.mediaFileId
+          ),
         })
       )
 

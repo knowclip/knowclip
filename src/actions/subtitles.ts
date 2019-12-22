@@ -31,12 +31,15 @@ export const loadSubtitlesFromFileRequest = (
   filePath: string,
   mediaFileId: MediaFileId
 ): LocateFileSuccess =>
-  locateFileSuccess({
-    type: 'ExternalSubtitlesFile',
-    parentId: mediaFileId,
-    id: uuid(),
-    name: basename(filePath),
-  }, filePath)
+  locateFileSuccess(
+    {
+      type: 'ExternalSubtitlesFile',
+      parentId: mediaFileId,
+      id: uuid(),
+      name: basename(filePath),
+    },
+    filePath
+  )
 
 export const deleteSubtitlesTrack = (
   id: SubtitlesTrackId,
