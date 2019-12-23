@@ -27,9 +27,7 @@ Once packages are installed, you may run the dev build:
 ```
 yarn start
 ```
-
-
-Then, in another tab, open the Electron app:
+Wait until you see that see a message about compilation completed (ignore the warnings). Then, in another tab, open the Electron app:
 
 ```
 yarn electron
