@@ -36,7 +36,7 @@ export const openProjectById = (id: ProjectId): Action => ({
 })
 
 export const openProject = (
-  project: ProjectFileRecord,
+  project: ProjectFile,
   clips: Clip[],
   now: string
 ): OpenProject => ({

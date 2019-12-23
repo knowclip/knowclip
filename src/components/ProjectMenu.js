@@ -14,7 +14,7 @@ class ProjectMenu extends Component {
   startEditing = e =>
     this.setState(
       {
-        text: this.props.projectFileRecord.name,
+        text: this.props.projectFile.name,
         editing: true,
       },
       () => this.input.focus()
@@ -24,9 +24,9 @@ class ProjectMenu extends Component {
 
   submit = () => {
     const text = this.state.text.trim()
-    const { projectFileRecord } = this.props
-    if (text && text !== projectFileRecord.name)
-      this.props.setProjectName(projectFileRecord.id, text)
+    const { projectFile } = this.props
+    if (text && text !== projectFile.name)
+      this.props.setProjectName(projectFile.id, text)
     this.setState({ editing: false })
   }
 
@@ -41,7 +41,7 @@ class ProjectMenu extends Component {
 
   render() {
     const {
-      projectFileRecord,
+      projectFile,
       closeProjectRequest,
       saveProjectRequest,
       className,
@@ -74,7 +74,7 @@ class ProjectMenu extends Component {
           ) : (
             <Tooltip title="Double-click to edit">
               <h1 className={css.projectName} onDoubleClick={this.startEditing}>
-                {truncate(projectFileRecord.name, 40)}
+                {truncate(projectFile.name, 40)}
               </h1>
             </Tooltip>
           )}
@@ -85,7 +85,7 @@ class ProjectMenu extends Component {
 }
 
 const mapStateToProps = state => ({
-  projectFileRecord: r.getCurrentProject(state),
+  projectFile: r.getCurrentProject(state),
 })
 const mapDispatchToProps = {
   closeProjectRequest: r.closeProjectRequest,

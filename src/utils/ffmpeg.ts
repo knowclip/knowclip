@@ -1,7 +1,6 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
-import uuid from 'uuid/v4'
 
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
@@ -43,13 +42,13 @@ export const getMediaMetadata = (path: string): Promise<FfprobeData> => {
   })
 }
 
-export const readMediaFileRecord = async (
+export const readMediaFile = async (
   filePath: string,
   id: string,
   projectId: string,
   subtitles: Array<string> = [],
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
-): Promise<MediaFileRecord> => {
+): Promise<MediaFile> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)
 
   return {

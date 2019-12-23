@@ -1,7 +1,7 @@
 import { flatMap, catchError, mergeAll } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
-import { readMediaFileRecord } from '../utils/ffmpeg'
+import { readMediaFile } from '../utils/ffmpeg'
 import uuid from 'uuid/v4'
 import { AppEpic } from '../types/AppEpic'
 
@@ -13,7 +13,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
         Promise.all(
           filePaths.map(async filePath =>
             r.addAndLoadFile(
-              await readMediaFileRecord(filePath, uuid(), projectId),
+              await readMediaFile(filePath, uuid(), projectId),
               filePath
             )
           )

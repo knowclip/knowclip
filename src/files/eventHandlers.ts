@@ -1,39 +1,39 @@
 import { Observable } from 'rxjs'
 
-export type LoadRequestHandler<F extends FileRecord> = (
-  fileRecord: F,
+export type LoadRequestHandler<F extends FileMetadata> = (
+  file: F,
   filePath: string,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
-export type LoadSuccessHandler<F extends FileRecord> = (
-  fileRecord: F,
+export type LoadSuccessHandler<F extends FileMetadata> = (
+  file: F,
   filePath: string,
   state: AppState,
   effects: EpicsDependencies
 ) => Observable<Action>
 
-export type LoadFailureHandler<F extends FileRecord> = (
-  fileRecord: F,
+export type LoadFailureHandler<F extends FileMetadata> = (
+  file: F,
   filePath: string | null,
   errorMessage: string,
   state: AppState,
   effects: EpicsDependencies
 ) => Observable<Action>
 
-export type LocateRequestHandler<F extends FileRecord> = (
-  action: LocateFileRequest & { fileRecord: F },
+export type LocateRequestHandler<F extends FileMetadata> = (
+  action: LocateFileRequest & { file: F },
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
 export type FileValidator = <F>(
-  existingFileRecord: F,
+  existingFile: F,
   path: string
 ) => Promise<string | F>
 
-export type FileEventHandlers<F extends FileRecord> = {
+export type FileEventHandlers<F extends FileMetadata> = {
   // openRequest
   loadRequest: LoadRequestHandler<F>
   // open

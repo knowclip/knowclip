@@ -158,7 +158,7 @@ const centerSelectedClip: AppEpic = (
 const LOOP_BUFFER = 25
 const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
+    filter<Action, LoadFileSuccessWith<MediaFile>>(
       isLoadFileSuccess('MediaFile')
     ),
     switchMap(() =>
@@ -188,7 +188,7 @@ const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
 const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
-    filter(({ fileRecord }) => fileRecord.type === 'MediaFile'),
+    filter(({ file }) => file.type === 'MediaFile'),
     map(() => r.highlightClip(null))
   )
 

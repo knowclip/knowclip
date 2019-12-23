@@ -6,6 +6,6 @@ declare type AppState = {
   snackbar: SnackbarState
   dialog: DialogState
   subtitles: SubtitlesState
-  loadedFiles: LoadedFilesState
-  fileRecords: FileRecordsState
+  fileAvailabilities: FileAvailabilitiesState
+  files: FilesState
 }

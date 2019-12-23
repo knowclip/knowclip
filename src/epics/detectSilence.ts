@@ -52,7 +52,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
     ofType<Action, DetectSilence>(A.DETECT_SILENCE),
     flatMap<DetectSilence, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
-      const currentMedia = r.getCurrentMediaFileRecord(state$.value)
+      const currentMedia = r.getCurrentMediaFile(state$.value)
       if (!currentMedia || !currentFilePath)
         throw new Error('Illegal: no media file loaded')
 

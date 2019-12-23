@@ -22,11 +22,11 @@ declare type EpicsDependencies = {
   getSubtitlesFilePath: (
     state: AppState,
     sourceFilePath: string,
-    fileRecord: ExternalSubtitlesFileRecord | TemporaryVttFileRecord
+    file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
   ) => Promise<string>
   getWaveformPng: (
     state: AppState,
-    fileRecord: WaveformPngRecord,
+    file: WaveformPng,
     constantBitrateFilePath: string
   ) => Promise<string>
   getConstantBitrateMediaPath: (

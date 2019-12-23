@@ -4,34 +4,34 @@ import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 
 export default {
-  loadRequest: async (fileRecord, filePath, state, effects) => {
-    return [r.loadFileSuccess(fileRecord, filePath)]
+  loadRequest: async (file, filePath, state, effects) => {
+    return [r.loadFileSuccess(file, filePath)]
   },
 
-  loadSuccess: (fileRecord, filePath, state, effects) => {
+  loadSuccess: (file, filePath, state, effects) => {
     return of(
       r.addAndLoadFile({
         type: 'WaveformPng',
-        parentId: fileRecord.id,
-        id: fileRecord.id,
+        parentId: file.id,
+        id: file.id,
       })
     )
   },
 
-  locateRequest: async ({ fileRecord }, state, effects) => {
-    const parentFile = r.getLoadedFileById(state, 'MediaFile', fileRecord.id)
+  locateRequest: async ({ file }, state, effects) => {
+    const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
       return await [
-        r.loadFileFailure(fileRecord, null, 'You must first locate this file.'), // TODO: test!!! maybe should delete?
+        r.loadFileFailure(file, null, 'You must first locate this file.'), // TODO: test!!! maybe should delete?
       ]
 
     const cbrFilePath = await effects.getConstantBitrateMediaPath(
       parentFile.filePath,
       null
     )
-    return [r.locateFileSuccess(fileRecord, cbrFilePath)]
+    return [r.locateFileSuccess(file, cbrFilePath)]
   },
 
   loadFailure: null,
   locateSuccess: null,
-} as FileEventHandlers<ConstantBitrateMp3Record>
+} as FileEventHandlers<ConstantBitrateMp3>

@@ -1,33 +1,31 @@
 import { Reducer } from 'redux'
 
-export const initialState: LoadedFilesState = {
+export const initialState: FileAvailabilitiesState = {
   ProjectFile: {},
   MediaFile: {},
   ExternalSubtitlesFile: {},
-  TemporaryVttFile: {},
+  VttConvertedSubtitlesFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
   // VideoStillImage: {},
 }
 
-const loadedFiles: Reducer<LoadedFilesState, Action> = (
+const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
   state = initialState,
   action
 ) => {
   switch (action.type) {
     case A.LOAD_FILE_SUCCESS: {
-      const loadedFile: LoadedFile = {
-        ...state[action.validatedFileRecord.type][
-          action.validatedFileRecord.id
-        ],
+      const fileAvailability: FileAvailability = {
+        ...state[action.validatedFile.type][action.validatedFile.id],
         status: 'CURRENTLY_LOADED',
         filePath: action.filePath,
       }
       return {
         ...state,
-        [action.validatedFileRecord.type]: {
-          ...state[action.validatedFileRecord.type],
-          [action.validatedFileRecord.id]: loadedFile,
+        [action.validatedFile.type]: {
+          ...state[action.validatedFile.type],
+          [action.validatedFile.id]: fileAvailability,
         },
       }
     }
@@ -37,9 +35,8 @@ const loadedFiles: Reducer<LoadedFilesState, Action> = (
     case A.LOCATE_FILE_SUCCESS: {
       if (!action.filePath) return state
 
-      const currentFile =
-        state[action.fileRecord.type][action.fileRecord.id] || null
-      const loadedFile: LoadedFile = currentFile
+      const currentFile = state[action.file.type][action.file.id] || null
+      const fileAvailability: FileAvailability = currentFile
         ? {
             ...currentFile,
             status:
@@ -51,13 +48,13 @@ const loadedFiles: Reducer<LoadedFilesState, Action> = (
         : {
             filePath: action.filePath,
             status: 'CURRENTLY_LOADED',
-            id: action.fileRecord.id,
+            id: action.file.id,
           }
       return {
         ...state,
-        [action.fileRecord.type]: {
-          ...state[action.fileRecord.type],
-          [action.fileRecord.id]: loadedFile,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: fileAvailability,
         },
       }
     }
@@ -67,4 +64,4 @@ const loadedFiles: Reducer<LoadedFilesState, Action> = (
   }
 }
 
-export default loadedFiles
+export default fileAvailabilities

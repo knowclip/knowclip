@@ -8,7 +8,7 @@ const CORRECTION_OFFSET = 0
 
 export const getWaveformPng = async (
   state: AppState,
-  fileRecord: WaveformPngRecord,
+  file: WaveformPng,
   constantBitrateFilePath: string
 ): Promise<string> => {
   const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
@@ -18,7 +18,7 @@ export const getWaveformPng = async (
   const { stepsPerSecond, stepLength } = state.waveform
   const width = ~~(duration * (stepsPerSecond * stepLength))
 
-  const outputFilename = getWaveformPngPath(state, fileRecord)
+  const outputFilename = getWaveformPngPath(state, file)
   if (outputFilename && existsSync(outputFilename)) return outputFilename
 
   return await new Promise((res, rej) => {

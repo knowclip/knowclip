@@ -45,10 +45,10 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
       return initialState
 
     case A.LOAD_FILE_REQUEST:
-      if (action.fileRecord.type === 'MediaFile')
+      if (action.file.type === 'MediaFile')
         return {
           ...state,
-          currentMediaFileId: action.fileRecord.id,
+          currentMediaFileId: action.file.id,
           mediaIsLoading: true,
         }
 
@@ -173,15 +173,15 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
       }
 
     case A.LOAD_FILE_SUCCESS: // temp
-      return action.validatedFileRecord.type === 'MediaFile'
+      return action.validatedFile.type === 'MediaFile'
         ? {
             ...state,
-            mediaIsLoading: false, // should probably exist in loadedFiles state
+            mediaIsLoading: false, // should probably exist in fileAvailabilities state
           }
         : state // what about cbr
 
     case A.LOAD_FILE_FAILURE:
-      return action.fileRecord.type === 'MediaFile'
+      return action.file.type === 'MediaFile'
         ? {
             ...state,
             mediaIsLoading: false,

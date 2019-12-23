@@ -1,9 +1,9 @@
-declare type LoadedFilesState = Record<
-  FileRecord['type'],
-  Record<FileId, LoadedFile>
+declare type FileAvailabilitiesState = Record<
+  FileMetadata['type'],
+  Record<FileId, FileAvailability>
 >
 
-declare type LoadedFile =
+declare type FileAvailability =
   | CurrentlyLoadedFile
   | NotCurrentlyLoadedFile
   | NotLoadedFile

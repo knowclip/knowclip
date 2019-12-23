@@ -35,7 +35,7 @@ declare type DialogData =
       type: 'FileSelection'
       props: {
         message: string
-        fileRecord: FileRecord
+        file: FileMetadata
       }
     }
   | {

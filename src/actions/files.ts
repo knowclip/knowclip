@@ -1,68 +1,64 @@
-export const addAndLoadFile = <F extends FileRecord>(
-  fileRecord: F,
+export const addAndLoadFile = <F extends FileMetadata>(
+  file: F,
   filePath?: FilePath
 ): AddAndLoadFile => ({
   type: A.ADD_AND_LOAD_FILE,
-  fileRecord,
+  file,
   filePath: filePath || null,
 })
 
-export const addFile = <F extends FileRecord>(
-  fileRecord: F,
+export const addFile = <F extends FileMetadata>(
+  file: F,
   filePath?: FilePath // optional?
 ): AddFile => ({
   type: A.ADD_FILE,
-  fileRecord,
+  file,
   filePath: filePath || null,
 })
 
-export const deleteFileRecordRequest = (
-  fileRecord: FileRecord
-): DeleteFileRecordRequest => ({
+export const deleteFileRequest = (file: FileMetadata): DeleteFileRequest => ({
   type: 'DELETE_FILE_RECORD_REQUEST',
-  fileRecord,
+  file,
 })
-export const deleteFileRecordSuccess = (
-  fileRecord: FileRecord
-): DeleteFileRecordSuccess => ({
+export const deleteFileSuccess = (file: FileMetadata): DeleteFileSuccess => ({
   type: 'DELETE_FILE_RECORD_SUCCESS',
-  fileRecord,
+  file,
 })
-export const loadFileRequest = (fileRecord: FileRecord): LoadFileRequest => ({
+export const loadFileRequest = (file: FileMetadata): LoadFileRequest => ({
   type: 'LOAD_FILE_REQUEST',
-  fileRecord,
+  file,
 })
 export const loadFileSuccess = (
-  fileRecord: FileRecord,
+  file: FileMetadata,
   filePath: FilePath
 ): LoadFileSuccess => ({
   type: 'LOAD_FILE_SUCCESS',
-  validatedFileRecord: fileRecord,
+  validatedFile: file,
   filePath,
 })
 export const loadFileFailure = (
-  fileRecord: FileRecord,
+  file: FileMetadata,
   filePath: FilePath | null,
   errorMessage: string
 ): LoadFileFailure => ({
   type: 'LOAD_FILE_FAILURE',
-  fileRecord,
+  file,
   filePath,
   errorMessage,
 })
 export const locateFileRequest = (
-  fileRecord: FileRecord,
+  file: FileMetadata,
   message: string
 ): LocateFileRequest => ({
   type: 'LOCATE_FILE_REQUEST',
-  fileRecord,
+  file,
   message,
 })
 export const locateFileSuccess = (
-  fileRecord: FileRecord,
+  file: FileMetadata,
   filePath: FilePath
 ): LocateFileSuccess => ({
   type: 'LOCATE_FILE_SUCCESS',
-  fileRecord,
+  file,
   filePath,
 })

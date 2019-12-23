@@ -8,18 +8,18 @@ import { extname } from 'path'
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
 export default {
-  loadRequest: async (fileRecord, filePath, state, effects) => [
-    r.loadFileSuccess(fileRecord, filePath),
+  loadRequest: async (file, filePath, state, effects) => [
+    r.loadFileSuccess(file, filePath),
   ],
 
-  loadSuccess: (fileRecord, filePath, state, effects) => {
+  loadSuccess: (file, filePath, state, effects) => {
     if (isVtt(filePath)) {
       return from(effects.getSubtitlesFromFile(state, filePath)).pipe(
         map(chunks =>
           r.addSubtitlesTrack(
             newExternalSubtitlesTrack(
-              fileRecord.id,
-              fileRecord.parentId,
+              file.id,
+              file.parentId,
               chunks,
               filePath,
               filePath
@@ -30,21 +30,21 @@ export default {
     } else {
       return of(
         r.addAndLoadFile({
-          type: 'TemporaryVttFile',
-          id: fileRecord.id,
-          parentId: fileRecord.id, // not needed?
+          type: 'VttConvertedSubtitlesFile',
+          id: file.id,
+          parentId: file.id, // not needed?
           parentType: 'ExternalSubtitlesFile',
         })
       )
     }
   },
 
-  loadFailure: (fileRecord, filePath, errorMessage, state, effects) =>
-    of(r.fileSelectionDialog(errorMessage, fileRecord)),
+  loadFailure: (file, filePath, errorMessage, state, effects) =>
+    of(r.fileSelectionDialog(errorMessage, file)),
 
-  locateRequest: async ({ fileRecord, message }, state, effects) => {
-    return [r.fileSelectionDialog(message, fileRecord)]
+  locateRequest: async ({ file, message }, state, effects) => {
+    return [r.fileSelectionDialog(message, file)]
   },
 
   locateSuccess: null,
-} as FileEventHandlers<ExternalSubtitlesFileRecord>
+} as FileEventHandlers<ExternalSubtitlesFile>

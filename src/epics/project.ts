@@ -58,11 +58,7 @@ const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.OPEN_PROJECT_REQUEST_BY_ID),
     map(({ id }) => {
-      const project = r.getFileRecord<ProjectFileRecord>(
-        state$.value,
-        'ProjectFile',
-        id
-      )
+      const project = r.getFile<ProjectFile>(state$.value, 'ProjectFile', id)
       if (!project)
         return r.simpleMessageSnackbar(`Could not find project ${id}.`)
 
@@ -107,7 +103,7 @@ const saveProject: AppEpic = (action$, state$) =>
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
         return Boolean({ type: 'NOOP_SAVE_PROJECT_WITH_NONE_OPEN' })
-      const projectFile = r.getLoadedFileById(
+      const projectFile = r.getFileAvailabilityById(
         state$.value,
         'ProjectFile',
         projectMetadata.id
@@ -127,7 +123,7 @@ const saveProject: AppEpic = (action$, state$) =>
           null,
           2
         )
-        const projectFile = r.getLoadedFileById(
+        const projectFile = r.getFileAvailabilityById(
           state$.value,
           'ProjectFile',
           projectMetadata.id
@@ -196,8 +192,8 @@ const autoSaveProject: AppEpic = (action$, state$) =>
 // const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
 //   action$.pipe(
 //     ofType<Action, OpenProject>(A.OPEN_PROJECT),
-//     flatMap(({ fileRecord, project }) => {
-//       if (!fileRecord.mediaFiles.length)
+//     flatMap(({ file, project }) => {
+//       if (!file.mediaFiles.length)
 //         return of(({
 //           type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
 //         } as unknown) as Action)
@@ -234,16 +230,16 @@ const autoSaveProject: AppEpic = (action$, state$) =>
 // const openProjectOnCreate: AppEpic = (action$, state$) =>
 //   action$.pipe(
 //     ofType<Action, CreateProject>(A.CREATE_PROJECT),
-//     flatMap(async ({ fileRecord }) => {
+//     flatMap(async ({ file }) => {
 //       try {
 //         const json = JSON.stringify(
-//           r.getProject(state$.value, fileRecord),
+//           r.getProject(state$.value, file),
 //           null,
 //           2
 //         )
-//         await writeFile(fileRecord, json, 'utf8')
+//         await writeFile(file, json, 'utf8')
 
-//         return await r.openProjectById(fileRecord.id)
+//         return await r.openProjectById(file.id)
 //       } catch (err) {
 //         console.error(err)
 //         return await r.simpleMessageSnackbar(

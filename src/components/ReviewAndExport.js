@@ -336,9 +336,9 @@ const mapStateToProps = state => ({
   // flashcards: r.getFlashcardsByTime(state),
   allProjectClipsIds: r.getAllProjectClipsIds(state),
   noteType: r.getCurrentNoteType(state),
-  currentMedia: r.getCurrentMediaFileRecord(state),
+  currentMedia: r.getCurrentMediaFile(state),
   currentFileId: r.getCurrentFileId(state),
-  projectMedia: r.getCurrentProjectMediaFileRecords(state),
+  projectMedia: r.getCurrentProjectMediaFiles(state),
 })
 
 const mapDispatchToProps = {

@@ -4,28 +4,28 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { getCurrentMediaFileRecord } from './project'
-import { getPreviouslyLoadedFile } from './files'
+import { getCurrentMediaFile } from './project'
+import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 
-export const getSubtitlesFileRecord = (
+export const getSubtitlesFile = (
   state: AppState,
   id: string
-): TemporaryVttFileRecord | ExternalSubtitlesFileRecord | null =>
-  state.fileRecords.TemporaryVttFile[id] ||
-  state.fileRecords.ExternalSubtitlesFile[id] ||
+): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
+  state.files.VttConvertedSubtitlesFile[id] ||
+  state.files.ExternalSubtitlesFile[id] ||
   null
 
 export const getSubtitlesLoadedFile = (state: AppState, id: string) => {
-  const record = getSubtitlesFileRecord(state, id)
+  const record = getSubtitlesFile(state, id)
 
-  return record ? getPreviouslyLoadedFile(state, record) : null
+  return record ? getFileAvailability(state, record) : null
 }
 
 const getSubtitles = (state: AppState) => state.subtitles
 
 export const getSubtitlesTracks = createSelector(
-  getCurrentMediaFileRecord,
+  getCurrentMediaFile,
   getSubtitles,
   (currentFile, subtitles): Array<SubtitlesTrack> => {
     if (!currentFile) return []
@@ -103,7 +103,7 @@ export const getSubtitlesChunksWithinRange = (
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
 ): SubtitlesFlashcardFieldsLinks => {
-  const media = getCurrentMediaFileRecord(state)
+  const media = getCurrentMediaFile(state)
   return media ? media.flashcardFieldsToSubtitlesTracks : {}
 }
 

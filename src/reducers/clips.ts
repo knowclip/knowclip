@@ -73,11 +73,11 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
     // case A.CHOOSE_MEDIA_FILES:
     case A.ADD_AND_LOAD_FILE:
-      if (action.fileRecord.type === 'MediaFile')
+      if (action.file.type === 'MediaFile')
         return {
           ...state,
           idsByMediaFileId: {
-            [action.fileRecord.id]: [],
+            [action.file.id]: [],
           },
         }
       return state

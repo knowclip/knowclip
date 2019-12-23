@@ -25,7 +25,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
           )
 
         const currentNoteType = r.getCurrentNoteType(state$.value)
-        const currentFile = r.getCurrentMediaFileRecord(state$.value)
+        const currentFile = r.getCurrentMediaFile(state$.value)
         if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
         if (!currentFile) throw new Error('Could not find media file.') // should be impossible
 
@@ -95,7 +95,7 @@ const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
         return r.simpleMessageSnackbar(
           'Please add a subtitles track and try again.'
         )
-      const mediaFile = r.getCurrentMediaFileRecord(state$.value)
+      const mediaFile = r.getCurrentMediaFile(state$.value)
       if (!mediaFile || !r.getCurrentFilePath(state$.value))
         return r.simpleMessageSnackbar(
           'Please locate this media file and try again.'
@@ -132,17 +132,13 @@ const deleteSubtitlesTrack: AppEpic = (action$, state$, dependencies) =>
   action$.pipe(
     ofType<Action, DeleteSubtitlesTrack>(A.DELETE_SUBTITLES_TRACK),
     map(({ id }) => {
-      const fileRecord = r.getFileRecord(
-        state$.value,
-        'ExternalSubtitlesFile',
-        id
-      )
+      const file = r.getFile(state$.value, 'ExternalSubtitlesFile', id)
 
       // TODO: report error
-      if (!fileRecord)
+      if (!file)
         return r.simpleMessageSnackbar('Could not delete subtitles track.')
 
-      return r.deleteFileRecordRequest(fileRecord)
+      return r.deleteFileRequest(file)
     })
   )
 

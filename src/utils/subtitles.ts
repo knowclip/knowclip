@@ -68,18 +68,18 @@ export const getExternalSubtitlesVttPath = async (
 export const getSubtitlesFilePath = async (
   state: AppState,
   sourceFilePath: string,
-  fileRecord: ExternalSubtitlesFileRecord | TemporaryVttFileRecord
+  file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
 ) => {
-  if (fileRecord.type === 'ExternalSubtitlesFile') {
+  if (file.type === 'ExternalSubtitlesFile') {
     return await getExternalSubtitlesVttPath(state, sourceFilePath)
   }
-  switch (fileRecord.parentType) {
+  switch (file.parentType) {
     case 'ExternalSubtitlesFile':
       return await getExternalSubtitlesVttPath(state, sourceFilePath)
     case 'MediaFile':
       const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
         sourceFilePath,
-        fileRecord.streamIndex
+        file.streamIndex
       )
       if (!subtitlesFilePath) {
         throw new Error('There was a problem loading embedded subtitles')

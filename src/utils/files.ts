@@ -1,11 +1,10 @@
-export const isLoadFileSuccess = <F extends FileRecord>(
-  fileRecordType: F['type']
+export const isLoadFileSuccess = <F extends FileMetadata>(
+  fileType: F['type']
 ) => (action: Action): action is LoadFileSuccessWith<F> =>
-  action.type === A.LOAD_FILE_SUCCESS &&
-  action.validatedFileRecord.type === fileRecordType
+  action.type === A.LOAD_FILE_SUCCESS && action.validatedFile.type === fileType
 
-export const getExtensions = (fileRecord: FileRecord) => {
-  switch (fileRecord.type) {
+export const getExtensions = (file: FileMetadata) => {
+  switch (file.type) {
     case 'ConstantBitrateMp3':
       return ['mp3']
     case 'ExternalSubtitlesFile':
@@ -14,7 +13,7 @@ export const getExtensions = (fileRecord: FileRecord) => {
       return []
     case 'ProjectFile':
       return ['afca']
-    case 'TemporaryVttFile':
+    case 'VttConvertedSubtitlesFile':
       return ['vtt']
     // case 'VideoStillImage':
     //   return ['png'] // ??

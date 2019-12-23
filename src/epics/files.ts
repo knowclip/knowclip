@@ -15,16 +15,17 @@ import { FileEventHandlers } from '../files/eventHandlers'
 const addAndLoadFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddAndLoadFile>(A.ADD_AND_LOAD_FILE),
-    map<AddAndLoadFile, Action>(({ fileRecord }) =>
-      r.loadFileRequest(fileRecord)
-    )
+    map<AddAndLoadFile, Action>(({ file }) => r.loadFileRequest(file))
   )
 
-const fileEventHandlers: Record<FileRecord['type'], FileEventHandlers<any>> = {
+const fileEventHandlers: Record<
+  FileMetadata['type'],
+  FileEventHandlers<any>
+> = {
   ProjectFile: project,
   MediaFile: media,
   ExternalSubtitlesFile: externalSubtitles,
-  TemporaryVttFile: temporaryVtt,
+  VttConvertedSubtitlesFile: temporaryVtt,
   WaveformPng: waveformPng,
   ConstantBitrateMp3: constantBitrateMp3,
   // VideoStillImage: ,
@@ -34,24 +35,28 @@ const fileEventHandlers: Record<FileRecord['type'], FileEventHandlers<any>> = {
 const loadFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
-    flatMap<LoadFileRequest, Observable<Action>>(({ fileRecord }) => {
-      const file = r.getPreviouslyLoadedFile(state$.value, fileRecord) // rename
+    flatMap<LoadFileRequest, Observable<Action>>(({ file }) => {
+      const fileAvailability = r.getFileAvailability(state$.value, file) // rename
 
-      if (!file || !file.filePath || !existsSync(file.filePath))
+      if (
+        !fileAvailability ||
+        !fileAvailability.filePath ||
+        !existsSync(fileAvailability.filePath)
+      )
         return of(
           r.locateFileRequest(
-            fileRecord,
+            file,
             `This file "${
-              'name' in fileRecord ? fileRecord.name : fileRecord.type
+              'name' in file ? file.name : file.type
             }" appears to have moved or been renamed. Try locating it manually?`
           )
         )
 
       try {
         return flatten(
-          fileEventHandlers[fileRecord.type].loadRequest(
-            fileRecord,
-            file.filePath,
+          fileEventHandlers[file.type].loadRequest(
+            file,
+            fileAvailability.filePath,
             state$.value,
             effects
           )
@@ -59,8 +64,8 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
       } catch (err) {
         return of(
           r.loadFileFailure(
-            fileRecord,
-            file ? file.filePath : null,
+            file,
+            fileAvailability ? fileAvailability.filePath : null,
             err.message || err.toString()
           )
         )
@@ -72,9 +77,9 @@ const loadFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LoadFileSuccess>(A.LOAD_FILE_SUCCESS),
     flatMap<LoadFileSuccess, Observable<Action>>(
-      ({ validatedFileRecord: fileRecord, filePath }) =>
-        fileEventHandlers[fileRecord.type].loadSuccess(
-          fileRecord,
+      ({ validatedFile: file, filePath }) =>
+        fileEventHandlers[file.type].loadSuccess(
+          file,
           filePath,
           state$.value,
           effects
@@ -86,11 +91,11 @@ const loadFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LoadFileFailure>(A.LOAD_FILE_FAILURE),
     flatMap<LoadFileFailure, Observable<Action>>(
-      ({ fileRecord, filePath, errorMessage }) => {
-        const hook = fileEventHandlers[fileRecord.type].loadFailure
+      ({ file, filePath, errorMessage }) => {
+        const hook = fileEventHandlers[file.type].loadFailure
 
         if (hook)
-          return hook(fileRecord, filePath, errorMessage, state$.value, effects)
+          return hook(file, filePath, errorMessage, state$.value, effects)
 
         return of(
           r.simpleMessageSnackbar('Could not load file: ' + errorMessage)
@@ -107,7 +112,7 @@ const locateFileRequest: AppEpic = (action$, state$, effects) =>
     ofType<Action, LocateFileRequest>(A.LOCATE_FILE_REQUEST),
     flatMap<LocateFileRequest, Observable<Action>>(action =>
       flatten(
-        fileEventHandlers[action.fileRecord.type].locateRequest(
+        fileEventHandlers[action.file.type].locateRequest(
           action,
           state$.value,
           effects
@@ -119,8 +124,8 @@ const locateFileRequest: AppEpic = (action$, state$, effects) =>
 const locateFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileSuccess>(A.LOCATE_FILE_SUCCESS),
-    map<LocateFileSuccess, Action>(({ fileRecord, filePath }) =>
-      r.loadFileRequest(fileRecord)
+    map<LocateFileSuccess, Action>(({ file, filePath }) =>
+      r.loadFileRequest(file)
     )
   )
 

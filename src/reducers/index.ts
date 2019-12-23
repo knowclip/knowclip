@@ -7,8 +7,8 @@ import snackbar from './snackbar'
 import dialog from './dialog'
 import subtitles from './subtitles'
 import settings from './settings'
-import loadedFiles from './loadedFiles'
-import fileRecords from './fileRecords'
+import fileAvailabilities from './fileAvailabilities'
+import files from './files'
 
 export default combineReducers<AppState>({
   waveform,
@@ -18,6 +18,6 @@ export default combineReducers<AppState>({
   dialog,
   subtitles,
   settings,
-  loadedFiles,
-  fileRecords,
+  fileAvailabilities,
+  files,
 })

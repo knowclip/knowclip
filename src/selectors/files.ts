@@ -1,30 +1,30 @@
-import { getCurrentFilePath, getCurrentMediaFileRecord } from './project'
+import { getCurrentMediaFile } from './project'
 
-export const getPreviouslyLoadedFile = (
+export const getFileAvailability = (
   state: AppState,
-  fileRecord: FileRecord
-): LoadedFile | null => state.loadedFiles[fileRecord.type][fileRecord.id]
+  file: FileMetadata
+): FileAvailability | null => state.fileAvailabilities[file.type][file.id]
 
-export const getFileRecord = <F extends FileRecord>(
+export const getFile = <F extends FileMetadata>(
   state: AppState,
   type: F['type'],
   id: FileId
-): F | null => (state.fileRecords[type][id] as F) || null
+): F | null => (state.files[type][id] as F) || null
 
-export const getLoadedFileById = <F extends FileRecord>(
+export const getFileAvailabilityById = <F extends FileMetadata>(
   state: AppState,
   type: F['type'],
   id: FileId
 ) => {
-  const record = getFileRecord(state, type, id)
-  return record ? getPreviouslyLoadedFile(state, record) : null
+  const record = getFile(state, type, id)
+  return record ? getFileAvailability(state, record) : null
 }
 
 export const getWaveformPath = (state: AppState): string | null => {
-  const currentMediaFile = getCurrentMediaFileRecord(state)
+  const currentMediaFile = getCurrentMediaFile(state)
   if (!currentMediaFile) return null
 
-  const waveformFile = getLoadedFileById(
+  const waveformFile = getFileAvailabilityById(
     state,
     'WaveformPng',
     currentMediaFile.id

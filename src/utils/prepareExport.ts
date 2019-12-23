@@ -3,7 +3,7 @@ import { toTimestamp } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
 import { unparse } from 'papaparse'
 import { getNoteTypeFields } from '../utils/noteType'
-import { getPreviouslyLoadedFile } from '../selectors'
+import { getFileAvailability } from '../selectors'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
@@ -51,11 +51,11 @@ const getCards = (noteType: NoteType) => [
 
 export const getApkgExportData = (
   state: AppState,
-  project: ProjectFileRecord,
+  project: ProjectFile,
   clipIds: Array<ClipId>
 ): ApkgExportData => {
   const fieldNames = getNoteTypeFields(project.noteType)
-  const mediaFiles = r.getProjectMediaFileRecords(state, project.id)
+  const mediaFiles = r.getProjectMediaFiles(state, project.id)
 
   // sort and validate
   clipIds.sort((id, id2) => {
@@ -65,18 +65,16 @@ export const getApkgExportData = (
     const clip2 = r.getClip(state, id2)
     if (!clip2) throw new Error('Could not find clip ' + id2)
 
-    const fileRecord = mediaFiles.find(media => media.id === clip.fileId)
-    if (!fileRecord)
-      throw new Error(`Couldn't find media metadata for clip ${id}`)
-    const fileLoaded = getPreviouslyLoadedFile(state, fileRecord)
+    const file = mediaFiles.find(media => media.id === clip.fileId)
+    if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
+    const fileLoaded = getFileAvailability(state, file)
     if (!(fileLoaded && fileLoaded.status === 'CURRENTLY_LOADED'))
-      throw new Error(`Please open ${fileRecord.name} and try again.`)
+      throw new Error(`Please open ${file.name} and try again.`)
 
-    const fileRecord2 = mediaFiles.find(media => media.id === clip.fileId)
-    if (!fileRecord2)
-      throw new Error(`Couldn't find media metadata for clip ${id}`)
+    const file2 = mediaFiles.find(media => media.id === clip.fileId)
+    if (!file2) throw new Error(`Couldn't find media metadata for clip ${id}`)
 
-    const fileIndex1 = mediaFiles.indexOf(fileRecord)
+    const fileIndex1 = mediaFiles.indexOf(file)
     const fileIndex2 = mediaFiles.findIndex(media => media.id === clip2.fileId)
 
     if (fileIndex1 < fileIndex2) return -1
@@ -94,12 +92,11 @@ export const getApkgExportData = (
     const metadataAndPath = mediaFiles.find(media => media.id === clip.fileId)
     if (!metadataAndPath)
       throw new Error(`Couldn't find media metadata for clip ${id}`)
-    const fileRecord = mediaFiles.find(media => media.id === clip.fileId)
-    if (!fileRecord)
-      throw new Error(`Couldn't find media metadata for clip ${id}`)
-    const fileLoaded = getPreviouslyLoadedFile(state, fileRecord)
+    const file = mediaFiles.find(media => media.id === clip.fileId)
+    if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
+    const fileLoaded = getFileAvailability(state, file)
     if (!(fileLoaded && fileLoaded.status === 'CURRENTLY_LOADED'))
-      throw new Error(`Please open ${fileRecord.name} and try again.`)
+      throw new Error(`Please open ${file.name} and try again.`)
     const extension = extname(fileLoaded.filePath)
     const filenameWithoutExtension = basename(fileLoaded.filePath, extension)
 

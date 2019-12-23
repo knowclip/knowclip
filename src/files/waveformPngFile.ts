@@ -7,48 +7,44 @@ import {
   FileEventHandlers,
 } from './eventHandlers'
 
-export const loadRequest: LoadRequestHandler<WaveformPngRecord> = async (
-  fileRecord,
+export const loadRequest: LoadRequestHandler<WaveformPng> = async (
+  file,
   filePath,
   state,
   effects
 ) => {
-  return [await r.loadFileSuccess(fileRecord, filePath)]
+  return [await r.loadFileSuccess(file, filePath)]
 }
 
-export const loadSuccess: LoadSuccessHandler<WaveformPngRecord> = (
-  fileRecord,
+export const loadSuccess: LoadSuccessHandler<WaveformPng> = (
+  file,
   filePath,
   state,
   effects
 ) => empty()
 
-export const locateRequest: LocateRequestHandler<WaveformPngRecord> = async (
-  { fileRecord },
+export const locateRequest: LocateRequestHandler<WaveformPng> = async (
+  { file },
   state,
   effects
 ) => {
   try {
-    const parentFile = r.getLoadedFileById(state, 'MediaFile', fileRecord.id)
+    const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-      return [
-        r.loadFileFailure(fileRecord, null, 'You must first locate this file.'),
-      ]
+      return [r.loadFileFailure(file, null, 'You must first locate this file.')]
 
     const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
 
     return cbr
       ? [
           r.locateFileSuccess(
-            fileRecord,
-            await effects.getWaveformPng(state, fileRecord, cbr)
+            file,
+            await effects.getWaveformPng(state, file, cbr)
           ),
         ]
       : []
   } catch (err) {
-    return [
-      r.loadFileFailure(fileRecord, null, 'whoops couldnt make waveform image'),
-    ]
+    return [r.loadFileFailure(file, null, 'whoops couldnt make waveform image')]
   }
 }
 
@@ -58,4 +54,4 @@ export default {
   loadFailure: null,
   locateRequest,
   locateSuccess: null,
-} as FileEventHandlers<WaveformPngRecord>
+} as FileEventHandlers<WaveformPng>

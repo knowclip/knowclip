@@ -1,11 +1,11 @@
-import { initialState as initialFileRecordsState } from '../reducers/fileRecords'
-import { initialState as initialLoadedFilesState } from '../reducers/loadedFiles'
+import { initialState as initialFilesState } from '../reducers/files'
+import { initialState as initialFileAvailabilitiesState } from '../reducers/fileAvailabilities'
 import moment from 'moment'
 
-type FilesyState<F> = Record<FileRecord['type'], { [fileId: string]: F }>
+type FilesyState<F> = Record<FileMetadata['type'], { [fileId: string]: F }>
 
 const mapFileState = <F, G>(state: FilesyState<F>, transform: (f: F) => G) =>
-  (Object.keys(state) as FileRecord['type'][]).reduce(
+  (Object.keys(state) as FileMetadata['type'][]).reduce(
     (all, type) => {
       all[type] = Object.keys(state[type]).reduce(
         (xxx, id) => {
@@ -26,10 +26,10 @@ export const getPersistedState = (): Partial<AppState> => {
     const projects = projectsText
       ? (JSON.parse(projectsText) as ProjectsState)
       : null
-    const convertedProjectFileRecords: Record<string, ProjectFileRecord> = {
+    const convertedProjectFiles: Record<string, ProjectFile> = {
       ...Object.values(projects ? projects.byId : {}).reduce(
         (all, oldProject) => {
-          const newProject: ProjectFileRecord = {
+          const newProject: ProjectFile = {
             type: 'ProjectFile',
             lastOpened: moment.utc().format(),
             lastSaved: '2015-11-16T09:44:45Z',
@@ -42,13 +42,13 @@ export const getPersistedState = (): Partial<AppState> => {
           all[oldProject.id] = newProject
           return all
         },
-        {} as Record<string, ProjectFileRecord>
+        {} as Record<string, ProjectFile>
       ),
     }
-    const oldProjectLoadedFiles: Record<string, LoadedFile> = {
+    const oldProjectFiles: Record<string, FileAvailability> = {
       ...Object.values(projects ? projects.byId : {}).reduce(
         (all, oldProject) => {
-          const newProject: LoadedFile = {
+          const newProject: FileAvailability = {
             id: oldProject.id,
             status: 'REMEMBERED',
             filePath: oldProject.filePath,
@@ -56,7 +56,7 @@ export const getPersistedState = (): Partial<AppState> => {
           all[oldProject.id] = newProject
           return all
         },
-        {} as Record<string, LoadedFile>
+        {} as Record<string, FileAvailability>
       ),
     }
 
@@ -66,65 +66,68 @@ export const getPersistedState = (): Partial<AppState> => {
       : null
     if (settings) persistedState.settings = settings
 
-    const fileRecordsText = window.localStorage.getItem('fileRecords')
-    const fileRecords = fileRecordsText
-      ? (JSON.parse(fileRecordsText) as FileRecordsState)
-      : null
+    const filesText = window.localStorage.getItem('files')
+    const files = filesText ? (JSON.parse(filesText) as FilesState) : null
 
-    persistedState.fileRecords = fileRecords
+    persistedState.files = files
       ? {
-          ...fileRecords,
+          ...files,
           ProjectFile: {
-            ...convertedProjectFileRecords,
-            ...fileRecords.ProjectFile,
+            ...convertedProjectFiles,
+            ...files.ProjectFile,
           },
         }
       : {
-          ...initialFileRecordsState,
+          ...initialFilesState,
           ProjectFile: {
-            ...initialFileRecordsState.ProjectFile,
-            ...convertedProjectFileRecords,
+            ...initialFilesState.ProjectFile,
+            ...convertedProjectFiles,
           },
         }
 
     // should also check for orphans?
 
-    const loadedFilesText = window.localStorage.getItem('loadedFiles')
-    const storedLoadedFiles = loadedFilesText
-      ? (JSON.parse(loadedFilesText) as LoadedFilesState)
+    const fileAvailabilitiesText = window.localStorage.getItem(
+      'fileAvailabilities'
+    )
+    const storedFiles = fileAvailabilitiesText
+      ? (JSON.parse(fileAvailabilitiesText) as FileAvailabilitiesState)
       : null
-    const loadedFiles = {
-      ...initialLoadedFilesState,
-      ...storedLoadedFiles,
+    const fileAvailabilities = {
+      ...initialFileAvailabilitiesState,
+      ...storedFiles,
       ProjectFile: {
-        ...initialLoadedFilesState.ProjectFile,
-        ...oldProjectLoadedFiles,
-        ...(storedLoadedFiles ? storedLoadedFiles.ProjectFile : null),
+        ...initialFileAvailabilitiesState.ProjectFile,
+        ...oldProjectFiles,
+        ...(storedFiles ? storedFiles.ProjectFile : null),
       },
     }
 
-    persistedState.loadedFiles = mapFileState(loadedFiles, loadedFile => {
-      switch (loadedFile.status) {
-        case 'CURRENTLY_LOADED':
-          return {
-            id: loadedFile.id,
-            status: 'REMEMBERED',
-            filePath: loadedFile.filePath,
-          }
-        case 'REMEMBERED':
-          return {
-            id: loadedFile.id,
-            status: loadedFile.status,
-            filePath: loadedFile.filePath,
-          }
-        case 'NOT_LOADED':
-          return {
-            id: loadedFile.id,
-            status: loadedFile.status,
-            filePath: loadedFile.filePath,
-          }
+    persistedState.fileAvailabilities = mapFileState(
+      fileAvailabilities,
+      fileAvailability => {
+        switch (fileAvailability.status) {
+          case 'CURRENTLY_LOADED':
+            return {
+              id: fileAvailability.id,
+              status: 'REMEMBERED',
+              filePath: fileAvailability.filePath,
+            }
+          case 'REMEMBERED':
+            return {
+              id: fileAvailability.id,
+              status: fileAvailability.status,
+              filePath: fileAvailability.filePath,
+            }
+          case 'NOT_LOADED':
+            return {
+              id: fileAvailability.id,
+              status: fileAvailability.status,
+              filePath: fileAvailability.filePath,
+            }
+        }
       }
-    })
+    )
   } catch (err) {
     console.error(err)
   }

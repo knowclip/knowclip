@@ -1,14 +1,19 @@
 import tempy from 'tempy'
 import { existsSync } from 'fs'
-import { getLoadedFileById } from '../selectors'
+import { getFileAvailabilityById } from '../selectors'
 
-export const getWaveformPngPath = (
-  state: AppState,
-  fileRecord: WaveformPngRecord
-) => {
-  const file = getLoadedFileById(state, 'WaveformPng', fileRecord.id)
-  if (file && file.filePath && existsSync(file.filePath)) {
-    return file.filePath
+export const getWaveformPngPath = (state: AppState, file: WaveformPng) => {
+  const fileAvailability = getFileAvailabilityById(
+    state,
+    'WaveformPng',
+    file.id
+  )
+  if (
+    fileAvailability &&
+    fileAvailability.filePath &&
+    existsSync(fileAvailability.filePath)
+  ) {
+    return fileAvailability.filePath
   }
   return tempy.file({ extension: 'png' })
 }

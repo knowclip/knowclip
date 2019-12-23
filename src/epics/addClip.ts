@@ -34,14 +34,14 @@ const addClipEpic: AppEpic = (
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
     switchMap(waveformMousedown => {
-      const mediaFileRecord = r.getCurrentMediaFileRecord(state$.value)
-      if (!mediaFileRecord) throw new Error('No current media metadata')
+      const mediaFile = r.getCurrentMediaFile(state$.value)
+      if (!mediaFile) throw new Error('No current media metadata')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =
         state$.value.waveform.stepsPerSecond * state$.value.waveform.stepLength
       const withinValidTime = (x: number) =>
-        Math.max(0, Math.min(x, mediaFileRecord.durationSeconds * factor))
+        Math.max(0, Math.min(x, mediaFile.durationSeconds * factor))
 
       const svgElement = getWaveformSvgElement()
       if (!svgElement) throw new Error('Waveform disappeared')

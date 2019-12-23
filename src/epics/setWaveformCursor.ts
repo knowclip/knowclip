@@ -40,10 +40,10 @@ export const setCursor = (
 
 const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    filter<Action, LoadFileSuccessWith<MediaFileRecord>>(
+    filter<Action, LoadFileSuccessWith<MediaFile>>(
       isLoadFileSuccess('MediaFile')
     ),
-    switchMap<LoadFileSuccessWith<MediaFileRecord>, Observable<Action>>(() =>
+    switchMap<LoadFileSuccessWith<MediaFile>, Observable<Action>>(() =>
       fromEvent<Event>(
         document,
         'timeupdate',

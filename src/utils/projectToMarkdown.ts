@@ -6,14 +6,14 @@ const projectToMarkdown = (
   projectId: ProjectId,
   noteType: NoteType
 ): string => {
-  const projectMetadata = r.getFileRecord<ProjectFileRecord>(
+  const projectMetadata = r.getFile<ProjectFile>(
     state,
     'ProjectFile',
     projectId
   )
   if (!projectMetadata) throw new Error('Could not find project')
 
-  const media = r.getProjectMediaFileRecords(state, projectId)
+  const media = r.getProjectMediaFiles(state, projectId)
 
   return [
     `# ${projectMetadata.name}`,

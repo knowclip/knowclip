@@ -196,7 +196,7 @@ const mapStateToProps = state => ({
   audioIsLoading: r.isAudioLoading(state),
   currentProjectId: r.getCurrentProjectId(state),
   constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
-  currentMediaFile: r.getCurrentMediaFileRecord(state),
+  currentMediaFile: r.getCurrentMediaFile(state),
   subtitles: r.getSubtitlesTracks(state),
 })
 

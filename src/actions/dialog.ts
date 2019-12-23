@@ -51,9 +51,9 @@ export const newProjectFormDialog = () =>
 
 export const fileSelectionDialog = (
   message: string,
-  fileRecord: FileRecord
+  file: FileMetadata
 ): DialogAction =>
-  enqueueDialog({ type: 'FileSelection', props: { message, fileRecord } })
+  enqueueDialog({ type: 'FileSelection', props: { message, file: file } })
 
 export const closeDialog = (): DialogAction => ({
   type: A.CLOSE_DIALOG,

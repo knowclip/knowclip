@@ -144,7 +144,7 @@ declare type OpenProjectRequestByFilePath = {
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
-  project: ProjectFileRecord
+  project: ProjectFile
   clips: Clip[]
   now: string
 }
@@ -284,8 +284,8 @@ declare type GoToSubtitlesChunk = {
 declare type FileAction =
   | AddAndLoadFile
   | AddFile
-  | DeleteFileRecordRequest
-  | DeleteFileRecordSuccess
+  | DeleteFileRequest
+  | DeleteFileSuccess
   | LoadFileRequest
   | LoadFileSuccess
   | LoadFileFailure
@@ -293,54 +293,54 @@ declare type FileAction =
   | LocateFileSuccess
 declare type AddAndLoadFile = {
   type: 'ADD_AND_LOAD_FILE'
-  fileRecord: FileRecord
+  file: FileMetadata
   filePath: FilePath | null
 }
 declare type AddFile = {
   type: 'ADD_FILE'
-  fileRecord: FileRecord
+  file: FileMetadata
   filePath: FilePath | null
 }
-declare type DeleteFileRecordRequest = {
+declare type DeleteFileRequest = {
   type: 'DELETE_FILE_RECORD_REQUEST'
-  fileRecord: FileRecord
+  file: FileMetadata
 }
-declare type DeleteFileRecordSuccess = {
+declare type DeleteFileSuccess = {
   type: 'DELETE_FILE_RECORD_SUCCESS'
-  fileRecord: FileRecord
+  file: FileMetadata
 }
 declare type LoadFileRequest = {
   type: 'LOAD_FILE_REQUEST'
-  fileRecord: FileRecord
+  file: FileMetadata
 }
 declare type LoadFileSuccess = {
   type: 'LOAD_FILE_SUCCESS'
-  validatedFileRecord: FileRecord
+  validatedFile: FileMetadata
   filePath: FilePath
 }
 declare type LoadFileFailure = {
   type: 'LOAD_FILE_FAILURE'
-  fileRecord: FileRecord
+  file: FileMetadata
   filePath: FilePath | null
   errorMessage: string
 }
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
-  fileRecord: FileRecord
+  file: FileMetadata
   message: string
 }
 declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
-  fileRecord: FileRecord
+  file: FileMetadata
   filePath: FilePath
 }
 
-interface WithRecordType<F extends FileRecord> {
-  fileRecord: F
+interface WithRecordType<F extends FileMetadata> {
+  file: F
 }
 
-type LoadFileSuccessWith<F extends FileRecord> = Omit<
+type LoadFileSuccessWith<F extends FileMetadata> = Omit<
   LoadFileSuccess,
-  'fileRecord'
+  'file'
 > &
   WithRecordType<F>

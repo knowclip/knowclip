@@ -9,13 +9,13 @@ import moment from 'moment'
 const { readFile } = promises
 
 export default {
-  loadRequest: async (fileRecord, filePath, state, effects) => {
+  loadRequest: async (file, filePath, state, effects) => {
     return [
       // TODO: check differences/opened time
-      r.loadFileSuccess(fileRecord, filePath),
+      r.loadFileSuccess(file, filePath),
     ]
   },
-  loadSuccess: (fileRecord, filePath, state, effects) => {
+  loadSuccess: (file, filePath, state, effects) => {
     return from(readFile(filePath, 'utf8')).pipe(
       map(projectJson => parseProject(projectJson)),
       flatMap(project => {
@@ -24,10 +24,8 @@ export default {
 
         const addNewMediaFiles = from(
           project.mediaFiles
-            .filter(
-              fileRecord => !r.getFileRecord(state, 'MediaFile', fileRecord.id)
-            )
-            .map(fileRecord => r.addFile(fileRecord))
+            .filter(file => !r.getFile(state, 'MediaFile', file.id))
+            .map(file => r.addFile(file))
         )
 
         const loadFirstMediaFile = project.mediaFiles.length
@@ -37,7 +35,7 @@ export default {
         return merge(
           of(
             r.openProject(
-              fileRecord,
+              file,
               project.clips,
               moment()
                 .utc()
@@ -51,11 +49,8 @@ export default {
     )
   },
   loadFailure: null,
-  locateRequest: async ({ fileRecord }, state, effects) => [
-    r.fileSelectionDialog(
-      `Please locate this project file ${fileRecord.name}`,
-      fileRecord
-    ),
+  locateRequest: async ({ file }, state, effects) => [
+    r.fileSelectionDialog(`Please locate this project file ${file.name}`, file),
   ],
   locateSuccess: null,
-} as FileEventHandlers<ProjectFileRecord>
+} as FileEventHandlers<ProjectFile>

@@ -1,19 +1,19 @@
 import { Reducer } from 'redux'
 import deleteKey from '../utils/deleteKey'
 
-export const initialState: FileRecordsState = {
+export const initialState: FilesState = {
   ProjectFile: {},
   MediaFile: {},
   ExternalSubtitlesFile: {},
-  TemporaryVttFile: {},
+  VttConvertedSubtitlesFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
   // VideoStillImage: {},
   // },
 }
 
-const edit = <F extends FileRecord>(
-  state: FileRecordsState,
+const edit = <F extends FileMetadata>(
+  state: FilesState,
   type: F['type'],
   id: string,
   transform: (file: F) => F
@@ -31,18 +31,15 @@ const edit = <F extends FileRecord>(
   }
 }
 
-const fileRecords: Reducer<FileRecordsState, Action> = (
-  state = initialState,
-  action
-) => {
+const files: Reducer<FilesState, Action> = (state = initialState, action) => {
   switch (action.type) {
     case A.LOAD_FILE_SUCCESS:
       // same logic as just below
       return {
         ...state,
-        [action.validatedFileRecord.type]: {
-          ...state[action.validatedFileRecord.type],
-          [action.validatedFileRecord.id]: action.validatedFileRecord,
+        [action.validatedFile.type]: {
+          ...state[action.validatedFile.type],
+          [action.validatedFile.id]: action.validatedFile,
         },
       }
     case A.ADD_FILE:
@@ -50,21 +47,21 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
     case A.LOCATE_FILE_SUCCESS: {
       const newState = {
         ...state,
-        [action.fileRecord.type]: {
-          ...state[action.fileRecord.type],
-          [action.fileRecord.id]: action.fileRecord,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: action.file,
         },
       }
 
-      return action.fileRecord.type === 'MediaFile'
-        ? edit<ProjectFileRecord>(
+      return action.file.type === 'MediaFile'
+        ? edit<ProjectFile>(
             newState,
             'ProjectFile',
-            action.fileRecord.parentId,
+            action.file.parentId,
             file => ({
               ...file,
               mediaFileIds: [
-                ...new Set([...file.mediaFileIds, action.fileRecord.id]),
+                ...new Set([...file.mediaFileIds, action.file.id]),
               ],
             })
           )
@@ -72,7 +69,7 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
     }
 
     case A.OPEN_PROJECT:
-      return edit<ProjectFileRecord>(
+      return edit<ProjectFile>(
         state,
         'ProjectFile',
         action.project.id,
@@ -83,7 +80,7 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
       )
 
     case A.ADD_SUBTITLES_TRACK:
-      return edit<MediaFileRecord>(
+      return edit<MediaFile>(
         state,
         'MediaFile',
         action.track.mediaFileId,
@@ -94,27 +91,22 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
       )
 
     case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
-      return edit<MediaFileRecord>(
-        state,
-        'MediaFile',
-        action.mediaFileId,
-        file => ({
-          ...file,
-          flashcardFieldsToSubtitlesTracks: {
-            ...file.flashcardFieldsToSubtitlesTracks,
-            [action.flashcardFieldName]: action.subtitlesTrackId,
-          },
-        })
-      )
+      return edit<MediaFile>(state, 'MediaFile', action.mediaFileId, file => ({
+        ...file,
+        flashcardFieldsToSubtitlesTracks: {
+          ...file.flashcardFieldsToSubtitlesTracks,
+          [action.flashcardFieldName]: action.subtitlesTrackId,
+        },
+      }))
 
     case A.SET_PROJECT_NAME:
-      return edit<ProjectFileRecord>(state, 'ProjectFile', action.id, file => ({
+      return edit<ProjectFile>(state, 'ProjectFile', action.id, file => ({
         ...file,
         name: action.name,
       }))
 
     case A.DELETE_MEDIA_FROM_PROJECT:
-      return edit<ProjectFileRecord>(
+      return edit<ProjectFile>(
         state,
         'ProjectFile',
         action.projectId,
@@ -137,4 +129,4 @@ const fileRecords: Reducer<FileRecordsState, Action> = (
   }
 }
 
-export default fileRecords
+export default files

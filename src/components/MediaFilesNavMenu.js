@@ -58,10 +58,14 @@ const MediaFileMenuItem = ({
     locateMediaFileRequest()
     closeMenu(e)
   }).current
-  const { loadedFile } = useSelector(state => ({
-    loadedFile: r.getLoadedFileById(state, 'MediaFile', mediaFile.id),
+  const { fileAvailability } = useSelector(state => ({
+    fileAvailability: r.getFileAvailabilityById(
+      state,
+      'MediaFile',
+      mediaFile.id
+    ),
   }))
-  const needsFilePath = !(loadedFile && loadedFile.filePath)
+  const needsFilePath = !(fileAvailability && fileAvailability.filePath)
   useEffect(
     () => {
       if (selected && submenu.anchorEl) submenu.anchorEl.scrollIntoView()
@@ -268,7 +272,7 @@ const mapStateToProps = state => ({
   currentFileName: r.getCurrentFileName(state),
   currentFileId: r.getCurrentFileId(state),
   currentProjectId: r.getCurrentProjectId(state),
-  projectMediaFiles: r.getCurrentProjectMediaFileRecords(state),
+  projectMediaFiles: r.getCurrentProjectMediaFiles(state),
 })
 
 const mapDispatchToProps = {

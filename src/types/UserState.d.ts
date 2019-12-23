@@ -21,5 +21,5 @@ declare type UserState = {
   currentMediaFileId: MediaFileId | null
   workIsUnsaved: boolean
   loopMedia: boolean
-  mediaIsLoading: boolean // should probably exist in loadedFiles state
+  mediaIsLoading: boolean // should probably exist in fileAvailabilities state
 }

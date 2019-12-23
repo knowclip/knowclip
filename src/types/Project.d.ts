@@ -60,7 +60,7 @@ declare type Project4_1_0 = {
   version: '4.1.0'
   id: ProjectId
   name: string
-  mediaFiles: Array<MediaFileRecord>
+  mediaFiles: Array<MediaFile>
   noteType: NoteType
   clips: Array<Clip>
   tags: Array<string> // maybe shouldnt be saved here

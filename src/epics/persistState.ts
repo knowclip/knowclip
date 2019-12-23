@@ -7,8 +7,11 @@ const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
     ofType(A.OPEN_PROJECT, A.SET_MEDIA_FOLDER_LOCATION),
     tap(() => {
       setLocalStorage('settings', JSON.stringify(state$.value.settings))
-      setLocalStorage('loadedFiles', JSON.stringify(state$.value.loadedFiles))
-      setLocalStorage('fileRecords', JSON.stringify(state$.value.fileRecords))
+      setLocalStorage(
+        'fileAvailabilities',
+        JSON.stringify(state$.value.fileAvailabilities)
+      )
+      setLocalStorage('files', JSON.stringify(state$.value.files))
     }),
     ignoreElements()
   )
