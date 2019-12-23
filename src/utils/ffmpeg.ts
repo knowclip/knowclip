@@ -43,57 +43,32 @@ export const getMediaMetadata = (path: string): Promise<FfprobeData> => {
   })
 }
 
-type Mxx = {
-  id: FileId
-
-  name: MediaFileName
-  durationSeconds: number
-  format: 'UNKNOWN' | string
-  isVideo: boolean
-  subtitlesTracksStreamIndexes: number[]
-}
-
-export const convertMediaMetadata = (
-  ffprobeMetadata: FfprobeData,
-  filePath: string,
-  id: string
-  // REMOVE THIS TYPE Mxx!!!!
-): Mxx => ({
-  id,
-  name: basename(filePath),
-  durationSeconds: ffprobeMetadata.format.duration || 0,
-  format: ffprobeMetadata.format.format_name || 'UNKNOWN_FORMAT',
-  isVideo:
-    ffprobeMetadata.format.format_name !== 'mp3' &&
-    ffprobeMetadata.streams.some(
-      ({ codec_type }) => codec_type && /video/i.test(codec_type)
-    ),
-  subtitlesTracksStreamIndexes: ffprobeMetadata.streams
-    .filter(stream => stream.codec_type === 'subtitle')
-    .map(stream => stream.index),
-})
-
 export const readMediaFileRecord = async (
   filePath: string,
   id: string,
   projectId: string,
-  subtitles: Array<string> | null,
-  flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks | null
+  subtitles: Array<string> = [],
+  flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): Promise<MediaFileRecord> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)
-  const metadata = convertMediaMetadata(ffprobeMetadata, filePath, id)
 
   return {
-    id: metadata.id,
+    id,
     type: 'MediaFile',
     parentId: projectId,
-    subtitles: subtitles || [],
-    flashcardFieldsToSubtitlesTracks: flashcardFieldsToSubtitlesTracks || {},
+    subtitles,
+    flashcardFieldsToSubtitlesTracks,
 
-    name: metadata.name,
-    durationSeconds: metadata.durationSeconds,
-    format: metadata.format,
-    isVideo: metadata.isVideo,
-    subtitlesTracksStreamIndexes: metadata.subtitlesTracksStreamIndexes,
+    name: basename(filePath),
+    durationSeconds: ffprobeMetadata.format.duration || 0,
+    format: ffprobeMetadata.format.format_name || 'UNKNOWN_FORMAT',
+    isVideo:
+      ffprobeMetadata.format.format_name !== 'mp3' &&
+      ffprobeMetadata.streams.some(
+        ({ codec_type }) => codec_type && /video/i.test(codec_type)
+      ),
+    subtitlesTracksStreamIndexes: ffprobeMetadata.streams
+      .filter(stream => stream.codec_type === 'subtitle')
+      .map(stream => stream.index),
   }
 }

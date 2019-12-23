@@ -1,4 +1,4 @@
-import { flatMap } from 'rxjs/operators'
+import { flatMap, mergeAll } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
 import { promisify } from 'util'
@@ -83,7 +83,7 @@ const exportMp3: AppEpic = (action$, state$) =>
         return of(exportFailureSnackbar(err))
       }
     }),
-    flatMap(x => x)
+    mergeAll()
   )
 
 export default combineEpics(exportCsv, exportMp3)

@@ -1,4 +1,4 @@
-import { ignoreElements, flatMap } from 'rxjs/operators'
+import { ignoreElements, mergeAll } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'
@@ -42,7 +42,7 @@ const closeEpic: AppEpic = (action$, state$) =>
       return await { type: 'QUIT_APP' }
     }
   }).pipe(
-    flatMap(x => x),
+    mergeAll(),
     ignoreElements()
   )
 

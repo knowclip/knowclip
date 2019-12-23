@@ -1,4 +1,4 @@
-import { flatMap, debounce, map, filter } from 'rxjs/operators'
+import { flatMap, debounce, map, filter, mergeAll } from 'rxjs/operators'
 import { timer, of, from, Observable } from 'rxjs'
 import { ofType, combineEpics, StateObservable } from 'redux-observable'
 import * as r from '../redux'
@@ -97,7 +97,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
         return await openProject(filePath, state$)
       }
     ),
-    flatMap(x => x)
+    mergeAll()
   )
 
 const saveProject: AppEpic = (action$, state$) =>
@@ -145,7 +145,7 @@ const saveProject: AppEpic = (action$, state$) =>
         )
       }
     }),
-    flatMap(x => x)
+    mergeAll()
   )
 
 const PROJECT_EDIT_ACTIONS = [
