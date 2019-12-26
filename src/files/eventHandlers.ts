@@ -3,7 +3,7 @@ export type FileEventHandlers<F extends FileMetadata> = {
   openSuccess: OpenFileSuccessHandler<F>[]
   locateRequest: LocateFileRequestHandler<F>
   locateSuccess: LocateFileSuccessHandler<F> | null
-  deleteRequest: DeleteFileRequestHandler<F> | null
+  deleteRequest: DeleteFileRequestHandler<F>[]
   deleteSuccess: DeleteFileSuccessHandler<F> | null
 }
 

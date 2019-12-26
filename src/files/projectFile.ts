@@ -49,6 +49,6 @@ export default {
   ],
 
   locateSuccess: null,
-  deleteRequest: null,
+  deleteRequest: [],
   deleteSuccess: null,
 } as FileEventHandlers<ProjectFile>

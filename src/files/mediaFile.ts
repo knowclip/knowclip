@@ -9,7 +9,7 @@ const streamIndexMatchesExistingTrack = (
   streamIndex: number
 ) => vttFile.parentType === 'MediaFile' && vttFile.streamIndex === streamIndex
 
-const addEmbeddedSubtitlesFiles: OpenFileSuccessHandler<MediaFile> = async (
+const addNewEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   {
     validatedFile: {
       subtitlesTracksStreamIndexes,
@@ -32,19 +32,18 @@ const addEmbeddedSubtitlesFiles: OpenFileSuccessHandler<MediaFile> = async (
           )
         )
     )
-    .map(
-      streamIndex =>
-        r.addAndOpenFile({
-          type: 'VttConvertedSubtitlesFile',
-          parentId: id,
-          id: uuid(),
-          streamIndex,
-          parentType: 'MediaFile',
-        })
-      // or load existing
+    .map(streamIndex =>
+      r.addAndOpenFile({
+        type: 'VttConvertedSubtitlesFile',
+        parentId: id,
+        id: uuid(),
+        streamIndex,
+        parentType: 'MediaFile',
+      })
     )
+
 const reloadRememberedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile: { subtitles: existingSubtitlesIds }, filePath },
+  { validatedFile: { subtitles: existingSubtitlesIds, name }, filePath },
   state,
   effects
 ) =>
@@ -55,7 +54,7 @@ const reloadRememberedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     const embeddedSubtitles = r.getFile(state, 'VttConvertedSubtitlesFile', id)
     if (embeddedSubtitles) return r.openFileRequest(embeddedSubtitles)
 
-    return ({ type: 'whoops couldnt find file' } as unknown) as Action
+    return r.simpleMessageSnackbar('Could not open subtitles file ' + name)
   })
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile, filePath },
@@ -117,7 +116,7 @@ export default {
   },
 
   openSuccess: [
-    addEmbeddedSubtitlesFiles,
+    addNewEmbeddedSubtitles,
     reloadRememberedSubtitles,
     getCbr,
     getWaveform,
@@ -127,7 +126,7 @@ export default {
     return [r.fileSelectionDialog(action.message, action.file)]
   },
   locateSuccess: null,
-  deleteRequest: null,
+  deleteRequest: [],
   deleteSuccess: null,
 } as FileEventHandlers<MediaFile>
 

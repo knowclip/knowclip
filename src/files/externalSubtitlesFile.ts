@@ -44,20 +44,22 @@ export default {
 
   locateSuccess: null,
 
-  deleteRequest: async (action, availability, state, effects) => {
-    const convertedVtt = r.getFile(
-      state,
-      'VttConvertedSubtitlesFile',
-      action.file.id
-    )
-    const deleteConvertedVtt = convertedVtt
-      ? [r.deleteFileRequest(convertedVtt)]
-      : []
-    return [
-      r.deleteSubtitlesTrack(action.file.id, action.file.parentId),
-      ...deleteConvertedVtt,
-    ]
-  },
+  deleteRequest: [
+    async (action, availability, state, effects) => {
+      const convertedVtt = r.getFile(
+        state,
+        'VttConvertedSubtitlesFile',
+        action.file.id
+      )
+      const deleteConvertedVtt = convertedVtt
+        ? [r.deleteFileRequest(convertedVtt)]
+        : []
+      return [
+        r.deleteSubtitlesTrack(action.file.id, action.file.parentId),
+        ...deleteConvertedVtt,
+      ]
+    },
+  ],
 
   deleteSuccess: null,
 } as FileEventHandlers<ExternalSubtitlesFile>
