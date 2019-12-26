@@ -282,17 +282,17 @@ declare type GoToSubtitlesChunk = {
 }
 
 declare type FileAction =
-  | AddAndLoadFile
+  | AddAndOpenFile
   | AddFile
   | DeleteFileRequest
   | DeleteFileSuccess
-  | LoadFileRequest
-  | LoadFileSuccess
-  | LoadFileFailure
+  | OpenFileRequest
+  | OpenFileSuccess
+  | OpenFileFailure
   | LocateFileRequest
   | LocateFileSuccess
-declare type AddAndLoadFile = {
-  type: 'ADD_AND_LOAD_FILE'
+declare type AddAndOpenFile = {
+  type: 'ADD_AND_OPEN_FILE'
   file: FileMetadata
   filePath: FilePath | null
 }
@@ -302,24 +302,24 @@ declare type AddFile = {
   filePath: FilePath | null
 }
 declare type DeleteFileRequest = {
-  type: 'DELETE_FILE_RECORD_REQUEST'
+  type: 'DELETE_FILE_REQUEST'
   file: FileMetadata
 }
 declare type DeleteFileSuccess = {
-  type: 'DELETE_FILE_RECORD_SUCCESS'
+  type: 'DELETE_FILE_SUCCESS'
   file: FileMetadata
 }
-declare type LoadFileRequest = {
-  type: 'LOAD_FILE_REQUEST'
+declare type OpenFileRequest = {
+  type: 'OPEN_FILE_REQUEST'
   file: FileMetadata
 }
-declare type LoadFileSuccess = {
-  type: 'LOAD_FILE_SUCCESS'
+declare type OpenFileSuccess = {
+  type: 'OPEN_FILE_SUCCESS'
   validatedFile: FileMetadata
   filePath: FilePath
 }
-declare type LoadFileFailure = {
-  type: 'LOAD_FILE_FAILURE'
+declare type OpenFileFailure = {
+  type: 'OPEN_FILE_FAILURE'
   file: FileMetadata
   filePath: FilePath | null
   errorMessage: string
@@ -339,8 +339,8 @@ interface WithRecordType<F extends FileMetadata> {
   file: F
 }
 
-type LoadFileSuccessWith<F extends FileMetadata> = Omit<
-  LoadFileSuccess,
+type OpenFileSuccessWith<F extends FileMetadata> = Omit<
+  OpenFileSuccess,
   'file'
 > &
   WithRecordType<F>

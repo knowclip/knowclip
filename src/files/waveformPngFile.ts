@@ -1,29 +1,29 @@
 import * as r from '../redux'
 import { empty } from 'rxjs'
 import {
-  LoadSuccessHandler,
-  LoadRequestHandler,
-  LocateRequestHandler,
+  OpenFileSuccessHandler,
+  OpenFileRequestHandler,
+  LocateFileRequestHandler,
   FileEventHandlers,
 } from './eventHandlers'
 
-export const loadRequest: LoadRequestHandler<WaveformPng> = async (
+export const loadRequest: OpenFileRequestHandler<WaveformPng> = async (
   file,
   filePath,
   state,
   effects
 ) => {
-  return [await r.loadFileSuccess(file, filePath)]
+  return [await r.openFileSuccess(file, filePath)]
 }
 
-export const loadSuccess: LoadSuccessHandler<WaveformPng> = (
+export const loadSuccess: OpenFileSuccessHandler<WaveformPng> = (
   file,
   filePath,
   state,
   effects
 ) => empty()
 
-export const locateRequest: LocateRequestHandler<WaveformPng> = async (
+export const locateRequest: LocateFileRequestHandler<WaveformPng> = async (
   { file },
   state,
   effects
@@ -31,7 +31,7 @@ export const locateRequest: LocateRequestHandler<WaveformPng> = async (
   try {
     const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-      return [r.loadFileFailure(file, null, 'You must first locate this file.')]
+      return [r.openFileFailure(file, null, 'You must first locate this file.')]
 
     const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
 
@@ -44,14 +44,14 @@ export const locateRequest: LocateRequestHandler<WaveformPng> = async (
         ]
       : []
   } catch (err) {
-    return [r.loadFileFailure(file, null, 'whoops couldnt make waveform image')]
+    return [r.openFileFailure(file, null, 'whoops couldnt make waveform image')]
   }
 }
 
 export default {
-  loadRequest,
-  loadSuccess,
-  loadFailure: null,
+  openRequest: loadRequest,
+  openSuccess: loadSuccess,
+  openFailure: null,
   locateRequest,
   locateSuccess: null,
 } as FileEventHandlers<WaveformPng>

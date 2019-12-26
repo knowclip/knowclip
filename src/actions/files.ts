@@ -1,8 +1,8 @@
-export const addAndLoadFile = <F extends FileMetadata>(
+export const addAndOpenFile = <F extends FileMetadata>(
   file: F,
   filePath?: FilePath
-): AddAndLoadFile => ({
-  type: A.ADD_AND_LOAD_FILE,
+): AddAndOpenFile => ({
+  type: A.ADD_AND_OPEN_FILE,
   file,
   filePath: filePath || null,
 })
@@ -17,31 +17,31 @@ export const addFile = <F extends FileMetadata>(
 })
 
 export const deleteFileRequest = (file: FileMetadata): DeleteFileRequest => ({
-  type: 'DELETE_FILE_RECORD_REQUEST',
+  type: 'DELETE_FILE_REQUEST',
   file,
 })
 export const deleteFileSuccess = (file: FileMetadata): DeleteFileSuccess => ({
-  type: 'DELETE_FILE_RECORD_SUCCESS',
+  type: 'DELETE_FILE_SUCCESS',
   file,
 })
-export const loadFileRequest = (file: FileMetadata): LoadFileRequest => ({
-  type: 'LOAD_FILE_REQUEST',
+export const openFileRequest = (file: FileMetadata): OpenFileRequest => ({
+  type: 'OPEN_FILE_REQUEST',
   file,
 })
-export const loadFileSuccess = (
+export const openFileSuccess = (
   file: FileMetadata,
   filePath: FilePath
-): LoadFileSuccess => ({
-  type: 'LOAD_FILE_SUCCESS',
+): OpenFileSuccess => ({
+  type: 'OPEN_FILE_SUCCESS',
   validatedFile: file,
   filePath,
 })
-export const loadFileFailure = (
+export const openFileFailure = (
   file: FileMetadata,
   filePath: FilePath | null,
   errorMessage: string
-): LoadFileFailure => ({
-  type: 'LOAD_FILE_FAILURE',
+): OpenFileFailure => ({
+  type: 'OPEN_FILE_FAILURE',
   file,
   filePath,
   errorMessage,

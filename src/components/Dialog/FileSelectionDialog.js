@@ -9,7 +9,7 @@ const FileSelectionDialog = ({
   open,
   closeDialog,
   onSubmit,
-  loadFileFailure,
+  openFileFailure,
   message,
   file,
 }) => (
@@ -19,7 +19,7 @@ const FileSelectionDialog = ({
         message={message}
         onSubmit={onSubmit}
         extensions={getExtensions(file)}
-        cancel={loadFileFailure}
+        cancel={openFileFailure}
       />
     </DialogContent>
   </Dialog>
@@ -31,9 +31,9 @@ const mapDispatchToProps = (dispatch, { file, closeDialog }) => ({
     dispatch(r.locateFileSuccess(file, path))
     closeDialog()
   },
-  loadFileFailure: () => {
+  openFileFailure: () => {
     dispatch(
-      r.loadFileFailure(file, null, 'File-locating action was canceled.')
+      r.openFileFailure(file, null, 'File-locating action was canceled.')
     )
     closeDialog()
   },

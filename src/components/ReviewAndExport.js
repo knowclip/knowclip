@@ -203,7 +203,7 @@ const Export = ({
   open,
   projectMedia,
   allProjectClipsIds,
-  loadFileRequest,
+  openFileRequest,
   currentMedia,
 }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
@@ -233,7 +233,7 @@ const Export = ({
   const onClickTable = index => {
     const mediaMetadata = projectMedia[index]
     if (mediaMetadata && mediaMetadata.id !== currentMedia.id)
-      loadFileRequest(mediaMetadata)
+      openFileRequest(mediaMetadata)
     setExpandedTableIndex(index)
   }
   // PaperProps={{ style: { minWidth: '600px', minHeight: '300px' } }}
@@ -347,7 +347,7 @@ const mapDispatchToProps = {
   exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
-  loadFileRequest: r.loadFileRequest,
+  openFileRequest: r.openFileRequest,
 }
 
 export default connect(

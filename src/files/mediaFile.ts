@@ -12,7 +12,7 @@ const streamIndexMatchesExistingTrack = (
 ) => vttFile.parentType === 'MediaFile' && vttFile.streamIndex === streamIndex
 
 export default {
-  loadRequest: async (file, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
@@ -25,14 +25,14 @@ export default {
         ? r.confirmationDialog(
             errorMessage +
               '\n\nAre you sure this is the file you want to open?',
-            r.loadFileSuccess(validatedFile, filePath),
-            r.loadFileFailure(file, filePath, `File was rejected: ${filePath}`)
+            r.openFileSuccess(validatedFile, filePath),
+            r.openFileFailure(file, filePath, `File was rejected: ${filePath}`)
           )
-        : r.loadFileSuccess(validatedFile, filePath),
+        : r.openFileSuccess(validatedFile, filePath),
     ]
   },
 
-  loadSuccess: (file, filePath, state, effects) => {
+  openSuccess: (file, filePath, state, effects) => {
     const {
       subtitlesTracksStreamIndexes,
       id,
@@ -51,7 +51,7 @@ export default {
             )
         )
         .map(streamIndex => {
-          return r.addAndLoadFile({
+          return r.addAndOpenFile({
             type: 'VttConvertedSubtitlesFile',
             parentId: id,
             id: uuid(),
@@ -65,20 +65,20 @@ export default {
     const reloadRememberedSubtitles = from(
       existingSubtitlesIds.map(id => {
         const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
-        if (externalSubtitles) return r.loadFileRequest(externalSubtitles)
+        if (externalSubtitles) return r.openFileRequest(externalSubtitles)
 
         const embeddedSubtitles = r.getFile(
           state,
           'VttConvertedSubtitlesFile',
           id
         )
-        if (embeddedSubtitles) return r.loadFileRequest(embeddedSubtitles)
+        if (embeddedSubtitles) return r.openFileRequest(embeddedSubtitles)
 
         return ({ type: 'whoops couldnt find file' } as unknown) as Action
       })
     )
     const getWaveform = of(
-      r.addAndLoadFile({
+      r.addAndOpenFile({
         type: 'WaveformPng',
         parentId: file.id,
         id: file.id,
@@ -90,7 +90,7 @@ export default {
           r.simpleMessageSnackbar(
             'Converting mp3 to a usable format. Please be patient!'
           ),
-          r.addAndLoadFile({
+          r.addAndOpenFile({
             type: 'ConstantBitrateMp3',
             id: file.id,
           }),
@@ -110,7 +110,7 @@ export default {
     return [r.fileSelectionDialog(action.message, action.file)]
   },
 
-  loadFailure: null,
+  openFailure: null,
   locateSuccess: null,
 } as FileEventHandlers<MediaFile>
 

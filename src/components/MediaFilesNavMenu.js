@@ -150,7 +150,7 @@ const MediaFilesNavMenu = ({
   addMediaToProjectRequest,
   currentProjectId,
   projectMediaFiles,
-  loadFileRequest,
+  openFileRequest,
   locateFileRequest,
   confirmationDialog,
   deleteMediaFromProjectRequest,
@@ -212,7 +212,7 @@ const MediaFilesNavMenu = ({
                       closeMenu={popover.close}
                       mediaFile={media}
                       selected={media.id === currentFileId}
-                      loadMediaFileRequest={() => loadFileRequest(media)}
+                      loadMediaFileRequest={() => openFileRequest(media)}
                       locateMediaFileRequest={() =>
                         locateFileRequest(
                           media,
@@ -278,7 +278,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   toggleLoop: r.toggleLoop,
   addMediaToProjectRequest: r.addMediaToProjectRequest,
-  loadFileRequest: r.loadFileRequest,
+  openFileRequest: r.openFileRequest,
   locateFileRequest: r.locateFileRequest,
   deleteMediaFromProjectRequest: r.deleteMediaFromProjectRequest,
   confirmationDialog: r.confirmationDialog,

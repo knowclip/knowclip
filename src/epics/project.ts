@@ -68,7 +68,7 @@ const openProjectById: AppEpic = (action$, state$) =>
       //     r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
       //   )
 
-      return r.loadFileRequest(project)
+      return r.openFileRequest(project)
     })
     // flatMap<Observable<Action>, Observable<Action>>(x => x)
   )
@@ -156,7 +156,7 @@ const PROJECT_EDIT_ACTIONS = [
   A.EDIT_CLIP,
   A.MERGE_CLIPS,
   A.DELETE_MEDIA_FROM_PROJECT,
-  A.ADD_AND_LOAD_FILE,
+  A.ADD_AND_OPEN_FILE,
   A.LOCATE_FILE_SUCCESS, //????
   // 'CREATED NEW PROJECT METADATA',
 ] as const
@@ -219,7 +219,7 @@ const autoSaveProject: AppEpic = (action$, state$) =>
 //       )
 
 //       return from([
-//         r.loadFileRequest(firstMediaFile),
+//         r.openFileRequest(firstMediaFile),
 //         r.setAllTags(tagsToClipIds),
 //       ])
 //     })

@@ -3,7 +3,7 @@ import { map, startWith, filter, switchMap } from 'rxjs/operators'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
-import { isLoadFileSuccess } from '../utils/files'
+import { isOpenFileSuccess } from '../utils/files'
 
 export const setCursor = (
   state: AppState,
@@ -40,10 +40,10 @@ export const setCursor = (
 
 const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    filter<Action, LoadFileSuccessWith<MediaFile>>(
-      isLoadFileSuccess('MediaFile')
+    filter<Action, OpenFileSuccessWith<MediaFile>>(
+      isOpenFileSuccess('MediaFile')
     ),
-    switchMap<LoadFileSuccessWith<MediaFile>, Observable<Action>>(() =>
+    switchMap<OpenFileSuccessWith<MediaFile>, Observable<Action>>(() =>
       fromEvent<Event>(
         document,
         'timeupdate',

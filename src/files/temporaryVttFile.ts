@@ -6,13 +6,13 @@ import {
   newEmbeddedSubtitlesTrack,
 } from '../utils/subtitles'
 import {
-  LoadRequestHandler,
-  LoadSuccessHandler,
-  LocateRequestHandler,
+  OpenFileRequestHandler,
+  OpenFileSuccessHandler,
+  LocateFileRequestHandler,
   FileEventHandlers,
 } from './eventHandlers'
 
-const loadRequest: LoadRequestHandler<VttConvertedSubtitlesFile> = async (
+const loadRequest: OpenFileRequestHandler<VttConvertedSubtitlesFile> = async (
   file,
   filePath,
   state,
@@ -25,7 +25,7 @@ const loadRequest: LoadRequestHandler<VttConvertedSubtitlesFile> = async (
   )
   if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
     return [
-      await r.loadFileFailure(file, null, 'You must first locate this file.'),
+      await r.openFileFailure(file, null, 'You must first locate this file.'),
     ]
 
   const vttFilePath = await effects.getSubtitlesFilePath(
@@ -34,10 +34,10 @@ const loadRequest: LoadRequestHandler<VttConvertedSubtitlesFile> = async (
     file
   )
 
-  return [r.loadFileSuccess(file, vttFilePath)]
+  return [r.openFileSuccess(file, vttFilePath)]
 }
 
-const loadSuccess: LoadSuccessHandler<VttConvertedSubtitlesFile> = (
+const loadSuccess: OpenFileSuccessHandler<VttConvertedSubtitlesFile> = (
   file,
   filePath,
   state,
@@ -78,11 +78,9 @@ const loadSuccess: LoadSuccessHandler<VttConvertedSubtitlesFile> = (
     })
   )
 }
-const locateRequest: LocateRequestHandler<VttConvertedSubtitlesFile> = async (
-  { file },
-  state,
-  effects
-) => {
+const locateRequest: LocateFileRequestHandler<
+  VttConvertedSubtitlesFile
+> = async ({ file }, state, effects) => {
   // if parent file/media track exists
   const source = r.getFileAvailabilityById(
     state,
@@ -133,9 +131,9 @@ const locateRequest: LocateRequestHandler<VttConvertedSubtitlesFile> = async (
 }
 
 export default {
-  loadRequest,
-  loadSuccess,
-  loadFailure: null,
+  openRequest: loadRequest,
+  openSuccess: loadSuccess,
+  openFailure: null,
   locateRequest,
   locateSuccess: null,
 } as FileEventHandlers<VttConvertedSubtitlesFile>

@@ -12,7 +12,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of, from } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
-import { isLoadFileSuccess } from '../utils/files'
+import { isOpenFileSuccess } from '../utils/files'
 import { setCursor } from './setWaveformCursor'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
@@ -158,8 +158,8 @@ const centerSelectedClip: AppEpic = (
 const LOOP_BUFFER = 25
 const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    filter<Action, LoadFileSuccessWith<MediaFile>>(
-      isLoadFileSuccess('MediaFile')
+    filter<Action, OpenFileSuccessWith<MediaFile>>(
+      isOpenFileSuccess('MediaFile')
     ),
     switchMap(() =>
       // @ts-ignore
@@ -187,7 +187,7 @@ const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
 
 const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
+    ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
     filter(({ file }) => file.type === 'MediaFile'),
     map(() => r.highlightClip(null))
   )

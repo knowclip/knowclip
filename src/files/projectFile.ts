@@ -9,13 +9,13 @@ import moment from 'moment'
 const { readFile } = promises
 
 export default {
-  loadRequest: async (file, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     return [
       // TODO: check differences/opened time
-      r.loadFileSuccess(file, filePath),
+      r.openFileSuccess(file, filePath),
     ]
   },
-  loadSuccess: (file, filePath, state, effects) => {
+  openSuccess: (file, filePath, state, effects) => {
     return from(readFile(filePath, 'utf8')).pipe(
       map(projectJson => parseProject(projectJson)),
       flatMap(project => {
@@ -29,7 +29,7 @@ export default {
         )
 
         const loadFirstMediaFile = project.mediaFiles.length
-          ? of(r.loadFileRequest(project.mediaFiles[0]))
+          ? of(r.openFileRequest(project.mediaFiles[0]))
           : empty()
 
         return merge(
@@ -48,7 +48,7 @@ export default {
       })
     )
   },
-  loadFailure: null,
+  openFailure: null,
   locateRequest: async ({ file }, state, effects) => [
     r.fileSelectionDialog(`Please locate this project file ${file.name}`, file),
   ],

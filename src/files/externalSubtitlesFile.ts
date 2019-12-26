@@ -8,11 +8,11 @@ import { extname } from 'path'
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
 export default {
-  loadRequest: async (file, filePath, state, effects) => [
-    r.loadFileSuccess(file, filePath),
+  openRequest: async (file, filePath, state, effects) => [
+    r.openFileSuccess(file, filePath),
   ],
 
-  loadSuccess: (file, filePath, state, effects) => {
+  openSuccess: (file, filePath, state, effects) => {
     if (isVtt(filePath)) {
       return from(effects.getSubtitlesFromFile(state, filePath)).pipe(
         map(chunks =>
@@ -29,7 +29,7 @@ export default {
       )
     } else {
       return of(
-        r.addAndLoadFile({
+        r.addAndOpenFile({
           type: 'VttConvertedSubtitlesFile',
           id: file.id,
           parentId: file.id, // not needed?
@@ -39,7 +39,7 @@ export default {
     }
   },
 
-  loadFailure: (file, filePath, errorMessage, state, effects) =>
+  openFailure: (file, filePath, errorMessage, state, effects) =>
     of(r.fileSelectionDialog(errorMessage, file)),
 
   locateRequest: async ({ file, message }, state, effects) => {

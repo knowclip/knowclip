@@ -16,7 +16,7 @@ export const getSubtitlesFile = (
   state.files.ExternalSubtitlesFile[id] ||
   null
 
-export const getSubtitlesLoadedFile = (state: AppState, id: string) => {
+export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
   const record = getSubtitlesFile(state, id)
 
   return record ? getFileAvailability(state, record) : null

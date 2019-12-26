@@ -72,7 +72,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     }
 
     // case A.CHOOSE_MEDIA_FILES:
-    case A.ADD_AND_LOAD_FILE:
+    case A.ADD_AND_OPEN_FILE:
       if (action.file.type === 'MediaFile')
         return {
           ...state,

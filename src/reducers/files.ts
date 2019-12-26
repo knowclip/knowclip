@@ -33,7 +33,7 @@ const edit = <F extends FileMetadata>(
 
 const files: Reducer<FilesState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case A.LOAD_FILE_SUCCESS:
+    case A.OPEN_FILE_SUCCESS:
       // same logic as just below
       return {
         ...state,
@@ -43,7 +43,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         },
       }
     case A.ADD_FILE:
-    case A.ADD_AND_LOAD_FILE:
+    case A.ADD_AND_OPEN_FILE:
     case A.LOCATE_FILE_SUCCESS: {
       const newState = {
         ...state,

@@ -12,10 +12,10 @@ import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
 import { FileEventHandlers } from '../files/eventHandlers'
 
-const addAndLoadFile: AppEpic = (action$, state$) =>
+const addAndOpenFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, AddAndLoadFile>(A.ADD_AND_LOAD_FILE),
-    map<AddAndLoadFile, Action>(({ file }) => r.loadFileRequest(file))
+    ofType<Action, AddAndOpenFile>(A.ADD_AND_OPEN_FILE),
+    map<AddAndOpenFile, Action>(({ file }) => r.openFileRequest(file))
   )
 
 const fileEventHandlers: Record<
@@ -32,10 +32,10 @@ const fileEventHandlers: Record<
   // },
 }
 
-const loadFileRequest: AppEpic = (action$, state$, effects) =>
+const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, LoadFileRequest>(A.LOAD_FILE_REQUEST),
-    flatMap<LoadFileRequest, Observable<Action>>(({ file }) => {
+    ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
+    flatMap<OpenFileRequest, Observable<Action>>(({ file }) => {
       const fileAvailability = r.getFileAvailability(state$.value, file) // rename
 
       if (
@@ -54,7 +54,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
 
       try {
         return flatten(
-          fileEventHandlers[file.type].loadRequest(
+          fileEventHandlers[file.type].openRequest(
             file,
             fileAvailability.filePath,
             state$.value,
@@ -63,7 +63,7 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
         )
       } catch (err) {
         return of(
-          r.loadFileFailure(
+          r.openFileFailure(
             file,
             fileAvailability ? fileAvailability.filePath : null,
             err.message || err.toString()
@@ -73,12 +73,12 @@ const loadFileRequest: AppEpic = (action$, state$, effects) =>
     })
   )
 
-const loadFileSuccess: AppEpic = (action$, state$, effects) =>
+const openFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, LoadFileSuccess>(A.LOAD_FILE_SUCCESS),
-    flatMap<LoadFileSuccess, Observable<Action>>(
+    ofType<Action, OpenFileSuccess>(A.OPEN_FILE_SUCCESS),
+    flatMap<OpenFileSuccess, Observable<Action>>(
       ({ validatedFile: file, filePath }) =>
-        fileEventHandlers[file.type].loadSuccess(
+        fileEventHandlers[file.type].openSuccess(
           file,
           filePath,
           state$.value,
@@ -87,12 +87,12 @@ const loadFileSuccess: AppEpic = (action$, state$, effects) =>
     )
   )
 
-const loadFileFailure: AppEpic = (action$, state$, effects) =>
+const openFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, LoadFileFailure>(A.LOAD_FILE_FAILURE),
-    flatMap<LoadFileFailure, Observable<Action>>(
+    ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
+    flatMap<OpenFileFailure, Observable<Action>>(
       ({ file, filePath, errorMessage }) => {
-        const hook = fileEventHandlers[file.type].loadFailure
+        const hook = fileEventHandlers[file.type].openFailure
 
         if (hook)
           return hook(file, filePath, errorMessage, state$.value, effects)
@@ -125,15 +125,15 @@ const locateFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileSuccess>(A.LOCATE_FILE_SUCCESS),
     map<LocateFileSuccess, Action>(({ file, filePath }) =>
-      r.loadFileRequest(file)
+      r.openFileRequest(file)
     )
   )
 
 export default combineEpics(
-  addAndLoadFile,
-  loadFileRequest,
-  loadFileSuccess,
-  loadFileFailure,
+  addAndOpenFile,
+  openFileRequest,
+  openFileSuccess,
+  openFileFailure,
   locateFileRequest,
   locateFileSuccess
 )

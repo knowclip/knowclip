@@ -44,7 +44,7 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
     case A.CLOSE_PROJECT:
       return initialState
 
-    case A.LOAD_FILE_REQUEST:
+    case A.OPEN_FILE_REQUEST:
       if (action.file.type === 'MediaFile')
         return {
           ...state,
@@ -172,7 +172,7 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         loopMedia: action.loop,
       }
 
-    case A.LOAD_FILE_SUCCESS: // temp
+    case A.OPEN_FILE_SUCCESS: // temp
       return action.validatedFile.type === 'MediaFile'
         ? {
             ...state,
@@ -180,7 +180,7 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
           }
         : state // what about cbr
 
-    case A.LOAD_FILE_FAILURE:
+    case A.OPEN_FILE_FAILURE:
       return action.file.type === 'MediaFile'
         ? {
             ...state,
