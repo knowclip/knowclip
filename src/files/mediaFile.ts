@@ -1,9 +1,7 @@
-import { of, merge, empty } from 'rxjs'
 import * as r from '../redux'
-import { from } from 'rxjs'
 import { basename } from 'path'
 import uuid from 'uuid'
-import { FileEventHandlers } from './eventHandlers'
+import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'
 
 const streamIndexMatchesExistingTrack = (
@@ -11,8 +9,94 @@ const streamIndexMatchesExistingTrack = (
   streamIndex: number
 ) => vttFile.parentType === 'MediaFile' && vttFile.streamIndex === streamIndex
 
+const addEmbeddedSubtitlesFiles: OpenFileSuccessHandler<MediaFile> = async (
+  {
+    validatedFile: {
+      subtitlesTracksStreamIndexes,
+      id,
+      subtitles: existingSubtitlesIds,
+    },
+    filePath,
+  },
+  state,
+  effects
+) =>
+  // TODO: clean up orphans?
+  subtitlesTracksStreamIndexes
+    .filter(
+      streamIndex =>
+        !existingSubtitlesIds.some(id =>
+          streamIndexMatchesExistingTrack(
+            state.files.VttConvertedSubtitlesFile[id],
+            streamIndex
+          )
+        )
+    )
+    .map(
+      streamIndex =>
+        r.addAndOpenFile({
+          type: 'VttConvertedSubtitlesFile',
+          parentId: id,
+          id: uuid(),
+          streamIndex,
+          parentType: 'MediaFile',
+        })
+      // or load existing
+    )
+const reloadRememberedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
+  { validatedFile: { subtitles: existingSubtitlesIds }, filePath },
+  state,
+  effects
+) =>
+  existingSubtitlesIds.map(id => {
+    const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
+    if (externalSubtitles) return r.openFileRequest(externalSubtitles)
+
+    const embeddedSubtitles = r.getFile(state, 'VttConvertedSubtitlesFile', id)
+    if (embeddedSubtitles) return r.openFileRequest(embeddedSubtitles)
+
+    return ({ type: 'whoops couldnt find file' } as unknown) as Action
+  })
+const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
+  { validatedFile, filePath },
+  state,
+  effects
+) => [
+  r.addAndOpenFile({
+    type: 'WaveformPng',
+    parentId: validatedFile.id,
+    id: validatedFile.id,
+  }),
+]
+
+const getCbr: OpenFileSuccessHandler<MediaFile> = async (
+  { validatedFile },
+  state,
+  effects
+) =>
+  validatedFile.format.toLowerCase().includes('mp3')
+    ? [
+        r.simpleMessageSnackbar(
+          'Converting mp3 to a usable format. Please be patient!'
+        ),
+        r.addAndOpenFile({
+          type: 'ConstantBitrateMp3',
+          id: validatedFile.id,
+        }),
+      ]
+    : []
+
+const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
+  action,
+  state,
+  effects
+) => {
+  const currentFileName = r.getCurrentFileName(state)
+  return [r.setDefaultTags(currentFileName ? [basename(currentFileName)] : [])]
+}
+
 export default {
-  openRequest: async (file, filePath, state, effects) => {
+  openRequest: async ({ file }, filePath, state, effects) => {
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
@@ -32,86 +116,19 @@ export default {
     ]
   },
 
-  openSuccess: (file, filePath, state, effects) => {
-    const {
-      subtitlesTracksStreamIndexes,
-      id,
-      subtitles: existingSubtitlesIds,
-    } = file
-    const addEmbeddedSubtitlesFiles = from(
-      // TODO: clean up orphans?
-      subtitlesTracksStreamIndexes
-        .filter(
-          streamIndex =>
-            !existingSubtitlesIds.some(id =>
-              streamIndexMatchesExistingTrack(
-                state.files.VttConvertedSubtitlesFile[id],
-                streamIndex
-              )
-            )
-        )
-        .map(streamIndex => {
-          return r.addAndOpenFile({
-            type: 'VttConvertedSubtitlesFile',
-            parentId: id,
-            id: uuid(),
-            streamIndex,
-            parentType: 'MediaFile',
-          })
-          // or load existing
-        })
-    )
-
-    const reloadRememberedSubtitles = from(
-      existingSubtitlesIds.map(id => {
-        const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
-        if (externalSubtitles) return r.openFileRequest(externalSubtitles)
-
-        const embeddedSubtitles = r.getFile(
-          state,
-          'VttConvertedSubtitlesFile',
-          id
-        )
-        if (embeddedSubtitles) return r.openFileRequest(embeddedSubtitles)
-
-        return ({ type: 'whoops couldnt find file' } as unknown) as Action
-      })
-    )
-    const getWaveform = of(
-      r.addAndOpenFile({
-        type: 'WaveformPng',
-        parentId: file.id,
-        id: file.id,
-      })
-    )
-    const fileName = r.getCurrentFileName(state)
-    const getCbr = file.format.toLowerCase().includes('mp3')
-      ? from([
-          r.simpleMessageSnackbar(
-            'Converting mp3 to a usable format. Please be patient!'
-          ),
-          r.addAndOpenFile({
-            type: 'ConstantBitrateMp3',
-            id: file.id,
-          }),
-        ])
-      : empty()
-
-    return merge(
-      addEmbeddedSubtitlesFiles,
-      reloadRememberedSubtitles,
-      getCbr,
-      getWaveform,
-
-      of(r.setDefaultTags(fileName ? [basename(fileName)] : []))
-    )
-  },
+  openSuccess: [
+    addEmbeddedSubtitlesFiles,
+    reloadRememberedSubtitles,
+    getCbr,
+    getWaveform,
+    setDefaultTags,
+  ],
   locateRequest: async (action, state, effects) => {
     return [r.fileSelectionDialog(action.message, action.file)]
   },
-
-  openFailure: null,
   locateSuccess: null,
+  deleteRequest: null,
+  deleteSuccess: null,
 } as FileEventHandlers<MediaFile>
 
 const validateMediaFile = async (

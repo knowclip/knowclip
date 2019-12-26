@@ -1,139 +1,119 @@
-import { map } from 'rxjs/operators'
 import * as r from '../redux'
-import { from } from 'rxjs'
 import {
   newExternalSubtitlesTrack,
   newEmbeddedSubtitlesTrack,
 } from '../utils/subtitles'
-import {
-  OpenFileRequestHandler,
-  OpenFileSuccessHandler,
-  LocateFileRequestHandler,
-  FileEventHandlers,
-} from './eventHandlers'
+import { FileEventHandlers } from './eventHandlers'
 
-const loadRequest: OpenFileRequestHandler<VttConvertedSubtitlesFile> = async (
-  file,
-  filePath,
-  state,
-  effects
-) => {
-  const parentFile = r.getFileAvailabilityById(
-    state,
-    file.parentType,
-    file.parentId
-  )
-  if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-    return [
-      await r.openFileFailure(file, null, 'You must first locate this file.'),
-    ]
-
-  const vttFilePath = await effects.getSubtitlesFilePath(
-    state,
-    parentFile.filePath,
-    file
-  )
-
-  return [r.openFileSuccess(file, vttFilePath)]
-}
-
-const loadSuccess: OpenFileSuccessHandler<VttConvertedSubtitlesFile> = (
-  file,
-  filePath,
-  state,
-  effects
-) => {
-  const sourceFile = r.getFileAvailabilityById(
-    state,
-    file.parentType,
-    file.parentId
-  ) as CurrentlyLoadedFile
-  return from(effects.getSubtitlesFromFile(state, filePath)).pipe(
-    map(chunks => {
-      if (file.parentType === 'MediaFile')
-        return r.addSubtitlesTrack(
-          newEmbeddedSubtitlesTrack(
-            file.id,
-            file.parentId,
-            chunks,
-            file.streamIndex,
-            filePath
-          )
-        )
-
-      const external = r.getFile(
-        state,
-        'ExternalSubtitlesFile',
-        file.parentId
-      ) as ExternalSubtitlesFile
-      return r.addSubtitlesTrack(
-        newExternalSubtitlesTrack(
-          file.id,
-          external.parentId,
-          chunks,
-          sourceFile.filePath,
-          filePath
-        )
-      )
-    })
-  )
-}
-const locateRequest: LocateFileRequestHandler<
-  VttConvertedSubtitlesFile
-> = async ({ file }, state, effects) => {
-  // if parent file/media track exists
-  const source = r.getFileAvailabilityById(
-    state,
-    file.parentType,
-    file.parentId
-  )
-  if (source && source.status === 'CURRENTLY_LOADED') {
-    //   try loading that again
-    const sourceRecord: MediaFile | ExternalSubtitlesFile | null = r.getFile(
+export default {
+  openRequest: async ({ file }, filePath, state, effects) => {
+    const parentFile = r.getFileAvailabilityById(
       state,
       file.parentType,
       file.parentId
     )
-    // how to prevent infinite loop?
-    if (!sourceRecord)
-      return [r.simpleMessageSnackbar('No source subtitles file ')]
+    if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
+      return [
+        await r.openFileFailure(file, null, 'You must first locate this file.'),
+      ]
 
-    switch (file.parentType) {
-      case 'MediaFile': {
-        return await Promise.all(
-          (sourceRecord as MediaFile).subtitlesTracksStreamIndexes.map(
-            async streamIndex => {
-              const tmpFilePath = await effects.getSubtitlesFilePath(
-                state,
-                source.filePath,
-                file
-              )
-              return r.locateFileSuccess(file, tmpFilePath)
-            }
+    const vttFilePath = await effects.getSubtitlesFilePath(
+      state,
+      parentFile.filePath,
+      file
+    )
+
+    return [r.openFileSuccess(file, vttFilePath)]
+  },
+  openSuccess: [
+    async ({ validatedFile, filePath }, state, effects) => {
+      const sourceFile = r.getFileAvailabilityById(
+        state,
+        validatedFile.parentType,
+        validatedFile.parentId
+      ) as CurrentlyLoadedFile
+      const chunks = await effects.getSubtitlesFromFile(state, filePath)
+      if (validatedFile.parentType === 'MediaFile')
+        return [
+          r.addSubtitlesTrack(
+            newEmbeddedSubtitlesTrack(
+              validatedFile.id,
+              validatedFile.parentId,
+              chunks,
+              validatedFile.streamIndex,
+              filePath
+            )
+          ),
+        ]
+
+      const external = r.getFile(
+        state,
+        'ExternalSubtitlesFile',
+        validatedFile.parentId
+      ) as ExternalSubtitlesFile
+      return [
+        r.addSubtitlesTrack(
+          newExternalSubtitlesTrack(
+            validatedFile.id,
+            external.parentId,
+            chunks,
+            sourceFile.filePath,
+            filePath
           )
-        )
+        ),
+      ]
+    },
+  ],
+
+  locateRequest: async ({ file }, state, effects) => {
+    const source = r.getFileAvailabilityById(
+      state,
+      file.parentType,
+      file.parentId
+    )
+    if (source && source.status === 'CURRENTLY_LOADED') {
+      const sourceFile: MediaFile | ExternalSubtitlesFile | null = r.getFile(
+        state,
+        file.parentType,
+        file.parentId
+      )
+      // TODO: investigate risk of infinite loop
+      if (!sourceFile)
+        return [r.simpleMessageSnackbar('No source subtitles file ')]
+
+      switch (file.parentType) {
+        case 'MediaFile': {
+          return await Promise.all(
+            (sourceFile as MediaFile).subtitlesTracksStreamIndexes.map(
+              async streamIndex => {
+                const tmpFilePath = await effects.getSubtitlesFilePath(
+                  state,
+                  source.filePath,
+                  file
+                )
+                return r.locateFileSuccess(file, tmpFilePath)
+              }
+            )
+          )
+        }
+        case 'ExternalSubtitlesFile':
+          const tmpFilePath = await effects.getSubtitlesFilePath(
+            state,
+            source.filePath,
+            file
+          )
+          return [r.locateFileSuccess(file, tmpFilePath)]
+        default:
+          //   delete file record, suggest retry?
+          return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
+
+        // else
       }
-      case 'ExternalSubtitlesFile':
-        const tmpFilePath = await effects.getSubtitlesFilePath(
-          state,
-          source.filePath,
-          file
-        )
-        return [r.locateFileSuccess(file, tmpFilePath)]
-      default:
-        //   delete file record, suggest retry?
-        return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
-
-      // else
     }
-  }
-  return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
-}
+    return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
+  },
 
-export default {
-  openRequest: loadRequest,
-  openSuccess: loadSuccess,
-  openFailure: null,
-  locateRequest,
   locateSuccess: null,
+  deleteRequest: null,
+  deleteSuccess: null,
 } as FileEventHandlers<VttConvertedSubtitlesFile>

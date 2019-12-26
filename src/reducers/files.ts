@@ -90,6 +90,23 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         })
       )
 
+    case A.DELETE_SUBTITLES_TRACK:
+      return edit<MediaFile>(state, 'MediaFile', action.mediaFileId, file => ({
+        ...file,
+        subtitles: file.subtitles.filter(id => id !== action.id),
+        flashcardFieldsToSubtitlesTracks: Object.entries(
+          file.flashcardFieldsToSubtitlesTracks
+        )
+          .filter(([fieldName, trackId]) => trackId !== action.id)
+          .reduce(
+            (all, [fieldName, trackId]) => {
+              all[fieldName as TransliterationFlashcardFieldName] = trackId
+              return all
+            },
+            {} as Partial<Record<TransliterationFlashcardFieldName, string>>
+          ),
+      }))
+
     case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
       return edit<MediaFile>(state, 'MediaFile', action.mediaFileId, file => ({
         ...file,

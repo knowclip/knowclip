@@ -1,4 +1,4 @@
-import { flatMap, map } from 'rxjs/operators'
+import { flatMap, map, mergeAll } from 'rxjs/operators'
 import { of, Observable, from } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
@@ -35,7 +35,8 @@ const fileEventHandlers: Record<
 const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
-    flatMap<OpenFileRequest, Observable<Action>>(({ file }) => {
+    flatMap<OpenFileRequest, Observable<Action>>(action => {
+      const { file } = action
       const fileAvailability = r.getFileAvailability(state$.value, file) // rename
 
       if (
@@ -53,14 +54,14 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         )
 
       try {
-        return flatten(
+        return from(
           fileEventHandlers[file.type].openRequest(
-            file,
+            action,
             fileAvailability.filePath,
             state$.value,
             effects
           )
-        )
+        ).pipe(mergeAll())
       } catch (err) {
         return of(
           r.openFileFailure(
@@ -76,15 +77,14 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 const openFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileSuccess>(A.OPEN_FILE_SUCCESS),
-    flatMap<OpenFileSuccess, Observable<Action>>(
-      ({ validatedFile: file, filePath }) =>
-        fileEventHandlers[file.type].openSuccess(
-          file,
-          filePath,
-          state$.value,
-          effects
+    flatMap(action =>
+      from(
+        fileEventHandlers[action.validatedFile.type].openSuccess.map(handler =>
+          from(handler(action, state$.value, effects)).pipe(mergeAll())
         )
-    )
+      )
+    ),
+    mergeAll()
   )
 
 const openFileFailure: AppEpic = (action$, state$, effects) =>
@@ -92,10 +92,10 @@ const openFileFailure: AppEpic = (action$, state$, effects) =>
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
     flatMap<OpenFileFailure, Observable<Action>>(
       ({ file, filePath, errorMessage }) => {
-        const hook = fileEventHandlers[file.type].openFailure
+        // const hook = fileEventHandlers[file.type].openFailure
 
-        if (hook)
-          return hook(file, filePath, errorMessage, state$.value, effects)
+        // if (hook)
+        //   return hook(file, filePath, errorMessage, state$.value, effects)
 
         return of(
           r.simpleMessageSnackbar('Could not load file: ' + errorMessage)

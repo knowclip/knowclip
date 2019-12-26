@@ -1,7 +1,5 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
-import { of, empty, from, merge } from 'rxjs'
-import { map, flatMap } from 'rxjs/operators'
 import parseProject from '../utils/parseProject'
 import { promises } from 'fs'
 import moment from 'moment'
@@ -9,48 +7,48 @@ import moment from 'moment'
 const { readFile } = promises
 
 export default {
-  openRequest: async (file, filePath, state, effects) => {
+  openRequest: async ({ file }, filePath, state, effects) => {
     return [
       // TODO: check differences/opened time
       r.openFileSuccess(file, filePath),
     ]
   },
-  openSuccess: (file, filePath, state, effects) => {
-    return from(readFile(filePath, 'utf8')).pipe(
-      map(projectJson => parseProject(projectJson)),
-      flatMap(project => {
-        if (!project)
-          return of(r.simpleMessageSnackbar('Could not open project'))
+  openSuccess: [
+    async ({ validatedFile, filePath }, state, effects) => {
+      const projectJson = await readFile(filePath, 'utf8')
+      const project = parseProject(projectJson)
 
-        const addNewMediaFiles = from(
-          project.mediaFiles
-            .filter(file => !r.getFile(state, 'MediaFile', file.id))
-            .map(file => r.addFile(file))
+      if (!project) return [r.simpleMessageSnackbar('Could not open project')]
+
+      const addNewMediaFiles = project.mediaFiles
+        .filter(
+          validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
+        .map(validatedFile => r.addFile(validatedFile))
 
-        const loadFirstMediaFile = project.mediaFiles.length
-          ? of(r.openFileRequest(project.mediaFiles[0]))
-          : empty()
+      const loadFirstMediaFile = project.mediaFiles.length
+        ? [r.openFileRequest(project.mediaFiles[0])]
+        : []
 
-        return merge(
-          of(
-            r.openProject(
-              file,
-              project.clips,
-              moment()
-                .utc()
-                .format()
-            )
-          ),
-          addNewMediaFiles,
-          loadFirstMediaFile
-        )
-      })
-    )
-  },
-  openFailure: null,
+      return [
+        r.openProject(
+          validatedFile,
+          project.clips,
+          moment()
+            .utc()
+            .format()
+        ),
+        ...addNewMediaFiles,
+        ...loadFirstMediaFile,
+      ]
+    },
+  ],
+
   locateRequest: async ({ file }, state, effects) => [
     r.fileSelectionDialog(`Please locate this project file ${file.name}`, file),
   ],
+
   locateSuccess: null,
+  deleteRequest: null,
+  deleteSuccess: null,
 } as FileEventHandlers<ProjectFile>
