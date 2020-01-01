@@ -59,6 +59,11 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
     }
 
+    case A.DELETE_FILE_SUCCESS: {
+      const { [action.file.id]: _, ...newSubstate } = state[action.file.type]
+      return { ...state, [action.file.type]: newSubstate }
+    }
+
     default:
       return state
   }

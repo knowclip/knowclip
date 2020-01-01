@@ -114,6 +114,6 @@ export default {
   },
 
   locateSuccess: null,
-  deleteRequest: [],
-  deleteSuccess: null,
+  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
+  deleteSuccess: [],
 } as FileEventHandlers<VttConvertedSubtitlesFile>

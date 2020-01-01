@@ -1,4 +1,3 @@
-import { addAndOpenFile } from './files'
 import moment from 'moment'
 
 export const createProject = (
@@ -6,25 +5,24 @@ export const createProject = (
   name: string,
   noteType: NoteType,
   filePath: string
-) =>
-  addAndOpenFile(
-    {
-      type: 'ProjectFile',
-      id,
-      name,
-      noteType,
-      mediaFileIds: [],
-      error: null,
-      lastOpened: moment()
-        .utc()
-        .format(),
-      lastSaved: moment()
-        .utc()
-        .format(),
-    },
-    filePath
-  )
-
+): CreateProject => ({
+  type: 'CREATE_PROJECT',
+  project: {
+    type: 'ProjectFile',
+    id,
+    name,
+    noteType,
+    mediaFileIds: [],
+    error: null,
+    lastOpened: moment()
+      .utc()
+      .format(),
+    lastSaved: moment()
+      .utc()
+      .format(),
+  },
+  filePath,
+})
 export const openProjectByFilePath = (filePath: string): Action => ({
   type: A.OPEN_PROJECT_REQUEST_BY_FILE_PATH,
   filePath,
@@ -44,11 +42,6 @@ export const openProject = (
   project,
   clips,
   now,
-})
-
-export const removeProjectFromRecents = (id: ProjectId): Action => ({
-  type: A.REMOVE_PROJECT_FROM_RECENTS,
-  id,
 })
 
 export const closeProject = (): Action => ({
@@ -72,15 +65,6 @@ export const addMediaToProjectRequest = (
   type: A.ADD_MEDIA_TO_PROJECT_REQUEST,
   projectId,
   filePaths,
-})
-
-export const deleteMediaFromProjectRequest = (
-  projectId: ProjectId,
-  mediaFileId: MediaFileId
-): Action => ({
-  type: A.DELETE_MEDIA_FROM_PROJECT_REQUEST,
-  projectId,
-  mediaFileId,
 })
 
 export const deleteMediaFromProject = (

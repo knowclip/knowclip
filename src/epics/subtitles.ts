@@ -138,7 +138,7 @@ const deleteSubtitlesTrack: AppEpic = (action$, state$, dependencies) =>
       if (!file)
         return r.simpleMessageSnackbar('Could not delete subtitles track.')
 
-      return r.deleteFileRequest(file)
+      return r.deleteFileRequest(file.type, file.id)
     })
   )
 

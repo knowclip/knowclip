@@ -27,11 +27,15 @@ export default {
         : []
     } catch (err) {
       return [
-        r.openFileFailure(file, null, 'whoops couldnt make waveform image'),
+        r.openFileFailure(
+          file,
+          null,
+          'Problem making waveform image: ' + (err.message || err.toString())
+        ),
       ]
     }
   },
   locateSuccess: null,
-  deleteRequest: [],
-  deleteSuccess: null,
+  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
+  deleteSuccess: [],
 } as FileEventHandlers<WaveformPng>

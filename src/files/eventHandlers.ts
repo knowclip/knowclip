@@ -4,7 +4,7 @@ export type FileEventHandlers<F extends FileMetadata> = {
   locateRequest: LocateFileRequestHandler<F>
   locateSuccess: LocateFileSuccessHandler<F> | null
   deleteRequest: DeleteFileRequestHandler<F>[]
-  deleteSuccess: DeleteFileSuccessHandler<F> | null
+  deleteSuccess: DeleteFileSuccessHandler<F>[]
 }
 
 export type OpenFileRequestHandler<F extends FileMetadata> = (
@@ -41,8 +41,7 @@ export type LocateFileSuccessHandler<F extends FileMetadata> = (
 ) => Promise<Array<Action>>
 
 export type DeleteFileRequestHandler<F extends FileMetadata> = (
-  action: DeleteFileRequest & { file: F },
-  fileAvailability: CurrentlyLoadedFile | NotCurrentlyLoadedFile & { file: F },
+  file: F,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>

@@ -51,6 +51,9 @@ declare type MediaFile = {
   isVideo: boolean
   subtitlesTracksStreamIndexes: number[]
 }
+
+declare type SubtitlesFile = ExternalSubtitlesFile | VttConvertedSubtitlesFile
+
 declare type ExternalSubtitlesFile = {
   type: 'ExternalSubtitlesFile'
   id: FileId

@@ -120,7 +120,7 @@ export const deleteAllCurrentFileClipsRequest = (): DeleteAllCurrentFileClipsReq
 
 export const setAllTags = (tagsToClipIds: {
   [tag: string]: Array<ClipId>
-}): Action => ({
+}): SetAllTags => ({
   type: A.SET_ALL_TAGS,
   tagsToClipIds,
 })

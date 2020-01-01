@@ -301,24 +301,25 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.DELETE_MEDIA_FROM_PROJECT: {
-      const clipIds = state.idsByMediaFileId[action.mediaFileId] || []
+    case A.DELETE_FILE_SUCCESS: {
+      if (action.file.type === 'MediaFile') {
+        const clipIds = state.idsByMediaFileId[action.file.id] || []
 
-      const byId = { ...state.byId }
-      clipIds.forEach(id => {
-        delete byId[id]
-      })
+        const byId = { ...state.byId }
+        clipIds.forEach(id => {
+          delete byId[id]
+        })
 
-      const idsByMediaFileId = { ...state.idsByMediaFileId }
-      delete idsByMediaFileId[action.mediaFileId]
+        const idsByMediaFileId = { ...state.idsByMediaFileId }
+        delete idsByMediaFileId[action.file.id]
 
-      return {
-        ...state,
-        byId,
-        idsByMediaFileId,
-      }
+        return {
+          ...state,
+          byId,
+          idsByMediaFileId,
+        }
+      } else return state
     }
-
     default:
       return state
   }

@@ -41,7 +41,7 @@ export const loadSubtitlesFromFileRequest = (
     filePath
   )
 
-export const deleteSubtitlesTrack = (
+export const deleteSubtitlesTrackFromMedia = (
   id: SubtitlesTrackId,
   mediaFileId: MediaFileId
 ): DeleteSubtitlesTrack => ({

@@ -1,7 +1,11 @@
 import * as r from '../redux'
 import { basename } from 'path'
 import uuid from 'uuid'
-import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
+import {
+  FileEventHandlers,
+  OpenFileSuccessHandler,
+  DeleteFileSuccessHandler,
+} from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'
 
 const streamIndexMatchesExistingTrack = (
@@ -94,6 +98,37 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
   return [r.setDefaultTags(currentFileName ? [basename(currentFileName)] : [])]
 }
 
+const deleteExternalSubtitles: DeleteFileSuccessHandler<MediaFile> = async (
+  { file },
+  state,
+  effects
+) =>
+  file.subtitles
+    .map(id => r.getSourceSubtitlesFile(state, id))
+    .filter(
+      (file): file is ExternalSubtitlesFile | VttConvertedSubtitlesFile =>
+        file !== null
+    )
+    .map(file => r.deleteFileRequest(file.type, file.id))
+
+const deleteCbr: DeleteFileSuccessHandler<MediaFile> = async (
+  { file },
+  state,
+  effects
+) => {
+  const cbrFile = r.getFile(state, 'ConstantBitrateMp3', file.id)
+  return cbrFile ? [r.deleteFileRequest('ConstantBitrateMp3', cbrFile.id)] : []
+}
+
+const deleteWaveform: DeleteFileSuccessHandler<MediaFile> = async (
+  { file },
+  state,
+  effects
+) => {
+  const waveformPng = r.getFile(state, 'WaveformPng', file.id)
+  return waveformPng ? [r.deleteFileRequest('WaveformPng', waveformPng.id)] : []
+}
+
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
     effects.pauseMedia()
@@ -126,8 +161,8 @@ export default {
     return [r.fileSelectionDialog(action.message, action.file)]
   },
   locateSuccess: null,
-  deleteRequest: [],
-  deleteSuccess: null,
+  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
+  deleteSuccess: [deleteExternalSubtitles, deleteCbr, deleteWaveform],
 } as FileEventHandlers<MediaFile>
 
 const validateMediaFile = async (

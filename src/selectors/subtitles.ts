@@ -16,6 +16,14 @@ export const getSubtitlesFile = (
   state.files.ExternalSubtitlesFile[id] ||
   null
 
+export const getSourceSubtitlesFile = (
+  state: AppState,
+  id: string
+): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
+  state.files.ExternalSubtitlesFile[id] ||
+  state.files.VttConvertedSubtitlesFile[id] ||
+  null
+
 export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
   const record = getSubtitlesFile(state, id)
 

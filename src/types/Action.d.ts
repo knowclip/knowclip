@@ -116,10 +116,10 @@ type EnqueueSnackbar = {
 type CloseSnackbar = { type: 'CLOSE_SNACKBAR' }
 
 declare type ProjectAction =
+  | CreateProject
   | OpenProjectRequestById
   | OpenProjectRequestByFilePath
   | OpenProject
-  | RemoveProjectFromRecents
   | SetProjectError
   | SetProjectName
   | CloseProject
@@ -133,7 +133,11 @@ declare type ProjectAction =
   | ExportMarkdown
   | ExportCsv
   | SetWorkIsUnsaved
-
+declare type CreateProject = {
+  type: 'CREATE_PROJECT'
+  project: ProjectFile
+  filePath: FilePath
+}
 declare type OpenProjectRequestById = {
   type: 'OPEN_PROJECT_REQUEST_BY_ID'
   id: ProjectId
@@ -147,10 +151,6 @@ declare type OpenProject = {
   project: ProjectFile
   clips: Clip[]
   now: string
-}
-declare type RemoveProjectFromRecents = {
-  type: 'REMOVE_PROJECT_FROM_RECENTS'
-  id: ProjectId
 }
 declare type SetProjectError = {
   type: 'SET_PROJECT_ERROR'
@@ -195,7 +195,6 @@ declare type SetWorkIsUnsaved = {
 
 declare type MediaAction =
   | AddMediaToProjectRequest
-  | DeleteMediaFromProjectRequest
   | DeleteMediaFromProject
   | RemoveMediaFiles
   | SetCurrentFile
@@ -206,11 +205,6 @@ declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
   filePaths: Array<MediaFilePath>
-}
-declare type DeleteMediaFromProjectRequest = {
-  type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST'
-  projectId: ProjectId
-  mediaFileId: MediaFileId
 }
 declare type DeleteMediaFromProject = {
   type: 'DELETE_MEDIA_FROM_PROJECT'
@@ -303,7 +297,8 @@ declare type AddFile = {
 }
 declare type DeleteFileRequest = {
   type: 'DELETE_FILE_REQUEST'
-  file: FileMetadata
+  fileType: FileMetadata['type']
+  id: FileId
 }
 declare type DeleteFileSuccess = {
   type: 'DELETE_FILE_SUCCESS'

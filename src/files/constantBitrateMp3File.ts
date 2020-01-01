@@ -9,6 +9,7 @@ export default {
 
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => [
+      // TODO: don't generate extras, break up big PNGs
       r.addAndOpenFile({
         type: 'WaveformPng',
         parentId: validatedFile.id,

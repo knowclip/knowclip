@@ -16,9 +16,13 @@ export const addFile = <F extends FileMetadata>(
   filePath: filePath || null,
 })
 
-export const deleteFileRequest = (file: FileMetadata): DeleteFileRequest => ({
+export const deleteFileRequest = (
+  fileType: FileMetadata['type'],
+  id: FileId
+): DeleteFileRequest => ({
   type: 'DELETE_FILE_REQUEST',
-  file,
+  fileType,
+  id,
 })
 export const deleteFileSuccess = (file: FileMetadata): DeleteFileSuccess => ({
   type: 'DELETE_FILE_SUCCESS',

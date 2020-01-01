@@ -1,7 +1,13 @@
 import { createSelector } from 'reselect'
 import { getSecondsAtX } from './waveformTime'
 import * as mediaSelectors from './media'
+import * as projectSelectors from './media'
 import formatTime from '../utils/formatTime'
+import getAllTagsFromClips from '../utils/getAllTags'
+// import { getClips } from '.'
+
+import { getSourceSubtitlesFile } from './subtitles'
+import moment from 'moment'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 5
@@ -217,4 +223,37 @@ export const getMediaFolderLocation = (state: AppState): string | null =>
 export const getAllTags = (state: AppState): Array<string> => {
   const tags = Object.keys(state.user.tagsToClipIds)
   return tags.reduce((a, b) => a.concat(b), [] as Array<string>)
+}
+
+export const getProject = (
+  state: AppState,
+  file: ProjectFile
+): Project4_1_0 => {
+  const mediaFiles = mediaSelectors.getProjectMediaFiles(state, file.id)
+  return {
+    version: '4.1.0',
+    timestamp: moment.utc().format(),
+    name: file.name,
+    id: file.id,
+    noteType: file.noteType,
+    lastOpened: file.lastOpened,
+    mediaFiles,
+    tags: [...getAllTagsFromClips(state.clips.byId)],
+    clips: mediaFiles.reduce(
+      (clips, { id }) => [...clips, ...getClips(state, id)],
+      [] as Clip[]
+    ),
+    subtitles: mediaFiles.reduce(
+      (subtitlesFiles, { id, subtitles }) => [
+        ...subtitlesFiles,
+        ...subtitles
+          .map(id => getSourceSubtitlesFile(state, id))
+          .filter(
+            (file): file is ExternalSubtitlesFile =>
+              Boolean(file && file.type === 'ExternalSubtitlesFile')
+          ),
+      ],
+      [] as ExternalSubtitlesFile[]
+    ),
+  }
 }

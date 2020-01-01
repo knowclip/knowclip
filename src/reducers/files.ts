@@ -1,5 +1,4 @@
 import { Reducer } from 'redux'
-import deleteKey from '../utils/deleteKey'
 
 export const initialState: FilesState = {
   ProjectFile: {},
@@ -135,11 +134,10 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         })
       )
 
-    case A.REMOVE_PROJECT_FROM_RECENTS:
-      return {
-        ...state,
-        ProjectFile: deleteKey(state.ProjectFile, action.id),
-      }
+    case A.DELETE_FILE_SUCCESS: {
+      const { [action.file.id]: _, ...newSubstate } = state[action.file.type]
+      return { ...state, [action.file.type]: newSubstate }
+    }
 
     default:
       return state

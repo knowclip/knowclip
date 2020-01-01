@@ -46,12 +46,12 @@ const SubtitlesMenu = ({
   subtitlesClipsDialogRequest,
   currentFileId,
 }) => {
-  const { anchorEl, open, close, isOpen } = usePopover()
+  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
 
   return (
     <Fragment>
       <Tooltip title="Subtitles">
-        <IconButton buttonRef={anchorEl} onClick={open}>
+        <IconButton buttonRef={anchorCallbackRef} onClick={open}>
           <SubtitlesIcon />
         </IconButton>
       </Tooltip>

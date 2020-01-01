@@ -66,7 +66,7 @@ declare type Project4_1_0 = {
   tags: Array<string> // maybe shouldnt be saved here
   timestamp: string
   lastOpened: string
-  subtitles: Array<SubtitlesTrack>
+  subtitles: Array<ExternalSubtitlesFile>
 }
 
 declare type ProjectExport = {

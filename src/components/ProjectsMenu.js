@@ -127,12 +127,13 @@ const mapStateToProps = state => ({
   projects: r.getProjects(state),
   currentProjectId: r.getCurrentProjectId(state),
 })
-
+const removeProjectFromRecents = projectId =>
+  r.deleteFileRequest('ProjectFile', projectId)
 const mapDispatchToProps = {
   openProjectByFilePath: r.openProjectByFilePath,
   openProjectById: r.openProjectById,
   newProjectFormDialog: r.newProjectFormDialog,
-  removeProjectFromRecents: r.removeProjectFromRecents,
+  removeProjectFromRecents: removeProjectFromRecents,
 }
 
 export default connect(

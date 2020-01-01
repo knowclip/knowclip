@@ -1,29 +1,8 @@
 import moment from 'moment'
-import getAllTags from '../utils/getAllTags'
-import { getClips } from '.'
-import { getProjectMediaFiles } from './media'
+// import { getProjectMediaFiles } from './media'
 import { getFile, getFileAvailabilityById } from './files'
 import { extname } from 'path'
 import { createSelector } from 'reselect'
-
-export const getProject = (
-  state: AppState,
-  file: ProjectFile
-): Project4_1_0 => ({
-  version: '4.1.0',
-  timestamp: moment.utc().format(),
-  name: file.name,
-  id: file.id,
-  noteType: file.noteType,
-  lastOpened: file.lastOpened,
-  mediaFiles: getProjectMediaFiles(state, file.id),
-  tags: [...getAllTags(state.clips.byId)],
-  clips: getProjectMediaFiles(state, file.id).reduce(
-    (clips, { id }) => [...clips, ...getClips(state, id)],
-    [] as Clip[]
-  ),
-  subtitles: [],
-})
 
 const newestToOldest = (
   { lastOpened: a }: ProjectFile,

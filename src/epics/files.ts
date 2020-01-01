@@ -1,5 +1,5 @@
 import { flatMap, map, mergeAll } from 'rxjs/operators'
-import { of, Observable, from } from 'rxjs'
+import { of, Observable, from, empty } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { existsSync } from 'fs'
@@ -37,7 +37,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
     flatMap<OpenFileRequest, Observable<Action>>(action => {
       const { file } = action
-      const fileAvailability = r.getFileAvailability(state$.value, file) // rename
+      const fileAvailability = r.getFileAvailability(state$.value, file)
 
       if (
         !fileAvailability ||
@@ -129,11 +129,50 @@ const locateFileSuccess: AppEpic = (action$, state$, effects) =>
     )
   )
 
+const deleteFileRequest: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType<Action, DeleteFileRequest>(A.DELETE_FILE_REQUEST),
+    flatMap(({ fileType, id }) => {
+      const file = r.getFile(state$.value, fileType, id)
+
+      // return file
+      //   ? from(
+      //       fileEventHandlers[fileType].deleteRequest.map(handler =>
+      //         from(handler(file, state$.value, effects)).pipe(mergeAll())
+      //       )
+      //     )
+      //   : empty
+
+      return file
+        ? from(
+            fileEventHandlers[fileType].deleteRequest.flatMap(handler =>
+              from(handler(file, state$.value, effects)).pipe(mergeAll())
+            )
+          )
+        : empty()
+    }),
+    mergeAll()
+  )
+
+const deleteFileSuccess: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType<Action, DeleteFileSuccess>(A.DELETE_FILE_SUCCESS),
+    flatMap(action =>
+      from(
+        fileEventHandlers[action.file.type].deleteSuccess.flatMap(handler =>
+          from(handler(action, state$.value, effects)).pipe(mergeAll())
+        )
+      )
+    ),
+    mergeAll()
+  )
 export default combineEpics(
   addAndOpenFile,
   openFileRequest,
   openFileSuccess,
   openFileFailure,
   locateFileRequest,
-  locateFileSuccess
+  locateFileSuccess,
+  deleteFileRequest,
+  deleteFileSuccess
 )

@@ -32,6 +32,7 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         ? {
             ...state,
             currentMediaFileId: null,
+            highlightedClipId: null,
           }
         : state
 

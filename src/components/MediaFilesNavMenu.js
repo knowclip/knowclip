@@ -153,7 +153,7 @@ const MediaFilesNavMenu = ({
   openFileRequest,
   locateFileRequest,
   confirmationDialog,
-  deleteMediaFromProjectRequest,
+  deleteMediaFromProject,
 }) => {
   const chooseMediaFiles = useCallback(
     async () => {
@@ -222,10 +222,7 @@ const MediaFilesNavMenu = ({
                       deleteMediaFile={() =>
                         confirmationDialog(
                           CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
-                          r.deleteMediaFromProjectRequest(
-                            currentProjectId,
-                            media.id
-                          )
+                          r.deleteMediaFromProject(currentProjectId, media.id)
                         )
                       }
                     />
@@ -280,7 +277,7 @@ const mapDispatchToProps = {
   addMediaToProjectRequest: r.addMediaToProjectRequest,
   openFileRequest: r.openFileRequest,
   locateFileRequest: r.locateFileRequest,
-  deleteMediaFromProjectRequest: r.deleteMediaFromProjectRequest,
+  deleteMediaFromProject: r.deleteMediaFromProject,
   confirmationDialog: r.confirmationDialog,
 }
 
