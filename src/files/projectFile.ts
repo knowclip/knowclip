@@ -32,25 +32,7 @@ export default {
             !r.getFile(state, subtitlesFile.type, subtitlesFile.id)
         )
         .map(file => r.addFile(file))
-      // .map(track =>
-      //   r.addFile(
-      //     track.type === 'EmbeddedSubtitlesTrack'
-      //       ? ({
-      //           id: track.id,
-      //           type: 'VttConvertedSubtitlesFile',
-      //           parentId: track.mediaFileId,
-      //           streamIndex: track.streamIndex,
-      //           parentType: 'MediaFile',
-      //         } as VttConvertedSubtitlesFile)
-      //       : ({
-      //           id: track.id,
-      //           type: 'ExternalSubtitlesFile',
-      //           parentId: track.mediaFileId,
-      //           name: basename(track.filePath),
-      //         } as ExternalSubtitlesFile)
-      //   )
-      // )
-      console.log({ addNewSubtitlesFiles })
+
       const loadFirstMediaFile = project.mediaFiles.length
         ? [r.openFileRequest(project.mediaFiles[0])]
         : []

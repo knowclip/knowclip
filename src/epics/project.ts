@@ -123,9 +123,6 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
         if (projectIdFromRecents)
           return from([r.openProjectById(projectIdFromRecents)])
 
-        // if (!fs.existsSync(filePath))
-        //   return of(r.simpleMessageSnackbar('Could not find project file.'))
-
         return await addAndOpenProject(filePath, state$)
       }
     ),

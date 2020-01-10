@@ -92,11 +92,6 @@ const openFileFailure: AppEpic = (action$, state$, effects) =>
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
     flatMap<OpenFileFailure, Observable<Action>>(
       ({ file, filePath, errorMessage }) => {
-        // const hook = fileEventHandlers[file.type].openFailure
-
-        // if (hook)
-        //   return hook(file, filePath, errorMessage, state$.value, effects)
-
         return of(
           r.simpleMessageSnackbar('Could not load file: ' + errorMessage)
         )
@@ -134,14 +129,6 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
     ofType<Action, DeleteFileRequest>(A.DELETE_FILE_REQUEST),
     flatMap(({ fileType, id }) => {
       const file = r.getFile(state$.value, fileType, id)
-
-      // return file
-      //   ? from(
-      //       fileEventHandlers[fileType].deleteRequest.map(handler =>
-      //         from(handler(file, state$.value, effects)).pipe(mergeAll())
-      //       )
-      //     )
-      //   : empty
 
       return file
         ? from(

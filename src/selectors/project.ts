@@ -1,5 +1,4 @@
 import moment from 'moment'
-// import { getProjectMediaFiles } from './media'
 import { getFile, getFileAvailabilityById } from './files'
 import { extname } from 'path'
 import { createSelector } from 'reselect'

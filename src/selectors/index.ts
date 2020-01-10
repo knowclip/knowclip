@@ -3,7 +3,6 @@ import { getSecondsAtX } from './waveformTime'
 import * as mediaSelectors from './media'
 import formatTime from '../utils/formatTime'
 import getAllTagsFromClips from '../utils/getAllTags'
-// import { getClips } from '.'
 
 import { getSourceSubtitlesFile } from './subtitles'
 import moment from 'moment'
