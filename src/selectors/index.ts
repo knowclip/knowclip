@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect'
 import { getSecondsAtX } from './waveformTime'
 import * as mediaSelectors from './media'
-import * as projectSelectors from './media'
 import formatTime from '../utils/formatTime'
 import getAllTagsFromClips from '../utils/getAllTags'
 // import { getClips } from '.'

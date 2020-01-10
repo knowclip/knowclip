@@ -45,7 +45,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "lint": "eslint src",
+    "lint": "eslint src/**/*.{ts,tsx,js}",
     "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.{js,ts,tsx}\"",
     "format:write": "yarn format --write",
     "build-electron:mac": "NODE_ENV=production electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icons/icon.icns --prune=true --out=release-builds",

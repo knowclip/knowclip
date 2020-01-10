@@ -1,11 +1,7 @@
 import * as r from '../redux'
 import { basename } from 'path'
 import uuid from 'uuid'
-import {
-  FileEventHandlers,
-  OpenFileSuccessHandler,
-  DeleteFileSuccessHandler,
-} from './eventHandlers'
+import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'
 
 const streamIndexMatchesExistingTrack = (
@@ -98,19 +94,6 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
   const currentFileName = r.getCurrentFileName(state)
   return [r.setDefaultTags(currentFileName ? [basename(currentFileName)] : [])]
 }
-
-const deleteExternalSubtitles: DeleteFileSuccessHandler<MediaFile> = async (
-  { file },
-  state,
-  effects
-) =>
-  file.subtitles
-    .map(id => r.getSourceSubtitlesFile(state, id))
-    .filter(
-      (file): file is ExternalSubtitlesFile | VttConvertedSubtitlesFile =>
-        file !== null
-    )
-    .map(file => r.deleteFileRequest(file.type, file.id))
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
