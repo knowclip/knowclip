@@ -66,6 +66,7 @@ export default {
             .format()
         ),
         ...loadFirstMediaFile,
+        ...persistFiles(state, effects.setLocalStorage),
       ]
     },
   ],
@@ -77,11 +78,27 @@ export default {
     ),
   ],
 
-  locateSuccess: null,
+  locateSuccess: async (action, state, { setLocalStorage }) =>
+    persistFiles(state, setLocalStorage),
   deleteRequest: [
     async (file, descendants, state, effects) => [
       r.deleteFileSuccess(file, descendants),
     ],
   ],
-  deleteSuccess: [],
+  deleteSuccess: [
+    async (action, state, { setLocalStorage }) =>
+      persistFiles(state, setLocalStorage),
+  ],
 } as FileEventHandlers<ProjectFile>
+
+function persistFiles(
+  state: AppState,
+  setLocalStorage: (arg0: string, arg1: string) => void
+) {
+  setLocalStorage('files', JSON.stringify(state.files))
+  setLocalStorage(
+    'fileAvailabilities',
+    JSON.stringify(state.fileAvailabilities)
+  )
+  return []
+}
