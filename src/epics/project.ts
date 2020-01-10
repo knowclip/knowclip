@@ -6,6 +6,8 @@ import {
   mergeAll,
   switchMap,
   catchError,
+  ignoreElements,
+  tap,
 } from 'rxjs/operators'
 import { timer, of, from, Observable, empty } from 'rxjs'
 import { ofType, combineEpics, StateObservable } from 'redux-observable'
@@ -193,7 +195,6 @@ const PROJECT_EDIT_ACTIONS = [
   A.DELETE_FILE_SUCCESS, // ???
   A.ADD_AND_OPEN_FILE,
   A.LOCATE_FILE_SUCCESS, // ????
-  // 'CREATED NEW PROJECT METADATA',
 ] as const
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
@@ -224,66 +225,6 @@ const autoSaveProject: AppEpic = (action$, state$) =>
     })
   )
 
-// const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType<Action, OpenProject>(A.OPEN_PROJECT),
-//     flatMap(({ file, project }) => {
-//       if (!file.mediaFiles.length)
-//         return of(({
-//           type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
-//         } as unknown) as Action)
-
-//       const [firstMediaFile] = project.mediaFiles
-
-//       const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
-//         (a, b) => a.concat(b),
-//         []
-//       )
-
-//       const tagsToClipIds: { [tag: string]: ClipId[] } = clips.reduce(
-//         (tagsToIds, clipId) => {
-//           const clip = r.getClip(state$.value, clipId)
-//           if (clip)
-//             clip.flashcard.tags.forEach(tag => {
-//               tagsToIds[tag] = (tagsToIds[tag] || []) as string[]
-//               tagsToIds[tag].push(clip.id)
-//             })
-//           return tagsToIds
-//         },
-//         {} as { [tag: string]: ClipId[] }
-//       )
-
-//       return from([
-//         r.openFileRequest(firstMediaFile),
-//         r.setAllTags(tagsToClipIds),
-//       ])
-//     })
-//   )
-
-// ^ above more recently commented
-
-// const openProjectOnCreate: AppEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType<Action, CreateProject>(A.CREATE_PROJECT),
-//     flatMap(async ({ file }) => {
-//       try {
-//         const json = JSON.stringify(
-//           r.getProject(state$.value, file),
-//           null,
-//           2
-//         )
-//         await writeFile(file, json, 'utf8')
-
-//         return await r.openProjectById(file.id)
-//       } catch (err) {
-//         console.error(err)
-//         return await r.simpleMessageSnackbar(
-//           `Could not create project file: ${err.message}`
-//         )
-//       }
-//     })
-//   )
-
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, DeleteMediaFromProject>(A.DELETE_MEDIA_FROM_PROJECT),
@@ -293,7 +234,7 @@ const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
     })
   )
 
-const closeProject: AppEpic = (action$, state$) =>
+const closeProjectRequest: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType(A.CLOSE_PROJECT_REQUEST),
     map(() => {
@@ -306,6 +247,15 @@ const closeProject: AppEpic = (action$, state$) =>
     })
   )
 
+const closeProject: AppEpic = (action$, state$, { getCurrentWindow }) =>
+  action$.pipe(
+    ofType(A.CLOSE_PROJECT),
+    tap(() => {
+      getCurrentWindow().reload()
+    }),
+    ignoreElements()
+  )
+
 export default combineEpics(
   createProject,
   openProjectByFilePath,
@@ -313,8 +263,7 @@ export default combineEpics(
   saveProject,
   registerUnsavedWork,
   autoSaveProject,
-  // openMediaFileRequestOnOpenProject,
-  // openProjectOnCreate,
   deleteMediaFileFromProject,
+  closeProjectRequest,
   closeProject
 )
