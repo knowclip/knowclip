@@ -25,7 +25,6 @@ export default {
           validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
         .map(validatedFile => r.addFile(validatedFile))
-      console.log('subbies', project.subtitles)
       const addNewSubtitlesFiles = project.subtitles
         .filter(
           subtitlesFile =>

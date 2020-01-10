@@ -5,7 +5,7 @@ import {
   blankTransliterationFields,
 } from '../utils/newFlashcard'
 import { getCurrentMediaFile } from './project'
-import { getFileAvailability } from './files'
+import { getFileAvailability, getFile } from './files'
 import { createSelector } from 'reselect'
 
 export const getSubtitlesFile = (
@@ -58,7 +58,17 @@ export const getEmbeddedSubtitlesTracks = (
 
 export const getExternalSubtitlesTracks = (
   state: AppState
-): Array<ExternalSubtitlesTrack> => getSubtitlesTracks(state).filter(isExternal)
+): Array<{ track: ExternalSubtitlesTrack; file: ExternalSubtitlesFile }> =>
+  getSubtitlesTracks(state)
+    .filter(isExternal)
+    .map(track => ({
+      track,
+      file: getFile(
+        state,
+        'ExternalSubtitlesFile',
+        track.id
+      ) as ExternalSubtitlesFile,
+    }))
 
 export const readVttChunk = (
   state: AppState,

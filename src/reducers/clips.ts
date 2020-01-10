@@ -71,7 +71,6 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    // case A.CHOOSE_MEDIA_FILES:
     case A.ADD_AND_OPEN_FILE:
       if (action.file.type === 'MediaFile')
         return {
@@ -81,6 +80,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
           },
         }
       return state
+
     case A.REMOVE_MEDIA_FILES:
       return {
         ...state,

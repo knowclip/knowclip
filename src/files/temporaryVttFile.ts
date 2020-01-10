@@ -66,51 +66,49 @@ export default {
   ],
 
   locateRequest: async ({ file }, state, effects) => {
-    const source = r.getFileAvailabilityById(
-      state,
-      file.parentType,
-      file.parentId
-    )
-    if (source && source.status === 'CURRENTLY_LOADED') {
-      const sourceFile: MediaFile | ExternalSubtitlesFile | null = r.getFile(
+    try {
+      const source = r.getFileAvailabilityById(
         state,
         file.parentType,
         file.parentId
       )
-      // TODO: investigate risk of infinite loop
-      if (!sourceFile)
-        return [r.simpleMessageSnackbar('No source subtitles file ')]
+      if (source && source.status === 'CURRENTLY_LOADED') {
+        const sourceFile: MediaFile | ExternalSubtitlesFile | null = r.getFile(
+          state,
+          file.parentType,
+          file.parentId
+        )
+        // TODO: investigate risk of infinite loop
+        if (!sourceFile)
+          return [r.simpleMessageSnackbar('No source subtitles file ')]
 
-      switch (file.parentType) {
-        case 'MediaFile': {
-          return await Promise.all(
-            (sourceFile as MediaFile).subtitlesTracksStreamIndexes.map(
-              async streamIndex => {
-                const tmpFilePath = await effects.getSubtitlesFilePath(
-                  state,
-                  source.filePath,
-                  file
-                )
-                return r.locateFileSuccess(file, tmpFilePath)
-              }
+        switch (file.parentType) {
+          case 'MediaFile': {
+            return await Promise.all(
+              (sourceFile as MediaFile).subtitlesTracksStreamIndexes.map(
+                async streamIndex => {
+                  const tmpFilePath = await effects.getSubtitlesFilePath(
+                    state,
+                    source.filePath,
+                    file
+                  )
+                  return r.locateFileSuccess(file, tmpFilePath)
+                }
+              )
             )
-          )
+          }
+          case 'ExternalSubtitlesFile':
+            const tmpFilePath = await effects.getSubtitlesFilePath(
+              state,
+              source.filePath,
+              file
+            )
+            return [r.locateFileSuccess(file, tmpFilePath)]
         }
-        case 'ExternalSubtitlesFile':
-          const tmpFilePath = await effects.getSubtitlesFilePath(
-            state,
-            source.filePath,
-            file
-          )
-          return [r.locateFileSuccess(file, tmpFilePath)]
-        default:
-          //   delete file record, suggest retry?
-          return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
-
-        // else
       }
+    } catch (err) {
+      return [r.openFileFailure(file, null, err.message)]
     }
-    return [r.simpleMessageSnackbar('Whoops no valid boop source??')]
   },
 
   locateSuccess: null,

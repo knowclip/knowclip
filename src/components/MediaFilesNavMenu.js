@@ -99,11 +99,6 @@ const MediaFileMenuItem = ({
       >
         {truncate(mediaFile.name, 40)}
       </ListItemText>
-      {needsFilePath ? (
-        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
-      ) : (
-        actionsButton
-      )}
       <Menu
         open={submenu.isOpen}
         anchorEl={submenu.anchorEl}
@@ -137,6 +132,11 @@ const MediaFileMenuItem = ({
           </MenuItem>
         </MenuList>
       </Menu>
+      {needsFilePath ? (
+        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
+      ) : (
+        actionsButton
+      )}
     </MenuItem>
   )
 }
@@ -209,6 +209,7 @@ const MediaFilesNavMenu = ({
                 <MenuList style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
                   {projectMediaFiles.map(media => (
                     <MediaFileMenuItem
+                      key={media.id}
                       closeMenu={popover.close}
                       mediaFile={media}
                       selected={media.id === currentFileId}

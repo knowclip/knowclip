@@ -19,7 +19,6 @@ export default function getStore() {
   })
 
   const persistedState = getPersistedState()
-  console.log('persisted state', persistedState)
 
   const { settings: persistedSettings } = persistedState
   const state: Partial<AppState> = {

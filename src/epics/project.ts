@@ -98,15 +98,8 @@ const openProjectById: AppEpic = (action$, state$) =>
       if (!project)
         return r.simpleMessageSnackbar(`Could not find project ${id}.`)
 
-      // const { filePath } = project
-      // if (!filePath)
-      //   return of(
-      //     r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
-      //   )
-
       return r.openFileRequest(project)
     })
-    // flatMap<Observable<Action>, Observable<Action>>(x => x)
   )
 
 const openProjectByFilePath: AppEpic = (action$, state$) =>
