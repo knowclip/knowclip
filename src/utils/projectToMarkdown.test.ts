@@ -1,6 +1,7 @@
 import projectToMarkdown from './projectToMarkdown'
 import reducer from '../reducers'
 import newClip from '../utils/newClip'
+import { initialState } from '../reducers/files'
 
 describe('projectToMarkdown', () => {
   const baseState = reducer(undefined, { type: '@@INIT' })
@@ -8,11 +9,16 @@ describe('projectToMarkdown', () => {
 
   const noteType = 'Transliteration'
   const newClipWithCard = (
-    id,
-    start,
-    end,
-    [transcription, pronunciation, meaning, notes],
-    tags
+    id: string,
+    start: number,
+    end: number,
+    [transcription, pronunciation, meaning, notes]: [
+      string,
+      string,
+      string,
+      string
+    ],
+    tags: string[]
   ) =>
     newClip(
       { start, end },
@@ -27,34 +33,36 @@ describe('projectToMarkdown', () => {
       tags
     )
 
-  const projectMetadata = {
+  const projectMetadata: ProjectFile = {
     error: null,
+    type: 'ProjectFile',
     id: 'xxx',
-    filePath: '/xxx.afca',
     name: 'Basic Japanese',
+    lastSaved: '2015-11-16T09:44:45Z',
+    lastOpened: '2015-11-16T09:44:45Z',
+
     noteType: 'Transliteration',
-    mediaFilePaths: [
-      {
-        filePath: '/xxx.mp4',
-        constantBitrateFilePath: '/xxx.mp4',
-        error: null,
-        metadata: {
+    mediaFileIds: [mediaFileId],
+  }
+
+  const state: AppState = {
+    ...baseState,
+    files: {
+      ...initialState,
+      ProjectFile: { [projectMetadata.id]: projectMetadata },
+      MediaFile: {
+        [mediaFileId]: {
           durationSeconds: 60,
           format: 'mp4 xxx xxx',
           isVideo: true,
           id: mediaFileId,
           name: 'Eetto',
+          type: 'MediaFile',
+          parentId: projectMetadata.id,
+          subtitles: [],
+          flashcardFieldsToSubtitlesTracks: {},
+          subtitlesTracksStreamIndexes: [],
         },
-      },
-    ],
-  }
-
-  const state = {
-    ...baseState,
-    projects: {
-      allIds: [projectMetadata.id],
-      byId: {
-        [projectMetadata.id]: projectMetadata,
       },
     },
     clips: {
@@ -133,47 +141,3 @@ describe('projectToMarkdown', () => {
     )
   })
 })
-
-// import * as r from '../redux'
-// import formatTime from '../utils/formatTime'
-
-// const flatten = [(a, b) => a.concat(b), []]
-
-// const projectToMarkdown = (
-//   state: AppState,
-//   projectId: ProjectId,
-//   noteType: NoteType
-// ): string => {
-//   const projectMetadata = r.getProjectMetadata(state, projectId)
-//   if (!projectMetadata) throw new Error('Could not find project')
-
-//   const mediaMetadata = r.getProjectMediaMetadata(state, projectId)
-
-//   return ([
-//     `#${projectMetadata.name}`,
-//     ...mediaMetadata
-//       .map(metadata => {
-//         return [
-//           `##${metadata.name}`,
-//           ...r
-//             .getClips(state, metadata.id)
-//             .map(clip => {
-//               const clipTime = r.getClipTime(state, clip.id) || {}
-//               return [
-//                 clipTime
-//                   ? `${formatTime(clipTime.start)} - ${formatTime(
-//                       clipTime.end
-//                     )}`
-//                   : '',
-//                 ...noteType.fields.map(f => clip.flashcard.fields[f.id]),
-//               ]
-//             })
-//             .reduce(...flatten)
-//             .map(rawString => rawString.replace('\n', '  \n')),
-//         ]
-//       })
-//       .reduce(...flatten),
-//   ]: Array<string>).join('\n')
-// }
-
-// export default projectToMarkdown
