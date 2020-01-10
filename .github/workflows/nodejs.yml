@@ -23,7 +23,7 @@ jobs:
         yarn format --list-different
         yarn lint
         yarn tsc
-        yarn build
+        CI=0 yarn build
         yarn test
       env:
         CI: true
