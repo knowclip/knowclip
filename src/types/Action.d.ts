@@ -8,6 +8,7 @@ declare type Action =
   | ProjectAction
   | MediaAction
   | SubtitlesAction
+  | FileAction
   | DetectSilence
   | DetectSilenceRequest
   | DeleteAllCurrentFileClipsRequest
@@ -72,18 +73,12 @@ declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
 
 declare type WaveformAction =
-  | SetWaveformImagePath
   | SetCursorPosition
   | SetWaveformViewBox
   | SetPendingClip
   | ClearPendingClip
   | SetPendingStretch
   | ClearPendingStretch
-  | WaveformMousedown
-declare type SetWaveformImagePath = {
-  type: 'SET_WAVEFORM_IMAGE_PATH'
-  path: string | null
-}
 declare type SetCursorPosition = {
   type: 'SET_CURSOR_POSITION'
   x: number
@@ -104,10 +99,6 @@ declare type SetPendingStretch = {
 declare type ClearPendingStretch = {
   type: 'CLEAR_PENDING_STRETCH'
 }
-declare type WaveformMousedown = {
-  type: 'WAVEFORM_MOUSEDOWN'
-  x: number
-}
 
 declare type DialogAction = EnqueueDialog | CloseDialog
 type EnqueueDialog = {
@@ -125,11 +116,10 @@ type EnqueueSnackbar = {
 type CloseSnackbar = { type: 'CLOSE_SNACKBAR' }
 
 declare type ProjectAction =
+  | CreateProject
   | OpenProjectRequestById
   | OpenProjectRequestByFilePath
   | OpenProject
-  | CreateProject
-  | RemoveProjectFromRecents
   | SetProjectError
   | SetProjectName
   | CloseProject
@@ -143,7 +133,11 @@ declare type ProjectAction =
   | ExportMarkdown
   | ExportCsv
   | SetWorkIsUnsaved
-
+declare type CreateProject = {
+  type: 'CREATE_PROJECT'
+  project: ProjectFile
+  filePath: FilePath
+}
 declare type OpenProjectRequestById = {
   type: 'OPEN_PROJECT_REQUEST_BY_ID'
   id: ProjectId
@@ -154,16 +148,9 @@ declare type OpenProjectRequestByFilePath = {
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
-  project: Project4_0_0
-  projectMetadata: ProjectMetadata
-}
-declare type CreateProject = {
-  type: 'CREATE_PROJECT'
-  projectMetadata: ProjectMetadata
-}
-declare type RemoveProjectFromRecents = {
-  type: 'REMOVE_PROJECT_FROM_RECENTS'
-  id: ProjectId
+  project: ProjectFile
+  clips: Clip[]
+  now: string
 }
 declare type SetProjectError = {
   type: 'SET_PROJECT_ERROR'
@@ -207,58 +194,17 @@ declare type SetWorkIsUnsaved = {
 }
 
 declare type MediaAction =
-  | OpenMediaFileRequest
-  | OpenMediaFileSuccess
-  | OpenMp3Request
-  | OpenMediaFileFailure
   | AddMediaToProjectRequest
-  | AddMediaToProject
-  | DeleteMediaFromProjectRequest
   | DeleteMediaFromProject
-  | LocateMediaFileRequest
-  | LocateMediaFileSuccess
-  | ChooseMediaFiles
   | RemoveMediaFiles
   | SetCurrentFile
   | ToggleLoop
   | SetLoop
   | SetMediaFolderLocation
-
-declare type OpenMediaFileRequest = {
-  type: 'OPEN_MEDIA_FILE_REQUEST'
-  id: MediaFileId
-}
-declare type OpenMediaFileSuccess = {
-  type: 'OPEN_MEDIA_FILE_SUCCESS'
-  filePath: MediaFilePath
-  constantBitrateFilePath: MediaFilePath
-  metadata: MediaFileMetadata
-  projectId: ProjectId
-  subtitlesTracksStreamIndexes: Array<number>
-}
-declare type OpenMediaFileFailure = {
-  type: 'OPEN_MEDIA_FILE_FAILURE'
-  errorMessage: string
-}
-declare type OpenMp3Request = {
-  type: 'OPEN_MP3_REQUEST'
-  id: MediaFileId
-  filePath: MediaFilePath
-}
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
   filePaths: Array<MediaFilePath>
-}
-declare type AddMediaToProject = {
-  type: 'ADD_MEDIA_TO_PROJECT'
-  projectId: ProjectId
-  mediaFilePaths: Array<AudioMetadataAndPath>
-}
-declare type DeleteMediaFromProjectRequest = {
-  type: 'DELETE_MEDIA_FROM_PROJECT_REQUEST'
-  projectId: ProjectId
-  mediaFileId: MediaFileId
 }
 declare type DeleteMediaFromProject = {
   type: 'DELETE_MEDIA_FROM_PROJECT'
@@ -266,25 +212,6 @@ declare type DeleteMediaFromProject = {
   mediaFileId: MediaFileId
 }
 
-declare type LocateMediaFileRequest = {
-  type: 'LOCATE_MEDIA_FILE_REQUEST'
-  id: MediaFileId
-  filePath: MediaFilePath
-}
-declare type LocateMediaFileSuccess = {
-  type: 'LOCATE_MEDIA_FILE_SUCCESS'
-  projectId: ProjectId
-  id: MediaFileId
-  metadata: MediaFileMetadata
-  filePath: MediaFilePath
-}
-
-declare type ChooseMediaFiles = {
-  type: 'CHOOSE_MEDIA_FILES'
-  filePaths: Array<MediaFilePath>
-  ids: Array<MediaFileId>
-  noteTypeId: NoteTypeId
-}
 declare type RemoveMediaFiles = { type: 'REMOVE_MEDIA_FILES' }
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
@@ -295,11 +222,7 @@ declare type SetMediaFolderLocation = {
 }
 
 declare type SubtitlesAction =
-  | LoadSubtitlesFromVideoRequest
-  | LoadSubtitlesFromFileRequest
-  | LoadExternalSubtitlesSuccess
-  | LoadEmbeddedSubtitlesSuccess
-  | LoadSubtitlesFailure
+  | AddSubtitlesTrack
   | DeleteSubtitlesTrack
   | ShowSubtitles
   | HideSubtitles
@@ -307,32 +230,30 @@ declare type SubtitlesAction =
   | ShowSubtitlesClipsDialogRequest
   | LinkFlashcardFieldToSubtitlesTrack
   | GoToSubtitlesChunk
-declare type LoadSubtitlesFromVideoRequest = {
-  type: 'LOAD_SUBTITLES_FROM_VIDEO_REQUEST'
-  streamIndex: number
-}
-declare type LoadSubtitlesFromFileRequest = {
-  type: 'LOAD_SUBTITLES_FROM_FILE_REQUEST'
-  filePath: SubtitlesFilePath
-}
-declare type LoadExternalSubtitlesSuccess = {
-  type: 'LOAD_EXTERNAL_SUBTITLES_SUCCESS'
-  subtitlesTracks: Array<ExternalSubtitlesTrack>
-}
-declare type LoadEmbeddedSubtitlesSuccess = {
-  type: 'LOAD_EMBEDDED_SUBTITLES_SUCCESS'
-  subtitlesTracks: Array<EmbeddedSubtitlesTrack>
-}
+
 declare type LoadSubtitlesFailure = {
   type: 'LOAD_SUBTITLES_FAILURE'
   error: string
 }
+declare type AddSubtitlesTrack = {
+  type: 'ADD_SUBTITLES_TRACK'
+  track: SubtitlesTrack
+}
 declare type DeleteSubtitlesTrack = {
   type: 'DELETE_SUBTITLES_TRACK'
+  mediaFileId: MediaFileId
   id: SubtitlesTrackId
 }
-declare type ShowSubtitles = { type: 'SHOW_SUBTITLES'; id: SubtitlesTrackId }
-declare type HideSubtitles = { type: 'HIDE_SUBTITLES'; id: SubtitlesTrackId }
+declare type ShowSubtitles = {
+  type: 'SHOW_SUBTITLES'
+  mediaFileId: MediaFileId
+  id: SubtitlesTrackId
+}
+declare type HideSubtitles = {
+  type: 'HIDE_SUBTITLES'
+  mediaFileId: MediaFileId
+  id: SubtitlesTrackId
+}
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId
@@ -344,11 +265,78 @@ declare type ShowSubtitlesClipsDialogRequest = {
 }
 declare type LinkFlashcardFieldToSubtitlesTrack = {
   type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK'
+  mediaFileId: MediaFileId
   flashcardFieldName: FlashcardFieldName
-  subtitlesTrackId: SubtitlesTrackId
+  subtitlesTrackId: SubtitlesTrackId | null
 }
 declare type GoToSubtitlesChunk = {
   type: 'GO_TO_SUBTITLES_CHUNK'
   subtitlesTrackId: SubtitlesTrackId
   chunkIndex: number
 }
+
+declare type FileAction =
+  | AddAndOpenFile
+  | AddFile
+  | DeleteFileRequest
+  | DeleteFileSuccess
+  | OpenFileRequest
+  | OpenFileSuccess
+  | OpenFileFailure
+  | LocateFileRequest
+  | LocateFileSuccess
+declare type AddAndOpenFile = {
+  type: 'ADD_AND_OPEN_FILE'
+  file: FileMetadata
+  filePath: FilePath | null
+}
+declare type AddFile = {
+  type: 'ADD_FILE'
+  file: FileMetadata
+  filePath: FilePath | null
+}
+declare type DeleteFileRequest = {
+  type: 'DELETE_FILE_REQUEST'
+  fileType: FileMetadata['type']
+  id: FileId
+}
+declare type DeleteFileSuccess = {
+  type: 'DELETE_FILE_SUCCESS'
+  file: FileMetadata
+  descendants: Array<FileMetadata>
+}
+declare type OpenFileRequest = {
+  type: 'OPEN_FILE_REQUEST'
+  file: FileMetadata
+}
+declare type OpenFileSuccess = {
+  type: 'OPEN_FILE_SUCCESS'
+  validatedFile: FileMetadata
+  filePath: FilePath
+}
+declare type OpenFileFailure = {
+  type: 'OPEN_FILE_FAILURE'
+  file: FileMetadata
+  filePath: FilePath | null
+  errorMessage: string
+}
+declare type LocateFileRequest = {
+  type: 'LOCATE_FILE_REQUEST'
+  file: FileMetadata
+  message: string
+}
+declare type LocateFileSuccess = {
+  type: 'LOCATE_FILE_SUCCESS'
+  file: FileMetadata
+  filePath: FilePath
+}
+
+interface WithRecordType<F extends FileMetadata> {
+  file: F
+}
+
+type OpenFileSuccessWith<F extends FileMetadata> = Omit<
+  OpenFileSuccess,
+  'file'
+> &
+  WithRecordType<F>

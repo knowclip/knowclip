@@ -14,7 +14,7 @@ class ProjectMenu extends Component {
   startEditing = e =>
     this.setState(
       {
-        text: this.props.projectMetadata.name,
+        text: this.props.projectFile.name,
         editing: true,
       },
       () => this.input.focus()
@@ -24,9 +24,9 @@ class ProjectMenu extends Component {
 
   submit = () => {
     const text = this.state.text.trim()
-    const { projectMetadata } = this.props
-    if (text && text !== projectMetadata.name)
-      this.props.setProjectName(projectMetadata.id, text)
+    const { projectFile } = this.props
+    if (text && text !== projectFile.name)
+      this.props.setProjectName(projectFile.id, text)
     this.setState({ editing: false })
   }
 
@@ -41,7 +41,7 @@ class ProjectMenu extends Component {
 
   render() {
     const {
-      projectMetadata,
+      projectFile,
       closeProjectRequest,
       saveProjectRequest,
       className,
@@ -74,7 +74,7 @@ class ProjectMenu extends Component {
           ) : (
             <Tooltip title="Double-click to edit">
               <h1 className={css.projectName} onDoubleClick={this.startEditing}>
-                {truncate(projectMetadata.name, 40)}
+                {truncate(projectFile.name, 40)}
               </h1>
             </Tooltip>
           )}
@@ -85,7 +85,7 @@ class ProjectMenu extends Component {
 }
 
 const mapStateToProps = state => ({
-  projectMetadata: r.getCurrentProject(state),
+  projectFile: r.getCurrentProject(state),
 })
 const mapDispatchToProps = {
   closeProjectRequest: r.closeProjectRequest,
@@ -97,10 +97,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(ProjectMenu)
-
-// <IconButton onClick={onClickPrevious} disabled={!isPrevButtonEnabled}>
-//   <FastRewind />
-// </IconButton>
-// <IconButton onClick={onClickNext} disabled={!isNextButtonEnabled}>
-//   <FastForward />
-// </IconButton>

@@ -1,22 +1,18 @@
 import {
   filter,
   map,
-  flatMap,
   takeUntil,
   takeLast,
   take,
   switchMap,
 } from 'rxjs/operators'
-import { fromEvent, merge, of, empty } from 'rxjs'
+import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
-import { ofType } from 'redux-observable'
-import {
-  toWaveformX,
-  toWaveformCoordinates,
-} from '../utils/waveformCoordinates'
+import { toWaveformX } from '../utils/waveformCoordinates'
 import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const pendingClipIsBigEnough = (state: AppState) => {
   const pendingClip = r.getPendingClip(state)
@@ -29,42 +25,23 @@ const pendingClipIsBigEnough = (state: AppState) => {
 const addClipEpic: AppEpic = (
   action$,
   state$,
-  { window, getWaveformSvgElement }
+  { window, getWaveformSvgElement, document }
 ) =>
-  action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-    flatMap(() => {
-      const svg = getWaveformSvgElement()
-      if (!svg) console.error('No svg element')
-      return svg ? of(svg) : empty()
-    }),
-    switchMap(svg =>
-      fromEvent<MouseEvent>(svg, 'mousedown').pipe(
-        map(mousedown =>
-          toWaveformCoordinates(
-            mousedown,
-            mousedown.currentTarget as SVGElement,
-            r.getWaveformViewBoxXMin(state$.value)
-          )
-        ),
-        filter(
-          waveformMousedown =>
-            !r.getClipEdgeAt(state$.value, waveformMousedown.x)
-        )
-      )
+  fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
+    filter(
+      waveformMousedown => !r.getClipEdgeAt(state$.value, waveformMousedown.x)
     ),
-
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
-    flatMap(waveformMousedown => {
-      const mediaMetadata = r.getCurrentMediaMetadata(state$.value)
-      if (!mediaMetadata) throw new Error('No current media metadata')
+    switchMap(waveformMousedown => {
+      const mediaFile = r.getCurrentMediaFile(state$.value)
+      if (!mediaFile) throw new Error('No current media metadata')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
       // this should be used also in stretch epic, i guess at any reference to waveform x
       const factor =
         state$.value.waveform.stepsPerSecond * state$.value.waveform.stepLength
       const withinValidTime = (x: number) =>
-        Math.max(0, Math.min(x, mediaMetadata.durationSeconds * factor))
+        Math.max(0, Math.min(x, mediaFile.durationSeconds * factor))
 
       const svgElement = getWaveformSvgElement()
       if (!svgElement) throw new Error('Waveform disappeared')

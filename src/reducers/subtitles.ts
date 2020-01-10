@@ -1,73 +1,41 @@
 import { Reducer } from 'redux'
 
-const initialState: SubtitlesState = {
-  loadedTracks: [],
-  mediaFileTracksStreamIndexes: [],
-  flashcardFieldLinks: {},
-}
-
-const editTrack: <T extends SubtitlesTrack>(
-  track: T,
-  overrides: Partial<T>
-) => T = (track, overrides) => ({
-  ...track,
-  ...overrides,
-})
+const initialState: SubtitlesState = {}
 
 const subtitles: Reducer<SubtitlesState> = (
   state: SubtitlesState = initialState,
   action: Action
 ) => {
   switch (action.type) {
-    case A.OPEN_MEDIA_FILE_SUCCESS:
+    case A.ADD_SUBTITLES_TRACK:
+      return { ...state, [action.track.id]: action.track }
+
+    case A.OPEN_FILE_REQUEST:
+      return action.file.type === 'MediaFile' ? initialState : state
+
+    case A.HIDE_SUBTITLES:
       return {
         ...state,
-        mediaFileTracksStreamIndexes: action.subtitlesTracksStreamIndexes,
-        loadedTracks: [],
+        [action.id]: {
+          ...state[action.id],
+          mode: 'hidden',
+        } as SubtitlesTrack,
       }
-    case A.OPEN_MEDIA_FILE_REQUEST:
-    case A.OPEN_PROJECT:
-    case A.CLOSE_PROJECT:
-      return initialState
-    case A.LOAD_EMBEDDED_SUBTITLES_SUCCESS:
-    case A.LOAD_EXTERNAL_SUBTITLES_SUCCESS:
+
+    case A.SHOW_SUBTITLES:
       return {
         ...state,
-        loadedTracks: [...state.loadedTracks, ...action.subtitlesTracks],
+        [action.id]: {
+          ...state[action.id],
+          mode: 'showing',
+        } as SubtitlesTrack,
       }
-    case A.SHOW_SUBTITLES: {
-      const { id } = action
-      return {
-        ...state,
-        loadedTracks: state.loadedTracks.map(track =>
-          track.id === id ? editTrack(track, { mode: 'showing' }) : track
-        ),
-      }
-    }
-    case A.HIDE_SUBTITLES: {
-      const { id } = action
-      return {
-        ...state,
-        loadedTracks: state.loadedTracks.map(track =>
-          track.id === id ? editTrack(track, { mode: 'hidden' }) : track
-        ),
-      }
-    }
+
     case A.DELETE_SUBTITLES_TRACK: {
-      const { id } = action
-      return {
-        ...state,
-        loadedTracks: state.loadedTracks.filter(track => track.id !== id),
-      }
+      const { [action.id]: _, ...newState } = state
+      return newState
     }
-    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
-      return {
-        ...state,
-        flashcardFieldLinks: {
-          ...state.flashcardFieldLinks,
-          [action.flashcardFieldName]: action.subtitlesTrackId,
-        },
-      }
+
     default:
       return state
   }

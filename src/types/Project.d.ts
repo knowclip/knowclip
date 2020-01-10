@@ -4,6 +4,7 @@ declare type Project =
   | Project2_0_0
   | Project3_0_0
   | Project4_0_0
+  | Project4_1_0
 
 declare type ProjectId = string
 
@@ -26,7 +27,7 @@ declare type Project2_0_0 = {
   version: '2.0.0'
   id: ProjectId
   name: string
-  mediaFilesMetadata: Array<MediaFileMetadata>
+  mediaFilesMetadata: Array<MediaFileMetadata_Pre_4>
   noteType: NoteTypePre3_0_0
   clips: Record<ClipId, ClipPre3_0_0>
   tags: Array<string>
@@ -37,7 +38,7 @@ declare type Project3_0_0 = {
   version: '3.0.0'
   id: ProjectId
   name: string
-  mediaFilesMetadata: Array<MediaFileMetadata>
+  mediaFilesMetadata: Array<MediaFileMetadata_Pre_4>
   noteType: NoteType
   clips: Record<ClipId, Clip>
   tags: Array<string>
@@ -51,6 +52,24 @@ declare type Project4_0_0 = {
   mediaFilesMetadata: Array<MediaFileMetadata>
   noteType: NoteType
   clips: Array<Clip>
-  tags: Array<string>
+  tags: Array<string> // maybe shouldnt be saved here
   timestamp: string
+}
+
+declare type Project4_1_0 = {
+  version: '4.1.0'
+  id: ProjectId
+  name: string
+  mediaFiles: Array<MediaFile>
+  noteType: NoteType
+  clips: Array<Clip>
+  tags: Array<string> // maybe shouldnt be saved here
+  timestamp: string
+  lastOpened: string
+  subtitles: Array<ExternalSubtitlesFile>
+}
+
+declare type ProjectExport = {
+  project: ProjectMetadata
+  clips: Array<Clip>
 }

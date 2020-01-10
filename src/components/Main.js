@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useEffect } from 'react'
+import React, { Component, Fragment, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { IconButton, CircularProgress, Tooltip, Fab } from '@material-ui/core'
 import {
@@ -17,41 +17,41 @@ import headerCss from '../components/Header.module.css'
 import * as r from '../redux'
 import SubtitlesMenu from '../components/SubtitlesMenu.js'
 
-const Subtitles = ({ track }) =>
+const Subtitles = ({ track, isDefault }) =>
   track.type === 'EmbeddedSubtitlesTrack' ? (
     <track
       kind="subtitles"
       src={`file://${track.tmpFilePath}`}
       mode={track.mode}
-      default={track.mode === 'showing'}
+      default={isDefault}
     />
   ) : (
     <track
       kind="subtitles"
       src={`file://${track.vttFilePath}`}
       mode={track.mode}
-      default={track.mode === 'showing'}
+      default={isDefault}
     />
   )
 
 const Media = ({
-  filePath,
+  constantBitrateFilePath,
   loop,
-  audioRef,
   handleAudioEnded,
   metadata,
   subtitles,
 }) => {
+  const mediaRef = useRef()
   const props = {
     onEnded: handleAudioEnded,
     loop: loop,
-    ref: audioRef,
+    ref: mediaRef,
     controls: true,
     disablePictureInPicture: true,
     id: 'audioPlayer',
     className: 'audioPlayer',
     controlsList: 'nodownload nofullscreen',
-    src: filePath ? `file://${filePath}` : null,
+    src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : null,
     playbackspeed: 1,
   }
   useEffect(
@@ -64,13 +64,23 @@ const Media = ({
     },
     [props.src]
   )
+  useEffect(
+    () => {
+      const { textTracks } = mediaRef.current
+      if (textTracks)
+        [...textTracks].forEach(
+          (track, index) => (track.mode = subtitles[index].mode)
+        )
+    },
+    [subtitles, mediaRef]
+  )
 
   return metadata && metadata.isVideo ? (
     <div className="videoContainer">
       <video {...props}>
-        {subtitles.map(track =>
+        {subtitles.map((track, index) =>
           track.mode === 'showing' ? (
-            <Subtitles track={track} key={track.id} />
+            <Subtitles track={track} key={track.id} isDefault={index === 0} />
           ) : null
         )}
       </video>
@@ -105,7 +115,7 @@ class Main extends Component {
       detectSilenceRequest,
       deleteAllCurrentFileClipsRequest,
       constantBitrateFilePath,
-      currentMediaMetadata,
+      currentMediaFile,
       subtitles,
     } = this.props
 
@@ -119,7 +129,7 @@ class Main extends Component {
             </section>
             <ul className={headerCss.rightMenu}>
               {' '}
-              {currentMediaMetadata && (
+              {currentMediaFile && (
                 <Fragment>
                   <li className={headerCss.menuItem}>
                     <SubtitlesMenu />
@@ -147,10 +157,10 @@ class Main extends Component {
         <section className="media">
           <Media
             key={String(constantBitrateFilePath)}
-            filePath={constantBitrateFilePath}
+            constantBitrateFilePath={constantBitrateFilePath}
             onEnded={this.handleAudioEnded}
             loop={loop}
-            metadata={currentMediaMetadata}
+            metadata={currentMediaFile}
             subtitles={subtitles}
           />
         </section>
@@ -185,8 +195,8 @@ const mapStateToProps = state => ({
   loop: r.isLoopOn(state),
   audioIsLoading: r.isAudioLoading(state),
   currentProjectId: r.getCurrentProjectId(state),
-  constantBitrateFilePath: r.getCurrentMediaFileConstantBitratePath(state),
-  currentMediaMetadata: r.getCurrentMediaMetadata(state),
+  constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
+  currentMediaFile: r.getCurrentMediaFile(state),
   subtitles: r.getSubtitlesTracks(state),
 })
 

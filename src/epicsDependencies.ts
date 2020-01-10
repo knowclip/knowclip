@@ -1,4 +1,9 @@
 import { getMediaMetadata } from './utils/ffmpeg'
+import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
+import { existsSync } from 'fs'
+import { getWaveformPng } from './utils/getWaveform'
+import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
+import { remote } from 'electron'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -15,6 +20,7 @@ const getWaveformSvgElement = () => document.getElementById('waveform-svg')
 const dependencies: EpicsDependencies = {
   document,
   window,
+  getCurrentWindow: () => remote.getCurrentWindow(),
   setLocalStorage: (key, value) => window.localStorage.setItem(key, value),
   getWaveformSvgElement: () =>
     (document.getElementById('waveform-svg') as SVGElement | null) || null,
@@ -45,5 +51,10 @@ const dependencies: EpicsDependencies = {
     else el.pause()
   },
   getMediaMetadata,
+  getSubtitlesFromFile,
+  getSubtitlesFilePath,
+  getWaveformPng,
+  getConstantBitrateMediaPath,
+  existsSync,
 }
 export default dependencies

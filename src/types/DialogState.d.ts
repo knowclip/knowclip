@@ -4,6 +4,7 @@ declare type DialogData =
       props: {
         message: string
         action: Action
+        onCancel: Action | null
       }
     }
   | {
@@ -28,6 +29,13 @@ declare type DialogData =
       type: 'OpenMediaFileFailure'
       props: {
         message: string
+      }
+    }
+  | {
+      type: 'FileSelection'
+      props: {
+        message: string
+        file: FileMetadata
       }
     }
   | {

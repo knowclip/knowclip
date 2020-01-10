@@ -1,6 +1,6 @@
 import { of, empty } from 'rxjs'
 import { map, flatMap } from 'rxjs/operators'
-import { ofType, Epic } from 'redux-observable'
+import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 

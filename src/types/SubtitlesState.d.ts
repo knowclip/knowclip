@@ -1,20 +1,16 @@
-declare type SubtitlesState = {
-  loadedTracks: Array<SubtitlesTrack>
-  mediaFileTracksStreamIndexes: Array<number>
-  flashcardFieldLinks: SubtitlesFlashcardFieldsLinks
-}
+declare type SubtitlesState = Record<SubtitlesTrackId, SubtitlesTrack>
+
+declare type SubtitlesFileExtension = 'vtt' | 'ass' | 'srt'
 
 declare type SubtitlesTrack = EmbeddedSubtitlesTrack | ExternalSubtitlesTrack
 declare type TextTrackMode = 'disabled' | 'hidden' | 'showing'
-declare type SubtitlesFlashcardFieldsLinks = Partial<
-  Record<FlashcardFieldName, SubtitlesTrackId>
->
 
 declare type EmbeddedSubtitlesTrack = {
   type: 'EmbeddedSubtitlesTrack'
   id: SubtitlesTrackId
   mode: TextTrackMode
   chunks: Array<SubtitlesChunk>
+  mediaFileId: MediaFileId
   streamIndex: number
   tmpFilePath: string
 }
@@ -24,6 +20,7 @@ declare type ExternalSubtitlesTrack = {
   id: SubtitlesTrackId
   mode: TextTrackMode
   chunks: Array<SubtitlesChunk>
+  mediaFileId: MediaFileId
   filePath: SubtitlesFilePath
   vttFilePath: string
 }

@@ -1,22 +1,24 @@
 declare type ProjectFilePath = string
 
-declare type AudioMetadataAndPath = {
-  metadata: MediaFileMetadata
-  filePath: MediaFilePath | null
-  constantBitrateFilePath: MediaFilePath | null
-  error: string | null
-}
-
 declare type ProjectMetadata = {
   id: ProjectId
-  filePath: ProjectFilePath
+  filePath: ProjectFilePath // TODO: delete field, use fileAvailabilities
   name: string
   noteType: NoteType
-  mediaFilePaths: Array<AudioMetadataAndPath>
+  mediaFileIds: Array<MediaFileId>
   error: string | null
 }
 
 declare type ProjectsState = {
   byId: Record<ProjectId, ProjectMetadata>
   allIds: Array<ProjectId>
+}
+
+declare type ProjectMetadata_Pre_4 = {
+  id: ProjectId
+  filePath: ProjectFilePath
+  name: string
+  noteType: NoteType
+  mediaFiles: Array<MediaFileId>
+  error: string | null
 }

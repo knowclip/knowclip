@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import {
@@ -15,6 +15,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
 import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
+import usePopover from '../utils/usePopover'
 
 const getOpenProjectByFilePath = openProjectByFilePath => async () => {
   const filePaths = await showOpenDialog({
@@ -28,43 +29,31 @@ const getOpenProjectByFilePath = openProjectByFilePath => async () => {
 }
 
 const ProjectMenuItem = ({
-  projectMetadata,
+  project,
   openProjectById,
   removeProjectFromRecents,
 }) => {
-  const menuAnchorEl = useRef(null)
-  const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const openMenu = e => {
-    setMenuIsOpen(true)
-    e.stopPropagation()
-  }
-  const closeMenu = e => {
-    e.stopPropagation()
-    setMenuIsOpen(false)
-  }
+  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
 
   return (
     <Fragment>
-      {menuIsOpen && (
+      {isOpen && (
         <Menu
-          open={menuIsOpen}
-          onClose={closeMenu}
-          anchorEl={menuAnchorEl.current}
+          open={isOpen}
+          onClose={close}
+          anchorEl={anchorEl}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <MenuItem onClick={e => removeProjectFromRecents(projectMetadata.id)}>
+          <MenuItem onClick={e => removeProjectFromRecents(project.id)}>
             Remove from recents
           </MenuItem>
         </Menu>
       )}
-      <MenuItem
-        key={projectMetadata.id}
-        onClick={() => openProjectById(projectMetadata.id)}
-      >
-        <RootRef rootRef={menuAnchorEl}>
-          <ListItemText>{projectMetadata.name}</ListItemText>
+      <MenuItem key={project.id} onClick={() => openProjectById(project.id)}>
+        <RootRef rootRef={anchorCallbackRef}>
+          <ListItemText>{project.name}</ListItemText>
         </RootRef>
-        <IconButton onClick={openMenu}>
+        <IconButton onClick={open}>
           <MoreVertIcon />
         </IconButton>
       </MenuItem>
@@ -99,10 +88,10 @@ const ProjectsMenu = ({
               {projects.length ? null : (
                 <MenuItem disabled>No recent projects.</MenuItem>
               )}
-              {projects.map(projectMetadata => (
+              {projects.map(project => (
                 <ProjectMenuItem
-                  key={projectMetadata.id}
-                  projectMetadata={projectMetadata}
+                  key={project.id}
+                  project={project}
                   openProjectById={openProjectById}
                   removeProjectFromRecents={removeProjectFromRecents}
                 />
@@ -138,12 +127,13 @@ const mapStateToProps = state => ({
   projects: r.getProjects(state),
   currentProjectId: r.getCurrentProjectId(state),
 })
-
+const removeProjectFromRecents = projectId =>
+  r.deleteFileRequest('ProjectFile', projectId)
 const mapDispatchToProps = {
   openProjectByFilePath: r.openProjectByFilePath,
   openProjectById: r.openProjectById,
   newProjectFormDialog: r.newProjectFormDialog,
-  removeProjectFromRecents: r.removeProjectFromRecents,
+  removeProjectFromRecents: removeProjectFromRecents,
 }
 
 export default connect(

@@ -4,20 +4,10 @@ export * from './snackbar'
 export * from './dialog'
 export * from './projects'
 export * from './subtitles'
+export * from './files'
 
 export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
-})
-
-export const chooseMediaFiles = (
-  filePaths: Array<MediaFilePath>,
-  ids: Array<MediaFileId>,
-  noteTypeId: NoteTypeId
-): Action => ({
-  type: A.CHOOSE_MEDIA_FILES,
-  filePaths,
-  ids,
-  noteTypeId,
 })
 
 export const removeMediaFiles = (): Action => ({
@@ -130,7 +120,12 @@ export const deleteAllCurrentFileClipsRequest = (): DeleteAllCurrentFileClipsReq
 
 export const setAllTags = (tagsToClipIds: {
   [tag: string]: Array<ClipId>
-}): Action => ({
+}): SetAllTags => ({
   type: A.SET_ALL_TAGS,
   tagsToClipIds,
+})
+
+export const setDefaultTags = (tags: string[]): SetDefaultTags => ({
+  type: 'SET_DEFAULT_TAGS',
+  tags,
 })

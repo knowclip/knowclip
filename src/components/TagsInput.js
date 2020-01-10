@@ -1,18 +1,7 @@
-import React, { Component, useRef, useState } from 'react'
-import { connect } from 'react-redux'
-import {
-  TextField,
-  IconButton,
-  Card,
-  CardContent,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Paper,
-} from '@material-ui/core'
-import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import React, { useRef, useState } from 'react'
+
+import { MenuItem, Paper } from '@material-ui/core'
 import ChipInput from 'material-ui-chip-input'
-import * as r from '../redux'
 import css from './FlashcardSection.module.css'
 import Autosuggest from 'react-autosuggest'
 

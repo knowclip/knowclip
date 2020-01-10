@@ -1,21 +1,23 @@
 import { combineReducers } from 'redux'
 
-import audio from './audio'
 import waveform from './waveform'
 import clips from './clips'
 import user from './user'
 import snackbar from './snackbar'
 import dialog from './dialog'
-import projects from './projects'
 import subtitles from './subtitles'
+import settings from './settings'
+import fileAvailabilities from './fileAvailabilities'
+import files from './files'
 
-export default combineReducers({
-  audio,
+export default combineReducers<AppState>({
   waveform,
   clips,
   user,
   snackbar,
   dialog,
-  projects,
   subtitles,
+  settings,
+  fileAvailabilities,
+  files,
 })

@@ -1,10 +1,3 @@
-export const setWaveformImagePath = (
-  path: string | null
-): SetWaveformImagePath => ({
-  type: A.SET_WAVEFORM_IMAGE_PATH,
-  path,
-})
-
 export const setWaveformCursor = (
   x: number,
   newViewBox?: WaveformViewBox
@@ -39,9 +32,4 @@ export const setWaveformViewBox = (
 ): SetWaveformViewBox => ({
   type: A.SET_WAVEFORM_VIEW_BOX,
   viewBox,
-})
-
-export const waveformMousedown = (x: number): WaveformMousedown => ({
-  type: A.WAVEFORM_MOUSEDOWN,
-  x,
 })

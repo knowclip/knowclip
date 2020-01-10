@@ -57,11 +57,11 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     case A.OPEN_PROJECT: {
       const newState: ClipsState = { byId: {}, idsByMediaFileId: {} }
       const { idsByMediaFileId, byId } = newState
-      action.project.mediaFilesMetadata.forEach(({ id }) => {
+      action.project.mediaFileIds.forEach(id => {
         idsByMediaFileId[id] = []
       })
 
-      for (const clip of action.project.clips) {
+      for (const clip of action.clips) {
         byId[clip.id] = clip
         idsByMediaFileId[clip.fileId].push(clip.id)
       }
@@ -71,17 +71,15 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.CHOOSE_MEDIA_FILES:
-      return {
-        ...state,
-        idsByMediaFileId: action.ids.reduce(
-          (all, id) => ({
-            ...all,
-            [id]: [],
-          }),
-          {}
-        ),
-      }
+    case A.ADD_AND_OPEN_FILE:
+      if (action.file.type === 'MediaFile')
+        return {
+          ...state,
+          idsByMediaFileId: {
+            [action.file.id]: [],
+          },
+        }
+      return state
 
     case A.REMOVE_MEDIA_FILES:
       return {
@@ -303,36 +301,25 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.ADD_MEDIA_TO_PROJECT: {
-      const idsByMediaFileId = { ...state.idsByMediaFileId }
-      action.mediaFilePaths.forEach(({ metadata }) => {
-        idsByMediaFileId[metadata.id] = []
-      })
-      return {
-        ...state,
-        idsByMediaFileId,
-      }
+    case A.DELETE_FILE_SUCCESS: {
+      if (action.file.type === 'MediaFile') {
+        const clipIds = state.idsByMediaFileId[action.file.id] || []
+
+        const byId = { ...state.byId }
+        clipIds.forEach(id => {
+          delete byId[id]
+        })
+
+        const idsByMediaFileId = { ...state.idsByMediaFileId }
+        delete idsByMediaFileId[action.file.id]
+
+        return {
+          ...state,
+          byId,
+          idsByMediaFileId,
+        }
+      } else return state
     }
-
-    case A.DELETE_MEDIA_FROM_PROJECT: {
-      const clipIds = state.idsByMediaFileId[action.mediaFileId] || []
-      console.log('mediaFileId', action.mediaFileId)
-
-      const byId = { ...state.byId }
-      clipIds.forEach(id => {
-        delete byId[id]
-      })
-
-      const idsByMediaFileId = { ...state.idsByMediaFileId }
-      delete idsByMediaFileId[action.mediaFileId]
-
-      return {
-        ...state,
-        byId,
-        idsByMediaFileId,
-      }
-    }
-
     default:
       return state
   }

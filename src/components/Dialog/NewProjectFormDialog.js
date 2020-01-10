@@ -100,14 +100,12 @@ class NewProjectFormDialog extends Component {
     if (Object.keys(errors).length) return this.setState({ errors })
 
     const { filePath, name } = this.state.fieldValues
-    this.props.createProject({
-      id: uuid(),
-      filePath,
+    this.props.createProject(
+      uuid(),
       name,
-      mediaFilePaths: [],
-      error: null,
-      noteType: this.state.fieldValues.noteType,
-    })
+      this.state.fieldValues.noteType,
+      filePath
+    )
     this.props.closeDialog()
   }
 
@@ -118,7 +116,6 @@ class NewProjectFormDialog extends Component {
     }))
 
   setFilePathText = text => {
-    console.log('boop!', text)
     this.setState(state => ({
       fieldValues: { ...state.fieldValues, filePath: text },
       errors: deleteKey(state.errors, 'filePath'),
@@ -135,7 +132,6 @@ class NewProjectFormDialog extends Component {
 
   showSaveDialog = async () => {
     const filePath = await showSaveDialog('AFCA Project File', ['afca'])
-    console.log('filePath', filePath)
     return filePath ? this.setFilePathText(filePath) : null
   }
 

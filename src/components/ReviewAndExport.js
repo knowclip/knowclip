@@ -107,7 +107,7 @@ const formatDuration = duration =>
     .filter(v => v)
     .join(':')
 let MediaTable = ({
-  mediaFileMetadata,
+  media,
   clips,
   open,
   closeDialog,
@@ -136,10 +136,10 @@ let MediaTable = ({
         </div>
 
         <h2 className={css.mediaFileName}>
-          {mediaFileMetadata.name}{' '}
+          {media.name}{' '}
           <small>
             {formatDuration(
-              moment.duration({ seconds: mediaFileMetadata.durationSeconds })
+              moment.duration({ seconds: media.durationSeconds })
             )}
           </small>
         </h2>
@@ -186,8 +186,8 @@ let MediaTable = ({
       </Table>
     </Paper>
   )
-MediaTable = connect((state, { open, mediaFileMetadata }) => ({
-  clips: r.getClips(state, mediaFileMetadata.id),
+MediaTable = connect((state, { open, media }) => ({
+  clips: r.getClips(state, media.id),
   highlightedClipId: r.getHighlightedClipId(state),
 }))(MediaTable)
 
@@ -201,9 +201,9 @@ const Export = ({
   exportMarkdown,
   noteType,
   open,
-  projectMediaMetadata,
+  projectMedia,
   allProjectClipsIds,
-  openMediaFileRequest,
+  openFileRequest,
   currentMedia,
 }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
@@ -228,12 +228,12 @@ const Export = ({
         : [...new Set([...selectedIds, ...ids])]
     )
   const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
-    projectMediaMetadata.findIndex(metadata => metadata.id === currentFileId)
+    projectMedia.findIndex(metadata => metadata.id === currentFileId)
   )
   const onClickTable = index => {
-    const mediaMetadata = projectMediaMetadata[index]
+    const mediaMetadata = projectMedia[index]
     if (mediaMetadata && mediaMetadata.id !== currentMedia.id)
-      openMediaFileRequest(mediaMetadata.id)
+      openFileRequest(mediaMetadata)
     setExpandedTableIndex(index)
   }
   // PaperProps={{ style: { minWidth: '600px', minHeight: '300px' } }}
@@ -279,12 +279,12 @@ const Export = ({
           </section>
         )}
         {selectionHasStarted &&
-          projectMediaMetadata.map((metadata, i) => (
+          projectMedia.map((metadata, i) => (
             <MediaTable
               key={metadata.id}
               open={i === expandedTableIndex}
               toggleOpen={e => onClickTable(i === expandedTableIndex ? -1 : i)}
-              mediaFileMetadata={metadata}
+              media={metadata}
               selectedIds={selectedIds}
               onSelect={onSelect}
               onSelectAll={onSelectAll}
@@ -336,12 +336,9 @@ const mapStateToProps = state => ({
   // flashcards: r.getFlashcardsByTime(state),
   allProjectClipsIds: r.getAllProjectClipsIds(state),
   noteType: r.getCurrentNoteType(state),
-  currentMedia: r.getCurrentMediaMetadata(state),
-  projectMediaMetadata: r.getProjectMediaMetadata(
-    state,
-    r.getCurrentProjectId(state)
-  ),
+  currentMedia: r.getCurrentMediaFile(state),
   currentFileId: r.getCurrentFileId(state),
+  projectMedia: r.getCurrentProjectMediaFiles(state),
 })
 
 const mapDispatchToProps = {
@@ -350,7 +347,7 @@ const mapDispatchToProps = {
   exportMarkdown: r.exportMarkdown,
   highlightClip: r.highlightClip,
   closeDialog: r.closeDialog,
-  openMediaFileRequest: r.openMediaFileRequest,
+  openFileRequest: r.openFileRequest,
 }
 
 export default connect(

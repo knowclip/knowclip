@@ -7,10 +7,14 @@ export const enqueueDialog = (
   skipQueue,
 })
 
-export const confirmationDialog = (message: string, action: Action) =>
+export const confirmationDialog = (
+  message: string,
+  action: Action,
+  onCancel: Action | null = null
+) =>
   enqueueDialog({
     type: 'Confirmation',
-    props: { message, action },
+    props: { message, action, onCancel },
   })
 
 export const editNoteTypeDialog = (noteTypeId: NoteTypeId): DialogAction =>
@@ -45,8 +49,11 @@ export const reviewAndExportDialog = () =>
 export const newProjectFormDialog = () =>
   enqueueDialog({ type: 'NewProjectForm' })
 
-export const openMediaFileFailureDialog = (message: string): DialogAction =>
-  enqueueDialog({ type: 'OpenMediaFileFailure', props: { message } })
+export const fileSelectionDialog = (
+  message: string,
+  file: FileMetadata
+): DialogAction =>
+  enqueueDialog({ type: 'FileSelection', props: { message, file: file } })
 
 export const closeDialog = (): DialogAction => ({
   type: A.CLOSE_DIALOG,

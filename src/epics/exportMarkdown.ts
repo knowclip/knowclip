@@ -18,14 +18,14 @@ const exportMarkdown: AppEpic = (action$, state$) =>
         const filename = await showSaveDialog('Markdown', ['md'])
         if (!filename)
           return of(({ type: 'NOOP_EXPORT_MARKDOWN' } as unknown) as Action)
-        const currentProjectMetadata = r.getCurrentProject(state$.value)
-        if (!currentProjectMetadata)
+        const currentProject = r.getCurrentProject(state$.value)
+        if (!currentProject)
           return of(r.simpleMessageSnackbar('Could not find project'))
         const currentNoteType = r.getCurrentNoteType(state$.value)
         if (!currentNoteType) throw new Error('No note type found')
         const markdown = projectToMarkdown(
           state$.value,
-          currentProjectMetadata.id,
+          currentProject.id,
           currentNoteType
         )
         await writeFile(filename, markdown, 'utf8')

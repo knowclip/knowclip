@@ -1,11 +1,8 @@
 import { basename } from 'path'
-import {
-  getCurrentFilePath,
-  getProjectMetadata,
-  getCurrentProject,
-} from './project'
+import { getCurrentFilePath, getCurrentProject } from './project'
+import { getFile } from './files'
 
-export const isLoopOn = (state: AppState) => state.audio.loop
+export const isLoopOn = (state: AppState) => state.user.loopMedia
 
 export const getCurrentFileName = (state: AppState): MediaFileName | null => {
   const filePath = getCurrentFilePath(state)
@@ -49,10 +46,24 @@ export const getCurrentNoteType = (state: AppState): NoteType | null => {
   return currentProject ? currentProject.noteType : null
 }
 
-export const getMediaFilePaths = (
+export const getCurrentProjectMediaFiles = (
+  state: AppState
+): Array<MediaFile> => {
+  const projectMetadata = getCurrentProject(state)
+  return projectMetadata
+    ? projectMetadata.mediaFileIds.map(
+        id => getFile<MediaFile>(state, 'MediaFile', id) as MediaFile
+      )
+    : []
+}
+
+export const getProjectMediaFiles = (
   state: AppState,
-  projectId: ProjectId
-): Array<AudioMetadataAndPath> => {
-  const projectMetadata = getProjectMetadata(state, projectId)
-  return projectMetadata ? projectMetadata.mediaFilePaths : []
+  id: ProjectId
+): Array<MediaFile> => {
+  const project = getFile<ProjectFile>(state, 'ProjectFile', id)
+
+  return project
+    ? project.mediaFileIds.map(id => state.files.MediaFile[id])
+    : []
 }

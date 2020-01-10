@@ -4,35 +4,71 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
+import { getCurrentMediaFile } from './project'
+import { getFileAvailability, getFile } from './files'
+import { createSelector } from 'reselect'
 
-export const getSubtitlesTracks = (state: AppState): Array<SubtitlesTrack> =>
-  state.subtitles.loadedTracks
+export const getSubtitlesFile = (
+  state: AppState,
+  id: string
+): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
+  state.files.VttConvertedSubtitlesFile[id] ||
+  state.files.ExternalSubtitlesFile[id] ||
+  null
+
+export const getSourceSubtitlesFile = (
+  state: AppState,
+  id: string
+): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
+  state.files.ExternalSubtitlesFile[id] ||
+  state.files.VttConvertedSubtitlesFile[id] ||
+  null
+
+export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
+  const record = getSubtitlesFile(state, id)
+
+  return record ? getFileAvailability(state, record) : null
+}
+
+const getSubtitles = (state: AppState) => state.subtitles
+
+export const getSubtitlesTracks = createSelector(
+  getCurrentMediaFile,
+  getSubtitles,
+  (currentFile, subtitles): Array<SubtitlesTrack> => {
+    if (!currentFile) return []
+    return currentFile.subtitles
+      .map(id => subtitles[id])
+      .filter((track): track is SubtitlesTrack => Boolean(track))
+  }
+)
 
 export const getSubtitlesTrack = (
   state: AppState,
   id: SubtitlesTrackId
-): SubtitlesTrack | null =>
-  state.subtitles.loadedTracks.find(track => track.id === id) || null
+): SubtitlesTrack | null => state.subtitles[id] || null
 
+const isEmbedded = (track: SubtitlesTrack): track is EmbeddedSubtitlesTrack =>
+  track.type === 'EmbeddedSubtitlesTrack'
+const isExternal = (track: SubtitlesTrack): track is ExternalSubtitlesTrack =>
+  track.type === 'ExternalSubtitlesTrack'
 export const getEmbeddedSubtitlesTracks = (
   state: AppState
-): Array<EmbeddedSubtitlesTrack> => {
-  const result: Array<EmbeddedSubtitlesTrack> = []
-  state.subtitles.loadedTracks.forEach(track => {
-    if (track.type === 'EmbeddedSubtitlesTrack') result.push(track)
-  })
-  return result
-}
+): Array<EmbeddedSubtitlesTrack> => getSubtitlesTracks(state).filter(isEmbedded)
 
 export const getExternalSubtitlesTracks = (
   state: AppState
-): Array<ExternalSubtitlesTrack> => {
-  const result: Array<ExternalSubtitlesTrack> = []
-  state.subtitles.loadedTracks.forEach(track => {
-    if (track.type === 'ExternalSubtitlesTrack') result.push(track)
-  })
-  return result
-}
+): Array<{ track: ExternalSubtitlesTrack; file: ExternalSubtitlesFile }> =>
+  getSubtitlesTracks(state)
+    .filter(isExternal)
+    .map(track => ({
+      track,
+      file: getFile(
+        state,
+        'ExternalSubtitlesFile',
+        track.id
+      ) as ExternalSubtitlesFile,
+    }))
 
 export const readVttChunk = (
   state: AppState,
@@ -70,9 +106,8 @@ export const getSubtitlesChunksWithinRange = (
   end: WaveformX
 ): Array<SubtitlesChunk> => {
   const track = getSubtitlesTrack(state, subtitlesTrackId)
-  // if (!track) return []
-  if (!track)
-    throw new Error(`Could not find subtitles track ${subtitlesTrackId}`)
+  if (!track) return []
+
   return track.chunks.filter(chunk =>
     overlap(
       chunk,
@@ -85,7 +120,10 @@ export const getSubtitlesChunksWithinRange = (
 
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
-): SubtitlesFlashcardFieldsLinks => state.subtitles.flashcardFieldLinks
+): SubtitlesFlashcardFieldsLinks => {
+  const media = getCurrentMediaFile(state)
+  return media ? media.flashcardFieldsToSubtitlesTracks : {}
+}
 
 export const getNewFieldsFromLinkedSubtitles = (
   state: AppState,

@@ -1,9 +1,10 @@
-import React, { Component, Fragment, memo, useRef, useCallback } from 'react'
+import React, { Fragment, memo, useRef, useCallback } from 'react'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 import * as r from '../redux'
 import css from './Waveform.module.css'
 import { toWaveformCoordinates } from '../utils/waveformCoordinates'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -105,11 +106,11 @@ const SubtitlesChunk = ({ chunk, trackIndex, chunkIndex, trackId }) => (
   <g
     className={css.subtitlesChunk}
     data-chunk-index={chunkIndex}
-    data-trackId={trackId}
+    data-track-id={trackId}
   >
     <path
       className={css.subtitlesChunkRectangle}
-      data-trackId={trackId}
+      data-track-id={trackId}
       data-chunk-index={chunkIndex}
       d={getSubtitlesPath(
         chunk.start,
@@ -120,7 +121,7 @@ const SubtitlesChunk = ({ chunk, trackIndex, chunkIndex, trackId }) => (
     />
     <text
       data-chunk-index={chunkIndex}
-      data-trackId={trackId}
+      data-track-id={trackId}
       className={css.subtitlesText}
       x={chunk.start + 4}
       y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6}
@@ -171,21 +172,23 @@ const Waveform = ({
   pendingStretch,
   highlightedClipId,
   waveform,
+  path,
   subtitles,
   goToSubtitlesChunk,
-  onWaveformMousedown,
 }) => {
-  const { viewBox, cursor, stepsPerSecond, path } = waveform
+  const { viewBox, cursor, stepsPerSecond } = waveform
   const viewBoxString = getViewBoxString(viewBox.xMin)
   const svgRef = useRef(null)
   const onMouseDown = useCallback(
     e =>
-      onWaveformMousedown(
-        toWaveformCoordinates(e, e.currentTarget, waveform.viewBox.xMin).x
+      document.dispatchEvent(
+        new WaveformMousedownEvent(
+          e.currentTarget,
+          toWaveformCoordinates(e, e.currentTarget, waveform.viewBox.xMin)
+        )
       ),
-    [waveform.viewBox.xMin, onWaveformMousedown]
+    [waveform.viewBox.xMin]
   )
-
   return (
     <Fragment>
       <svg
@@ -222,6 +225,7 @@ const Waveform = ({
 
 const mapStateToProps = state => ({
   waveform: r.getWaveform(state),
+  path: r.getWaveformPath(state),
   clips: r.getCurrentFileClips(state),
   pendingClip: r.getPendingClip(state),
   pendingStretch: r.getPendingStretch(state),
@@ -231,7 +235,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   highlightClip: r.highlightClip,
   goToSubtitlesChunk: r.goToSubtitlesChunk,
-  onWaveformMousedown: r.waveformMousedown,
 }
 
 export default connect(

@@ -1,219 +1,11 @@
-import { promisify } from 'util'
-import tempy from 'tempy'
-import fs from 'fs'
-import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import { Epic, ofType, combineEpics } from 'redux-observable'
-import { filter, flatMap, map } from 'rxjs/operators'
+import { flatMap, map } from 'rxjs/operators'
 import { of, Observable } from 'rxjs'
 import uuid from 'uuid/v4'
 import * as r from '../redux'
-import { extname } from 'path'
-import { parse, stringifyVtt } from 'subtitle'
-import subsrt from 'subsrt'
 import newClip from '../utils/newClip'
 import { from } from 'rxjs'
 import { AppEpic } from '../types/AppEpic'
-import { getMillisecondsAtX } from '../selectors'
-
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
-
-export const getSubtitlesFilePathFromMedia = async (
-  mediaFilePath: MediaFilePath,
-  streamIndex: number
-): Promise<string | null> => {
-  const mediaMetadata = await getMediaMetadata(mediaFilePath)
-  if (
-    !mediaMetadata.streams[streamIndex] ||
-    mediaMetadata.streams[streamIndex].codec_type !== 'subtitle'
-  ) {
-    return null
-  }
-  const outputFilePath = tempy.file({ extension: 'vtt' })
-
-  return await new Promise((res, rej) =>
-    ffmpeg(mediaFilePath)
-      .outputOptions(`-map 0:${streamIndex}`)
-      .output(outputFilePath)
-      .on('end', () => {
-        res(outputFilePath)
-      })
-      .on('error', err => {
-        console.error(err)
-        rej(err)
-      })
-      .run()
-  )
-}
-
-export const getSubtitlesFromMedia = async (
-  mediaFilePath: MediaFilePath,
-  streamIndex: number,
-  state: AppState
-) => {
-  const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
-    mediaFilePath,
-    streamIndex
-  )
-  if (!subtitlesFilePath) {
-    throw new Error('There was a problem loading embedded subtitles')
-  }
-  const vttText = await readFile(subtitlesFilePath, 'utf8')
-
-  return {
-    tmpFilePath: subtitlesFilePath,
-    chunks: parse(vttText)
-      .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
-      .filter(({ text }) => text),
-  }
-}
-
-export const convertAssToVtt = (filePath: string, vttFilePath: string) =>
-  new Promise((res, rej) =>
-    ffmpeg(filePath)
-      .output(vttFilePath)
-      .on('end', () => {
-        res(vttFilePath)
-      })
-      .on('error', err => {
-        console.error(err)
-        rej(err)
-      })
-      .run()
-  )
-
-const parseSubtitles = (
-  state: AppState,
-  fileContents: string,
-  extension: string
-) =>
-  extension === '.ass'
-    ? subsrt
-        .parse(fileContents)
-        .filter(({ type }) => type === 'caption')
-        .map(chunk => r.readSubsrtChunk(state, chunk))
-        .filter(({ text }) => text)
-    : parse(fileContents)
-        .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
-        .filter(({ text }) => text)
-
-export const getSubtitlesFromFile = async (
-  filePath: string,
-  state: AppState
-) => {
-  const extension = extname(filePath).toLowerCase()
-  const vttFilePath =
-    extension === '.vtt' ? filePath : tempy.file({ extension: 'vtt' })
-  const fileContents = await readFile(filePath, 'utf8')
-  const chunks = parseSubtitles(state, fileContents, extension)
-
-  if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
-  if (extension === '.srt')
-    await writeFile(
-      vttFilePath,
-      stringifyVtt(
-        chunks.map(chunk => ({
-          start: getMillisecondsAtX(state, chunk.start),
-          end: getMillisecondsAtX(state, chunk.end),
-          text: chunk.text,
-        }))
-      ),
-      'utf8'
-    )
-  return {
-    vttFilePath,
-    chunks,
-  }
-}
-
-const newEmbeddedSubtitlesTrack = (
-  id: string,
-  chunks: Array<SubtitlesChunk>,
-  streamIndex: number,
-  tmpFilePath: string
-): EmbeddedSubtitlesTrack => ({
-  type: 'EmbeddedSubtitlesTrack',
-  id,
-  mode: 'showing',
-  chunks,
-  streamIndex,
-  tmpFilePath,
-})
-
-export const newExternalSubtitlesTrack = (
-  id: string,
-  chunks: Array<SubtitlesChunk>,
-  filePath: string,
-  vttFilePath: string
-): ExternalSubtitlesTrack => ({
-  mode: 'showing',
-  type: 'ExternalSubtitlesTrack',
-  id,
-  chunks,
-  filePath,
-  vttFilePath,
-})
-
-export const loadEmbeddedSubtitles: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenMediaFileSuccess>(A.OPEN_MEDIA_FILE_SUCCESS),
-    filter(({ subtitlesTracksStreamIndexes }) =>
-      Boolean(subtitlesTracksStreamIndexes.length)
-    ),
-    flatMap(async ({ subtitlesTracksStreamIndexes, filePath }) => {
-      try {
-        const subtitles = await Promise.all(
-          subtitlesTracksStreamIndexes.map(async streamIndex => {
-            const { tmpFilePath, chunks } = await getSubtitlesFromMedia(
-              filePath,
-              streamIndex,
-              state$.value
-            )
-            return newEmbeddedSubtitlesTrack(
-              uuid(),
-              chunks,
-              streamIndex,
-              tmpFilePath
-            )
-          })
-        )
-        return r.loadEmbeddedSubtitlesSuccess(subtitles)
-      } catch (err) {
-        console.error(err)
-        return r.loadSubtitlesFailure(err.message || err.toString())
-      }
-    })
-  )
-
-export const loadSubtitlesFailure: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, LoadSubtitlesFailure>(A.LOAD_SUBTITLES_FAILURE),
-    map(({ error }) =>
-      r.simpleMessageSnackbar(`Could not load subtitles: ${error}`)
-    )
-  )
-
-export const loadSubtitlesFile: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, LoadSubtitlesFromFileRequest>(
-      A.LOAD_SUBTITLES_FROM_FILE_REQUEST
-    ),
-    flatMap(async ({ filePath }) => {
-      try {
-        const { chunks, vttFilePath } = await getSubtitlesFromFile(
-          filePath,
-          state$.value
-        )
-
-        return await r.loadExternalSubtitlesSuccess([
-          newExternalSubtitlesTrack(uuid(), chunks, filePath, vttFilePath),
-        ])
-      } catch (err) {
-        console.error(err.message)
-        return await r.loadSubtitlesFailure(err.message || err.toString())
-      }
-    })
-  )
 
 const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -233,7 +25,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
           )
 
         const currentNoteType = r.getCurrentNoteType(state$.value)
-        const currentFile = r.getCurrentMediaMetadata(state$.value)
+        const currentFile = r.getCurrentMediaFile(state$.value)
         if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
         if (!currentFile) throw new Error('Could not find media file.') // should be impossible
 
@@ -281,6 +73,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
             const fieldName = badTypefieldName as FlashcardFieldName
             return r.linkFlashcardFieldToSubtitlesTrack(
               fieldName,
+              currentFile.id,
               fieldNamesToTrackIds[fieldName]
             )
           }),
@@ -302,7 +95,7 @@ const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
         return r.simpleMessageSnackbar(
           'Please add a subtitles track and try again.'
         )
-      const mediaFile = r.getCurrentMediaMetadata(state$.value)
+      const mediaFile = r.getCurrentMediaFile(state$.value)
       if (!mediaFile || !r.getCurrentFilePath(state$.value))
         return r.simpleMessageSnackbar(
           'Please locate this media file and try again.'
@@ -335,11 +128,23 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
     })
   )
 
+const deleteSubtitlesTrack: AppEpic = (action$, state$, dependencies) =>
+  action$.pipe(
+    ofType<Action, DeleteSubtitlesTrack>(A.DELETE_SUBTITLES_TRACK),
+    map(({ id }) => {
+      const file = r.getFile(state$.value, 'ExternalSubtitlesFile', id)
+
+      // TODO: report error
+      if (!file)
+        return r.simpleMessageSnackbar('Could not delete subtitles track.')
+
+      return r.deleteFileRequest(file.type, file.id)
+    })
+  )
+
 export default combineEpics(
-  loadEmbeddedSubtitles,
-  loadSubtitlesFile,
-  loadSubtitlesFailure,
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
-  goToSubtitlesChunk
+  goToSubtitlesChunk,
+  deleteSubtitlesTrack
 )

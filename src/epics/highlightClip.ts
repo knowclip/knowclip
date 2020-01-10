@@ -6,56 +6,58 @@ import {
   tap,
   takeWhile,
   sample,
+  switchMap,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, empty, of } from 'rxjs'
+import { fromEvent, empty, of, from } from 'rxjs'
 import * as r from '../redux'
-import { toWaveformCoordinates } from '../utils/waveformCoordinates'
 import { AppEpic } from '../types/AppEpic'
+import { isOpenFileSuccess } from '../utils/files'
+import { setCursor } from './setWaveformCursor'
+import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
 
-const highlightEpic: AppEpic = (
-  action$,
-  state$,
-  { setCurrentTime, getWaveformSvgElement }
-) =>
-  action$.pipe(
-    ofType(A.OPEN_MEDIA_FILE_SUCCESS),
-    flatMap(() =>
-      fromEvent<MouseEvent>(
-        getWaveformSvgElement() as SVGElement,
-        'mousedown'
-      ).pipe(
-        flatMap(mouseDown => {
-          if (r.getPendingStretch(state$.value)) return empty()
+const highlightEpic: AppEpic = (action$, state$, effects) => {
+  const waveformMousedowns = fromEvent<WaveformMousedownEvent>(
+    effects.document,
+    'waveformMousedown'
+  )
+  return waveformMousedowns.pipe(
+    switchMap(waveformMousedown => {
+      if (r.getPendingStretch(state$.value)) return empty()
 
-          const waveformMouseDown = toWaveformCoordinates(
-            mouseDown,
-            mouseDown.currentTarget as SVGElement,
-            r.getWaveformViewBoxXMin(state$.value)
-          )
-          return of({
-            waveformMouseDown,
-            clipIdAtX: r.getClipIdAt(state$.value, waveformMouseDown.x),
-          })
-        }),
-        sample(fromEvent(getWaveformSvgElement() as SVGElement, 'mouseup'))
+      return of({
+        waveformMousedown,
+        clipIdAtX: r.getClipIdAt(state$.value, waveformMousedown.x),
+      })
+    }),
+    sample(
+      waveformMousedowns.pipe(
+        switchMap(waveformMousedown =>
+          fromEvent(waveformMousedown.svg, 'mouseup')
+        )
       )
     ),
-    map(({ waveformMouseDown, clipIdAtX }) => {
+    flatMap(({ waveformMousedown, clipIdAtX }) => {
       const state = state$.value
       const mousePositionOrClipStart = clipIdAtX
         ? (r.getClip(state, clipIdAtX) as Clip).start
-        : waveformMouseDown.x
+        : waveformMousedown.x
       const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
-      setCurrentTime(newTime)
-      return clipIdAtX ? r.highlightClip(clipIdAtX) : r.highlightClip(null)
+      effects.setCurrentTime(newTime)
+      return clipIdAtX
+        ? of(r.highlightClip(clipIdAtX))
+        : from([
+            setCursor(state$.value, effects.getCurrentTime(), effects),
+            r.highlightClip(null),
+          ])
     })
   )
+}
 
 const highlightClipsOnAddEpic: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -118,7 +120,7 @@ const centerSelectedClip: AppEpic = (
 ) =>
   action$.pipe(
     ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
-    flatMap(({ id }) => {
+    switchMap(({ id }) => {
       if (!id) return empty()
       const clip = r.getClip(state$.value, id) as Clip
       if (!clip) return empty()
@@ -154,18 +156,16 @@ const centerSelectedClip: AppEpic = (
   )
 
 const LOOP_BUFFER = 25
-const deselectClipOnManualChangeTime: AppEpic = (
-  action$,
-  state$,
-  { document, getCurrentTime }
-) =>
+const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.OPEN_MEDIA_FILE_SUCCESS),
-    flatMap(() =>
+    filter<Action, OpenFileSuccessWith<MediaFile>>(
+      isOpenFileSuccess('MediaFile')
+    ),
+    switchMap(() =>
       // @ts-ignore
-      fromEvent(document, 'seeking', true).pipe(
+      fromEvent(effects.document, 'seeking', true).pipe(
         takeWhile(() =>
-          Boolean(r.getCurrentMediaFileConstantBitratePath(state$.value))
+          Boolean(r.getCurrentMediaConstantBitrateFilePath(state$.value))
         )
       )
     ),
@@ -176,7 +176,10 @@ const deselectClipOnManualChangeTime: AppEpic = (
       if (!highlightedClipId) return false
 
       const highlightedClip = r.getClip(state$.value, highlightedClipId) as Clip
-      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
+      const x = r.getXAtMilliseconds(
+        state$.value,
+        effects.getCurrentTime() * 1000
+      )
       return x < highlightedClip.start || x > highlightedClip.end + LOOP_BUFFER
     }),
     map(() => r.highlightClip(null))
@@ -184,7 +187,8 @@ const deselectClipOnManualChangeTime: AppEpic = (
 
 const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.OPEN_MEDIA_FILE_REQUEST),
+    ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
+    filter(({ file }) => file.type === 'MediaFile'),
     map(() => r.highlightClip(null))
   )
 

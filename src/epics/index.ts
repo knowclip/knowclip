@@ -1,9 +1,8 @@
-import { map, ignoreElements, flatMap } from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
+import { ignoreElements, mergeAll } from 'rxjs/operators'
+import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { ipcRenderer, remote } from 'electron'
 import * as r from '../redux'
-import getWaveformEpic from './getWaveform'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
 import stretchClip from './stretchClip'
@@ -12,45 +11,15 @@ import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
 import persistStateEpic from './persistState'
-import media from './media'
+import addMediaToProject from './addMediaToProject'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
 import subtitles from './subtitles'
+import files from './files'
+import defaultTags from './defaultTags'
 import { AppEpic } from '../types/AppEpic'
-
-const defaultTagsEpic: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, AddFlashcardTag | DeleteFlashcardTag>(
-      A.ADD_FLASHCARD_TAG,
-      A.DELETE_FLASHCARD_TAG
-    ),
-    map(({ id }) => {
-      const clip = r.getClip(state$.value, id)
-      if (!clip) {
-        // should this happen or should we set empty default tags?
-        console.error('No clip found')
-        return r.simpleMessageSnackbar(
-          'Could not set default tags: no clip found'
-        )
-      }
-      return {
-        type: 'SET_DEFAULT_TAGS',
-        tags: clip.flashcard.tags,
-      } as SetDefaultTags
-    })
-  )
-
-// const defaultTagsAudioEpic: AppEpic = (action$, state$) =>
-//   action$.pipe(
-//     ofType(A.LOAD_MEDIA_SUCCESS),
-//     filter(({ file }) => file),
-//     map(({ id }) => ({
-//       type: 'SET_DEFAULT_TAGS',
-//       tags: [basename(r.getCurrentFileName(state$.value))],
-//     }))
-//   )
 
 const closeEpic: AppEpic = (action$, state$) =>
   fromEvent(ipcRenderer, 'app-close', async () => {
@@ -73,13 +42,12 @@ const closeEpic: AppEpic = (action$, state$) =>
       return await { type: 'QUIT_APP' }
     }
   }).pipe(
-    flatMap(x => x),
+    mergeAll(),
     ignoreElements()
   )
 
 const rootEpic: AppEpic = combineEpics(
-  media,
-  getWaveformEpic,
+  addMediaToProject,
   setWaveformCursorEpic,
   addClip,
   stretchClip,
@@ -90,11 +58,12 @@ const rootEpic: AppEpic = combineEpics(
   exportMarkdown,
   deleteAllCurrentFileClips,
   project,
-  defaultTagsEpic,
+  defaultTags,
   keyboard,
   highlightClip,
   closeEpic,
-  subtitles
+  subtitles,
+  files
 )
 
 export default rootEpic

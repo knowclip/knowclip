@@ -10,9 +10,11 @@ const initialState: UserState = {
   currentProjectId: null,
   workIsUnsaved: false,
   tagsToClipIds: {},
+  mediaIsLoading: false,
+  loopMedia: true,
 }
 
-const user: Reducer<UserState> = (state = initialState, action) => {
+const user: Reducer<UserState, Action> = (state = initialState, action) => {
   switch (action.type) {
     case A.DELETE_CARD:
       return action.id === state.highlightedClipId
@@ -20,7 +22,8 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         : state
 
     case A.DELETE_CARDS:
-      return action.ids.includes(state.highlightedClipId)
+      return state.highlightedClipId &&
+        action.ids.includes(state.highlightedClipId)
         ? { ...state, highlightedClipId: null }
         : state
 
@@ -29,6 +32,7 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         ? {
             ...state,
             currentMediaFileId: null,
+            highlightedClipId: null,
           }
         : state
 
@@ -41,11 +45,15 @@ const user: Reducer<UserState> = (state = initialState, action) => {
     case A.CLOSE_PROJECT:
       return initialState
 
-    case A.OPEN_MEDIA_FILE_REQUEST:
-      return {
-        ...state,
-        currentMediaFileId: action.id,
-      }
+    case A.OPEN_FILE_REQUEST:
+      if (action.file.type === 'MediaFile')
+        return {
+          ...state,
+          currentMediaFileId: action.file.id,
+          mediaIsLoading: true,
+        }
+
+      return state
 
     case A.ADD_CLIP:
       return {
@@ -152,6 +160,34 @@ const user: Reducer<UserState> = (state = initialState, action) => {
         ...state,
         workIsUnsaved: action.workIsUnsaved,
       }
+
+    case A.TOGGLE_LOOP:
+      return {
+        ...state,
+        loopMedia: !state.loopMedia,
+      }
+
+    case A.SET_LOOP:
+      return {
+        ...state,
+        loopMedia: action.loop,
+      }
+
+    case A.OPEN_FILE_SUCCESS: // temp
+      return action.validatedFile.type === 'MediaFile'
+        ? {
+            ...state,
+            mediaIsLoading: false, // should probably exist in fileAvailabilities state
+          }
+        : state // what about cbr
+
+    case A.OPEN_FILE_FAILURE:
+      return action.file.type === 'MediaFile'
+        ? {
+            ...state,
+            mediaIsLoading: false,
+          }
+        : state // what about cbr
 
     default:
       return state

@@ -1,7 +1,11 @@
 import { createSelector } from 'reselect'
 import { getSecondsAtX } from './waveformTime'
-import * as audioSelectors from './audio'
+import * as mediaSelectors from './media'
 import formatTime from '../utils/formatTime'
+import getAllTagsFromClips from '../utils/getAllTags'
+
+import { getSourceSubtitlesFile } from './subtitles'
+import moment from 'moment'
 
 export const WAVEFORM_HEIGHT = 50
 export const SELECTION_BORDER_WIDTH = 5
@@ -9,11 +13,12 @@ export const CLIP_THRESHOLD = 40
 
 export * from './waveformTime'
 export * from './clips'
-export * from './audio'
+export * from './media'
 export * from './snackbar'
 export * from './dialog'
 export * from './project'
 export * from './subtitles'
+export * from './files'
 
 export const getClip = (state: AppState, id: ClipId): Clip | null =>
   state.clips.byId[id]
@@ -49,7 +54,7 @@ export const getAllProjectClipsIds: ((
 export const getCurrentFileClips: ((
   state: AppState
 ) => Array<Clip>) = createSelector(
-  audioSelectors.getCurrentFileClipsOrder,
+  mediaSelectors.getCurrentFileClipsOrder,
   getClipsObject,
   getClipsByIds
 )
@@ -126,7 +131,7 @@ export const getSelectedClipTime = (state: AppState): TimeSpan | null => {
 }
 
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
-  audioSelectors.getCurrentFileClipsOrder(state).map(id => {
+  mediaSelectors.getCurrentFileClipsOrder(state).map(id => {
     const flashcard = getFlashcard(state, id)
     if (!flashcard) throw new Error('flashcard not found ' + id)
     return flashcard
@@ -135,7 +140,7 @@ export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
 export const getPendingClip = (state: AppState): PendingClip | null =>
   state.user.pendingClip
 export const getClipIdAt = (state: AppState, x: number): ClipId | null =>
-  audioSelectors.getCurrentFileClipsOrder(state).find(clipId => {
+  mediaSelectors.getCurrentFileClipsOrder(state).find(clipId => {
     const clip = state.clips.byId[clipId]
     const { start, end } = clip
     return x >= start && x <= end
@@ -145,11 +150,11 @@ export const getPreviousClipId = (
   state: AppState,
   id: ClipId
 ): ClipId | null => {
-  const clipsOrder = audioSelectors.getCurrentFileClipsOrder(state)
+  const clipsOrder = mediaSelectors.getCurrentFileClipsOrder(state)
   return clipsOrder[clipsOrder.indexOf(id) - 1]
 }
 export const getNextClipId = (state: AppState, id: ClipId): ClipId | null => {
-  const clipsOrder = audioSelectors.getCurrentFileClipsOrder(state)
+  const clipsOrder = mediaSelectors.getCurrentFileClipsOrder(state)
   return clipsOrder[clipsOrder.indexOf(id) + 1]
 }
 
@@ -203,17 +208,50 @@ export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
 }
 
 export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
-  audioSelectors
+  mediaSelectors
     .getCurrentFileClipsOrder(state)
     .map(id => getClipTimes(state, id))
 
 export const isAudioLoading = (state: AppState): boolean =>
-  state.audio.isLoading
+  state.user.mediaIsLoading
 
 export const getMediaFolderLocation = (state: AppState): string | null =>
-  state.audio.mediaFolderLocation
+  state.settings.mediaFolderLocation
 
 export const getAllTags = (state: AppState): Array<string> => {
   const tags = Object.keys(state.user.tagsToClipIds)
   return tags.reduce((a, b) => a.concat(b), [] as Array<string>)
+}
+
+export const getProject = (
+  state: AppState,
+  file: ProjectFile
+): Project4_1_0 => {
+  const mediaFiles = mediaSelectors.getProjectMediaFiles(state, file.id)
+  return {
+    version: '4.1.0',
+    timestamp: moment.utc().format(),
+    name: file.name,
+    id: file.id,
+    noteType: file.noteType,
+    lastOpened: file.lastOpened,
+    mediaFiles,
+    tags: [...getAllTagsFromClips(state.clips.byId)],
+    clips: mediaFiles.reduce(
+      (clips, { id }) => [...clips, ...getClips(state, id)],
+      [] as Clip[]
+    ),
+    subtitles: mediaFiles.reduce(
+      (subtitlesFiles, { id, subtitles }) => [
+        ...subtitlesFiles,
+        ...subtitles
+          .map(id => getSourceSubtitlesFile(state, id))
+          .filter(
+            (file): file is ExternalSubtitlesFile =>
+              Boolean(file && file.type === 'ExternalSubtitlesFile')
+          ),
+      ],
+      [] as ExternalSubtitlesFile[]
+    ),
+  }
 }

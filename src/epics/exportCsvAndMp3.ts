@@ -1,4 +1,4 @@
-import { flatMap } from 'rxjs/operators'
+import { flatMap, mergeAll } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
 import { promisify } from 'util'
@@ -21,13 +21,13 @@ const exportCsv: AppEpic = (action$, state$) =>
     flatMap<ExportCsv, Promise<Observable<Action>>>(
       async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
         try {
-          const currentProjectMetadata = r.getCurrentProject(state$.value)
-          if (!currentProjectMetadata)
+          const currentProject = r.getCurrentProject(state$.value)
+          if (!currentProject)
             return of(r.simpleMessageSnackbar('Could not find project'))
 
           const exportData = getApkgExportData(
             state$.value,
-            currentProjectMetadata,
+            currentProject,
             clipIds
           )
           const csvText = getCsvText(exportData)
@@ -83,7 +83,7 @@ const exportMp3: AppEpic = (action$, state$) =>
         return of(exportFailureSnackbar(err))
       }
     }),
-    flatMap(x => x)
+    mergeAll()
   )
 
 export default combineEpics(exportCsv, exportMp3)

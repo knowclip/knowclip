@@ -1,17 +1,52 @@
-import { flatMap, debounce, map, filter } from 'rxjs/operators'
-import { timer, of, from, Observable } from 'rxjs'
+import {
+  flatMap,
+  debounce,
+  map,
+  filter,
+  mergeAll,
+  switchMap,
+  catchError,
+  ignoreElements,
+  tap,
+} from 'rxjs/operators'
+import { timer, of, from, Observable, empty } from 'rxjs'
 import { ofType, combineEpics, StateObservable } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
-import parseProject, { getMediaFilePaths } from '../utils/parseProject'
+import parseProject from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
+import moment from 'moment'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
 
-const openProject = async (
+const createProject: AppEpic = (action$, state$, effects) =>
+  action$.ofType<CreateProject>(A.CREATE_PROJECT).pipe(
+    switchMap(({ project, filePath }) => {
+      return from(
+        writeFile(
+          filePath,
+          JSON.stringify(r.getProject(state$.value, project), null, 2),
+          'utf8'
+        )
+      ).pipe(
+        flatMap(() =>
+          from([r.addAndOpenFile(project, filePath), r.setWorkIsUnsaved(false)])
+        )
+      )
+    }),
+    catchError(err =>
+      of(
+        r.simpleMessageSnackbar(
+          'Error creating project file: ' + err.toString()
+        )
+      )
+    )
+  )
+
+const addAndOpenProject = async (
   filePath: string,
   state$: StateObservable<AppState>
 ): Promise<Observable<Action>> => {
@@ -24,28 +59,28 @@ const openProject = async (
           'Could not read project file. Please make sure your software is up to date and try again.'
         )
       )
-    let originalProjectJson = JSON.parse(projectJson)
-    const mediaFilePaths = getMediaFilePaths(
-      originalProjectJson,
-      project,
-      filePath,
-      r.getMediaFilePaths(state$.value, project.id)
-    )
-    const projectMetadata = r.getProjectMetadata(state$.value, project.id)
+
+    const mediaFiles = project.mediaFiles.map(({ id }) => id)
+    const projectFile: ProjectFile = {
+      id: project.id,
+      type: 'ProjectFile',
+      lastSaved: project.timestamp,
+      lastOpened: project.lastOpened,
+      name: project.name,
+      mediaFileIds: mediaFiles,
+      error: null,
+      noteType: project.noteType,
+    }
     return from([
-      r.openProject(project, {
-        id: project.id,
-        filePath: filePath,
-        name: project.name,
-        mediaFilePaths,
-        error: null,
-        noteType: project.noteType,
-      }),
-      ({
-        type: projectMetadata
-          ? 'CREATED NEW PROJECT METADATA'
-          : 'open old project metadata',
-      } as unknown) as Action,
+      r.addFile(projectFile, filePath),
+      r.openProject(
+        projectFile,
+        project.clips,
+        moment()
+          .utc()
+          .format()
+      ),
+      r.openFileSuccess(projectFile, filePath),
     ])
   } catch (err) {
     console.error(err)
@@ -58,22 +93,13 @@ const openProject = async (
 const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.OPEN_PROJECT_REQUEST_BY_ID),
-    flatMap<OpenProjectRequestById, Promise<Observable<Action>>>(
-      async ({ id }) => {
-        const projectMetadata = r.getProjectMetadata(state$.value, id)
-        if (!projectMetadata)
-          return of(r.simpleMessageSnackbar(`Could not find project ${id}.`))
+    map(({ id }) => {
+      const project = r.getFile<ProjectFile>(state$.value, 'ProjectFile', id)
+      if (!project)
+        return r.simpleMessageSnackbar(`Could not find project ${id}.`)
 
-        const { filePath } = projectMetadata
-        if (!filePath)
-          return of(
-            r.simpleMessageSnackbar(`Could not find project at ${filePath}`)
-          )
-
-        return await openProject(filePath, state$)
-      }
-    ),
-    flatMap<Observable<Action>, Observable<Action>>(x => x)
+      return r.openFileRequest(project)
+    })
   )
 
 const openProjectByFilePath: AppEpic = (action$, state$) =>
@@ -88,15 +114,12 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
           filePath
         )
         if (projectIdFromRecents)
-          return of(r.openProjectById(projectIdFromRecents))
+          return from([r.openProjectById(projectIdFromRecents)])
 
-        if (!fs.existsSync(filePath))
-          return of(r.simpleMessageSnackbar('Could not find project file.'))
-
-        return await openProject(filePath, state$)
+        return await addAndOpenProject(filePath, state$)
       }
     ),
-    flatMap(x => x)
+    mergeAll()
   )
 
 const saveProject: AppEpic = (action$, state$) =>
@@ -106,8 +129,16 @@ const saveProject: AppEpic = (action$, state$) =>
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
         return Boolean({ type: 'NOOP_SAVE_PROJECT_WITH_NONE_OPEN' })
-      const { filePath } = projectMetadata
-      return Boolean(filePath && fs.existsSync(filePath))
+      const projectFile = r.getFileAvailabilityById(
+        state$.value,
+        'ProjectFile',
+        projectMetadata.id
+      )
+      return Boolean(
+        projectFile &&
+          projectFile.filePath &&
+          fs.existsSync(projectFile.filePath)
+      )
     }), // while can't find project file path in local storage, or file doesn't exist
     flatMap(async () => {
       try {
@@ -118,21 +149,25 @@ const saveProject: AppEpic = (action$, state$) =>
           null,
           2
         )
-        await writeFile(projectMetadata.filePath, json, 'utf8')
+        const projectFile = r.getFileAvailabilityById(
+          state$.value,
+          'ProjectFile',
+          projectMetadata.id
+        ) as CurrentlyLoadedFile
+        await writeFile(projectFile.filePath, json, 'utf8')
 
         return from([
           r.setWorkIsUnsaved(false),
-          r.simpleMessageSnackbar(
-            `Project saved in ${projectMetadata.filePath}`
-          ),
+          r.simpleMessageSnackbar(`Project saved in ${projectFile.filePath}`),
         ])
       } catch (err) {
+        console.error(err)
         return of(
           r.simpleMessageSnackbar(`Problem saving project file: ${err.message}`)
         )
       }
     }),
-    flatMap(x => x)
+    mergeAll()
   )
 
 const PROJECT_EDIT_ACTIONS = [
@@ -146,10 +181,10 @@ const PROJECT_EDIT_ACTIONS = [
   A.ADD_CLIPS,
   A.EDIT_CLIP,
   A.MERGE_CLIPS,
-  A.ADD_MEDIA_TO_PROJECT,
   A.DELETE_MEDIA_FROM_PROJECT,
-  A.LOCATE_MEDIA_FILE_SUCCESS,
-  // 'CREATED NEW PROJECT METADATA',
+  A.DELETE_FILE_SUCCESS, // ???
+  A.ADD_AND_OPEN_FILE,
+  A.LOCATE_FILE_SUCCESS, // ????
 ] as const
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
@@ -166,10 +201,13 @@ const autoSaveProject: AppEpic = (action$, state$) =>
     map(() => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
-        if (!projectMetadata) throw new Error('No project metadata found')
+        if (!projectMetadata) return ({ type: 'AUTOSAVE' } as unknown) as Action
+
         saveProjectToLocalStorage(r.getProject(state$.value, projectMetadata))
+
         return ({ type: 'AUTOSAVE' } as unknown) as Action
       } catch (err) {
+        console.error(err)
         return r.simpleMessageSnackbar(
           `Problem saving project file: ${err.message}`
         )
@@ -177,83 +215,16 @@ const autoSaveProject: AppEpic = (action$, state$) =>
     })
   )
 
-const openMediaFileRequestOnOpenProject: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, OpenProject>(A.OPEN_PROJECT),
-    flatMap(({ projectMetadata }) => {
-      if (!projectMetadata.mediaFilePaths.length)
-        return of(({
-          type: 'NOOP_OPEN_PROJECT_NO_MEDIA_FILES',
-        } as unknown) as Action)
-
-      const [
-        {
-          metadata: { id: firstMediaFileId },
-        },
-      ] = projectMetadata.mediaFilePaths
-
-      const clips = Object.values(state$.value.clips.idsByMediaFileId).reduce(
-        (a, b) => a.concat(b),
-        []
-      )
-
-      const tagsToClipIds: { [tag: string]: ClipId[] } = clips.reduce(
-        (tagsToIds, clipId) => {
-          const clip = r.getClip(state$.value, clipId)
-          if (clip)
-            clip.flashcard.tags.forEach(tag => {
-              tagsToIds[tag] = (tagsToIds[tag] || []) as string[]
-              tagsToIds[tag].push(clip.id)
-            })
-          return tagsToIds
-        },
-        {} as { [tag: string]: ClipId[] }
-      )
-
-      return from([
-        r.openMediaFileRequest(firstMediaFileId),
-        r.setAllTags(tagsToClipIds),
-      ])
-    })
-  )
-
-const openProjectOnCreate: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, CreateProject>(A.CREATE_PROJECT),
-    flatMap(async ({ projectMetadata }) => {
-      try {
-        const json = JSON.stringify(
-          r.getProject(state$.value, projectMetadata),
-          null,
-          2
-        )
-        await writeFile(projectMetadata.filePath, json, 'utf8')
-
-        return await r.openProjectById(projectMetadata.id)
-      } catch (err) {
-        console.error(err)
-        return await r.simpleMessageSnackbar(
-          `Could not create project file: ${err.message}`
-        )
-      }
-    })
-  )
-
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DeleteMediaFromProjectRequest>(
-      A.DELETE_MEDIA_FROM_PROJECT_REQUEST
-    ),
-    flatMap(({ projectId, mediaFileId }) => {
-      const highlightedClip = r.getHighlightedClip(state$.value)
-      return from([
-        ...(highlightedClip ? [r.highlightClip(null)] : []),
-        r.deleteMediaFromProject(projectId, mediaFileId),
-      ])
+    ofType<Action, DeleteMediaFromProject>(A.DELETE_MEDIA_FROM_PROJECT),
+    flatMap(({ mediaFileId }) => {
+      const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
+      return file ? of(r.deleteFileRequest(file.type, file.id)) : empty()
     })
   )
 
-const closeProject: AppEpic = (action$, state$) =>
+const closeProjectRequest: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType(A.CLOSE_PROJECT_REQUEST),
     map(() => {
@@ -266,14 +237,23 @@ const closeProject: AppEpic = (action$, state$) =>
     })
   )
 
+const closeProject: AppEpic = (action$, state$, { getCurrentWindow }) =>
+  action$.pipe(
+    ofType(A.CLOSE_PROJECT),
+    tap(() => {
+      getCurrentWindow().reload()
+    }),
+    ignoreElements()
+  )
+
 export default combineEpics(
+  createProject,
   openProjectByFilePath,
   openProjectById,
   saveProject,
   registerUnsavedWork,
   autoSaveProject,
-  openMediaFileRequestOnOpenProject,
-  openProjectOnCreate,
   deleteMediaFileFromProject,
+  closeProjectRequest,
   closeProject
 )
