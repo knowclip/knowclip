@@ -303,6 +303,7 @@ declare type DeleteFileRequest = {
 declare type DeleteFileSuccess = {
   type: 'DELETE_FILE_SUCCESS'
   file: FileMetadata
+  descendants: Array<FileMetadata>
 }
 declare type OpenFileRequest = {
   type: 'OPEN_FILE_REQUEST'

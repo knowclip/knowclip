@@ -78,9 +78,10 @@ export default {
   ],
 
   locateSuccess: null,
-  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
-  deleteSuccess: [
-    async ({ file }, state, effects) =>
-      file.mediaFileIds.map(id => r.deleteFileRequest('MediaFile', id)),
+  deleteRequest: [
+    async (file, descendants, state, effects) => [
+      r.deleteFileSuccess(file, descendants),
+    ],
   ],
+  deleteSuccess: [],
 } as FileEventHandlers<ProjectFile>

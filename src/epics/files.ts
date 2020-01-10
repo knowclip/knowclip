@@ -146,7 +146,14 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
       return file
         ? from(
             fileEventHandlers[fileType].deleteRequest.flatMap(handler =>
-              from(handler(file, state$.value, effects)).pipe(mergeAll())
+              from(
+                handler(
+                  file,
+                  r.getFileDescendants(state$.value, file.id),
+                  state$.value,
+                  effects
+                )
+              ).pipe(mergeAll())
             )
           )
         : empty()

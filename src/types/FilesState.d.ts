@@ -77,12 +77,12 @@ declare type VttConvertedSubtitlesFile =
 declare type WaveformPng = {
   type: 'WaveformPng'
   id: FileId
-  // parentId: MediaFileId // TODO: verify whether this is needed
+  parentId: MediaFileId
 }
 declare type ConstantBitrateMp3 = {
   type: 'ConstantBitrateMp3'
   id: FileId
-  // parentId: MediaFileId  // TODO: verify whether this is needed
+  parentId: MediaFileId
 }
 // declare type VideoStillImageRecord = {
 //   type: 'VideoStillImage'

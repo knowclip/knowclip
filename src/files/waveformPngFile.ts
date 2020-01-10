@@ -36,6 +36,10 @@ export default {
     }
   },
   locateSuccess: null,
-  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
+  deleteRequest: [
+    async (file, descendants, state, effects) => [
+      r.deleteFileSuccess(file, descendants),
+    ],
+  ],
   deleteSuccess: [],
 } as FileEventHandlers<WaveformPng>

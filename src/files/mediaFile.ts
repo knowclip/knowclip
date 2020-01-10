@@ -85,6 +85,7 @@ const getCbr: OpenFileSuccessHandler<MediaFile> = async (
         r.addAndOpenFile({
           type: 'ConstantBitrateMp3',
           id: validatedFile.id,
+          parentId: validatedFile.id,
         }),
       ]
     : []
@@ -110,24 +111,6 @@ const deleteExternalSubtitles: DeleteFileSuccessHandler<MediaFile> = async (
         file !== null
     )
     .map(file => r.deleteFileRequest(file.type, file.id))
-
-const deleteCbr: DeleteFileSuccessHandler<MediaFile> = async (
-  { file },
-  state,
-  effects
-) => {
-  const cbrFile = r.getFile(state, 'ConstantBitrateMp3', file.id)
-  return cbrFile ? [r.deleteFileRequest('ConstantBitrateMp3', cbrFile.id)] : []
-}
-
-const deleteWaveform: DeleteFileSuccessHandler<MediaFile> = async (
-  { file },
-  state,
-  effects
-) => {
-  const waveformPng = r.getFile(state, 'WaveformPng', file.id)
-  return waveformPng ? [r.deleteFileRequest('WaveformPng', waveformPng.id)] : []
-}
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -161,8 +144,12 @@ export default {
     return [r.fileSelectionDialog(action.message, action.file)]
   },
   locateSuccess: null,
-  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
-  deleteSuccess: [deleteExternalSubtitles, deleteCbr, deleteWaveform],
+  deleteRequest: [
+    async (file, descendants, state, effects) => [
+      r.deleteFileSuccess(file, descendants),
+    ],
+  ],
+  deleteSuccess: [],
 } as FileEventHandlers<MediaFile>
 
 const validateMediaFile = async (

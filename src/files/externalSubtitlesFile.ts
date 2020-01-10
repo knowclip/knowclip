@@ -44,24 +44,18 @@ export default {
 
   locateSuccess: null,
 
-  deleteRequest: [async (file, state, effects) => [r.deleteFileSuccess(file)]],
+  deleteRequest: [
+    async (file, descendants, state, effects) => [
+      r.deleteFileSuccess(file, descendants),
+    ],
+  ],
 
   deleteSuccess: [
     async ({ file }, state, effects) => {
-      const convertedVtt = r.getFile(
-        state,
-        'VttConvertedSubtitlesFile',
-        file.id
-      )
-      const deleteConvertedVtt = convertedVtt
-        ? [r.deleteFileRequest('VttConvertedSubtitlesFile', convertedVtt.id)]
-        : []
-
       const mediaFile = r.getFile(state, 'MediaFile', file.parentId)
-      const deleteSubtitlesTrack = mediaFile
+      return mediaFile
         ? [r.deleteSubtitlesTrackFromMedia(file.id, file.parentId)]
         : []
-      return [...deleteSubtitlesTrack, ...deleteConvertedVtt]
     },
   ],
 } as FileEventHandlers<ExternalSubtitlesFile>

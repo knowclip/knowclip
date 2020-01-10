@@ -24,9 +24,13 @@ export const deleteFileRequest = (
   fileType,
   id,
 })
-export const deleteFileSuccess = (file: FileMetadata): DeleteFileSuccess => ({
+export const deleteFileSuccess = (
+  file: FileMetadata,
+  descendants: Array<FileMetadata>
+): DeleteFileSuccess => ({
   type: 'DELETE_FILE_SUCCESS',
   file,
+  descendants,
 })
 export const openFileRequest = (file: FileMetadata): OpenFileRequest => ({
   type: 'OPEN_FILE_REQUEST',

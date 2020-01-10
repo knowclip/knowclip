@@ -31,3 +31,28 @@ export const getWaveformPath = (state: AppState): string | null => {
   )
   return waveformFile ? waveformFile.filePath : null
 }
+
+export const getFileDescendants = (
+  state: AppState,
+  id: FileId,
+  descendants: Array<FileMetadata> = []
+): Array<FileMetadata> => {
+  // TODO: speed this up jic there are lots of files
+  for (const filesHash of Object.values(state.files)) {
+    for (const fileId in filesHash) {
+      const file = filesHash[fileId]
+      // TODO: check if we should check parentType as well
+      if (
+        !descendants.includes(file) &&
+        'parentId' in file &&
+        file.parentId === id
+      ) {
+        descendants.push(file)
+
+        getFileDescendants(state, fileId, descendants)
+      }
+    }
+  }
+
+  return descendants
+}
