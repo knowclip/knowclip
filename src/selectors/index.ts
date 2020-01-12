@@ -245,7 +245,7 @@ export const getProject = (
       (subtitlesFiles, { id, subtitles }) => [
         ...subtitlesFiles,
         ...subtitles
-          .map(id => getSourceSubtitlesFile(state, id))
+          .map(({ id }) => getSourceSubtitlesFile(state, id))
           .filter(
             (file): file is ExternalSubtitlesFile =>
               Boolean(file && file.type === 'ExternalSubtitlesFile')

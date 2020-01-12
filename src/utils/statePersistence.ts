@@ -1,6 +1,5 @@
 import { initialState as initialFilesState } from '../reducers/files'
 import { initialState as initialFileAvailabilitiesState } from '../reducers/fileAvailabilities'
-import moment from 'moment'
 
 type FilesyState<F> = Record<FileMetadata['type'], { [fileId: string]: F }>
 
@@ -22,44 +21,6 @@ const mapFileState = <F, G>(state: FilesyState<F>, transform: (f: F) => G) =>
 export const getPersistedState = (): Partial<AppState> => {
   const persistedState: Partial<AppState> = {}
   try {
-    const projectsText = window.localStorage.getItem('projects')
-    const projects = projectsText
-      ? (JSON.parse(projectsText) as ProjectsState)
-      : null
-    const convertedProjectFiles: Record<string, ProjectFile> = {
-      ...Object.values(projects ? projects.byId : {}).reduce(
-        (all, oldProject) => {
-          const newProject: ProjectFile = {
-            type: 'ProjectFile',
-            lastOpened: moment.utc().format(),
-            lastSaved: '2015-11-16T09:44:45Z',
-            id: oldProject.id,
-            name: oldProject.name,
-            noteType: oldProject.noteType,
-            mediaFileIds: oldProject.mediaFileIds,
-            error: null,
-          }
-          all[oldProject.id] = newProject
-          return all
-        },
-        {} as Record<string, ProjectFile>
-      ),
-    }
-    const oldProjectFiles: Record<string, FileAvailability> = {
-      ...Object.values(projects ? projects.byId : {}).reduce(
-        (all, oldProject) => {
-          const newProject: FileAvailability = {
-            id: oldProject.id,
-            status: 'REMEMBERED',
-            filePath: oldProject.filePath,
-          }
-          all[oldProject.id] = newProject
-          return all
-        },
-        {} as Record<string, FileAvailability>
-      ),
-    }
-
     const settingsText = window.localStorage.getItem('settings')
     const settings = settingsText
       ? (JSON.parse(settingsText) as SettingsState)
@@ -69,21 +30,7 @@ export const getPersistedState = (): Partial<AppState> => {
     const filesText = window.localStorage.getItem('files')
     const files = filesText ? (JSON.parse(filesText) as FilesState) : null
 
-    persistedState.files = files
-      ? {
-          ...files,
-          ProjectFile: {
-            ...convertedProjectFiles,
-            ...files.ProjectFile,
-          },
-        }
-      : {
-          ...initialFilesState,
-          ProjectFile: {
-            ...initialFilesState.ProjectFile,
-            ...convertedProjectFiles,
-          },
-        }
+    if (files) persistedState.files = { ...initialFilesState, ...files }
 
     // should also check for orphans?
 
@@ -96,11 +43,6 @@ export const getPersistedState = (): Partial<AppState> => {
     const fileAvailabilities = {
       ...initialFileAvailabilitiesState,
       ...storedFiles,
-      ProjectFile: {
-        ...initialFileAvailabilitiesState.ProjectFile,
-        ...oldProjectFiles,
-        ...(storedFiles ? storedFiles.ProjectFile : null),
-      },
     }
 
     persistedState.fileAvailabilities = mapFileState(

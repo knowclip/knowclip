@@ -38,7 +38,7 @@ export const getSubtitlesTracks = createSelector(
   (currentFile, subtitles): Array<SubtitlesTrack> => {
     if (!currentFile) return []
     return currentFile.subtitles
-      .map(id => subtitles[id])
+      .map(({ id }) => subtitles[id])
       .filter((track): track is SubtitlesTrack => Boolean(track))
   }
 )

@@ -1,10 +1,14 @@
 {
-  "name": "audio-flashcard-assistant",
-  "productName": "audio-flashcard-assistant",
-  "version": "0.4.1",
+  "name": "knowclip",
+  "productName": "knowclip",
+  "version": "0.5.0",
   "private": true,
   "engines": {
     "node": "^12.4.0"
+  },
+  "author": {
+    "name": "Justin Silvestre",
+    "email": "justinsilvestre@gmail.com"
   },
   "dependencies": {
     "@material-ui/core": "^3.9.0",
@@ -49,12 +53,10 @@
     "lint": "eslint src/**/*.{ts,tsx,js}",
     "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.{js,ts,tsx}\"",
     "format:write": "yarn format --write",
-    "build-electron:mac": "NODE_ENV=production electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icons/icon.icns --prune=true --out=release-builds",
-    "build-electron:win": "electron-packager . audio-flashcard-assistant --asar.unpackDir=\"**/node_modules/{ffmpeg-static/bin/win32,ffprobe-static/bin/win32}*\" --overwrite --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Audio Flashcard Assistant\"",
-    "build:mac": "yarn build && yarn build-electron:mac",
-    "build:win": "yarn build && yarn build-electron:win && zip -r ./release-builds/afca.zip ./release-builds/audio-flashcard-assistant-win32-ia32",
     "tsc": "tsc",
-    "tidy": "yarn format --list-different && yarn lint && yarn tsc"
+    "tidy": "yarn format --list-different && yarn lint && yarn tsc",
+    "electron-builder": "electron-builder",
+    "dist": "yarn build && yarn electron-builder"
   },
   "husky": {
     "hooks": {
@@ -77,7 +79,7 @@
     "@types/uuid": "^3.4.5",
     "@typescript-eslint/eslint-plugin": "^2.3.2",
     "electron": "6.0.12",
-    "electron-packager": "^14.0.6",
+    "electron-builder": "^21.2.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-react-hooks": "^1.6.0",
     "husky": "^1.1.3",
@@ -85,9 +87,23 @@
     "silvestre-afa-react-scripts": "^3.2.0",
     "typescript": "^3.6.3"
   },
-  "bruild": {
-    "asarUnpack": [
-      "**/node_modules/ffmpeg-static/*"
-    ]
+  "build": {
+    "appId": "com.electron.knowclip",
+    "asar": true,
+    "productName": "Knowclip",
+    "copyright": "Copyright 2019 Justin Silvestre",
+    "files": ["./build/**/*", "./icons/**/*", "./main.js", "./electron"],
+    "win": {
+      "target": ["portable"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Education"
+    },
+    "mac": {
+      "target": ["zip"],
+      "category": "public.app-category.education",
+      "icon": "./icons/icon.icns"
+    }
   }
 }

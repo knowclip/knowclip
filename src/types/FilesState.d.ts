@@ -42,7 +42,10 @@ declare type MediaFile = {
   id: FileId
   parentId: ProjectId
 
-  subtitles: Array<SubtitlesTrackId>
+  subtitles: Array<
+    | { type: 'EmbeddedSubtitlesTrack'; id: string; streamIndex: number }
+    | { type: 'ExternalSubtitlesTrack'; id: string }
+  >
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 
   name: MediaFileName

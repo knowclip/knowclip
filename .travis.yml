@@ -1,0 +1,41 @@
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode10.2
+      language: node_js
+      node_js: "12"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+
+    - os: linux
+      services: docker
+      language: generic
+
+cache:
+  directories:
+    - node_modules
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder
+
+script:
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      ./docker/docker_run.sh --linux --win
+    else
+      ./docker/docker_run.sh --mac
+    fi
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
+
+deploy:
+  provider: releases
+  api_key:
+    secure: hmepcJBDAtMrDZtn/S5uUMkQuScPJDTw7CJx5d+7Lght4+TvzLJi8PkV9XqyNWT8COzwwUyjvhTeDtxg/+ug0586b3kmm7/SiDC+tflObWpfJw6Ux3tFh25Jg2QWgKt2Yu6xjoQm490+orYTXBgPz8lbk81vubz4pqr+3mAS+ZK4K9VlzV+VxoJOsn9Nu7KYIn6+G1qs3U9533uvX4PjWHfDFb+UvSFUngscpvopAJr89hVgbCNBl08rNKguZy6pSV89ZvLoFt0lmfBG1gm9h4PuBFeb2x2mK8a8kLBNCPz03QaaXgA4YkAPJZ06GvNRMtOt6cQLbSLmDic6Ft7xihLibIX75WhiaFv2ynTjMs3iSktaodiVwNBFvSRC4p7WolFpNkJtMLZ/3uAr8fwANgCQ3TrPJ98j94hLXEPfMoxsK609tVjZtDSlM3hGuFJubEuwi3mhdn4ugESoiH0QiqnXeW01SKZCJdIqD/CHzipDgYLlfgUlEBar7yPYrkzDXysE8y45LEDH7uTTbYKWjqGsPVqhpp387CopOSBUYhYyIUam/mYoeiEun+ThP9/xN/YG6MY40xewXeMKYNjJp04xtrnGBexmQSHtYRdRRfOvmhg1bXYJVTp1a//RAu/ZPPANoHVKfloO93VW8UBswnX1rGNUEHN4mZNBjTvuHOw=
+  file:
+    - dist/knowclip_0.5.0_amd64.deb
+    - dist/Knowclip-0.5.0.AppImage
+    - dist/Knowclip-0.5.0-mac.zip
+    - dist/Knowclip 0.5.0.exe
+  on:
+    repo: knowclip/knowclip

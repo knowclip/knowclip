@@ -79,7 +79,7 @@ const ProjectsMenu = ({
   return (
     <section className="App">
       <header className={css.header}>
-        <h1 className={css.mainHeading}>Audio Flashcard Assistant</h1>
+        <h1 className={css.mainHeading}>Knowclip</h1>
       </header>
       <section className={css.main}>
         <section className={css.menu}>
