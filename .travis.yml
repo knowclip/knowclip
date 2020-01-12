@@ -41,3 +41,7 @@ deploy:
     - dist/Knowclip 0.5.0.exe
   on:
     repo: knowclip/knowclip
+
+branches:
+  only: 
+    - master
