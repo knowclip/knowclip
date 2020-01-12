@@ -92,16 +92,29 @@
     "asar": true,
     "productName": "Knowclip",
     "copyright": "Copyright 2019 Justin Silvestre",
-    "files": ["./build/**/*", "./icons/**/*", "./main.js", "./electron"],
+    "files": [
+      "./build/**/*",
+      "./icons/**/*",
+      "./main.js",
+      "./electron"
+    ],
     "win": {
-      "target": ["portable"]
+      "target": [
+        "portable"
+      ]
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Education"
     },
     "mac": {
-      "target": ["zip", "dmg"],
+      "target": [
+        "zip",
+        "dmg"
+      ],
       "category": "public.app-category.education",
       "icon": "./icons/icon.icns"
     }
