@@ -1,50 +1,43 @@
 services: docker
-
 jobs:
   include:
-    - os: osx
-      osx_image: xcode10.2
-      language: node_js
-      node_js: "12"
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
-    - os: linux
-      services: docker
-      language: generic
-
+  - os: osx
+    osx_image: xcode10.2
+    language: node_js
+    node_js: '12'
+    env:
+    - ELECTRON_CACHE=$HOME/.cache/electron
+    - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+  - os: linux
+    services: docker
+    language: generic
 cache:
   directories:
-    - node_modules
-    - $HOME/.cache/electron
-    - $HOME/.cache/electron-builder
-
+  - node_modules
+  - "$HOME/.cache/electron"
+  - "$HOME/.cache/electron-builder"
 script:
-  - |
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      ./docker/docker_run.sh --linux --win
-    else
-      yarn dist --mac
-    fi
+- |
+  if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    ./docker/docker_run.sh --linux --win
+  else
+    yarn dist --mac
+  fi
 before_cache:
-  - rm -rf $HOME/.cache/electron-builder/wine
-
+- rm -rf $HOME/.cache/electron-builder/wine
 deploy:
   provider: releases
-  token:
-    secure: hmepcJBDAtMrDZtn/S5uUMkQuScPJDTw7CJx5d+7Lght4+TvzLJi8PkV9XqyNWT8COzwwUyjvhTeDtxg/+ug0586b3kmm7/SiDC+tflObWpfJw6Ux3tFh25Jg2QWgKt2Yu6xjoQm490+orYTXBgPz8lbk81vubz4pqr+3mAS+ZK4K9VlzV+VxoJOsn9Nu7KYIn6+G1qs3U9533uvX4PjWHfDFb+UvSFUngscpvopAJr89hVgbCNBl08rNKguZy6pSV89ZvLoFt0lmfBG1gm9h4PuBFeb2x2mK8a8kLBNCPz03QaaXgA4YkAPJZ06GvNRMtOt6cQLbSLmDic6Ft7xihLibIX75WhiaFv2ynTjMs3iSktaodiVwNBFvSRC4p7WolFpNkJtMLZ/3uAr8fwANgCQ3TrPJ98j94hLXEPfMoxsK609tVjZtDSlM3hGuFJubEuwi3mhdn4ugESoiH0QiqnXeW01SKZCJdIqD/CHzipDgYLlfgUlEBar7yPYrkzDXysE8y45LEDH7uTTbYKWjqGsPVqhpp387CopOSBUYhYyIUam/mYoeiEun+ThP9/xN/YG6MY40xewXeMKYNjJp04xtrnGBexmQSHtYRdRRfOvmhg1bXYJVTp1a//RAu/ZPPANoHVKfloO93VW8UBswnX1rGNUEHN4mZNBjTvuHOw=
+  api_key:
+    secure: OhuDDhUttZxsm5FGfVli3ZsFIibrWCArC0wCNIkIJuZnR/sz6zqpufi41MqGVWJ1PXVlzOx0hpGrWeTy4Zhtf3xo7R+lQidlV3EQOo4OZ3KTdr3tlQ+uQYVNkG+4yNp+N2/MBAlMc9BJ3SNG/euxs1dXWdPbVO6IJJrAt6d0Ky1rR2EHH/cZSyEgLBgg2eLoQOBpfoYBC3BzLLW1ivZoK80gtxxhVqPwhmuFgmAFrA1CQIb75Y9O40qSfzOt2e0Fln6trPzwnGhnmZAY1rkj0ybRQhhaFn2K9nTUYppNplFq7Et9Fm/dGAlc6BzvXyEiJ/xtVtQmxAocPx/bCm1gMy36eOoXKHwEDIuNBFeKskalnM34yTDZenExbW9DWt0qboUMbE01z7cYBayNkR4D3WXQlSR+031UGcI3ZfHNyHv/jWgfD4Qp3QXyRYGzyjKdsIoR5CG00x2uqAphPSjZ1uMKhsnI4PaGPwKHX/8gw495SmvMVT7utPs0YSaUunQRF9gh5v23NiKP1y8nmEKCF0OFz2GwiSUHpXRTBsDbDnmv0MU77K0NKKU2ZBJC+XkdSmzt/cfR/VRGLTnlgWjc7AKEeKw26z8n40Nuj1Gtw2aVtxN6n3BftYoP3TgWcqHGdCH3glbskuZQgWZffG/eWj/8F1MNgxIT/mNXIizj1Mo=
   file:
     - dist/knowclip_0.5.0_amd64.deb
     - dist/Knowclip-0.5.0.AppImage
     - dist/Knowclip-0.5.0-mac.zip
     - dist/Knowclip-0.5.0.dmg
     - dist/Knowclip 0.5.0.exe
+  draft: true
   on:
     repo: knowclip/knowclip
-  cleanup: false
-  draft: true
-
 branches:
-  only: 
-    - master
+  only:
+  - master
