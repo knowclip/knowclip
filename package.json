@@ -101,7 +101,7 @@
       "category": "Education"
     },
     "mac": {
-      "target": ["zip"],
+      "target": ["zip", "dmg"],
       "category": "public.app-category.education",
       "icon": "./icons/icon.icns"
     }
