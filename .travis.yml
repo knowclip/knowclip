@@ -41,10 +41,11 @@ script:
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     ./docker/docker_run.sh --linux --win
   else
-    yarn dist --mac
+    yarn && yarn dist --mac
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
 branches:
   only:
   - master
+  - /v\d+\.\d+.\d+(-.+)/
