@@ -46,7 +46,7 @@ export const readMediaFile = async (
   filePath: string,
   id: string,
   projectId: string,
-  subtitles: Array<string> = [],
+  subtitles: MediaFile['subtitles'] = [],
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): Promise<MediaFile> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)

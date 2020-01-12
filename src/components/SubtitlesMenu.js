@@ -75,7 +75,6 @@ const ExternalTrackMenuItem = ({
         </MenuItem>
         <MenuItem dense>
           <ListItemIcon>
-            {' '}
             <Icon>
               <DeleteIcon />
             </Icon>

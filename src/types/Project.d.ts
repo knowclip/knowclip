@@ -68,8 +68,3 @@ declare type Project4_1_0 = {
   lastOpened: string
   subtitles: Array<ExternalSubtitlesFile>
 }
-
-declare type ProjectExport = {
-  project: ProjectMetadata
-  clips: Array<Clip>
-}

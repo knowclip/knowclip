@@ -85,14 +85,23 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         action.track.mediaFileId,
         file => ({
           ...file,
-          subtitles: [...new Set([...file.subtitles, action.track.id])],
+          subtitles: [
+            ...file.subtitles,
+            action.track.type === 'EmbeddedSubtitlesTrack'
+              ? {
+                  type: 'EmbeddedSubtitlesTrack',
+                  id: action.track.id,
+                  streamIndex: action.track.streamIndex,
+                }
+              : { type: 'ExternalSubtitlesTrack', id: action.track.id },
+          ],
         })
       )
 
     case A.DELETE_SUBTITLES_TRACK:
       return edit<MediaFile>(state, 'MediaFile', action.mediaFileId, file => ({
         ...file,
-        subtitles: file.subtitles.filter(id => id !== action.id),
+        subtitles: file.subtitles.filter(({ id }) => id !== action.id),
         flashcardFieldsToSubtitlesTracks: Object.entries(
           file.flashcardFieldsToSubtitlesTracks
         )

@@ -1,14 +1,19 @@
 const { Menu } = require('electron')
 
-const template = app => [
+const template = (app, { mainWindow }) => [
   {
     label: 'Application',
     submenu: [
       { label: 'About Application', selector: 'orderFrontStandardAboutPanel:' },
+      {
+        label: 'Show developer tools',
+        accelerator: 'CmdOrCtrl+K',
+        click: () => mainWindow.webContents.openDevTools(),
+      },
       { type: 'separator' },
       {
         label: 'Quit',
-        accelerator: 'Command+Q',
+        accelerator: 'CmdOrCtrl+Q',
         click: () => {
           app.quit()
         },
@@ -33,5 +38,5 @@ const template = app => [
   },
 ]
 
-module.exports = app =>
-  Menu.setApplicationMenu(Menu.buildFromTemplate(template(app)))
+module.exports = (app, mainWindow) =>
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template(app, mainWindow)))

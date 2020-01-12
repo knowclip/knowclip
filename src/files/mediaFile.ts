@@ -4,58 +4,41 @@ import uuid from 'uuid'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'
 
-const streamIndexMatchesExistingTrack = (
-  vttFile: VttConvertedSubtitlesFile,
-  streamIndex: number
-) => vttFile.parentType === 'MediaFile' && vttFile.streamIndex === streamIndex
-
-const addNewEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  {
-    validatedFile: {
-      subtitlesTracksStreamIndexes,
-      id,
-      subtitles: existingSubtitlesIds,
-    },
-    filePath,
-  },
+const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
+  { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
   state,
   effects
 ) =>
   // TODO: clean up orphans?
-  subtitlesTracksStreamIndexes
-    .filter(
-      streamIndex =>
-        !existingSubtitlesIds.some(id =>
-          streamIndexMatchesExistingTrack(
-            state.files.VttConvertedSubtitlesFile[id],
-            streamIndex
-          )
-        )
+  subtitlesTracksStreamIndexes.map(streamIndex => {
+    const existing = subtitles.find(
+      s => s.type === 'EmbeddedSubtitlesTrack' && s.streamIndex === streamIndex
     )
-    .map(streamIndex =>
-      r.addAndOpenFile({
-        type: 'VttConvertedSubtitlesFile',
-        parentId: id,
-        id: uuid(),
-        streamIndex,
-        parentType: 'MediaFile',
-      })
-    )
+    return r.addAndOpenFile({
+      type: 'VttConvertedSubtitlesFile',
+      parentId: id,
+      id: existing ? existing.id : uuid(),
+      streamIndex,
+      parentType: 'MediaFile',
+    })
+  })
 
-const reloadRememberedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile: { subtitles: existingSubtitlesIds, name }, filePath },
+const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
+  MediaFile
+> = async (
+  { validatedFile: { subtitles, name }, filePath },
   state,
   effects
-) =>
-  existingSubtitlesIds.map(id => {
+) => [
+  ...subtitles.map(({ id }) => {
     const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
     if (externalSubtitles) return r.openFileRequest(externalSubtitles)
 
-    const embeddedSubtitles = r.getFile(state, 'VttConvertedSubtitlesFile', id)
-    if (embeddedSubtitles) return r.openFileRequest(embeddedSubtitles)
-
-    return r.simpleMessageSnackbar('Could not open subtitles file ' + name)
-  })
+    return r.simpleMessageSnackbar(
+      'Could not open external subtitles for ' + name
+    )
+  }),
+]
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile, filePath },
   state,
@@ -117,8 +100,8 @@ export default {
   },
 
   openSuccess: [
-    addNewEmbeddedSubtitles,
-    reloadRememberedSubtitles,
+    addEmbeddedSubtitles,
+    reloadRememberedExternalSubtitles,
     getCbr,
     getWaveform,
     setDefaultTags,

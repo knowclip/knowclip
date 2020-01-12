@@ -4,13 +4,14 @@ const url = require('url')
 const { app, ipcMain } = electron
 const { isPackaged } = app
 const { BrowserWindow } = electron
-const setUpMenu = require('./src/utils/electronMenu')
+const setUpMenu = require('./electron/appMenu')
 
-const installDevtools = require('./devtools')
+const installDevtools = require('./electron/devtools')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+
+const context = { mainWindow: null }
 
 // have to do it this to access ffmpeg path from within webpack bundle
 const ffmpegStaticBasePath = require('ffmpeg-static').path
@@ -23,14 +24,14 @@ global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
 
 async function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  context.mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: { webSecurity: isPackaged, nodeIntegration: true },
   })
 
   // and load the index.html of the app.
-  mainWindow.loadURL(
+  context.mainWindow.loadURL(
     isPackaged
       ? url.format({
           pathname: path.join(__dirname, 'build', 'index.html'),
@@ -40,25 +41,21 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  // if (!isPackaged) {
-  await installDevtools()
+  if (!isPackaged) await installDevtools()
 
-  // mainWindow.webContents.openDevTools()
-  // }
-
-  mainWindow.on('close', e => {
-    if (mainWindow) {
+  context.mainWindow.on('close', e => {
+    if (context.mainWindow) {
       e.preventDefault()
-      mainWindow.webContents.send('app-close')
+      context.mainWindow.webContents.send('app-close')
     }
   })
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
+  context.mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null
+    context.mainWindow = null
   })
 }
 
@@ -68,27 +65,14 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
-  setUpMenu(app)
-
-  // Register a 'CommandOrControl+X' shortcut listener.
-  const ret = electron.globalShortcut.register('CommandOrControl+K', () => {
-    electron.BrowserWindow.getFocusedWindow().webContents.openDevTools()
-  })
-
-  if (!ret) {
-    console.log('registration failed')
-  }
-
-  // Check whether a shortcut is registered.
-  console.log(electron.globalShortcut.isRegistered('CommandOrControl+K'))
+  setUpMenu(app, context)
 })
 
 app.on('will-quit', () => {
-  // Unregister a shortcut.
-  electron.globalShortcut.unregister('CommandOrControl+K')
-
-  // Unregister all shortcuts.
-  electron.globalShortcut.unregisterAll()
+  // // Unregister a shortcut.
+  // electron.globalShortcut.unregister('CommandOrControl+K')
+  // // Unregister all shortcuts.
+  // electron.globalShortcut.unregisterAll()
 })
 
 // Quit when all windows are closed.
@@ -103,7 +87,7 @@ app.on('window-all-closed', function() {
 app.on('activate', function() {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
+  if (context.mainWindow === null) {
     createWindow()
   }
 })
@@ -112,6 +96,6 @@ app.on('activate', function() {
 // code. You can also put them in separate files and require them here.
 
 ipcMain.on('closed', function() {
-  mainWindow = null
+  context.mainWindow = null
   app.quit()
 })
