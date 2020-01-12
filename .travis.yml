@@ -10,11 +10,11 @@ jobs:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
     deploy: &deploy_base
+      draft: true
       skip_cleanup: true
       provider: releases
       api_key:
         secure: D3H4h11A5pgO9L2GQ66VEMRsWmgOQ7Nu71OF/F+pRyoUFTynjS84a4BJRFEU6NYC6kCZxOfH1EHgUzpKvvo+JkiNQNvMe8HFIKqiLlNZikwZukuZfU9Pj9ORRC3LXfC4pUkritBjNmOOivLZK6hopXGALgiGvMXIOpLtK/7HcJSyRNZLmLEAjksVcZNI4XKuD0OcHLcNPZ9b00Dkx9gF7Z5AKAsvn0qXHVS1yhjA9jDuyhwawCxorCoR1r87EU+hrXWIwsbyrG+0ecy90zs8wK4qg1PTnp/06uXeoWdRt+qeNU8DUqP5sxRUzp76ZxnL1UtedSMhbypkxDnSOBOlD3M3pMzBZGEhF3ADic51MlsiITljuRzoaup/h466MYgfTDZto0b+A6SsG4YU+LzwKzzx1DiO9ZAkvnsj4i0x9GvHDVYs3Z92AJ9pfGPp2QySHlxm9FtFdmvfUP/VqOMDh2A29qUJ8gcLprBRVAEB/Jo/r05/Fp6E0ZLONaLeNlZzXoDKbq+L1s9EsFu8e0cR3ABwZOXEDvb4qcpqYjrfl0R/7wneehBVilYFBPBhj4EdOrwdc1Qv5rw6XpnsdczPvYiqThKMTt186kmzZaGeHhzHInxG8bJazCBYKSNqxyrpGsAYbCG6sLYJ8ljrhdQaFgXicL/9+hsUI2Jk7FQAVKY=
-      draft: true
       file:
         - dist/Knowclip-0.5.0-mac.zip
         - dist/Knowclip-0.5.0.dmg
@@ -27,6 +27,7 @@ jobs:
     language: generic
     deploy:
       <<: *deploy_base
+      draft: false
       file:
         - dist/knowclip_0.5.0_amd64.deb
         - dist/Knowclip-0.5.0.AppImage
@@ -41,7 +42,7 @@ script:
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     ./docker/docker_run.sh --linux --win
   else
-    yarn && yarn dist --mac
+    yarn && yarn dist --mac --publish never
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
