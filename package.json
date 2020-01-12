@@ -56,7 +56,7 @@
     "tsc": "tsc",
     "tidy": "yarn format --list-different && yarn lint && yarn tsc",
     "electron-builder": "electron-builder",
-    "dist": "yarn build && yarn electron-builder"
+    "dist": "yarn build:ci && yarn electron-builder"
   },
   "husky": {
     "hooks": {
