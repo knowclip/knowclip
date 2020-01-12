@@ -113,8 +113,7 @@
     },
     "mac": {
       "target": [
-        "zip",
-        "dmg"
+        "zip"
       ],
       "category": "public.app-category.education",
       "icon": "./icons/icon.icns"
