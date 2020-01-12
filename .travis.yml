@@ -25,7 +25,7 @@ script:
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       ./docker/docker_run.sh --linux --win
     else
-      ./docker/docker_run.sh --mac
+      yarn dist --mac
     fi
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
