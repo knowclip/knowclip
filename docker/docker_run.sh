@@ -7,4 +7,4 @@ sudo docker run --rm -ti --env ELECTRON_CACHE="/root/.cache/electron" \
   -v ~/.cache/electron:/root/.cache/electron \
   -v ~/.cache/electron-builder:/root/.cache/electron-builder \
   builder-node-12-wine \
-  /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn dist $*"
+  /bin/bash -c "yarn && yarn dist $*"

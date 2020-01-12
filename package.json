@@ -79,7 +79,7 @@
     "@types/uuid": "^3.4.5",
     "@typescript-eslint/eslint-plugin": "^2.3.2",
     "electron": "6.0.12",
-    "electron-builder": "^21.2.0",
+    "electron-builder": "^22.2.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-react-hooks": "^1.6.0",
     "husky": "^1.1.3",
@@ -93,15 +93,16 @@
     "productName": "Knowclip",
     "copyright": "Copyright 2019 Justin Silvestre",
     "files": [
-      "./build/**/*",
-      "./icons/**/*",
+      "./build",
+      "./icons",
       "./main.js",
       "./electron"
     ],
     "win": {
       "target": [
         "portable"
-      ]
+      ],
+      "icon": "./icons/icon.ico"
     },
     "linux": {
       "target": [
