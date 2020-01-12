@@ -1,16 +1,34 @@
 services: docker
 jobs:
   include:
-  - os: osx
+  - stage: build mac assets
+    os: osx
     osx_image: xcode10.2
     language: node_js
     node_js: '12'
     env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-  - os: linux
+    deploy: &deploy_base
+      provider: releases
+      api_key:
+        secure: D3H4h11A5pgO9L2GQ66VEMRsWmgOQ7Nu71OF/F+pRyoUFTynjS84a4BJRFEU6NYC6kCZxOfH1EHgUzpKvvo+JkiNQNvMe8HFIKqiLlNZikwZukuZfU9Pj9ORRC3LXfC4pUkritBjNmOOivLZK6hopXGALgiGvMXIOpLtK/7HcJSyRNZLmLEAjksVcZNI4XKuD0OcHLcNPZ9b00Dkx9gF7Z5AKAsvn0qXHVS1yhjA9jDuyhwawCxorCoR1r87EU+hrXWIwsbyrG+0ecy90zs8wK4qg1PTnp/06uXeoWdRt+qeNU8DUqP5sxRUzp76ZxnL1UtedSMhbypkxDnSOBOlD3M3pMzBZGEhF3ADic51MlsiITljuRzoaup/h466MYgfTDZto0b+A6SsG4YU+LzwKzzx1DiO9ZAkvnsj4i0x9GvHDVYs3Z92AJ9pfGPp2QySHlxm9FtFdmvfUP/VqOMDh2A29qUJ8gcLprBRVAEB/Jo/r05/Fp6E0ZLONaLeNlZzXoDKbq+L1s9EsFu8e0cR3ABwZOXEDvb4qcpqYjrfl0R/7wneehBVilYFBPBhj4EdOrwdc1Qv5rw6XpnsdczPvYiqThKMTt186kmzZaGeHhzHInxG8bJazCBYKSNqxyrpGsAYbCG6sLYJ8ljrhdQaFgXicL/9+hsUI2Jk7FQAVKY=
+      draft: true
+      file:
+        - dist/Knowclip-0.5.0-mac.zip
+        - dist/Knowclip-0.5.0.dmg
+      on:
+        repo: knowclip/knowclip
+  - stage: build linux & win assets
+    os: linux
     services: docker
     language: generic
+    deploy:
+      <<: *deploy_base
+      file:
+        - dist/knowclip_0.5.0_amd64.deb
+        - dist/Knowclip-0.5.0.AppImage
+        - dist/Knowclip 0.5.0.exe
 cache:
   directories:
   - node_modules
@@ -25,19 +43,6 @@ script:
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
-deploy:
-  provider: releases
-  api_key:
-    secure: D3H4h11A5pgO9L2GQ66VEMRsWmgOQ7Nu71OF/F+pRyoUFTynjS84a4BJRFEU6NYC6kCZxOfH1EHgUzpKvvo+JkiNQNvMe8HFIKqiLlNZikwZukuZfU9Pj9ORRC3LXfC4pUkritBjNmOOivLZK6hopXGALgiGvMXIOpLtK/7HcJSyRNZLmLEAjksVcZNI4XKuD0OcHLcNPZ9b00Dkx9gF7Z5AKAsvn0qXHVS1yhjA9jDuyhwawCxorCoR1r87EU+hrXWIwsbyrG+0ecy90zs8wK4qg1PTnp/06uXeoWdRt+qeNU8DUqP5sxRUzp76ZxnL1UtedSMhbypkxDnSOBOlD3M3pMzBZGEhF3ADic51MlsiITljuRzoaup/h466MYgfTDZto0b+A6SsG4YU+LzwKzzx1DiO9ZAkvnsj4i0x9GvHDVYs3Z92AJ9pfGPp2QySHlxm9FtFdmvfUP/VqOMDh2A29qUJ8gcLprBRVAEB/Jo/r05/Fp6E0ZLONaLeNlZzXoDKbq+L1s9EsFu8e0cR3ABwZOXEDvb4qcpqYjrfl0R/7wneehBVilYFBPBhj4EdOrwdc1Qv5rw6XpnsdczPvYiqThKMTt186kmzZaGeHhzHInxG8bJazCBYKSNqxyrpGsAYbCG6sLYJ8ljrhdQaFgXicL/9+hsUI2Jk7FQAVKY=
-  draft: true
-  file:
-    - dist/knowclip_0.5.0_amd64.deb
-    - dist/Knowclip-0.5.0.AppImage
-    - dist/Knowclip-0.5.0-mac.zip
-    - dist/Knowclip-0.5.0.dmg
-    - dist/Knowclip 0.5.0.exe
-  on:
-    repo: knowclip/knowclip
 branches:
   only:
   - master
