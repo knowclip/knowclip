@@ -20,6 +20,7 @@ jobs:
         - dist/Knowclip-0.5.0.dmg
       on:
         repo: knowclip/knowclip
+        tags: true
   - stage: build linux & win assets
     os: linux
     services: docker
