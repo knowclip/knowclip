@@ -28,14 +28,14 @@ before_cache:
 deploy:
   provider: releases
   api_key:
-    secure: OhuDDhUttZxsm5FGfVli3ZsFIibrWCArC0wCNIkIJuZnR/sz6zqpufi41MqGVWJ1PXVlzOx0hpGrWeTy4Zhtf3xo7R+lQidlV3EQOo4OZ3KTdr3tlQ+uQYVNkG+4yNp+N2/MBAlMc9BJ3SNG/euxs1dXWdPbVO6IJJrAt6d0Ky1rR2EHH/cZSyEgLBgg2eLoQOBpfoYBC3BzLLW1ivZoK80gtxxhVqPwhmuFgmAFrA1CQIb75Y9O40qSfzOt2e0Fln6trPzwnGhnmZAY1rkj0ybRQhhaFn2K9nTUYppNplFq7Et9Fm/dGAlc6BzvXyEiJ/xtVtQmxAocPx/bCm1gMy36eOoXKHwEDIuNBFeKskalnM34yTDZenExbW9DWt0qboUMbE01z7cYBayNkR4D3WXQlSR+031UGcI3ZfHNyHv/jWgfD4Qp3QXyRYGzyjKdsIoR5CG00x2uqAphPSjZ1uMKhsnI4PaGPwKHX/8gw495SmvMVT7utPs0YSaUunQRF9gh5v23NiKP1y8nmEKCF0OFz2GwiSUHpXRTBsDbDnmv0MU77K0NKKU2ZBJC+XkdSmzt/cfR/VRGLTnlgWjc7AKEeKw26z8n40Nuj1Gtw2aVtxN6n3BftYoP3TgWcqHGdCH3glbskuZQgWZffG/eWj/8F1MNgxIT/mNXIizj1Mo=
+    secure: D3H4h11A5pgO9L2GQ66VEMRsWmgOQ7Nu71OF/F+pRyoUFTynjS84a4BJRFEU6NYC6kCZxOfH1EHgUzpKvvo+JkiNQNvMe8HFIKqiLlNZikwZukuZfU9Pj9ORRC3LXfC4pUkritBjNmOOivLZK6hopXGALgiGvMXIOpLtK/7HcJSyRNZLmLEAjksVcZNI4XKuD0OcHLcNPZ9b00Dkx9gF7Z5AKAsvn0qXHVS1yhjA9jDuyhwawCxorCoR1r87EU+hrXWIwsbyrG+0ecy90zs8wK4qg1PTnp/06uXeoWdRt+qeNU8DUqP5sxRUzp76ZxnL1UtedSMhbypkxDnSOBOlD3M3pMzBZGEhF3ADic51MlsiITljuRzoaup/h466MYgfTDZto0b+A6SsG4YU+LzwKzzx1DiO9ZAkvnsj4i0x9GvHDVYs3Z92AJ9pfGPp2QySHlxm9FtFdmvfUP/VqOMDh2A29qUJ8gcLprBRVAEB/Jo/r05/Fp6E0ZLONaLeNlZzXoDKbq+L1s9EsFu8e0cR3ABwZOXEDvb4qcpqYjrfl0R/7wneehBVilYFBPBhj4EdOrwdc1Qv5rw6XpnsdczPvYiqThKMTt186kmzZaGeHhzHInxG8bJazCBYKSNqxyrpGsAYbCG6sLYJ8ljrhdQaFgXicL/9+hsUI2Jk7FQAVKY=
+  draft: true
   file:
     - dist/knowclip_0.5.0_amd64.deb
     - dist/Knowclip-0.5.0.AppImage
     - dist/Knowclip-0.5.0-mac.zip
     - dist/Knowclip-0.5.0.dmg
     - dist/Knowclip 0.5.0.exe
-  draft: true
   on:
     repo: knowclip/knowclip
 branches:
