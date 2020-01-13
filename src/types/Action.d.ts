@@ -13,6 +13,7 @@ declare type Action =
   | DetectSilenceRequest
   | DeleteAllCurrentFileClipsRequest
   | SetAllTags
+  | SetProgress
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
@@ -23,6 +24,10 @@ declare type DeleteAllCurrentFileClipsRequest = {
 declare type SetAllTags = {
   type: 'SET_ALL_TAGS'
   tagsToClipIds: { [tag: string]: Array<ClipId> }
+}
+declare type SetProgress = {
+  type: 'SET_PROGRESS'
+  progress: ProgressInfo | null
 }
 
 declare type ClipAction =
@@ -169,6 +174,7 @@ declare type ExportMp3 = { type: 'EXPORT_MP3'; exportData: ApkgExportData }
 declare type ExportApkgRequest = {
   type: 'EXPORT_APKG_REQUEST'
   clipIds: Array<ClipId>
+  outputFilePath: string
 }
 declare type ExportApkgFailure = {
   type: 'EXPORT_APKG_FAILURE'

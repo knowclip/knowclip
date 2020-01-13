@@ -90,3 +90,9 @@
 .blank {
   color: pink;
 }
+
+.progressMessage {
+  text-align: center;
+  position: relative;
+  top: 33%;
+}

@@ -4,6 +4,7 @@ import { extname, basename } from 'path'
 import { unparse } from 'papaparse'
 import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability } from '../selectors'
+import { existsSync } from 'fs'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
@@ -53,9 +54,11 @@ export const getApkgExportData = (
   state: AppState,
   project: ProjectFile,
   clipIds: Array<ClipId>
-): ApkgExportData => {
+): ApkgExportData | Set<MediaFile> => {
   const fieldNames = getNoteTypeFields(project.noteType)
   const mediaFiles = r.getProjectMediaFiles(state, project.id)
+
+  const missingMediaFiles: Set<MediaFile> = new Set()
 
   // sort and validate
   clipIds.sort((id, id2) => {
@@ -68,8 +71,8 @@ export const getApkgExportData = (
     const file = mediaFiles.find(media => media.id === clip.fileId)
     if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
     const fileLoaded = getFileAvailability(state, file)
-    if (!(fileLoaded && fileLoaded.status === 'CURRENTLY_LOADED'))
-      throw new Error(`Please open ${file.name} and try again.`)
+    if (!fileLoaded || !fileLoaded.filePath || !existsSync(fileLoaded.filePath))
+      missingMediaFiles.add(file)
 
     const file2 = mediaFiles.find(media => media.id === clip.fileId)
     if (!file2) throw new Error(`Couldn't find media metadata for clip ${id}`)
@@ -85,17 +88,20 @@ export const getApkgExportData = (
     return 0
   })
 
+  if (missingMediaFiles.size > 0) return missingMediaFiles
+
   const clips = clipIds.map((id, i) => {
     const clip = r.getClip(state, id)
     if (!clip) throw new Error('Could not find clip ' + id)
 
-    const metadataAndPath = mediaFiles.find(media => media.id === clip.fileId)
-    if (!metadataAndPath)
+    const mediaFile = mediaFiles.find(media => media.id === clip.fileId)
+    if (!mediaFile)
       throw new Error(`Couldn't find media metadata for clip ${id}`)
     const file = mediaFiles.find(media => media.id === clip.fileId)
     if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
     const fileLoaded = getFileAvailability(state, file)
-    if (!(fileLoaded && fileLoaded.status === 'CURRENTLY_LOADED'))
+    if (!(fileLoaded && fileLoaded.filePath))
+      // verified existent via missingMediaFiles above
       throw new Error(`Please open ${file.name} and try again.`)
     const extension = extname(fileLoaded.filePath)
     const filenameWithoutExtension = basename(fileLoaded.filePath, extension)

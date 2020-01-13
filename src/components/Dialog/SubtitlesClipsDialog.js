@@ -52,6 +52,7 @@ const SubtitlesClipsDialog = ({
   loadSubtitlesFromFile,
   allTags,
 }) => {
+  console.log({ subtitlesTracks })
   const [fields, setFields] = useState(() =>
     getDefaultFields(currentNoteTypeFields, subtitlesTracks[0].id)
   )
@@ -107,7 +108,10 @@ const SubtitlesClipsDialog = ({
             <Select
               inputProps={{ id: 'transcription', name: 'transcription' }}
               value={fields.transcription}
-              onChange={e => setField('transcription', e.target.value)}
+              onChange={e => {
+                console.log({ e }, e.target.value)
+                setField('transcription', e.target.value)
+              }}
             >
               {embeddedSubtitlesTracks.map(trackMenuItem)}
               {externalSubtitlesTracks.map(trackMenuItem)}

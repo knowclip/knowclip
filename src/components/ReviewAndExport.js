@@ -16,12 +16,34 @@ import {
   Checkbox,
   Chip,
   IconButton,
+  LinearProgress,
+  Tooltip,
 } from '@material-ui/core'
 import { ExpandLess, ExpandMore, Loop } from '@material-ui/icons'
 import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
 import moment from 'moment'
+import { showSaveDialog } from '../utils/electron'
+import truncate from '../utils/truncate'
+
+const ShortTag = ({ title }) =>
+  title.length > 12 ? (
+    <Tooltip title={title}>
+      <Chip label={truncate(title, 12)} />
+    </Tooltip>
+  ) : (
+    <Chip label={title} />
+  )
+
+const SmallTag = ({ title }) =>
+  title.length > 12 ? (
+    <Tooltip title={title}>
+      <span className={css.smallTag}>{truncate(title, 12)}</span>
+    </Tooltip>
+  ) : (
+    <span className={css.smallTag}>{title}</span>
+  )
 
 let FlashcardRow = ({
   flashcard: { fields, id, tags },
@@ -79,11 +101,12 @@ let FlashcardRow = ({
     </TableCell>
     <TableCell>
       {tags.map(t => (
-        <Chip key={t} label={t} />
+        <ShortTag key={t} title={t} />
       ))}
     </TableCell>
   </TableRow>
 )
+
 FlashcardRow = connect(
   (state, { id }) => ({
     formattedClipTime: r.getFormattedClipTime(state, id),
@@ -152,9 +175,7 @@ let MediaTable = ({
                   clip.flashcard.tags.forEach(tag => tags.add(tag))
                   return tags
                 }, new Set()),
-              ].map(tag => (
-                <span key={tag} className={css.smallTag}>{`${tag}`}</span>
-              ))}
+              ].map(tag => <SmallTag title={tag} />)}
         </div>
 
         <IconButton>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
@@ -205,6 +226,8 @@ const Export = ({
   allProjectClipsIds,
   openFileRequest,
   currentMedia,
+  initialSelectedIds,
+  progress,
 }) => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
   const [selectionHasStarted, setSelectionHasStarted] = useState(false)
@@ -213,7 +236,7 @@ const Export = ({
     setSelectionHasStarted(false)
   }
 
-  const [selectedIds, setSelectedIds] = useState(allProjectClipsIds)
+  const [selectedIds, setSelectedIds] = useState(initialSelectedIds)
 
   const onSelect = id =>
     setSelectedIds(
@@ -237,6 +260,57 @@ const Export = ({
     setExpandedTableIndex(index)
   }
   // PaperProps={{ style: { minWidth: '600px', minHeight: '300px' } }}
+
+  const dialogContent = (
+    <DialogContent>
+      {currentTabIndex === 0 && (
+        <section className={css.introText}>
+          <p>
+            Export an Anki .apkg file. This format is best for{' '}
+            <strong>starting a new deck.</strong>
+          </p>
+          <p>
+            If you want to update some flashcards you've previously exported, or
+            add some new cards to a previously exported deck, you probably want
+            to export CSV and MP3s.
+          </p>
+        </section>
+      )}
+      {currentTabIndex === 1 && (
+        <section className={css.introText}>
+          <p>Export a Comma-Separated-Values file along with MP3s.</p>
+          <p>
+            This format is best for{' '}
+            <strong>updating or adding to a deck</strong> which you've
+            previously exported.
+          </p>
+        </section>
+      )}
+
+      {currentTabIndex === 2 && (
+        <section className={css.introText}>
+          <p>Export a Markdown file.</p>
+          <p>
+            This lets you <strong>review all your notes</strong> in a handy text
+            format.
+          </p>
+        </section>
+      )}
+      {selectionHasStarted &&
+        projectMedia.map((metadata, i) => (
+          <MediaTable
+            key={metadata.id}
+            open={i === expandedTableIndex}
+            toggleOpen={e => onClickTable(i === expandedTableIndex ? -1 : i)}
+            media={metadata}
+            selectedIds={selectedIds}
+            onSelect={onSelect}
+            onSelectAll={onSelectAll}
+          />
+        ))}
+    </DialogContent>
+  )
+
   return (
     <Dialog open={open} onClose={closeDialog} fullScreen={selectionHasStarted}>
       <Tabs value={currentTabIndex} className={css.tabs}>
@@ -244,60 +318,25 @@ const Export = ({
         <Tab label="Export CSV & MP3" onClick={() => chooseTab(1)} />
         <Tab label="Export MD" onClick={() => chooseTab(2)} />
       </Tabs>
-      <DialogContent>
-        {currentTabIndex === 0 && (
-          <section className={css.introText}>
-            <p>
-              Export an Anki .apkg file. This format is best for{' '}
-              <strong>starting a new deck.</strong>
-            </p>
-            <p>
-              If you want to update some flashcards you've previously exported,
-              or add some new cards to a previously exported deck, you probably
-              want to export CSV and MP3s.
-            </p>
-          </section>
-        )}
-        {currentTabIndex === 1 && (
-          <section className={css.introText}>
-            <p>Export a Comma-Separated-Values file along with MP3s.</p>
-            <p>
-              This format is best for{' '}
-              <strong>updating or adding to a deck</strong> which you've
-              previously exported.
-            </p>
-          </section>
-        )}
+      {progress ? (
+        <DialogContent>
+          <LinearProgress variant="determinate" value={progress.percentage} />
+          <p className={css.progressMessage}>{progress.message}</p>
+        </DialogContent>
+      ) : (
+        dialogContent
+      )}
 
-        {currentTabIndex === 2 && (
-          <section className={css.introText}>
-            <p>Export a Markdown file.</p>
-            <p>
-              This lets you <strong>review all your notes</strong> in a handy
-              text format.
-            </p>
-          </section>
-        )}
-        {selectionHasStarted &&
-          projectMedia.map((metadata, i) => (
-            <MediaTable
-              key={metadata.id}
-              open={i === expandedTableIndex}
-              toggleOpen={e => onClickTable(i === expandedTableIndex ? -1 : i)}
-              media={metadata}
-              selectedIds={selectedIds}
-              onSelect={onSelect}
-              onSelectAll={onSelectAll}
-            />
-          ))}
-      </DialogContent>
       {selectionHasStarted ? (
         <DialogActions>
-          <Button onClick={() => closeDialog()}>Exit</Button>
+          <Button onClick={() => closeDialog()} disabled={progress}>
+            Exit
+          </Button>
           {currentTabIndex === 1 && (
             <Button
               variant="contained"
               color="primary"
+              disabled={Boolean(progress)}
               onClick={() => csvAndMp3ExportDialog(selectedIds)}
             >
               Export CSV and MP3 from selected clips
@@ -307,6 +346,7 @@ const Export = ({
             <Button
               variant="contained"
               color="primary"
+              disabled={Boolean(progress)}
               onClick={() => exportMarkdown(selectedIds)}
             >
               Export Markdown from selected clips
@@ -316,7 +356,12 @@ const Export = ({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => exportApkgRequest(selectedIds)}
+              disabled={Boolean(progress)}
+              onClick={() =>
+                showSaveDialog().then(
+                  path => path && exportApkgRequest(selectedIds, path)
+                )
+              }
             >
               Export Anki Deck from selected clips
             </Button>
@@ -324,22 +369,36 @@ const Export = ({
         </DialogActions>
       ) : (
         <DialogActions>
-          <Button onClick={() => closeDialog()}>Exit</Button>
-          <Button onClick={() => setSelectionHasStarted(true)}>Continue</Button>
+          <Button disabled={Boolean(progress)} onClick={() => closeDialog()}>
+            Exit
+          </Button>
+          <Button
+            disabled={Boolean(progress)}
+            onClick={() => setSelectionHasStarted(true)}
+          >
+            Continue
+          </Button>
         </DialogActions>
       )}
     </Dialog>
   )
 }
 
-const mapStateToProps = state => ({
-  // flashcards: r.getFlashcardsByTime(state),
-  allProjectClipsIds: r.getAllProjectClipsIds(state),
-  noteType: r.getCurrentNoteType(state),
-  currentMedia: r.getCurrentMediaFile(state),
-  currentFileId: r.getCurrentFileId(state),
-  projectMedia: r.getCurrentProjectMediaFiles(state),
-})
+const mapStateToProps = state => {
+  const currentMedia = r.getCurrentMediaFile(state)
+  return {
+    // flashcards: r.getFlashcardsByTime(state),
+    allProjectClipsIds: r.getAllProjectClipsIds(state),
+    noteType: r.getCurrentNoteType(state),
+    currentMedia,
+    initialSelectedIds: currentMedia
+      ? r.getClips(state, r.getCurrentMediaFile(state).id).map(clip => clip.id)
+      : [],
+    currentFileId: r.getCurrentFileId(state),
+    projectMedia: r.getCurrentProjectMediaFiles(state),
+    progress: state.user.progress,
+  }
+}
 
 const mapDispatchToProps = {
   exportApkgRequest: r.exportApkgRequest,

@@ -85,16 +85,18 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         action.track.mediaFileId,
         file => ({
           ...file,
-          subtitles: [
-            ...file.subtitles,
-            action.track.type === 'EmbeddedSubtitlesTrack'
-              ? {
-                  type: 'EmbeddedSubtitlesTrack',
-                  id: action.track.id,
-                  streamIndex: action.track.streamIndex,
-                }
-              : { type: 'ExternalSubtitlesTrack', id: action.track.id },
-          ],
+          subtitles: file.subtitles.some(s => s.id === action.track.id)
+            ? file.subtitles
+            : [
+                ...file.subtitles,
+                action.track.type === 'EmbeddedSubtitlesTrack'
+                  ? {
+                      type: 'EmbeddedSubtitlesTrack',
+                      id: action.track.id,
+                      streamIndex: action.track.streamIndex,
+                    }
+                  : { type: 'ExternalSubtitlesTrack', id: action.track.id },
+              ],
         })
       )
 

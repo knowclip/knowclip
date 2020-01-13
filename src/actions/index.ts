@@ -66,9 +66,13 @@ export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
   ids,
 })
 
-export const exportApkgRequest = (clipIds: Array<ClipId>) => ({
+export const exportApkgRequest = (
+  clipIds: Array<ClipId>,
+  outputFilePath: string
+): ExportApkgRequest => ({
   type: A.EXPORT_APKG_REQUEST,
   clipIds,
+  outputFilePath,
 })
 
 export const exportApkgFailure = (errorMessage?: string): Action => ({
@@ -128,4 +132,9 @@ export const setAllTags = (tagsToClipIds: {
 export const setDefaultTags = (tags: string[]): SetDefaultTags => ({
   type: 'SET_DEFAULT_TAGS',
   tags,
+})
+
+export const setProgress = (progress: ProgressInfo | null): SetProgress => ({
+  type: 'SET_PROGRESS',
+  progress,
 })

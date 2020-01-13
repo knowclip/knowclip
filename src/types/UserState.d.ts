@@ -22,4 +22,11 @@ declare type UserState = {
   workIsUnsaved: boolean
   loopMedia: boolean
   mediaIsLoading: boolean // should probably exist in fileAvailabilities state
+
+  progress: ProgressInfo | null
+}
+
+declare type ProgressInfo = {
+  message: string
+  percentage: number
 }

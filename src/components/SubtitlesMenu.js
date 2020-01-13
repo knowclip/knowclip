@@ -174,7 +174,7 @@ const SubtitlesMenu = ({
 
 const mapStateToProps = state => ({
   embeddedTracks: r.getEmbeddedSubtitlesTracks(state),
-  externalTracksWithFiles: r.getExternalSubtitlesTracks(state),
+  externalTracksWithFiles: r.getExternalSubtitlesTracksWithFiles(state),
   currentFileId: r.getCurrentFileId(state),
 })
 

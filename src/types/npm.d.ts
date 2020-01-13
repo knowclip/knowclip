@@ -21,3 +21,8 @@ declare module 'anki-apkg-export-multi-field/dist/exporter' {
     }): Promise<Buffer>
   }
 }
+
+declare module 'electron-progressbar' {
+  const x: any
+  export default x
+}

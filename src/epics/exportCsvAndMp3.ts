@@ -30,6 +30,19 @@ const exportCsv: AppEpic = (action$, state$) =>
             currentProject,
             clipIds
           )
+          if (exportData instanceof Set) {
+            return from(
+              [...exportData].map(file =>
+                r.locateFileRequest(
+                  file,
+                  `You can't make clips from this file until you've located it in the filesystem:\n${
+                    file.name
+                  }`
+                )
+              )
+            )
+          }
+
           const csvText = getCsvText(exportData)
           await writeFile(csvFilePath, csvText, 'utf8')
           return from([

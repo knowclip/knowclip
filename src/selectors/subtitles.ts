@@ -55,8 +55,11 @@ const isExternal = (track: SubtitlesTrack): track is ExternalSubtitlesTrack =>
 export const getEmbeddedSubtitlesTracks = (
   state: AppState
 ): Array<EmbeddedSubtitlesTrack> => getSubtitlesTracks(state).filter(isEmbedded)
-
 export const getExternalSubtitlesTracks = (
+  state: AppState
+): Array<ExternalSubtitlesTrack> => getSubtitlesTracks(state).filter(isExternal)
+
+export const getExternalSubtitlesTracksWithFiles = (
   state: AppState
 ): Array<{ track: ExternalSubtitlesTrack; file: ExternalSubtitlesFile }> =>
   getSubtitlesTracks(state)

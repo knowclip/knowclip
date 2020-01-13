@@ -30,14 +30,16 @@ const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
   state,
   effects
 ) => [
-  ...subtitles.map(({ id }) => {
-    const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
-    if (externalSubtitles) return r.openFileRequest(externalSubtitles)
+  ...subtitles
+    .filter(s => s.type === 'ExternalSubtitlesTrack')
+    .map(({ id }) => {
+      const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
+      if (externalSubtitles) return r.openFileRequest(externalSubtitles)
 
-    return r.simpleMessageSnackbar(
-      'Could not open external subtitles for ' + name
-    )
-  }),
+      return r.simpleMessageSnackbar(
+        'Could not open external subtitles for ' + name
+      )
+    }),
 ]
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile, filePath },

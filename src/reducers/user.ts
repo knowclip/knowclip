@@ -12,6 +12,7 @@ const initialState: UserState = {
   tagsToClipIds: {},
   mediaIsLoading: false,
   loopMedia: true,
+  progress: null,
 }
 
 const user: Reducer<UserState, Action> = (state = initialState, action) => {
@@ -188,6 +189,12 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
             mediaIsLoading: false,
           }
         : state // what about cbr
+
+    case A.SET_PROGRESS:
+      return {
+        ...state,
+        progress: action.progress,
+      }
 
     default:
       return state
