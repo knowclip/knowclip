@@ -48,86 +48,82 @@ const SmallTag = ({ title }: { title: string }) =>
   )
 
 type FlashcardRowProps = {
-  flashcard: Flashcard
+  id: string
   onSelect: (id: string) => void
   isSelected: boolean
 }
-const FlashcardRow = memo(
-  ({
-    flashcard: { fields, id, tags },
-    isSelected,
-    onSelect,
-  }: FlashcardRowProps) => {
-    const { formattedClipTime, isLoopOn, highlightedClipId } = useSelector(
-      (state: AppState) => ({
-        formattedClipTime: r.getFormattedClipTime(state, id),
-        isLoopOn: r.isLoopOn(state),
-        highlightedClipId: r.getHighlightedClipId(state),
-      })
-    )
-    const isHighlighted = id === highlightedClipId
+const FlashcardRow = memo(({ id, isSelected, onSelect }: FlashcardRowProps) => {
+  const {
+    flashcard: { fields, tags },
+    formattedClipTime,
+    isLoopOn,
+    highlightedClipId,
+  } = useSelector((state: AppState) => ({
+    flashcard: r.getFlashcard(state, id) as Flashcard,
+    formattedClipTime: r.getFormattedClipTime(state, id),
+    isLoopOn: r.isLoopOn(state),
+    highlightedClipId: r.getHighlightedClipId(state),
+  }))
+  const isHighlighted = id === highlightedClipId
 
-    const dispatch = useDispatch()
-    const toggleLoop = useCallback(e => dispatch(actions.toggleLoop()), [
-      dispatch,
-    ])
+  const dispatch = useDispatch()
+  const toggleLoop = useCallback(e => dispatch(actions.toggleLoop()), [
+    dispatch,
+  ])
 
-    return (
-      <TableRow
-        className={css.tableRow}
-        onClick={useCallback(() => dispatch(actions.highlightClip(id)), [
-          dispatch,
-          id,
-        ])}
-        selected={isHighlighted}
-      >
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={isSelected}
-            onClick={useCallback(e => e.stopPropagation(), [])}
-            onChange={useCallback(e => onSelect(id), [onSelect, id])}
-          />
-        </TableCell>
-        <TableCell padding="default">
-          <span className={css.clipTime}>{formattedClipTime}</span>
-          {isHighlighted && (
-            <IconButton
-              onClick={toggleLoop}
-              color={isLoopOn ? 'secondary' : 'default'}
-            >
-              <Loop />
-            </IconButton>
-          )}
-        </TableCell>
-        <TableCell className={css.flashcardContents}>
-          <p
-            className={cn(css.transcription, {
-              [css.blank]: !fields.transcription.trim(),
-            })}
+  return (
+    <TableRow
+      className={css.tableRow}
+      onClick={useCallback(() => dispatch(actions.highlightClip(id)), [
+        dispatch,
+        id,
+      ])}
+      selected={isHighlighted}
+    >
+      <TableCell padding="checkbox">
+        <Checkbox
+          checked={isSelected}
+          onClick={useCallback(e => e.stopPropagation(), [])}
+          onChange={useCallback(e => onSelect(id), [onSelect, id])}
+        />
+      </TableCell>
+      <TableCell padding="default">
+        <span className={css.clipTime}>{formattedClipTime}</span>
+        {isHighlighted && (
+          <IconButton
+            onClick={toggleLoop}
+            color={isLoopOn ? 'secondary' : 'default'}
           >
-            {fields.transcription.trim() || '[no transcription given]'}
-          </p>
-          {'pronunciation' in fields && (
-            <p className={css.pronunciation}>{fields.pronunciation}</p>
-          )}
-          <p
-            className={cn(css.meaning, { [css.blank]: !fields.meaning.trim() })}
-          >
-            {fields.meaning.trim() || '[no meaning given]'}
-          </p>
-        </TableCell>
-        <TableCell>
-          <p className={css.field}>{fields.notes}</p>
-        </TableCell>
-        <TableCell>
-          {tags.map(t => (
-            <ShortTag key={t} title={t} />
-          ))}
-        </TableCell>
-      </TableRow>
-    )
-  }
-)
+            <Loop />
+          </IconButton>
+        )}
+      </TableCell>
+      <TableCell className={css.flashcardContents}>
+        <p
+          className={cn(css.transcription, {
+            [css.blank]: !fields.transcription.trim(),
+          })}
+        >
+          {fields.transcription.trim() || '[no transcription given]'}
+        </p>
+        {'pronunciation' in fields && (
+          <p className={css.pronunciation}>{fields.pronunciation}</p>
+        )}
+        <p className={cn(css.meaning, { [css.blank]: !fields.meaning.trim() })}>
+          {fields.meaning.trim() || '[no meaning given]'}
+        </p>
+      </TableCell>
+      <TableCell>
+        <p className={css.field}>{fields.notes}</p>
+      </TableCell>
+      <TableCell>
+        {tags.map(t => (
+          <ShortTag key={t} title={t} />
+        ))}
+      </TableCell>
+    </TableRow>
+  )
+})
 
 const formatDuration = (duration: moment.Duration) =>
   [
@@ -155,13 +151,13 @@ type MediaTableProps = {
 }
 
 const MediaTableBody = React.memo(
-  ({ clips, onSelect, selectedIds }: MediaTableBodyProps) => {
+  ({ clipsIds, onSelect, selectedIds }: MediaTableBodyProps) => {
     return (
       <TableBody>
-        {clips.map(({ id, flashcard }) => (
+        {clipsIds.map(id => (
           <FlashcardRow
-            key={flashcard.id}
-            flashcard={flashcard}
+            key={id}
+            id={id}
             onSelect={onSelect}
             isSelected={selectedIds.includes(id)}
           />
@@ -181,8 +177,8 @@ const MediaTable = memo(
     onClick,
     mediaIndex,
   }: MediaTableProps) => {
-    const { clips, highlightedClipId } = useSelector((state: AppState) => ({
-      clips: r.getClips(state, media.id),
+    const { clipsIds, highlightedClipId } = useSelector((state: AppState) => ({
+      clipsIds: state.clips.idsByMediaFileId[media.id],
       highlightedClipId: r.getHighlightedClipId(state),
     }))
     const toggleOpen = useCallback(e => onClick(open ? -1 : mediaIndex), [
@@ -191,27 +187,27 @@ const MediaTable = memo(
       mediaIndex,
     ])
     const stopPropagation = useCallback(e => e.stopPropagation, [])
-    const selectAll = useCallback(() => onSelectAll(clips.map(c => c.id)), [
+    const selectAll = useCallback(() => onSelectAll(clipsIds), [
       onSelectAll,
-      clips,
+      clipsIds,
     ])
 
-    return !clips.length ? null : (
+    return !clipsIds.length ? null : (
       <Paper>
         <Toolbar
           className={cn(css.toolbar, { [css.openToolbar]: open })}
           onClick={toggleOpen}
         >
           <Checkbox
-            checked={clips.every(c => selectedIds.includes(c.id))}
+            checked={clipsIds.every(id => selectedIds.includes(id))}
             onChange={selectAll}
             onClick={stopPropagation}
             className={css.selectAllClipsCheckbox}
           />
 
           <div className={css.selectedClipsCount}>
-            {clips.filter(c => selectedIds.includes(c.id)).length || '--'} of{' '}
-            {clips.length}
+            {clipsIds.filter(id => selectedIds.includes(id)).length || '--'} of{' '}
+            {clipsIds.length}
           </div>
 
           <h2 className={css.mediaFileName}>
@@ -222,17 +218,6 @@ const MediaTable = memo(
               )}
             </small>
           </h2>
-
-          <div className={css.fileTagChips}>
-            {open
-              ? ' '
-              : ([
-                  ...(clips.reduce((tags, clip) => {
-                    clip.flashcard.tags.forEach(tag => tags.add(tag))
-                    return tags
-                  }, new Set()) as Set<string>),
-                ] as string[]).map(tag => <SmallTag key={tag} title={tag} />)}
-          </div>
 
           <IconButton>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
         </Toolbar>
@@ -247,7 +232,7 @@ const MediaTable = memo(
           </colgroup>
           {open && (
             <MediaTableBody
-              {...{ clips, onSelect, highlightedClipId, selectedIds }}
+              {...{ clipsIds, onSelect, highlightedClipId, selectedIds }}
             />
           )}
         </Table>
@@ -264,7 +249,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
 
   const {
     currentMedia,
-    clips,
+    clipsIds,
     currentFileId,
     projectMedia,
     progress,
@@ -272,7 +257,9 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
     const currentMedia = r.getCurrentMediaFile(state)
     return {
       currentMedia,
-      clips: currentMedia ? r.getClips(state, currentMedia.id) : [],
+      clipsIds: currentMedia
+        ? state.clips.idsByMediaFileId[currentMedia.id]
+        : [],
       currentFileId: r.getCurrentFileId(state),
       projectMedia: r.getCurrentProjectMediaFiles(state),
       progress: state.user.progress,
@@ -289,9 +276,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
     setSelectionHasStarted,
   ])
 
-  const [selectedIds, setSelectedIds] = useState(() =>
-    clips.map(clip => clip.id)
-  )
+  const [selectedIds, setSelectedIds] = useState(clipsIds)
   const exportApkg = useCallback(
     e =>
       showSaveDialog('Anki APKG file', ['apkg']).then(
@@ -464,7 +449,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
 export default Export
 
 type MediaTableBodyProps = {
-  clips: Clip[]
+  clipsIds: string[]
   onSelect: (id: string) => void
   highlightedClipId: string | null
   selectedIds: string[]
