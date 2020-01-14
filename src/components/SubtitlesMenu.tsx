@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useCallback } from 'react'
 import {
   Subtitles as SubtitlesIcon,
   Visibility as VisibilityOnIcon,
@@ -7,8 +7,9 @@ import {
   FolderSpecial,
   Delete as DeleteIcon,
 } from '@material-ui/icons'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import * as r from '../redux'
+import * as actions from '../actions'
 import {
   IconButton,
   Icon,
@@ -24,7 +25,7 @@ import { showOpenDialog } from '../utils/electron'
 import css from './Header.module.css'
 import usePopover from '../utils/usePopover'
 
-const VisibilityIcon = ({ visible }) => (
+const VisibilityIcon = ({ visible }: { visible: boolean }) => (
   <Icon>
     {visible ? (
       <VisibilityOnIcon fontSize="small" />
@@ -34,18 +35,6 @@ const VisibilityIcon = ({ visible }) => (
   </Icon>
 )
 
-const getOnClickLoadExternal = (
-  loadSubtitlesFromFile,
-  getCurrentFileId
-) => async () => {
-  const filePaths = await showOpenDialog([
-    { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
-  ])
-  if (!filePaths) return
-
-  loadSubtitlesFromFile(filePaths[0], getCurrentFileId)
-}
-
 const ExternalTrackMenuItem = ({
   title,
   visible,
@@ -53,6 +42,13 @@ const ExternalTrackMenuItem = ({
   hide,
   deleteTrack,
   locateTrack,
+}: {
+  title: string
+  visible: boolean
+  show: () => void
+  hide: () => void
+  deleteTrack: () => void
+  locateTrack: () => void
 }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
   return (
@@ -94,18 +90,51 @@ const ExternalTrackMenuItem = ({
   )
 }
 
-const SubtitlesMenu = ({
-  embeddedTracks,
-  externalTracksWithFiles,
-  showSubtitles,
-  hideSubtitles,
-  loadSubtitlesFromFile,
-  subtitlesClipsDialogRequest,
-  currentFileId,
-  deleteExternalSubtitles,
-  locateFileRequest,
-}) => {
+const SubtitlesMenu = () => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+
+  const {
+    embeddedTracks,
+    externalTracksWithFiles,
+    currentFileId,
+  } = useSelector((state: AppState) => ({
+    embeddedTracks: r.getEmbeddedSubtitlesTracks(state),
+    externalTracksWithFiles: r.getExternalSubtitlesTracksWithFiles(state),
+    currentFileId: r.getCurrentFileId(state),
+  }))
+
+  const dispatch = useDispatch()
+
+  const showSubtitles = useCallback(
+    (trackId: string, mediaFileId: string) => {
+      dispatch(actions.showSubtitles(trackId, mediaFileId))
+    },
+    [dispatch]
+  )
+  const hideSubtitles = useCallback(
+    (trackId: string, mediaFileId: string) => {
+      dispatch(actions.hideSubtitles(trackId, mediaFileId))
+    },
+    [dispatch]
+  )
+  const subtitlesClipsDialogRequest = useCallback(
+    () => {
+      dispatch(actions.subtitlesClipsDialogRequest())
+    },
+    [dispatch]
+  )
+  const deleteExternalSubtitles = useCallback(
+    (id: string) => {
+      dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
+    },
+    [dispatch]
+  )
+  const locateFileRequest = useCallback(
+    (file: FileMetadata, message: string) => {
+      dispatch(actions.locateFileRequest(file, message))
+    },
+    [dispatch]
+  )
 
   return (
     <Fragment>
@@ -126,8 +155,8 @@ const SubtitlesMenu = ({
             key={track.id}
             onClick={() =>
               track.mode === 'showing'
-                ? hideSubtitles(track.id, currentFileId)
-                : showSubtitles(track.id, currentFileId)
+                ? hideSubtitles(track.id, track.mediaFileId)
+                : showSubtitles(track.id, track.mediaFileId)
             }
           >
             <ListItemIcon>
@@ -144,8 +173,8 @@ const SubtitlesMenu = ({
             key={track.id}
             title={`External track ${i + 1}`}
             visible={track.mode === 'showing'}
-            show={() => showSubtitles(track.id, currentFileId)}
-            hide={() => hideSubtitles(track.id, currentFileId)}
+            show={() => showSubtitles(track.id, track.mediaFileId)}
+            hide={() => hideSubtitles(track.id, track.mediaFileId)}
             deleteTrack={() => deleteExternalSubtitles(track.id)}
             locateTrack={() =>
               locateFileRequest(
@@ -160,11 +189,33 @@ const SubtitlesMenu = ({
         <Divider />
         <MenuItem
           dense
-          onClick={getOnClickLoadExternal(loadSubtitlesFromFile, currentFileId)}
+          onClick={useCallback(
+            async () => {
+              if (!currentFileId)
+                return dispatch(
+                  actions.simpleMessageSnackbar(
+                    'Please open a media file first.'
+                  )
+                )
+
+              const filePaths = await showOpenDialog([
+                { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
+              ])
+              if (!filePaths) return
+
+              dispatch(
+                actions.loadSubtitlesFromFileRequest(
+                  filePaths[0],
+                  currentFileId
+                )
+              )
+            },
+            [dispatch, currentFileId]
+          )}
         >
           <ListItemText primary="Load external track" />
         </MenuItem>
-        <MenuItem dense onClick={e => subtitlesClipsDialogRequest()}>
+        <MenuItem dense onClick={() => subtitlesClipsDialogRequest()}>
           <ListItemText primary="Make clips + cards from subtitles" />
         </MenuItem>
       </Menu>
@@ -172,25 +223,4 @@ const SubtitlesMenu = ({
   )
 }
 
-const mapStateToProps = state => ({
-  embeddedTracks: r.getEmbeddedSubtitlesTracks(state),
-  externalTracksWithFiles: r.getExternalSubtitlesTracksWithFiles(state),
-  currentFileId: r.getCurrentFileId(state),
-})
-
-const deleteExternalSubtitles = trackId =>
-  r.deleteFileRequest('ExternalSubtitlesFile', trackId)
-
-const mapDispatchToProps = {
-  showSubtitles: r.showSubtitles,
-  hideSubtitles: r.hideSubtitles,
-  loadSubtitlesFromFile: r.loadSubtitlesFromFileRequest,
-  subtitlesClipsDialogRequest: r.subtitlesClipsDialogRequest,
-  deleteExternalSubtitles,
-  locateFileRequest: r.locateFileRequest,
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SubtitlesMenu)
+export default SubtitlesMenu

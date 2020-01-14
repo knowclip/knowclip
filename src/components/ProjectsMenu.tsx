@@ -1,5 +1,5 @@
-import React, { Fragment, useRef } from 'react'
-import { connect } from 'react-redux'
+import React, { Fragment, useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import {
   Paper,
@@ -13,28 +13,22 @@ import {
 } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
+import * as actions from '../actions'
 import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
-const getOpenProjectByFilePath = openProjectByFilePath => async () => {
-  const filePaths = await showOpenDialog({
-    name: 'AFCA project file',
-    extensions: ['afca'],
-  })
-
-  if (filePaths) {
-    openProjectByFilePath(filePaths[0])
-  }
-}
-
-const ProjectMenuItem = ({
-  project,
-  openProjectById,
-  removeProjectFromRecents,
-}) => {
+const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
-
+  const dispatch = useDispatch()
+  const removeFromRecents = useCallback(
+    () => dispatch(actions.deleteFileRequest('ProjectFile', project.id)),
+    [dispatch, project.id]
+  )
+  const openProjectById = useCallback(
+    () => dispatch(actions.openProjectById(project.id)),
+    [dispatch, project.id]
+  )
   return (
     <Fragment>
       {isOpen && (
@@ -44,12 +38,10 @@ const ProjectMenuItem = ({
           anchorEl={anchorEl}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <MenuItem onClick={e => removeProjectFromRecents(project.id)}>
-            Remove from recents
-          </MenuItem>
+          <MenuItem onClick={removeFromRecents}>Remove from recents</MenuItem>
         </Menu>
       )}
-      <MenuItem key={project.id} onClick={() => openProjectById(project.id)}>
+      <MenuItem key={project.id} onClick={openProjectById}>
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>
@@ -61,17 +53,33 @@ const ProjectMenuItem = ({
   )
 }
 
-const ProjectsMenu = ({
-  currentProjectId,
-  projects,
-  openProjectById,
-  newProjectFormDialog,
-  openProjectByFilePath,
-  removeProjectFromRecents,
-}) => {
-  const handleClickNewProject = useRef(newProjectFormDialog)
-  const onClickOpenExisting = useRef(
-    getOpenProjectByFilePath(openProjectByFilePath)
+const ProjectsMenu = () => {
+  const { projects, currentProjectId } = useSelector((state: AppState) => ({
+    projects: r.getProjects(state),
+    currentProjectId: r.getCurrentProjectId(state),
+  }))
+
+  const dispatch = useDispatch()
+  const handleClickNewProject = useCallback(
+    () => {
+      dispatch(actions.newProjectFormDialog())
+    },
+    [dispatch]
+  )
+  const onClickOpenExisting = useCallback(
+    async () => {
+      const filePaths = await showOpenDialog([
+        {
+          name: 'AFCA project file',
+          extensions: ['afca'],
+        },
+      ])
+
+      if (filePaths) {
+        dispatch(actions.openProjectByFilePath(filePaths[0]))
+      }
+    },
+    [dispatch]
   )
 
   if (currentProjectId) return <Redirect to="/" />
@@ -89,12 +97,7 @@ const ProjectsMenu = ({
                 <MenuItem disabled>No recent projects.</MenuItem>
               )}
               {projects.map(project => (
-                <ProjectMenuItem
-                  key={project.id}
-                  project={project}
-                  openProjectById={openProjectById}
-                  removeProjectFromRecents={removeProjectFromRecents}
-                />
+                <ProjectMenuItem key={project.id} project={project} />
               ))}
             </MenuList>
           </Paper>
@@ -104,7 +107,7 @@ const ProjectsMenu = ({
               className={css.button}
               variant="contained"
               color="primary"
-              onClick={handleClickNewProject.current}
+              onClick={handleClickNewProject}
             >
               New project
             </Button>
@@ -112,7 +115,7 @@ const ProjectsMenu = ({
               className={css.button}
               variant="contained"
               color="primary"
-              onClick={onClickOpenExisting.current}
+              onClick={onClickOpenExisting}
             >
               Open existing project
             </Button>
@@ -123,20 +126,4 @@ const ProjectsMenu = ({
   )
 }
 
-const mapStateToProps = state => ({
-  projects: r.getProjects(state),
-  currentProjectId: r.getCurrentProjectId(state),
-})
-const removeProjectFromRecents = projectId =>
-  r.deleteFileRequest('ProjectFile', projectId)
-const mapDispatchToProps = {
-  openProjectByFilePath: r.openProjectByFilePath,
-  openProjectById: r.openProjectById,
-  newProjectFormDialog: r.newProjectFormDialog,
-  removeProjectFromRecents: removeProjectFromRecents,
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ProjectsMenu)
+export default ProjectsMenu

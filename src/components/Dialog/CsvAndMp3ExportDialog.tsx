@@ -8,15 +8,14 @@ import {
   TextField,
 } from '@material-ui/core'
 import * as r from '../../redux'
-import { showOpenDirectoryDialog, showSaveDialog } from '../../utils/electron'
-import { shell } from 'electron'
+import {
+  showOpenDirectoryDialog,
+  showSaveDialog,
+  openInBrowser,
+} from '../../utils/electron'
+
 import { exportCsv, closeDialog } from '../../actions'
 import { DialogProps } from './DialogProps'
-
-const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-  e.preventDefault()
-  shell.openExternal((e.target as HTMLAnchorElement).href)
-}
 
 type ErrorsState = {
   csvFilePath?: string

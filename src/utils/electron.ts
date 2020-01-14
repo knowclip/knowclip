@@ -1,4 +1,4 @@
-import electron, { FileFilter } from 'electron'
+import electron, { FileFilter, shell } from 'electron'
 
 const {
   remote: { dialog, getCurrentWindow },
@@ -53,3 +53,10 @@ export const showOpenDirectoryDialog = (
       return await rej(err)
     }
   })
+
+export const openInBrowser = (
+  e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+) => {
+  e.preventDefault()
+  shell.openExternal((e.target as HTMLAnchorElement).href)
+}

@@ -1,9 +1,9 @@
 import { useState, useCallback, SyntheticEvent } from 'react'
 
 const usePopover = () => {
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const anchorCallbackRef = (el: any) => {
+  const anchorCallbackRef = (el: HTMLElement) => {
     if (el !== anchorEl) setAnchorEl(el)
   }
   const open = useCallback((event: SyntheticEvent) => {
