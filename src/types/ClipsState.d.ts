@@ -54,6 +54,11 @@ declare type PendingClip = {
   end: WaveformX
 }
 
+type TimeSpan = {
+  start: number
+  end: number
+}
+
 declare type ClipSpecs = {
   // for export?
   sourceFilePath: string

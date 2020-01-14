@@ -1,4 +1,4 @@
-import { getCurrentMediaFile } from './project'
+import { getCurrentMediaFile } from './currentMedia'
 
 export const getFileAvailability = (
   state: AppState,

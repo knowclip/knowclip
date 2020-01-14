@@ -352,7 +352,7 @@ const mapStateToProps = state => ({
   allTags: r.getAllTags(state),
   currentFlashcard: r.getCurrentFlashcard(state),
   currentMediaFileId: r.getCurrentFileId(state),
-  selectedClipId: r.getSelectedClipId(state),
+  selectedClipId: r.getHighlightedClipId(state),
   selectedClipTime: r.getSelectedClipTime(state),
   highlightedClipId: r.getHighlightedClipId(state),
   clipsTimes: r.getClipsTimes(state),
