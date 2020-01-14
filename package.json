@@ -10,6 +10,7 @@
     "name": "Justin Silvestre",
     "email": "justinsilvestre@gmail.com"
   },
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@material-ui/core": "^3.9.0",
     "@material-ui/icons": "^3.0.1",
