@@ -17,7 +17,7 @@ import uuid from 'uuid/v4'
 import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'classnames'
-import { DialogProps } from '../DialogProps'
+import { DialogProps } from './DialogProps'
 import { closeDialog, createProject } from '../../actions'
 
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {

@@ -27,7 +27,7 @@ import moment from 'moment'
 import { showSaveDialog } from '../utils/electron'
 import truncate from '../utils/truncate'
 import * as actions from '../actions'
-import { DialogProps } from './DialogProps'
+import { DialogProps } from './Dialog/DialogProps'
 
 const ShortTag = ({ title }: { title: string }) =>
   title.length > 12 ? (
@@ -36,15 +36,6 @@ const ShortTag = ({ title }: { title: string }) =>
     </Tooltip>
   ) : (
     <Chip label={title} />
-  )
-
-const SmallTag = ({ title }: { title: string }) =>
-  title.length > 12 ? (
-    <Tooltip title={title}>
-      <span className={css.smallTag}>{truncate(title, 12)}</span>
-    </Tooltip>
-  ) : (
-    <span className={css.smallTag}>{title}</span>
   )
 
 type FlashcardRowProps = {

@@ -4,7 +4,7 @@ import { Dialog, DialogContent } from '@material-ui/core'
 import FileSelectionForm from '../FileSelectionForm'
 import { getExtensions } from '../../utils/files'
 import * as actions from '../../actions'
-import { DialogProps } from '../DialogProps'
+import { DialogProps } from './DialogProps'
 
 const FileSelectionDialog = ({
   open,

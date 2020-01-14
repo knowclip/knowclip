@@ -14,7 +14,7 @@ import * as r from '../../redux'
 import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
-import { DialogProps } from '../DialogProps'
+import { DialogProps } from './DialogProps'
 import {
   loadSubtitlesFromFileRequest,
   makeClipsFromSubtitles,

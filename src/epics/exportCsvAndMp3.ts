@@ -1,16 +1,13 @@
 import { flatMap, mergeAll } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
-import { promisify } from 'util'
-import fs from 'fs'
+import { promises as fs } from 'fs'
 import { join } from 'path'
 import * as r from '../redux'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 import { AppEpic } from '../types/AppEpic'
-
-const writeFile = promisify(fs.writeFile)
 
 const exportFailureSnackbar = (err: Error) =>
   r.simpleMessageSnackbar(`There was a problem making clips: ${err.message}`)
@@ -44,7 +41,7 @@ const exportCsv: AppEpic = (action$, state$) =>
           }
 
           const csvText = getCsvText(exportData)
-          await writeFile(csvFilePath, csvText, 'utf8')
+          await fs.writeFile(csvFilePath, csvText, 'utf8')
           return from([
             r.simpleMessageSnackbar(`Flashcards saved in ${csvFilePath}`),
             r.setMediaFolderLocation(mediaFolderLocation), // should probably just get rid of this action

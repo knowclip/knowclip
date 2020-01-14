@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useCallback, SyntheticEvent } from 'react'
 
 const usePopover = () => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -6,14 +6,14 @@ const usePopover = () => {
   const anchorCallbackRef = (el: any) => {
     if (el !== anchorEl) setAnchorEl(el)
   }
-  const open = useRef((event: Event) => {
+  const open = useCallback((event: SyntheticEvent) => {
     event.stopPropagation()
     setIsOpen(true)
-  }).current
-  const close = useRef((event: Event) => {
+  }, [])
+  const close = useCallback((event: SyntheticEvent) => {
     event.stopPropagation()
     setIsOpen(false)
-  }).current
+  }, [])
   const toggle = isOpen ? close : open
 
   return {

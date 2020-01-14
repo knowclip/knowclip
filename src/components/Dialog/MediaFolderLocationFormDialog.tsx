@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dialog, DialogContent } from '@material-ui/core'
 import MediaFolderLocationForm from '../MediaFolderLocationForm'
-import { DialogProps } from '../DialogProps'
+import { DialogProps } from './DialogProps'
 import { closeDialog } from '../../actions'
 
 const MediaFolderLocationFormDialog = ({

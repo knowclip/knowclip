@@ -1,9 +1,12 @@
 import React, { useCallback, useState } from 'react'
 import { TextField, Button } from '@material-ui/core'
-import * as css from './FileSelectionForm.module.css'
+import css from './FileSelectionForm.module.css'
 import { showOpenDialog } from '../utils/electron'
 
-const useLocationForm = (extensions, onSubmit) => {
+const useLocationForm = (
+  extensions: string[],
+  onSubmit: (string: string) => void
+) => {
   const [locationText, setLocationText] = useState('')
   const [errorText, setErrorText] = useState('')
 
@@ -14,7 +17,7 @@ const useLocationForm = (extensions, onSubmit) => {
   const onLocationTextFocus = useCallback(
     async e => {
       const filePaths = await showOpenDialog(
-        extensions.map(ext => ({ name: 'File', extensions: ext }))
+        extensions.map(ext => ({ name: 'File', extensions: [ext] }))
       )
 
       if (!filePaths) return
@@ -43,7 +46,17 @@ const useLocationForm = (extensions, onSubmit) => {
   }
 }
 
-const FileSelectionForm = ({ message, cancel, extensions, onSubmit }) => {
+const FileSelectionForm = ({
+  message,
+  cancel,
+  extensions,
+  onSubmit,
+}: {
+  message: string
+  cancel: () => void
+  extensions: string[]
+  onSubmit: (path: string) => void
+}) => {
   const {
     locationText,
     errorText,

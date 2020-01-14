@@ -11,7 +11,7 @@ import * as r from '../../redux'
 import { showOpenDirectoryDialog, showSaveDialog } from '../../utils/electron'
 import { shell } from 'electron'
 import { exportCsv, closeDialog } from '../../actions'
-import { DialogProps } from '../DialogProps'
+import { DialogProps } from './DialogProps'
 
 const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
   e.preventDefault()
