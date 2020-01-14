@@ -13,10 +13,9 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
     flatMap<MakeClipsFromSubtitles, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags }) => {
         const transcriptionTrackId = fieldNamesToTrackIds.transcription
-        const transcriptionTrack = r.getSubtitlesTrack(
-          state$.value,
-          transcriptionTrackId
-        )
+        const transcriptionTrack =
+          transcriptionTrackId &&
+          r.getSubtitlesTrack(state$.value, transcriptionTrackId)
         if (!transcriptionTrack)
           return of(
             r.simpleMessageSnackbar(
@@ -71,10 +70,11 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
           ),
           ...Object.keys(fieldNamesToTrackIds).map(badTypefieldName => {
             const fieldName = badTypefieldName as FlashcardFieldName
+            const trackId = fieldNamesToTrackIds[fieldName] || null
             return r.linkFlashcardFieldToSubtitlesTrack(
               fieldName,
               currentFile.id,
-              fieldNamesToTrackIds[fieldName]
+              trackId
             )
           }),
           r.addClips(clips, fileId),

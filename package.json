@@ -13,6 +13,7 @@
   "dependencies": {
     "@material-ui/core": "^3.9.0",
     "@material-ui/icons": "^3.0.1",
+    "@types/classnames": "^2.2.9",
     "anki-apkg-export-multi-field": "^0.1.0",
     "asar": "0.14.3",
     "dataurl": "^0.1.0",
