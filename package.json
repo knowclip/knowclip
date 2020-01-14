@@ -60,7 +60,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn tidy; git diff"
+      "pre-commit": "yarn tidy",
+      "post-commit": "git diff"
     }
   },
   "browserslist": [
