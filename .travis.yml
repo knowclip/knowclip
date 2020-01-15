@@ -9,7 +9,7 @@ jobs:
     env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-    script: yarn build:ci && yarn test:integration
+    script: yarn && yarn build:ci && yarn test:integration
   - stage: build linux & win assets
     os: linux
     services: docker
@@ -40,7 +40,7 @@ script:
   # else	
   #  yarn && yarn dist --mac
   # fi
-  yarn build:ci && yarn test:integration
+  yarn && yarn build:ci && yarn test:integration
 
   ./docker/docker_run.sh --linux --win --mac
 before_cache:
