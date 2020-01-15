@@ -1,7 +1,9 @@
 // A simple test to verify a visible window is opened with a title
 import { Application } from 'spectron'
 import { join } from 'path'
-const electron = require('electron')
+import electron from 'electron'
+
+jest.setTimeout(60000)
 
 describe('App runs', () => {
   let app: Application | undefined
