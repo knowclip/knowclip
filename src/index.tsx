@@ -5,7 +5,6 @@ import { Provider } from 'react-redux'
 import App from './App'
 import getStore from './getStore'
 import './index.css'
-import registerServiceWorker from './registerServiceWorker'
 import { AppContainer, setConfig, cold } from 'react-hot-loader'
 
 setConfig({
@@ -16,8 +15,6 @@ setConfig({
 })
 
 const store = getStore()
-
-registerServiceWorker()
 
 const render = (Component: typeof React.Component.constructor) =>
   ReactDOM.render(
