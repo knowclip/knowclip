@@ -36,7 +36,6 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         className={cn('waveform-clip', { highlightedClip: isHighlighted })}
         d={getClipPath(start, end)}
       />
-      {/*<text x={start} y={90} width={end - start}>{Object.values(flashcard.fields)[0]}</text>*/}
       <rect
         className={cn('waveform-clip-border', {
           highlightedClipBorder: isHighlighted,
