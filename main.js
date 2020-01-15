@@ -47,7 +47,7 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  if (!isPackaged && process.env.NODE_ENV !== test) await installDevtools()
+  if (!isPackaged && process.env.NODE_ENV !== 'test') await installDevtools()
 
   context.mainWindow.on('close', e => {
     if (context.mainWindow) {
