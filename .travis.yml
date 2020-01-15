@@ -1,7 +1,7 @@
 services: docker
 jobs:
   include:
-  - stage: build mac assets
+  - stage: mac integration tests
     os: osx
     osx_image: xcode10.2
     language: node_js
@@ -9,9 +9,10 @@ jobs:
     env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-    script: yarn && yarn build:ci && yarn test:integration
-  - stage: build linux & win assets
+  - stage: linux + windows integration tests and all platforms build
     os: linux
+    language: node_js
+    node_js: '12'
     services: docker
     language: generic
     deploy:
@@ -35,14 +36,11 @@ cache:
   - "$HOME/.cache/electron-builder"
 script:
 - |	
-  # if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-  # ./docker/docker_run.sh --linux --win
-  # else	
-  #  yarn && yarn dist --mac
-  # fi
-  yarn && yarn build:ci && yarn test:integration
-
-  ./docker/docker_run.sh --linux --win --mac
+  if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
+  else	
+    yarn && yarn build:ci && yarn test:integration
+  fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
 branches:
