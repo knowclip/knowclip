@@ -22,7 +22,7 @@ declare module 'anki-apkg-export-multi-field/dist/exporter' {
   }
 }
 
-declare module 'electron-progressbar' {
+declare module 'react-autosuggest' {
   const x: any
   export default x
 }

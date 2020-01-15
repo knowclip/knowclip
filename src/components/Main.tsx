@@ -23,7 +23,7 @@ import DarkTheme from '../components/DarkTheme'
 import headerCss from '../components/Header.module.css'
 import * as r from '../redux'
 import * as actions from '../actions'
-import SubtitlesMenu from '../components/SubtitlesMenu.js'
+import SubtitlesMenu from '../components/SubtitlesMenu'
 
 declare module 'react' {
   interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
