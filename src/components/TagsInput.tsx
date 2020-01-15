@@ -1,24 +1,23 @@
-import React, { useRef, useState, useCallback, ReactChild } from 'react'
+import React, { useRef, useState, useCallback } from 'react'
 
 import { MenuItem, Paper } from '@material-ui/core'
 import ChipInput from 'material-ui-chip-input'
 import css from './FlashcardSection.module.css'
-import Autosuggest from 'react-autosuggest'
-import { PaperProps } from '@material-ui/core/Paper'
-import { MenuItemProps } from '@material-ui/core/MenuItem'
+import Autosuggest, {
+  RenderSuggestion,
+  GetSuggestionValue,
+  RenderSuggestionsContainer,
+  InputProps,
+} from 'react-autosuggest'
 
-const getSuggestionValue = (a: string) => a
+const getSuggestionValue: GetSuggestionValue<string> = a => a
 const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
   e.preventDefault()
 }
 
-const renderSuggestion = (
-  suggestion: string,
-  {
-    query,
-    isHighlighted,
-    ...other
-  }: { query: string; isHighlighted: boolean } & MenuItemProps
+const renderSuggestion: RenderSuggestion<string> = (
+  suggestion,
+  { query, isHighlighted, ...other }
 ) => (
   // prevent the click causing the input to be blurred
   <MenuItem
@@ -42,7 +41,7 @@ const TagsInput = ({
   onAddChip: (text: string) => void
   onDeleteChip: (index: number, text: string) => void
 }) => {
-  const autosuggestComponent = useRef<{ input: HTMLInputElement } | null>(null)
+  const autosuggestComponent = useRef<Autosuggest<string, any>>(null)
 
   const [textFieldInput, setTextFieldInput] = useState('')
   const [suggestions, setSuggestions] = useState<string[]>([])
@@ -62,7 +61,8 @@ const TagsInput = ({
   const handleDeleteChip = useCallback(
     (text, index) => {
       onDeleteChip(index, text)
-      autosuggestComponent.current && autosuggestComponent.current.input.focus()
+      if (autosuggestComponent.current && autosuggestComponent.current.input)
+        autosuggestComponent.current.input.focus()
     },
     [onDeleteChip, autosuggestComponent]
   )
@@ -100,12 +100,9 @@ const TagsInput = ({
 
   const onSuggestionsClearRequested = () => setSuggestions([])
 
-  const renderSuggestionsContainer = ({
+  const renderSuggestionsContainer: RenderSuggestionsContainer = ({
     children,
     containerProps,
-  }: {
-    children: ReactChild
-    containerProps: PaperProps
   }) => (
     <Paper {...containerProps} square className={css.suggestionsContainer}>
       {children}
@@ -114,7 +111,7 @@ const TagsInput = ({
 
   return (
     <Autosuggest
-      ref={autosuggestComponent.current}
+      ref={autosuggestComponent}
       theme={{
         suggestionsList: css.suggestionsList,
         suggestionsContainer: css.suggestionsContainer,
@@ -132,13 +129,15 @@ const TagsInput = ({
         value => value && value.trim().length > 0,
         []
       )}
-      inputProps={{
-        chips: tags || [],
-        value: textFieldInput,
-        onChange: handletextFieldInputChange,
-        onAdd: handleAddChip,
-        onDelete: handleDeleteChip,
-      }}
+      inputProps={
+        {
+          chips: tags || [],
+          value: textFieldInput,
+          onChange: handletextFieldInputChange,
+          onAdd: handleAddChip,
+          onDelete: handleDeleteChip,
+        } as InputProps<string>
+      }
       renderInputComponent={useCallback(
         ({ value, onChange, chips, ref, ...other }) => (
           <ChipInput
