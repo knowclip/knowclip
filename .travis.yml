@@ -32,12 +32,13 @@ jobs:
 cache:
   directories:
   - node_modules
+  - "$HOME/.cache/yarn"
   - "$HOME/.cache/electron"
   - "$HOME/.cache/electron-builder"
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
+    nvm install && yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
   else	
     yarn && yarn build:ci && yarn test:integration
   fi
