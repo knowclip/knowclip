@@ -14,7 +14,6 @@ jobs:
     language: node_js
     node_js: '12'
     services: docker
-    language: generic
     deploy:
       skip_cleanup: true
       provider: releases
@@ -38,7 +37,7 @@ cache:
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    nvm install && yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
+    yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
   else	
     yarn && yarn build:ci && yarn test:integration
   fi
