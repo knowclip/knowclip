@@ -93,9 +93,8 @@ const Media = ({
   )
   useEffect(
     () => {
-      const { textTracks } = mediaRef.current as
-        | HTMLVideoElement
-        | HTMLAudioElement
+      if (!mediaRef.current) return
+      const { textTracks } = mediaRef.current
       if (textTracks)
         [...textTracks].forEach(
           (track, index) => (track.mode = subtitles[index].mode)

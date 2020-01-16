@@ -15,15 +15,15 @@ const getAudioElement = () => {
     return null
   return el
 }
-const getWaveformSvgElement = () => document.getElementById('waveform-svg')
+const getWaveformSvgElement = () =>
+  (document.getElementById('waveform-svg') as SVGElement | null) || null
 
 const dependencies: EpicsDependencies = {
   document,
   window,
   getCurrentWindow: () => remote.getCurrentWindow(),
   setLocalStorage: (key, value) => window.localStorage.setItem(key, value),
-  getWaveformSvgElement: () =>
-    (document.getElementById('waveform-svg') as SVGElement | null) || null,
+  getWaveformSvgElement,
   getWaveformSvgWidth: () => {
     const el = getWaveformSvgElement()
     return el ? elementWidth(el) : 0

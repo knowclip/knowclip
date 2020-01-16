@@ -10,7 +10,8 @@ const composeEnhancers =
   process.env.NODE_ENV === 'development'
     ? ((window as unknown) as {
         __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
-      }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+      }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
+      (console.error('Could not load dev tools'), compose)
     : compose
 
 export default function getStore() {

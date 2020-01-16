@@ -172,7 +172,7 @@ const Field = ({
   )
 }
 
-const FlashcardSection = ({ showing }: { showing: boolean }) => {
+const Flashcard = () => {
   const dispatch = useDispatch()
   const {
     allTags,
@@ -202,19 +202,7 @@ const FlashcardSection = ({ showing }: { showing: boolean }) => {
     subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
   }))
 
-  // highlightClip,
-  // addFlashcardTag,
-  // deleteFlashcardTag,
-  // linkFlashcardFieldToSubtitlesTrack,
-
   const [moreMenuAnchorEl, setMoreMenuAnchorEl] = useState(null)
-
-  // const handleClickMoreButton = useCallback(
-  //   event => {
-  //     setMoreMenuAnchorEl(event.currentTarget)
-  //   },
-  //   [setMoreMenuAnchorEl]
-  // )
 
   const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
     dispatch,
@@ -294,120 +282,71 @@ const FlashcardSection = ({ showing }: { showing: boolean }) => {
       </Tooltip>
 
       <Card className={css.form}>
-        {!showing ? (
-          <CardContent className={css.intro}>
-            <p className={css.introText}>
-              You can <strong>create clips</strong> in a few different ways:
-            </p>
-            <ul className={css.introList}>
-              <li>
-                Manually <strong>click and drag</strong> on the waveform
-              </li>
-
-              <li>
-                Use <Hearing className={css.icon} />{' '}
-                <strong>silence detection</strong> to automatically make clips
-                from audio containing little background noise.
-              </li>
-              <li>
-                Use <Subtitles className={css.icon} />{' '}
-                <strong>subtitles</strong> to automatically create both clips
-                and flashcards.
-              </li>
-            </ul>
-            <p className={css.introText}>
-              When you're done, press the <Layers className={css.icon} />{' '}
-              <strong>export button</strong>.
-            </p>
-          </CardContent>
-        ) : (
-          <CardContent>
-            <form className="form" onSubmit={handleFlashcardSubmit}>
-              <div className="formBody">
-                <section className={css.timeStamp}>
-                  {formatTime(selectedClipTime.start)}
-                  {' - '}
-                  {formatTime(selectedClipTime.end)}
-                  <Tooltip title="Loop audio (Ctrl + L)">
-                    <IconButton
-                      onClick={toggleLoop}
-                      color={isLoopOn ? 'secondary' : 'default'}
-                    >
-                      <Loop />
-                    </IconButton>
-                  </Tooltip>
-                </section>
-                {currentNoteType &&
-                  getNoteTypeFields(currentNoteType).map(id => (
-                    <Field
-                      key={`${id}_${currentFlashcard.id}`}
-                      id={id}
-                      currentFlashcard={currentFlashcard}
-                      name={capitalize(id)}
-                      setFlashcardText={setFlashcardText}
-                      embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-                      externalSubtitlesTracks={externalSubtitlesTracks}
-                      linkedSubtitlesTrack={
-                        subtitlesFlashcardFieldLinks[id] || null
-                      }
-                      linkToSubtitlesTrack={trackId =>
-                        dispatch(
-                          actions.linkFlashcardFieldToSubtitlesTrack(
-                            id,
-                            currentMediaFileId,
-                            trackId
-                          )
-                        )
-                      }
-                    />
-                  ))}
-                <TagsInput
-                  allTags={allTags}
-                  tags={currentFlashcard.tags}
-                  onAddChip={onAddChip}
-                  onDeleteChip={onDeleteChip}
-                />
-
-                <section className={css.bottom}>
-                  {/* <span className={css.noteTypeName}>
-                  Using card template:{' '}
-                  <Tooltip title="Edit card template">
-                    <span
-                      className={css.noteTypeNameLink}
-                      onClick={editCardTemplate}
-                      tabIndex={0}
-                    >
-                      {currentNoteType.name}
-                    </span>
-                  </Tooltip>
-                </span> */}
+        <CardContent>
+          <form className="form" onSubmit={handleFlashcardSubmit}>
+            <div className="formBody">
+              <section className={css.timeStamp}>
+                {formatTime(selectedClipTime.start)}
+                {' - '}
+                {formatTime(selectedClipTime.end)}
+                <Tooltip title="Loop audio (Ctrl + L)">
                   <IconButton
-                    className={css.moreMenuButton}
-                    onClick={handleClickDeleteButton}
+                    onClick={toggleLoop}
+                    color={isLoopOn ? 'secondary' : 'default'}
                   >
-                    <DeleteIcon />
+                    <Loop />
                   </IconButton>
-                  <Menu
-                    anchorEl={moreMenuAnchorEl}
-                    open={Boolean(moreMenuAnchorEl)}
-                    onClose={handleCloseMoreMenu}
-                  >
-                    {/* <MenuItem onClick={editCardTemplate}>
-                    Edit card template
-                  </MenuItem> */}
-                    <MenuItem onClick={deleteCard}>Delete card</MenuItem>
-                  </Menu>
-                </section>
-                {/* <IconButton
-                className={css.deleteButton}
-                onClick={deleteCard}
-              >
-                <DeleteIcon />
-              </IconButton> */}
-              </div>
-            </form>
-          </CardContent>
-        )}
+                </Tooltip>
+              </section>
+              {currentNoteType &&
+                getNoteTypeFields(currentNoteType).map(id => (
+                  <Field
+                    key={`${id}_${currentFlashcard.id}`}
+                    id={id}
+                    currentFlashcard={currentFlashcard}
+                    name={capitalize(id)}
+                    setFlashcardText={setFlashcardText}
+                    embeddedSubtitlesTracks={embeddedSubtitlesTracks}
+                    externalSubtitlesTracks={externalSubtitlesTracks}
+                    linkedSubtitlesTrack={
+                      subtitlesFlashcardFieldLinks[id] || null
+                    }
+                    linkToSubtitlesTrack={trackId =>
+                      dispatch(
+                        actions.linkFlashcardFieldToSubtitlesTrack(
+                          id,
+                          currentMediaFileId,
+                          trackId
+                        )
+                      )
+                    }
+                  />
+                ))}
+              <TagsInput
+                allTags={allTags}
+                tags={currentFlashcard.tags}
+                onAddChip={onAddChip}
+                onDeleteChip={onDeleteChip}
+              />
+
+              <section className={css.bottom}>
+                <IconButton
+                  className={css.moreMenuButton}
+                  onClick={handleClickDeleteButton}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={moreMenuAnchorEl}
+                  open={Boolean(moreMenuAnchorEl)}
+                  onClose={handleCloseMoreMenu}
+                >
+                  <MenuItem onClick={deleteCard}>Delete card</MenuItem>
+                </Menu>
+              </section>
+            </div>
+          </form>
+        </CardContent>
       </Card>
 
       <Tooltip title="Next clip (Ctrl + period)">
@@ -427,5 +366,37 @@ const FlashcardSection = ({ showing }: { showing: boolean }) => {
     </section>
   )
 }
+
+const Placeholder = () => (
+  <Card className={css.form}>
+    <CardContent className={css.intro}>
+      <p className={css.introText}>
+        You can <strong>create clips</strong> in a few different ways:
+      </p>
+      <ul className={css.introList}>
+        <li>
+          Manually <strong>click and drag</strong> on the waveform
+        </li>
+
+        <li>
+          Use <Hearing className={css.icon} />{' '}
+          <strong>silence detection</strong> to automatically make clips from
+          audio containing little background noise.
+        </li>
+        <li>
+          Use <Subtitles className={css.icon} /> <strong>subtitles</strong> to
+          automatically create both clips and flashcards.
+        </li>
+      </ul>
+      <p className={css.introText}>
+        When you're done, press the <Layers className={css.icon} />{' '}
+        <strong>export button</strong>.
+      </p>
+    </CardContent>
+  </Card>
+)
+
+const FlashcardSection = ({ showing }: { showing: boolean }) =>
+  showing ? <Flashcard /> : <Placeholder />
 
 export default FlashcardSection

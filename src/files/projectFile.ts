@@ -7,12 +7,9 @@ import moment from 'moment'
 const { readFile } = promises
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => {
-    return [
-      // TODO: check differences/opened time
-      r.openFileSuccess(file, filePath),
-    ]
-  },
+  openRequest: async ({ file }, filePath, state, effects) => [
+    r.openFileSuccess(file, filePath),
+  ],
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
       const projectJson = await readFile(filePath, 'utf8')

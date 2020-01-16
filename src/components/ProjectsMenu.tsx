@@ -18,6 +18,8 @@ import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
+export const testLabels = { newProjectButton: 'new-project-button' }
+
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
   const dispatch = useDispatch()
@@ -104,6 +106,7 @@ const ProjectsMenu = () => {
 
           <section className={css.buttons}>
             <Button
+              id={testLabels.newProjectButton}
               className={css.button}
               variant="contained"
               color="primary"

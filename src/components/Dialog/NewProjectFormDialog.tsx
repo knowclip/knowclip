@@ -20,6 +20,14 @@ import cn from 'classnames'
 import { DialogProps } from './DialogProps'
 import { closeDialog, createProject } from '../../actions'
 
+export const testLabels = {
+  projectNameField: 'project-name',
+  projectFileLocationField: 'project-file-location',
+  noteTypeSelect: 'note-type-select',
+  transcriptionNoteTypeOption: 'transcription-note-type-option',
+  saveButton: 'save-button',
+} as const
+
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
   switch (noteType) {
     case 'Simple':
@@ -110,8 +118,10 @@ const NewProjectFormDialog = ({
   const handleSubmit = useCallback(
     () => {
       const errors = validate()
-      if (Object.keys(errors).length)
+      if (Object.values(errors).filter(err => err).length)
         return setState(state => ({ ...state, errors }))
+
+      console.log('submit!!')
 
       const { filePath, name } = fieldValues
       dispatch(
@@ -169,11 +179,17 @@ const NewProjectFormDialog = ({
   return (
     <Dialog open={open}>
       <DialogContent>
-        <form className={css.form} onSubmit={handleSubmit}>
+        <form
+          className={css.form}
+          onSubmit={() => {
+            console.log('submated', handleSubmit())
+          }}
+        >
           <h3>New project</h3>
           <TextField
             fullWidth
             label="Project name"
+            inputProps={{ id: testLabels.projectNameField }}
             value={fieldValues.name}
             error={Boolean(errors.name)}
             helperText={errors.name}
@@ -186,6 +202,7 @@ const NewProjectFormDialog = ({
           <TextField
             fullWidth
             label="Project file location"
+            id={testLabels.projectFileLocationField}
             value={fieldValues.filePath}
             error={Boolean(errors.filePath)}
             helperText={errors.filePath}
@@ -203,12 +220,19 @@ const NewProjectFormDialog = ({
               onChange={handleChangeNoteType}
               inputProps={{
                 name: 'note-type',
-                id: 'note-type',
+              }}
+              SelectDisplayProps={{
+                id: testLabels.noteTypeSelect,
               }}
             >
               <MenuItem value="" />
               <MenuItem value="Simple">Simple</MenuItem>
-              <MenuItem value="Transliteration">
+              <MenuItem
+                id={testLabels.transcriptionNoteTypeOption}
+                value="Transliteration"
+                ContainerComponent="div"
+                ContainerProps={{ id: testLabels.transcriptionNoteTypeOption }}
+              >
                 Including pronunciation field
               </MenuItem>
             </Select>
@@ -220,7 +244,15 @@ const NewProjectFormDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog}>Exit</Button>
-        <Button onClick={handleSubmit}>Save</Button>
+        <Button
+          onClick={() => {
+            console.log('clooked', handleSubmit())
+          }}
+          id={testLabels.saveButton}
+          type="submit"
+        >
+          Save
+        </Button>
       </DialogActions>
     </Dialog>
   )

@@ -23,22 +23,25 @@ global.ffmpegpath = getFfmpegStaticPath(ffmpegStaticBasePath)
 global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
 
 async function createWindow() {
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+
   // Create the browser window.
-  context.mainWindow =
-    context.mainWindow ||
-    new BrowserWindow({
-      width: 800,
-      height: 600,
-      webPreferences: {
-        webSecurity: isPackaged,
-        nodeIntegration: true,
-        devTools: process.env.NODE_ENV !== 'test',
-      },
-    })
+  const mainWindow = new BrowserWindow({
+    width: Math.min(1400, width),
+    height: Math.min(950, height),
+    webPreferences: {
+      webSecurity: isPackaged,
+      nodeIntegration: true,
+      // devTools: process.env.NODE_ENV !== 'test',
+    },
+  })
+
+  context.mainWindow = mainWindow
 
   // and load the index.html of the app.
-  context.mainWindow.loadURL(
-    process.env.NODE_ENV === 'test' || isPackaged
+  mainWindow.loadURL(
+    !process.env.INTEGRATION_DEV &&
+      (process.env.NODE_ENV === 'test' || isPackaged)
       ? url.format({
           pathname: path.join(__dirname, 'build', 'index.html'),
           protocol: 'file',
@@ -47,17 +50,20 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  if (!isPackaged && process.env.NODE_ENV !== 'test') await installDevtools()
+  if (
+    process.env.NODE_ENV === 'test' ? process.env.INTEGRATION_DEV : !isPackaged
+  )
+    await installDevtools()
 
-  context.mainWindow.on('close', e => {
+  mainWindow.on('close', e => {
     if (context.mainWindow) {
       e.preventDefault()
-      context.mainWindow.webContents.send('app-close')
+      mainWindow.webContents.send('app-close')
     }
   })
 
   // Emitted when the window is closed.
-  context.mainWindow.on('closed', function() {
+  mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
