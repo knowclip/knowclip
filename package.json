@@ -56,7 +56,7 @@
     "build": "react-scripts build",
     "build:ci": "CI=false yarn build",
     "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test",
-    "integration:ci": "REACT_APP_SPECTRON=true yarn build && react-scripts test ./src/test --watchAll=false",
+    "integration:ci": "REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test --watchAll=false",
     "integration:dev-server": "REACT_APP_SPECTRON=true react-scripts start",
     "integration:dev": "INTEGRATION_DEV=true react-scripts test ./src/test --watchAll=false",
     "eject": "react-scripts eject",
