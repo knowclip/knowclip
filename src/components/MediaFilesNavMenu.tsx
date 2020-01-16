@@ -1,5 +1,5 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react'
-import { connect, useSelector } from 'react-redux'
+import React, { useCallback, useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Button,
   IconButton,
@@ -26,39 +26,84 @@ import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
+import * as actions from '../actions'
 import css from './Header.module.css'
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
+const MEDIA_FILTERS = [
+  {
+    name: 'Audio or video files',
+    extensions: [
+      'mp3',
+      'mp4',
+      'wav',
+      'ogg',
+      'm4a',
+      'mkv',
+      'flac',
+      'avi',
+      'mov',
+      'aac',
+      'webm',
+    ],
+  },
+]
+
+type MediaFileMenuItemProps = {
+  mediaFile: MediaFile
+  selected: boolean
+  currentProjectId: ProjectId
+  closeMenu: (event: React.SyntheticEvent<Element, Event>) => void
+}
 
 const MediaFileMenuItem = ({
   mediaFile,
   selected,
-  loadMediaFileRequest,
-  locateMediaFileRequest,
-  deleteMediaFile,
+  currentProjectId,
   closeMenu: closeSupermenu,
-}) => {
+}: MediaFileMenuItemProps) => {
+  const dispatch = useDispatch()
+
   const submenu = usePopover()
+  const closeSubmenu = submenu.close
+  const closeMenu = useCallback(
+    e => {
+      closeSubmenu(e)
+      closeSupermenu(e)
+    },
+    [closeSubmenu, closeSupermenu]
+  )
 
-  const closeMenu = useRef(e => {
-    submenu.close(e)
-    closeSupermenu(e)
-  }).current
-
-  const loadAndClose = useRef(e => {
-    loadMediaFileRequest()
-    closeMenu(e)
-  }).current
-  const deleteAndClose = useRef(e => {
-    deleteMediaFile()
-    closeMenu(e)
-  }).current
-  const locateAndClose = useRef(e => {
-    locateMediaFileRequest()
-    closeMenu(e)
-  }).current
-  const { fileAvailability } = useSelector(state => ({
+  const loadAndClose = useCallback(
+    e => {
+      dispatch(actions.openFileRequest(mediaFile))
+      closeMenu(e)
+    },
+    [dispatch, mediaFile, closeMenu]
+  )
+  const deleteAndClose = useCallback(
+    e => {
+      dispatch(
+        actions.confirmationDialog(
+          CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
+          actions.deleteMediaFromProject(currentProjectId, mediaFile.id)
+        )
+      )
+      closeMenu(e)
+    },
+    [dispatch, mediaFile, currentProjectId, closeMenu]
+  )
+  const locateAndClose = useCallback(
+    e => {
+      dispatch(
+        actions.locateFileRequest(mediaFile, 'Please locate this media file.')
+      )
+      closeMenu(e)
+    },
+    [dispatch, mediaFile, closeMenu]
+  )
+  const { fileAvailability } = useSelector((state: AppState) => ({
     fileAvailability: r.getFileAvailabilityById(
       state,
       'MediaFile',
@@ -103,13 +148,16 @@ const MediaFileMenuItem = ({
         open={submenu.isOpen}
         anchorEl={submenu.anchorEl}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        onClose={e => {
+        onClose={useCallback(
+          e => {
+            e.stopPropagation()
+            closeSubmenu(e)
+          },
+          [closeSubmenu]
+        )}
+        onClick={useCallback(e => {
           e.stopPropagation()
-          submenu.close(e)
-        }}
-        onClick={e => {
-          e.stopPropagation()
-        }}
+        }, [])}
       >
         <MenuList>
           <MenuItem dense style={{ width: 200 }} onClick={loadAndClose}>
@@ -141,28 +189,35 @@ const MediaFileMenuItem = ({
   )
 }
 
-const MediaFilesNavMenu = ({
-  className,
-  toggleLoop,
-  currentFileName,
-  currentFileId,
-  loop,
-  addMediaToProjectRequest,
-  currentProjectId,
-  projectMediaFiles,
-  openFileRequest,
-  locateFileRequest,
-  confirmationDialog,
-  deleteMediaFromProject,
-}) => {
+const MediaFilesNavMenu = ({ className }: { className: string }) => {
+  const {
+    loop,
+    currentFileName,
+    currentFileId,
+    currentProjectId,
+    projectMediaFiles,
+  } = useSelector((state: AppState) => ({
+    loop: r.isLoopOn(state),
+    currentFileName: r.getCurrentFileName(state),
+    currentFileId: r.getCurrentFileId(state),
+    currentProjectId: r.getCurrentProjectId(state),
+    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+  }))
+
+  if (!currentProjectId) throw new Error('Could not find project')
+
+  const dispatch = useDispatch()
   const chooseMediaFiles = useCallback(
     async () => {
-      const filters = [{ name: 'Audio or video files' }]
-      const filePaths = await showOpenDialog(filters, true)
-      if (filePaths) addMediaToProjectRequest(currentProjectId, filePaths)
+      const filePaths = await showOpenDialog(MEDIA_FILTERS, true)
+      if (filePaths)
+        dispatch(actions.addMediaToProjectRequest(currentProjectId, filePaths))
     },
-    [addMediaToProjectRequest, currentProjectId]
+    [dispatch, currentProjectId]
   )
+  const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
+    dispatch,
+  ])
 
   const popover = usePopover()
 
@@ -180,10 +235,14 @@ const MediaFilesNavMenu = ({
     return () => document.removeEventListener('pause', stopPlaying, true)
   }, [])
 
-  const playOrPauseAudio = useRef(() => {
-    const player = document.getElementById('audioPlayer')
+  const playOrPauseAudio = useCallback(() => {
+    const player = document.getElementById('audioPlayer') as
+      | HTMLAudioElement
+      | HTMLVideoElement
+      | null
+    if (!player) return
     player.paused ? player.play() : player.pause()
-  })
+  }, [])
 
   useEffect(() => {
     const resetPlayButton = () => setPlaying(false)
@@ -195,7 +254,7 @@ const MediaFilesNavMenu = ({
     <DarkTheme>
       <section className={className} ref={popover.anchorCallbackRef}>
         {projectMediaFiles.length > 0 ? (
-          <span className="mediaFileName" title={currentFileName}>
+          <span className="mediaFileName" title={currentFileName || undefined}>
             <Button className={css.audioButton} onClick={popover.open}>
               {currentFileName ? truncate(currentFileName, 40) : 'Select media'}
             </Button>
@@ -213,19 +272,7 @@ const MediaFilesNavMenu = ({
                       closeMenu={popover.close}
                       mediaFile={media}
                       selected={media.id === currentFileId}
-                      loadMediaFileRequest={() => openFileRequest(media)}
-                      locateMediaFileRequest={() =>
-                        locateFileRequest(
-                          media,
-                          'Please locate this media file.'
-                        )
-                      }
-                      deleteMediaFile={() =>
-                        confirmationDialog(
-                          CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
-                          r.deleteMediaFromProject(currentProjectId, media.id)
-                        )
-                      }
+                      currentProjectId={currentProjectId}
                     />
                   ))}
                 </MenuList>
@@ -255,7 +302,7 @@ const MediaFilesNavMenu = ({
           <Tooltip
             title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
           >
-            <IconButton onClick={playOrPauseAudio.current}>
+            <IconButton onClick={playOrPauseAudio}>
               {playing ? <Pause /> : <PlayArrow />}
             </IconButton>
           </Tooltip>
@@ -265,24 +312,4 @@ const MediaFilesNavMenu = ({
   )
 }
 
-const mapStateToProps = state => ({
-  loop: r.isLoopOn(state),
-  currentFileName: r.getCurrentFileName(state),
-  currentFileId: r.getCurrentFileId(state),
-  currentProjectId: r.getCurrentProjectId(state),
-  projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-})
-
-const mapDispatchToProps = {
-  toggleLoop: r.toggleLoop,
-  addMediaToProjectRequest: r.addMediaToProjectRequest,
-  openFileRequest: r.openFileRequest,
-  locateFileRequest: r.locateFileRequest,
-  deleteMediaFromProject: r.deleteMediaFromProject,
-  confirmationDialog: r.confirmationDialog,
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(MediaFilesNavMenu)
+export default MediaFilesNavMenu

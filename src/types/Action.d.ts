@@ -263,7 +263,7 @@ declare type HideSubtitles = {
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId
-  fieldNamesToTrackIds: Record<FlashcardFieldName, string>
+  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields>
   tags: Array<string>
 }
 declare type ShowSubtitlesClipsDialogRequest = {

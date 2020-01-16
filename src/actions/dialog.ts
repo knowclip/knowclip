@@ -14,19 +14,9 @@ export const confirmationDialog = (
 ) =>
   enqueueDialog({
     type: 'Confirmation',
-    props: { message, action, onCancel },
-  })
-
-export const editNoteTypeDialog = (noteTypeId: NoteTypeId): DialogAction =>
-  enqueueDialog({
-    type: 'NoteTypeForm',
-    props: { noteTypeId },
-  })
-
-export const newNoteTypeDialog = (): DialogAction =>
-  enqueueDialog({
-    type: 'NoteTypeForm',
-    props: { noteTypeId: null },
+    message,
+    action,
+    onCancel,
   })
 
 export const mediaFolderLocationFormDialog = (
@@ -36,7 +26,7 @@ export const mediaFolderLocationFormDialog = (
   enqueueDialog(
     {
       type: 'MediaFolderLocationForm',
-      props: { action },
+      action,
     },
     skipQueue
   )
@@ -52,15 +42,14 @@ export const newProjectFormDialog = () =>
 export const fileSelectionDialog = (
   message: string,
   file: FileMetadata
-): DialogAction =>
-  enqueueDialog({ type: 'FileSelection', props: { message, file: file } })
+): DialogAction => enqueueDialog({ type: 'FileSelection', message, file })
 
 export const closeDialog = (): DialogAction => ({
   type: A.CLOSE_DIALOG,
 })
 
 export const csvAndMp3ExportDialog = (clipIds: Array<ClipId>): DialogAction =>
-  enqueueDialog({ type: 'CsvAndMp3Export', props: { clipIds } }, true)
+  enqueueDialog({ type: 'CsvAndMp3Export', clipIds }, true)
 
 export const subtitlesClipDialog = (): DialogAction =>
   enqueueDialog({ type: 'SubtitlesClips' })

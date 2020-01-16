@@ -1,52 +1,47 @@
 declare type DialogData =
-  | {
-      type: 'Confirmation'
-      props: {
-        message: string
-        action: Action
-        onCancel: Action | null
-      }
-    }
-  | {
-      type: 'NoteTypeForm'
-      props: {
-        noteTypeId: NoteTypeId | null
-      }
-    }
-  | {
-      type: 'MediaFolderLocationForm'
-      props: {
-        action: Action | null
-      }
-    }
-  | {
-      type: 'ReviewAndExport'
-    }
-  | {
-      type: 'NewProjectForm'
-    }
-  | {
-      type: 'OpenMediaFileFailure'
-      props: {
-        message: string
-      }
-    }
-  | {
-      type: 'FileSelection'
-      props: {
-        message: string
-        file: FileMetadata
-      }
-    }
-  | {
-      type: 'CsvAndMp3Export'
-      props: {
-        clipIds: Array<ClipId>
-      }
-    }
-  | {
-      type: 'SubtitlesClips'
-    }
+  | ConfirmationDialogData
+  | MediaFolderLocationFormDialogData
+  | ReviewAndExportDialogData
+  | NewProjectFormDialogData
+  | FileSelectionDialogData
+  | CsvAndMp3ExportDialogData
+  | SubtitlesClipsDialogData
+
+declare type ConfirmationDialogData = {
+  type: 'Confirmation'
+  message: string
+  action: Action
+  onCancel: Action | null
+}
+
+declare type MediaFolderLocationFormDialogData = {
+  type: 'MediaFolderLocationForm'
+  action: Action | null
+}
+
+declare type ReviewAndExportDialogData = {
+  type: 'ReviewAndExport'
+}
+
+declare type NewProjectFormDialogData = {
+  type: 'NewProjectForm'
+}
+
+declare type FileSelectionDialogData = {
+  type: 'FileSelection'
+  message: string
+  file: FileMetadata
+}
+
+declare type CsvAndMp3ExportDialogData = {
+  type: 'CsvAndMp3Export'
+
+  clipIds: Array<ClipId>
+}
+
+declare type SubtitlesClipsDialogData = {
+  type: 'SubtitlesClips'
+}
 
 declare type DialogState = {
   queue: Array<DialogData>

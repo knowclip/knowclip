@@ -1,7 +1,7 @@
 services: docker
 jobs:
   include:
-  - stage: build mac assets
+  - stage: mac integration tests
     os: osx
     osx_image: xcode10.2
     language: node_js
@@ -9,11 +9,11 @@ jobs:
     env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-    script: echo "skipping OSX build while signing not needed"
-  - stage: build linux & win assets
+  - stage: linux + windows integration tests and all platforms build
     os: linux
+    language: node_js
+    node_js: '12'
     services: docker
-    language: generic
     deploy:
       skip_cleanup: true
       provider: releases
@@ -31,19 +31,28 @@ jobs:
 cache:
   directories:
   - node_modules
+  - "$HOME/.cache/yarn"
   - "$HOME/.cache/electron"
   - "$HOME/.cache/electron-builder"
 script:
 - |	
-  # if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-  # ./docker/docker_run.sh --linux --win
-  # else	
-  #  yarn && yarn dist --mac
-  # fi
-
-  ./docker/docker_run.sh --linux --win --mac
+  if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
+  else	
+    yarn && yarn build:ci && yarn test:integration
+  fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
 branches:
   only:
+  - master
   - /v\d+\.\d+.\d+(-.+)/
+
+addons:
+  apt:
+    packages:
+      - xvfb
+
+install:
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &

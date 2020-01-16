@@ -24,15 +24,21 @@ global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
 
 async function createWindow() {
   // Create the browser window.
-  context.mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: { webSecurity: isPackaged, nodeIntegration: true },
-  })
+  context.mainWindow =
+    context.mainWindow ||
+    new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences: {
+        webSecurity: isPackaged,
+        nodeIntegration: true,
+        devTools: process.env.NODE_ENV !== 'test',
+      },
+    })
 
   // and load the index.html of the app.
   context.mainWindow.loadURL(
-    isPackaged
+    process.env.NODE_ENV === 'test' || isPackaged
       ? url.format({
           pathname: path.join(__dirname, 'build', 'index.html'),
           protocol: 'file',
@@ -41,7 +47,7 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  if (!isPackaged) await installDevtools()
+  if (!isPackaged && process.env.NODE_ENV !== 'test') await installDevtools()
 
   context.mainWindow.on('close', e => {
     if (context.mainWindow) {

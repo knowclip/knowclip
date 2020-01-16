@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Card, CardContent } from '@material-ui/core'
 import css from './KeyboardShortcuts.module.css'
 import os from 'os'
 
 const CtrlCmd = os.platform() === 'darwin' ? '⌘' : 'Ctrl'
-const Shortcut = ({ keys, action }) => (
+const Shortcut = ({ keys, action }: { keys: string; action: string }) => (
   <p className={css.shortcut}>
     <span className={css.keyCombination}>{keys.replace('Cmd', CtrlCmd)}</span>
     <span className={css.action}>{action}</span>
@@ -13,7 +13,7 @@ const Shortcut = ({ keys, action }) => (
 
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false)
-  const handleClick = useRef(() => setOpen(open => !open)).current
+  const handleClick = useCallback(() => setOpen(open => !open), [setOpen])
   return (
     <section className={css.container} onClick={handleClick}>
       {open ? (

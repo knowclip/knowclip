@@ -66,7 +66,7 @@ const exportApkg: AppEpic = (action$, state$) =>
           r.closeDialog(),
           ...[...exportData].map(file =>
             r.fileSelectionDialog(
-              `You can't make clips from this file until you've located it in the filesystem. Please file "${
+              `You can't make clips from this file until you've located it in the filesystem. Please find "${
                 file.name
               }" and try again.`,
               file

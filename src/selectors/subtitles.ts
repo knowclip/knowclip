@@ -4,9 +4,9 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { getCurrentMediaFile } from './project'
 import { getFileAvailability, getFile } from './files'
 import { createSelector } from 'reselect'
+import { getCurrentMediaFile } from './currentMedia'
 
 export const getSubtitlesFile = (
   state: AppState,

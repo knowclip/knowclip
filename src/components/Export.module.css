@@ -32,12 +32,10 @@
 .selectedClipsCount {
   min-width: 8em;
   text-align: center;
-}
-.fileTagChips {
   padding: 1rem;
-  line-height: 2.4;
-  flex-basis: 20em;
+  line-height: 1.4;
 }
+
 .smallTag {
   display: inline-block;
   background-color: rgba(0,0,0, .1);

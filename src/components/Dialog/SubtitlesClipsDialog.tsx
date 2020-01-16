@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react'
-import { connect } from 'react-redux'
+import React, { useState, useCallback } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Dialog,
   DialogContent,
@@ -14,18 +14,18 @@ import * as r from '../../redux'
 import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
+import { DialogProps } from './DialogProps'
+import {
+  loadSubtitlesFromFileRequest,
+  makeClipsFromSubtitles,
+  closeDialog,
+} from '../../actions'
 
-const getOnClickLoadExternal = loadSubtitlesFromFile => async () => {
-  const filePaths = await showOpenDialog([
-    { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
-  ])
-  if (!filePaths) return
-
-  loadSubtitlesFromFile(filePaths[0])
-}
-
-const getDefaultFields = (currentNoteTypeFieldNames, firstSubtitlesTrackId) => {
-  const fields = {}
+const getDefaultFields = (
+  currentNoteTypeFieldNames: TransliterationFlashcardFieldName[],
+  firstSubtitlesTrackId: string
+) => {
+  const fields: Partial<TransliterationFlashcardFields> = {}
   currentNoteTypeFieldNames.forEach(fieldName => {
     fields[fieldName] =
       fieldName === 'transcription' ? firstSubtitlesTrackId : ''
@@ -33,62 +33,109 @@ const getDefaultFields = (currentNoteTypeFieldNames, firstSubtitlesTrackId) => {
   return fields
 }
 
-const trackMenuItem = (track, index) => (
+const trackMenuItem = (track: SubtitlesTrack, index: number) => (
   <MenuItem key={track.id} value={track.id}>
     {track.type === 'EmbeddedSubtitlesTrack' ? 'Embedded ' : 'External '}track{' '}
     {index + 1}
   </MenuItem>
 )
 
+const MEDIA_FILE_MISSING_MESSAGE = r.simpleMessageSnackbar(
+  'Please select a media file before continuing.'
+)
+
 const SubtitlesClipsDialog = ({
   open,
-  closeDialog,
-  currentNoteTypeFields,
-  externalSubtitlesTracks,
-  embeddedSubtitlesTracks,
-  subtitlesTracks,
-  currentFileId,
-  makeClipsFromSubtitles,
-  loadSubtitlesFromFile,
-  allTags,
-}) => {
-  console.log({ subtitlesTracks })
+}: DialogProps<SubtitlesClipsDialogData>) => {
+  const dispatch = useDispatch()
+  const {
+    currentNoteTypeFields,
+    externalSubtitlesTracks,
+    embeddedSubtitlesTracks,
+    subtitlesTracks,
+    currentFileId,
+    allTags,
+  } = useSelector((state: AppState) => {
+    const currentNoteType = r.getCurrentNoteType(state)
+    return {
+      currentNoteTypeFields: currentNoteType
+        ? getNoteTypeFields(currentNoteType)
+        : [],
+      externalSubtitlesTracks: r.getExternalSubtitlesTracks(state),
+      embeddedSubtitlesTracks: r.getEmbeddedSubtitlesTracks(state),
+      subtitlesTracks: r.getSubtitlesTracks(state),
+      currentFileId: r.getCurrentFileId(state),
+      allTags: r.getAllTags(state),
+    }
+  })
+
   const [fields, setFields] = useState(() =>
     getDefaultFields(currentNoteTypeFields, subtitlesTracks[0].id)
   )
-  const [tags, setTags] = useState([])
-  const onAddChip = useRef(text =>
-    setTags(tags => (tags.includes(text) ? tags : tags.concat(text)))
-  ).current
-  const onDeleteChip = useRef((index, text) =>
-    setTags(tags => tags.filter((t, i) => i !== index))
-  ).current
+  const [tags, setTags] = useState<Array<string>>([])
+  const onAddChip = useCallback(
+    (text: string) =>
+      setTags(tags => (tags.includes(text) ? tags : tags.concat(text))),
+    []
+  )
+  const onDeleteChip = useCallback(
+    (index: number) => setTags(tags => tags.filter((t, i) => i !== index)),
+    []
+  )
 
-  const onSubmit = () => {
-    const fieldsWithoutBlankValues = {}
-    Object.keys(fields)
-      .filter(fieldName => fields[fieldName])
-      .forEach(fieldName => {
-        fieldsWithoutBlankValues[fieldName] = fields[fieldName]
-      })
-    closeDialog()
-    return makeClipsFromSubtitles(currentFileId, fieldsWithoutBlankValues, tags)
-  }
-  const setField = (key, value) => {
-    setFields(fields => ({
-      ...fields,
-      [key]: value,
-    }))
-  }
+  const onSubmit = useCallback(
+    e => {
+      if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
+      const fieldsWithoutBlankValues: Partial<
+        TransliterationFlashcardFields
+      > = {}
+      ;(Object.keys(fields) as TransliterationFlashcardFieldName[]).forEach(
+        fieldName => {
+          const value = fields[fieldName]
+          if (value) fieldsWithoutBlankValues[fieldName] = value
+        }
+      )
+      dispatch(closeDialog())
+      dispatch(
+        makeClipsFromSubtitles(currentFileId, fieldsWithoutBlankValues, tags)
+      )
+    },
+    [dispatch, fields, currentFileId, tags]
+  )
+  const setField = useCallback(
+    (key: TransliterationFlashcardFieldName, value: string) => {
+      setFields(fields => ({
+        ...fields,
+        [key]: value,
+      }))
+    },
+    [setFields]
+  )
+
+  const onClickLoadExternal = useCallback(
+    async () => {
+      if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
+      const filePaths = await showOpenDialog([
+        { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
+      ])
+      if (!filePaths) return
+
+      dispatch(loadSubtitlesFromFileRequest(filePaths[0], currentFileId))
+    },
+    [dispatch, currentFileId]
+  )
 
   return (
     <Dialog open={open}>
       <DialogContent>
         <form
-          onSubmit={e => {
-            e.preventDefault()
-            onSubmit()
-          }}
+          onSubmit={useCallback(
+            e => {
+              e.preventDefault()
+              onSubmit(e)
+            },
+            [onSubmit]
+          )}
         >
           You currently have {subtitlesTracks.length} subtitles track
           {subtitlesTracks.length === 1 ? '' : 's'} loaded.
@@ -97,7 +144,7 @@ const SubtitlesClipsDialog = ({
           <Button
             color="primary"
             variant="contained"
-            onClick={getOnClickLoadExternal(loadSubtitlesFromFile)}
+            onClick={onClickLoadExternal}
           >
             Load more subtitles
           </Button>
@@ -109,7 +156,6 @@ const SubtitlesClipsDialog = ({
               inputProps={{ id: 'transcription', name: 'transcription' }}
               value={fields.transcription}
               onChange={e => {
-                console.log({ e }, e.target.value)
                 setField('transcription', e.target.value)
               }}
             >
@@ -165,27 +211,10 @@ const SubtitlesClipsDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog}>Cancel</Button>
-        <Button onClick={() => onSubmit()}>Ok</Button>
+        <Button onClick={onSubmit}>Ok</Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-const mapStateToProps = state => ({
-  currentNoteTypeFields: getNoteTypeFields(r.getCurrentNoteType(state)),
-  externalSubtitlesTracks: r.getExternalSubtitlesTracks(state),
-  embeddedSubtitlesTracks: r.getEmbeddedSubtitlesTracks(state),
-  subtitlesTracks: r.getSubtitlesTracks(state),
-  currentFileId: r.getCurrentFileId(state),
-  allTags: r.getAllTags(state),
-})
-
-const mapDispatchToProps = {
-  makeClipsFromSubtitles: r.makeClipsFromSubtitles,
-  loadSubtitlesFromFile: r.loadSubtitlesFromFileRequest,
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SubtitlesClipsDialog)
+export default SubtitlesClipsDialog
