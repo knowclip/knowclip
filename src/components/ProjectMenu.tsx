@@ -18,13 +18,13 @@ const ProjectMenu = ({ className }: { className: string }) => {
   const dispatch = useDispatch()
   const closeProjectRequest = useCallback(
     () => {
-      dispatch(actions.closeProjectRequest)
+      dispatch(actions.closeProjectRequest())
     },
     [dispatch]
   )
   const saveProjectRequest = useCallback(
     () => {
-      dispatch(actions.saveProjectRequest)
+      dispatch(actions.saveProjectRequest())
     },
     [dispatch]
   )

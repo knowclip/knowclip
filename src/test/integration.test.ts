@@ -12,7 +12,7 @@ describe('App', () => {
 
   beforeAll(async () => {
     const tmpDirectory = join(process.cwd(), 'test-tmp')
-    await remove(tmpDirectory)
+    // await remove(tmpDirectory)
 
     await copy(join(__dirname, 'fixtures'), tmpDirectory)
   })
