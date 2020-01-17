@@ -17,7 +17,7 @@ import {
 import { RawResult, Element } from 'webdriverio'
 // import { remove, copy } from 'fs-extra'
 
-jest.setTimeout(60000)
+jest.setTimeout(120000)
 
 const MEDIA_DIRECTORY = join(__dirname, 'media')
 
@@ -28,11 +28,6 @@ describe('App', () => {
     // const tmpDirectory = join(process.cwd(), 'test-tmp')
     // await remove(tmpDirectory)
     // await copy(join(__dirname, 'fixtures'), tmpDirectory)
-  })
-
-  afterAll(() => {
-    const { app } = context
-    if (app && app.isRunning()) app.mainProcess.exit(0)
   })
 
   it('creates a deck from a new project', async () => {
@@ -98,7 +93,7 @@ async function makeTwoFlashcards({ app, $, $$, client }: TestSetup) {
     }
   )
   await $(tagsInput.tagsInput)
-    .$('[class*=delete]')
+    .$('svg')
     .click()
   await $(tagsInput.tagsInput).click()
   await $(tagsInput.tagsInput)
@@ -108,7 +103,7 @@ async function makeTwoFlashcards({ app, $, $$, client }: TestSetup) {
     .$('input')
     .keys(['Enter'])
   await runEvents(app, getMouseDragEvents([756, 422], [920, 422]))
-  expect(await app.client.$$('[class*="MuiChip-root"]')).toHaveLength(1)
+  expect(await app.client.$$(`.${tagsInput.tagsInput} svg`)).toHaveLength(1)
   expect(await $(tagsInput.tagsInput).getText()).toContain('pbc')
   await fillInFlashcardFields(
     await $$(flashcardSection.flashcardField),
