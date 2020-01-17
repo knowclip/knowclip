@@ -23,6 +23,7 @@ export async function setUpApp(
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
     webdriverOptions: { deprecationWarnings: false },
+    waitTimeout: 30000,
     path: (electron as unknown) as string,
     env: { NODE_ENV: 'test', SPECTRON: process.env.REACT_APP_SPECTRON },
     args: [join(__dirname, '..', '..'), '-r', join(__dirname, 'mocks.js')],
