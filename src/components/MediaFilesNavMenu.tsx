@@ -29,6 +29,8 @@ import * as r from '../redux'
 import * as actions from '../actions'
 import css from './Header.module.css'
 
+export const testLabels = {}
+
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
 const MEDIA_FILTERS = [
@@ -189,7 +191,13 @@ const MediaFileMenuItem = ({
   )
 }
 
-const MediaFilesNavMenu = ({ className }: { className: string }) => {
+const MediaFilesNavMenu = ({
+  className,
+  buttonId,
+}: {
+  className: string
+  buttonId?: string
+}) => {
   const {
     loop,
     currentFileName,
@@ -286,7 +294,9 @@ const MediaFilesNavMenu = ({ className }: { className: string }) => {
             )}
           </span>
         ) : (
-          <Button onClick={chooseMediaFiles}>Choose source file</Button>
+          <Button id={buttonId} onClick={chooseMediaFiles}>
+            Choose source file
+          </Button>
         )}
         {currentFileId && (
           <Tooltip title="Loop audio (Ctrl + L)">

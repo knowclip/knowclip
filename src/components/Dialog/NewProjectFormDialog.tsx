@@ -121,8 +121,6 @@ const NewProjectFormDialog = ({
       if (Object.values(errors).filter(err => err).length)
         return setState(state => ({ ...state, errors }))
 
-      console.log('submit!!')
-
       const { filePath, name } = fieldValues
       dispatch(
         createProject(
@@ -179,12 +177,7 @@ const NewProjectFormDialog = ({
   return (
     <Dialog open={open}>
       <DialogContent>
-        <form
-          className={css.form}
-          onSubmit={() => {
-            console.log('submated', handleSubmit())
-          }}
-        >
+        <form className={css.form} onSubmit={handleSubmit}>
           <h3>New project</h3>
           <TextField
             fullWidth
@@ -244,13 +237,7 @@ const NewProjectFormDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog}>Exit</Button>
-        <Button
-          onClick={() => {
-            console.log('clooked', handleSubmit())
-          }}
-          id={testLabels.saveButton}
-          type="submit"
-        >
+        <Button onClick={handleSubmit} id={testLabels.saveButton} type="submit">
           Save
         </Button>
       </DialogActions>

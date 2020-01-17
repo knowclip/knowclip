@@ -1,14 +1,15 @@
-export const getSecondsAtX = (state: AppState, x: number): number => {
-  const { stepsPerSecond, stepLength } = state.waveform
-  return +(x / (stepsPerSecond * stepLength)).toFixed(5)
-}
+import {
+  getSecondsAtXFromWaveform,
+  getXAtMillisecondsFromWaveform,
+} from '../utils/waveformCoordinates'
+
+export const getSecondsAtX = (state: AppState, x: number): number =>
+  getSecondsAtXFromWaveform(state.waveform, x)
 export const getMillisecondsAtX = (state: AppState, x: number): number => {
   return 1000 * getSecondsAtX(state, x)
 }
+
 export const getXAtMilliseconds = (
   state: AppState,
   milliseconds: number
-): number => {
-  const { stepsPerSecond, stepLength } = state.waveform
-  return +((milliseconds / 1000) * (stepsPerSecond * stepLength)).toFixed(2)
-}
+): number => getXAtMillisecondsFromWaveform(state.waveform, milliseconds)

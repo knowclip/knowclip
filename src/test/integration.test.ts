@@ -1,115 +1,193 @@
-import { Application } from 'spectron'
+import { Application, SpectronClient } from 'spectron'
 import { join } from 'path'
-import electron from 'electron'
 import { testLabels as projectsMenu } from '../components/ProjectsMenu'
 import { testLabels as newProjectForm } from '../components/Dialog/NewProjectFormDialog'
-import { remove, copy } from 'fs-extra'
+import { testLabels as main } from '../components/Main'
+import { testLabels as mediaFilesMenu } from '../components/MediaFilesNavMenu'
+import { testLabels as flashcardSection } from '../components/FlashcardSection'
+import { testLabels as tagsInput } from '../components/TagsInput'
+import {
+  setUpApp,
+  tearDownApp,
+  mockElectronHelpers,
+  _,
+  TestSetup,
+} from './setup'
+import { RawResult, Element } from 'webdriverio'
+// import { remove, copy } from 'fs-extra'
 
 jest.setTimeout(60000)
+
+const MEDIA_DIRECTORY = join(__dirname, 'media')
 
 describe('App', () => {
   let context: { app: Application | null } = { app: null }
 
   beforeAll(async () => {
-    const tmpDirectory = join(process.cwd(), 'test-tmp')
+    // const tmpDirectory = join(process.cwd(), 'test-tmp')
     // await remove(tmpDirectory)
-
-    await copy(join(__dirname, 'fixtures'), tmpDirectory)
+    // await copy(join(__dirname, 'fixtures'), tmpDirectory)
   })
 
-  afterEach(() => {
+  afterAll(() => {
     const { app } = context
-    if (app && app.isRunning()) {
-      app.mainProcess.exit(0)
-    }
+    if (app && app.isRunning()) app.mainProcess.exit(0)
   })
 
-  it('creates new project file', async () => {
-    const { app, $id } = await setUpApp(context, {
-      showSaveDialog: join(process.cwd(), 'test-tmp', 'my_cool_project.afca'),
-    })
+  it('creates a deck from a new project', async () => {
+    const setup = await setUpApp(context)
 
-    $id(projectsMenu.newProjectButton).click()
+    await createNewProject(setup)
 
-    await app.client.waitForExist('#' + newProjectForm.projectNameField)
+    await addJapaneseMedia(setup)
 
-    await $id(newProjectForm.projectNameField).setValue('My cool project')
-    $id(newProjectForm.projectFileLocationField).click()
-    $id(newProjectForm.noteTypeSelect).click()
-    await app.client.waitForExist(
-      '#' + newProjectForm.transcriptionNoteTypeOption
-    )
-
-    await $id(newProjectForm.transcriptionNoteTypeOption).click()
-
-    await app.client.waitUntilTextExists(
-      'body',
-      'Includes fields for transcription, pronunciation, meaning, and notes. Especially useful when learning a language with a different writing system.'
-    )
-
-    await app.client.waitUntil(
-      async () =>
-        !(await app.client.isExisting(
-          '#' + newProjectForm.transcriptionNoteTypeOption
-        ))
-    )
-
-    await app.client.waitForVisible('#' + newProjectForm.saveButton)
-
-    await $id(newProjectForm.saveButton).click()
+    await makeTwoFlashcards(setup)
 
     await tearDownApp(context)
   })
 })
 
-async function setUpApp(
-  context: {
-    app: Application | null
-  },
-  mocks?: any
-): Promise<{
-  app: Application
-  $id: (
-    id: string
-  ) => WebdriverIO.Client<WebdriverIO.RawResult<WebdriverIO.Element>> &
-    WebdriverIO.RawResult<WebdriverIO.Element>
-}> {
-  const app = new Application({
-    chromeDriverArgs: ['--disable-extensions', '--debug'],
-    path: (electron as unknown) as string,
-    env: { NODE_ENV: 'test', SPECTRON: process.env.REACT_APP_SPECTRON },
-    args: [join(__dirname, '..', '..'), '-r', join(__dirname, 'mocks.js')],
-  })
-
-  context.app = app
-
-  await app.start()
-
-  if (mocks) {
-    await app.client.waitUntilWindowLoaded()
-    for (const [functionName, returnValue] of Object.entries(mocks))
-      app.webContents.send('mock', functionName, returnValue)
-  }
-
-  const $id = (
-    id: string
-  ): WebdriverIO.Client<WebdriverIO.RawResult<WebdriverIO.Element>> &
-    WebdriverIO.RawResult<WebdriverIO.Element> => app.client.$('#' + id)
-  return {
-    app,
-    $id,
-  }
+async function makeTwoFlashcards({ app, $, $$, client }: TestSetup) {
+  const mouseDragEvents = getMouseDragEvents([402, 422], [625, 422])
+  await runEvents(app, mouseDragEvents)
+  await client.waitForExist(_(flashcardSection.flashcardField))
+  await fillInFlashcardFields(
+    await $$(flashcardSection.flashcardField),
+    client,
+    {
+      transcription: '笹を食べながらのんびりするのは最高だなぁ',
+      pronunciation: 'sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa',
+      meaning: 'Lying around while eating bamboo grass is the best',
+    }
+  )
+  await $(tagsInput.tagsInput)
+    .$('[class*=delete]')
+    .click()
+  await $(tagsInput.tagsInput).click()
+  await $(tagsInput.tagsInput)
+    .$('input')
+    .setValue('pbc')
+  await $(tagsInput.tagsInput)
+    .$('input')
+    .keys(['Enter'])
+  await runEvents(app, getMouseDragEvents([756, 422], [920, 422]))
+  expect(await app.client.$$('[class*="MuiChip-root"]')).toHaveLength(1)
+  expect(await $(tagsInput.tagsInput).getText()).toContain('pbc')
+  await fillInFlashcardFields(
+    await $$(flashcardSection.flashcardField),
+    client,
+    {
+      transcription: 'またこの子は昼間からゴロゴロして',
+      pronunciation: 'mata kono ko-wa hiruma-kara goro-goro shite',
+      meaning: 'This kid, lazing about again so early',
+      notes: '"Goro-goro" is the sound of something big rolling around.',
+    }
+  )
 }
 
-async function tearDownApp(context: {
-  app: Application | null
-}): Promise<null> {
-  const { app } = context
-  if (app) await app.stop()
+async function fillInFlashcardFields(
+  elements: RawResult<Element>[],
+  client: SpectronClient,
+  {
+    transcription,
+    pronunciation,
+    meaning,
+    notes,
+  }: Partial<TransliterationFlashcardFields>
+) {
+  const [transcriptionId, pronunciationId, meaningId, notesId] = elements.map(
+    el => el.value.ELEMENT
+  )
+  if (transcription) await client.elementIdValue(transcriptionId, transcription)
+  if (pronunciation) await client.elementIdValue(pronunciationId, pronunciation)
+  if (meaning) await client.elementIdValue(meaningId, meaning)
+  if (notes) await client.elementIdValue(notesId, notes)
+}
 
-  context.app = null
+async function runEvents(app: Application, [next, ...rest]: any[]) {
+  if (next) {
+    await app.webContents.sendInputEvent(next)
+    await runEvents(app, rest)
+  }
+}
+function getMouseDragEvents(
+  [fromX, fromY]: [number, number],
+  [toX, toY]: [number, number]
+) {
+  return [
+    {
+      type: 'mouseDown',
+      x: fromX,
+      y: fromY,
+    },
+    {
+      type: 'mouseMove',
+      x: ~~((toX + fromX) / 2),
+      y: ~~((toY + fromY) / 2),
+    },
+    {
+      type: 'mouseMove',
+      x: toX,
+      y: toY,
+    },
+    {
+      type: 'mouseUp',
+      x: toX,
+      y: toY,
+    },
+  ]
+}
 
-  if (app) app.webContents.send('reset-mocks')
+async function addJapaneseMedia(setup: TestSetup) {
+  const { app, client, $ } = setup
+  const { mediaFilesNavMenuButton } = main
+  const japaneseVideoPath = join(MEDIA_DIRECTORY, 'japanese.mp4')
+  await mockElectronHelpers(app, {
+    showOpenDialog: Promise.resolve([japaneseVideoPath]),
+  })
+  await $(mediaFilesNavMenuButton).click()
+  await client.waitUntilTextExists('body', 'japanese.mp4')
+  const video = $('audioPlayer')
+  expect(await video.getAttribute('src')).toContain(japaneseVideoPath)
+}
 
-  return null
+async function createNewProject({ app, client, $ }: TestSetup) {
+  $(projectsMenu.newProjectButton).click()
+
+  await mockElectronHelpers(app, {
+    showSaveDialog: Promise.resolve(
+      join(process.cwd(), 'test-tmp', 'my_cool_project.afca')
+    ),
+  })
+  const {
+    projectNameField,
+    projectFileLocationField,
+    noteTypeSelect,
+    transcriptionNoteTypeOption,
+    saveButton,
+  } = newProjectForm
+
+  await client.waitForExist(_(projectNameField))
+  await $(projectNameField).setValue('My cool project')
+
+  $(projectFileLocationField).click()
+
+  $(noteTypeSelect).click()
+  await client.waitForExist(_(transcriptionNoteTypeOption))
+  await $(transcriptionNoteTypeOption).click()
+
+  await client.waitUntilTextExists(
+    'body',
+    'Includes fields for transcription, pronunciation, meaning, and notes.'
+  )
+  await app.client.waitUntil(
+    async () =>
+      !(await app.client.isExisting(
+        _(newProjectForm.transcriptionNoteTypeOption)
+      ))
+  )
+
+  await $(saveButton).click()
+
+  await client.waitUntilTextExists('body', 'CHOOSE SOURCE FILE')
 }

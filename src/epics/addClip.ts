@@ -29,7 +29,11 @@ const addClipEpic: AppEpic = (
 ) =>
   fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
     filter(
-      waveformMousedown => !r.getClipEdgeAt(state$.value, waveformMousedown.x)
+      waveformMousedown =>
+        !r.getClipEdgeAt(
+          state$.value,
+          r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
+        )
     ),
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
@@ -43,18 +47,17 @@ const addClipEpic: AppEpic = (
       const withinValidTime = (x: number) =>
         Math.max(0, Math.min(x, mediaFile.durationSeconds * factor))
 
-      const svgElement = getWaveformSvgElement()
-      if (!svgElement) throw new Error('Waveform disappeared')
-
       const pendingClips = fromEvent<MouseEvent>(window, 'mousemove').pipe(
         map(mousemove => {
           mousemove.preventDefault()
           return r.setPendingClip({
-            start: withinValidTime(waveformMousedown.x), // should start be called origin instead to match with stretch thing?
+            start: withinValidTime(
+              r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
+            ), // should start be called origin instead to match with stretch thing?
             end: withinValidTime(
               toWaveformX(
                 mousemove,
-                svgElement,
+                waveformMousedown.svg,
                 r.getWaveformViewBoxXMin(state$.value)
               )
             ),

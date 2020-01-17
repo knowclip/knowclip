@@ -3,8 +3,12 @@ import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import * as r from '../redux'
 import css from './Waveform.module.css'
-import { toWaveformCoordinates } from '../utils/waveformCoordinates'
+import {
+  toWaveformCoordinates,
+  getSecondsAtXFromWaveform,
+} from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
+import { getMillisecondsAtX } from '../selectors'
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -221,14 +225,20 @@ const Waveform = ({ show }: { show: boolean }) => {
   const viewBoxString = getViewBoxString(viewBox.xMin)
   const svgRef = useRef(null)
   const onMouseDown = useCallback(
-    e =>
-      document.dispatchEvent(
-        new WaveformMousedownEvent(
-          e.currentTarget,
-          toWaveformCoordinates(e, e.currentTarget, waveform.viewBox.xMin)
-        )
-      ),
-    [waveform.viewBox.xMin]
+    e => {
+      const coords = toWaveformCoordinates(
+        e,
+        e.currentTarget,
+        waveform.viewBox.xMin
+      )
+      const waveformMousedown = new WaveformMousedownEvent(
+        e.currentTarget,
+        getSecondsAtXFromWaveform(waveform, coords.x)
+      )
+      console.log({ waveformMousedown })
+      document.dispatchEvent(waveformMousedown)
+    },
+    [waveform]
   )
   return (
     <Fragment>

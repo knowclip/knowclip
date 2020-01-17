@@ -25,6 +25,10 @@ import * as r from '../redux'
 import * as actions from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 
+export const testLabels = {
+  mediaFilesNavMenuButton: 'media-files-nav-menu-button',
+} as const
+
 declare module 'react' {
   interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
     mode?: TextTrackMode
@@ -163,10 +167,12 @@ const Main = () => {
         <header className={headerCss.container}>
           <ProjectMenu className={headerCss.block} />
           <section className={headerCss.block}>
-            <MediaFilesNavMenu className={headerCss.leftMenu} />
+            <MediaFilesNavMenu
+              buttonId={testLabels.mediaFilesNavMenuButton}
+              className={headerCss.leftMenu}
+            />
           </section>
           <ul className={headerCss.rightMenu}>
-            {' '}
             {currentMediaFile && (
               <Fragment>
                 <li className={headerCss.menuItem}>

@@ -18,7 +18,7 @@ import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
-export const testLabels = { newProjectButton: 'new-project-button' }
+export const testLabels = { newProjectButton: 'new-project-button' } as const
 
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
