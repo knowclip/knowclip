@@ -32,19 +32,36 @@ describe('App', () => {
 
   afterAll(() => {
     const { app } = context
-    // if (app && app.isRunning()) app.mainProcess.exit(0)
+    if (app && app.isRunning()) app.mainProcess.exit(0)
   })
 
   it('creates a deck from a new project', async () => {
     const setup = await setUpApp(context)
+    const pad = (text: string) => '***' + text.padStart(250, ' ')
+    async function step(description: string, action: () => Promise<void>) {
+      console.log(pad(description))
 
-    await createNewProject(setup)
+      try {
+        await action()
+        console.log(pad('SUCCESS!'))
+      } catch (err) {
+        console.log(pad('FAILURE :('))
+        throw err
+      }
+    }
 
-    await changeProjectName(setup)
-
-    await addJapaneseMedia(setup)
-
-    await makeTwoFlashcards(setup)
+    await step('create a new project', async () => {
+      await createNewProject(setup)
+    })
+    await step('change project name', async () => {
+      await changeProjectName(setup)
+    })
+    await step('add media to project', async () => {
+      await addJapaneseMedia(setup)
+    })
+    await step('create flashcards', async () => {
+      await makeTwoFlashcards(setup)
+    })
 
     await tearDownApp(context)
   })

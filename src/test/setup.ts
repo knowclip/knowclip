@@ -22,6 +22,7 @@ export async function setUpApp(
 ): Promise<TestSetup> {
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
+    webdriverOptions: { deprecationWarnings: false },
     path: (electron as unknown) as string,
     env: { NODE_ENV: 'test', SPECTRON: process.env.REACT_APP_SPECTRON },
     args: [join(__dirname, '..', '..'), '-r', join(__dirname, 'mocks.js')],
@@ -78,8 +79,6 @@ export async function tearDownApp(context: {
   }
 
   context.app = null
-
-  if (app) app.webContents.send('reset-mocks')
 
   return null
 }
