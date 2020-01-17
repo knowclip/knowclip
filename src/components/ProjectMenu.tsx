@@ -9,6 +9,11 @@ import css from './Header.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
 
+export const testLabels = {
+  projectTitle: 'project-title',
+  projectTitleInput: 'project-title-input',
+} as const
+
 const ProjectMenu = ({ className }: { className: string }) => {
   const projectFile = useSelector((state: AppState) =>
     r.getCurrentProject(state)
@@ -44,7 +49,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
 
   const handleChangeText = useCallback(
-    e => setState(state => ({ ...state, text: e.target.value })),
+    e => setState({ editing: true, text: e.target.value }),
     []
   )
 
@@ -95,11 +100,16 @@ const ProjectMenu = ({ className }: { className: string }) => {
               value={text}
               onChange={handleChangeText}
               onBlur={handleBlur}
+              inputProps={{ id: testLabels.projectTitleInput }}
             />
           </form>
         ) : (
           <Tooltip title="Double-click to edit">
-            <h1 className={css.projectName} onDoubleClick={startEditing}>
+            <h1
+              className={css.projectName}
+              onDoubleClick={startEditing}
+              id={testLabels.projectTitle}
+            >
               {truncate(projectFile.name, 40)}
             </h1>
           </Tooltip>

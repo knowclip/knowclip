@@ -6,6 +6,7 @@ import { testLabels as main } from '../components/Main'
 import { testLabels as mediaFilesMenu } from '../components/MediaFilesNavMenu'
 import { testLabels as flashcardSection } from '../components/FlashcardSection'
 import { testLabels as tagsInput } from '../components/TagsInput'
+import { testLabels as projectMenu } from '../components/ProjectMenu'
 import {
   setUpApp,
   tearDownApp,
@@ -31,13 +32,15 @@ describe('App', () => {
 
   afterAll(() => {
     const { app } = context
-    if (app && app.isRunning()) app.mainProcess.exit(0)
+    // if (app && app.isRunning()) app.mainProcess.exit(0)
   })
 
   it('creates a deck from a new project', async () => {
     const setup = await setUpApp(context)
 
     await createNewProject(setup)
+
+    await changeProjectName(setup)
 
     await addJapaneseMedia(setup)
 
@@ -46,6 +49,23 @@ describe('App', () => {
     await tearDownApp(context)
   })
 })
+
+async function changeProjectName({ $, client, app }: TestSetup) {
+  expect(await $(projectMenu.projectTitle).getText()).toContain(
+    'My cool poject'
+  )
+  await $(projectMenu.projectTitle).doubleClick()
+  await $(projectMenu.projectTitleInput).doubleClick()
+  await $(projectMenu.projectTitleInput).keys([
+    ...[...Array(10)].map(() => 'Backspace'),
+    ...'My cool project',
+  ])
+  await $(projectMenu.projectTitleInput).submitForm()
+  await client.waitForExist(_(projectMenu.projectTitle))
+  expect(await $(projectMenu.projectTitle).getText()).toContain(
+    'My cool project'
+  )
+}
 
 async function makeTwoFlashcards({ app, $, $$, client }: TestSetup) {
   const mouseDragEvents = getMouseDragEvents([402, 422], [625, 422])
@@ -168,7 +188,7 @@ async function createNewProject({ app, client, $ }: TestSetup) {
   } = newProjectForm
 
   await client.waitForExist(_(projectNameField))
-  await $(projectNameField).setValue('My cool project')
+  await $(projectNameField).setValue('My cool poject')
 
   $(projectFileLocationField).click()
 
