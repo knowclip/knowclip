@@ -197,6 +197,7 @@ async function createNewProject({ app, client, $ }: TestSetup) {
     noteTypeSelect,
     transcriptionNoteTypeOption,
     saveButton,
+    cardsPreview,
   } = newProjectForm
 
   await client.waitForExist(_(projectNameField))
@@ -208,10 +209,8 @@ async function createNewProject({ app, client, $ }: TestSetup) {
   await client.waitForExist(_(transcriptionNoteTypeOption))
   await $(transcriptionNoteTypeOption).click()
 
-  await client.waitUntilTextExists(
-    'body',
-    'Includes fields for transcription, pronunciation, meaning, and notes.'
-  )
+  await client.waitForExist(_(cardsPreview))
+
   await app.client.waitUntil(
     async () =>
       !(await app.client.isExisting(
@@ -221,5 +220,5 @@ async function createNewProject({ app, client, $ }: TestSetup) {
 
   await $(saveButton).click()
 
-  await client.waitUntilTextExists('body', 'CHOOSE SOURCE FILE')
+  await client.waitForExist(_(main.mediaFilesNavMenuButton))
 }

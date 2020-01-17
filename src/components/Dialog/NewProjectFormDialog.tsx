@@ -26,13 +26,14 @@ export const testLabels = {
   noteTypeSelect: 'note-type-select',
   transcriptionNoteTypeOption: 'transcription-note-type-option',
   saveButton: 'save-button',
+  cardsPreview: 'cards-preview',
 } as const
 
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
   switch (noteType) {
     case 'Simple':
       return (
-        <section className={css.cardsPreview}>
+        <section className={css.cardsPreview} id={testLabels.cardsPreview}>
           <h3 className={css.cardPreviewHeading}>Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, meaning, and notes.
