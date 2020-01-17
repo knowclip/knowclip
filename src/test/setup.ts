@@ -76,7 +76,7 @@ export async function tearDownApp(context: {
 }): Promise<null> {
   const { app } = context
   if (app) {
-    app.stop()
+    await app.stop()
   }
 
   if (app && app.isRunning()) app.mainProcess.exit(0)
