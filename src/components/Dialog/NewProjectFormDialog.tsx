@@ -52,7 +52,7 @@ const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
       )
     case 'Transliteration':
       return (
-        <section className={css.cardsPreview}>
+        <section className={css.cardsPreview} id={testLabels.cardsPreview}>
           <h3 className={css.cardPreviewHeading}>Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, pronunciation, meaning, and
