@@ -15,6 +15,7 @@ import {
   TestSetup,
 } from './setup'
 import { RawResult, Element } from 'webdriverio'
+import { mkdirp, remove, existsSync } from 'fs-extra'
 // import { remove, copy } from 'fs-extra'
 
 jest.setTimeout(120000)
@@ -25,8 +26,9 @@ describe('App', () => {
   let context: { app: Application | null } = { app: null }
 
   beforeAll(async () => {
-    // const tmpDirectory = join(process.cwd(), 'test-tmp')
-    // await remove(tmpDirectory)
+    const tmpDirectory = join(process.cwd(), 'test-tmp')
+    if (existsSync(tmpDirectory)) await remove(tmpDirectory)
+    await mkdirp(tmpDirectory)
     // await copy(join(__dirname, 'fixtures'), tmpDirectory)
   })
 
