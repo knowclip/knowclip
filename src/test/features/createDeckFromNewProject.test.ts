@@ -1,70 +1,78 @@
 import { Application, SpectronClient } from 'spectron'
 import { join } from 'path'
-import { testLabels as projectsMenu } from '../components/ProjectsMenu'
-import { testLabels as newProjectForm } from '../components/Dialog/NewProjectFormDialog'
-import { testLabels as main } from '../components/Main'
-import { testLabels as mediaFilesMenu } from '../components/MediaFilesNavMenu'
-import { testLabels as flashcardSection } from '../components/FlashcardSection'
-import { testLabels as tagsInput } from '../components/TagsInput'
-import { testLabels as projectMenu } from '../components/ProjectMenu'
+import { testLabels as projectsMenu } from '../../components/ProjectsMenu'
+import { testLabels as newProjectForm } from '../../components/Dialog/NewProjectFormDialog'
+import { testLabels as main } from '../../components/Main'
+import { testLabels as mediaFilesMenu } from '../../components/MediaFilesNavMenu'
+import { testLabels as flashcardSection } from '../../components/FlashcardSection'
+import { testLabels as tagsInput } from '../../components/TagsInput'
+import { testLabels as projectMenu } from '../../components/ProjectMenu'
 import {
-  setUpApp,
-  tearDownApp,
+  startApp,
+  stopApp,
   mockElectronHelpers,
   _,
   TestSetup,
-} from './setup'
+  TMP_DIRECTORY,
+  MEDIA_DIRECTORY,
+} from '../setup'
 import { RawResult, Element } from 'webdriverio'
 import { mkdirp, remove, existsSync } from 'fs-extra'
 // import { remove, copy } from 'fs-extra'
 
-jest.setTimeout(120000)
+jest.setTimeout(60000)
 
-const MEDIA_DIRECTORY = join(__dirname, 'media')
-
-describe('App', () => {
+describe('create a deck from a new project', () => {
   let context: { app: Application | null } = { app: null }
+  let setup: TestSetup
 
   beforeAll(async () => {
-    const tmpDirectory = join(process.cwd(), 'test-tmp')
-    if (existsSync(tmpDirectory)) await remove(tmpDirectory)
-    await mkdirp(tmpDirectory)
-    // await copy(join(__dirname, 'fixtures'), tmpDirectory)
+    if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
+    await mkdirp(TMP_DIRECTORY)
+    // await copy(join(__dirname, 'fixtures'), TMP_DIRECTORY)
+    setup = await startApp(context)
   })
 
-  it('creates a deck from a new project', async () => {
-    const setup = await setUpApp(context)
-    const pad = (text: string) => '***' + text.padStart(250, ' ')
-    async function step(description: string, action: () => Promise<void>) {
-      console.log(pad(description))
+  it('create a new project', async () => createNewProject(setup))
+  it('change project name', async () => changeProjectName(setup))
+  it('add media to project', async () => addJapaneseMedia(setup))
+  it('create flashcards', async () => makeTwoFlashcards(setup))
 
-      try {
-        await action()
-        console.log(pad('SUCCESS!'))
-      } catch (err) {
-        console.log(pad('FAILURE :('))
-        throw err
-      }
-    }
-
-    await step('create a new project', async () => {
-      await createNewProject(setup)
-    })
-    await step('change project name', async () => {
-      await changeProjectName(setup)
-    })
-    await step('add media to project', async () => {
-      await addJapaneseMedia(setup)
-    })
-    await step('create flashcards', async () => {
-      await makeTwoFlashcards(setup)
-    })
-
+  afterAll(async () => {
     await mockElectronHelpers(setup.app, {
-      showMessageBox: Promise.resolve({ response: 0, checkboxChecked: false }),
+      showMessageBox: Promise.resolve({
+        response: 0,
+        checkboxChecked: false,
+      }),
     })
+    await stopApp(context)
+  })
+})
 
-    await tearDownApp(context)
+describe('second test', () => {
+  let context: { app: Application | null } = { app: null }
+  let setup: TestSetup
+
+  beforeAll(async () => {
+    if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
+    await mkdirp(TMP_DIRECTORY)
+    // await copy(join(__dirname, 'fixtures'), TMP_DIRECTORY)
+    setup = await startApp(context)
+  })
+
+  it('create a new project', async () => createNewProject(setup))
+  it('change project name', async () => changeProjectName(setup))
+  it('add media to project', async () => addJapaneseMedia(setup))
+  it('create flashcards', async () => makeTwoFlashcards(setup))
+
+  afterAll(async () => {
+    await mockElectronHelpers(setup.app, {
+      showMessageBox: Promise.resolve({
+        response: 0,
+        checkboxChecked: false,
+      }),
+    })
+    await stopApp(context)
   })
 })
 
@@ -194,7 +202,7 @@ async function createNewProject({ app, client, $ }: TestSetup) {
 
   await mockElectronHelpers(app, {
     showSaveDialog: Promise.resolve(
-      join(process.cwd(), 'test-tmp', 'my_cool_project.afca')
+      join(TMP_DIRECTORY, 'my_cool_project.afca')
     ),
   })
   const {
