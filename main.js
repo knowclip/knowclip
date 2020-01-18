@@ -55,12 +55,17 @@ async function createWindow() {
   )
     await installDevtools()
 
-  mainWindow.on('close', e => {
-    if (context.mainWindow) {
-      e.preventDefault()
-      mainWindow.webContents.send('app-close')
-    }
-  })
+  mainWindow.on(
+    'close',
+    process.env.SPECTRON
+      ? quitApp
+      : e => {
+          if (context.mainWindow) {
+            e.preventDefault()
+            mainWindow.webContents.send('app-close')
+          }
+        }
+  )
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
@@ -107,7 +112,9 @@ app.on('activate', function() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('closed', function() {
+ipcMain.on('closed', quitApp)
+
+function quitApp() {
   context.mainWindow = null
   app.quit()
-})
+}
