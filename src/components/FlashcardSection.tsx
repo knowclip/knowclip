@@ -11,9 +11,9 @@ import {
 } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop, MoreVert } from '@material-ui/icons'
 import formatTime from '../utils/formatTime'
+import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
-import { getNoteTypeFields } from '../utils/noteType'
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,12 +21,17 @@ import {
   Hearing,
   Layers,
 } from '@material-ui/icons'
+import { getNoteTypeFields } from '../utils/noteType'
 import TagsInput from './TagsInput'
 import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 
-export const testLabels = { flashcardField: 'flashcard-field' } as const
+export const testLabels = {
+  container: 'flashcard-section-container',
+  flashcardFields: 'flashcard-field',
+  previousClipButton: 'previous-clip-button',
+} as const
 
 type FieldMenuProps = {
   embeddedSubtitlesTracks: EmbeddedSubtitlesTrack[]
@@ -304,7 +309,7 @@ const CurrentFlashcard = () => {
                     )
                   )
                 }
-                inputProps={{ className: testLabels.flashcardField }}
+                inputProps={{ className: testLabels.flashcardFields }}
               />
             ))}
           <TagsInput
@@ -370,12 +375,11 @@ const FlashcardSection = ({ showing }: { showing: boolean }) => {
   const dispatch = useDispatch()
 
   return (
-    <section className={css.container}>
+    <section className={cn(css.container, testLabels.container)}>
       <Tooltip title="Previous clip (Ctrl + comma)">
         <span>
-          {' '}
           <IconButton
-            className={css.navButton}
+            className={cn(css.navButton, testLabels.previousClipButton)}
             disabled={!prevId}
             onClick={useCallback(
               () => dispatch(actions.highlightClip(prevId)),

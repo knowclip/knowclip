@@ -29,7 +29,11 @@ import * as r from '../redux'
 import * as actions from '../actions'
 import css from './Header.module.css'
 
-export const testLabels = {}
+export const testLabels = {
+  chooseFirstMediaFileButton: 'choose-media-file-button',
+  addNewAdditionalMediaButton: 'add-new-additional-media-button',
+  mediaFilesMenuButton: 'select-media-file-button',
+}
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
@@ -191,13 +195,7 @@ const MediaFileMenuItem = ({
   )
 }
 
-const MediaFilesNavMenu = ({
-  className,
-  buttonId,
-}: {
-  className: string
-  buttonId?: string
-}) => {
+const MediaFilesNavMenu = ({ className }: { className: string }) => {
   const {
     loop,
     currentFileName,
@@ -263,8 +261,14 @@ const MediaFilesNavMenu = ({
       <section className={className} ref={popover.anchorCallbackRef}>
         {projectMediaFiles.length > 0 ? (
           <span className="mediaFileName" title={currentFileName || undefined}>
-            <Button className={css.audioButton} onClick={popover.open}>
-              {currentFileName ? truncate(currentFileName, 40) : 'Select media'}
+            <Button
+              className={css.audioButton}
+              onClick={popover.open}
+              id={testLabels.mediaFilesMenuButton}
+            >
+              {currentFileName
+                ? truncate(currentFileName, 40)
+                : 'Select media file'}
             </Button>
 
             {popover.isOpen && (
@@ -286,7 +290,10 @@ const MediaFilesNavMenu = ({
                 </MenuList>
                 <Divider />
                 <MenuItem dense>
-                  <ListItemText onClick={chooseMediaFiles}>
+                  <ListItemText
+                    onClick={chooseMediaFiles}
+                    id={testLabels.addNewAdditionalMediaButton}
+                  >
                     Add new media
                   </ListItemText>
                 </MenuItem>
@@ -294,8 +301,11 @@ const MediaFilesNavMenu = ({
             )}
           </span>
         ) : (
-          <Button id={buttonId} onClick={chooseMediaFiles}>
-            Choose source file
+          <Button
+            id={testLabels.chooseFirstMediaFileButton}
+            onClick={chooseMediaFiles}
+          >
+            Choose media file
           </Button>
         )}
         {currentFileId && (

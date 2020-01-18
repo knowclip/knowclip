@@ -3,9 +3,8 @@ import electron from 'electron'
 import { join } from 'path'
 import * as electronHelpers from '../utils/electron'
 import { RawResult } from 'webdriverio'
-import chalk from 'chalk'
 
-export const TMP_DIRECTORY = join(process.cwd(), 'test-tmp')
+export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
 export const MEDIA_DIRECTORY = join(__dirname, 'media')
 
 export const _ = (idOrClassName: string) =>
@@ -18,31 +17,12 @@ export type TestSetup = {
   $$: (label: string) => RawResult<WebdriverIO.Element>[]
 }
 
-export type StepFn = ReturnType<typeof getStepFn>
-
-const pad = (text: string) => '***' + text.padStart(250, ' ')
-const getStepFn = (setup: TestSetup) =>
-  async function step(
-    description: string,
-    action: (setup: TestSetup) => Promise<void>
-  ) {
-    console.log(pad(description))
-
-    try {
-      await action(setup)
-      console.log(pad('SUCCESS!'))
-    } catch (err) {
-      console.log(pad('FAILURE :('))
-      throw err
-    }
-  }
-
 export async function startApp(
   context: {
     app: Application | null
   },
   mocks?: any
-): Promise<TestSetup & { step: StepFn }> {
+): Promise<TestSetup> {
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
     webdriverOptions: { deprecationWarnings: false },
@@ -50,7 +30,6 @@ export async function startApp(
     env: { NODE_ENV: 'test', SPECTRON: process.env.REACT_APP_SPECTRON },
     args: [join(__dirname, '..', '..')],
   })
-  console.log(chalk.blue('Hello') + ' World' + chalk.red('!'))
   context.app = app
 
   await app.start()
@@ -65,7 +44,7 @@ export async function startApp(
     $: (label: string) => app.client.$(_(label)),
     $$: (label: string) => app.client.$$(_(label)),
   }
-  return { ...setup, step: getStepFn(setup) }
+  return setup
 }
 
 export async function stopApp(context: {

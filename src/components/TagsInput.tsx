@@ -10,7 +10,9 @@ import Autosuggest, {
   InputProps,
 } from 'react-autosuggest'
 
-export const testLabels = { tagsInput: 'tags-input' } as const
+export const testLabels = {
+  tagsInputContainer: 'tags-input-container',
+} as const
 
 const getSuggestionValue: GetSuggestionValue<string> = a => a
 const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -146,7 +148,7 @@ const TagsInput = ({
             margin="dense"
             label="Tags"
             placeholder="Type your tag and press 'enter'"
-            className={cn(css.tagsField, testLabels.tagsInput)}
+            className={cn(css.tagsField, testLabels.tagsInputContainer)}
             fullWidth
             onAdd={handleAddChip}
             onDelete={handleDeleteChip}

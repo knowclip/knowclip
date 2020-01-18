@@ -26,7 +26,7 @@ import * as actions from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 
 export const testLabels = {
-  mediaFilesNavMenuButton: 'media-files-nav-menu-button',
+  exportButton: 'export-button',
 } as const
 
 declare module 'react' {
@@ -167,10 +167,7 @@ const Main = () => {
         <header className={headerCss.container}>
           <ProjectMenu className={headerCss.block} />
           <section className={headerCss.block}>
-            <MediaFilesNavMenu
-              buttonId={testLabels.mediaFilesNavMenuButton}
-              className={headerCss.leftMenu}
-            />
+            <MediaFilesNavMenu className={headerCss.leftMenu} />
           </section>
           <ul className={headerCss.rightMenu}>
             {currentMediaFile && (
@@ -217,6 +214,7 @@ const Main = () => {
       {currentFilePath && (
         <Tooltip title="Review and export flashcards">
           <Fab
+            id={testLabels.exportButton}
             className="floatingActionButton"
             onClick={reviewAndExportDialog}
             color="primary"
