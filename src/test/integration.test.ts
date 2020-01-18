@@ -60,6 +60,10 @@ describe('App', () => {
       await makeTwoFlashcards(setup)
     })
 
+    await mockElectronHelpers(setup.app, {
+      showMessageBox: Promise.resolve({ response: 0, checkboxChecked: false }),
+    })
+
     await tearDownApp(context)
   })
 })

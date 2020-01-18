@@ -1,4 +1,9 @@
-import electron, { FileFilter, shell } from 'electron'
+import electron, {
+  FileFilter,
+  shell,
+  MessageBoxOptions,
+  MessageBoxReturnValue,
+} from 'electron'
 
 const showSaveDialog = (
   name: string,
@@ -65,9 +70,15 @@ const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
   shell.openExternal((e.target as HTMLAnchorElement).href)
 }
 
+const showMessageBox: (
+  options: MessageBoxOptions
+) => Promise<MessageBoxReturnValue | null> = options =>
+  electron.remote.dialog.showMessageBox(options)
+
 export default {
   showSaveDialog,
   showOpenDialog,
   showOpenDirectoryDialog,
   openInBrowser,
+  showMessageBox,
 }

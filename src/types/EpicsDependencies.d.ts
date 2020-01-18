@@ -35,4 +35,5 @@ declare type EpicsDependencies = {
     oldConstantBitratePath: string | null // not needed
   ) => Promise<string>
   existsSync: (string) => boolean
+  ipcRenderer: Electron.IpcRenderer
 }

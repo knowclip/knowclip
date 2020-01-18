@@ -45,9 +45,13 @@ const showOpenDirectoryDialog: typeof helpers['showOpenDirectoryDialog'] = async
 const openInBrowser: typeof helpers['openInBrowser'] = (...args) =>
   mocked.openInBrowser ? mocked.openInBrowser(...args) : null
 
+const showMessageBox: typeof helpers['showMessageBox'] = async (...args) =>
+  mocked.showMessageBox ? await mocked.showMessageBox(...args) : null
+
 export default {
   showSaveDialog,
   showOpenDialog,
   showOpenDirectoryDialog,
   openInBrowser,
+  showMessageBox,
 }

@@ -37,7 +37,7 @@ cache:
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    yarn integration:ci &&./docker/docker_run.sh --linux --win --mac
+    yarn && yarn integration:ci &&./docker/docker_run.sh --linux --win --mac
   else	
     yarn && yarn integration:ci
   fi

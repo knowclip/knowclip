@@ -6,6 +6,7 @@ const {
   showOpenDialog,
   showOpenDirectoryDialog,
   openInBrowser,
+  showMessageBox,
 } =
   process.env.REACT_APP_SPECTRON || process.env.NODE_ENV === 'test'
     ? mocks
@@ -16,4 +17,5 @@ export {
   showOpenDialog,
   showOpenDirectoryDialog,
   openInBrowser,
+  showMessageBox,
 }

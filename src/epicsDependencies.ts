@@ -3,7 +3,7 @@ import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -56,5 +56,6 @@ const dependencies: EpicsDependencies = {
   getWaveformPng,
   getConstantBitrateMediaPath,
   existsSync,
+  ipcRenderer,
 }
 export default dependencies

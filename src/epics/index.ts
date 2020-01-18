@@ -1,7 +1,6 @@
 import { ignoreElements, mergeAll } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
-import { ipcRenderer, remote } from 'electron'
 import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
@@ -19,22 +18,23 @@ import highlightClip from './highlightClip'
 import subtitles from './subtitles'
 import files from './files'
 import defaultTags from './defaultTags'
+import { showMessageBox } from '../utils/electron'
 import { AppEpic } from '../types/AppEpic'
 
-const closeEpic: AppEpic = (action$, state$) =>
+const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'app-close', async () => {
     if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
       ipcRenderer.send('closed')
       return await { type: 'QUIT_APP' }
     }
 
-    const choice = await remote.dialog.showMessageBox({
+    const choice = await showMessageBox({
       type: 'question',
-      buttons: ['Yes', 'No'],
+      buttons: ['Quit', 'Cancel'],
       title: 'Confirm',
       message: 'Are you sure you want to quit without saving your work?',
     })
-    if (choice.response === 1) {
+    if (!choice || choice.response === 1) {
       // e.preventDefault()
       return await { type: "DON'T QUIT ON ME!!" }
     } else {
