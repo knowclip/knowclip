@@ -20,8 +20,7 @@ export default async function navigateBetweenMedia({
   const menuItemsText: RawResult<string>[] = (await Promise.all(
     menuItems.map(item => client.elementIdText(item.value.ELEMENT))
   )) as any
-  console.log(menuItems, menuItems[0])
-  console.log(menuItemsText, menuItemsText[0])
+
   const otherVideoIndex = menuItemsText.findIndex(({ value }) =>
     value.includes('polar_bear_cafe.mp4')
   )

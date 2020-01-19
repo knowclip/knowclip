@@ -6,7 +6,12 @@ const { isPackaged } = app
 const { BrowserWindow } = electron
 const setUpMenu = require('./electron/appMenu')
 
+const { INTEGRATION_DEV } = JSON.parse(process.env.INTEGRATION_DEV)
+
 const installDevtools = require('./electron/devtools')
+const useDevtools = Boolean(
+  process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : !isPackaged
+)
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -32,7 +37,7 @@ async function createWindow() {
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,
-      // devTools: process.env.NODE_ENV !== 'test',
+      devTools: useDevtools,
     },
   })
 
@@ -40,8 +45,7 @@ async function createWindow() {
 
   // and load the index.html of the app.
   mainWindow.loadURL(
-    !process.env.INTEGRATION_DEV &&
-      (process.env.NODE_ENV === 'test' || isPackaged)
+    isPackaged || (process.env.NODE_ENV === 'test' && !INTEGRATION_DEV)
       ? url.format({
           pathname: path.join(__dirname, 'build', 'index.html'),
           protocol: 'file',
@@ -50,10 +54,7 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  if (
-    process.env.NODE_ENV === 'test' ? process.env.INTEGRATION_DEV : !isPackaged
-  )
-    await installDevtools()
+  if (useDevtools) await installDevtools()
 
   mainWindow.on('close', e => {
     if (context.mainWindow) {
