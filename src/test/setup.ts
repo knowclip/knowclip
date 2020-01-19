@@ -29,8 +29,8 @@ export async function startApp(
     path: (electron as unknown) as string,
     env: {
       NODE_ENV: 'test',
-      SPECTRON: process.env.REACT_APP_SPECTRON,
-      INTEGRATION_DEV: process.env.INTEGRATION_DEV,
+      SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
+      INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
     },
     args: [join(__dirname, '..', '..')],
   })

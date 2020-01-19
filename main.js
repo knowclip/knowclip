@@ -6,7 +6,7 @@ const { isPackaged } = app
 const { BrowserWindow } = electron
 const setUpMenu = require('./electron/appMenu')
 
-const { INTEGRATION_DEV } = JSON.parse(process.env.INTEGRATION_DEV)
+const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
 const installDevtools = require('./electron/devtools')
 const useDevtools = Boolean(
