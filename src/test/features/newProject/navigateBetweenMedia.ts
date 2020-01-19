@@ -1,4 +1,4 @@
-import { TestSetup } from '../../setup'
+import { TestSetup, _ } from '../../setup'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
 import { RawResult } from 'webdriverio'
 
@@ -15,7 +15,9 @@ export default async function navigateBetweenMedia({
 
   await $_(mediaFilesMenuButton).click()
 
+  await client.waitUntil(() => client.isExisting(_(mediaFileMenuItem)))
   const menuItems = await $$_(mediaFileMenuItem)
+  expect(menuItems).toHaveLength(2)
 
   const menuItemsText: RawResult<string>[] = (await Promise.all(
     menuItems.map(item => client.elementIdText(item.value.ELEMENT))
