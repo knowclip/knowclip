@@ -4,8 +4,8 @@ import { testLabels as newProjectForm } from '../../../components/Dialog/NewProj
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
 import { join } from 'path'
 
-export default async function createNewProject({ app, client, $ }: TestSetup) {
-  $(projectsMenu.newProjectButton).click()
+export default async function createNewProject({ app, client, $_ }: TestSetup) {
+  $_(projectsMenu.newProjectButton).click()
 
   await mockElectronHelpers(app, {
     showSaveDialog: Promise.resolve(
@@ -22,13 +22,13 @@ export default async function createNewProject({ app, client, $ }: TestSetup) {
   } = newProjectForm
 
   await client.waitForExist(_(projectNameField))
-  await $(projectNameField).setValue('My cool poject')
+  await $_(projectNameField).setValue('My cool poject')
 
-  $(projectFileLocationField).click()
+  $_(projectFileLocationField).click()
 
-  $(noteTypeSelect).click()
+  $_(noteTypeSelect).click()
   await client.waitForExist(_(transcriptionNoteTypeOption))
-  await $(transcriptionNoteTypeOption).click()
+  await $_(transcriptionNoteTypeOption).click()
 
   await client.waitForExist(_(cardsPreview))
 
@@ -39,7 +39,7 @@ export default async function createNewProject({ app, client, $ }: TestSetup) {
       ))
   )
 
-  await $(saveButton).click()
+  await $_(saveButton).click()
 
   await client.waitForExist(_(mediaFilesMenu.chooseFirstMediaFileButton))
 }

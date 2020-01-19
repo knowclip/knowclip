@@ -202,7 +202,6 @@ declare type SetWorkIsUnsaved = {
 declare type MediaAction =
   | AddMediaToProjectRequest
   | DeleteMediaFromProject
-  | RemoveMediaFiles
   | SetCurrentFile
   | ToggleLoop
   | SetLoop
@@ -218,7 +217,6 @@ declare type DeleteMediaFromProject = {
   mediaFileId: MediaFileId
 }
 
-declare type RemoveMediaFiles = { type: 'REMOVE_MEDIA_FILES' }
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }

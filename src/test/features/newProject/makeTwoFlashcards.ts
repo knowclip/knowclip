@@ -7,8 +7,8 @@ import { testLabels as tagsInput } from '../../../components/TagsInput'
 
 export default async function makeTwoFlashcards({
   app,
-  $,
-  $$,
+  $_,
+  $$_,
   client,
 }: TestSetup) {
   await dragMouse(app, [402, 422], [625, 422])
@@ -16,25 +16,25 @@ export default async function makeTwoFlashcards({
   const { flashcardFields } = flashcardSection
   const { tagsInputContainer } = tagsInput
   await client.waitForExist(_(flashcardFields))
-  await fillInFlashcardFields(await $$(flashcardFields), client, {
+  await fillInFlashcardFields(await $$_(flashcardFields), client, {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
     pronunciation: 'sasa-o tabe-nagara nonbíri-suru-no-wa saikoo-da-naa',
     meaning: 'Relaxing while eating bamboo grass is the best',
   })
-  await getDeleteTagButton($(tagsInputContainer)).click()
-  await $(tagsInputContainer).click()
+  await getDeleteTagButton($_(tagsInputContainer)).click()
+  await $_(tagsInputContainer).click()
 
-  const newTagTextField = getNewTagTextField($(tagsInputContainer))
+  const newTagTextField = getNewTagTextField($_(tagsInputContainer))
   await newTagTextField.setValue('pbc')
   await newTagTextField.keys(['Enter'])
 
   await dragMouse(app, [756, 422], [920, 422])
 
   const tagsChips = `.${tagsInputContainer} svg`
-  expect(await app.client.$$(tagsChips)).toHaveLength(1)
-  expect(await $(tagsInputContainer).getText()).toContain('pbc')
+  expect(await client.$$(tagsChips)).toHaveLength(1)
+  expect(await $_(tagsInputContainer).getText()).toContain('pbc')
 
-  await fillInFlashcardFields(await $$(flashcardFields), client, {
+  await fillInFlashcardFields(await $$_(flashcardFields), client, {
     transcription: 'またこの子は昼間からゴロゴロして',
     pronunciation: 'mata kono ko-wa hiruma-kara góro-goro shite',
     meaning: 'This kid, lazing about again so early',

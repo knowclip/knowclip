@@ -52,11 +52,11 @@ video::-webkit-media-controls-toggle-closed-captions-button {
   max-width: 100%;
   display: block;
 }
-audio.audioPlayer {
+audio.mediaPlayer {
   width: 100%;
   display: block;
 }
-video.audioPlayer {
+video.mediaPlayer {
   height: 100%;
   padding: 0 1rem 0 0;
   box-sizing: border-box;

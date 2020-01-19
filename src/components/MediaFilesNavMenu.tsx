@@ -33,7 +33,8 @@ export const testLabels = {
   chooseFirstMediaFileButton: 'choose-media-file-button',
   addNewAdditionalMediaButton: 'add-new-additional-media-button',
   mediaFilesMenuButton: 'select-media-file-button',
-}
+  mediaFileMenuItem: 'media-file-menu-item',
+} as const
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
@@ -63,6 +64,7 @@ type MediaFileMenuItemProps = {
   closeMenu: (event: React.SyntheticEvent<Element, Event>) => void
 }
 
+const submenuAnchorOrigin = { vertical: 'top', horizontal: 'right' } as const
 const MediaFileMenuItem = ({
   mediaFile,
   selected,
@@ -143,6 +145,7 @@ const MediaFileMenuItem = ({
       key={mediaFile.id}
       selected={selected}
       onClick={loadAndClose}
+      className={testLabels.mediaFileMenuItem}
     >
       <ListItemText
         title={mediaFile.name}
@@ -153,7 +156,7 @@ const MediaFileMenuItem = ({
       <Menu
         open={submenu.isOpen}
         anchorEl={submenu.anchorEl}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={submenuAnchorOrigin}
         onClose={useCallback(
           e => {
             e.stopPropagation()
@@ -212,20 +215,22 @@ const MediaFilesNavMenu = ({ className }: { className: string }) => {
 
   if (!currentProjectId) throw new Error('Could not find project')
 
+  const popover = usePopover()
+
   const dispatch = useDispatch()
   const chooseMediaFiles = useCallback(
     async () => {
       const filePaths = await showOpenDialog(MEDIA_FILTERS, true)
-      if (filePaths)
+      if (filePaths) {
         dispatch(actions.addMediaToProjectRequest(currentProjectId, filePaths))
+        popover.close()
+      }
     },
-    [dispatch, currentProjectId]
+    [dispatch, currentProjectId, popover]
   )
   const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
     dispatch,
   ])
-
-  const popover = usePopover()
 
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
@@ -242,7 +247,7 @@ const MediaFilesNavMenu = ({ className }: { className: string }) => {
   }, [])
 
   const playOrPauseAudio = useCallback(() => {
-    const player = document.getElementById('audioPlayer') as
+    const player = document.getElementById('mediaPlayer') as
       | HTMLAudioElement
       | HTMLVideoElement
       | null

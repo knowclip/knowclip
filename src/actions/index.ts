@@ -10,10 +10,6 @@ export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
 })
 
-export const removeMediaFiles = (): Action => ({
-  type: A.REMOVE_MEDIA_FILES,
-})
-
 export const setFlashcardField = (
   id: ClipId,
   key: FlashcardFieldName,

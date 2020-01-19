@@ -7,7 +7,7 @@ import { initialState as initialSettingsState } from './reducers/settings'
 import epicsDependencies from './epicsDependencies'
 
 const composeEnhancers =
-  process.env.NODE_ENV === 'development'
+  process.env.NODE_ENV === 'development' || process.env.INTEGRATION_DEV
     ? ((window as unknown) as {
         __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
       }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||

@@ -75,8 +75,8 @@ const Media = ({
     loop: loop,
     controls: true,
     disablePictureInPicture: true,
-    id: 'audioPlayer',
-    className: 'audioPlayer',
+    id: 'mediaPlayer',
+    className: 'mediaPlayer',
     controlsList: 'nodownload nofullscreen',
     src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',
     playbackspeed: 1,
@@ -85,7 +85,7 @@ const Media = ({
     () => {
       if (props.src) {
         setTimeout(() => {
-          const player = document.getElementById('audioPlayer') as
+          const player = document.getElementById('mediaPlayer') as
             | HTMLAudioElement
             | HTMLVideoElement
             | null

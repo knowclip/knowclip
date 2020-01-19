@@ -8,7 +8,8 @@ import {
   getSecondsAtXFromWaveform,
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
-import { getMillisecondsAtX } from '../selectors'
+
+export const testLabels = { subtitlesContainer: 'subtitles-container' } as const
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -168,7 +169,7 @@ const SubtitlesTimelines = memo(
     )
     return (
       <svg
-        className={css.subtitlesSvg}
+        className={cn(css.subtitlesSvg, testLabels.subtitlesContainer)}
         preserveAspectRatio="xMinYMin slice"
         viewBox={getSubtitlesViewBoxString(
           viewBox.xMin,

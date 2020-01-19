@@ -13,8 +13,8 @@ export const _ = (idOrClassName: string) =>
 export type TestSetup = {
   app: Application
   client: SpectronClient
-  $: SpectronClient['$']
-  $$: (label: string) => RawResult<WebdriverIO.Element>[]
+  $_: SpectronClient['$']
+  $$_: (label: string) => RawResult<WebdriverIO.Element>[]
 }
 
 export async function startApp(
@@ -27,7 +27,11 @@ export async function startApp(
     chromeDriverArgs: ['--disable-extensions', '--debug'],
     webdriverOptions: { deprecationWarnings: false },
     path: (electron as unknown) as string,
-    env: { NODE_ENV: 'test', SPECTRON: process.env.REACT_APP_SPECTRON },
+    env: {
+      NODE_ENV: 'test',
+      SPECTRON: process.env.REACT_APP_SPECTRON,
+      INTEGRATION_DEV: process.env.INTEGRATION_DEV,
+    },
     args: [join(__dirname, '..', '..')],
   })
   context.app = app
@@ -41,8 +45,8 @@ export async function startApp(
   const setup = {
     app,
     client: app.client,
-    $: (label: string) => app.client.$(_(label)),
-    $$: (label: string) => app.client.$$(_(label)),
+    $_: (label: string) => app.client.$(_(label)),
+    $$_: (label: string) => app.client.$$(_(label)),
   }
   return setup
 }

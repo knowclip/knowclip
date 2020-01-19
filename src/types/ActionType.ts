@@ -1,5 +1,4 @@
 export const INIT = '@@INIT'
-export const REMOVE_MEDIA_FILES = 'REMOVE_MEDIA_FILES'
 export const SET_CURRENT_FILE = 'SET_CURRENT_FILE'
 export const TOGGLE_LOOP = 'TOGGLE_LOOP'
 export const SET_LOOP = 'SET_LOOP'

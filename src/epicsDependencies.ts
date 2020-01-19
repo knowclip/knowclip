@@ -9,12 +9,12 @@ const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
-const getAudioElement = () => {
-  const el = document.getElementById('audioPlayer')
-  if (!(el instanceof HTMLAudioElement || el instanceof HTMLVideoElement))
-    return null
-  return el
-}
+const getMediaPlayer = () =>
+  document.getElementById('mediaPlayer') as
+    | HTMLAudioElement
+    | HTMLVideoElement
+    | null
+
 const getWaveformSvgElement = () =>
   (document.getElementById('waveform-svg') as SVGElement | null) || null
 
@@ -29,24 +29,24 @@ const dependencies: EpicsDependencies = {
     return el ? elementWidth(el) : 0
   },
   setCurrentTime: (time: number) => {
-    const media = getAudioElement()
+    const media = getMediaPlayer()
     if (media) {
       media.currentTime = time
     }
   },
   getCurrentTime: () => {
-    const media = getAudioElement()
+    const media = getMediaPlayer()
     return media ? media.currentTime : 0
   },
   pauseMedia: () => {
-    const el = getAudioElement()
+    const el = getMediaPlayer()
     if (el) {
       el.pause()
     }
   },
   toggleMediaPaused: () => {
-    const el = document.getElementById('audioPlayer')
-    if (!(el instanceof HTMLAudioElement)) return
+    const el = getMediaPlayer()
+    if (!el) return
     if (el.paused) el.play()
     else el.pause()
   },

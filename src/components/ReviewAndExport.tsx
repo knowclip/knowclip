@@ -29,6 +29,11 @@ import truncate from '../utils/truncate'
 import * as actions from '../actions'
 import { DialogProps } from './Dialog/DialogProps'
 
+export const testLabels = {
+  exportApkgButton: 'export-apkg-button',
+  continueButton: 'continue-button',
+} as const
+
 const ShortTag = ({ title }: { title: string }) =>
   title.length > 12 ? (
     <Tooltip title={title}>
@@ -418,6 +423,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
               color="primary"
               disabled={Boolean(progress)}
               onClick={exportApkg}
+              id={testLabels.exportApkgButton}
             >
               Export Anki Deck from selected clips
             </Button>
@@ -428,7 +434,11 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
           <Button disabled={Boolean(progress)} onClick={closeDialog}>
             Exit
           </Button>
-          <Button disabled={Boolean(progress)} onClick={startSelection}>
+          <Button
+            disabled={Boolean(progress)}
+            onClick={startSelection}
+            id={testLabels.continueButton}
+          >
             Continue
           </Button>
         </DialogActions>

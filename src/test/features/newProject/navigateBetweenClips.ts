@@ -2,18 +2,22 @@ import { TestSetup } from '../../setup'
 import { clickAt } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 
-export default async function navigateBetweenClips({ app, $, $$ }: TestSetup) {
+export default async function navigateBetweenClips({
+  app,
+  $_,
+  $$_,
+}: TestSetup) {
   const { flashcardFields, previousClipButton, container } = flashcardSection
 
   await clickAt(app, [650, 422])
 
-  expect(await $$(flashcardFields)).toHaveLength(0)
+  expect(await $$_(flashcardFields)).toHaveLength(0)
 
   await clickAt(app, [800, 422])
 
-  await $(previousClipButton).click()
+  await $_(previousClipButton).click()
 
-  expect(await $(container).getText()).toContain(
+  expect(await $_(container).getText()).toContain(
     'Relaxing while eating bamboo grass'
   )
 }
