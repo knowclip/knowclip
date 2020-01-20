@@ -11,7 +11,8 @@ export default async function changeProjectName(setup: TestSetup) {
   const projectTitleInputEl = await client.element_(projectTitleInput)
   await projectTitleInputEl.doubleClick()
   await client.pressKeys([
-    ...[...Array(15)].map(() => 'Backspace'),
+    ...[...'My cool new poject'].map(() => 'ArrowRight'),
+    ...[...'My cool new poject'].map(() => 'Backspace'),
     ...'My cool new project',
     'Enter',
   ])
