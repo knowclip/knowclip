@@ -8,11 +8,13 @@ import Main from './components/Main'
 import ProjectsMenu from './components/ProjectsMenu'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import themeSpecs from './themeSpecs'
+import { CssBaseline } from '@material-ui/core'
 
 const theme = createMuiTheme(themeSpecs)
 
 const App = () => (
   <MuiThemeProvider theme={theme}>
+    <CssBaseline />
     <HashRouter>
       <Switch>
         <Route exact path="/" component={Main} />

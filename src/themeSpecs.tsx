@@ -5,6 +5,21 @@ const themeSpecs = {
         fontSize: '.8rem',
       },
     },
+    ...(process.env.REACT_APP_SPECTRON
+      ? {
+          MuiCssBaseline: {
+            '@global': {
+              '*, *::before, *::after': {
+                transition: 'none !important',
+                animation: 'none !important',
+              },
+            },
+          },
+        }
+      : null),
+    transitions: () => 'none',
   },
 }
+console.log(process.env.REACT_APP_SPECTRON, 'spec')
+
 export default themeSpecs
