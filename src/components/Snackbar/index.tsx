@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import * as r from '../../redux'
 import SimpleMessage from './SimpleMessage'
 
-export const testLabels = { closeButton: 'close-snackbar-button' }
+export const testLabels = { closeButton: 'close-snackbar-button' } as const
 
 const SnackbarView = () => {
   const currentSnackbar = useSelector((state: AppState) =>

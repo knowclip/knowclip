@@ -8,7 +8,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
     await Promise.all(waveformClips.map(c => c.isVisible()))
   ).toMatchObject([true, true])
   await client._client.execute((video: HTMLVideoElement) => {
-    video.currentTime = 53
+    video.currentTime = 61
   }, (await client._client.$('video')).value)
 
   await client.waitUntil(async () => {
@@ -18,7 +18,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
     )
   })
 
-  await dragMouse(app, [1106, 422], [1404, 422])
+  await dragMouse(app, [710, 422], [1008, 422])
 
   await client.waitUntil(
     async () => (await client.elements('.waveform-clip')).length === 3

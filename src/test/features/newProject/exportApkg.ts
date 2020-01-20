@@ -33,6 +33,7 @@ export default async function navigateBetweenMedia({ client, app }: TestSetup) {
 
   await client.waitForText('body', 'Flashcards made in ')
   await client.clickElement_(snackbar.closeButton)
+  await client.waitUntilGone_(snackbar.closeButton)
 
   await client.clickElement_(dialog.exitButton)
 }
