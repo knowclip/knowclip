@@ -167,7 +167,10 @@ const Main = () => {
         <header className={headerCss.container}>
           <ProjectMenu className={headerCss.block} />
           <section className={headerCss.block}>
-            <MediaFilesNavMenu className={headerCss.leftMenu} />
+            <MediaFilesNavMenu
+              className={headerCss.leftMenu}
+              currentProjectId={currentProjectId}
+            />
           </section>
           <ul className={headerCss.rightMenu}>
             {currentMediaFile && (

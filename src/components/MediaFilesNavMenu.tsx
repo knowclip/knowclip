@@ -139,6 +139,7 @@ const MediaFileMenuItem = ({
       </IconButton>
     </ListItemSecondaryAction>
   )
+
   return (
     <MenuItem
       dense
@@ -198,23 +199,23 @@ const MediaFileMenuItem = ({
   )
 }
 
-const MediaFilesNavMenu = ({ className }: { className: string }) => {
+type MediaFilesNavMenuProps = { className: string; currentProjectId: ProjectId }
+
+const MediaFilesNavMenu = ({
+  className,
+  currentProjectId,
+}: MediaFilesNavMenuProps) => {
   const {
     loop,
     currentFileName,
     currentFileId,
-    currentProjectId,
     projectMediaFiles,
   } = useSelector((state: AppState) => ({
     loop: r.isLoopOn(state),
     currentFileName: r.getCurrentFileName(state),
     currentFileId: r.getCurrentFileId(state),
-    currentProjectId: r.getCurrentProjectId(state),
     projectMediaFiles: r.getCurrentProjectMediaFiles(state),
   }))
-
-  if (!currentProjectId) throw new Error('Could not find project')
-
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -232,6 +233,84 @@ const MediaFilesNavMenu = ({ className }: { className: string }) => {
     dispatch,
   ])
 
+  const { playing, playOrPauseAudio } = usePlayButtonSync()
+
+  return (
+    <DarkTheme>
+      <section className={className} ref={popover.anchorCallbackRef}>
+        {projectMediaFiles.length > 0 ? (
+          <span className="mediaFileName" title={currentFileName || undefined}>
+            <Button
+              className={css.audioButton}
+              onClick={popover.open}
+              id={testLabels.mediaFilesMenuButton}
+            >
+              {currentFileName
+                ? truncate(currentFileName, 40)
+                : 'Select media file'}
+            </Button>
+          </span>
+        ) : (
+          <Button
+            id={testLabels.chooseFirstMediaFileButton}
+            onClick={chooseMediaFiles}
+          >
+            Choose media file
+          </Button>
+        )}
+        {currentFileId && (
+          <>
+            <Tooltip title="Loop audio (Ctrl + L)">
+              <IconButton
+                onClick={toggleLoop}
+                color={loop ? 'primary' : 'default'}
+              >
+                <Loop />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
+            >
+              <IconButton onClick={playOrPauseAudio}>
+                {playing ? <Pause /> : <PlayArrow />}
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
+        {popover.isOpen && (
+          <Popover
+            anchorEl={popover.anchorEl}
+            open={popover.isOpen}
+            onClose={popover.close}
+          >
+            <MenuList style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
+              {projectMediaFiles.map(media => (
+                <MediaFileMenuItem
+                  key={media.id}
+                  closeMenu={popover.close}
+                  mediaFile={media}
+                  selected={media.id === currentFileId}
+                  currentProjectId={currentProjectId}
+                />
+              ))}
+            </MenuList>
+            <Divider />
+            <MenuItem dense>
+              <ListItemText
+                onClick={chooseMediaFiles}
+                id={testLabels.addNewAdditionalMediaButton}
+              >
+                Add new media
+              </ListItemText>
+            </MenuItem>
+          </Popover>
+        )}
+      </section>
+    </DarkTheme>
+  )
+}
+
+function usePlayButtonSync() {
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
     const startPlaying = () => setPlaying(true)
@@ -261,80 +340,7 @@ const MediaFilesNavMenu = ({ className }: { className: string }) => {
     return () => document.removeEventListener('loadeddata', resetPlayButton)
   }, [])
 
-  return (
-    <DarkTheme>
-      <section className={className} ref={popover.anchorCallbackRef}>
-        {projectMediaFiles.length > 0 ? (
-          <span className="mediaFileName" title={currentFileName || undefined}>
-            <Button
-              className={css.audioButton}
-              onClick={popover.open}
-              id={testLabels.mediaFilesMenuButton}
-            >
-              {currentFileName
-                ? truncate(currentFileName, 40)
-                : 'Select media file'}
-            </Button>
-
-            {popover.isOpen && (
-              <Popover
-                anchorEl={popover.anchorEl}
-                open={popover.isOpen}
-                onClose={popover.close}
-              >
-                <MenuList style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
-                  {projectMediaFiles.map(media => (
-                    <MediaFileMenuItem
-                      key={media.id}
-                      closeMenu={popover.close}
-                      mediaFile={media}
-                      selected={media.id === currentFileId}
-                      currentProjectId={currentProjectId}
-                    />
-                  ))}
-                </MenuList>
-                <Divider />
-                <MenuItem dense>
-                  <ListItemText
-                    onClick={chooseMediaFiles}
-                    id={testLabels.addNewAdditionalMediaButton}
-                  >
-                    Add new media
-                  </ListItemText>
-                </MenuItem>
-              </Popover>
-            )}
-          </span>
-        ) : (
-          <Button
-            id={testLabels.chooseFirstMediaFileButton}
-            onClick={chooseMediaFiles}
-          >
-            Choose media file
-          </Button>
-        )}
-        {currentFileId && (
-          <Tooltip title="Loop audio (Ctrl + L)">
-            <IconButton
-              onClick={toggleLoop}
-              color={loop ? 'primary' : 'default'}
-            >
-              <Loop />
-            </IconButton>
-          </Tooltip>
-        )}
-        {currentFileId && (
-          <Tooltip
-            title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
-          >
-            <IconButton onClick={playOrPauseAudio}>
-              {playing ? <Pause /> : <PlayArrow />}
-            </IconButton>
-          </Tooltip>
-        )}
-      </section>
-    </DarkTheme>
-  )
+  return { playOrPauseAudio, playing }
 }
 
 export default MediaFilesNavMenu
