@@ -32,8 +32,8 @@ async function createWindow() {
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: Math.min(1400, width),
-    height: Math.min(950, height),
+    width: Math.min(1027, width),
+    height: Math.min(768, height),
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,

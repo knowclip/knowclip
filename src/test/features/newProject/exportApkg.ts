@@ -1,6 +1,7 @@
 import { TestSetup, TMP_DIRECTORY } from '../../setup'
 import { testLabels as main } from '../../../components/Main'
 import { testLabels as dialog } from '../../../components/ReviewAndExport'
+import { testLabels as snackbar } from '../../../components/Snackbar'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
@@ -34,6 +35,7 @@ export default async function navigateBetweenMedia({
   await clientWrapper.clickElement_(dialog.exportApkgButton)
 
   await clientWrapper.waitForText('body', 'Flashcards made in ')
+  await clientWrapper.clickElement_(snackbar.closeButton)
 
   await clientWrapper.clickElement_(dialog.exitButton)
 }

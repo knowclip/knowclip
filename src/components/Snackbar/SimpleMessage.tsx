@@ -5,7 +5,13 @@ import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import { closeSnackbar } from '../../actions'
 
-const SimpleMessageSnackbar = ({ message }: { message: string }) => {
+const SimpleMessageSnackbar = ({
+  message,
+  closeButtonId,
+}: {
+  message: string
+  closeButtonId: string
+}) => {
   const [open, setOpen] = useState(true)
 
   const handleClose = useCallback(e => setOpen(false), [setOpen])
@@ -22,7 +28,7 @@ const SimpleMessageSnackbar = ({ message }: { message: string }) => {
       onExited={handleExited}
       action={
         <DarkTheme>
-          <IconButton onClick={handleClose}>
+          <IconButton onClick={handleClose} id={closeButtonId}>
             <Close />
           </IconButton>
         </DarkTheme>
