@@ -1,6 +1,7 @@
-import { TestSetup, MEDIA_DIRECTORY, mockElectronHelpers, _ } from '../../setup'
+import { TestSetup, MEDIA_DIRECTORY, _ } from '../../setup'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
 import { join } from 'path'
+import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 export default async function addMoreMediaToProject({
   app,
@@ -14,7 +15,7 @@ export default async function addMoreMediaToProject({
   const germanVideoPath = join(MEDIA_DIRECTORY, 'piggeldy_cat.mp4')
 
   await mockElectronHelpers(app, {
-    showOpenDialog: Promise.resolve([germanVideoPath]),
+    showOpenDialog: [Promise.resolve([germanVideoPath])],
   })
   await $_(addNewAdditionalMediaButton).click()
 

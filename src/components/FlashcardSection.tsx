@@ -31,6 +31,7 @@ export const testLabels = {
   container: 'flashcard-section-container',
   flashcardFields: 'flashcard-field',
   previousClipButton: 'previous-clip-button',
+  nextClipButton: 'next-clip-button',
 } as const
 
 type FieldMenuProps = {
@@ -396,7 +397,7 @@ const FlashcardSection = ({ showing }: { showing: boolean }) => {
       <Tooltip title="Next clip (Ctrl + period)">
         <span>
           <IconButton
-            className={css.navButton}
+            className={cn(css.navButton, testLabels.nextClipButton)}
             disabled={!nextId}
             onClick={useCallback(
               () => dispatch(actions.highlightClip(nextId)),

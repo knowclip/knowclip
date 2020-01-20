@@ -36,4 +36,5 @@ declare type EpicsDependencies = {
   ) => Promise<string>
   existsSync: (string) => boolean
   ipcRenderer: Electron.IpcRenderer
+  nowUtcTimestamp: () => string
 }

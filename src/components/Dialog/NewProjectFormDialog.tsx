@@ -13,12 +13,12 @@ import {
   Paper,
   FormHelperText,
 } from '@material-ui/core'
-import uuid from 'uuid/v4'
 import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'classnames'
 import { DialogProps } from './DialogProps'
 import { closeDialog, createProject } from '../../actions'
+import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
 export const testLabels = {
   projectNameField: 'project-name',
@@ -128,7 +128,8 @@ const NewProjectFormDialog = ({
           uuid(),
           name,
           (fieldValues.noteType as unknown) as NoteType, // guaranteed after validation
-          filePath
+          filePath,
+          nowUtcTimestamp()
         )
       )
       dispatch(closeDialog())

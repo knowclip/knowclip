@@ -18,7 +18,10 @@ import css from './ProjectsMenu.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
-export const testLabels = { newProjectButton: 'new-project-button' } as const
+export const testLabels = {
+  newProjectButton: 'new-project-button',
+  recentProjectsListItem: 'recent-projects-list-item',
+} as const
 
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
@@ -43,7 +46,10 @@ const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
           <MenuItem onClick={removeFromRecents}>Remove from recents</MenuItem>
         </Menu>
       )}
-      <MenuItem key={project.id} onClick={openProjectById}>
+      <MenuItem
+        onClick={openProjectById}
+        className={testLabels.recentProjectsListItem}
+      >
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>

@@ -1,16 +1,17 @@
-import { TestSetup, mockElectronHelpers, TMP_DIRECTORY, _ } from '../../setup'
+import { TestSetup, TMP_DIRECTORY, _ } from '../../setup'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 import { testLabels as newProjectForm } from '../../../components/Dialog/NewProjectFormDialog'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
 import { join } from 'path'
+import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 export default async function createNewProject({ app, client, $_ }: TestSetup) {
   $_(projectsMenu.newProjectButton).click()
 
   await mockElectronHelpers(app, {
-    showSaveDialog: Promise.resolve(
-      join(TMP_DIRECTORY, 'my_cool_project.afca')
-    ),
+    showSaveDialog: [
+      Promise.resolve(join(TMP_DIRECTORY, 'my_cool_new_project.afca')),
+    ],
   })
   const {
     projectNameField,
@@ -22,7 +23,7 @@ export default async function createNewProject({ app, client, $_ }: TestSetup) {
   } = newProjectForm
 
   await client.waitForExist(_(projectNameField))
-  await $_(projectNameField).setValue('My cool poject')
+  await $_(projectNameField).setValue('My cool new poject')
 
   $_(projectFileLocationField).click()
 

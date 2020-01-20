@@ -1,11 +1,11 @@
 import { Epic, ofType, combineEpics } from 'redux-observable'
 import { flatMap, map } from 'rxjs/operators'
 import { of, Observable } from 'rxjs'
-import uuid from 'uuid/v4'
 import * as r from '../redux'
 import newClip from '../utils/newClip'
 import { from } from 'rxjs'
 import { AppEpic } from '../types/AppEpic'
+import { uuid } from '../utils/sideEffects'
 
 const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(

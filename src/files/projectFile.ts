@@ -2,7 +2,6 @@ import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 import parseProject from '../utils/parseProject'
 import { promises } from 'fs'
-import moment from 'moment'
 
 const { readFile } = promises
 
@@ -36,13 +35,7 @@ export default {
       return [
         ...addNewMediaFiles,
         ...addNewSubtitlesFiles, // maybe should happen when opening media
-        r.openProject(
-          validatedFile,
-          project.clips,
-          moment()
-            .utc()
-            .format()
-        ),
+        r.openProject(validatedFile, project.clips, effects.nowUtcTimestamp()),
         ...loadFirstMediaFile,
         ...persistFiles(state, effects.setLocalStorage),
       ]

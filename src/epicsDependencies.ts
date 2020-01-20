@@ -4,6 +4,7 @@ import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 import { remote, ipcRenderer } from 'electron'
+import { nowUtcTimestamp } from './utils/sideEffects'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -57,5 +58,6 @@ const dependencies: EpicsDependencies = {
   getConstantBitrateMediaPath,
   existsSync,
   ipcRenderer,
+  nowUtcTimestamp,
 }
 export default dependencies

@@ -32,6 +32,8 @@ import { DialogProps } from './Dialog/DialogProps'
 export const testLabels = {
   exportApkgButton: 'export-apkg-button',
   continueButton: 'continue-button',
+  exitButton: 'exit-button',
+  clipCheckboxes: 'clip-checkbox',
 } as const
 
 const ShortTag = ({ title }: { title: string }) =>
@@ -81,6 +83,7 @@ const FlashcardRow = memo(({ id, isSelected, onSelect }: FlashcardRowProps) => {
           checked={isSelected}
           onClick={useCallback(e => e.stopPropagation(), [])}
           onChange={useCallback(e => onSelect(id), [onSelect, id])}
+          className={testLabels.clipCheckboxes}
         />
       </TableCell>
       <TableCell padding="default">
@@ -394,7 +397,11 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
 
       {selectionHasStarted ? (
         <DialogActions>
-          <Button onClick={closeDialog} disabled={Boolean(progress)}>
+          <Button
+            onClick={closeDialog}
+            disabled={Boolean(progress)}
+            id={testLabels.exitButton}
+          >
             Exit
           </Button>
           {currentTabIndex === 1 && (

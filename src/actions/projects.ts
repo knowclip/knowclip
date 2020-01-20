@@ -1,10 +1,9 @@
-import moment from 'moment'
-
 export const createProject = (
   id: string,
   name: string,
   noteType: NoteType,
-  filePath: string
+  filePath: string,
+  now: string
 ): CreateProject => ({
   type: 'CREATE_PROJECT',
   project: {
@@ -14,12 +13,8 @@ export const createProject = (
     noteType,
     mediaFileIds: [],
     error: null,
-    lastOpened: moment()
-      .utc()
-      .format(),
-    lastSaved: moment()
-      .utc()
-      .format(),
+    lastOpened: now,
+    lastSaved: now,
   },
   filePath,
 })

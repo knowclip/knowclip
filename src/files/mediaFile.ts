@@ -1,8 +1,8 @@
 import * as r from '../redux'
 import { basename } from 'path'
-import uuid from 'uuid'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'
+import { uuid } from '../utils/sideEffects'
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },

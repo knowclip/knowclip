@@ -9,10 +9,10 @@ import {
 import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
-import uuid from 'uuid/v4'
 import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
+import { uuid } from '../utils/sideEffects'
 
 const pendingClipIsBigEnough = (state: AppState) => {
   const pendingClip = r.getPendingClip(state)

@@ -18,7 +18,7 @@ export default async function makeTwoFlashcards({
   await client.waitForExist(_(flashcardFields))
   await fillInFlashcardFields(await $$_(flashcardFields), client, {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
-    pronunciation: 'sasa-o tabe-nagara nonbíri-suru-no-wa saikoo-da-naa',
+    pronunciation: 'sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa',
     meaning: 'Relaxing while eating bamboo grass is the best',
   })
   await getDeleteTagButton($_(tagsInputContainer)).click()
@@ -36,7 +36,7 @@ export default async function makeTwoFlashcards({
 
   await fillInFlashcardFields(await $$_(flashcardFields), client, {
     transcription: 'またこの子は昼間からゴロゴロして',
-    pronunciation: 'mata kono ko-wa hiruma-kara góro-goro shite',
+    pronunciation: 'mata kono ko-wa hirumá-kara góro-goro shite',
     meaning: 'This kid, lazing about again so early',
     notes: '"Goro-goro" is the sound of something big rolling around.',
   })

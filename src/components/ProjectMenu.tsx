@@ -12,6 +12,8 @@ import truncate from '../utils/truncate'
 export const testLabels = {
   projectTitle: 'project-title',
   projectTitleInput: 'project-title-input',
+  saveButton: 'save-button',
+  closeButton: 'close-button',
 } as const
 
 const ProjectMenu = ({ className }: { className: string }) => {
@@ -83,12 +85,12 @@ const ProjectMenu = ({ className }: { className: string }) => {
     <DarkTheme>
       <section className={cn(className, css.projectMenu)}>
         <Tooltip title="Close project">
-          <IconButton onClick={closeProjectRequest}>
+          <IconButton onClick={closeProjectRequest} id={testLabels.closeButton}>
             <CloseIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Save project">
-          <IconButton onClick={saveProjectRequest}>
+          <IconButton onClick={saveProjectRequest} id={testLabels.saveButton}>
             <SaveIcon />
           </IconButton>
         </Tooltip>{' '}

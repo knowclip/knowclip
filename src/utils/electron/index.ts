@@ -1,5 +1,8 @@
 import mocks from './mocks'
 import helpers from './helpers'
+import setUpMocks from '../../test/setUpMocks'
+
+const { mocked, resetMocks } = setUpMocks('electron-helper', helpers)
 
 const {
   showSaveDialog,
@@ -9,7 +12,7 @@ const {
   showMessageBox,
 } =
   process.env.REACT_APP_SPECTRON || process.env.NODE_ENV === 'test'
-    ? mocks
+    ? mocked
     : helpers
 
 export {
