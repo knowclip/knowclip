@@ -1,5 +1,5 @@
 import { TestSetup, _ } from '../../setup'
-import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
+import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 import { RawResult } from 'webdriverio'
 
 export default async function navigateBetweenMedia({
@@ -11,7 +11,10 @@ export default async function navigateBetweenMedia({
     'piggeldy_cat.mp4'
   )
 
-  const { mediaFilesMenuButton, mediaFileMenuItem } = mediaFilesMenu
+  const {
+    openMediaFilesMenuButton: mediaFilesMenuButton,
+    mediaFileMenuItem,
+  } = mediaFilesMenu
 
   await $_(mediaFilesMenuButton).click()
 

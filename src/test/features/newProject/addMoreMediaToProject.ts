@@ -1,5 +1,5 @@
 import { TestSetup, MEDIA_DIRECTORY, _ } from '../../setup'
-import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
+import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
@@ -8,7 +8,10 @@ export default async function addMoreMediaToProject({
   $_,
   client,
 }: TestSetup) {
-  const { mediaFilesMenuButton, addNewAdditionalMediaButton } = mediaFilesMenu
+  const {
+    openMediaFilesMenuButton: mediaFilesMenuButton,
+    addNewAdditionalMediaButton,
+  } = mediaFilesMenu
 
   await $_(mediaFilesMenuButton).click()
 

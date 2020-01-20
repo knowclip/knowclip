@@ -7,21 +7,12 @@ import {
   MenuItem,
   MenuList,
   ListItemText,
-  ListItemIcon,
-  ListItemSecondaryAction,
   Divider,
   Popover,
-  Menu,
 } from '@material-ui/core'
-import {
-  Loop,
-  Delete as DeleteIcon,
-  MoreVert as MoreVertIcon,
-  PlayArrow,
-  Pause,
-  FolderSpecial,
-} from '@material-ui/icons'
+import { Loop, PlayArrow, Pause } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
+import MediaFilesMenuItem from './MediaFilesMenuItem'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
@@ -31,13 +22,11 @@ import css from './Header.module.css'
 
 export const testLabels = {
   chooseFirstMediaFileButton: 'choose-media-file-button',
-  addNewAdditionalMediaButton: 'add-new-additional-media-button',
-  mediaFilesMenuButton: 'select-media-file-button',
+  openMediaFilesMenuButton: 'open-media-files-menu-button',
   mediaFileMenuItem: 'media-file-menu-item',
+  addNewAdditionalMediaButton: 'add-new-additional-media-button',
 } as const
 
-const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
-  'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'
 const MEDIA_FILTERS = [
   {
     name: 'Audio or video files',
@@ -57,154 +46,12 @@ const MEDIA_FILTERS = [
   },
 ]
 
-type MediaFileMenuItemProps = {
-  mediaFile: MediaFile
-  selected: boolean
-  currentProjectId: ProjectId
-  closeMenu: (event: React.SyntheticEvent<Element, Event>) => void
-}
+type MediaFilesMenuProps = { className: string; currentProjectId: ProjectId }
 
-const submenuAnchorOrigin = { vertical: 'top', horizontal: 'right' } as const
-const MediaFileMenuItem = ({
-  mediaFile,
-  selected,
-  currentProjectId,
-  closeMenu: closeSupermenu,
-}: MediaFileMenuItemProps) => {
-  const dispatch = useDispatch()
-
-  const submenu = usePopover()
-  const closeSubmenu = submenu.close
-  const closeMenu = useCallback(
-    e => {
-      closeSubmenu(e)
-      closeSupermenu(e)
-    },
-    [closeSubmenu, closeSupermenu]
-  )
-
-  const loadAndClose = useCallback(
-    e => {
-      dispatch(actions.openFileRequest(mediaFile))
-      closeMenu(e)
-    },
-    [dispatch, mediaFile, closeMenu]
-  )
-  const deleteAndClose = useCallback(
-    e => {
-      dispatch(
-        actions.confirmationDialog(
-          CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
-          actions.deleteMediaFromProject(currentProjectId, mediaFile.id)
-        )
-      )
-      closeMenu(e)
-    },
-    [dispatch, mediaFile, currentProjectId, closeMenu]
-  )
-  const locateAndClose = useCallback(
-    e => {
-      dispatch(
-        actions.locateFileRequest(mediaFile, 'Please locate this media file.')
-      )
-      closeMenu(e)
-    },
-    [dispatch, mediaFile, closeMenu]
-  )
-  const { fileAvailability } = useSelector((state: AppState) => ({
-    fileAvailability: r.getFileAvailabilityById(
-      state,
-      'MediaFile',
-      mediaFile.id
-    ),
-  }))
-  const needsFilePath = !(fileAvailability && fileAvailability.filePath)
-  useEffect(
-    () => {
-      if (selected && submenu.anchorEl) submenu.anchorEl.scrollIntoView()
-    },
-    [submenu.anchorEl, selected]
-  )
-
-  const actionsButton = (
-    <ListItemSecondaryAction>
-      <IconButton
-        onClick={e => {
-          e.stopPropagation()
-          submenu.toggle(e)
-        }}
-        buttonRef={submenu.anchorCallbackRef}
-      >
-        {needsFilePath ? <FolderSpecial /> : <MoreVertIcon />}
-      </IconButton>
-    </ListItemSecondaryAction>
-  )
-
-  return (
-    <MenuItem
-      dense
-      key={mediaFile.id}
-      selected={selected}
-      onClick={loadAndClose}
-      className={testLabels.mediaFileMenuItem}
-    >
-      <ListItemText
-        title={mediaFile.name}
-        className={css.mediaFilesMenuListItemText}
-      >
-        {truncate(mediaFile.name, 40)}
-      </ListItemText>
-      <Menu
-        open={submenu.isOpen}
-        anchorEl={submenu.anchorEl}
-        anchorOrigin={submenuAnchorOrigin}
-        onClose={useCallback(
-          e => {
-            e.stopPropagation()
-            closeSubmenu(e)
-          },
-          [closeSubmenu]
-        )}
-        onClick={useCallback(e => {
-          e.stopPropagation()
-        }, [])}
-      >
-        <MenuList>
-          <MenuItem dense style={{ width: 200 }} onClick={loadAndClose}>
-            <ListItemIcon>
-              <PlayArrow />
-            </ListItemIcon>
-            <ListItemText>Open</ListItemText>
-          </MenuItem>
-          <MenuItem dense style={{ width: 200 }} onClick={deleteAndClose}>
-            <ListItemIcon>
-              <DeleteIcon />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-          <MenuItem dense style={{ width: 200 }} onClick={locateAndClose}>
-            <ListItemIcon>
-              <FolderSpecial />
-            </ListItemIcon>
-            <ListItemText>Locate in file system</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-      {needsFilePath ? (
-        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
-      ) : (
-        actionsButton
-      )}
-    </MenuItem>
-  )
-}
-
-type MediaFilesNavMenuProps = { className: string; currentProjectId: ProjectId }
-
-const MediaFilesNavMenu = ({
+const MediaFilesMenu = ({
   className,
   currentProjectId,
-}: MediaFilesNavMenuProps) => {
+}: MediaFilesMenuProps) => {
   const {
     loop,
     currentFileName,
@@ -243,7 +90,7 @@ const MediaFilesNavMenu = ({
             <Button
               className={css.audioButton}
               onClick={popover.open}
-              id={testLabels.mediaFilesMenuButton}
+              id={testLabels.openMediaFilesMenuButton}
             >
               {currentFileName
                 ? truncate(currentFileName, 40)
@@ -285,12 +132,13 @@ const MediaFilesNavMenu = ({
           >
             <MenuList style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
               {projectMediaFiles.map(media => (
-                <MediaFileMenuItem
+                <MediaFilesMenuItem
                   key={media.id}
                   closeMenu={popover.close}
                   mediaFile={media}
                   selected={media.id === currentFileId}
                   currentProjectId={currentProjectId}
+                  className={testLabels.mediaFileMenuItem}
                 />
               ))}
             </MenuList>
@@ -343,4 +191,4 @@ function usePlayButtonSync() {
   return { playOrPauseAudio, playing }
 }
 
-export default MediaFilesNavMenu
+export default MediaFilesMenu

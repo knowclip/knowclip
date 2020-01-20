@@ -16,7 +16,7 @@ import {
 import { Redirect } from 'react-router-dom'
 import Waveform from '../components/Waveform'
 import FlashcardSection from '../components/FlashcardSection'
-import MediaFilesNavMenu from '../components/MediaFilesNavMenu'
+import MediaFilesMenu from '../components/MediaFilesMenu'
 import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import ProjectMenu from '../components/ProjectMenu'
 import DarkTheme from '../components/DarkTheme'
@@ -167,7 +167,7 @@ const Main = () => {
         <header className={headerCss.container}>
           <ProjectMenu className={headerCss.block} />
           <section className={headerCss.block}>
-            <MediaFilesNavMenu
+            <MediaFilesMenu
               className={headerCss.leftMenu}
               currentProjectId={currentProjectId}
             />

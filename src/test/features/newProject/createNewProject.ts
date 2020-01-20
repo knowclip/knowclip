@@ -1,7 +1,7 @@
 import { TestSetup, TMP_DIRECTORY, _ } from '../../setup'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 import { testLabels as newProjectForm } from '../../../components/Dialog/NewProjectFormDialog'
-import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesNavMenu'
+import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
