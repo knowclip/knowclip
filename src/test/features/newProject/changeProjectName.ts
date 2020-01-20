@@ -16,7 +16,5 @@ export default async function changeProjectName(setup: TestSetup) {
     'Enter',
   ])
 
-  await (await client.element_(projectTitle)).waitForText(
-    'My cool new project'
-  )
+  await (await client.element_(projectTitle)).waitForText('My cool new project')
 }

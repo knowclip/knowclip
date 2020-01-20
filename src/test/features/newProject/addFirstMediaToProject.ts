@@ -19,9 +19,7 @@ export default async function addFirstMediaToProject({
 
   await client.waitForText('body', 'polar_bear_cafe.mp4')
 
-  expect(await client.getAttribute('video', 'src')).toContain(
-    japaneseVideoPath
-  )
+  expect(await client.getAttribute('video', 'src')).toContain(japaneseVideoPath)
 
   await client.waitUntilPresent_(waveform.subtitlesContainer)
 }

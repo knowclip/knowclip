@@ -2,10 +2,7 @@ import { TestSetup } from '../../setup'
 import { dragMouse } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 
-export default async function moveThroughoutMedia({
-  app,
-  client,
-}: TestSetup) {
+export default async function moveThroughoutMedia({ app, client }: TestSetup) {
   const waveformClips = await client.elements('.waveform-clip')
   expect(
     await Promise.all(waveformClips.map(c => c.isVisible()))

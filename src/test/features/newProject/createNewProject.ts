@@ -5,10 +5,7 @@ import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
-export default async function createNewProject({
-  app,
-  client,
-}: TestSetup) {
+export default async function createNewProject({ app, client }: TestSetup) {
   await client.clickElement_(projectsMenu.newProjectButton)
 
   await mockElectronHelpers(app, {
@@ -38,7 +35,5 @@ export default async function createNewProject({
 
   await client.clickElement_(saveButton)
 
-  await client.waitUntilPresent_(
-    mediaFilesMenu.chooseFirstMediaFileButton
-  )
+  await client.waitUntilPresent_(mediaFilesMenu.chooseFirstMediaFileButton)
 }

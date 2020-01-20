@@ -1,9 +1,7 @@
 import { TestSetup } from '../../setup'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 
-export default async function navigateBetweenMedia({
-  client,
-}: TestSetup) {
+export default async function navigateBetweenMedia({ client }: TestSetup) {
   expect(await client.getAttribute('video', 'src')).toContain(
     'piggeldy_cat.mp4'
   )

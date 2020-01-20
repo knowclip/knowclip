@@ -4,10 +4,7 @@ import { testLabels as flashcardSection } from '../../../components/FlashcardSec
 import { testLabels as tagsInput } from '../../../components/TagsInput'
 import { testLabels as waveform } from '../../../components/Waveform'
 
-export default async function makeTwoFlashcards({
-  app,
-  client,
-}: TestSetup) {
+export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await dragMouse(app, [402, 422], [625, 422])
 
   const { flashcardFields } = flashcardSection
@@ -31,9 +28,7 @@ export default async function makeTwoFlashcards({
   await dragMouse(app, [756, 422], [920, 422])
   await dragMouse(app, [917, 422], [888, 422])
 
-  const tagsDeleteButtons = await client.elements_(
-    `${tagsInputContainer} svg`
-  )
+  const tagsDeleteButtons = await client.elements_(`${tagsInputContainer} svg`)
   expect(tagsDeleteButtons).toHaveLength(1)
 
   const tagsInputContainerEl = await client.element_(tagsInputContainer)

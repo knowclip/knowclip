@@ -2,10 +2,7 @@ import { TestSetup } from '../../setup'
 import { clickAt } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 
-export default async function navigateBetweenClips({
-  app,
-  client,
-}: TestSetup) {
+export default async function navigateBetweenClips({ app, client }: TestSetup) {
   const { flashcardFields, previousClipButton, container } = flashcardSection
 
   await client.waitUntilPresent_(flashcardFields)

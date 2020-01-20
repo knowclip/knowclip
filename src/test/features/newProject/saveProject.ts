@@ -4,9 +4,7 @@ import { TestSetup, TMP_DIRECTORY } from '../../setup'
 import { testLabels as projectMenu } from '../../../components/ProjectMenu'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 
-export default async function saveAndCloseProject({
-  client,
-}: TestSetup) {
+export default async function saveAndCloseProject({ client }: TestSetup) {
   const { saveButton, closeButton } = projectMenu
 
   await client.waitForVisible_(saveButton)
@@ -23,8 +21,5 @@ export default async function saveAndCloseProject({
   await client.clickElement_(closeButton)
 
   const { recentProjectsListItem } = projectsMenu
-  await client.waitForText_(
-    recentProjectsListItem,
-    'My cool new project'
-  )
+  await client.waitForText_(recentProjectsListItem, 'My cool new project')
 }

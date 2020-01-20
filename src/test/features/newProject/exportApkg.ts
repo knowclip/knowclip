@@ -5,10 +5,7 @@ import { testLabels as snackbar } from '../../../components/Snackbar'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
-export default async function navigateBetweenMedia({
-  client,
-  app,
-}: TestSetup) {
+export default async function navigateBetweenMedia({ client, app }: TestSetup) {
   await client.clickElement_(main.exportButton)
 
   await client.clickElement_(dialog.continueButton)
