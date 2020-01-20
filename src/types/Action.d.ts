@@ -1,6 +1,7 @@
 declare type Action =
   | { type: '@@INIT' }
   | InitializeApp
+  | LoadPersistedState
   | SnackbarAction
   | DialogAction
   | WaveformAction
@@ -15,6 +16,12 @@ declare type Action =
   | SetAllTags
   | SetProgress
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
+
+declare type LoadPersistedState = {
+  type: 'LOAD_PERSISTED_STATE'
+  files: FilesState | null
+  fileAvailabilities: FileAvailabilitiesState | null
+}
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
 declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }

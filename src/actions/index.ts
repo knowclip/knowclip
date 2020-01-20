@@ -10,6 +10,15 @@ export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
 })
 
+export const loadPersistedState = (
+  files: FilesState | null,
+  fileAvailabilities: FileAvailabilitiesState | null
+): LoadPersistedState => ({
+  type: A.LOAD_PERSISTED_STATE,
+  files,
+  fileAvailabilities,
+})
+
 export const setFlashcardField = (
   id: ClipId,
   key: FlashcardFieldName,
