@@ -30,6 +30,10 @@ export default async function createNewProject({ app, client }: TestSetup) {
   await client.clickElement_(transcriptionNoteTypeOption)
 
   await client.waitUntilPresent_(cardsPreview)
+  await client.waitForText_(
+    cardsPreview,
+    'Includes fields for transcription, pronunciation, meaning, and'
+  )
 
   await client.waitUntilGone_(newProjectForm.transcriptionNoteTypeOption)
 
