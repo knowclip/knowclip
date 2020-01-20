@@ -9,7 +9,10 @@ import {
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
-export const testLabels = { subtitlesContainer: 'subtitles-container' } as const
+export const testLabels = {
+  subtitlesContainer: 'subtitles-container',
+  waveformClip: 'waveform-clip',
+} as const
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -38,7 +41,11 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
   return (
     <g id={id}>
       <path
-        className={cn('waveform-clip', { highlightedClip: isHighlighted })}
+        className={cn(
+          'waveform-clip',
+          { highlightedClip: isHighlighted },
+          testLabels.waveformClip
+        )}
         d={getClipPath(start, end)}
       />
       <rect

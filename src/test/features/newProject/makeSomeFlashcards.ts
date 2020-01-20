@@ -2,6 +2,7 @@ import { TestSetup } from '../../setup'
 import { dragMouse, ElementWrapper } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 import { testLabels as tagsInput } from '../../../components/TagsInput'
+import { testLabels as waveform } from '../../../components/Waveform'
 
 export default async function makeTwoFlashcards({
   app,
@@ -28,6 +29,7 @@ export default async function makeTwoFlashcards({
   await clientWrapper.pressKeys(['Enter'])
 
   await dragMouse(app, [756, 422], [920, 422])
+  await dragMouse(app, [917, 422], [888, 422])
 
   const tagsDeleteButtons = await clientWrapper.elements_(
     `${tagsInputContainer} svg`
@@ -43,6 +45,8 @@ export default async function makeTwoFlashcards({
     meaning: 'This kid, lazing about again so early',
     notes: '"Goro-goro" is the sound of something big rolling around.',
   })
+
+  expect(await clientWrapper.elements_(waveform.waveformClip)).toHaveLength(2)
 }
 
 async function fillInFlashcardFields(

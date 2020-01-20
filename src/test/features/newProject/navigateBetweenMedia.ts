@@ -1,6 +1,5 @@
 import { TestSetup } from '../../setup'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
-import { RawResult } from 'webdriverio'
 
 export default async function navigateBetweenMedia({
   clientWrapper,
@@ -21,7 +20,6 @@ export default async function navigateBetweenMedia({
   expect(menuItems).toHaveLength(2)
 
   const menuItemsText = await Promise.all(menuItems.map(mi => mi.getText()))
-  console.log({ menuItemsText })
   const otherVideoIndex = menuItemsText.findIndex(text =>
     text.includes('polar_bear_cafe.mp4')
   )
