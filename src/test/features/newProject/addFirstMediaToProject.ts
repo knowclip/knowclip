@@ -6,7 +6,7 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 export default async function addFirstMediaToProject({
   app,
-  clientWrapper,
+  client,
 }: TestSetup) {
   const { chooseFirstMediaFileButton: chooseMediaFileButton } = mediaFilesMenu
   const japaneseVideoPath = join(MEDIA_DIRECTORY, 'polar_bear_cafe.mp4')
@@ -15,13 +15,13 @@ export default async function addFirstMediaToProject({
     showOpenDialog: [Promise.resolve([japaneseVideoPath])],
   })
 
-  await clientWrapper.clickElement_(chooseMediaFileButton)
+  await client.clickElement_(chooseMediaFileButton)
 
-  await clientWrapper.waitForText('body', 'polar_bear_cafe.mp4')
+  await client.waitForText('body', 'polar_bear_cafe.mp4')
 
-  expect(await clientWrapper.getAttribute('video', 'src')).toContain(
+  expect(await client.getAttribute('video', 'src')).toContain(
     japaneseVideoPath
   )
 
-  await clientWrapper.waitUntilPresent_(waveform.subtitlesContainer)
+  await client.waitUntilPresent_(waveform.subtitlesContainer)
 }

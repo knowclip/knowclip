@@ -7,9 +7,9 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 export default async function createNewProject({
   app,
-  clientWrapper,
+  client,
 }: TestSetup) {
-  await clientWrapper.clickElement_(projectsMenu.newProjectButton)
+  await client.clickElement_(projectsMenu.newProjectButton)
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
@@ -25,20 +25,20 @@ export default async function createNewProject({
     cardsPreview,
   } = newProjectForm
 
-  await clientWrapper.setFieldValue_(projectNameField, 'My cool new poject')
+  await client.setFieldValue_(projectNameField, 'My cool new poject')
 
-  await clientWrapper.clickElement_(projectFileLocationField)
+  await client.clickElement_(projectFileLocationField)
 
-  await clientWrapper.clickElement_(noteTypeSelect)
-  await clientWrapper.clickElement_(transcriptionNoteTypeOption)
+  await client.clickElement_(noteTypeSelect)
+  await client.clickElement_(transcriptionNoteTypeOption)
 
-  await clientWrapper.waitUntilPresent_(cardsPreview)
+  await client.waitUntilPresent_(cardsPreview)
 
-  await clientWrapper.waitUntilGone_(newProjectForm.transcriptionNoteTypeOption)
+  await client.waitUntilGone_(newProjectForm.transcriptionNoteTypeOption)
 
-  await clientWrapper.clickElement_(saveButton)
+  await client.clickElement_(saveButton)
 
-  await clientWrapper.waitUntilPresent_(
+  await client.waitUntilPresent_(
     mediaFilesMenu.chooseFirstMediaFileButton
   )
 }

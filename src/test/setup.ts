@@ -9,7 +9,7 @@ export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 export type TestSetup = {
   app: Application
-  clientWrapper: ClientWrapper
+  client: ClientWrapper
 }
 
 export async function startApp(
@@ -35,7 +35,7 @@ export async function startApp(
 
   const setup = {
     app,
-    clientWrapper: new ClientWrapper(app.client),
+    client: new ClientWrapper(app.client),
   }
   return setup
 }
