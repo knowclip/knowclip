@@ -1,19 +1,15 @@
-import { Application, SpectronClient } from 'spectron'
+import { Application } from 'spectron'
 import electron from 'electron'
 import { join } from 'path'
-import { RawResult } from 'webdriverio'
+import { ClientWrapper } from './driver'
 
 export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
 export const MEDIA_DIRECTORY = join(__dirname, 'media')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
-export const _ = (idOrClassName: string) =>
-  `#${idOrClassName}, .${idOrClassName}`
 
 export type TestSetup = {
   app: Application
-  client: SpectronClient
-  $_: SpectronClient['$']
-  $$_: (label: string) => RawResult<WebdriverIO.Element>[]
+  clientWrapper: ClientWrapper
 }
 
 export async function startApp(
@@ -39,9 +35,7 @@ export async function startApp(
 
   const setup = {
     app,
-    client: app.client,
-    $_: (label: string) => app.client.$(_(label)),
-    $$_: (label: string) => app.client.$$(_(label)),
+    clientWrapper: new ClientWrapper(app.client),
   }
   return setup
 }

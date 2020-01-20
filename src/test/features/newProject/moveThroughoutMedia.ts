@@ -4,40 +4,39 @@ import { testLabels as flashcardSection } from '../../../components/FlashcardSec
 
 export default async function moveThroughoutMedia({
   app,
-  $_,
-  $$_,
-  client,
+  clientWrapper,
 }: TestSetup) {
-  expect(await client.isVisible('.waveform-clip')).toMatchObject([true, true])
-  await client.execute((video: HTMLVideoElement) => {
+  const waveformClips = await clientWrapper.elements('.waveform-clip')
+  expect(
+    await Promise.all(waveformClips.map(c => c.isVisible()))
+  ).toMatchObject([true, true])
+  await clientWrapper._client.execute((video: HTMLVideoElement) => {
     video.currentTime = 53
-  }, (await client.$('video')).value)
+  }, (await clientWrapper._client.$('video')).value)
 
-  await client.waitUntil(async () =>
-    (((await client.isVisible(
-      '.waveform-clip'
-    )) as unknown) as boolean[]).every(isVisible => !isVisible)
-  )
+  await clientWrapper.waitUntil(async () => {
+    const clips = await clientWrapper.elements('.waveform-clip')
+    return (await Promise.all(clips.map(c => c.isVisible()))).every(
+      visible => !visible
+    )
+  })
 
   await dragMouse(app, [1106, 422], [1404, 422])
 
-  await client.waitUntil(
-    async () => [...(await client.$$('.waveform-clip'))].length === 3
+  await clientWrapper.waitUntil(
+    async () => (await clientWrapper.elements('.waveform-clip')).length === 3
   )
-  expect(await client.isVisible('.waveform-clip')).toMatchObject([
-    false,
-    false,
-    true,
-  ])
 
-  await $_(flashcardSection.previousClipButton).click()
+  const clipsVisibility = async () =>
+    await Promise.all(
+      (await clientWrapper.elements('.waveform-clip')).map(c => c.isVisible())
+    )
+  expect(await clipsVisibility()).toMatchObject([false, false, true])
 
-  expect(await client.isVisible('.waveform-clip')).toMatchObject([
-    false,
-    true,
-    false,
-  ])
+  await clientWrapper.clickElement_(flashcardSection.previousClipButton)
+
+  expect(await clipsVisibility()).toMatchObject([false, true, false])
   expect(
-    Number(await client.$('video').getAttribute('currentTime'))
+    Number(await clientWrapper.getAttribute('video', 'currentTime'))
   ).toBeLessThan(53)
 }

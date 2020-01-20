@@ -1,6 +1,9 @@
 import { Application } from 'spectron'
 
-export async function runEvents(app: Application, [next, ...rest]: any[]) {
+export default async function runEvents(
+  app: Application,
+  [next, ...rest]: any[]
+) {
   if (next) {
     await app.webContents.sendInputEvent(next)
     await runEvents(app, rest)

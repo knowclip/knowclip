@@ -1,17 +1,18 @@
 import { join } from 'path'
 import { readFile } from 'fs-extra'
-import { TestSetup, _, TMP_DIRECTORY } from '../../setup'
+import { TestSetup, TMP_DIRECTORY } from '../../setup'
 import { testLabels as projectMenu } from '../../../components/ProjectMenu'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 
-export default async function saveAndCloseProject(setup: TestSetup) {
-  const { client, $_ } = setup
+export default async function saveAndCloseProject({
+  clientWrapper,
+}: TestSetup) {
   const { saveButton, closeButton } = projectMenu
 
-  await client.waitForVisible(_(saveButton))
-  await $_(saveButton).click()
+  await clientWrapper.waitForVisible_(saveButton)
+  await clientWrapper.clickElement_(saveButton)
 
-  await client.waitUntilTextExists('body', 'Project saved')
+  await clientWrapper.waitForText('body', 'Project saved')
 
   const actualProjectFileContents = JSON.parse(
     await readFile(join(TMP_DIRECTORY, 'my_cool_new_project.afca'), 'utf8')
@@ -19,10 +20,11 @@ export default async function saveAndCloseProject(setup: TestSetup) {
 
   expect(actualProjectFileContents).toMatchSnapshot()
 
-  await $_(closeButton).click()
+  await clientWrapper.clickElement_(closeButton)
 
   const { recentProjectsListItem } = projectsMenu
-  expect(await $_(recentProjectsListItem).getText()).toContain(
+  await clientWrapper.waitForText_(
+    recentProjectsListItem,
     'My cool new project'
   )
 }

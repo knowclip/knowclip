@@ -4,20 +4,21 @@ import { testLabels as flashcardSection } from '../../../components/FlashcardSec
 
 export default async function navigateBetweenClips({
   app,
-  $_,
-  $$_,
+  clientWrapper,
 }: TestSetup) {
   const { flashcardFields, previousClipButton, container } = flashcardSection
 
+  await clientWrapper.waitUntilPresent_(flashcardFields)
+
   await clickAt(app, [650, 422])
 
-  expect(await $$_(flashcardFields)).toHaveLength(0)
+  await clientWrapper.waitUntilGone_(flashcardFields)
 
   await clickAt(app, [800, 422])
 
-  await $_(previousClipButton).click()
+  await clientWrapper.clickElement_(previousClipButton)
 
-  expect(await $_(container).getText()).toContain(
+  expect(await clientWrapper.getText_(container)).toContain(
     'Relaxing while eating bamboo grass'
   )
 }

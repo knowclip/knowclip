@@ -5,39 +5,35 @@ import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 export default async function navigateBetweenMedia({
-  $_,
-  $$_,
-  client,
+  clientWrapper,
   app,
 }: TestSetup) {
-  await $_(main.exportButton).click()
+  await clientWrapper.clickElement_(main.exportButton)
 
-  await $_(dialog.continueButton).click()
-  await client.waitUntil(
-    async () => [...(await $$_(dialog.clipCheckboxes))].length === 3
+  await clientWrapper.clickElement_(dialog.continueButton)
+
+  const [first, , third] = await clientWrapper.elements_(dialog.clipCheckboxes)
+
+  await first.click()
+  await first.click()
+  await third.click()
+
+  const checkboxInputs = await clientWrapper.elements_(
+    `${dialog.clipCheckboxes} input`
   )
-  const clipCheckboxes = await $$_(dialog.clipCheckboxes)
+  const checkboxesChecked = async () =>
+    await Promise.all(checkboxInputs.map(cbi => cbi.isSelected()))
 
-  await client.elementIdClick(clipCheckboxes[0].value.ELEMENT)
-  await client.elementIdClick(clipCheckboxes[0].value.ELEMENT)
-  await client.elementIdClick(clipCheckboxes[2].value.ELEMENT)
-
-  const checkboxesChecked = await Promise.all(
-    (await $$_(dialog.clipCheckboxes)).map(
-      async el =>
-        await client.elementIdElement(el.value.ELEMENT, 'input').isSelected()
-    )
-  )
-  expect(checkboxesChecked).toMatchObject([true, true, false])
+  expect(await checkboxesChecked()).toMatchObject([true, true, false])
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
       Promise.resolve(join(TMP_DIRECTORY, 'deck_from_new_project.apkg')),
     ],
   })
-  await $_(dialog.exportApkgButton).click()
+  await clientWrapper.clickElement_(dialog.exportApkgButton)
 
-  await client.waitUntilTextExists('body', 'Flashcards made in ')
+  await clientWrapper.waitForText('body', 'Flashcards made in ')
 
-  await $_(dialog.exitButton).click()
+  await clientWrapper.clickElement_(dialog.exitButton)
 }

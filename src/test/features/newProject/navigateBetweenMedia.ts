@@ -1,13 +1,11 @@
-import { TestSetup, _ } from '../../setup'
+import { TestSetup } from '../../setup'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 import { RawResult } from 'webdriverio'
 
 export default async function navigateBetweenMedia({
-  $_,
-  $$_,
-  client,
+  clientWrapper,
 }: TestSetup) {
-  expect(await client.$('video').getAttribute('src')).toContain(
+  expect(await clientWrapper.getAttribute('video', 'src')).toContain(
     'piggeldy_cat.mp4'
   )
 
@@ -16,25 +14,23 @@ export default async function navigateBetweenMedia({
     mediaFileMenuItem,
   } = mediaFilesMenu
 
-  await $_(mediaFilesMenuButton).click()
+  await clientWrapper.clickElement_(mediaFilesMenuButton)
 
-  await client.waitUntil(() => client.isExisting(_(mediaFileMenuItem)))
-  const menuItems = await $$_(mediaFileMenuItem)
+  await clientWrapper.waitUntilPresent_(mediaFileMenuItem)
+  const menuItems = await clientWrapper.elements_(mediaFileMenuItem)
   expect(menuItems).toHaveLength(2)
 
-  const menuItemsText: RawResult<string>[] = (await Promise.all(
-    menuItems.map(item => client.elementIdText(item.value.ELEMENT))
-  )) as any
-
-  const otherVideoIndex = menuItemsText.findIndex(({ value }) =>
-    value.includes('polar_bear_cafe.mp4')
+  const menuItemsText = await Promise.all(menuItems.map(mi => mi.getText()))
+  console.log({ menuItemsText })
+  const otherVideoIndex = menuItemsText.findIndex(text =>
+    text.includes('polar_bear_cafe.mp4')
   )
 
-  await client.elementIdClick(menuItems[otherVideoIndex].value.ELEMENT)
+  await menuItems[otherVideoIndex].click()
 
-  await client.waitUntil(() => $_(mediaFilesMenuButton).isExisting())
+  await clientWrapper.waitUntilPresent_(mediaFilesMenuButton)
 
-  expect(await client.$('video').getAttribute('src')).toContain(
+  expect(await clientWrapper.getAttribute('video', 'src')).toContain(
     'polar_bear_cafe.mp4'
   )
 }

@@ -1,12 +1,15 @@
-import { TestSetup, TMP_DIRECTORY, _ } from '../../setup'
+import { TestSetup, TMP_DIRECTORY } from '../../setup'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 import { testLabels as newProjectForm } from '../../../components/Dialog/NewProjectFormDialog'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
-export default async function createNewProject({ app, client, $_ }: TestSetup) {
-  $_(projectsMenu.newProjectButton).click()
+export default async function createNewProject({
+  app,
+  clientWrapper,
+}: TestSetup) {
+  await clientWrapper.clickElement_(projectsMenu.newProjectButton)
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
@@ -22,25 +25,20 @@ export default async function createNewProject({ app, client, $_ }: TestSetup) {
     cardsPreview,
   } = newProjectForm
 
-  await client.waitForExist(_(projectNameField))
-  await $_(projectNameField).setValue('My cool new poject')
+  await clientWrapper.setFieldValue_(projectNameField, 'My cool new poject')
 
-  $_(projectFileLocationField).click()
+  await clientWrapper.clickElement_(projectFileLocationField)
 
-  $_(noteTypeSelect).click()
-  await client.waitForExist(_(transcriptionNoteTypeOption))
-  await $_(transcriptionNoteTypeOption).click()
+  await clientWrapper.clickElement_(noteTypeSelect)
+  await clientWrapper.clickElement_(transcriptionNoteTypeOption)
 
-  await client.waitForExist(_(cardsPreview))
+  await clientWrapper.waitUntilPresent_(cardsPreview)
 
-  await app.client.waitUntil(
-    async () =>
-      !(await app.client.isExisting(
-        _(newProjectForm.transcriptionNoteTypeOption)
-      ))
+  await clientWrapper.waitUntilGone_(newProjectForm.transcriptionNoteTypeOption)
+
+  await clientWrapper.clickElement_(saveButton)
+
+  await clientWrapper.waitUntilPresent_(
+    mediaFilesMenu.chooseFirstMediaFileButton
   )
-
-  await $_(saveButton).click()
-
-  await client.waitForExist(_(mediaFilesMenu.chooseFirstMediaFileButton))
 }

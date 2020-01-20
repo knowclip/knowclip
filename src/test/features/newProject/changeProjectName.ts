@@ -1,18 +1,22 @@
-import { TestSetup, _ } from '../../setup'
+import { TestSetup } from '../../setup'
 import { testLabels as projectMenu } from '../../../components/ProjectMenu'
 export default async function changeProjectName(setup: TestSetup) {
-  const { $_, client } = setup
+  const { clientWrapper } = setup
   const { projectTitle, projectTitleInput } = projectMenu
 
-  expect(await $_(projectTitle).getText()).toContain('My cool new poject')
-  await $_(projectTitle).doubleClick()
-  await $_(projectTitleInput).doubleClick()
-  await $_(projectTitleInput).keys([
+  const projectTitleEl = await clientWrapper.element_(projectTitle)
+  await projectTitleEl.waitForText('My cool new poject')
+
+  await projectTitleEl.doubleClick()
+  const projectTitleInputEl = await clientWrapper.element_(projectTitleInput)
+  await projectTitleInputEl.doubleClick()
+  await clientWrapper.pressKeys([
     ...[...Array(15)].map(() => 'Backspace'),
     ...'My cool new project',
+    'Enter',
   ])
-  await $_(projectTitleInput).submitForm()
 
-  await client.waitForExist(_(projectTitle))
-  expect(await $_(projectTitle).getText()).toContain('My cool new project')
+  await (await clientWrapper.element_(projectTitle)).waitForText(
+    'My cool new project'
+  )
 }
