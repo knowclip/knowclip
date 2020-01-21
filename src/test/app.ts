@@ -2,9 +2,11 @@ import { Application } from 'spectron'
 import electron from 'electron'
 import { join } from 'path'
 import { ClientWrapper } from './driver'
+import { mkdirp, remove, existsSync, copy } from 'fs-extra'
 
 export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
-export const MEDIA_DIRECTORY = join(__dirname, 'media')
+export const ASSETS_DIRECTORY = join(__dirname, 'assets')
+export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 export type TestSetup = {
@@ -19,6 +21,8 @@ export async function startApp(
   testId: string,
   persistedState?: Partial<AppState>
 ): Promise<TestSetup> {
+  await copyFixtures()
+
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
     webdriverOptions: { deprecationWarnings: false },
@@ -63,4 +67,9 @@ export async function stopApp(context: {
   context.app = null
 
   return null
+}
+async function copyFixtures() {
+  if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
+  await mkdirp(TMP_DIRECTORY)
+  await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
 }

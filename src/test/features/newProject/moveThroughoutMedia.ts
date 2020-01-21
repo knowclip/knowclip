@@ -1,15 +1,14 @@
-import { TestSetup } from '../../setup'
+import { TestSetup } from '../../app'
 import { dragMouse } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
+import { setVideoTime } from '../../driver/media'
 
 export default async function moveThroughoutMedia({ app, client }: TestSetup) {
   const waveformClips = await client.elements('.waveform-clip')
   expect(
     await Promise.all(waveformClips.map(c => c.isVisible()))
   ).toMatchObject([true, true])
-  await client._client.execute((video: HTMLVideoElement) => {
-    video.currentTime = 61
-  }, (await client._client.$('video')).value)
+  await setVideoTime(client, 61)
 
   await client.waitUntil(async () => {
     const clips = await client.elements('.waveform-clip')

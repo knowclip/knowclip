@@ -1,4 +1,4 @@
-import { TestSetup } from '../../setup'
+import { TestSetup } from '../../app'
 import { clickAt } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 

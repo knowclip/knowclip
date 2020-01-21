@@ -1,4 +1,4 @@
-import { TestSetup } from '../../setup'
+import { TestSetup } from '../../app'
 import { testLabels as projectMenu } from '../../../components/ProjectMenu'
 export default async function changeProjectName(setup: TestSetup) {
   const { client } = setup

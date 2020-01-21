@@ -32,6 +32,7 @@ export const testLabels = {
   flashcardFields: 'flashcard-field',
   previousClipButton: 'previous-clip-button',
   nextClipButton: 'next-clip-button',
+  deleteButton: 'delete-clip-button',
 } as const
 
 type FieldMenuProps = {
@@ -324,6 +325,7 @@ const CurrentFlashcard = () => {
             <IconButton
               className={css.moreMenuButton}
               onClick={handleClickDeleteButton}
+              id={testLabels.deleteButton}
             >
               <DeleteIcon />
             </IconButton>

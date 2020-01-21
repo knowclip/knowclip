@@ -146,15 +146,34 @@ export class ClientWrapper {
     return await this.element(getSelector(testLabel))
   }
 
-  async elements(selector: string): Promise<ElementWrapper[]> {
-    await this.waitUntilPresent(selector)
+  async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
+    if (!count) {
+      await this.waitUntilPresent(selector)
+    } else {
+      let elementsSoFar: ElementWrapper[] | undefined
+      try {
+        await this.waitUntil(async () => {
+          const elements = await this.elements(selector)
+          elementsSoFar = elements
+          return elements.length === count
+        })
+      } catch (err) {
+        throw new Error(
+          `Could not find ${count} elements with selector "${selector}". Only found ${elementsSoFar &&
+            elementsSoFar.length} before: ${err.message}`
+        )
+      }
+    }
     const result: RawResult<Element>[] = await this._client.$$(selector)
     return await Promise.all(
       result.map(el => element(this._client, el.value.ELEMENT, selector))
     )
   }
-  async elements_(testLabel: string): Promise<ElementWrapper[]> {
-    return await this.elements(getSelector(testLabel))
+  async elements_(
+    testLabel: string,
+    count?: number
+  ): Promise<ElementWrapper[]> {
+    return await this.elements(getSelector(testLabel), count)
   }
 
   async setFieldValue(selector: string, value: string) {
@@ -233,6 +252,17 @@ export class ClientWrapper {
   async waitForVisible_(selector: string) {
     return this.waitForVisible(getSelector(selector))
   }
+
+  async waitForHidden(selector: string) {
+    return this.waitUntil(async () => {
+      const element = await this.element(selector)
+      return await !element.isVisible()
+    })
+  }
+  async waitForHidden_(selector: string) {
+    return this.waitForVisible(getSelector(selector))
+  }
+
   /** possible values listed here: https://w3c.github.io/webdriver/#keyboard-actions **/
   async pressKeys(normalizedKeyValues: string[]) {
     await this._client.keys(normalizedKeyValues)

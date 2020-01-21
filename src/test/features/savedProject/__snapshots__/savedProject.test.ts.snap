@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`opening and saving a previously opened project saves and closes project 1`] = `
+Object {
+  "clips": Array [
+    Object {
+      "end": 625,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Relaxing while eating bamboo grass is the best",
+          "notes": "",
+          "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
+          "transcription": "笹を食べながらのんびりするのは最高だなぁ",
+        },
+        "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+      "start": 402,
+    },
+    Object {
+      "end": 888,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "This kid, lazing about again so early",
+          "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
+          "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
+          "transcription": "またこの子は昼間からゴロゴロして",
+        },
+        "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+      "start": 756,
+    },
+    Object {
+      "end": 4058,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "",
+        },
+        "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+      "start": 3760,
+    },
+    Object {
+      "end": 438,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I am not a cat, said Frederick angrily",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Ich bin keine Katze, sagte Frederick böse",
+        },
+        "id": "ece1aa0c-2377-47db-b5d1-47d63e918ca7",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "ece1aa0c-2377-47db-b5d1-47d63e918ca7",
+      "start": 351,
+    },
+    Object {
+      "end": 1093,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I didn't say that",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Das hab' ich nicht gesagt",
+        },
+        "id": "cab0801b-3d8d-4cf8-a8d0-575beed8d645",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "cab0801b-3d8d-4cf8-a8d0-575beed8d645",
+      "start": 921,
+    },
+  ],
+  "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+  "lastOpened": "2020-01-21T18:00:32Z",
+  "mediaFiles": Array [
+    Object {
+      "durationSeconds": 87.062,
+      "flashcardFieldsToSubtitlesTracks": Object {},
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "isVideo": true,
+      "name": "polar_bear_cafe.mp4",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": Array [
+        Object {
+          "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
+          "streamIndex": 2,
+          "type": "EmbeddedSubtitlesTrack",
+        },
+        Object {
+          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+          "type": "ExternalSubtitlesTrack",
+        },
+      ],
+      "subtitlesTracksStreamIndexes": Array [
+        2,
+      ],
+      "type": "MediaFile",
+    },
+    Object {
+      "durationSeconds": 58.24,
+      "flashcardFieldsToSubtitlesTracks": Object {},
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "id": "fa462524-bfeb-4434-a506-07858cc97151",
+      "isVideo": true,
+      "name": "piggeldy_cat.mp4",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": Array [],
+      "subtitlesTracksStreamIndexes": Array [],
+      "type": "MediaFile",
+    },
+  ],
+  "name": "My cool saved project",
+  "noteType": "Transliteration",
+  "subtitles": Array [
+    Object {
+      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "name": "pbc_jp.ass",
+      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "type": "ExternalSubtitlesFile",
+    },
+  ],
+  "tags": Array [
+    "pbc",
+    "piggeldy_cat.mp4",
+  ],
+  "timestamp": "2020-01-21T18:00:47Z",
+  "version": "4.1.0",
+}
+`;

@@ -1,7 +1,7 @@
-import { TestSetup, TMP_DIRECTORY } from '../../setup'
+import { TestSetup, TMP_DIRECTORY } from '../../app'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 import { testLabels as newProjectForm } from '../../../components/Dialog/NewProjectFormDialog'
-import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
+import { testLabels as main } from '../../../components/Main'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
@@ -39,5 +39,5 @@ export default async function createNewProject({ app, client }: TestSetup) {
 
   await client.clickElement_(saveButton)
 
-  await client.waitUntilPresent_(mediaFilesMenu.chooseFirstMediaFileButton)
+  await client.waitUntilPresent_(main.container)
 }

@@ -10,7 +10,8 @@ import {
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 export const testLabels = {
-  subtitlesContainer: 'subtitles-container',
+  subtitlesTimelinesContainer: 'subtitles-timelines-container',
+  subtitlesTimelines: 'subtitles-timeline',
   waveformClip: 'waveform-clip',
 } as const
 
@@ -176,7 +177,7 @@ const SubtitlesTimelines = memo(
     )
     return (
       <svg
-        className={cn(css.subtitlesSvg, testLabels.subtitlesContainer)}
+        className={cn(css.subtitlesSvg, testLabels.subtitlesTimelinesContainer)}
         preserveAspectRatio="xMinYMin slice"
         viewBox={getSubtitlesViewBoxString(
           viewBox.xMin,
@@ -186,17 +187,19 @@ const SubtitlesTimelines = memo(
         height={subtitles.length * SUBTITLES_CHUNK_HEIGHT}
         onClick={handleClick}
       >
-        {subtitles.map(({ chunks, id }, trackIndex) =>
-          chunks.map((chunk, index) => (
-            <SubtitlesChunk
-              key={`${chunk.start}_${chunk.text}`}
-              chunk={chunk}
-              trackIndex={trackIndex}
-              trackId={id}
-              chunkIndex={index}
-            />
-          ))
-        )}
+        {subtitles.map(({ chunks, id }, trackIndex) => (
+          <g className={testLabels.subtitlesTimelines}>
+            {chunks.map((chunk, index) => (
+              <SubtitlesChunk
+                key={`${chunk.start}_${chunk.text}`}
+                chunk={chunk}
+                trackIndex={trackIndex}
+                trackId={id}
+                chunkIndex={index}
+              />
+            ))}
+          </g>
+        ))}
       </svg>
     )
   }

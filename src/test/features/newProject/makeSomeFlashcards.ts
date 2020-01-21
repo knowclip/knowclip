@@ -1,8 +1,9 @@
-import { TestSetup } from '../../setup'
-import { dragMouse, ElementWrapper } from '../../driver'
+import { TestSetup } from '../../app'
+import { dragMouse } from '../../driver'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 import { testLabels as tagsInput } from '../../../components/TagsInput'
 import { testLabels as waveform } from '../../../components/Waveform'
+import { fillInFlashcardFields } from '../../driver/flashcardSection'
 
 export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await dragMouse(app, [402, 422], [625, 422])
@@ -10,7 +11,6 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   const { flashcardFields } = flashcardSection
   const { tagsInputContainer } = tagsInput
 
-  await client.waitUntilPresent_(flashcardFields)
   await fillInFlashcardFields(await client.elements_(flashcardFields), {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
     pronunciation: 'sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa',
@@ -42,20 +42,4 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   })
 
   expect(await client.elements_(waveform.waveformClip)).toHaveLength(2)
-}
-
-async function fillInFlashcardFields(
-  elements: ElementWrapper[],
-  {
-    transcription,
-    pronunciation,
-    meaning,
-    notes,
-  }: Partial<TransliterationFlashcardFields>
-) {
-  const [transcriptionEl, pronunciationEl, meaningEl, notesEl] = elements
-  if (transcription) await transcriptionEl.setFieldValue(transcription)
-  if (pronunciation) await pronunciationEl.setFieldValue(pronunciation)
-  if (meaning) await meaningEl.setFieldValue(meaning)
-  if (notes) await notesEl.setFieldValue(notes)
 }

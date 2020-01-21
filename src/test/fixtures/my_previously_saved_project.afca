@@ -1,10 +1,10 @@
 {
   "version": "4.1.0",
-  "timestamp": "2020-01-20T11:43:27Z",
-  "name": "My cool new project",
+  "timestamp": "2020-01-21T16:38:54Z",
+  "name": "My cool saved project",
   "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
   "noteType": "Transliteration",
-  "lastOpened": "2020-01-20T11:42:45Z",
+  "lastOpened": "2020-01-20T11:43:27Z",
   "mediaFiles": [
     {
       "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
@@ -15,6 +15,10 @@
           "type": "EmbeddedSubtitlesTrack",
           "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
           "streamIndex": 2
+        },
+        {
+          "type": "ExternalSubtitlesTrack",
+          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439"
         }
       ],
       "flashcardFieldsToSubtitlesTracks": {},
@@ -82,8 +86,8 @@
       }
     },
     {
-      "start": 3756,
-      "end": 4054,
+      "start": 3760,
+      "end": 4058,
       "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
       "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
       "flashcard": {
@@ -101,5 +105,12 @@
       }
     }
   ],
-  "subtitles": []
+  "subtitles": [
+    {
+      "type": "ExternalSubtitlesFile",
+      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "name": "pbc_jp.ass"
+    }
+  ]
 }

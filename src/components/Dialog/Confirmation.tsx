@@ -4,6 +4,11 @@ import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
 import { closeDialog } from '../../actions'
 import { DialogProps } from './DialogProps'
 
+export const testLabels = {
+  cancelButton: 'confirmation-dialog-cancel-button',
+  okButton: 'confirmation-dialog-ok-button',
+} as const
+
 const ConfirmationDialog = ({
   open,
   data: { message, action, onCancel },
@@ -30,8 +35,12 @@ const ConfirmationDialog = ({
     <Dialog open={open}>
       <DialogContent>{message}</DialogContent>
       <DialogActions>
-        <Button onClick={cancel}>Cancel</Button>
-        <Button onClick={dispatchAction}>Ok</Button>
+        <Button onClick={cancel} id={testLabels.cancelButton}>
+          Cancel
+        </Button>
+        <Button onClick={dispatchAction} id={testLabels.okButton}>
+          Ok
+        </Button>
       </DialogActions>
     </Dialog>
   )

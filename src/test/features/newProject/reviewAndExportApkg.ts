@@ -1,11 +1,11 @@
-import { TestSetup, TMP_DIRECTORY } from '../../setup'
+import { TestSetup, TMP_DIRECTORY } from '../../app'
 import { testLabels as main } from '../../../components/Main'
 import { testLabels as dialog } from '../../../components/ReviewAndExport'
 import { testLabels as snackbar } from '../../../components/Snackbar'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
-export default async function navigateBetweenMedia({ client, app }: TestSetup) {
+export default async function reviewAndExportApkg({ client, app }: TestSetup) {
   await client.clickElement_(main.exportButton)
 
   await client.clickElement_(dialog.continueButton)
@@ -36,4 +36,5 @@ export default async function navigateBetweenMedia({ client, app }: TestSetup) {
   await client.waitUntilGone_(snackbar.closeButton)
 
   await client.clickElement_(dialog.exitButton)
+  await client.waitUntilGone_(dialog.exitButton)
 }

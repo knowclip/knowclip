@@ -18,9 +18,9 @@ const themeSpecs = {
         }
       : null),
     transitions: () => 'none',
-    typography: {
-      useNextVariants: true,
-    },
+  },
+  typography: {
+    useNextVariants: true,
   },
 }
 
