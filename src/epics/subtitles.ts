@@ -128,23 +128,8 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
     })
   )
 
-const deleteSubtitlesTrack: AppEpic = (action$, state$, dependencies) =>
-  action$.pipe(
-    ofType<Action, DeleteSubtitlesTrack>(A.DELETE_SUBTITLES_TRACK),
-    map(({ id }) => {
-      const file = r.getFile(state$.value, 'ExternalSubtitlesFile', id)
-
-      // TODO: report error
-      if (!file)
-        return r.simpleMessageSnackbar('Could not delete subtitles track.')
-
-      return r.deleteFileRequest(file.type, file.id)
-    })
-  )
-
 export default combineEpics(
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
-  goToSubtitlesChunk,
-  deleteSubtitlesTrack
+  goToSubtitlesChunk
 )
