@@ -15,6 +15,7 @@ import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import ProjectMenu from '../components/ProjectMenu'
 import DarkTheme from '../components/DarkTheme'
 import headerCss from '../components/Header.module.css'
+import css from '../components/Main.module.css'
 import * as r from '../redux'
 import * as actions from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
@@ -64,7 +65,7 @@ const Main = () => {
   if (!currentProjectId) return <Redirect to="/projects" />
 
   return (
-    <div className="App" id={testLabels.container}>
+    <div className={css.container} id={testLabels.container}>
       <DarkTheme>
         <header className={headerCss.container}>
           <ProjectMenu className={headerCss.block} />
@@ -100,7 +101,7 @@ const Main = () => {
         </header>
       </DarkTheme>
 
-      <section className="media">
+      <section className={css.media}>
         <Media
           key={String(constantBitrateFilePath)}
           constantBitrateFilePath={constantBitrateFilePath}
@@ -111,7 +112,7 @@ const Main = () => {
       </section>
       {Boolean(currentFileName) && <Waveform show={!audioIsLoading} />}
       {audioIsLoading && (
-        <div className="waveform-placeholder">
+        <div className={css.waveformPlaceholder}>
           <CircularProgress />
         </div>
       )}
@@ -120,7 +121,7 @@ const Main = () => {
         <Tooltip title="Review and export flashcards">
           <Fab
             id={testLabels.exportButton}
-            className="floatingActionButton"
+            className={css.floatingActionButton}
             onClick={reviewAndExportDialog}
             color="primary"
           >

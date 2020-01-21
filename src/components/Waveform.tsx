@@ -12,6 +12,7 @@ import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 export const testLabels = {
   subtitlesTimelinesContainer: 'subtitles-timelines-container',
   subtitlesTimelines: 'subtitles-timeline',
+  waveformClipsContainer: 'waveform-clips-container',
   waveformClip: 'waveform-clip',
 } as const
 
@@ -43,15 +44,16 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
     <g id={id}>
       <path
         className={cn(
-          'waveform-clip',
-          { highlightedClip: isHighlighted },
+          css.waveformClip,
+          { [css.highlightedClip]: isHighlighted },
           testLabels.waveformClip
         )}
         d={getClipPath(start, end)}
       />
+
       <rect
-        className={cn('waveform-clip-border', {
-          highlightedClipBorder: isHighlighted,
+        className={cn(css.waveformClipBorder, {
+          [css.highlightedClipBorder]: isHighlighted,
         })}
         x={start}
         y="0"
@@ -59,8 +61,8 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         height={HEIGHT}
       />
       <rect
-        className={cn('waveform-clip-border', {
-          highlightedClipBorder: isHighlighted,
+        className={cn(css.waveformClipBorder, {
+          [css.highlightedClipBorder]: isHighlighted,
         })}
         x={end - SELECTION_BORDER_WIDTH}
         y="0"
@@ -75,11 +77,11 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
 type ChunkProps = { start: number; end: number; stepsPerSecond: number }
 
 const PendingClip = ({ start, end }: ChunkProps) => (
-  <path className="waveform-pending-clip" d={getClipPath(start, end)} />
+  <path className={css.waveformPendingClip} d={getClipPath(start, end)} />
 )
 
 const PendingStretch = ({ start, end }: ChunkProps) => (
-  <path className="waveform-pending-stretch" d={getClipPath(start, end)} />
+  <path className={css.waveformPendingStretch} d={getClipPath(start, end)} />
 )
 
 const getViewBoxString = (xMin: number) => `${xMin} 0 3000 ${HEIGHT}`
@@ -94,7 +96,7 @@ const Clips = React.memo(
     clips: Clip[]
     highlightedClipId: string | null
   }) => (
-    <g className="waveform-clips">
+    <g className={testLabels.waveformClipsContainer}>
       {clips.map(clip => (
         <Clip
           {...clip}
@@ -259,7 +261,7 @@ const Waveform = ({ show }: { show: boolean }) => {
         id="waveform-svg"
         viewBox={viewBoxString}
         preserveAspectRatio="xMinYMin slice"
-        className="waveform-svg"
+        className={css.waveformSvg}
         width="100%"
         onMouseDown={onMouseDown}
         height={HEIGHT}

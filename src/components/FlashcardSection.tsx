@@ -276,8 +276,8 @@ const CurrentFlashcard = () => {
 
   return (
     <CardContent>
-      <form className="form" onSubmit={handleFlashcardSubmit}>
-        <div className="formBody">
+      <form className={css.form} onSubmit={handleFlashcardSubmit}>
+        <div className={css.formBody}>
           <section className={css.timeStamp}>
             {formatTime(selectedClipTime.start)}
             {' - '}
@@ -323,7 +323,6 @@ const CurrentFlashcard = () => {
 
           <section className={css.bottom}>
             <IconButton
-              className={css.moreMenuButton}
               onClick={handleClickDeleteButton}
               id={testLabels.deleteButton}
             >
@@ -393,7 +392,7 @@ const FlashcardSection = ({ showing }: { showing: boolean }) => {
           </IconButton>
         </span>
       </Tooltip>
-      <Card className={css.form}>
+      <Card className={css.card}>
         {showing ? <CurrentFlashcard /> : <Placeholder />}
       </Card>
       <Tooltip title="Next clip (Ctrl + period)">

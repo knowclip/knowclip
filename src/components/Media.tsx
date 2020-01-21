@@ -6,7 +6,9 @@ import React, {
   VideoHTMLAttributes,
 } from 'react'
 import { useDispatch } from 'react-redux'
+import cn from 'classnames'
 import * as r from '../redux'
+import css from './Media.module.css'
 
 type MediaProps = {
   constantBitrateFilePath: string | null
@@ -29,7 +31,6 @@ const Media = ({
     controls: true,
     disablePictureInPicture: true,
     id: 'mediaPlayer',
-    className: 'mediaPlayer',
     controlsList: 'nodownload nofullscreen',
     src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',
     // @ts-ignore
@@ -54,8 +55,12 @@ const Media = ({
   useSyncSubtitlesVisibility(subtitles, mediaRef)
 
   return metadata && metadata.isVideo ? (
-    <div className="videoContainer">
-      <video {...props} ref={mediaRef as MutableRefObject<HTMLVideoElement>}>
+    <div className={css.videoContainer}>
+      <video
+        {...props}
+        ref={mediaRef as MutableRefObject<HTMLVideoElement>}
+        className={cn(css.video, css.mediaPlayer)}
+      >
         {subtitles.map((track, index) => (
           <Subtitles
             index={index}
@@ -67,7 +72,11 @@ const Media = ({
       </video>
     </div>
   ) : (
-    <audio {...props} ref={mediaRef as MutableRefObject<HTMLAudioElement>} />
+    <audio
+      {...props}
+      ref={mediaRef as MutableRefObject<HTMLAudioElement>}
+      className={cn(css.audio, css.mediaPlayer)}
+    />
   )
 }
 

@@ -1,13 +1,12 @@
 import React from 'react'
 import { HashRouter } from 'react-router-dom'
 import { Switch, Route } from 'react-router'
-import './App.css'
-import Snackbar from './components/Snackbar'
-import Dialog from './components/Dialog'
-import Main from './components/Main'
-import ProjectsMenu from './components/ProjectsMenu'
+import Snackbar from './Snackbar'
+import Dialog from './Dialog'
+import Main from './Main'
+import ProjectsMenu from './ProjectsMenu'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import themeSpecs from './themeSpecs'
+import themeSpecs from '../themeSpecs'
 import { CssBaseline } from '@material-ui/core'
 
 const theme = createMuiTheme(themeSpecs)

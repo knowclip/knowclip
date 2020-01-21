@@ -15,6 +15,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
 import * as actions from '../actions'
 import css from './ProjectsMenu.module.css'
+import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
@@ -93,7 +94,7 @@ const ProjectsMenu = () => {
   if (currentProjectId) return <Redirect to="/" />
 
   return (
-    <section className="App">
+    <section className={mainCss.container}>
       <header className={css.header}>
         <h1 className={css.mainHeading}>Knowclip</h1>
       </header>

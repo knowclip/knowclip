@@ -86,7 +86,10 @@ const MediaFilesMenu = ({
     <DarkTheme>
       <section className={className} ref={popover.anchorCallbackRef}>
         {projectMediaFiles.length > 0 ? (
-          <span className="mediaFileName" title={currentFileName || undefined}>
+          <span
+            className={css.mediaFileName}
+            title={currentFileName || undefined}
+          >
             <Button
               className={css.audioButton}
               onClick={popover.open}

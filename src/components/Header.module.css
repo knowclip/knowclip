@@ -64,6 +64,14 @@
   padding-right: 3rem !important;
 }
 
+.mediaFileName {
+  font-size: large;
+  display: inline;
+  /* overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis; */
+}
+
 .mediaFilesMenuList {
   max-height: 30rem;
   overflow-y: auto;

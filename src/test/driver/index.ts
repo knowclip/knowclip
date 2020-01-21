@@ -159,7 +159,7 @@ export class ClientWrapper {
         })
       } catch (err) {
         throw new Error(
-          `Could not find ${count} elements with selector "${selector}". Only found ${elementsSoFar &&
+          `Could not find ${count} elements with selector "${selector}". Instead found ${elementsSoFar &&
             elementsSoFar.length} before: ${err.message}`
         )
       }
