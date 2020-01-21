@@ -84,16 +84,6 @@ function useSyncSubtitlesVisibility(
           const track: SubtitlesTrack | undefined = subtitles.find(
             track => track.id === domTrack.id
           )
-          console.log(
-            track && track.type + '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-          )
-          console.log(
-            `DOM triggers redux change? ${track &&
-              track.mode !== domTrack.mode}`,
-            `track ${i} is now ${domTrack.mode}`,
-            `redux track is ${track && track.mode}`
-          )
-
           if (track && track.mode !== domTrack.mode)
             dispatch(
               domTrack.mode === 'showing'
@@ -124,14 +114,6 @@ function useSyncSubtitlesVisibility(
       for (const track of subtitles) {
         const domTrack = [...mediaRef.current.textTracks].find(
           domTrack => domTrack.id === track.id
-        )
-        console.log(`${track.type}!!!!!!!!!!!!!!!!!!!!!!!!!!!`)
-        console.log(
-          `DOM track ${domTrack &&
-            [...mediaRef.current.textTracks].indexOf(
-              domTrack
-            )} is currently ${domTrack && domTrack.mode}`,
-          `redux track is ${track.mode}`
         )
         if (domTrack && domTrack.mode !== track.mode) domTrack.mode = track.mode
       }
