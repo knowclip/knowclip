@@ -30,6 +30,7 @@ jobs:
         - dist/Knowclip-0.5.0-mac.zip
 cache:
   directories:
+  - node_modules
   - "$HOME/.cache/yarn"
   - "$HOME/.cache/electron"
   - "$HOME/.cache/electron-builder"
@@ -42,6 +43,7 @@ script:
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
+- rm -rf node_modules/.cache/terser-webpack-plugin
 branches:
   only:
   - master
