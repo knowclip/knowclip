@@ -16,7 +16,8 @@ export async function startApp(
   context: {
     app: Application | null
   },
-  testId: string
+  testId: string,
+  persistedState?: Partial<AppState>
 ): Promise<TestSetup> {
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
@@ -24,7 +25,7 @@ export async function startApp(
     path: (electron as unknown) as string,
     env: {
       NODE_ENV: 'test',
-      SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
+      REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
       INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
     },
     args: [join(__dirname, '..', '..')],
@@ -32,6 +33,15 @@ export async function startApp(
   context.app = app
 
   await app.start()
+
+  if (persistedState) {
+    for (const [key, value] of Object.entries(persistedState))
+      await app.client.localStorage('POST', {
+        key,
+        value: JSON.stringify(value),
+      })
+    await app.client.refresh()
+  }
 
   const setup = {
     app,

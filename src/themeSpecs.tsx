@@ -18,8 +18,10 @@ const themeSpecs = {
         }
       : null),
     transitions: () => 'none',
+    typography: {
+      useNextVariants: true,
+    },
   },
 }
-console.log(process.env.REACT_APP_SPECTRON, 'spec')
 
 export default themeSpecs
