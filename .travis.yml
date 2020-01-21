@@ -44,6 +44,7 @@ script:
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
 - rm -rf node_modules/.cache/terser-webpack-plugin
+- rm -rf node_modules/.cache/babel-loader
 branches:
   only:
   - master

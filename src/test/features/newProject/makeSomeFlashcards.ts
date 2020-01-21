@@ -41,5 +41,5 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
     notes: '"Goro-goro" is the sound of something big rolling around.',
   })
 
-  expect(await client.elements_(waveform.waveformClip)).toHaveLength(2)
+  await client.elements_(waveform.waveformClip, 2)
 }

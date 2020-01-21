@@ -24,7 +24,7 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
     meaning: "I didn't say that",
   })
 
-  expect(await client.elements_(waveform.waveformClip)).toHaveLength(2)
+  await client.elements_(waveform.waveformClip, 2)
 
   await setVideoTime(client, 38)
   await client.waitForHidden_(waveform.waveformClip)
