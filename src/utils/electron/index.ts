@@ -1,8 +1,8 @@
 import mocks from './mocks'
 import helpers from './helpers'
-import setUpMocks from '../../test/setUpMocks'
+import spectronMocks from '../../test/spectronMocks'
 
-const { mocked, resetMocks } = setUpMocks('electron-helper', helpers)
+const { mocked, resetMocks } = spectronMocks('electron-helper', helpers)
 
 const {
   showSaveDialog,

@@ -1,5 +1,5 @@
 import { Application } from 'spectron'
-import { startApp, stopApp, TestSetup } from '../../app'
+import { startApp, stopApp, TestSetup } from '../../spectronApp'
 import createNewProject from './createNewProject'
 import changeProjectName from './changeProjectName'
 import addFirstMediaToProject from './addFirstMediaToProject'

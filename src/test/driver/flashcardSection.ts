@@ -1,4 +1,4 @@
-import { ElementWrapper } from '.'
+import { ElementWrapper } from './ElementWrapper'
 
 export async function fillInFlashcardFields(
   transliterationFieldsElements: ElementWrapper[],

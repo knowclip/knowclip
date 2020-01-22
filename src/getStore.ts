@@ -6,13 +6,15 @@ import { getPersistedState } from './utils/statePersistence'
 import { initialState as initialSettingsState } from './reducers/settings'
 import epicsDependencies from './epicsDependencies'
 
+const getDevToolsCompose = () => {
+  const devToolsCompose = ((window as unknown) as {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
+  }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+
+  return devToolsCompose || compose
+}
 const composeEnhancers =
-  process.env.NODE_ENV === 'development' || process.env.INTEGRATION_DEV
-    ? ((window as unknown) as {
-        __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
-      }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
-      (console.error('Could not load dev tools'), compose)
-    : compose
+  process.env.NODE_ENV === 'development' ? getDevToolsCompose() : compose
 
 export default function getStore() {
   const epicMiddleware = createEpicMiddleware({

@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../app'
+import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 import { testLabels as waveform } from '../../../components/Waveform'
 import { join } from 'path'

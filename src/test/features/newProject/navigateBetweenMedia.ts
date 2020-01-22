@@ -1,4 +1,4 @@
-import { TestSetup } from '../../app'
+import { TestSetup } from '../../spectronApp'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
 
 export default async function navigateBetweenMedia({ client }: TestSetup) {

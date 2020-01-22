@@ -7,7 +7,7 @@ import {
   FIXTURES_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
-} from '../../app'
+} from '../../spectronApp'
 import { mkdirp, remove, existsSync, copy } from 'fs-extra'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import openSavedProject from './openSavedProject'

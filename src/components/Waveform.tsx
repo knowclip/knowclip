@@ -248,7 +248,6 @@ const Waveform = ({ show }: { show: boolean }) => {
         e.currentTarget,
         getSecondsAtXFromWaveform(waveform, coords.x)
       )
-      console.log({ waveformMousedown })
       document.dispatchEvent(waveformMousedown)
     },
     [waveform]

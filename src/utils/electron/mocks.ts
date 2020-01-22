@@ -1,10 +1,11 @@
 import helpers from './helpers'
-import setUpMocks from '../../test/setUpMocks'
+import spectronMocks from '../../test/spectronMocks'
 
-const { mocked, resetMocks, mockFunctions: mockElectronHelpers } = setUpMocks(
-  'electron-helper',
-  helpers
-)
+const {
+  mocked,
+  resetMocks,
+  mockFunctions: mockElectronHelpers,
+} = spectronMocks('electron-helper', helpers)
 
 const showSaveDialog: typeof helpers['showSaveDialog'] = async (...args) => {
   return mocked.showSaveDialog ? await mocked.showSaveDialog(...args) : null

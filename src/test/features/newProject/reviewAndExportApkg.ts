@@ -1,4 +1,4 @@
-import { TestSetup, TMP_DIRECTORY } from '../../app'
+import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
 import { testLabels as main } from '../../../components/Main'
 import { testLabels as dialog } from '../../../components/ReviewAndExport'
 import { testLabels as snackbar } from '../../../components/Snackbar'

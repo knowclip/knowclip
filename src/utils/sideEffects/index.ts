@@ -1,11 +1,11 @@
 import sideEffects from './module'
-import setUpMocks from '../../test/setUpMocks'
+import spectronMocks from '../../test/spectronMocks'
 
 const {
   mocked,
   mockFunctions: mockSideEffects,
   logMocks: logSideEffectsMocks,
-} = setUpMocks('side-effect', sideEffects)
+} = spectronMocks('side-effect', sideEffects)
 
 export { mockSideEffects, logSideEffectsMocks }
 

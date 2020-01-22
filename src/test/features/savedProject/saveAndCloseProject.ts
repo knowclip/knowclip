@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { readFile } from 'fs-extra'
-import { TestSetup, TMP_DIRECTORY } from '../../app'
+import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 

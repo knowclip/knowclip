@@ -1,4 +1,4 @@
-import { TestSetup } from '../../app'
+import { TestSetup } from '../../spectronApp'
 import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
 import { testLabels as waveform } from '../../../components/Waveform'
 import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'

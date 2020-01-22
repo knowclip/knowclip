@@ -1,4 +1,4 @@
-import { ClientWrapper } from '.'
+import { ClientWrapper } from './ClientWrapper'
 import { testLabels as projectMenu } from '../../components/ProjectMenu'
 
 export async function saveProjectViaButton(client: ClientWrapper) {

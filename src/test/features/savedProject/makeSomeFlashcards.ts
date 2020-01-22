@@ -1,5 +1,5 @@
-import { TestSetup } from '../../app'
-import { dragMouse } from '../../driver'
+import { TestSetup } from '../../spectronApp'
+import { dragMouse } from '../../driver/ClientWrapper'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 import { testLabels as waveform } from '../../../components/Waveform'
 import { testLabels as confirmationDialog } from '../../../components/Dialog/Confirmation'

@@ -1,5 +1,5 @@
-import { TestSetup } from '../../app'
-import { clickAt } from '../../driver'
+import { TestSetup } from '../../spectronApp'
+import { clickAt } from '../../driver/ClientWrapper'
 import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
 
 export default async function navigateBetweenClips({ app, client }: TestSetup) {
