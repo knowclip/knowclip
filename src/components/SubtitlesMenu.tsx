@@ -25,9 +25,11 @@ import { showOpenDialog } from '../utils/electron'
 import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 
-const testLabels = {
+export const testLabels = {
   openMenuButton: 'subtitles-menu-open-menu-button',
-  trackMenuItem: 'subtitles-menu-track-item',
+  trackMenuItems: 'subtitles-menu-track-item',
+  openTrackSubmenuButton: 'subtitles-menu-open-track-menu-button',
+  locateExternalFileButton: 'subtitles-menu-locate-external-file-button',
 } as const
 
 const SubtitlesMenu = () => {
@@ -46,8 +48,9 @@ const SubtitlesMenu = () => {
   const subtitlesClipsDialogRequest = useCallback(
     e => {
       dispatch(actions.subtitlesClipsDialogRequest())
+      close()
     },
-    [dispatch]
+    [dispatch, close]
   )
 
   return (
@@ -116,8 +119,10 @@ const SubtitlesMenu = () => {
                   currentFileId
                 )
               )
+
+              close()
             },
-            [dispatch, currentFileId]
+            [dispatch, currentFileId, close]
           )}
         >
           <ListItemText primary="Load external track" />
@@ -151,7 +156,11 @@ const EmbeddedTrackMenuItem = ({
   track: EmbeddedSubtitlesTrack | null
   title: string
 }) => (
-  <MenuItem dense onClick={useToggleVisible(track, id)}>
+  <MenuItem
+    dense
+    onClick={useToggleVisible(track, id)}
+    className={testLabels.trackMenuItems}
+  >
     <ListItemIcon>
       {track ? (
         <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
@@ -182,41 +191,72 @@ const ExternalTrackMenuItem = ({
   const deleteExternalSubtitles = useCallback(
     e => {
       dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
+      close()
     },
-    [dispatch, id]
+    [dispatch, id, close]
   )
 
   const locateFileRequest = useCallback(
     e => {
-      if (file)
+      if (file) {
         dispatch(
           actions.locateFileRequest(
             file,
             `Locate "${file.name}" in your filesystem to use these subtitles.`
           )
         )
+
+        close()
+      }
     },
-    [dispatch, file]
+    [dispatch, file, close]
   )
 
   const toggleVisible = useToggleVisible(track, id)
 
   return (
-    <MenuItem dense onClick={toggleVisible} disabled={!file}>
-      <ListItemIcon>
-        {track ? (
-          <VisibilityIcon
-            visible={Boolean(track && track.mode === 'showing')}
-          />
-        ) : (
-          <Tooltip title="Not found in filesystem">
-            <FolderSpecial />
-          </Tooltip>
-        )}
-      </ListItemIcon>
-      <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
+    <>
+      <MenuItem
+        dense
+        onClick={toggleVisible}
+        disabled={!file}
+        className={testLabels.trackMenuItems}
+      >
+        <ListItemIcon>
+          {track ? (
+            <VisibilityIcon
+              visible={Boolean(track && track.mode === 'showing')}
+            />
+          ) : (
+            <Tooltip title="Not found in filesystem">
+              <FolderSpecial />
+            </Tooltip>
+          )}
+        </ListItemIcon>
+
+        <ListItemText
+          className={css.subtitlesMenuListItemText}
+          primary={title}
+        />
+
+        <ListItemSecondaryAction>
+          <IconButton
+            buttonRef={anchorCallbackRef}
+            onClick={open}
+            className={testLabels.openTrackSubmenuButton}
+          >
+            <MoreVert />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </MenuItem>
+
       <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
-        <MenuItem dense onClick={locateFileRequest} disabled={!file}>
+        <MenuItem
+          dense
+          onClick={locateFileRequest}
+          disabled={!file}
+          id={testLabels.locateExternalFileButton}
+        >
           <ListItemIcon>
             <Icon>
               <FolderSpecial />
@@ -233,12 +273,7 @@ const ExternalTrackMenuItem = ({
           <ListItemText primary="Remove subtitles track" />
         </MenuItem>
       </Menu>
-      <ListItemSecondaryAction>
-        <IconButton buttonRef={anchorCallbackRef} onClick={open}>
-          <MoreVert />
-        </IconButton>
-      </ListItemSecondaryAction>
-    </MenuItem>
+    </>
   )
 }
 

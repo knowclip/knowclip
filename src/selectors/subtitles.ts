@@ -185,3 +185,56 @@ export const getNewFieldsFromLinkedSubtitles = (
   }
   return result
 }
+
+type Coords = { start: number; end: number }
+const overlaps = (a: Coords, b: Coords) => a.end >= b.start && b.end >= a.start
+
+export const getNewFlashcardForStretchedClip = (
+  state: AppState,
+  noteType: NoteType,
+  { start, end, flashcard }: Clip,
+  { start: stretchStart, end: stretchEnd }: { start: number; end: number },
+  direction: 'PREPEND' | 'APPEND'
+): Flashcard => {
+  const links = getSubtitlesFlashcardFieldLinks(state)
+  if (!Object.keys(links).length) return flashcard
+
+  const originalFields: TransliterationFlashcardFields = flashcard.fields as any
+  const newFields: TransliterationFlashcardFields = { ...originalFields }
+
+  for (const fn in links) {
+    const fieldName = fn as TransliterationFlashcardFieldName
+    const trackId = links[fieldName]
+    const originalText = originalFields[fieldName]
+    const newlyOverlapped = (chunk: SubtitlesChunk) =>
+      !originalText.trim() || !overlaps({ start, end }, chunk)
+    const chunks = trackId
+      ? getSubtitlesChunksWithinRange(
+          state,
+          trackId,
+          stretchStart,
+          stretchEnd
+        ).filter(newlyOverlapped)
+      : []
+
+    const newText = chunks.map(chunk => chunk.text).join('\n')
+
+    newFields[fieldName] = (direction === 'PREPEND'
+      ? [newText, originalText]
+      : [originalText, newText]
+    )
+      .filter(t => t.trim())
+      .join('\n')
+  }
+
+  if (
+    Object.keys(newFields).every(
+      k =>
+        originalFields[k as TransliterationFlashcardFieldName] ===
+        newFields[k as TransliterationFlashcardFieldName]
+    )
+  )
+    return flashcard
+
+  return { ...flashcard, fields: newFields }
+}

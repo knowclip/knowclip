@@ -8,7 +8,7 @@ export const toWaveformX =
   process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON
     ? (mouseEvent: MouseEvent, svgElement: SVGElement, xMin = 0) => {
         const x = toWaveformXRaw(mouseEvent, svgElement, xMin)
-        console.log(mouseEvent.type, mouseEvent)
+        console.log(mouseEvent.type, mouseEvent.pageX, mouseEvent)
         return x
       }
     : toWaveformXRaw
