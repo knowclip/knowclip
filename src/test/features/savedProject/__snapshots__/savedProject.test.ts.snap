@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`opening and saving a previously opened project saves and closes project 1`] = `
+exports[`opening and saving a previously saved project saves and closes project 1`] = `
 Object {
   "clips": Array [
     Object {

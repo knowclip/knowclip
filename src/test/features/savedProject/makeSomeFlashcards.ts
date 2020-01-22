@@ -22,7 +22,6 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
   })
 
   await client.elements_(waveform.waveformClip, 2)
-
   await setVideoTime(client, 38)
   await client.waitForHidden_(waveform.waveformClip)
 

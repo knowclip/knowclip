@@ -8,7 +8,7 @@ It works like this:
 2. Make your clips (manually or automatically).
 3. Export your audio flashcards for use in [Anki](https://apps.ankiweb.net/).
 
-Currently being built with [Electron](https://electronjs.org), [Create React App](https://github.com/facebookincubator/create-react-app), [Redux](https://redux.js.org/) and [RxJS](https://rxjs-dev.firebaseapp.com/). Audio processing is done with [ffmpeg](https://ffmpeg.org/) for audio processing.
+Currently being built with [Electron](https://electronjs.org), [Create React App](https://github.com/facebookincubator/create-react-app), [Redux](https://redux.js.org/) and [RxJS](https://rxjs-dev.firebaseapp.com/). Audio processing is done with [ffmpeg](https://ffmpeg.org/).
 
 ### Demo: [Making cards automatically with subtitled video](https://www.youtube.com/watch?v=kFEfS8dyKQ8)
 [![Knowclip](img/screenshot_190604.png)](https://www.youtube.com/watch?v=kFEfS8dyKQ8)
@@ -16,19 +16,61 @@ Currently being built with [Electron](https://electronjs.org), [Create React App
 
 ### Development
 
-To install NPM packages:
+To install NPM packages, use [Yarn](https://yarnpkg.com/):
 
-```
+```bash
 yarn install
 ```
 
 Once packages are installed, you may run the dev build:
 
-```
+```bash
 yarn start
 ```
-Wait until you see that see a message about compilation completed (ignore the warnings). Then, in another tab, open the Electron app:
 
-```
+Wait until you see that see a message about compilation completed (some warnings are OK). Then, in another terminal tab, open the Electron app:
+
+```bash
 yarn electron
 ```
+
+### Tests
+
+Tests are run with [Jest](https://jestjs.io/) via [Create React App](https://create-react-app.dev/docs/running-tests/).
+
+#### Unit tests
+
+```bash
+yarn test
+```
+
+#### Integration tests
+
+Integration tests use [Spectron](https://electronjs.org/spectron) to make sure all the parts of the app are working together.
+
+```bash
+yarn integration
+```
+
+
+The disadvantage of integration tests is that they are slow to run. To speed things up while debugging them and writing new ones, you can run these scripts instead:
+
+```bash
+# run a dev server configured for integration tests
+yarn start:integration
+
+# run integration tests without closing
+# the app at the end so you can inspect it
+yarn integration:debug
+```
+
+#### Test CLI options
+
+Any arguments you pass to the test scripts will be [forwarded to Jest](https://jestjs.io/docs/en/cli).
+
+So if you wanted to say, run just one specific test, you can do something like this:
+
+```bash
+yarn test -t "clips reducer"
+```
+

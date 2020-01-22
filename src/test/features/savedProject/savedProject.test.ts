@@ -17,7 +17,7 @@ import saveAndCloseProject from './saveAndCloseProject'
 
 jest.setTimeout(60000)
 
-describe('opening and saving a previously opened project', () => {
+describe('opening and saving a previously saved project', () => {
   let context: { app: Application | null } = { app: null }
   let setup: TestSetup
 
@@ -38,9 +38,7 @@ describe('opening and saving a previously opened project', () => {
   })
 
   test('opens a previously saved project', async () => openSavedProject(setup))
-
   test('make some flashcards', async () => makeSomeFlashcards(setup))
-
   test('saves and closes project', async () => saveAndCloseProject(setup))
 
   afterAll(async () => {
