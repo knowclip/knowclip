@@ -83,7 +83,7 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
     : 0
   return [
     r.setDefaultTags(
-      clipsCount && currentFileName ? [basename(currentFileName)] : []
+      currentFileName && !clipsCount ? [basename(currentFileName)] : []
     ),
   ]
 }
