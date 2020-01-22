@@ -18,7 +18,7 @@ const subtitles: Reducer<SubtitlesState> = (
         ...state,
         [action.id]: {
           ...state[action.id],
-          mode: 'hidden',
+          mode: 'disabled',
         } as SubtitlesTrack,
       }
 

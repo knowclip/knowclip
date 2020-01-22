@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react'
-
+import cn from 'classnames'
 import { MenuItem, Paper } from '@material-ui/core'
 import ChipInput from 'material-ui-chip-input'
 import css from './FlashcardSection.module.css'
@@ -9,6 +9,10 @@ import Autosuggest, {
   RenderSuggestionsContainer,
   InputProps,
 } from 'react-autosuggest'
+
+export const testLabels = {
+  tagsInputContainer: 'tags-input-container',
+} as const
 
 const getSuggestionValue: GetSuggestionValue<string> = a => a
 const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -144,7 +148,7 @@ const TagsInput = ({
             margin="dense"
             label="Tags"
             placeholder="Type your tag and press 'enter'"
-            className={css.tagsField}
+            className={cn(css.tagsField, testLabels.tagsInputContainer)}
             fullWidth
             onAdd={handleAddChip}
             onDelete={handleDeleteChip}

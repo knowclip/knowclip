@@ -1,6 +1,7 @@
 declare type Action =
   | { type: '@@INIT' }
   | InitializeApp
+  | LoadPersistedState
   | SnackbarAction
   | DialogAction
   | WaveformAction
@@ -15,6 +16,12 @@ declare type Action =
   | SetAllTags
   | SetProgress
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
+
+declare type LoadPersistedState = {
+  type: 'LOAD_PERSISTED_STATE'
+  files: FilesState | null
+  fileAvailabilities: FileAvailabilitiesState | null
+}
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
 declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }
@@ -202,7 +209,6 @@ declare type SetWorkIsUnsaved = {
 declare type MediaAction =
   | AddMediaToProjectRequest
   | DeleteMediaFromProject
-  | RemoveMediaFiles
   | SetCurrentFile
   | ToggleLoop
   | SetLoop
@@ -218,7 +224,6 @@ declare type DeleteMediaFromProject = {
   mediaFileId: MediaFileId
 }
 
-declare type RemoveMediaFiles = { type: 'REMOVE_MEDIA_FILES' }
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }

@@ -1,12 +1,14 @@
 export default class WaveformMousedownEvent extends Event {
-  x: number
-  y: number
+  seconds: number
   svg: SVGElement
 
-  constructor(svg: SVGElement, { x, y }: { x: number; y: number }) {
+  constructor(svg: SVGElement, seconds: number) {
     super('waveformMousedown')
     this.svg = svg
-    this.x = x
-    this.y = y
+    this.seconds = seconds
+  }
+
+  get milliseconds() {
+    return this.seconds * 1000
   }
 }

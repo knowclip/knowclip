@@ -13,18 +13,27 @@ import {
   Paper,
   FormHelperText,
 } from '@material-ui/core'
-import uuid from 'uuid/v4'
 import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'classnames'
 import { DialogProps } from './DialogProps'
 import { closeDialog, createProject } from '../../actions'
+import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
+
+export const testLabels = {
+  projectNameField: 'project-name',
+  projectFileLocationField: 'project-file-location',
+  noteTypeSelect: 'note-type-select',
+  transcriptionNoteTypeOption: 'transcription-note-type-option',
+  saveButton: 'save-button',
+  cardsPreview: 'cards-preview',
+} as const
 
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
   switch (noteType) {
     case 'Simple':
       return (
-        <section className={css.cardsPreview}>
+        <section className={css.cardsPreview} id={testLabels.cardsPreview}>
           <h3 className={css.cardPreviewHeading}>Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, meaning, and notes.
@@ -43,7 +52,7 @@ const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
       )
     case 'Transliteration':
       return (
-        <section className={css.cardsPreview}>
+        <section className={css.cardsPreview} id={testLabels.cardsPreview}>
           <h3 className={css.cardPreviewHeading}>Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, pronunciation, meaning, and
@@ -110,7 +119,7 @@ const NewProjectFormDialog = ({
   const handleSubmit = useCallback(
     () => {
       const errors = validate()
-      if (Object.keys(errors).length)
+      if (Object.values(errors).filter(err => err).length)
         return setState(state => ({ ...state, errors }))
 
       const { filePath, name } = fieldValues
@@ -119,7 +128,8 @@ const NewProjectFormDialog = ({
           uuid(),
           name,
           (fieldValues.noteType as unknown) as NoteType, // guaranteed after validation
-          filePath
+          filePath,
+          nowUtcTimestamp()
         )
       )
       dispatch(closeDialog())
@@ -174,6 +184,7 @@ const NewProjectFormDialog = ({
           <TextField
             fullWidth
             label="Project name"
+            inputProps={{ id: testLabels.projectNameField }}
             value={fieldValues.name}
             error={Boolean(errors.name)}
             helperText={errors.name}
@@ -186,6 +197,7 @@ const NewProjectFormDialog = ({
           <TextField
             fullWidth
             label="Project file location"
+            id={testLabels.projectFileLocationField}
             value={fieldValues.filePath}
             error={Boolean(errors.filePath)}
             helperText={errors.filePath}
@@ -203,12 +215,19 @@ const NewProjectFormDialog = ({
               onChange={handleChangeNoteType}
               inputProps={{
                 name: 'note-type',
-                id: 'note-type',
+              }}
+              SelectDisplayProps={{
+                id: testLabels.noteTypeSelect,
               }}
             >
               <MenuItem value="" />
               <MenuItem value="Simple">Simple</MenuItem>
-              <MenuItem value="Transliteration">
+              <MenuItem
+                id={testLabels.transcriptionNoteTypeOption}
+                value="Transliteration"
+                ContainerComponent="div"
+                ContainerProps={{ id: testLabels.transcriptionNoteTypeOption }}
+              >
                 Including pronunciation field
               </MenuItem>
             </Select>
@@ -220,7 +239,9 @@ const NewProjectFormDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog}>Exit</Button>
-        <Button onClick={handleSubmit}>Save</Button>
+        <Button onClick={handleSubmit} id={testLabels.saveButton} type="submit">
+          Save
+        </Button>
       </DialogActions>
     </Dialog>
   )

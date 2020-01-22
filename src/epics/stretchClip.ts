@@ -14,7 +14,8 @@ const stretchClipEpic: AppEpic = (
     document,
     'waveformMousedown'
   ).pipe(
-    switchMap(({ x }) => {
+    switchMap(({ milliseconds }) => {
+      const x = r.getXAtMilliseconds(state$.value, milliseconds)
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()
     }),

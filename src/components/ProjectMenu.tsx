@@ -9,6 +9,13 @@ import css from './Header.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
 
+export const testLabels = {
+  projectTitle: 'project-title',
+  projectTitleInput: 'project-title-input',
+  saveButton: 'save-button',
+  closeButton: 'close-button',
+} as const
+
 const ProjectMenu = ({ className }: { className: string }) => {
   const projectFile = useSelector((state: AppState) =>
     r.getCurrentProject(state)
@@ -18,13 +25,13 @@ const ProjectMenu = ({ className }: { className: string }) => {
   const dispatch = useDispatch()
   const closeProjectRequest = useCallback(
     () => {
-      dispatch(actions.closeProjectRequest)
+      dispatch(actions.closeProjectRequest())
     },
     [dispatch]
   )
   const saveProjectRequest = useCallback(
     () => {
-      dispatch(actions.saveProjectRequest)
+      dispatch(actions.saveProjectRequest())
     },
     [dispatch]
   )
@@ -44,7 +51,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
 
   const handleChangeText = useCallback(
-    e => setState(state => ({ ...state, text: e.target.value })),
+    e => setState({ editing: true, text: e.target.value }),
     []
   )
 
@@ -78,12 +85,12 @@ const ProjectMenu = ({ className }: { className: string }) => {
     <DarkTheme>
       <section className={cn(className, css.projectMenu)}>
         <Tooltip title="Close project">
-          <IconButton onClick={closeProjectRequest}>
+          <IconButton onClick={closeProjectRequest} id={testLabels.closeButton}>
             <CloseIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Save project">
-          <IconButton onClick={saveProjectRequest}>
+          <IconButton onClick={saveProjectRequest} id={testLabels.saveButton}>
             <SaveIcon />
           </IconButton>
         </Tooltip>{' '}
@@ -95,11 +102,16 @@ const ProjectMenu = ({ className }: { className: string }) => {
               value={text}
               onChange={handleChangeText}
               onBlur={handleBlur}
+              inputProps={{ id: testLabels.projectTitleInput }}
             />
           </form>
         ) : (
           <Tooltip title="Double-click to edit">
-            <h1 className={css.projectName} onDoubleClick={startEditing}>
+            <h1
+              className={css.projectName}
+              onDoubleClick={startEditing}
+              id={testLabels.projectTitle}
+            >
               {truncate(projectFile.name, 40)}
             </h1>
           </Tooltip>

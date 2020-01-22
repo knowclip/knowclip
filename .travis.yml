@@ -37,12 +37,14 @@ cache:
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    yarn && yarn build:ci && yarn test:integration &&./docker/docker_run.sh --linux --win --mac
+    yarn && yarn integration &&./docker/docker_run.sh --linux --win --mac
   else	
-    yarn && yarn build:ci && yarn test:integration
+    yarn && yarn integration
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
+- rm -rf node_modules/.cache/terser-webpack-plugin
+- rm -rf node_modules/.cache/babel-loader
 branches:
   only:
   - master

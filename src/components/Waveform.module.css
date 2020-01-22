@@ -1,3 +1,55 @@
+.waveformPlaceholder {
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.waveformSvg,
+.waveformPlaceholder {
+  /* background-color: aliceblue; */
+  background-color: #9ba9b5;
+  flex-basis: 70px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.waveformPath {
+  stroke: #000000;
+}
+
+.waveformClip {
+  stroke: rgba(255, 245, 187, 0.2);
+  fill: rgba(255, 237, 133, 0.2);
+}
+
+.waveformClipBorder {
+  fill: rgba(255, 230, 146, 0.4);
+  stroke: none;
+  cursor: ew-resize;
+}
+
+.waveformPendingClip {
+  stroke: rgba(255, 255, 0, 0.2);
+  fill: rgba(255, 255, 0, .2);
+}
+
+.waveformPendingStretch {
+  stroke: rgba(0, 255, 255, 0.4);
+  fill: rgba(0, 255, 255, 0.4);
+}
+
+.highlightedClip {
+  stroke: rgba(100, 255, 0, .5);
+  fill: rgba(0, 255, 0, 0.26);
+}
+
+.highlightedClipBorder {
+  fill: rgba(0, 255, 0, 0.26);
+  stroke: none;
+  cursor: ew-resize;
+}
+
 .subtitlesSvg {
   background-color: #616161;
   flex-shrink: 0;
@@ -13,7 +65,7 @@
   font-size: 14px;
   fill: #616161;
 }
-
+ 
 .subtitlesChunk:hover .subtitlesChunkRectangle {
   fill: aliceblue;
 }

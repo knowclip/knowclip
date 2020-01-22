@@ -6,8 +6,6 @@ import {
   mergeAll,
   switchMap,
   catchError,
-  ignoreElements,
-  tap,
 } from 'rxjs/operators'
 import { timer, of, from, Observable, empty } from 'rxjs'
 import { ofType, combineEpics, StateObservable } from 'redux-observable'
@@ -17,7 +15,6 @@ import fs from 'fs'
 import parseProject from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
-import moment from 'moment'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
@@ -48,7 +45,8 @@ const createProject: AppEpic = (action$, state$, effects) =>
 
 const addAndOpenProject = async (
   filePath: string,
-  state$: StateObservable<AppState>
+  state$: StateObservable<AppState>,
+  { nowUtcTimestamp }: EpicsDependencies
 ): Promise<Observable<Action>> => {
   try {
     const projectJson = ((await readFile(filePath)) as unknown) as string
@@ -73,13 +71,7 @@ const addAndOpenProject = async (
     }
     return from([
       r.addFile(projectFile, filePath),
-      r.openProject(
-        projectFile,
-        project.clips,
-        moment()
-          .utc()
-          .format()
-      ),
+      r.openProject(projectFile, project.clips, nowUtcTimestamp()),
       r.openFileSuccess(projectFile, filePath),
     ])
   } catch (err) {
@@ -102,7 +94,7 @@ const openProjectById: AppEpic = (action$, state$) =>
     })
   )
 
-const openProjectByFilePath: AppEpic = (action$, state$) =>
+const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestByFilePath>(
       A.OPEN_PROJECT_REQUEST_BY_FILE_PATH
@@ -116,7 +108,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
         if (projectIdFromRecents)
           return from([r.openProjectById(projectIdFromRecents)])
 
-        return await addAndOpenProject(filePath, state$)
+        return await addAndOpenProject(filePath, state$, effects)
       }
     ),
     mergeAll()
@@ -237,13 +229,19 @@ const closeProjectRequest: AppEpic = (action$, state$) =>
     })
   )
 
-const closeProject: AppEpic = (action$, state$, { getCurrentWindow }) =>
+const closeProject: AppEpic = (action$, state$, { getLocalStorage }) =>
   action$.pipe(
     ofType(A.CLOSE_PROJECT),
-    tap(() => {
-      getCurrentWindow().reload()
-    }),
-    ignoreElements()
+    map(() => {
+      const filesRaw = getLocalStorage('files')
+      const fileAvailabilitiesRaw = getLocalStorage('fileAvailabilities')
+
+      const files = filesRaw ? (JSON.parse(filesRaw) as FilesState) : null
+      const fileAvailabilities = fileAvailabilitiesRaw
+        ? (JSON.parse(fileAvailabilitiesRaw) as FileAvailabilitiesState)
+        : null
+      return r.loadPersistedState(files, fileAvailabilities)
+    })
   )
 
 export default combineEpics(
@@ -252,7 +250,7 @@ export default combineEpics(
   openProjectById,
   saveProject,
   registerUnsavedWork,
-  autoSaveProject,
+  // autoSaveProject,
   deleteMediaFileFromProject,
   closeProjectRequest,
   closeProject

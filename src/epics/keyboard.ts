@@ -19,7 +19,6 @@ const spaceEpic: AppEpic = (action$, state$, { window, toggleMediaPaused }) =>
     tap(e => {
       e.preventDefault()
       toggleMediaPaused()
-      return { type: 'CTRL_SPACE' }
     }),
     ignoreElements()
   )

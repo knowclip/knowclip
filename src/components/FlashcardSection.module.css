@@ -27,13 +27,24 @@
   margin: 10rem .5rem .5rem .5rem !important;
 }
 
-.form {
+.card {
   min-height: 20rem;
   width: 30rem;
   margin: .5rem !important;
   position: relative;
   padding-bottom: 3rem;
 }
+
+.form {
+  font-size: large;
+  max-width: 30em;
+  margin: auto;
+}
+.formBody {
+  max-width: 20em;
+  margin: auto;
+}
+
 
 .timeStamp,
 .noteTypeName {

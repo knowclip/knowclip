@@ -15,8 +15,14 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
 import * as actions from '../actions'
 import css from './ProjectsMenu.module.css'
+import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
+
+export const testLabels = {
+  newProjectButton: 'new-project-button',
+  recentProjectsListItem: 'recent-projects-list-item',
+} as const
 
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
@@ -41,7 +47,10 @@ const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
           <MenuItem onClick={removeFromRecents}>Remove from recents</MenuItem>
         </Menu>
       )}
-      <MenuItem key={project.id} onClick={openProjectById}>
+      <MenuItem
+        onClick={openProjectById}
+        className={testLabels.recentProjectsListItem}
+      >
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>
@@ -85,7 +94,7 @@ const ProjectsMenu = () => {
   if (currentProjectId) return <Redirect to="/" />
 
   return (
-    <section className="App">
+    <section className={mainCss.container}>
       <header className={css.header}>
         <h1 className={css.mainHeading}>Knowclip</h1>
       </header>
@@ -104,6 +113,7 @@ const ProjectsMenu = () => {
 
           <section className={css.buttons}>
             <Button
+              id={testLabels.newProjectButton}
               className={css.button}
               variant="contained"
               color="primary"

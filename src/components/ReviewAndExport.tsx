@@ -29,6 +29,13 @@ import truncate from '../utils/truncate'
 import * as actions from '../actions'
 import { DialogProps } from './Dialog/DialogProps'
 
+export const testLabels = {
+  exportApkgButton: 'export-apkg-button',
+  continueButton: 'continue-button',
+  exitButton: 'exit-button',
+  clipCheckboxes: 'clip-checkbox',
+} as const
+
 const ShortTag = ({ title }: { title: string }) =>
   title.length > 12 ? (
     <Tooltip title={title}>
@@ -76,6 +83,7 @@ const FlashcardRow = memo(({ id, isSelected, onSelect }: FlashcardRowProps) => {
           checked={isSelected}
           onClick={useCallback(e => e.stopPropagation(), [])}
           onChange={useCallback(e => onSelect(id), [onSelect, id])}
+          className={testLabels.clipCheckboxes}
         />
       </TableCell>
       <TableCell padding="default">
@@ -389,7 +397,11 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
 
       {selectionHasStarted ? (
         <DialogActions>
-          <Button onClick={closeDialog} disabled={Boolean(progress)}>
+          <Button
+            onClick={closeDialog}
+            disabled={Boolean(progress)}
+            id={testLabels.exitButton}
+          >
             Exit
           </Button>
           {currentTabIndex === 1 && (
@@ -418,6 +430,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
               color="primary"
               disabled={Boolean(progress)}
               onClick={exportApkg}
+              id={testLabels.exportApkgButton}
             >
               Export Anki Deck from selected clips
             </Button>
@@ -428,7 +441,11 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
           <Button disabled={Boolean(progress)} onClick={closeDialog}>
             Exit
           </Button>
-          <Button disabled={Boolean(progress)} onClick={startSelection}>
+          <Button
+            disabled={Boolean(progress)}
+            onClick={startSelection}
+            id={testLabels.continueButton}
+          >
             Continue
           </Button>
         </DialogActions>

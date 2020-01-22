@@ -3,50 +3,52 @@ import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
+import { nowUtcTimestamp } from './utils/sideEffects'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
-const getAudioElement = () => {
-  const el = document.getElementById('audioPlayer')
-  if (!(el instanceof HTMLAudioElement || el instanceof HTMLVideoElement))
-    return null
-  return el
-}
-const getWaveformSvgElement = () => document.getElementById('waveform-svg')
+const getMediaPlayer = () =>
+  document.getElementById('mediaPlayer') as
+    | HTMLAudioElement
+    | HTMLVideoElement
+    | null
+
+const getWaveformSvgElement = () =>
+  (document.getElementById('waveform-svg') as SVGElement | null) || null
 
 const dependencies: EpicsDependencies = {
   document,
   window,
   getCurrentWindow: () => remote.getCurrentWindow(),
   setLocalStorage: (key, value) => window.localStorage.setItem(key, value),
-  getWaveformSvgElement: () =>
-    (document.getElementById('waveform-svg') as SVGElement | null) || null,
+  getLocalStorage: key => window.localStorage.getItem(key),
+  getWaveformSvgElement,
   getWaveformSvgWidth: () => {
     const el = getWaveformSvgElement()
     return el ? elementWidth(el) : 0
   },
   setCurrentTime: (time: number) => {
-    const media = getAudioElement()
+    const media = getMediaPlayer()
     if (media) {
       media.currentTime = time
     }
   },
   getCurrentTime: () => {
-    const media = getAudioElement()
+    const media = getMediaPlayer()
     return media ? media.currentTime : 0
   },
   pauseMedia: () => {
-    const el = getAudioElement()
+    const el = getMediaPlayer()
     if (el) {
       el.pause()
     }
   },
   toggleMediaPaused: () => {
-    const el = document.getElementById('audioPlayer')
-    if (!(el instanceof HTMLAudioElement)) return
+    const el = getMediaPlayer()
+    if (!el) return
     if (el.paused) el.play()
     else el.pause()
   },
@@ -56,5 +58,7 @@ const dependencies: EpicsDependencies = {
   getWaveformPng,
   getConstantBitrateMediaPath,
   existsSync,
+  ipcRenderer,
+  nowUtcTimestamp,
 }
 export default dependencies

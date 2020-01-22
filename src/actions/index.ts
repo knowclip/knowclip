@@ -10,8 +10,13 @@ export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
 })
 
-export const removeMediaFiles = (): Action => ({
-  type: A.REMOVE_MEDIA_FILES,
+export const loadPersistedState = (
+  files: FilesState | null,
+  fileAvailabilities: FileAvailabilitiesState | null
+): LoadPersistedState => ({
+  type: A.LOAD_PERSISTED_STATE,
+  files,
+  fileAvailabilities,
 })
 
 export const setFlashcardField = (

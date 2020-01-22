@@ -4,6 +4,7 @@ import { getProjectMediaFiles } from './currentMedia'
 import { getSourceSubtitlesFile } from './subtitles'
 import getAllTagsFromClips from '../utils/getAllTags'
 import { getClips } from './clips'
+import { nowUtcTimestamp } from '../utils/sideEffects'
 
 const newestToOldest = (
   { lastOpened: a }: ProjectFile,
@@ -30,7 +31,7 @@ export const getProject = (
   const mediaFiles = getProjectMediaFiles(state, file.id)
   return {
     version: '4.1.0',
-    timestamp: moment.utc().format(),
+    timestamp: nowUtcTimestamp(),
     name: file.name,
     id: file.id,
     noteType: file.noteType,

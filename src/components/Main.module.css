@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  height: 100%;
+  flex-flow: column nowrap;
+  background: #ececec;
+}
+
+.media {
+  background: black;
+  text-align: center;
+}
+
+.floatingActionButton {
+  position: fixed !important;
+  bottom: 5%;
+  right: 5%;
+}

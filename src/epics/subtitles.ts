@@ -1,11 +1,11 @@
 import { Epic, ofType, combineEpics } from 'redux-observable'
 import { flatMap, map } from 'rxjs/operators'
 import { of, Observable } from 'rxjs'
-import uuid from 'uuid/v4'
 import * as r from '../redux'
 import newClip from '../utils/newClip'
 import { from } from 'rxjs'
 import { AppEpic } from '../types/AppEpic'
+import { uuid } from '../utils/sideEffects'
 
 const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -128,23 +128,8 @@ const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
     })
   )
 
-const deleteSubtitlesTrack: AppEpic = (action$, state$, dependencies) =>
-  action$.pipe(
-    ofType<Action, DeleteSubtitlesTrack>(A.DELETE_SUBTITLES_TRACK),
-    map(({ id }) => {
-      const file = r.getFile(state$.value, 'ExternalSubtitlesFile', id)
-
-      // TODO: report error
-      if (!file)
-        return r.simpleMessageSnackbar('Could not delete subtitles track.')
-
-      return r.deleteFileRequest(file.type, file.id)
-    })
-  )
-
 export default combineEpics(
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
-  goToSubtitlesChunk,
-  deleteSubtitlesTrack
+  goToSubtitlesChunk
 )

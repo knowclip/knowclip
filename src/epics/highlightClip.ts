@@ -32,7 +32,10 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
 
       return of({
         waveformMousedown,
-        clipIdAtX: r.getClipIdAt(state$.value, waveformMousedown.x),
+        clipIdAtX: r.getClipIdAt(
+          state$.value,
+          r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
+        ),
       })
     }),
     sample(
@@ -46,7 +49,7 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
       const state = state$.value
       const mousePositionOrClipStart = clipIdAtX
         ? (r.getClip(state, clipIdAtX) as Clip).start
-        : waveformMousedown.x
+        : r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
       const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
       effects.setCurrentTime(newTime)
       return clipIdAtX

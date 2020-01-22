@@ -1,6 +1,6 @@
-import uuid from 'uuid'
 import { basename } from 'path'
 import { locateFileSuccess } from './files'
+import { uuid } from '../utils/sideEffects'
 
 export const showSubtitles = (
   id: SubtitlesTrackId,

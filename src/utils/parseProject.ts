@@ -1,7 +1,6 @@
-import uuid from 'uuid/v4'
-import moment from 'moment'
 import getAllTags from '../utils/getAllTags'
 import { compose } from 'redux'
+import { uuid, nowUtcTimestamp } from '../utils/sideEffects'
 
 const convertProject0_0_0___1_0_0 = (project: Project0_0_0): Project1_0_0 => {
   const { clips: oldClips } = project
@@ -44,7 +43,7 @@ const convertProject1_0_0___2_0_0 = (project: Project1_0_0): Project2_0_0 => {
   return {
     version: '2.0.0',
     id: uuid(),
-    timestamp: moment.utc().format(),
+    timestamp: nowUtcTimestamp(),
     name: `Clips from ${project.audioFileName}`,
     // @ts-ignore
     tags: [...getAllTags(project.clips)],
@@ -114,7 +113,7 @@ const convertProject2_0_0___3_0_0 = (project: Project2_0_0): Project3_0_0 => {
     version: '3.0.0',
     id: uuid(),
     noteType,
-    timestamp: moment.utc().format(),
+    timestamp: nowUtcTimestamp(),
     name: project.name,
     tags: project.tags,
     mediaFilesMetadata: project.mediaFilesMetadata,
@@ -148,9 +147,7 @@ const convertProject4_0_0___4_1_0 = (project: Project4_0_0): Project4_1_0 => ({
     subtitlesTracksStreamIndexes: [],
   })),
   subtitles: [],
-  lastOpened: moment()
-    .utc()
-    .format(),
+  lastOpened: nowUtcTimestamp(),
 })
 
 const parseProject = (jsonFileContents: string) => {
