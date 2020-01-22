@@ -3,6 +3,56 @@ import { TextField, Button } from '@material-ui/core'
 import css from './FileSelectionForm.module.css'
 import { showOpenDialog } from '../utils/electron'
 
+export const testLabels = {
+  container: 'file-selection-form-container',
+  filePathField: 'file-selection-form-file-path-field',
+  cancelButton: 'file-selection-form-cancel-button',
+  continueButton: 'file-selection-form-continue-button',
+}
+
+const FileSelectionForm = ({
+  message,
+  cancel,
+  extensions,
+  onSubmit,
+}: {
+  message: string
+  cancel: () => void
+  extensions: string[]
+  onSubmit: (path: string) => void
+}) => {
+  const {
+    locationText,
+    errorText,
+    onLocationTextFocus,
+    handleSubmit,
+  } = useLocationForm(extensions, onSubmit)
+
+  return (
+    <section className={css.container} id={testLabels.container}>
+      <p className={css.prompt}>{message}</p>
+      <form className={css.form}>
+        <TextField
+          id={testLabels.filePathField}
+          className={css.textField}
+          value={locationText}
+          onClick={onLocationTextFocus}
+          onKeyPress={onLocationTextFocus}
+          error={Boolean(errorText)}
+          helperText={errorText}
+        />
+        <p className={css.buttons}>
+          <Button onClick={cancel} id={testLabels.cancelButton}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} id={testLabels.continueButton}>
+            Continue
+          </Button>
+        </p>
+      </form>
+    </section>
+  )
+}
 const useLocationForm = (
   extensions: string[],
   onSubmit: (string: string) => void
@@ -46,42 +96,4 @@ const useLocationForm = (
   }
 }
 
-const FileSelectionForm = ({
-  message,
-  cancel,
-  extensions,
-  onSubmit,
-}: {
-  message: string
-  cancel: () => void
-  extensions: string[]
-  onSubmit: (path: string) => void
-}) => {
-  const {
-    locationText,
-    errorText,
-    onLocationTextFocus,
-    handleSubmit,
-  } = useLocationForm(extensions, onSubmit)
-
-  return (
-    <section className={css.container}>
-      <p className={css.prompt}>{message}</p>
-      <form className={css.form}>
-        <TextField
-          className={css.textField}
-          value={locationText}
-          onClick={onLocationTextFocus}
-          onKeyPress={onLocationTextFocus}
-          error={Boolean(errorText)}
-          helperText={errorText}
-        />
-        <p className={css.buttons}>
-          <Button onClick={cancel}>Cancel</Button>
-          <Button onClick={handleSubmit}>Continue</Button>
-        </p>
-      </form>
-    </section>
-  )
-}
 export default FileSelectionForm

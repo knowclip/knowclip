@@ -1,13 +1,13 @@
 import { TestSetup } from '../../spectronApp'
 import { dragMouse } from '../../driver/ClientWrapper'
-import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
+import { testLabels as flashcardForm } from '../../../components/FlashcardSectionForm'
 import { testLabels as waveform } from '../../../components/Waveform'
 import { testLabels as confirmationDialog } from '../../../components/Dialog/Confirmation'
 import { fillInFlashcardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
 
 export default async function makeSomeFlashcards({ app, client }: TestSetup) {
-  const { flashcardFields, deleteButton } = flashcardSection
+  const { flashcardFields, deleteButton } = flashcardForm
 
   await dragMouse(app, [351, 422], [438, 422])
   await fillInFlashcardFields(await client.elements_(flashcardFields), {

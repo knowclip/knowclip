@@ -116,7 +116,10 @@ const Main = () => {
           <CircularProgress />
         </div>
       )}
-      <FlashcardSection showing={Boolean(currentFlashcard)} />
+      <FlashcardSection
+        showing={Boolean(currentFlashcard)}
+        mediaFile={currentMediaFile}
+      />
       {currentFilePath && (
         <Tooltip title="Review and export flashcards">
           <Fab

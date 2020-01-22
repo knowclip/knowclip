@@ -22,29 +22,28 @@ describe('opening and saving a previously saved project', () => {
   let setup: TestSetup
 
   beforeAll(async () => {
-    if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
-    await mkdirp(TMP_DIRECTORY)
-    await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
     setup = await startApp(context, 'savedProject', persistedState)
 
-    await mockSideEffects(setup.app, {
-      uuid: [
-        'ece1aa0c-2377-47db-b5d1-47d63e918ca7',
-        'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
-        'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
-      ],
-      nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
-    })
+    await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('opens a previously saved project', async () => openSavedProject(setup))
-  test('make some flashcards', async () => makeSomeFlashcards(setup))
-  test('saves and closes project', async () => saveAndCloseProject(setup))
+  test('opens a previously saved project', () => openSavedProject(setup))
+  test('make some flashcards', () => makeSomeFlashcards(setup))
+  test('saves and closes project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
     await stopApp(context)
   })
 })
+
+const sideEffectsMocks = {
+  uuid: [
+    'ece1aa0c-2377-47db-b5d1-47d63e918ca7',
+    'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
+    'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
+  ],
+  nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
+}
 
 const persistedState: Partial<AppState> = {
   files: {

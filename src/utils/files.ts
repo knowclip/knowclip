@@ -21,3 +21,21 @@ export const getExtensions = (file: FileMetadata) => {
       return ['png']
   }
 }
+
+const getHumanFileTypeName = (file: FileMetadata) => {
+  switch (file.type) {
+    case 'MediaFile':
+      return 'media file'
+    case 'ExternalSubtitlesFile':
+      return 'subtitles file'
+    case 'ProjectFile':
+      return 'project file'
+    case 'ConstantBitrateMp3':
+    case 'WaveformPng':
+    case 'VttConvertedSubtitlesFile':
+      return 'generated file' // should not be displayed to user
+  }
+}
+export const getHumanFileName = (file: FileMetadata) => {
+  return getHumanFileTypeName(file) + ('name' in file ? ` "${file.name}"` : '')
+}

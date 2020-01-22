@@ -20,8 +20,9 @@ import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
 export const testLabels = {
-  newProjectButton: 'new-project-button',
   recentProjectsListItem: 'recent-projects-list-item',
+  newProjectButton: 'new-project-button',
+  openExistingProjectButton: 'open-existing-project-button',
 } as const
 
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
@@ -122,6 +123,7 @@ const ProjectsMenu = () => {
               New project
             </Button>
             <Button
+              id={testLabels.openExistingProjectButton}
               className={css.button}
               variant="contained"
               color="primary"

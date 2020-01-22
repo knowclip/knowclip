@@ -56,7 +56,7 @@
     "start:integration": "REACT_APP_SPECTRON=true react-scripts start",
     "build": "react-scripts build",
     "build:ci": "CI=false yarn build",
-    "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test",
+    "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test --setupTestFrameworkScriptFile=./src/utils/initializeActionTypeGlobals.ts",
     "integration": "REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
     "integration:skip-build": "REACT_APP_SPECTRON=true react-scripts test ./src/test/ --watchAll=false --runInBand",
     "integration:debug": "INTEGRATION_DEV=true yarn integration:skip-build",

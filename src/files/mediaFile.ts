@@ -77,7 +77,15 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
   effects
 ) => {
   const currentFileName = r.getCurrentFileName(state)
-  return [r.setDefaultTags(currentFileName ? [basename(currentFileName)] : [])]
+  const currentFileId = r.getCurrentFileId(state)
+  const clipsCount = currentFileId
+    ? r.getClipIdsByMediaFileId(state, currentFileId).length
+    : 0
+  return [
+    r.setDefaultTags(
+      clipsCount && currentFileName ? [basename(currentFileName)] : []
+    ),
+  ]
 }
 
 export default {
