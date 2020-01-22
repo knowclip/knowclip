@@ -6,8 +6,6 @@ import {
   mergeAll,
   switchMap,
   catchError,
-  ignoreElements,
-  tap,
 } from 'rxjs/operators'
 import { timer, of, from, Observable, empty } from 'rxjs'
 import { ofType, combineEpics, StateObservable } from 'redux-observable'
@@ -252,7 +250,7 @@ export default combineEpics(
   openProjectById,
   saveProject,
   registerUnsavedWork,
-  autoSaveProject,
+  // autoSaveProject,
   deleteMediaFileFromProject,
   closeProjectRequest,
   closeProject

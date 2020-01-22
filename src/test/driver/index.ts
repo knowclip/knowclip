@@ -152,11 +152,11 @@ export class ClientWrapper {
     } else {
       let elementsSoFar: ElementWrapper[] | undefined
       try {
-        await this.waitUntil(async () => {
+        await this._client.waitUntil(async () => {
           const elements = await this.elements(selector)
           elementsSoFar = elements
           return elements.length === count
-        })
+        }, 30000)
       } catch (err) {
         throw new Error(
           `Could not find ${count} elements with selector "${selector}". Instead found ${elementsSoFar &&
