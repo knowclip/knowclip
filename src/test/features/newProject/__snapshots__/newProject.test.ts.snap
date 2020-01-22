@@ -62,7 +62,7 @@ Object {
     },
   ],
   "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
-  "lastOpened": "2020-01-20T11:42:45Z",
+  "lastOpened": "2020-01-22T07:49:42Z",
   "mediaFiles": Array [
     Object {
       "durationSeconds": 87.062,
@@ -103,7 +103,7 @@ Object {
   "tags": Array [
     "pbc",
   ],
-  "timestamp": "2020-01-20T11:43:27Z",
+  "timestamp": "2020-01-22T07:49:57Z",
   "version": "4.1.0",
 }
 `;

@@ -33,7 +33,7 @@ describe('opening and saving a previously opened project', () => {
         'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
         'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
       ],
-      nowUtcTimestamp: ['2020-01-21T18:00:32Z', '2020-01-21T18:00:47Z'],
+      nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
     })
   })
 

@@ -100,7 +100,7 @@ Object {
     },
   ],
   "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
-  "lastOpened": "2020-01-21T18:00:32Z",
+  "lastOpened": "2020-01-22T07:50:05Z",
   "mediaFiles": Array [
     Object {
       "durationSeconds": 87.062,
@@ -153,7 +153,7 @@ Object {
     "pbc",
     "piggeldy_cat.mp4",
   ],
-  "timestamp": "2020-01-21T18:00:47Z",
+  "timestamp": "2020-01-22T07:50:10Z",
   "version": "4.1.0",
 }
 `;
