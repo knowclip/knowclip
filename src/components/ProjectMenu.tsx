@@ -5,7 +5,7 @@ import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
 import * as r from '../redux'
 import * as actions from '../actions'
 import DarkTheme from './DarkTheme'
-import css from './Header.module.css'
+import css from './MainHeader.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
 

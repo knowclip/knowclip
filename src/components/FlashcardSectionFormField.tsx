@@ -30,7 +30,6 @@ const FlashcardSectionFormField = ({
   )
   const embeddedSubtitlesTracks = subtitles.filter(isEmbedded)
   const externalSubtitlesTracks = subtitles.filter(isExternal)
-  console.log({ embeddedSubtitlesTracks, externalSubtitlesTracks, subtitles })
 
   return (
     <section className={css.field}>

@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
-import { getSourceSubtitlesFile } from './subtitles'
+import { getSubtitlesSourceFile } from './subtitles'
 import getAllTagsFromClips from '../utils/getAllTags'
 import { getClips } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
@@ -46,7 +46,7 @@ export const getProject = (
       (subtitlesFiles, { id, subtitles }) => [
         ...subtitlesFiles,
         ...subtitles
-          .map(({ id }) => getSourceSubtitlesFile(state, id))
+          .map(({ id }) => getSubtitlesSourceFile(state, id))
           .filter(
             (file): file is ExternalSubtitlesFile =>
               Boolean(file && file.type === 'ExternalSubtitlesFile')

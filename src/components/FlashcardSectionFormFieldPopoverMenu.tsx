@@ -53,6 +53,7 @@ const FlashcardSectionFormFieldPopoverMenu = ({
         >
           {embeddedSubtitlesTracks.map((track, i) => (
             <FieldMenuItem
+              key={track.id}
               trackId={track.id}
               label={`Embedded subtitles track ${i + 1}`}
               selected={linkedSubtitlesTrack === track.id}
@@ -63,6 +64,7 @@ const FlashcardSectionFormFieldPopoverMenu = ({
           ))}
           {externalSubtitlesTracks.map((track, i) => (
             <FieldMenuItem
+              key={track.id}
               trackId={track.id}
               label={`External subtitles track ${i + 1}`}
               selected={linkedSubtitlesTrack === track.id}

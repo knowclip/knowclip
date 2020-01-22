@@ -8,7 +8,7 @@ import { getFileAvailability, getFile } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
 
-export const getSubtitlesFile = (
+export const getSubtitlesDisplayFile = (
   state: AppState,
   id: string
 ): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
@@ -16,16 +16,23 @@ export const getSubtitlesFile = (
   state.files.ExternalSubtitlesFile[id] ||
   null
 
-export const getSourceSubtitlesFile = (
+const getSubtitlesSourceFileFromFilesSubset = (
+  external: FilesState['ExternalSubtitlesFile'],
+  generated: FilesState['VttConvertedSubtitlesFile'],
+  id: string
+) => external[id] || generated[id] || null
+export const getSubtitlesSourceFile = (
   state: AppState,
   id: string
-): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
-  state.files.ExternalSubtitlesFile[id] ||
-  state.files.VttConvertedSubtitlesFile[id] ||
-  null
+): ExternalSubtitlesFile | VttConvertedSubtitlesFile | null =>
+  getSubtitlesSourceFileFromFilesSubset(
+    state.files.ExternalSubtitlesFile,
+    state.files.VttConvertedSubtitlesFile,
+    id
+  )
 
 export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
-  const record = getSubtitlesFile(state, id)
+  const record = getSubtitlesDisplayFile(state, id)
 
   return record ? getFileAvailability(state, record) : null
 }
@@ -41,6 +48,35 @@ export const getSubtitlesTracks = createSelector(
       .map(({ id }) => subtitles[id])
       .filter((track): track is SubtitlesTrack => Boolean(track))
   }
+)
+export const getSubtitlesFilesWithTracks = createSelector(
+  getCurrentMediaFile,
+  getSubtitles,
+  (state: AppState) => state.files.ExternalSubtitlesFile,
+  (state: AppState) => state.files.VttConvertedSubtitlesFile,
+  (
+    currentFile,
+    subtitlesTracks,
+    externalFiles,
+    convertedFiles
+  ): Array<{
+    relation: MediaSubtitlesRelation
+    file: SubtitlesFile | null // can be null while loading?
+    track: SubtitlesTrack | null
+  }> =>
+    currentFile
+      ? currentFile.subtitles.map(t => {
+          return {
+            relation: t,
+            file: getSubtitlesSourceFileFromFilesSubset(
+              externalFiles,
+              convertedFiles,
+              t.id
+            ),
+            track: subtitlesTracks[t.id] || null,
+          }
+        })
+      : []
 )
 
 export const getSubtitlesTrack = (

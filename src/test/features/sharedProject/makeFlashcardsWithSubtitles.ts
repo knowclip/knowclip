@@ -1,10 +1,8 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
+import { TestSetup } from '../../spectronApp'
 import { testLabels as waveform } from '../../../components/Waveform'
 import { testLabels as flashcardForm } from '../../../components/FlashcardSectionForm'
 import { testLabels as flashcardFormFieldMenu } from '../../../components/FlashcardSectionFormFieldPopoverMenu'
 import { testLabels as confirmationDialog } from '../../../components/Dialog/Confirmation'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
-import { join } from 'path'
 import { setVideoTime } from '../../driver/media'
 import { dragMouse } from '../../driver/runEvents'
 
@@ -35,7 +33,7 @@ export default async function makeFlashcardsWithSubtitles({
     flashcardFormFieldMenu.menuItem
   )
   await embeddedSubtitlesTrackButton.click()
-  await client.waitUntilGone_(flashcardFormFieldMenu.menuItem)
+  // await client.waitUntilGone_(flashcardFormFieldMenu.menuItem)
 
   await client.clickElement_(flashcardForm.deleteButton)
   await client.clickElement_(confirmationDialog.okButton)

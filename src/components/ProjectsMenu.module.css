@@ -1,5 +1,5 @@
 .header {
-  composes: container from './Header.module.css';
+  composes: container from './MainHeader.module.css';
 }
 
 .mainHeading {

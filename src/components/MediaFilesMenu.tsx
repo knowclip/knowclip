@@ -18,7 +18,7 @@ import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
 import * as actions from '../actions'
-import css from './Header.module.css'
+import css from './MainHeader.module.css'
 
 export const testLabels = {
   chooseFirstMediaFileButton: 'choose-media-file-button',
