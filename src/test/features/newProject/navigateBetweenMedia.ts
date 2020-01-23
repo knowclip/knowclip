@@ -1,5 +1,5 @@
 import { TestSetup } from '../../spectronApp'
-import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 
 export default async function navigateBetweenMedia({ client }: TestSetup) {
   expect(await client.getAttribute('video', 'src')).toContain(
@@ -9,7 +9,7 @@ export default async function navigateBetweenMedia({ client }: TestSetup) {
   const {
     openMediaFilesMenuButton: mediaFilesMenuButton,
     mediaFileMenuItem,
-  } = mediaFilesMenu
+  } = mediaFilesMenu$
 
   await client.clickElement_(mediaFilesMenuButton)
 

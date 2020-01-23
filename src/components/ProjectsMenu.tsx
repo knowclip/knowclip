@@ -19,11 +19,11 @@ import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 
-export const testLabels = {
-  recentProjectsListItem: 'recent-projects-list-item',
-  newProjectButton: 'new-project-button',
-  openExistingProjectButton: 'open-existing-project-button',
-} as const
+enum $ {
+  recentProjectsListItem = 'recent-projects-list-item',
+  newProjectButton = 'new-project-button',
+  openExistingProjectButton = 'open-existing-project-button',
+}
 
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
@@ -48,10 +48,7 @@ const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
           <MenuItem onClick={removeFromRecents}>Remove from recents</MenuItem>
         </Menu>
       )}
-      <MenuItem
-        onClick={openProjectById}
-        className={testLabels.recentProjectsListItem}
-      >
+      <MenuItem onClick={openProjectById} className={$.recentProjectsListItem}>
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText>{project.name}</ListItemText>
         </RootRef>
@@ -114,7 +111,7 @@ const ProjectsMenu = () => {
 
           <section className={css.buttons}>
             <Button
-              id={testLabels.newProjectButton}
+              id={$.newProjectButton}
               className={css.button}
               variant="contained"
               color="primary"
@@ -123,7 +120,7 @@ const ProjectsMenu = () => {
               New project
             </Button>
             <Button
-              id={testLabels.openExistingProjectButton}
+              id={$.openExistingProjectButton}
               className={css.button}
               variant="contained"
               color="primary"
@@ -139,3 +136,5 @@ const ProjectsMenu = () => {
 }
 
 export default ProjectsMenu
+
+export { $ as projectsMenu$ }

@@ -3,11 +3,11 @@ import { TextField, Button } from '@material-ui/core'
 import css from './FileSelectionForm.module.css'
 import { showOpenDialog } from '../utils/electron'
 
-export const testLabels = {
-  container: 'file-selection-form-container',
-  filePathField: 'file-selection-form-file-path-field',
-  cancelButton: 'file-selection-form-cancel-button',
-  continueButton: 'file-selection-form-continue-button',
+enum $ {
+  container = 'file-selection-form-container',
+  filePathField = 'file-selection-form-file-path-field',
+  cancelButton = 'file-selection-form-cancel-button',
+  continueButton = 'file-selection-form-continue-button',
 }
 
 const FileSelectionForm = ({
@@ -29,11 +29,11 @@ const FileSelectionForm = ({
   } = useLocationForm(extensions, onSubmit)
 
   return (
-    <section className={css.container} id={testLabels.container}>
+    <section className={css.container} id={$.container}>
       <p className={css.prompt}>{message}</p>
       <form className={css.form}>
         <TextField
-          id={testLabels.filePathField}
+          id={$.filePathField}
           className={css.textField}
           value={locationText}
           onClick={onLocationTextFocus}
@@ -42,10 +42,10 @@ const FileSelectionForm = ({
           helperText={errorText}
         />
         <p className={css.buttons}>
-          <Button onClick={cancel} id={testLabels.cancelButton}>
+          <Button onClick={cancel} id={$.cancelButton}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} id={testLabels.continueButton}>
+          <Button onClick={handleSubmit} id={$.continueButton}>
             Continue
           </Button>
         </p>
@@ -97,3 +97,5 @@ const useLocationForm = (
 }
 
 export default FileSelectionForm
+
+export { $ as fileSelectionForm$ }

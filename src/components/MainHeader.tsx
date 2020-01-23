@@ -11,9 +11,9 @@ import headerCss from '../components/MainHeader.module.css'
 import * as actions from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 
-export const testLabels = {
-  container: 'main-screen-header',
-} as const
+enum $ {
+  container = 'main-screen-header',
+}
 
 const MainHeader = ({
   currentProjectId,
@@ -68,3 +68,5 @@ const MainHeader = ({
 }
 
 export default MainHeader
+
+export { $ as mainHeader$ }

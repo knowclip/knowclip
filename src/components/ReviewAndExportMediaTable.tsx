@@ -16,9 +16,9 @@ import moment from 'moment'
 import FlashcardRow from './ReviewAndExportMediaTableRow'
 import { formatDuration } from '../utils/formatTime'
 
-export const testLabels = {
-  container: 'review-and-export-media-table-container',
-} as const
+enum $ {
+  container = 'review-and-export-media-table-container',
+}
 
 type MediaTableProps = {
   media: MediaFile
@@ -56,7 +56,7 @@ const ReviewAndExportMediaTable = memo(
     ])
 
     return !clipsIds.length ? null : (
-      <Paper id={testLabels.container}>
+      <Paper id={$.container}>
         <Toolbar
           className={cn(css.toolbar, { [css.openToolbar]: open })}
           onClick={toggleOpen}
@@ -128,3 +128,5 @@ type MediaTableBodyProps = {
 }
 
 export default ReviewAndExportMediaTable
+
+export { $ as reviewAndExportMediaTable$ }

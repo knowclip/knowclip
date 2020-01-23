@@ -20,12 +20,12 @@ import * as r from '../redux'
 import * as actions from '../actions'
 import css from './MainHeader.module.css'
 
-export const testLabels = {
-  chooseFirstMediaFileButton: 'choose-media-file-button',
-  openMediaFilesMenuButton: 'open-media-files-menu-button',
-  mediaFileMenuItem: 'media-file-menu-item',
-  addNewAdditionalMediaButton: 'add-new-additional-media-button',
-} as const
+enum $ {
+  chooseFirstMediaFileButton = 'choose-media-file-button',
+  openMediaFilesMenuButton = 'open-media-files-menu-button',
+  mediaFileMenuItem = 'media-file-menu-item',
+  addNewAdditionalMediaButton = 'add-new-additional-media-button',
+}
 
 const MEDIA_FILTERS = [
   {
@@ -93,7 +93,7 @@ const MediaFilesMenu = ({
             <Button
               className={css.audioButton}
               onClick={popover.open}
-              id={testLabels.openMediaFilesMenuButton}
+              id={$.openMediaFilesMenuButton}
             >
               {currentFileName
                 ? truncate(currentFileName, 40)
@@ -101,10 +101,7 @@ const MediaFilesMenu = ({
             </Button>
           </span>
         ) : (
-          <Button
-            id={testLabels.chooseFirstMediaFileButton}
-            onClick={chooseMediaFiles}
-          >
+          <Button id={$.chooseFirstMediaFileButton} onClick={chooseMediaFiles}>
             Choose media file
           </Button>
         )}
@@ -141,7 +138,7 @@ const MediaFilesMenu = ({
                   mediaFile={media}
                   selected={media.id === currentFileId}
                   currentProjectId={currentProjectId}
-                  className={testLabels.mediaFileMenuItem}
+                  className={$.mediaFileMenuItem}
                 />
               ))}
             </MenuList>
@@ -149,7 +146,7 @@ const MediaFilesMenu = ({
             <MenuItem dense>
               <ListItemText
                 onClick={chooseMediaFiles}
-                id={testLabels.addNewAdditionalMediaButton}
+                id={$.addNewAdditionalMediaButton}
               >
                 Add new media
               </ListItemText>
@@ -195,3 +192,5 @@ function usePlayButtonSync() {
 }
 
 export default MediaFilesMenu
+
+export { $ as mediaFilesMenu$ }

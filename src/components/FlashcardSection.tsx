@@ -14,11 +14,11 @@ import {
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
 
-export const testLabels = {
-  container: 'flashcard-section-container',
-  previousClipButton: 'previous-clip-button',
-  nextClipButton: 'next-clip-button',
-} as const
+enum $ {
+  container = 'flashcard-section-container',
+  previousClipButton = 'previous-clip-button',
+  nextClipButton = 'next-clip-button',
+}
 
 const FlashcardSection = ({
   showing,
@@ -34,11 +34,11 @@ const FlashcardSection = ({
   const dispatch = useDispatch()
 
   return (
-    <section className={cn(css.container, testLabels.container)}>
+    <section className={cn(css.container, $.container)}>
       <Tooltip title="Previous clip (Ctrl + comma)">
         <span>
           <IconButton
-            className={cn(css.navButton, testLabels.previousClipButton)}
+            className={cn(css.navButton, $.previousClipButton)}
             disabled={!prevId}
             onClick={useCallback(
               () => dispatch(actions.highlightClip(prevId)),
@@ -61,7 +61,7 @@ const FlashcardSection = ({
       <Tooltip title="Next clip (Ctrl + period)">
         <span>
           <IconButton
-            className={cn(css.navButton, testLabels.nextClipButton)}
+            className={cn(css.navButton, $.nextClipButton)}
             disabled={!nextId}
             onClick={useCallback(
               () => dispatch(actions.highlightClip(nextId)),
@@ -104,3 +104,5 @@ const Placeholder = () => (
 )
 
 export default FlashcardSection
+
+export { $ as flashcardSection$ }

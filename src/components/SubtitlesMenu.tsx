@@ -25,12 +25,12 @@ import { showOpenDialog } from '../utils/electron'
 import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 
-export const testLabels = {
-  openMenuButton: 'subtitles-menu-open-menu-button',
-  trackMenuItems: 'subtitles-menu-track-item',
-  openTrackSubmenuButton: 'subtitles-menu-open-track-menu-button',
-  locateExternalFileButton: 'subtitles-menu-locate-external-file-button',
-} as const
+enum $ {
+  openMenuButton = 'subtitles-menu-open-menu-button',
+  trackMenuItems = 'subtitles-menu-track-item',
+  openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
+  locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
+}
 
 const SubtitlesMenu = () => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
@@ -59,7 +59,7 @@ const SubtitlesMenu = () => {
         <IconButton
           buttonRef={anchorCallbackRef}
           onClick={open}
-          id={testLabels.openMenuButton}
+          id={$.openMenuButton}
         >
           <SubtitlesIcon />
         </IconButton>
@@ -159,7 +159,7 @@ const EmbeddedTrackMenuItem = ({
   <MenuItem
     dense
     onClick={useToggleVisible(track, id)}
-    className={testLabels.trackMenuItems}
+    className={$.trackMenuItems}
   >
     <ListItemIcon>
       {track ? (
@@ -220,7 +220,7 @@ const ExternalTrackMenuItem = ({
         dense
         onClick={toggleVisible}
         disabled={!file}
-        className={testLabels.trackMenuItems}
+        className={$.trackMenuItems}
       >
         <ListItemIcon>
           {track ? (
@@ -243,7 +243,7 @@ const ExternalTrackMenuItem = ({
           <IconButton
             buttonRef={anchorCallbackRef}
             onClick={open}
-            className={testLabels.openTrackSubmenuButton}
+            className={$.openTrackSubmenuButton}
           >
             <MoreVert />
           </IconButton>
@@ -255,7 +255,7 @@ const ExternalTrackMenuItem = ({
           dense
           onClick={locateFileRequest}
           disabled={!file}
-          id={testLabels.locateExternalFileButton}
+          id={$.locateExternalFileButton}
         >
           <ListItemIcon>
             <Icon>
@@ -293,3 +293,5 @@ function useToggleVisible(track: SubtitlesTrack | null, id: string) {
 }
 
 export default SubtitlesMenu
+
+export { $ as subtitlesMenu$ }

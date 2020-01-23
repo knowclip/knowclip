@@ -6,9 +6,9 @@ import css from './FlashcardSection.module.css'
 import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
 
-export const testLabels = {
-  openMenuButton: 'flashcard-form-field-menu-open-button',
-  menuItem: 'flashcard-form-field-menu-item',
+enum $ {
+  openMenuButton = 'flashcard-form-field-menu-open-button',
+  menuItem = 'flashcard-form-field-menu-item',
 }
 
 const FlashcardSectionFormFieldPopoverMenu = ({
@@ -40,7 +40,7 @@ const FlashcardSectionFormFieldPopoverMenu = ({
           className={css.fieldMenuButton}
           buttonRef={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
-          id={testLabels.openMenuButton}
+          id={$.openMenuButton}
         >
           <MoreVert />
         </IconButton>
@@ -115,14 +115,12 @@ const FieldMenuItem = ({
     [dispatch, selected, trackId, fieldName, mediaFileId, closeMenu]
   )
   return (
-    <MenuItem
-      onClick={handleClick}
-      selected={selected}
-      id={testLabels.menuItem}
-    >
+    <MenuItem onClick={handleClick} selected={selected} id={$.menuItem}>
       {label}
     </MenuItem>
   )
 }
 
 export default FlashcardSectionFormFieldPopoverMenu
+
+export { $ as flashcardFormFieldMenu$ }

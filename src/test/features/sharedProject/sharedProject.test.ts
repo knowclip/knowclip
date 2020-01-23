@@ -1,20 +1,9 @@
 import { Application } from 'spectron'
-import {
-  startApp,
-  stopApp,
-  TestSetup,
-  TMP_DIRECTORY,
-  FIXTURES_DIRECTORY,
-  ASSETS_DIRECTORY,
-  GENERATED_ASSETS_DIRECTORY,
-} from '../../spectronApp'
-import { mkdirp, remove, existsSync, copy } from 'fs-extra'
-import { mockSideEffects } from '../../../utils/sideEffects'
+import { startApp, stopApp, TestSetup } from '../../spectronApp'
 import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
 import makeFlashcardsWithSubtitles from './makeFlashcardsWithSubtitles'
 import manuallyLocateAsset from './manuallyLocateAsset'
-import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 jest.setTimeout(60000)
@@ -35,6 +24,7 @@ describe('opening a shared project', () => {
     navigateBetweenMedia(setup))
   test('make some flashcards', () => makeFlashcardsWithSubtitles(setup))
   test('manually locate missing assets', () => manuallyLocateAsset(setup))
+
   // test('review and export deck with missing media', () =>
   //   reviewAndExportApkg(setup))
   // test('save and close project', () => saveAndCloseProject(setup))

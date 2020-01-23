@@ -4,11 +4,9 @@ import {
   stopApp,
   TestSetup,
   TMP_DIRECTORY,
-  FIXTURES_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
 } from '../../spectronApp'
-import { mkdirp, remove, existsSync, copy } from 'fs-extra'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import openSavedProject from './openSavedProject'
 import { join } from 'path'

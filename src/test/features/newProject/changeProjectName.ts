@@ -1,8 +1,8 @@
 import { TestSetup } from '../../spectronApp'
-import { testLabels as projectMenu } from '../../../components/ProjectMenu'
+import { projectMenu$ } from '../../../components/ProjectMenu'
 export default async function changeProjectName(setup: TestSetup) {
   const { client } = setup
-  const { projectTitle, projectTitleInput } = projectMenu
+  const { projectTitle, projectTitleInput } = projectMenu$
 
   const projectTitleEl = await client.firstElement_(projectTitle)
   await projectTitleEl.waitForText('My cool new poject')

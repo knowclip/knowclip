@@ -1,13 +1,13 @@
 import { TestSetup } from '../../spectronApp'
 import { dragMouse } from '../../driver/ClientWrapper'
-import { testLabels as flashcardForm } from '../../../components/FlashcardSectionForm'
-import { testLabels as waveform } from '../../../components/Waveform'
-import { testLabels as confirmationDialog } from '../../../components/Dialog/Confirmation'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
+import { waveform$ } from '../../../components/Waveform'
+import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { fillInFlashcardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
 
 export default async function makeSomeFlashcards({ app, client }: TestSetup) {
-  const { flashcardFields, deleteButton } = flashcardForm
+  const { flashcardFields, deleteButton } = flashcardForm$
 
   await dragMouse(app, [351, 422], [438, 422])
   await fillInFlashcardFields(await client.elements_(flashcardFields), {
@@ -21,16 +21,16 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
     meaning: "I didn't say that",
   })
 
-  await client.elements_(waveform.waveformClip, 2)
+  await client.elements_(waveform$.waveformClip, 2)
   await setVideoTime(client, 38)
-  await client.waitForHidden_(waveform.waveformClip)
+  await client.waitForHidden_(waveform$.waveformClip)
 
   await dragMouse(app, [176, 422], [355, 422])
 
-  await client.elements_(waveform.waveformClip, 3)
+  await client.elements_(waveform$.waveformClip, 3)
 
   await client.clickElement_(deleteButton)
-  await client.clickElement_(confirmationDialog.okButton)
+  await client.clickElement_(confirmationDialog$.okButton)
 
-  await client.elements_(waveform.waveformClip, 2)
+  await client.elements_(waveform$.waveformClip, 2)
 }

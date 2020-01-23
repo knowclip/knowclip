@@ -13,10 +13,10 @@ import css from '../components/Main.module.css'
 import * as actions from '../actions'
 import * as r from '../selectors'
 
-export const testLabels = {
-  container: 'main-screen-container',
-  exportButton: 'export-button',
-} as const
+enum $ {
+  container = 'main-screen-container',
+  exportButton = 'export-button',
+}
 
 const Main = () => {
   const {
@@ -50,7 +50,7 @@ const Main = () => {
   if (!currentProjectId) return <Redirect to="/projects" />
 
   return (
-    <div className={css.container} id={testLabels.container}>
+    <div className={css.container} id={$.container}>
       <DarkTheme>
         <Header
           currentProjectId={currentProjectId}
@@ -80,7 +80,7 @@ const Main = () => {
       {currentFilePath && (
         <Tooltip title="Review and export flashcards">
           <Fab
-            id={testLabels.exportButton}
+            id={$.exportButton}
             className={css.floatingActionButton}
             onClick={reviewAndExportDialog}
             color="primary"
@@ -95,3 +95,5 @@ const Main = () => {
 }
 
 export default Main
+
+export { $ as main$ }

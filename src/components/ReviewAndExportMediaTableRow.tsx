@@ -15,9 +15,9 @@ import cn from 'classnames'
 import truncate from '../utils/truncate'
 import * as actions from '../actions'
 
-export const testLabels = {
-  clipCheckboxes: 'review-and-export-table-row-clip-checkbox',
-} as const
+enum $ {
+  clipCheckboxes = 'review-and-export-table-row-clip-checkbox',
+}
 
 type FlashcardRowProps = {
   id: string
@@ -58,7 +58,7 @@ const ReviewAndExportMediaTableRow = memo(
             checked={isSelected}
             onClick={useCallback(e => e.stopPropagation(), [])}
             onChange={useCallback(() => onSelect(id), [onSelect, id])}
-            className={testLabels.clipCheckboxes}
+            className={$.clipCheckboxes}
           />
         </TableCell>
         <TableCell padding="default">
@@ -112,3 +112,5 @@ const ShortTag = ({ title }: { title: string }) =>
   )
 
 export default ReviewAndExportMediaTableRow
+
+export { $ as reviewAndExportMediaTableRow$ }

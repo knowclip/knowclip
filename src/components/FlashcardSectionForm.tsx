@@ -10,11 +10,11 @@ import TagsInput from './TagsInput'
 import * as actions from '../actions'
 import Field from './FlashcardSectionFormField'
 
-export const testLabels = {
-  container: 'flashcard-form-container',
-  flashcardFields: 'flashcard-field',
-  deleteButton: 'delete-clip-button',
-} as const
+enum $ {
+  container = 'flashcard-form-container',
+  flashcardFields = 'flashcard-field',
+  deleteButton = 'delete-clip-button',
+}
 
 const FlashcardSectionForm = ({
   className,
@@ -102,7 +102,7 @@ const FlashcardSectionForm = ({
     <form
       className={className}
       onSubmit={handleFlashcardSubmit}
-      id={testLabels.container}
+      id={$.container}
     >
       <div className={css.formBody}>
         <section className={css.timeStamp}>
@@ -131,7 +131,7 @@ const FlashcardSectionForm = ({
                 subtitlesFlashcardFieldLinks[fieldName] || null
               }
               mediaFileId={mediaFile.id}
-              inputProps={{ className: testLabels.flashcardFields }}
+              inputProps={{ className: $.flashcardFields }}
             />
           ))}
         <TagsInput
@@ -142,10 +142,7 @@ const FlashcardSectionForm = ({
         />
 
         <section className={css.bottom}>
-          <IconButton
-            onClick={handleClickDeleteButton}
-            id={testLabels.deleteButton}
-          >
+          <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
             <DeleteIcon />
           </IconButton>
           <Menu
@@ -165,3 +162,5 @@ const capitalize = (string: string) =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
 
 export default FlashcardSectionForm
+
+export { $ as flashcardSectionForm$ }

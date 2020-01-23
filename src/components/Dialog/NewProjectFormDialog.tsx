@@ -20,20 +20,20 @@ import { DialogProps } from './DialogProps'
 import { closeDialog, createProject } from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
-export const testLabels = {
-  projectNameField: 'project-name',
-  projectFileLocationField: 'project-file-location',
-  noteTypeSelect: 'note-type-select',
-  transcriptionNoteTypeOption: 'transcription-note-type-option',
-  saveButton: 'save-button',
-  cardsPreview: 'cards-preview',
-} as const
+enum $ {
+  projectNameField = 'project-name',
+  projectFileLocationField = 'project-file-location',
+  noteTypeSelect = 'note-type-select',
+  transcriptionNoteTypeOption = 'transcription-note-type-option',
+  saveButton = 'save-button',
+  cardsPreview = 'cards-preview',
+}
 
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
   switch (noteType) {
     case 'Simple':
       return (
-        <section className={css.cardsPreview} id={testLabels.cardsPreview}>
+        <section className={css.cardsPreview} id={$.cardsPreview}>
           <h3 className={css.cardPreviewHeading}>Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, meaning, and notes.
@@ -52,7 +52,7 @@ const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
       )
     case 'Transliteration':
       return (
-        <section className={css.cardsPreview} id={testLabels.cardsPreview}>
+        <section className={css.cardsPreview} id={$.cardsPreview}>
           <h3 className={css.cardPreviewHeading}>Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, pronunciation, meaning, and
@@ -184,7 +184,7 @@ const NewProjectFormDialog = ({
           <TextField
             fullWidth
             label="Project name"
-            inputProps={{ id: testLabels.projectNameField }}
+            inputProps={{ id: $.projectNameField }}
             value={fieldValues.name}
             error={Boolean(errors.name)}
             helperText={errors.name}
@@ -197,7 +197,7 @@ const NewProjectFormDialog = ({
           <TextField
             fullWidth
             label="Project file location"
-            id={testLabels.projectFileLocationField}
+            id={$.projectFileLocationField}
             value={fieldValues.filePath}
             error={Boolean(errors.filePath)}
             helperText={errors.filePath}
@@ -217,16 +217,16 @@ const NewProjectFormDialog = ({
                 name: 'note-type',
               }}
               SelectDisplayProps={{
-                id: testLabels.noteTypeSelect,
+                id: $.noteTypeSelect,
               }}
             >
               <MenuItem value="" />
               <MenuItem value="Simple">Simple</MenuItem>
               <MenuItem
-                id={testLabels.transcriptionNoteTypeOption}
+                id={$.transcriptionNoteTypeOption}
                 value="Transliteration"
                 ContainerComponent="div"
-                ContainerProps={{ id: testLabels.transcriptionNoteTypeOption }}
+                ContainerProps={{ id: $.transcriptionNoteTypeOption }}
               >
                 Including pronunciation field
               </MenuItem>
@@ -239,7 +239,7 @@ const NewProjectFormDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog}>Exit</Button>
-        <Button onClick={handleSubmit} id={testLabels.saveButton} type="submit">
+        <Button onClick={handleSubmit} id={$.saveButton} type="submit">
           Save
         </Button>
       </DialogActions>
@@ -248,3 +248,5 @@ const NewProjectFormDialog = ({
 }
 
 export default NewProjectFormDialog
+
+export { $ as newProjectFormDialog$ }

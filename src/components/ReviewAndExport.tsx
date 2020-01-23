@@ -16,11 +16,11 @@ import * as actions from '../actions'
 import { DialogProps } from './Dialog/DialogProps'
 import MediaTable from './ReviewAndExportMediaTable'
 
-export const testLabels = {
-  exportApkgButton: 'export-apkg-button',
-  continueButton: 'continue-button',
-  exitButton: 'exit-button',
-} as const
+enum $ {
+  exportApkgButton = 'export-apkg-button',
+  continueButton = 'continue-button',
+  exitButton = 'exit-button',
+}
 
 const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
   const dispatch = useDispatch()
@@ -182,7 +182,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
           <Button
             onClick={closeDialog}
             disabled={Boolean(progress)}
-            id={testLabels.exitButton}
+            id={$.exitButton}
           >
             Exit
           </Button>
@@ -212,7 +212,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
               color="primary"
               disabled={Boolean(progress)}
               onClick={exportApkg}
-              id={testLabels.exportApkgButton}
+              id={$.exportApkgButton}
             >
               Export Anki Deck from selected clips
             </Button>
@@ -226,7 +226,7 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
           <Button
             disabled={Boolean(progress)}
             onClick={startSelection}
-            id={testLabels.continueButton}
+            id={$.continueButton}
           >
             Continue
           </Button>
@@ -237,3 +237,5 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
 }
 
 export default Export
+
+export { $ as reviewAndExport$ }

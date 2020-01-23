@@ -1,15 +1,15 @@
 import { TestSetup } from '../../spectronApp'
 import { dragMouse } from '../../driver/ClientWrapper'
-import { testLabels as flashcardForm } from '../../../components/FlashcardSectionForm'
-import { testLabels as tagsInput } from '../../../components/TagsInput'
-import { testLabels as waveform } from '../../../components/Waveform'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
+import { tagsInput$ } from '../../../components/TagsInput'
+import { waveform$ } from '../../../components/Waveform'
 import { fillInFlashcardFields } from '../../driver/flashcardSection'
 
 export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await dragMouse(app, [402, 422], [625, 422])
 
-  const { flashcardFields } = flashcardForm
-  const { tagsInputContainer } = tagsInput
+  const { flashcardFields } = flashcardForm$
+  const { tagsInputContainer } = tagsInput$
 
   await fillInFlashcardFields(await client.elements_(flashcardFields), {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
@@ -41,5 +41,5 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
     notes: '"Goro-goro" is the sound of something big rolling around.',
   })
 
-  await client.elements_(waveform.waveformClip, 2)
+  await client.elements_(waveform$.waveformClip, 2)
 }
