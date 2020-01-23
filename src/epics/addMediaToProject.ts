@@ -1,7 +1,7 @@
 import { flatMap, catchError, mergeAll } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
-import { readMediaFile } from '../utils/ffmpeg'
+import { readMediaFile, AsyncError } from '../utils/ffmpeg'
 import { AppEpic } from '../types/AppEpic'
 import { uuid } from '../utils/sideEffects'
 
@@ -11,12 +11,11 @@ const addMediaToProject: AppEpic = (action$, state$) =>
     flatMap<AddMediaToProjectRequest, Promise<Array<Action>>>(
       ({ projectId, filePaths }) =>
         Promise.all(
-          filePaths.map(async filePath =>
-            r.addAndOpenFile(
-              await readMediaFile(filePath, uuid(), projectId),
-              filePath
-            )
-          )
+          filePaths.map(async filePath => {
+            const file = await readMediaFile(filePath, uuid(), projectId)
+            if (file instanceof AsyncError) throw file
+            return r.addAndOpenFile(file, filePath)
+          })
         )
     ),
     mergeAll(),

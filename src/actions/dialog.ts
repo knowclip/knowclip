@@ -10,14 +10,18 @@ export const enqueueDialog = (
 export const confirmationDialog = (
   message: string,
   action: Action,
-  onCancel: Action | null = null
+  onCancel: Action | null = null,
+  skipQueue: boolean = false
 ) =>
-  enqueueDialog({
-    type: 'Confirmation',
-    message,
-    action,
-    onCancel,
-  })
+  enqueueDialog(
+    {
+      type: 'Confirmation',
+      message,
+      action,
+      onCancel,
+    },
+    skipQueue
+  )
 
 export const mediaFolderLocationFormDialog = (
   action: Action | null,
@@ -31,9 +35,10 @@ export const mediaFolderLocationFormDialog = (
     skipQueue
   )
 
-export const reviewAndExportDialog = () =>
+export const reviewAndExportDialog = (mediaOpenPrior: MediaFile | null) =>
   enqueueDialog({
     type: 'ReviewAndExport',
+    mediaOpenPrior,
   })
 
 export const newProjectFormDialog = () =>

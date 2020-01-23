@@ -1,5 +1,5 @@
 import React, { useCallback, memo } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Table,
   Toolbar,
@@ -18,6 +18,7 @@ import { formatDuration } from '../utils/formatTime'
 
 enum $ {
   container = 'review-and-export-media-table-container',
+  checkbox = 'review-and-export-media-table-checkbox',
 }
 
 type MediaTableProps = {
@@ -40,16 +41,29 @@ const ReviewAndExportMediaTable = memo(
     onClick,
     mediaIndex,
   }: MediaTableProps) => {
-    const { clipsIds, highlightedClipId } = useSelector((state: AppState) => ({
-      clipsIds: state.clips.idsByMediaFileId[media.id],
-      highlightedClipId: r.getHighlightedClipId(state),
-    }))
-    const toggleOpen = useCallback(() => onClick(open ? -1 : mediaIndex), [
-      onClick,
-      open,
-      mediaIndex,
-    ])
-    const stopPropagation = useCallback(e => e.stopPropagation, [])
+    const { clipsIds, highlightedClipId, availability } = useSelector(
+      (state: AppState) => ({
+        clipsIds: state.clips.idsByMediaFileId[media.id],
+        highlightedClipId: r.getHighlightedClipId(state),
+        availability: r.getFileAvailability(state, media),
+      })
+    )
+
+    const fileRemembered = Boolean(
+      availability &&
+        (availability.status === 'CURRENTLY_LOADED' ||
+          availability.status === 'REMEMBERED')
+    )
+    const dispatch = useDispatch()
+    const toggleOpen = useCallback(
+      () => {
+        onClick(open ? -1 : mediaIndex)
+        if (!open)
+          dispatch(fileRemembered ? r.openFileRequest(media) : r.dismissMedia())
+      },
+      [onClick, open, mediaIndex, dispatch, fileRemembered, media]
+    )
+    const stopPropagation = useCallback(e => e.stopPropagation(), [])
     const selectAll = useCallback(() => onSelectAll(clipsIds), [
       onSelectAll,
       clipsIds,
@@ -66,6 +80,7 @@ const ReviewAndExportMediaTable = memo(
             onChange={selectAll}
             onClick={stopPropagation}
             className={css.selectAllClipsCheckbox}
+            id={$.checkbox}
           />
 
           <div className={css.selectedClipsCount}>

@@ -27,7 +27,7 @@ const FileSelectionDialog = ({
           null,
           `Could not locate ${getHumanFileName(
             file
-          )}. Some features may unavailable until it is located.`
+          )}. Some features may be unavailable until it is located.`
         )
       )
       dispatch(actions.closeDialog())

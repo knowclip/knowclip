@@ -1,7 +1,7 @@
 import { promisify } from 'util'
 import tempy from 'tempy'
 import fs from 'fs'
-import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import * as r from '../redux'
 import { extname } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
@@ -16,6 +16,10 @@ export const getSubtitlesFilePathFromMedia = async (
   streamIndex: number
 ): Promise<string | null> => {
   const mediaMetadata = await getMediaMetadata(mediaFilePath)
+  if (mediaMetadata instanceof AsyncError) {
+    console.error(mediaMetadata)
+    return null
+  }
   if (
     !mediaMetadata.streams[streamIndex] ||
     mediaMetadata.streams[streamIndex].codec_type !== 'subtitle'

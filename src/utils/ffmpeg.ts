@@ -32,14 +32,29 @@ export const toTimestamp = (
   return `${hoursStamp}${unitsSeparator}${minutesStamp}${unitsSeparator}${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }
 
-export const getMediaMetadata = (path: string): Promise<FfprobeData> => {
-  return new Promise((res, rej) => {
-    ffmpeg.ffprobe(path, (err, metadata) => {
-      if (err) rej(err)
+export class AsyncError extends Error {
+  thrown: any
+  constructor(thrown: any, message = '') {
+    const thrownMessage = thrown && 'message' in thrown ? thrown.message : null
+    super([message, thrownMessage].filter(x => x).join(''))
+    this.thrown = thrown
+  }
+}
 
-      res(metadata)
+export const getMediaMetadata = async (
+  path: string
+): Promise<FfprobeData | AsyncError> => {
+  try {
+    return await new Promise((res, rej) => {
+      ffmpeg.ffprobe(path, (error, metadata) => {
+        if (error) rej(error)
+
+        res(metadata)
+      })
     })
-  })
+  } catch (error) {
+    return new AsyncError(error)
+  }
 }
 
 export const readMediaFile = async (
@@ -48,8 +63,9 @@ export const readMediaFile = async (
   projectId: string,
   subtitles: MediaFile['subtitles'] = [],
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
-): Promise<MediaFile> => {
+): Promise<MediaFile | AsyncError> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)
+  if (ffprobeMetadata instanceof AsyncError) return ffprobeMetadata
 
   return {
     id,

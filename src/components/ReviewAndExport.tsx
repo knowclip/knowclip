@@ -11,7 +11,6 @@ import {
 } from '@material-ui/core'
 import * as r from '../redux'
 import css from './Export.module.css'
-import { showSaveDialog } from '../utils/electron'
 import * as actions from '../actions'
 import { DialogProps } from './Dialog/DialogProps'
 import MediaTable from './ReviewAndExportMediaTable'
@@ -22,12 +21,11 @@ enum $ {
   exitButton = 'exit-button',
 }
 
-const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
+const Export = ({
+  open,
+  data: { mediaOpenPrior },
+}: DialogProps<ReviewAndExportDialogData>) => {
   const dispatch = useDispatch()
-  const closeDialog = useCallback(() => dispatch(actions.closeDialog()), [
-    dispatch,
-  ])
-
   const {
     currentMedia,
     clipsIds,
@@ -47,6 +45,20 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
     }
   })
 
+  const closeDialog = useCallback(
+    () => {
+      const currentMediaId = currentMedia && currentMedia.id
+      const initialMediaId = mediaOpenPrior && mediaOpenPrior.id
+      if (currentMediaId !== initialMediaId)
+        dispatch(
+          mediaOpenPrior ? r.openFileRequest(mediaOpenPrior) : r.dismissMedia()
+        )
+
+      dispatch(actions.closeDialog())
+    },
+    [currentMedia, dispatch, mediaOpenPrior]
+  )
+
   const [currentTabIndex, setCurrentTabIndex] = useState(0)
   const [selectionHasStarted, setSelectionHasStarted] = useState(false)
   const chooseTab = (index: number) => {
@@ -59,12 +71,8 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
 
   const [selectedIds, setSelectedIds] = useState(clipsIds)
   const exportApkg = useCallback(
-    () =>
-      showSaveDialog('Anki APKG file', ['apkg']).then(
-        (path: string | null) =>
-          path && dispatch(actions.exportApkgRequest(selectedIds, path))
-      ),
-    [dispatch, selectedIds]
+    () => dispatch(actions.exportApkgRequest(selectedIds, currentMedia)),
+    [dispatch, selectedIds, currentMedia]
   )
   const csvAndMp3ExportDialog = useCallback(
     () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
@@ -98,12 +106,9 @@ const Export = ({ open }: DialogProps<ReviewAndExportDialogData>) => {
   )
   const onClickTable = useCallback(
     (index: number) => {
-      const mediaMetadata = projectMedia[index]
-      if (mediaMetadata && currentMedia && mediaMetadata.id !== currentMedia.id)
-        dispatch(actions.openFileRequest(mediaMetadata))
       setExpandedTableIndex(index)
     },
-    [dispatch, currentMedia, setExpandedTableIndex, projectMedia]
+    [setExpandedTableIndex]
   )
 
   const dialogContent = (

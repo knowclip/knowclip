@@ -4,6 +4,7 @@ import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
 import makeFlashcardsWithSubtitles from './makeFlashcardsWithSubtitles'
 import manuallyLocateAsset from './manuallyLocateAsset'
+import reviewAndExportApkg from './reviewAndExportApkg'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 jest.setTimeout(60000)
@@ -24,9 +25,8 @@ describe('opening a shared project', () => {
     navigateBetweenMedia(setup))
   test('make some flashcards', () => makeFlashcardsWithSubtitles(setup))
   test('manually locate missing assets', () => manuallyLocateAsset(setup))
-
-  // test('review and export deck with missing media', () =>
-  //   reviewAndExportApkg(setup))
+  test('review and export deck with missing media', () =>
+    reviewAndExportApkg(setup))
   // test('save and close project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {

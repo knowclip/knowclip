@@ -21,6 +21,7 @@ declare type MediaFolderLocationFormDialogData = {
 
 declare type ReviewAndExportDialogData = {
   type: 'ReviewAndExport'
+  mediaOpenPrior: MediaFile | null
 }
 
 declare type NewProjectFormDialogData = {

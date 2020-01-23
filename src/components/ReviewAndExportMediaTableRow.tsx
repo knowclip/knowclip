@@ -31,11 +31,13 @@ const ReviewAndExportMediaTableRow = memo(
       formattedClipTime,
       isLoopOn,
       highlightedClipId,
+      currentMediaFile,
     } = useSelector((state: AppState) => ({
       flashcard: r.getFlashcard(state, id) as Flashcard,
       formattedClipTime: r.getFormattedClipTime(state, id),
       isLoopOn: r.isLoopOn(state),
       highlightedClipId: r.getHighlightedClipId(state),
+      currentMediaFile: r.getCurrentMediaFile(state),
     }))
     const isHighlighted = id === highlightedClipId
 
@@ -47,10 +49,12 @@ const ReviewAndExportMediaTableRow = memo(
     return (
       <TableRow
         className={css.tableRow}
-        onClick={useCallback(() => dispatch(actions.highlightClip(id)), [
-          dispatch,
-          id,
-        ])}
+        onClick={useCallback(
+          () => {
+            if (currentMediaFile) dispatch(actions.highlightClip(id))
+          },
+          [currentMediaFile, dispatch, id]
+        )}
         selected={isHighlighted}
       >
         <TableCell padding="checkbox">

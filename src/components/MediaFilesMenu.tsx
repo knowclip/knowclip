@@ -52,17 +52,13 @@ const MediaFilesMenu = ({
   className,
   currentProjectId,
 }: MediaFilesMenuProps) => {
-  const {
-    loop,
-    currentFileName,
-    currentFileId,
-    projectMediaFiles,
-  } = useSelector((state: AppState) => ({
-    loop: r.isLoopOn(state),
-    currentFileName: r.getCurrentFileName(state),
-    currentFileId: r.getCurrentFileId(state),
-    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-  }))
+  const { loop, currentFile, projectMediaFiles } = useSelector(
+    (state: AppState) => ({
+      loop: r.isLoopOn(state),
+      currentFile: r.getCurrentMediaFile(state),
+      projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+    })
+  )
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -88,15 +84,15 @@ const MediaFilesMenu = ({
         {projectMediaFiles.length > 0 ? (
           <span
             className={css.mediaFileName}
-            title={currentFileName || undefined}
+            title={currentFile ? currentFile.name : undefined}
           >
             <Button
               className={css.audioButton}
               onClick={popover.open}
               id={$.openMediaFilesMenuButton}
             >
-              {currentFileName
-                ? truncate(currentFileName, 40)
+              {currentFile
+                ? truncate(currentFile.name, 40)
                 : 'Select media file'}
             </Button>
           </span>
@@ -105,7 +101,7 @@ const MediaFilesMenu = ({
             Choose media file
           </Button>
         )}
-        {currentFileId && (
+        {currentFile && (
           <>
             <Tooltip title="Loop audio (Ctrl + L)">
               <IconButton
@@ -136,7 +132,7 @@ const MediaFilesMenu = ({
                   key={media.id}
                   closeMenu={popover.close}
                   mediaFile={media}
-                  selected={media.id === currentFileId}
+                  selected={Boolean(currentFile && currentFile.id === media.id)}
                   currentProjectId={currentProjectId}
                   className={$.mediaFileMenuItem}
                 />

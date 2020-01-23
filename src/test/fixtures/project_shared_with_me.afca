@@ -50,6 +50,63 @@
     "polar_bear_cafe.mp4"
   ],
   "clips": [
+     {
+      "start": 603,
+      "end": 888,
+      "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": {
+        "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Du hast eben gesagt, murrte Piggeldy, eine Katze sieht aus wie ein Schwein, stimmt's?",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ]
+      }
+    },
+    {
+      "start": 1074,
+      "end": 1545,
+      "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": {
+        "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ]
+      }
+    },
+    {
+      "start": 1571,
+      "end": 2048,
+      "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": {
+        "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Schön! seufzte Piggeldy verzückt.\n\nSchön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse bist.",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ]
+      }
+    },
     {
       "start": 402,
       "end": 625,

@@ -1,6 +1,7 @@
 import * as r from '../redux'
 
 import { FileEventHandlers } from './eventHandlers'
+import { AsyncError } from '../utils/ffmpeg'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -16,15 +17,20 @@ export default {
         ]
 
       const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
+      if (!cbr) return []
 
-      return cbr
-        ? [
-            r.locateFileSuccess(
-              file,
-              await effects.getWaveformPng(state, file, cbr)
-            ),
-          ]
-        : []
+      const pngPath = await effects.getWaveformPng(state, file, cbr)
+      if (pngPath instanceof Error)
+        return [
+          r.openFileFailure(
+            file,
+            null,
+            'Could not locate file: ' +
+              (pngPath.message || 'problem generating waveform.')
+          ),
+        ]
+
+      return [r.locateFileSuccess(file, pngPath)]
     } catch (err) {
       return [
         r.openFileFailure(

@@ -20,8 +20,6 @@ enum $ {
 
 const Main = () => {
   const {
-    currentFileName,
-    currentFilePath,
     currentFlashcard,
     loop,
     audioIsLoading,
@@ -30,8 +28,6 @@ const Main = () => {
     currentMediaFile,
     subtitles,
   } = useSelector((state: AppState) => ({
-    currentFileName: r.getCurrentFileName(state),
-    currentFilePath: r.getCurrentFilePath(state),
     currentFlashcard: r.getCurrentFlashcard(state),
     loop: r.isLoopOn(state),
     audioIsLoading: r.isAudioLoading(state),
@@ -43,8 +39,8 @@ const Main = () => {
   const dispatch = useDispatch()
 
   const reviewAndExportDialog = useCallback(
-    () => dispatch(actions.reviewAndExportDialog()),
-    [dispatch]
+    () => dispatch(actions.reviewAndExportDialog(currentMediaFile)),
+    [dispatch, currentMediaFile]
   )
 
   if (!currentProjectId) return <Redirect to="/projects" />
@@ -59,36 +55,37 @@ const Main = () => {
       </DarkTheme>
 
       <section className={css.media}>
-        <Media
-          key={String(constantBitrateFilePath)}
-          constantBitrateFilePath={constantBitrateFilePath}
-          loop={loop}
-          metadata={currentMediaFile}
-          subtitles={subtitles}
-        />
+        {audioIsLoading ? (
+          <div className={css.waveformPlaceholder}>
+            <CircularProgress />
+          </div>
+        ) : (
+          <Media
+            key={String(constantBitrateFilePath)}
+            constantBitrateFilePath={constantBitrateFilePath}
+            loop={loop}
+            metadata={currentMediaFile}
+            subtitles={subtitles}
+          />
+        )}
       </section>
-      {Boolean(currentFileName) && <Waveform show={!audioIsLoading} />}
-      {audioIsLoading && (
-        <div className={css.waveformPlaceholder}>
-          <CircularProgress />
-        </div>
-      )}
+
+      {Boolean(currentMediaFile) && <Waveform show={!audioIsLoading} />}
       <FlashcardSection
         showing={Boolean(currentFlashcard)}
         mediaFile={currentMediaFile}
       />
-      {currentFilePath && (
-        <Tooltip title="Review and export flashcards">
-          <Fab
-            id={$.exportButton}
-            className={css.floatingActionButton}
-            onClick={reviewAndExportDialog}
-            color="primary"
-          >
-            <Layers />
-          </Fab>
-        </Tooltip>
-      )}
+
+      <Tooltip title="Review and export flashcards">
+        <Fab
+          id={$.exportButton}
+          className={css.floatingActionButton}
+          onClick={reviewAndExportDialog}
+          color="primary"
+        >
+          <Layers />
+        </Fab>
+      </Tooltip>
       <KeyboardShortcuts />
     </div>
   )

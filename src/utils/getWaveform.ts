@@ -1,4 +1,4 @@
-import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import { getWaveformPngPath } from '../utils/localStorage'
 import { existsSync } from 'fs'
 
@@ -10,38 +10,44 @@ export const getWaveformPng = async (
   state: AppState,
   file: WaveformPng,
   constantBitrateFilePath: string
-): Promise<string> => {
+): Promise<string | AsyncError> => {
   const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
-  const {
-    format: { duration = 0 },
-  } = ffprobeMetadata
-  const { stepsPerSecond, stepLength } = state.waveform
-  const width = ~~(duration * (stepsPerSecond * stepLength))
+  if (ffprobeMetadata instanceof AsyncError) return ffprobeMetadata
 
-  const outputFilename = getWaveformPngPath(state, file)
-  if (outputFilename && existsSync(outputFilename)) return outputFilename
+  try {
+    const {
+      format: { duration = 0 },
+    } = ffprobeMetadata
+    const { stepsPerSecond, stepLength } = state.waveform
+    const width = ~~(duration * (stepsPerSecond * stepLength))
 
-  return await new Promise((res, rej) => {
-    ffmpeg(constantBitrateFilePath)
-      .complexFilter(
-        [
-          `[0:a]aformat=channel_layouts=mono,`,
-          `compand=gain=-6,`,
-          `showwavespic=s=${width +
-            CORRECTION_OFFSET}x70:colors=${WAVE_COLOR}[fg];`,
-          `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
-          `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
-        ].join(''),
-        [] // why needed?
-      )
-      .outputOptions('-frames:v 1')
-      .output(outputFilename)
-      .on('end', function() {
-        res(outputFilename)
-      })
-      .on('error', (err: any) => {
-        rej(err)
-      })
-      .run()
-  })
+    const outputFilename = getWaveformPngPath(state, file)
+    if (outputFilename && existsSync(outputFilename)) return outputFilename
+
+    return await new Promise((res, rej) => {
+      ffmpeg(constantBitrateFilePath)
+        .complexFilter(
+          [
+            `[0:a]aformat=channel_layouts=mono,`,
+            `compand=gain=-6,`,
+            `showwavespic=s=${width +
+              CORRECTION_OFFSET}x70:colors=${WAVE_COLOR}[fg];`,
+            `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
+            `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
+          ].join(''),
+          [] // why needed?
+        )
+        .outputOptions('-frames:v 1')
+        .output(outputFilename)
+        .on('end', function() {
+          res(outputFilename)
+        })
+        .on('error', (err: any) => {
+          rej(err)
+        })
+        .run()
+    })
+  } catch (err) {
+    return new AsyncError(err)
+  }
 }

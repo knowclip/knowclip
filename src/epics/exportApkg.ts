@@ -8,6 +8,12 @@ import {
   startWith,
   endWith,
   concat,
+  concatMap,
+  filter,
+  takeUntil,
+  take,
+  ignoreElements,
+  switchMap,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, empty, defer, from } from 'rxjs'
@@ -20,10 +26,11 @@ import tempy from 'tempy'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 import { AppEpic } from '../types/AppEpic'
+import { showSaveDialog } from '../utils/electron'
 
 const { writeFile, readFile, unlink: deleteFile } = promises
 
-const exportApkgFailure: AppEpic = (action$, state$) =>
+const exportApkgFailure: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, ExportApkgFailure>(A.EXPORT_APKG_FAILURE),
     tap(() => (document.body.style.cursor = 'default')),
@@ -37,7 +44,7 @@ const exportApkgFailure: AppEpic = (action$, state$) =>
         : empty()
     )
   )
-const exportApkgSuccess: AppEpic = (action$, state$) =>
+const exportApkgSuccess: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, ExportApkgSuccess>(A.EXPORT_APKG_SUCCESS),
     tap(() => (document.body.style.cursor = 'default')),
@@ -47,8 +54,8 @@ const exportApkgSuccess: AppEpic = (action$, state$) =>
 const exportApkg: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportApkgRequest>(A.EXPORT_APKG_REQUEST),
-    flatMap(exportApkgRequest => {
-      const { clipIds, outputFilePath } = exportApkgRequest
+    switchMap(exportApkgRequest => {
+      const { clipIds } = exportApkgRequest
       const directory = tempy.directory()
 
       const currentProject = r.getCurrentProject(state$.value)
@@ -62,115 +69,139 @@ const exportApkg: AppEpic = (action$, state$) =>
       )
 
       if (exportData instanceof Set) {
-        return from([
-          r.closeDialog(),
-          ...[...exportData].map(file =>
-            r.fileSelectionDialog(
-              `You can't make clips from this file until you've located it in the filesystem. Please find "${
-                file.name
-              }" and try again.`,
-              file
+        const missingMediaFileIds = [...exportData].map(file => file.id)
+        return from(exportData).pipe(
+          concatMap(file =>
+            of(r.openFileRequest(file)).pipe(
+              concat(
+                action$.pipe(
+                  filter(
+                    a =>
+                      a.type === 'OPEN_FILE_SUCCESS' &&
+                      a.validatedFile.id === file.id
+                  ),
+                  take(1),
+                  ignoreElements()
+                )
+              )
             )
           ),
-          r.reviewAndExportDialog(),
-        ])
+          startWith(r.closeDialog()),
+          takeUntil(
+            action$.pipe(
+              filter(
+                a =>
+                  a.type === 'OPEN_FILE_FAILURE' &&
+                  missingMediaFileIds.includes(a.file.id)
+              ),
+              take(1)
+            )
+          ),
+          endWith(r.reviewAndExportDialog(exportApkgRequest.mediaOpenPrior))
+        )
       }
 
-      document.body.style.cursor = 'progress'
+      return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
+        filter((path): path is string => Boolean(path)),
+        flatMap(outputFilePath => {
+          document.body.style.cursor = 'progress'
 
-      const apkg = new Exporter(exportData.deckName, {
-        // @ts-ignore
-        sql: window.SQL,
-        template: createTemplate(exportData.template),
-      })
-
-      let count = 0
-
-      const processClipsObservables = exportData.clips.map(
-        (clipSpecs, clipIndex) =>
-          defer(async () => {
-            const {
-              outputFilename,
-              sourceFilePath,
-              startTime,
-              endTime,
-              flashcardSpecs,
-            } = clipSpecs
-
-            const { fields, ...restSpecs } = flashcardSpecs
-            apkg.addCard(fields, restSpecs)
-
-            const clipOutputFilePath = join(directory, outputFilename)
-            await clipAudio(
-              sourceFilePath,
-              startTime,
-              endTime,
-              clipOutputFilePath
-            )
-
-            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
-
-            await deleteFile(clipOutputFilePath)
-
-            count += 1
-            return r.setProgress({
-              percentage: (count / exportData.clips.length) * 100,
-              message: `${count} clips out of ${
-                exportData.clips.length
-              } processed`,
-            })
+          const apkg = new Exporter(exportData.deckName, {
+            // @ts-ignore
+            sql: window.SQL,
+            template: createTemplate(exportData.template),
           })
-      )
-      const mergedProcessClips = from(processClipsObservables).pipe(
-        mergeAll(20)
-      )
-      const result = mergedProcessClips.pipe(
-        startWith(
-          r.setProgress({
-            percentage: 0,
-            message: 'Processing clips...',
-          })
-        ),
-        endWith(
-          r.setProgress({
-            percentage: 100,
-            message: 'Saving .apkg file...',
-          })
-        ),
-        concat(
-          mergedProcessClips.pipe(
-            last(),
-            flatMap(() =>
-              from(
-                apkg.save({
-                  type: 'nodebuffer',
-                  base64: false,
-                  compression: 'DEFLATE',
-                })
-              ).pipe(
-                flatMap(async (zip: Buffer) => {
-                  await writeFile(outputFilePath, zip, 'binary')
-                  console.log(`Package has been generated: ${outputFilePath}`)
 
-                  return r.exportApkgSuccess(
-                    'Flashcards made in ' + outputFilePath
-                  )
-                }),
-                endWith(r.setProgress(null))
+          let count = 0
+
+          const processClipsObservables = exportData.clips.map(clipSpecs =>
+            defer(async () => {
+              const {
+                outputFilename,
+                sourceFilePath,
+                startTime,
+                endTime,
+                flashcardSpecs,
+              } = clipSpecs
+
+              const { fields, ...restSpecs } = flashcardSpecs
+              apkg.addCard(fields, restSpecs)
+
+              const clipOutputFilePath = join(directory, outputFilename)
+              await clipAudio(
+                sourceFilePath,
+                startTime,
+                endTime,
+                clipOutputFilePath
               )
-            ),
-            catchError(err => {
-              console.error(err)
 
-              return from([
-                r.exportApkgFailure(err.message || err.toString()),
-                r.setProgress(null),
-              ])
+              apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
+
+              await deleteFile(clipOutputFilePath)
+
+              count += 1
+              return r.setProgress({
+                percentage: (count / exportData.clips.length) * 100,
+                message: `${count} clips out of ${
+                  exportData.clips.length
+                } processed`,
+              })
             })
           )
-        )
+          const mergedProcessClips = from(processClipsObservables).pipe(
+            mergeAll(20)
+          )
+          const result = mergedProcessClips.pipe(
+            startWith(
+              r.setProgress({
+                percentage: 0,
+                message: 'Processing clips...',
+              })
+            ),
+            endWith(
+              r.setProgress({
+                percentage: 100,
+                message: 'Saving .apkg file...',
+              })
+            ),
+            concat(
+              mergedProcessClips.pipe(
+                last(),
+                flatMap(() =>
+                  from(
+                    apkg.save({
+                      type: 'nodebuffer',
+                      base64: false,
+                      compression: 'DEFLATE',
+                    })
+                  ).pipe(
+                    flatMap(async (zip: Buffer) => {
+                      await writeFile(outputFilePath, zip, 'binary')
+                      console.log(
+                        `Package has been generated: ${outputFilePath}`
+                      )
+
+                      return r.exportApkgSuccess(
+                        'Flashcards made in ' + outputFilePath
+                      )
+                    }),
+                    endWith(r.setProgress(null))
+                  )
+                ),
+                catchError(err => {
+                  console.error(err)
+
+                  return from([
+                    r.exportApkgFailure(err.message || err.toString()),
+                    r.setProgress(null),
+                  ])
+                })
+              )
+            )
+          )
+          return result
+        })
       )
-      return result
     })
   )
 
