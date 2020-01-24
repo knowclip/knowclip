@@ -35,10 +35,14 @@ export const mediaFolderLocationFormDialog = (
     skipQueue
   )
 
-export const reviewAndExportDialog = (mediaOpenPrior: MediaFile | null) =>
+export const reviewAndExportDialog = (
+  mediaOpenPrior: MediaFile | null,
+  clipIds: string[]
+) =>
   enqueueDialog({
     type: 'ReviewAndExport',
     mediaOpenPrior,
+    clipIds,
   })
 
 export const newProjectFormDialog = () =>

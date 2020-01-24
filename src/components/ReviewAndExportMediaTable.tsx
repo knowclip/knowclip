@@ -7,8 +7,9 @@ import {
   Paper,
   Checkbox,
   IconButton,
+  Tooltip,
 } from '@material-ui/core'
-import { ExpandLess, ExpandMore } from '@material-ui/icons'
+import { ExpandLess, ExpandMore, FolderSpecial } from '@material-ui/icons'
 import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
@@ -18,6 +19,7 @@ import { formatDuration } from '../utils/formatTime'
 
 enum $ {
   container = 'review-and-export-media-table-container',
+  header = 'review-and-export-media-table-header',
   checkbox = 'review-and-export-media-table-checkbox',
 }
 
@@ -70,17 +72,16 @@ const ReviewAndExportMediaTable = memo(
     ])
 
     return !clipsIds.length ? null : (
-      <Paper id={$.container}>
+      <Paper className={$.container}>
         <Toolbar
-          className={cn(css.toolbar, { [css.openToolbar]: open })}
+          className={cn(css.toolbar, { [css.openToolbar]: open }, $.header)}
           onClick={toggleOpen}
         >
           <Checkbox
             checked={clipsIds.every(id => selectedIds.includes(id))}
             onChange={selectAll}
             onClick={stopPropagation}
-            className={css.selectAllClipsCheckbox}
-            id={$.checkbox}
+            className={cn(css.selectAllClipsCheckbox, $.checkbox)}
           />
 
           <div className={css.selectedClipsCount}>
@@ -89,6 +90,18 @@ const ReviewAndExportMediaTable = memo(
           </div>
 
           <h2 className={css.mediaFileName}>
+            {!fileRemembered && (
+              <>
+                {
+                  <Tooltip title="Not found in filesystem">
+                    <FolderSpecial
+                      style={{ verticalAlign: 'middle' }}
+                      color="error"
+                    />
+                  </Tooltip>
+                }{' '}
+              </>
+            )}
             {media.name}{' '}
             <small>
               {formatDuration(

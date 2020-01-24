@@ -26,21 +26,31 @@ const Main = () => {
     currentProjectId,
     constantBitrateFilePath,
     currentMediaFile,
+    clipsIdsForExport,
     subtitles,
-  } = useSelector((state: AppState) => ({
-    currentFlashcard: r.getCurrentFlashcard(state),
-    loop: r.isLoopOn(state),
-    audioIsLoading: r.isAudioLoading(state),
-    currentProjectId: r.getCurrentProjectId(state),
-    constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
-    currentMediaFile: r.getCurrentMediaFile(state),
-    subtitles: r.getSubtitlesTracks(state),
-  }))
+  } = useSelector((state: AppState) => {
+    const currentMediaFile = r.getCurrentMediaFile(state)
+    return {
+      currentFlashcard: r.getCurrentFlashcard(state),
+      loop: r.isLoopOn(state),
+      audioIsLoading: r.isAudioLoading(state),
+      currentProjectId: r.getCurrentProjectId(state),
+      constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
+      currentMediaFile,
+      clipsIdsForExport: currentMediaFile
+        ? state.clips.idsByMediaFileId[currentMediaFile.id]
+        : [],
+      subtitles: r.getSubtitlesTracks(state),
+    }
+  })
   const dispatch = useDispatch()
 
   const reviewAndExportDialog = useCallback(
-    () => dispatch(actions.reviewAndExportDialog(currentMediaFile)),
-    [dispatch, currentMediaFile]
+    () =>
+      dispatch(
+        actions.reviewAndExportDialog(currentMediaFile, clipsIdsForExport)
+      ),
+    [dispatch, currentMediaFile, clipsIdsForExport]
   )
 
   if (!currentProjectId) return <Redirect to="/projects" />

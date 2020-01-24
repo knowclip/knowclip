@@ -16,7 +16,9 @@ import truncate from '../utils/truncate'
 import * as actions from '../actions'
 
 enum $ {
+  container = 'review-and-export-table-row-container',
   clipCheckboxes = 'review-and-export-table-row-clip-checkbox',
+  highlightedClipRow = 'review-and-export-table-highlighted-clip-row',
 }
 
 type FlashcardRowProps = {
@@ -48,12 +50,15 @@ const ReviewAndExportMediaTableRow = memo(
 
     return (
       <TableRow
-        className={css.tableRow}
+        className={cn(css.tableRow, $.container, {
+          [$.highlightedClipRow]: isHighlighted,
+        })}
         onClick={useCallback(
           () => {
-            if (currentMediaFile) dispatch(actions.highlightClip(id))
+            if (currentMediaFile && !isHighlighted)
+              dispatch(actions.highlightClip(id))
           },
-          [currentMediaFile, dispatch, id]
+          [currentMediaFile, dispatch, id, isHighlighted]
         )}
         selected={isHighlighted}
       >

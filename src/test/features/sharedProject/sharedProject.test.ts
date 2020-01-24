@@ -4,8 +4,10 @@ import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
 import makeFlashcardsWithSubtitles from './makeFlashcardsWithSubtitles'
 import manuallyLocateAsset from './manuallyLocateAsset'
-import reviewAndExportApkg from './reviewAndExportApkg'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import reviewWithMissingMedia from './reviewWithMissingMedia'
+import exportWithMissingMedia from './exportWithMissingMedia'
+import saveAndCloseProject from './saveAndCloseProject'
+import { mockSideEffects } from '../../../utils/sideEffects'
 
 jest.setTimeout(60000)
 
@@ -16,7 +18,7 @@ describe('opening a shared project', () => {
   beforeAll(async () => {
     setup = await startApp(context, 'sharedProject')
 
-    // await mockSideEffects(setup.app,{})
+    await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
   test('open a shared project and locates media in local filesystem', () =>
@@ -25,20 +27,23 @@ describe('opening a shared project', () => {
     navigateBetweenMedia(setup))
   test('make some flashcards', () => makeFlashcardsWithSubtitles(setup))
   test('manually locate missing assets', () => manuallyLocateAsset(setup))
-  test('review and export deck with missing media', () =>
-    reviewAndExportApkg(setup))
-  // test('save and close project', () => saveAndCloseProject(setup))
+  test('review with missing media', () => reviewWithMissingMedia(setup))
+  test('export deck with missing media', () => exportWithMissingMedia(setup))
+  test('save and close project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
-    if (context.app)
-      await mockElectronHelpers(context.app, {
-        showMessageBox: [
-          Promise.resolve({
-            response: 0,
-            checkboxChecked: false,
-          }),
-        ],
-      })
     await stopApp(context)
   })
 })
+
+const sideEffectsMocks = {
+  uuid: [
+    '64bc9fe8-822a-4ecf-83d9-d6997029db7d',
+    'b9ba2184-cb5c-4d50-98c2-568bf8e75854',
+  ],
+  nowUtcTimestamp: [
+    '2020-01-24T15:09:02Z',
+    '2020-01-24T15:09:03Z',
+    '2020-01-24T15:09:18Z',
+  ],
+}

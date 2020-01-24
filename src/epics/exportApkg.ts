@@ -97,7 +97,12 @@ const exportApkg: AppEpic = (action$, state$) =>
               take(1)
             )
           ),
-          endWith(r.reviewAndExportDialog(exportApkgRequest.mediaOpenPrior))
+          endWith(
+            r.reviewAndExportDialog(
+              exportApkgRequest.mediaOpenPrior,
+              exportApkgRequest.clipIds
+            )
+          )
         )
       }
 

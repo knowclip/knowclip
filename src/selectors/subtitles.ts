@@ -95,20 +95,6 @@ export const getExternalSubtitlesTracks = (
   state: AppState
 ): Array<ExternalSubtitlesTrack> => getSubtitlesTracks(state).filter(isExternal)
 
-export const getExternalSubtitlesTracksWithFiles = (
-  state: AppState
-): Array<{ track: ExternalSubtitlesTrack; file: ExternalSubtitlesFile }> =>
-  getSubtitlesTracks(state)
-    .filter(isExternal)
-    .map(track => ({
-      track,
-      file: getFile(
-        state,
-        'ExternalSubtitlesFile',
-        track.id
-      ) as ExternalSubtitlesFile,
-    }))
-
 export const readVttChunk = (
   state: AppState,
   {

@@ -1,0 +1,202 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`opening a shared project save and close project 1`] = `
+Object {
+  "clips": Array [
+    Object {
+      "end": 888,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Du hast eben gesagt, murrte Piggeldy, eine Katze sieht aus wie ein Schwein, stimmt's?",
+        },
+        "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+      "start": 603,
+    },
+    Object {
+      "end": 1545,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«",
+        },
+        "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+      "start": 1074,
+    },
+    Object {
+      "end": 2048,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Schön! seufzte Piggeldy verzückt.
+
+Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse bist.",
+        },
+        "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+      "start": 1571,
+    },
+    Object {
+      "end": 625,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Relaxing while eating bamboo grass is the best",
+          "notes": "",
+          "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
+          "transcription": "笹を食べながらのんびりするのは最高だなぁ",
+        },
+        "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+      "start": 402,
+    },
+    Object {
+      "end": 888,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "This kid, lazing about again so early",
+          "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
+          "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
+          "transcription": "またこの子は昼間からゴロゴロして",
+        },
+        "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+      "start": 756,
+    },
+    Object {
+      "end": 2774,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Don't try to suck me up!",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "ああー  吸わないで",
+        },
+        "id": "b9ba2184-cb5c-4d50-98c2-568bf8e75854",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "b9ba2184-cb5c-4d50-98c2-568bf8e75854",
+      "start": 2522,
+    },
+    Object {
+      "end": 4058,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "",
+        },
+        "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+      "start": 3760,
+    },
+  ],
+  "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+  "lastOpened": "2020-01-24T15:09:03Z",
+  "mediaFiles": Array [
+    Object {
+      "durationSeconds": 58.24,
+      "flashcardFieldsToSubtitlesTracks": Object {},
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "id": "fa462524-bfeb-4434-a506-07858cc97151",
+      "isVideo": true,
+      "name": "piggeldy_cat.mp4",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": Array [],
+      "subtitlesTracksStreamIndexes": Array [],
+      "type": "MediaFile",
+    },
+    Object {
+      "durationSeconds": 87.062,
+      "flashcardFieldsToSubtitlesTracks": Object {
+        "meaning": "37bd5e91-89c5-491b-9308-533c7be7338a",
+        "transcription": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      },
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "isVideo": true,
+      "name": "polar_bear_cafe.mp4",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": Array [
+        Object {
+          "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
+          "streamIndex": 2,
+          "type": "EmbeddedSubtitlesTrack",
+        },
+        Object {
+          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+          "type": "ExternalSubtitlesTrack",
+        },
+      ],
+      "subtitlesTracksStreamIndexes": Array [
+        2,
+      ],
+      "type": "MediaFile",
+    },
+  ],
+  "name": "My friend's shared project",
+  "noteType": "Transliteration",
+  "subtitles": Array [
+    Object {
+      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "name": "pbc_jp.ass",
+      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "type": "ExternalSubtitlesFile",
+    },
+  ],
+  "tags": Array [
+    "piggeldy_cat.mp4",
+    "pbc",
+  ],
+  "timestamp": "2020-01-24T15:09:18Z",
+  "version": "4.1.0",
+}
+`;
