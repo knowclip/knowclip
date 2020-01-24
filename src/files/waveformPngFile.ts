@@ -1,7 +1,5 @@
 import * as r from '../redux'
-
 import { FileEventHandlers } from './eventHandlers'
-import { AsyncError } from '../utils/ffmpeg'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {

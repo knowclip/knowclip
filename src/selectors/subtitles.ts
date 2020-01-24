@@ -4,7 +4,7 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { getFileAvailability, getFile } from './files'
+import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
 

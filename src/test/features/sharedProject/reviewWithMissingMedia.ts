@@ -1,4 +1,4 @@
-import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
+import { TestSetup } from '../../spectronApp'
 import { main$ } from '../../../components/Main'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
@@ -6,18 +6,10 @@ import {
   reviewAndExportMediaTableRow$ as mediaTableRows$,
   reviewAndExportMediaTableRow$,
 } from '../../../components/ReviewAndExportMediaTableRow'
-import { snackbar$ } from '../../../components/Snackbar'
-import { join } from 'path'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
-import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
 import { flashcardSectionForm$ } from '../../../components/FlashcardSectionForm'
-import { ClientWrapper } from '../../driver/ClientWrapper'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 
-export default async function reviewWithMissingMedia({
-  client,
-  app,
-}: TestSetup) {
+export default async function reviewWithMissingMedia({ client }: TestSetup) {
   // maybe the first part for the loaded media should go in a different integration test
   await client.waitForText_(
     flashcardSectionForm$.container,
