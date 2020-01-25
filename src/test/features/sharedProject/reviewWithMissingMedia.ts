@@ -48,7 +48,7 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
   ).toMatchObject([false, true, true, true])
 
-  await client.clickElement_(mediaTableRows$.container)
+  await client.doubleClickElement_(mediaTableRows$.container)
   await client.waitForText_(
     mediaTableRows$.highlightedClipRow,
     '笹を食べながらのんびりするのは最高だなぁ'
@@ -56,7 +56,7 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
 
   await client.clickElement_(mediaTables$.header)
   await client.waitUntilGone_(mediaTableRows$.highlightedClipRow)
-  await client.clickElement_(mediaTableRows$.container)
+  await client.doubleClickElement_(mediaTableRows$.container)
 
   expect(
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
