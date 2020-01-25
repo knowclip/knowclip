@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react'
 import cn from 'classnames'
-import { MenuItem, Paper } from '@material-ui/core'
-import ChipInput from 'material-ui-chip-input'
+import { MenuItem, Paper, Chip } from '@material-ui/core'
+import ChipInput, { ChipRenderer } from 'material-ui-chip-input'
 import css from './FlashcardSection.module.css'
 import Autosuggest, {
   RenderSuggestion,
@@ -9,6 +9,8 @@ import Autosuggest, {
   RenderSuggestionsContainer,
   InputProps,
 } from 'react-autosuggest'
+import { blue } from '@material-ui/core/colors'
+import truncate from '../utils/truncate'
 
 enum $ {
   tagsInputContainer = 'tags-input-container',
@@ -158,6 +160,7 @@ const TagsInput = ({
             value={chips}
             clearInputValueOnChange
             inputRef={ref}
+            chipRenderer={chipRenderer}
             {...other}
           />
         ),
@@ -166,6 +169,24 @@ const TagsInput = ({
     />
   )
 }
+
+const chipRenderer: ChipRenderer = (
+  { text, isFocused, isDisabled, handleClick, handleDelete, className },
+  key
+) => (
+  <Chip
+    key={key}
+    className={className}
+    style={{
+      pointerEvents: isDisabled ? 'none' : undefined,
+      backgroundColor: isFocused ? blue[300] : undefined,
+    }}
+    onClick={handleClick}
+    onDelete={handleDelete}
+    label={truncate(text, 12)}
+    title={text}
+  />
+)
 
 export default TagsInput
 

@@ -20,7 +20,13 @@ enum $ {
   nextClipButton = 'next-clip-button',
 }
 
-const FlashcardSection = ({ mediaFile }: { mediaFile: MediaFile | null }) => {
+const FlashcardSection = ({
+  mediaFile,
+  className,
+}: {
+  mediaFile: MediaFile | null
+  className?: string
+}) => {
   const { prevId, nextId, highlightedClipId } = useSelector(
     (state: AppState) => ({
       prevId: r.getFlashcardIdBeforeCurrent(state),
@@ -31,50 +37,45 @@ const FlashcardSection = ({ mediaFile }: { mediaFile: MediaFile | null }) => {
   const dispatch = useDispatch()
 
   return (
-    <section className={cn(css.container, $.container)}>
+    <Card className={cn(className, css.container, $.container, css.card)}>
       <Tooltip title="Previous clip (Ctrl + comma)">
-        <span>
-          <IconButton
-            className={cn(css.navButton, $.previousClipButton)}
-            disabled={!prevId}
-            onClick={useCallback(
-              () => dispatch(actions.highlightClip(prevId)),
-              [dispatch, prevId]
-            )}
-          >
-            <ChevronLeft />
-          </IconButton>
-        </span>
+        <IconButton
+          className={cn(css.prevButton, $.previousClipButton)}
+          disabled={!prevId}
+          onClick={useCallback(() => dispatch(actions.highlightClip(prevId)), [
+            dispatch,
+            prevId,
+          ])}
+        >
+          <ChevronLeft />
+        </IconButton>
       </Tooltip>
-      <Card className={css.card}>
-        <CardContent>
-          {highlightedClipId && mediaFile ? (
-            <FlashcardForm
-              key={highlightedClipId}
-              className={css.form}
-              mediaFile={mediaFile}
-              clipId={highlightedClipId}
-            />
-          ) : (
-            <Placeholder />
-          )}
-        </CardContent>
-      </Card>
+
+      <CardContent>
+        {highlightedClipId && mediaFile ? (
+          <FlashcardForm
+            key={highlightedClipId}
+            className={css.form}
+            mediaFile={mediaFile}
+            clipId={highlightedClipId}
+          />
+        ) : (
+          <Placeholder />
+        )}
+      </CardContent>
       <Tooltip title="Next clip (Ctrl + period)">
-        <span>
-          <IconButton
-            className={cn(css.navButton, $.nextClipButton)}
-            disabled={!nextId}
-            onClick={useCallback(
-              () => dispatch(actions.highlightClip(nextId)),
-              [dispatch, nextId]
-            )}
-          >
-            <ChevronRight />
-          </IconButton>
-        </span>
+        <IconButton
+          className={cn(css.nextButton, $.nextClipButton)}
+          disabled={!nextId}
+          onClick={useCallback(() => dispatch(actions.highlightClip(nextId)), [
+            dispatch,
+            nextId,
+          ])}
+        >
+          <ChevronRight />
+        </IconButton>
       </Tooltip>
-    </section>
+    </Card>
   )
 }
 

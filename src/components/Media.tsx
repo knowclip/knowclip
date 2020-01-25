@@ -15,12 +15,14 @@ type MediaProps = {
   loop: boolean
   metadata: MediaFile | null
   subtitles: SubtitlesTrack[]
+  className?: string
 }
 const Media = ({
   constantBitrateFilePath,
   loop,
   metadata,
   subtitles,
+  className,
 }: MediaProps) => {
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
 
@@ -54,29 +56,31 @@ const Media = ({
 
   useSyncSubtitlesVisibility(subtitles, mediaRef)
 
-  return metadata && metadata.isVideo ? (
-    <div className={css.videoContainer}>
-      <video
-        {...props}
-        ref={mediaRef as MutableRefObject<HTMLVideoElement>}
-        className={cn(css.video, css.mediaPlayer)}
-      >
-        {subtitles.map((track, index) => (
-          <Subtitles
-            index={index}
-            track={track}
-            key={track.id}
-            isDefault={index === 0}
-          />
-        ))}
-      </video>
-    </div>
-  ) : (
-    <audio
-      {...props}
-      ref={mediaRef as MutableRefObject<HTMLAudioElement>}
-      className={cn(css.audio, css.mediaPlayer)}
-    />
+  return (
+    <section className={className}>
+      {metadata && metadata.isVideo ? (
+        <video
+          {...props}
+          ref={mediaRef as MutableRefObject<HTMLVideoElement>}
+          className={cn(css.video, css.mediaPlayer)}
+        >
+          {subtitles.map((track, index) => (
+            <Subtitles
+              index={index}
+              track={track}
+              key={track.id}
+              isDefault={index === 0}
+            />
+          ))}
+        </video>
+      ) : (
+        <audio
+          {...props}
+          ref={mediaRef as MutableRefObject<HTMLAudioElement>}
+          className={cn(css.audio, css.mediaPlayer)}
+        />
+      )}
+    </section>
   )
 }
 

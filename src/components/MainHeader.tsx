@@ -28,10 +28,6 @@ const MainHeader = ({
     () => dispatch(actions.detectSilenceRequest()),
     [dispatch]
   )
-  const deleteAllCurrentFileClipsRequest = useCallback(
-    () => dispatch(actions.deleteAllCurrentFileClipsRequest()),
-    [dispatch]
-  )
   return (
     <header className={cn(headerCss.container, $.container)}>
       <ProjectMenu className={headerCss.block} />
@@ -51,13 +47,6 @@ const MainHeader = ({
               <Tooltip title="Detect silences">
                 <IconButton onClick={detectSilenceRequest}>
                   <HearingIcon />
-                </IconButton>
-              </Tooltip>
-            </li>
-            <li className={headerCss.menuItem}>
-              <Tooltip title="Delete all clips for this media">
-                <IconButton onClick={deleteAllCurrentFileClipsRequest}>
-                  <DeleteIcon />
                 </IconButton>
               </Tooltip>
             </li>

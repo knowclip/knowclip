@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-flow: row nowrap;
-  padding: .5rem !important;
+  /* padding: .5rem !important; */
   justify-content: center;
   align-items: flex-start;
   overflow: auto;
@@ -24,15 +24,29 @@
 }
 
 .navButton {
-  margin: 10rem .5rem .5rem .5rem !important;
+  /* margin: 10rem .5rem .5rem .5rem !important; */
+  position: absolute !important;
+  top: 1rem;
+}
+.prevButton {
+  composes: navButton;
+  left: 1rem;
+}
+.nextButton {
+  composes: navButton;
+  right: 1rem;
 }
 
 .card {
-  min-height: 20rem;
-  width: 30rem;
-  margin: .5rem !important;
+  /* min-height: 20rem; */
+  /* width: 30rem; */
+  /* margin: .5rem !important; */
   position: relative;
-  padding-bottom: 3rem;
+  /* padding-bottom: 3rem; */
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  border-radius: 0;
 }
 
 .form {
