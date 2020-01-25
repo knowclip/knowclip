@@ -52,7 +52,10 @@ const FlashcardSectionForm = ({
   ])
   const loopOnInteract = useCallback(
     () => {
-      if (!isLoopOn) dispatch(actions.setLoop(true))
+      const media = document.getElementById('mediaPlayer')
+      const mediaIsPlaying =
+        media && !(media as HTMLVideoElement | HTMLAudioElement).paused
+      if (mediaIsPlaying && !isLoopOn) dispatch(actions.setLoop(true))
     },
     [dispatch, isLoopOn]
   )

@@ -18,6 +18,7 @@ import highlightClip from './highlightClip'
 import subtitles from './subtitles'
 import files from './files'
 import defaultTags from './defaultTags'
+import loopMedia from './loopMedia'
 import { showMessageBox } from '../utils/electron'
 import { AppEpic } from '../types/AppEpic'
 
@@ -49,6 +50,7 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 const rootEpic: AppEpic = combineEpics(
   addMediaToProject,
   setWaveformCursorEpic,
+  loopMedia,
   addClip,
   stretchClip,
   detectSilenceEpic,
