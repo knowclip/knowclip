@@ -8,7 +8,7 @@ import {
   switchMap,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, empty, of, from } from 'rxjs'
+import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
