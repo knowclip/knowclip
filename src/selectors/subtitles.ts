@@ -91,6 +91,7 @@ export const getSubtitlesFilesWithTracks = createSelector(
     let externalCount = 0
     const subtitles = currentFile
       ? currentFile.subtitles.map((t, i) => {
+          // eslint-disable-line array-callback-return
           switch (t.type) {
             case 'EmbeddedSubtitlesTrack':
               const embeddedIndex = ++embeddedCount

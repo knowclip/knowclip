@@ -43,7 +43,6 @@ const SubtitlesClipsDialog = ({
 }: DialogProps<SubtitlesClipsDialogData>) => {
   const dispatch = useDispatch()
   const {
-    noteType,
     currentNoteTypeFields,
     subtitles,
     fieldsToTracks,

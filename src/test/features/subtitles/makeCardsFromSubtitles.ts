@@ -1,13 +1,9 @@
 import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
-import { dragMouse } from '../../driver/runEvents'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import {
-  flashcardSectionForm$ as flashcardForm$,
-  flashcardSectionForm$,
-} from '../../../components/FlashcardSectionForm'
+import { flashcardSectionForm$ } from '../../../components/FlashcardSectionForm'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
