@@ -190,7 +190,7 @@ const SubtitlesTimelines = memo(
         onClick={handleClick}
       >
         {subtitles.map(({ chunks, id }, trackIndex) => (
-          <g className={$.subtitlesTimelines}>
+          <g className={$.subtitlesTimelines} key={id}>
             {chunks.map((chunk, index) => (
               <SubtitlesChunk
                 key={`${chunk.start}_${chunk.text}`}

@@ -52,10 +52,20 @@ declare type MediaFile = {
   subtitlesTracksStreamIndexes: number[]
 }
 
-declare type SubtitlesFile = ExternalSubtitlesFile | VttConvertedSubtitlesFile
 declare type MediaSubtitlesRelation =
-  | { type: 'EmbeddedSubtitlesTrack'; id: string; streamIndex: number }
-  | { type: 'ExternalSubtitlesTrack'; id: string }
+  | EmbeddedSubtitlesTrackRelation
+  | ExternalSubtitlesTrackRelation
+declare type EmbeddedSubtitlesTrackRelation = {
+  type: 'EmbeddedSubtitlesTrack'
+  id: string
+  streamIndex: number
+}
+declare type ExternalSubtitlesTrackRelation = {
+  type: 'ExternalSubtitlesTrack'
+  id: string
+}
+
+declare type SubtitlesFile = ExternalSubtitlesFile | VttConvertedSubtitlesFile
 
 declare type ExternalSubtitlesFile = {
   type: 'ExternalSubtitlesFile'

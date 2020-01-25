@@ -20,7 +20,8 @@ const getSubtitlesSourceFileFromFilesSubset = (
   external: FilesState['ExternalSubtitlesFile'],
   generated: FilesState['VttConvertedSubtitlesFile'],
   id: string
-) => external[id] || generated[id] || null
+): ExternalSubtitlesFile | VttConvertedSubtitlesFile | null =>
+  external[id] || generated[id] || null
 export const getSubtitlesSourceFile = (
   state: AppState,
   id: string
@@ -49,6 +50,32 @@ export const getSubtitlesTracks = createSelector(
       .filter((track): track is SubtitlesTrack => Boolean(track))
   }
 )
+
+export type SubtitlesFileWithTrack =
+  | EmbeddedSubtitlesFileWithTrack
+  | ExternalSubtitlesFileWithTrack
+export type EmbeddedSubtitlesFileWithTrack = {
+  relation: EmbeddedSubtitlesTrackRelation
+  label: string
+  embeddedIndex: number
+  file: VttConvertedSubtitlesFile | null // can be null while loading?
+  track: EmbeddedSubtitlesTrack | null
+}
+export type ExternalSubtitlesFileWithTrack = {
+  relation: ExternalSubtitlesTrackRelation
+  label: string
+  externalIndex: number
+  file: ExternalSubtitlesFile | null // should never really be null
+  track: ExternalSubtitlesTrack | null
+}
+
+export type MediaSubtitles = {
+  total: number
+  embedded: EmbeddedSubtitlesFileWithTrack[]
+  external: ExternalSubtitlesFileWithTrack[]
+  all: SubtitlesFileWithTrack[]
+}
+
 export const getSubtitlesFilesWithTracks = createSelector(
   getCurrentMediaFile,
   getSubtitles,
@@ -59,41 +86,62 @@ export const getSubtitlesFilesWithTracks = createSelector(
     subtitlesTracks,
     externalFiles,
     convertedFiles
-  ): Array<{
-    relation: MediaSubtitlesRelation
-    file: SubtitlesFile | null // can be null while loading?
-    track: SubtitlesTrack | null
-  }> =>
-    currentFile
-      ? currentFile.subtitles.map(t => {
-          return {
-            relation: t,
-            file: getSubtitlesSourceFileFromFilesSubset(
-              externalFiles,
-              convertedFiles,
-              t.id
-            ),
-            track: subtitlesTracks[t.id] || null,
+  ): MediaSubtitles => {
+    let embeddedCount = 0
+    let externalCount = 0
+    const subtitles = currentFile
+      ? currentFile.subtitles.map((t, i) => {
+          switch (t.type) {
+            case 'EmbeddedSubtitlesTrack':
+              const embeddedIndex = ++embeddedCount
+              return {
+                relation: t,
+                embeddedIndex,
+                label: `Embedded subtitles track ${embeddedIndex}`,
+                file: getSubtitlesSourceFileFromFilesSubset(
+                  externalFiles,
+                  convertedFiles,
+                  t.id
+                ),
+                track: subtitlesTracks[t.id] || null,
+              } as EmbeddedSubtitlesFileWithTrack
+
+            case 'ExternalSubtitlesTrack':
+              const externalIndex = ++externalCount
+              return {
+                relation: t,
+                externalIndex,
+                label: `External subtitles track ${externalIndex}`,
+                file: getSubtitlesSourceFileFromFilesSubset(
+                  externalFiles,
+                  convertedFiles,
+                  t.id
+                ),
+                track: subtitlesTracks[t.id] || null,
+              } as ExternalSubtitlesFileWithTrack
           }
         })
       : []
+
+    return {
+      total: subtitles.length,
+      all: subtitles,
+      embedded: subtitles.filter(
+        (s): s is EmbeddedSubtitlesFileWithTrack =>
+          s.relation.type === 'EmbeddedSubtitlesTrack'
+      ),
+      external: subtitles.filter(
+        (s): s is ExternalSubtitlesFileWithTrack =>
+          s.relation.type === 'ExternalSubtitlesTrack'
+      ),
+    }
+  }
 )
 
 export const getSubtitlesTrack = (
   state: AppState,
   id: SubtitlesTrackId
 ): SubtitlesTrack | null => state.subtitles[id] || null
-
-const isEmbedded = (track: SubtitlesTrack): track is EmbeddedSubtitlesTrack =>
-  track.type === 'EmbeddedSubtitlesTrack'
-const isExternal = (track: SubtitlesTrack): track is ExternalSubtitlesTrack =>
-  track.type === 'ExternalSubtitlesTrack'
-export const getEmbeddedSubtitlesTracks = (
-  state: AppState
-): Array<EmbeddedSubtitlesTrack> => getSubtitlesTracks(state).filter(isEmbedded)
-export const getExternalSubtitlesTracks = (
-  state: AppState
-): Array<ExternalSubtitlesTrack> => getSubtitlesTracks(state).filter(isExternal)
 
 export const readVttChunk = (
   state: AppState,

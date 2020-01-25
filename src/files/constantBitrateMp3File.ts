@@ -8,14 +8,18 @@ export default {
   },
 
   openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => [
+    async ({ validatedFile, filePath }, state, effects) => {
       // TODO: don't generate extras, break up big PNGs
-      r.addAndOpenFile({
-        type: 'WaveformPng',
-        parentId: validatedFile.id,
-        id: validatedFile.id,
-      }),
-    ],
+      const waveform = r.getFile(state, 'WaveformPng', validatedFile.id)
+      if (waveform) return [r.openFileRequest(waveform)]
+      return [
+        r.addAndOpenFile({
+          type: 'WaveformPng',
+          parentId: validatedFile.id,
+          id: validatedFile.id,
+        }),
+      ]
+    },
   ],
 
   locateRequest: async ({ file }, state, effects) => {

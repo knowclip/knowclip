@@ -7,17 +7,16 @@ import {
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
 } from '../../spectronApp'
-import { mockSideEffects } from '../../../utils/sideEffects'
-import openSavedProject from './openSavedProject'
-import { join } from 'path'
-import makeSomeFlashcards from './makeSomeFlashcards'
+import makeCardsFromSubtitles from './makeCardsFromSubtitles'
 import saveAndCloseProject from './saveAndCloseProject'
+import { join } from 'path'
+import { mockSideEffects } from '../../../utils/sideEffects'
 
 jest.setTimeout(60000)
 
-const testId = 'savedProject'
+const testId = 'subtitlesProject'
 
-describe('opening and saving a previously saved project', () => {
+describe('make clips and cards from subtitles', () => {
   let context: { app: Application | null } = { app: null }
   let setup: TestSetup
 
@@ -27,8 +26,8 @@ describe('opening and saving a previously saved project', () => {
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('opens a previously saved project', () => openSavedProject(setup))
-  test('make some flashcards', () => makeSomeFlashcards(setup))
+  test('automatically make clips and cards from subtitles', () =>
+    makeCardsFromSubtitles(setup))
   test('saves and closes project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
@@ -38,31 +37,55 @@ describe('opening and saving a previously saved project', () => {
 
 const sideEffectsMocks = {
   uuid: [
-    'ece1aa0c-2377-47db-b5d1-47d63e918ca7',
-    'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
-    'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
+    '94367f0c-92ef-4542-a80a-6fbaf8e1ad76',
+    'e78620d8-9ebd-45b8-b335-d3280a4f3ecc',
+    '320265ad-8190-4729-8ec1-5fcf0d1b832e',
+    '2f5ad340-c06b-4754-a468-56852ec9638c',
+    '7d4e2afe-55d1-4a1a-8365-767aa83c83e5',
+    '8a0d55ba-e456-4108-9fe2-911d7d25ffde',
+    '193c54f4-49f0-442b-b866-320ba111d369',
+    'c7e5886a-0899-4192-8a9c-4b30c304a717',
+    'f4f17e82-af87-459e-af11-4f3d65f9d5d7',
+    'f1def124-bbaa-418a-8836-34a8d8cf74da',
+    '6c34f168-1e1d-4933-84ae-df589c68ec06',
+    '24374cd7-bed9-4f30-aace-dbdf8fe31422',
+    '8f0f15ae-fe46-4b73-ad7d-36c4d10359dd',
+    '2a3ce4c2-4714-47f6-9e33-2e28ba56eb1f',
+    '90bf45fc-00e0-41b7-b82e-fda29473761e',
   ],
-  nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
+  nowUtcTimestamp: ['2020-01-24T23:44:33Z', '2020-01-24T23:44:38Z'],
 }
 
 const persistedState: Partial<AppState> = {
   files: {
     ProjectFile: {
       'e36ca6de-4893-49f5-bca1-4410ace25d46': {
-        type: 'ProjectFile',
         id: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
-        name: 'My cool saved project',
-        noteType: 'Transliteration',
+        type: 'ProjectFile',
+        lastSaved: '2020-01-22T13:43:37Z',
+        lastOpened: '2020-01-24T15:09:03Z',
+        name: 'Project with subtitles',
         mediaFileIds: [
-          '535935a3-7d72-4238-87ab-1b7a413c1f71',
           'fa462524-bfeb-4434-a506-07858cc97151',
+          '535935a3-7d72-4238-87ab-1b7a413c1f71',
         ],
         error: null,
-        lastOpened: '2020-01-20T11:43:27Z',
-        lastSaved: '2020-01-20T11:42:45Z',
+        noteType: 'Transliteration',
       },
     },
     MediaFile: {
+      'fa462524-bfeb-4434-a506-07858cc97151': {
+        id: 'fa462524-bfeb-4434-a506-07858cc97151',
+        type: 'MediaFile',
+        parentId: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
+        subtitles: [],
+        flashcardFieldsToSubtitlesTracks: {},
+        name: 'piggeldy_cat.mp4',
+        durationSeconds: 58.24,
+        format: 'mov,mp4,m4a,3gp,3g2,mj2',
+        isVideo: true,
+        subtitlesTracksStreamIndexes: [],
+      },
       '535935a3-7d72-4238-87ab-1b7a413c1f71': {
         id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
         type: 'MediaFile',
@@ -78,24 +101,15 @@ const persistedState: Partial<AppState> = {
             id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
           },
         ],
-        flashcardFieldsToSubtitlesTracks: {},
+        flashcardFieldsToSubtitlesTracks: {
+          transcription: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
+          meaning: '37bd5e91-89c5-491b-9308-533c7be7338a',
+        },
         name: 'polar_bear_cafe.mp4',
         durationSeconds: 87.062,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
         isVideo: true,
         subtitlesTracksStreamIndexes: [2],
-      },
-      'fa462524-bfeb-4434-a506-07858cc97151': {
-        id: 'fa462524-bfeb-4434-a506-07858cc97151',
-        type: 'MediaFile',
-        parentId: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
-        subtitles: [],
-        flashcardFieldsToSubtitlesTracks: {},
-        name: 'piggeldy_cat.mp4',
-        durationSeconds: 58.24,
-        format: 'mov,mp4,m4a,3gp,3g2,mj2',
-        isVideo: true,
-        subtitlesTracksStreamIndexes: [],
       },
     },
     ExternalSubtitlesFile: {
@@ -138,7 +152,7 @@ const persistedState: Partial<AppState> = {
   fileAvailabilities: {
     ProjectFile: {
       'e36ca6de-4893-49f5-bca1-4410ace25d46': {
-        filePath: join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
+        filePath: join(TMP_DIRECTORY, 'project_with_subtitles.afca'),
         status: 'CURRENTLY_LOADED',
         id: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
       },
@@ -155,31 +169,16 @@ const persistedState: Partial<AppState> = {
         id: 'fa462524-bfeb-4434-a506-07858cc97151',
       },
     },
-    ExternalSubtitlesFile: {
-      '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
-        filePath: join(ASSETS_DIRECTORY, 'pbc_jp.ass'),
-        status: 'CURRENTLY_LOADED',
-        id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
-      },
-    },
+    ExternalSubtitlesFile: {},
     VttConvertedSubtitlesFile: {
       '37bd5e91-89c5-491b-9308-533c7be7338a': {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '95ecfad8a8bf42d562d0e751aa9f8448.vtt'
+          'cafbc25b9c6405df0dd0c77173539bcd.vtt'
         ),
         status: 'CURRENTLY_LOADED',
         id: '37bd5e91-89c5-491b-9308-533c7be7338a',
-      },
-      '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
-        filePath: join(
-          GENERATED_ASSETS_DIRECTORY,
-          testId,
-          '3e59a4e5742e827fdb30511fc40f7e82.vtt'
-        ),
-        status: 'CURRENTLY_LOADED',
-        id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
       },
     },
     WaveformPng: {
@@ -187,7 +186,7 @@ const persistedState: Partial<AppState> = {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '833a0a72cd50d38e26f320c7924f4da6.png'
+          '68a8d8c5862e344e7d032006fe1d2c0a.png'
         ),
         status: 'CURRENTLY_LOADED',
         id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
@@ -196,7 +195,7 @@ const persistedState: Partial<AppState> = {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          'f492c13cdbdf0c59adf3a72b2cb74e04.png'
+          '992896afa3b7fd044dd8a60bdba4c730.png'
         ),
         status: 'CURRENTLY_LOADED',
         id: 'fa462524-bfeb-4434-a506-07858cc97151',

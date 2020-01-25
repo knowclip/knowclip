@@ -15,13 +15,22 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     const existing = subtitles.find(
       s => s.type === 'EmbeddedSubtitlesTrack' && s.streamIndex === streamIndex
     )
-    return r.addAndOpenFile({
-      type: 'VttConvertedSubtitlesFile',
-      parentId: id,
-      id: existing ? existing.id : uuid(),
-      streamIndex,
-      parentType: 'MediaFile',
-    })
+    const file = existing
+      ? r.getFile(state, 'VttConvertedSubtitlesFile', existing.id)
+      : null
+    return file
+      ? r.openFileRequest(file)
+      : r.addAndOpenFile({
+          type: 'VttConvertedSubtitlesFile',
+          parentId: id,
+          // TODO: investigate separating setting current media file
+          // and opening a media file?
+          // this complexity is maybe a sign that we need
+          // two different stages for the event of adding + selecting a media file
+          id: existing ? existing.id : uuid(),
+          streamIndex,
+          parentType: 'MediaFile',
+        })
   })
 
 const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
@@ -46,31 +55,39 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile, filePath },
   state,
   effects
-) => [
-  r.addAndOpenFile({
-    type: 'WaveformPng',
-    parentId: validatedFile.id,
-    id: validatedFile.id,
-  }),
-]
+) => {
+  const waveform = r.getFile(state, 'WaveformPng', validatedFile.id)
+  if (waveform) return [r.openFileRequest(waveform)]
+  return [
+    r.addAndOpenFile({
+      type: 'WaveformPng',
+      parentId: validatedFile.id,
+      id: validatedFile.id,
+    }),
+  ]
+}
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile },
   state,
   effects
-) =>
-  validatedFile.format.toLowerCase().includes('mp3')
-    ? [
-        r.simpleMessageSnackbar(
-          'Converting mp3 to a usable format. Please be patient!'
-        ),
-        r.addAndOpenFile({
-          type: 'ConstantBitrateMp3',
-          id: validatedFile.id,
-          parentId: validatedFile.id,
-        }),
-      ]
-    : []
+) => {
+  if (validatedFile.format.toLowerCase().includes('mp3')) {
+    // TODO: investigate putting this logic (checking if file exists, then delegating to openFileRequest)
+    // into an epic for addAndOpenFile?
+    const cbr = r.getFile(state, 'ConstantBitrateMp3', validatedFile.id)
+    return cbr
+      ? [r.openFileRequest(cbr)]
+      : [
+          r.addAndOpenFile({
+            type: 'ConstantBitrateMp3',
+            id: validatedFile.id,
+            parentId: validatedFile.id,
+          }),
+        ]
+  }
+  return []
+}
 
 const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
   action,

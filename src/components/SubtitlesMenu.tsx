@@ -30,6 +30,7 @@ enum $ {
   trackMenuItems = 'subtitles-menu-track-item',
   openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
   locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
+  makeClipsAndCardsButton = 'subtitles-menu-make-clips-and-cards-button',
 }
 
 const SubtitlesMenu = () => {
@@ -38,13 +39,32 @@ const SubtitlesMenu = () => {
   const { subtitles, currentFileId } = useSelector((state: AppState) => {
     const currentFileId = r.getCurrentFileId(state)
     return {
-      subtitles: currentFileId ? r.getSubtitlesFilesWithTracks(state) : [],
+      subtitles: r.getSubtitlesFilesWithTracks(state),
       currentFileId,
     }
   })
 
   const dispatch = useDispatch()
+  const loadExternalTrack = useCallback(
+    async () => {
+      if (!currentFileId)
+        return dispatch(
+          actions.simpleMessageSnackbar('Please open a media file first.')
+        )
 
+      const filePaths = await showOpenDialog([
+        { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
+      ])
+      if (!filePaths) return
+
+      dispatch(
+        actions.loadSubtitlesFromFileRequest(filePaths[0], currentFileId)
+      )
+
+      close()
+    },
+    [dispatch, currentFileId, close]
+  )
   const subtitlesClipsDialogRequest = useCallback(
     e => {
       dispatch(actions.subtitlesClipsDialogRequest())
@@ -65,69 +85,42 @@ const SubtitlesMenu = () => {
         </IconButton>
       </Tooltip>
       <Menu anchorEl={anchorEl} open={isOpen} onClose={close}>
-        {!subtitles.length && (
+        {!subtitles.total && (
           <MenuItem dense disabled>
             No subtitles loaded.
           </MenuItem>
         )}
-        {subtitles
-          .filter(s => s.relation.type === 'EmbeddedSubtitlesTrack')
-          .map(({ relation, file, track }, i) => (
-            <EmbeddedTrackMenuItem
-              key={relation.id}
-              id={relation.id}
-              file={
-                file as
-                  | (VttConvertedSubtitlesFile & { parentType: 'MediaFile' })
-                  | null
-              }
-              track={track as EmbeddedSubtitlesTrack}
-              title={`Embedded track ${i + 1}`}
-            />
-          ))}
-        {subtitles
-          .filter(s => s.relation.type === 'ExternalSubtitlesTrack')
-          .map(({ relation, file, track }, i) => (
-            <ExternalTrackMenuItem
-              key={relation.id}
-              id={relation.id}
-              track={track as ExternalSubtitlesTrack}
-              file={file as ExternalSubtitlesFile}
-              title={`External track ${i + 1}`}
-            />
-          ))}
+        {subtitles.embedded.map(({ relation, file, track }, i) => (
+          <EmbeddedTrackMenuItem
+            key={relation.id}
+            id={relation.id}
+            file={
+              file as
+                | (VttConvertedSubtitlesFile & { parentType: 'MediaFile' })
+                | null
+            }
+            track={track}
+            title={`Embedded track ${i + 1}`}
+          />
+        ))}
+        {subtitles.external.map(({ relation, file, track }, i) => (
+          <ExternalTrackMenuItem
+            key={relation.id}
+            id={relation.id}
+            track={track}
+            file={file}
+            title={`External track ${i + 1}`}
+          />
+        ))}
         <Divider />
-        <MenuItem
-          dense
-          onClick={useCallback(
-            async () => {
-              if (!currentFileId)
-                return dispatch(
-                  actions.simpleMessageSnackbar(
-                    'Please open a media file first.'
-                  )
-                )
-
-              const filePaths = await showOpenDialog([
-                { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
-              ])
-              if (!filePaths) return
-
-              dispatch(
-                actions.loadSubtitlesFromFileRequest(
-                  filePaths[0],
-                  currentFileId
-                )
-              )
-
-              close()
-            },
-            [dispatch, currentFileId, close]
-          )}
-        >
+        <MenuItem dense onClick={loadExternalTrack}>
           <ListItemText primary="Load external track" />
         </MenuItem>
-        <MenuItem dense onClick={subtitlesClipsDialogRequest}>
+        <MenuItem
+          dense
+          onClick={subtitlesClipsDialogRequest}
+          id={$.makeClipsAndCardsButton}
+        >
           <ListItemText primary="Make clips + cards from subtitles" />
         </MenuItem>
       </Menu>

@@ -1,0 +1,415 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`make clips and cards from subtitles saves and closes project 1`] = `
+Object {
+  "clips": Array [
+    Object {
+      "end": 888,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Du hast eben gesagt, murrte Piggeldy, eine Katze sieht aus wie ein Schwein, stimmt's?",
+        },
+        "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+      "start": 603,
+    },
+    Object {
+      "end": 1545,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«",
+        },
+        "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+      "start": 1074,
+    },
+    Object {
+      "end": 2048,
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Schön! seufzte Piggeldy verzückt.
+
+Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse bist.",
+        },
+        "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+      "start": 1571,
+    },
+    Object {
+      "end": 626,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Chilling and eating bamboo 
+grass is the best thing ever.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "笹を食べながらのんびりするのは最高だなぁ",
+        },
+        "id": "94367f0c-92ef-4542-a80a-6fbaf8e1ad76",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "94367f0c-92ef-4542-a80a-6fbaf8e1ad76",
+      "start": 381.5,
+    },
+    Object {
+      "end": 882.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Hey now. Look at you, being so lazy 
+so early in the day.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "ちょっと  またこの子は昼間からゴロゴロして",
+        },
+        "id": "e78620d8-9ebd-45b8-b335-d3280a4f3ecc",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "e78620d8-9ebd-45b8-b335-d3280a4f3ecc",
+      "start": 639,
+    },
+    Object {
+      "end": 1063,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "You're in the way of my cleaning. Scoot.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "掃除の邪魔よ  どきなさい",
+        },
+        "id": "320265ad-8190-4729-8ec1-5fcf0d1b832e",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "320265ad-8190-4729-8ec1-5fcf0d1b832e",
+      "start": 916.5,
+    },
+    Object {
+      "end": 1136,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Okay.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "はいー",
+        },
+        "id": "2f5ad340-c06b-4754-a468-56852ec9638c",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "2f5ad340-c06b-4754-a468-56852ec9638c",
+      "start": 1064,
+    },
+    Object {
+      "end": 1372.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Seconds please, Mom.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "お母さん  おかわり",
+        },
+        "id": "7d4e2afe-55d1-4a1a-8365-767aa83c83e5",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "7d4e2afe-55d1-4a1a-8365-767aa83c83e5",
+      "start": 1240,
+    },
+    Object {
+      "end": 1609.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Exactly what do you have 
+planned for your future?",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "どうするの  あなた将来は",
+        },
+        "id": "8a0d55ba-e456-4108-9fe2-911d7d25ffde",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "8a0d55ba-e456-4108-9fe2-911d7d25ffde",
+      "start": 1466,
+    },
+    Object {
+      "end": 1961,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Jeez... Could we not talk about my future when I'm relaxing?",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "もう  ゴロゴロしてるときに  将来の話なんかしないでよ",
+        },
+        "id": "193c54f4-49f0-442b-b866-320ba111d369",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "193c54f4-49f0-442b-b866-320ba111d369",
+      "start": 1661.5,
+    },
+    Object {
+      "end": 2131.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "If you have so much time to relax, you could go look for a part-time job.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "暇があるなら  ちょっとはバイトでも探しなさい",
+        },
+        "id": "c7e5886a-0899-4192-8a9c-4b30c304a717",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "c7e5886a-0899-4192-8a9c-4b30c304a717",
+      "start": 1962.5,
+    },
+    Object {
+      "end": 2464.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I'm too busy relaxing, 
+so I'll do it later.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "ええ  ゴロゴロするのに忙しいから  後にするよ",
+        },
+        "id": "f4f17e82-af87-459e-af11-4f3d65f9d5d7",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "f4f17e82-af87-459e-af11-4f3d65f9d5d7",
+      "start": 2136.5,
+    },
+    Object {
+      "end": 2755,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Don't try to suck me up!",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "ああー  吸わないで",
+        },
+        "id": "f1def124-bbaa-418a-8836-34a8d8cf74da",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "f1def124-bbaa-418a-8836-34a8d8cf74da",
+      "start": 2516.5,
+    },
+    Object {
+      "end": 2912,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Jeez...",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "もう",
+        },
+        "id": "6c34f168-1e1d-4933-84ae-df589c68ec06",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "6c34f168-1e1d-4933-84ae-df589c68ec06",
+      "start": 2844,
+    },
+    Object {
+      "end": 3233.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I wonder why Mom can't understand how much time relaxing takes up.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "どうしてお母さんはゴロゴロする忙しさが分かんないんだろな",
+        },
+        "id": "24374cd7-bed9-4f30-aace-dbdf8fe31422",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "24374cd7-bed9-4f30-aace-dbdf8fe31422",
+      "start": 2951,
+    },
+    Object {
+      "end": 4099,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Excuse me, which of these will have jobs where I can get paid to do nothing?",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "えーと  働かないでお金がもらえる仕事が載っているのはどれですか",
+        },
+        "id": "8f0f15ae-fe46-4b73-ad7d-36c4d10359dd",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "8f0f15ae-fe46-4b73-ad7d-36c4d10359dd",
+      "start": 3764.5,
+    },
+    Object {
+      "end": 4254.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I don't think there is one.",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "ないと思います",
+        },
+        "id": "2a3ce4c2-4714-47f6-9e33-2e28ba56eb1f",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "2a3ce4c2-4714-47f6-9e33-2e28ba56eb1f",
+      "start": 4173,
+    },
+    Object {
+      "end": 4336.5,
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "Really?",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "え",
+        },
+        "id": "90bf45fc-00e0-41b7-b82e-fda29473761e",
+        "tags": Array [
+          "pbc",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "90bf45fc-00e0-41b7-b82e-fda29473761e",
+      "start": 4268,
+    },
+  ],
+  "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+  "lastOpened": "2020-01-24T23:44:33Z",
+  "mediaFiles": Array [
+    Object {
+      "durationSeconds": 58.24,
+      "flashcardFieldsToSubtitlesTracks": Object {},
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "id": "fa462524-bfeb-4434-a506-07858cc97151",
+      "isVideo": true,
+      "name": "piggeldy_cat.mp4",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": Array [],
+      "subtitlesTracksStreamIndexes": Array [],
+      "type": "MediaFile",
+    },
+    Object {
+      "durationSeconds": 87.062,
+      "flashcardFieldsToSubtitlesTracks": Object {
+        "meaning": "37bd5e91-89c5-491b-9308-533c7be7338a",
+        "transcription": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      },
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "isVideo": true,
+      "name": "polar_bear_cafe.mp4",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": Array [
+        Object {
+          "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
+          "streamIndex": 2,
+          "type": "EmbeddedSubtitlesTrack",
+        },
+        Object {
+          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+          "type": "ExternalSubtitlesTrack",
+        },
+      ],
+      "subtitlesTracksStreamIndexes": Array [
+        2,
+      ],
+      "type": "MediaFile",
+    },
+  ],
+  "name": "Project with subtitles",
+  "noteType": "Transliteration",
+  "subtitles": Array [
+    Object {
+      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "name": "pbc_jp.ass",
+      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "type": "ExternalSubtitlesFile",
+    },
+  ],
+  "tags": Array [
+    "piggeldy_cat.mp4",
+    "pbc",
+  ],
+  "timestamp": "2020-01-24T23:44:38Z",
+  "version": "4.1.0",
+}
+`;

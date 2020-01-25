@@ -5,6 +5,7 @@ import {
   Hearing as HearingIcon,
   Delete as DeleteIcon,
 } from '@material-ui/icons'
+import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'
 import ProjectMenu from '../components/ProjectMenu'
 import headerCss from '../components/MainHeader.module.css'
@@ -32,7 +33,7 @@ const MainHeader = ({
     [dispatch]
   )
   return (
-    <header className={headerCss.container}>
+    <header className={cn(headerCss.container, $.container)}>
       <ProjectMenu className={headerCss.block} />
       <section className={headerCss.block}>
         <MediaFilesMenu

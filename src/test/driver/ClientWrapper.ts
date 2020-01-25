@@ -141,6 +141,21 @@ export class ClientWrapper {
     return await this.getText(getSelector(selector))
   }
 
+  async elementWithText(selector: string, text: string) {
+    await this.waitForText('body', text)
+    const elements = await this.elements(selector)
+    const elementsText = await Promise.all(elements.map(e => e.getText()))
+    const elementWithText = elements.find((e, i) =>
+      elementsText[i].includes(text)
+    )
+
+    if (!elementWithText)
+      throw new Error(
+        `No elements matching "${selector}" contain text "${text}"`
+      )
+    return elementWithText
+  }
+
   async waitForVisible(selector: string) {
     try {
       return await this._client.waitUntil(async () => {

@@ -39,3 +39,8 @@ const getHumanFileTypeName = (file: FileMetadata) => {
 export const getHumanFileName = (file: FileMetadata) => {
   return getHumanFileTypeName(file) + ('name' in file ? ` "${file.name}"` : '')
 }
+
+export const areSameFile = <F extends FileMetadata>(
+  a: F,
+  b: FileMetadata
+): boolean => a.id === b.id && a.type === b.type

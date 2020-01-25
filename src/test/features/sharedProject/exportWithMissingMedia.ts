@@ -6,6 +6,7 @@ import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
+import { mainHeader$ } from '../../../components/MainHeader'
 
 export default async function exportWithMissingMedia({
   client,
@@ -44,4 +45,6 @@ export default async function exportWithMissingMedia({
 
   await client.clickElement_(dialog$.exitButton)
   await client.waitUntilGone_(dialog$.exitButton)
+
+  await client.waitForText_(mainHeader$.container, 'polar_bear_cafe.mp4')
 }

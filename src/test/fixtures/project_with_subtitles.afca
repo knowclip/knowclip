@@ -1,0 +1,196 @@
+{
+  "version": "4.1.0",
+  "timestamp": "2020-01-24T15:09:18Z",
+  "name": "Project with subtitles",
+  "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+  "noteType": "Transliteration",
+  "lastOpened": "2020-01-24T15:09:03Z",
+  "mediaFiles": [
+    {
+      "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "type": "MediaFile",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": [
+        {
+          "type": "EmbeddedSubtitlesTrack",
+          "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
+          "streamIndex": 2
+        },
+        {
+          "type": "ExternalSubtitlesTrack",
+          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439"
+        }
+      ],
+      "flashcardFieldsToSubtitlesTracks": {
+        "transcription": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+        "meaning": "37bd5e91-89c5-491b-9308-533c7be7338a"
+      },
+      "name": "polar_bear_cafe.mp4",
+      "durationSeconds": 87.062,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "isVideo": true,
+      "subtitlesTracksStreamIndexes": [
+        2
+      ]
+    },
+    {
+      "id": "fa462524-bfeb-4434-a506-07858cc97151",
+      "type": "MediaFile",
+      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "subtitles": [],
+      "flashcardFieldsToSubtitlesTracks": {},
+      "name": "piggeldy_cat.mp4",
+      "durationSeconds": 58.24,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "isVideo": true,
+      "subtitlesTracksStreamIndexes": []
+    }
+  ],
+  "tags": [
+    "piggeldy_cat.mp4",
+    "pbc"
+  ],
+  "clips": [
+    {
+      "start": 603,
+      "end": 888,
+      "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": {
+        "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Du hast eben gesagt, murrte Piggeldy, eine Katze sieht aus wie ein Schwein, stimmt's?",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ]
+      }
+    },
+    {
+      "start": 1074,
+      "end": 1545,
+      "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": {
+        "id": "298d069b-1b30-420c-b3b4-2728569a6718",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ]
+      }
+    },
+    {
+      "start": 1571,
+      "end": 2048,
+      "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
+      "flashcard": {
+        "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Schön! seufzte Piggeldy verzückt.\n\nSchön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse bist.",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ]
+      }
+    },
+    {
+      "start": 402,
+      "end": 625,
+      "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": {
+        "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "笹を食べながらのんびりするのは最高だなぁ",
+          "meaning": "Relaxing while eating bamboo grass is the best",
+          "notes": "",
+          "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa"
+        },
+        "tags": [
+          "pbc"
+        ]
+      }
+    },
+    {
+      "start": 756,
+      "end": 888,
+      "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": {
+        "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "またこの子は昼間からゴロゴロして",
+          "meaning": "This kid, lazing about again so early",
+          "notes": "\"Goro-goro\" is the sound of something big rolling around.",
+          "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite"
+        },
+        "tags": [
+          "pbc"
+        ]
+      }
+    },
+    {
+      "start": 2522,
+      "end": 2774,
+      "id": "b9ba2184-cb5c-4d50-98c2-568bf8e75854",
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": {
+        "id": "b9ba2184-cb5c-4d50-98c2-568bf8e75854",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "ああー  吸わないで",
+          "meaning": "Don't try to suck me up!",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "pbc"
+        ]
+      }
+    },
+    {
+      "start": 3760,
+      "end": 4058,
+      "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "flashcard": {
+        "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "",
+          "meaning": "",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "pbc"
+        ]
+      }
+    }
+  ],
+  "subtitles": [
+    {
+      "type": "ExternalSubtitlesFile",
+      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "name": "pbc_jp.ass"
+    }
+  ]
+}
