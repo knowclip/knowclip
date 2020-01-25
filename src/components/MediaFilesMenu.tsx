@@ -10,7 +10,7 @@ import {
   Divider,
   Popover,
 } from '@material-ui/core'
-import { Loop, PlayArrow, Pause } from '@material-ui/icons'
+import { PlayArrow, Pause } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import MediaFilesMenuItem from './MediaFilesMenuItem'
 import { showOpenDialog } from '../utils/electron'
@@ -52,13 +52,11 @@ const MediaFilesMenu = ({
   className,
   currentProjectId,
 }: MediaFilesMenuProps) => {
-  const { loop, currentFile, projectMediaFiles } = useSelector(
-    (state: AppState) => ({
-      loop: r.isLoopOn(state),
-      currentFile: r.getCurrentMediaFile(state),
-      projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-    })
-  )
+  const { currentFile, projectMediaFiles } = useSelector((state: AppState) => ({
+    loop: r.isLoopOn(state),
+    currentFile: r.getCurrentMediaFile(state),
+    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+  }))
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -72,9 +70,6 @@ const MediaFilesMenu = ({
     },
     [dispatch, currentProjectId, popover]
   )
-  const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
-    dispatch,
-  ])
 
   const { playing, playOrPauseAudio } = usePlayButtonSync()
 

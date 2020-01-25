@@ -27,7 +27,7 @@ type FlashcardRowProps = {
   isSelected: boolean
   isHighlighted: boolean
 }
-let x: string | undefined
+
 const ReviewAndExportMediaTableRow = memo(
   ({ id, isSelected, onSelect, isHighlighted }: FlashcardRowProps) => {
     const {
