@@ -11,7 +11,6 @@ import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of, from } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
-import { setCursor } from './setWaveformCursor'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const elementWidth = (element: Element) => {
@@ -45,21 +44,16 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
     ),
     flatMap(({ waveformMousedown, clipIdAtX }) => {
       const state = state$.value
-      const mousePositionOrClipStart = clipIdAtX
-        ? (r.getClip(state, clipIdAtX) as Clip).start
-        : r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
-      const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
+      const highlightedClipId = r.getHighlightedClipId(state)
+      const newTime =
+        clipIdAtX && clipIdAtX !== highlightedClipId
+          ? (r.getClip(state, clipIdAtX) as Clip).start
+          : waveformMousedown.seconds
       effects.setCurrentTime(newTime)
-      const maxX = r.getXAtMilliseconds(
-        state$.value,
-        (r.getCurrentMediaFile(state$.value) as MediaFile).durationSeconds
-      )
-      return clipIdAtX
-        ? of(r.highlightClip(clipIdAtX))
-        : from([
-            setCursor(state$.value, effects.getCurrentTime(), maxX, effects),
-            r.highlightClip(null),
-          ])
+
+      return clipIdAtX === highlightedClipId
+        ? empty()
+        : of(r.highlightClip(clipIdAtX))
     })
   )
 }

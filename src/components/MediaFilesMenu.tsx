@@ -102,23 +102,13 @@ const MediaFilesMenu = ({
           </Button>
         )}
         {currentFile && (
-          <>
-            <Tooltip title="Loop audio (Ctrl + L)">
-              <IconButton
-                onClick={toggleLoop}
-                color={loop ? 'primary' : 'default'}
-              >
-                <Loop />
-              </IconButton>
-            </Tooltip>
-            <Tooltip
-              title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
-            >
-              <IconButton onClick={playOrPauseAudio}>
-                {playing ? <Pause /> : <PlayArrow />}
-              </IconButton>
-            </Tooltip>
-          </>
+          <Tooltip
+            title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
+          >
+            <IconButton onClick={playOrPauseAudio}>
+              {playing ? <Pause /> : <PlayArrow />}
+            </IconButton>
+          </Tooltip>
         )}
         {popover.isOpen && (
           <Popover
