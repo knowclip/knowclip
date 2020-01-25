@@ -1,14 +1,16 @@
-import { fromEvent, Observable } from 'rxjs'
-import { map, startWith, filter, switchMap } from 'rxjs/operators'
+import { fromEvent, Observable, of, from } from 'rxjs'
+import { map, startWith, filter, switchMap, flatMap } from 'rxjs/operators'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { isOpenFileSuccess } from '../utils/files'
+import highlightClip from './highlightClip'
 
 export const setCursor = (
   state: AppState,
-  currentTime: number,
-  { setCurrentTime, getWaveformSvgWidth }: EpicsDependencies
+  newlySetTime: number,
+  maxX: number,
+  { setCurrentTime, getWaveformSvgWidth, isMediaPlaying }: EpicsDependencies
 ) => {
   const viewBox = state.waveform.viewBox
 
@@ -17,15 +19,15 @@ export const setCursor = (
   const timeToLoop =
     highlightedClip &&
     r.isLoopOn(state) &&
-    currentTime >= r.getSecondsAtX(state, highlightedClip.end)
-  if (highlightedClip && timeToLoop) {
-    setCurrentTime(r.getSecondsAtX(state, highlightedClip.start))
+    newlySetTime >= r.getSecondsAtX(state, highlightedClip.end)
+  if (isMediaPlaying() && highlightedClip && timeToLoop) {
+    const highlightedClipStart = r.getSecondsAtX(state, highlightedClip.start)
+    setCurrentTime(highlightedClipStart)
   }
 
-  const newX = Math.round(
-    highlightedClip && timeToLoop ? highlightedClip.start : currentTime * 50
-  )
+  const newX = Math.round(newlySetTime * 50)
   const svgWidth = getWaveformSvgWidth()
+
   if (newX < viewBox.xMin) {
     return setWaveformCursor(newX, {
       ...viewBox,
@@ -50,7 +52,32 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
         // @ts-ignore
         true
       ).pipe(
-        map(() => setCursor(state$.value, effects.getCurrentTime(), effects)),
+        switchMap(() => {
+          const maxX = r.getXAtMilliseconds(
+            state$.value,
+            (r.getCurrentMediaFile(state$.value) as MediaFile).durationSeconds
+          )
+          const newCurrentTime = effects.getCurrentTime()
+          const highlightedClipId = r.getHighlightedClipId(state$.value)
+          const loopingClip = highlightedClipId && r.isLoopOn(state$.value)
+          const newClipIdToHighlight = r.getClipIdAt(
+            state$.value,
+            r.getXAtMilliseconds(state$.value, newCurrentTime * 1000)
+          )
+
+          if (
+            !loopingClip &&
+            newClipIdToHighlight &&
+            newClipIdToHighlight !== highlightedClipId
+          )
+            return from([r.highlightClip(newClipIdToHighlight)])
+
+          const result = of(
+            setCursor(state$.value, newCurrentTime, maxX, effects)
+          )
+          ;(window as any).seeky = false
+          return result
+        }),
         startWith(setWaveformCursor(0, { xMin: 0 }))
       )
     )

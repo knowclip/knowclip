@@ -25,23 +25,22 @@ type FlashcardRowProps = {
   id: string
   onSelect: (id: string) => void
   isSelected: boolean
+  isHighlighted: boolean
 }
+let x: string | undefined
 const ReviewAndExportMediaTableRow = memo(
-  ({ id, isSelected, onSelect }: FlashcardRowProps) => {
+  ({ id, isSelected, onSelect, isHighlighted }: FlashcardRowProps) => {
     const {
       flashcard: { fields, tags },
       formattedClipTime,
       isLoopOn,
-      highlightedClipId,
       currentMediaFile,
     } = useSelector((state: AppState) => ({
       flashcard: r.getFlashcard(state, id) as Flashcard,
       formattedClipTime: r.getFormattedClipTime(state, id),
       isLoopOn: r.isLoopOn(state),
-      highlightedClipId: r.getHighlightedClipId(state),
       currentMediaFile: r.getCurrentMediaFile(state),
     }))
-    const isHighlighted = id === highlightedClipId
 
     const dispatch = useDispatch()
     const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
@@ -53,7 +52,7 @@ const ReviewAndExportMediaTableRow = memo(
         className={cn(css.tableRow, $.container, {
           [$.highlightedClipRow]: isHighlighted,
         })}
-        onClick={useCallback(
+        onDoubleClick={useCallback(
           () => {
             if (currentMediaFile && !isHighlighted)
               dispatch(actions.highlightClip(id))

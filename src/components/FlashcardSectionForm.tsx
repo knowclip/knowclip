@@ -19,15 +19,15 @@ enum $ {
 const FlashcardSectionForm = ({
   className,
   mediaFile,
+  clipId,
 }: {
   className?: string
   mediaFile: MediaFile
+  clipId: string
 }) => {
-  const dispatch = useDispatch()
   const {
     allTags,
     currentFlashcard,
-    highlightedClipId,
     selectedClipTime,
     currentNoteType,
     isLoopOn,
@@ -36,35 +36,53 @@ const FlashcardSectionForm = ({
     allTags: r.getAllTags(state),
     currentFlashcard: r.getCurrentFlashcard(state),
     selectedClipTime: r.getSelectedClipTime(state),
-    highlightedClipId: r.getHighlightedClipId(state),
     currentNoteType: r.getCurrentNoteType(state),
     isLoopOn: r.isLoopOn(state),
     subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
   }))
 
+  if (!selectedClipTime || !currentFlashcard) throw new Error('Clip not found')
+
   const [moreMenuAnchorEl, setMoreMenuAnchorEl] = useState(null)
+
+  const dispatch = useDispatch()
 
   const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
     dispatch,
   ])
+  const loopOnInteract = useCallback(
+    () => {
+      if (!isLoopOn) dispatch(actions.setLoop(true))
+    },
+    [dispatch, isLoopOn]
+  )
+  const [focusedOnLoad, setFocusedOnLoad] = useState(false)
+  const handleFocus = useCallback(
+    () => {
+      if (!focusedOnLoad) return setFocusedOnLoad(true)
+
+      loopOnInteract()
+    },
+    [focusedOnLoad, setFocusedOnLoad, loopOnInteract]
+  )
+
   const handleCloseMoreMenu = useCallback(
     () => {
       setMoreMenuAnchorEl(null)
     },
     [setMoreMenuAnchorEl]
   )
-
   const handleClickDeleteButton = useCallback(
     () => {
-      if (highlightedClipId)
-        dispatch(
-          actions.confirmationDialog(
-            'Are you sure you want to delete this clip and flashcard?',
-            actions.deleteCard(highlightedClipId)
-          )
+      dispatch(
+        actions.confirmationDialog(
+          'Are you sure you want to delete this clip and flashcard?',
+          actions.deleteCard(clipId)
         )
+      )
+      loopOnInteract()
     },
-    [dispatch, highlightedClipId]
+    [dispatch, clipId, loopOnInteract]
   )
 
   const handleFlashcardSubmit = useCallback(e => {
@@ -72,30 +90,23 @@ const FlashcardSectionForm = ({
   }, [])
 
   const setFlashcardText = useCallback(
-    (key, text) => {
-      if (highlightedClipId)
-        dispatch(actions.setFlashcardField(highlightedClipId, key, text))
-    },
-    [dispatch, highlightedClipId]
+    (key, text) => dispatch(actions.setFlashcardField(clipId, key, text)),
+    [dispatch, clipId]
   )
-  const deleteCard = () => {
-    if (highlightedClipId) {
-      dispatch(actions.deleteCard(highlightedClipId))
-    }
-  }
-
-  if (!highlightedClipId || !selectedClipTime || !currentFlashcard)
-    throw new Error('Clip not found')
+  const deleteCard = useCallback(
+    () => {
+      dispatch(actions.deleteCard(clipId))
+    },
+    [dispatch, clipId]
+  )
 
   const onAddChip = useCallback(
-    (text: string) =>
-      dispatch(actions.addFlashcardTag(highlightedClipId, text)),
-    [dispatch, highlightedClipId]
+    (text: string) => dispatch(actions.addFlashcardTag(clipId, text)),
+    [dispatch, clipId]
   )
   const onDeleteChip = useCallback(
-    (index, text) =>
-      dispatch(actions.deleteFlashcardTag(highlightedClipId, index, text)),
-    [dispatch, highlightedClipId]
+    (index, text) => dispatch(actions.deleteFlashcardTag(clipId, index, text)),
+    [dispatch, clipId]
   )
 
   return (
@@ -104,7 +115,7 @@ const FlashcardSectionForm = ({
       onSubmit={handleFlashcardSubmit}
       id={$.container}
     >
-      <div className={css.formBody}>
+      <div className={css.formBody} onFocus={handleFocus}>
         <section className={css.timeStamp}>
           {formatTime(selectedClipTime.start)}
           {' - '}
@@ -119,9 +130,10 @@ const FlashcardSectionForm = ({
           </Tooltip>
         </section>
         {currentNoteType &&
-          getNoteTypeFields(currentNoteType).map(fieldName => (
+          getNoteTypeFields(currentNoteType).map((fieldName, i) => (
             <Field
               key={`${fieldName}_${currentFlashcard.id}`}
+              autoFocus={i === 0}
               name={fieldName}
               currentFlashcard={currentFlashcard}
               label={capitalize(fieldName)}
@@ -132,6 +144,7 @@ const FlashcardSectionForm = ({
               }
               mediaFileId={mediaFile.id}
               inputProps={{ className: $.flashcardFields }}
+              onKeyDown={loopOnInteract}
             />
           ))}
         <TagsInput

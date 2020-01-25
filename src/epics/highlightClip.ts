@@ -4,7 +4,6 @@ import {
   ignoreElements,
   filter,
   tap,
-  takeWhile,
   sample,
   switchMap,
 } from 'rxjs/operators'
@@ -12,7 +11,6 @@ import { ofType, combineEpics } from 'redux-observable'
 import { fromEvent, empty, of, from } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
-import { isOpenFileSuccess } from '../utils/files'
 import { setCursor } from './setWaveformCursor'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
@@ -52,10 +50,14 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
         : r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
       const newTime = r.getSecondsAtX(state, mousePositionOrClipStart)
       effects.setCurrentTime(newTime)
+      const maxX = r.getXAtMilliseconds(
+        state$.value,
+        (r.getCurrentMediaFile(state$.value) as MediaFile).durationSeconds
+      )
       return clipIdAtX
         ? of(r.highlightClip(clipIdAtX))
         : from([
-            setCursor(state$.value, effects.getCurrentTime(), effects),
+            setCursor(state$.value, effects.getCurrentTime(), maxX, effects),
             r.highlightClip(null),
           ])
     })
@@ -71,35 +73,27 @@ const highlightClipsOnAddEpic: AppEpic = (action$, state$) =>
 const playClipsOnHighlightEpic: AppEpic = (
   action$,
   state$,
-  { setCurrentTime }
+  { setCurrentTime, getCurrentTime }
 ) =>
   action$.pipe(
     ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
     filter(({ id }) => Boolean(id)),
     tap(({ id: clipId }) => {
-      const { start } = r.getClip(state$.value, clipId as ClipId) as Clip
-      const newTime = r.getSecondsAtX(state$.value, start)
-      setCurrentTime(newTime)
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
+      const { start, end } = r.getClip(state$.value, clipId as ClipId) as Clip
 
-      const input = document.querySelector(
-        'textarea:not([aria-hidden=true])'
-      ) as HTMLTextAreaElement | null
-      input && input.focus()
-      //
-      //
-      //
-      //
-      //
-      //
+      const { durationSeconds } = r.getCurrentMediaFile(
+        state$.value
+      ) as MediaFile
+      const newTime = Math.min(
+        durationSeconds,
+        r.getSecondsAtX(state$.value, start)
+      )
+      const currentTime = getCurrentTime()
+      if (
+        currentTime <= r.getSecondsAtX(state$.value, start) ||
+        currentTime >= r.getSecondsAtX(state$.value, end)
+      )
+        setCurrentTime(newTime)
     }),
     ignoreElements()
   )
@@ -159,36 +153,6 @@ const centerSelectedClip: AppEpic = (
     })
   )
 
-const LOOP_BUFFER = 25
-const deselectClipOnManualChangeTime: AppEpic = (action$, state$, effects) =>
-  action$.pipe(
-    filter<Action, OpenFileSuccessWith<MediaFile>>(
-      isOpenFileSuccess('MediaFile')
-    ),
-    switchMap(() =>
-      // @ts-ignore
-      fromEvent(effects.document, 'seeking', true).pipe(
-        takeWhile(() =>
-          Boolean(r.getCurrentMediaConstantBitrateFilePath(state$.value))
-        )
-      )
-    ),
-    filter(() => {
-      if (!r.isLoopOn(state$.value)) return false
-
-      const highlightedClipId = r.getHighlightedClipId(state$.value)
-      if (!highlightedClipId) return false
-
-      const highlightedClip = r.getClip(state$.value, highlightedClipId) as Clip
-      const x = r.getXAtMilliseconds(
-        state$.value,
-        effects.getCurrentTime() * 1000
-      )
-      return x < highlightedClip.start || x > highlightedClip.end + LOOP_BUFFER
-    }),
-    map(() => r.highlightClip(null))
-  )
-
 const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
@@ -202,6 +166,5 @@ export default combineEpics(
   playClipsOnHighlightEpic,
   selectClipOnStretch,
   centerSelectedClip,
-  deselectClipOnManualChangeTime,
   deselectOnOpenMediaFile
 )

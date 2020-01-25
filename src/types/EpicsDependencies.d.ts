@@ -10,6 +10,7 @@ declare type EpicsDependencies = {
   getWaveformSvgWidth: (() => number)
   getCurrentTime: (() => number)
   setCurrentTime: ((seconds: number) => void)
+  isMediaPlaying: () => boolean
   pauseMedia: (() => void)
   toggleMediaPaused: (() => void)
   getMediaMetadata: (

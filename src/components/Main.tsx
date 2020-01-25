@@ -20,7 +20,6 @@ enum $ {
 
 const Main = () => {
   const {
-    currentFlashcard,
     loop,
     audioIsLoading,
     currentProjectId,
@@ -31,7 +30,6 @@ const Main = () => {
   } = useSelector((state: AppState) => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
-      currentFlashcard: r.getCurrentFlashcard(state),
       loop: r.isLoopOn(state),
       audioIsLoading: r.isAudioLoading(state),
       currentProjectId: r.getCurrentProjectId(state),
@@ -81,10 +79,7 @@ const Main = () => {
       </section>
 
       {Boolean(currentMediaFile) && <Waveform show={!audioIsLoading} />}
-      <FlashcardSection
-        showing={Boolean(currentFlashcard)}
-        mediaFile={currentMediaFile}
-      />
+      <FlashcardSection mediaFile={currentMediaFile} />
 
       <Tooltip title="Review and export flashcards">
         <Fab

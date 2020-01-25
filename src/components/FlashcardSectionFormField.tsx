@@ -13,6 +13,8 @@ type Props = {
   subtitles: MediaFile['subtitles']
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
+  onKeyDown: () => void
+  autoFocus: boolean
 }
 const FlashcardSectionFormField = ({
   name,
@@ -23,6 +25,8 @@ const FlashcardSectionFormField = ({
   subtitles,
   linkedSubtitlesTrack,
   inputProps,
+  onKeyDown,
+  autoFocus,
 }: Props) => {
   const handleChange = useCallback(
     e => setFlashcardText(name, e.target.value),
@@ -43,8 +47,10 @@ const FlashcardSectionFormField = ({
         />
       )}
       <TextField
+        autoFocus={autoFocus}
         inputProps={inputProps}
         onChange={handleChange}
+        onKeyDown={onKeyDown}
         value={
           name in currentFlashcard.fields
             ? (currentFlashcard.fields as Record<

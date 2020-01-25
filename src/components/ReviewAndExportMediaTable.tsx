@@ -133,7 +133,12 @@ const ReviewAndExportMediaTable = memo(
 )
 
 const MediaTableBody = React.memo(
-  ({ clipsIds, onSelect, selectedIds }: MediaTableBodyProps) => {
+  ({
+    clipsIds,
+    onSelect,
+    selectedIds,
+    highlightedClipId,
+  }: MediaTableBodyProps) => {
     return (
       <TableBody>
         {clipsIds.map(id => (
@@ -142,6 +147,7 @@ const MediaTableBody = React.memo(
             id={id}
             onSelect={onSelect}
             isSelected={selectedIds.includes(id)}
+            isHighlighted={highlightedClipId === id}
           />
         ))}
       </TableBody>
