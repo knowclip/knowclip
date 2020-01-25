@@ -1,8 +1,9 @@
 import * as r from '../redux'
 import { basename } from 'path'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
-import { readMediaFile } from '../utils/ffmpeg'
+import { readMediaFile, AsyncError } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
+import { getHumanFileName } from '../utils/files'
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
@@ -14,13 +15,22 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     const existing = subtitles.find(
       s => s.type === 'EmbeddedSubtitlesTrack' && s.streamIndex === streamIndex
     )
-    return r.addAndOpenFile({
-      type: 'VttConvertedSubtitlesFile',
-      parentId: id,
-      id: existing ? existing.id : uuid(),
-      streamIndex,
-      parentType: 'MediaFile',
-    })
+    const file = existing
+      ? r.getFile(state, 'VttConvertedSubtitlesFile', existing.id)
+      : null
+    return file
+      ? r.openFileRequest(file)
+      : r.addAndOpenFile({
+          type: 'VttConvertedSubtitlesFile',
+          parentId: id,
+          // TODO: investigate separating setting current media file
+          // and opening a media file?
+          // this complexity is maybe a sign that we need
+          // two different stages for the event of adding + selecting a media file
+          id: existing ? existing.id : uuid(),
+          streamIndex,
+          parentType: 'MediaFile',
+        })
   })
 
 const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
@@ -45,31 +55,39 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile, filePath },
   state,
   effects
-) => [
-  r.addAndOpenFile({
-    type: 'WaveformPng',
-    parentId: validatedFile.id,
-    id: validatedFile.id,
-  }),
-]
+) => {
+  const waveform = r.getFile(state, 'WaveformPng', validatedFile.id)
+  if (waveform) return [r.openFileRequest(waveform)]
+  return [
+    r.addAndOpenFile({
+      type: 'WaveformPng',
+      parentId: validatedFile.id,
+      id: validatedFile.id,
+    }),
+  ]
+}
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile },
   state,
   effects
-) =>
-  validatedFile.format.toLowerCase().includes('mp3')
-    ? [
-        r.simpleMessageSnackbar(
-          'Converting mp3 to a usable format. Please be patient!'
-        ),
-        r.addAndOpenFile({
-          type: 'ConstantBitrateMp3',
-          id: validatedFile.id,
-          parentId: validatedFile.id,
-        }),
-      ]
-    : []
+) => {
+  if (validatedFile.format.toLowerCase().includes('mp3')) {
+    // TODO: investigate putting this logic (checking if file exists, then delegating to openFileRequest)
+    // into an epic for addAndOpenFile?
+    const cbr = r.getFile(state, 'ConstantBitrateMp3', validatedFile.id)
+    return cbr
+      ? [r.openFileRequest(cbr)]
+      : [
+          r.addAndOpenFile({
+            type: 'ConstantBitrateMp3',
+            id: validatedFile.id,
+            parentId: validatedFile.id,
+          }),
+        ]
+  }
+  return []
+}
 
 const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
   action,
@@ -77,7 +95,36 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
   effects
 ) => {
   const currentFileName = r.getCurrentFileName(state)
-  return [r.setDefaultTags(currentFileName ? [basename(currentFileName)] : [])]
+  const currentFileId = r.getCurrentFileId(state)
+  const clipsCount = currentFileId
+    ? r.getClipIdsByMediaFileId(state, currentFileId).length
+    : 0
+
+  if (currentFileName && !clipsCount)
+    return [r.setDefaultTags([basename(currentFileName)])]
+
+  const commonTags = currentFileId
+    ? r.getClips(state, currentFileId).reduce(
+        (tags, clip, i) => {
+          if (i === 0) return clip.flashcard.tags
+
+          const tagsToDelete = []
+          for (const tag of tags) {
+            if (!clip.flashcard.tags.includes(tag)) tagsToDelete.push(tag)
+          }
+
+          for (const tagToDelete of tagsToDelete) {
+            const index = tags.indexOf(tagToDelete)
+            tags.splice(index, 1)
+          }
+          return tags
+        },
+        [] as string[]
+      )
+    : []
+  if (commonTags.length) return [r.setDefaultTags(commonTags)]
+
+  return [r.setDefaultTags([])]
 }
 
 export default {
@@ -85,20 +132,33 @@ export default {
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
-    const [errorMessage, validatedFile] = await validateMediaFile(
-      file,
-      filePath
-    )
-    return [
-      errorMessage
-        ? r.confirmationDialog(
-            errorMessage +
-              '\n\nAre you sure this is the file you want to open?',
-            r.openFileSuccess(validatedFile, filePath),
-            r.openFileFailure(file, filePath, `File was rejected: ${filePath}`)
-          )
-        : r.openFileSuccess(validatedFile, filePath),
-    ]
+    const validationResult = await validateMediaFile(file, filePath)
+    if (validationResult instanceof AsyncError)
+      return [
+        r.openFileFailure(
+          file,
+          filePath,
+          `Problem opening ${getHumanFileName(
+            file
+          )}: ${validationResult.message || 'problem reading file.'}`
+        ),
+      ]
+    const [errorMessage, validatedFile] = validationResult
+    if (errorMessage)
+      return [
+        r.confirmationDialog(
+          errorMessage + '\n\nAre you sure this is the file you want to open?',
+          r.openFileSuccess(validatedFile, filePath),
+          r.openFileFailure(
+            file,
+            filePath,
+            `Some features may be unavailable until your file is located.`
+          ),
+          true
+        ),
+      ]
+
+    return [r.openFileSuccess(validatedFile, filePath)]
   },
 
   openSuccess: [
@@ -123,7 +183,7 @@ export default {
 const validateMediaFile = async (
   existingFile: MediaFile,
   filePath: string
-): Promise<[string | null, MediaFile]> => {
+): Promise<[string | null, MediaFile] | AsyncError> => {
   const newFile = await readMediaFile(
     filePath,
     existingFile.id,
@@ -131,6 +191,8 @@ const validateMediaFile = async (
     existingFile.subtitles,
     existingFile.flashcardFieldsToSubtitlesTracks
   )
+
+  if (newFile instanceof AsyncError) return newFile
 
   const differences = []
 

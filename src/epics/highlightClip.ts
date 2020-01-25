@@ -125,10 +125,11 @@ const centerSelectedClip: AppEpic = (
     ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
     switchMap(({ id }) => {
       if (!id) return empty()
-      const clip = r.getClip(state$.value, id) as Clip
+      const clip = r.getClip(state$.value, id)
       if (!clip) return empty()
 
-      const svgElement = getWaveformSvgElement() as SVGElement
+      const svgElement = getWaveformSvgElement()
+      if (!svgElement) return empty()
       const svgWidth = elementWidth(svgElement)
 
       const svgFits = clip.end - clip.start <= svgWidth

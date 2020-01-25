@@ -5,6 +5,7 @@ export * from './dialog'
 export * from './projects'
 export * from './subtitles'
 export * from './files'
+export * from './user'
 
 export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
@@ -73,11 +74,11 @@ export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
 
 export const exportApkgRequest = (
   clipIds: Array<ClipId>,
-  outputFilePath: string
+  mediaOpenPrior: MediaFile | null
 ): ExportApkgRequest => ({
   type: A.EXPORT_APKG_REQUEST,
   clipIds,
-  outputFilePath,
+  mediaOpenPrior,
 })
 
 export const exportApkgFailure = (errorMessage?: string): Action => ({

@@ -121,13 +121,31 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       }))
 
     case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
-      return edit<MediaFile>(state, 'MediaFile', action.mediaFileId, file => ({
-        ...file,
-        flashcardFieldsToSubtitlesTracks: {
+      return edit<MediaFile>(state, 'MediaFile', action.mediaFileId, file => {
+        const flashcardFieldsToSubtitlesTracks = {
           ...file.flashcardFieldsToSubtitlesTracks,
-          [action.flashcardFieldName]: action.subtitlesTrackId,
-        },
-      }))
+        }
+        if (action.subtitlesTrackId) {
+          for (const [fieldName, trackId] of Object.entries(
+            flashcardFieldsToSubtitlesTracks
+          )) {
+            if (trackId === action.subtitlesTrackId)
+              delete flashcardFieldsToSubtitlesTracks[
+                fieldName as TransliterationFlashcardFieldName
+              ]
+          }
+
+          flashcardFieldsToSubtitlesTracks[action.flashcardFieldName] =
+            action.subtitlesTrackId
+        } else {
+          delete flashcardFieldsToSubtitlesTracks[action.flashcardFieldName]
+        }
+
+        return {
+          ...file,
+          flashcardFieldsToSubtitlesTracks,
+        }
+      })
 
     case A.SET_PROJECT_NAME:
       return edit<ProjectFile>(state, 'ProjectFile', action.id, file => ({

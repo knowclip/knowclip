@@ -1,15 +1,15 @@
 import { TestSetup } from '../../spectronApp'
 import { dragMouse } from '../../driver/ClientWrapper'
-import { testLabels as flashcardSection } from '../../../components/FlashcardSection'
-import { testLabels as tagsInput } from '../../../components/TagsInput'
-import { testLabels as waveform } from '../../../components/Waveform'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
+import { tagsInput$ } from '../../../components/TagsInput'
+import { waveform$ } from '../../../components/Waveform'
 import { fillInFlashcardFields } from '../../driver/flashcardSection'
 
 export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await dragMouse(app, [402, 422], [625, 422])
 
-  const { flashcardFields } = flashcardSection
-  const { tagsInputContainer } = tagsInput
+  const { flashcardFields } = flashcardForm$
+  const { tagsInputContainer } = tagsInput$
 
   await fillInFlashcardFields(await client.elements_(flashcardFields), {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
@@ -31,7 +31,7 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   const tagsDeleteButtons = await client.elements_(`${tagsInputContainer} svg`)
   expect(tagsDeleteButtons).toHaveLength(1)
 
-  const tagsInputContainerEl = await client.element_(tagsInputContainer)
+  const tagsInputContainerEl = await client.firstElement_(tagsInputContainer)
   await tagsInputContainerEl.waitForText('pbc')
 
   await fillInFlashcardFields(await client.elements_(flashcardFields), {
@@ -41,5 +41,5 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
     notes: '"Goro-goro" is the sound of something big rolling around.',
   })
 
-  await client.elements_(waveform.waveformClip, 2)
+  await client.elements_(waveform$.waveformClip, 2)
 }

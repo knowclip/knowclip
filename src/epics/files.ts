@@ -11,6 +11,7 @@ import externalSubtitles from '../files/externalSubtitlesFile'
 import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
 import { FileEventHandlers } from '../files/eventHandlers'
+import { getHumanFileName } from '../utils/files'
 
 const addAndOpenFile: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -43,15 +44,18 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         !fileAvailability ||
         !fileAvailability.filePath ||
         !existsSync(fileAvailability.filePath)
-      )
-        return of(
-          r.locateFileRequest(
-            file,
-            `This file "${
-              'name' in file ? file.name : file.type
-            }" appears to have moved or been renamed. Try locating it manually?`
-          )
-        )
+      ) {
+        const fileTypeAndName = getHumanFileName(file)
+        const fileVerb =
+          file.type === 'MediaFile' ? 'making clips with' : 'using'
+        const message =
+          fileAvailability && fileAvailability.filePath
+            ? `This ${fileTypeAndName} appears to have moved or been renamed. Try locating it manually?`
+            : `Please locate your ${fileTypeAndName} in the filesystem so you can ${fileVerb} it.
+              
+              (If you're seeing this message, it's probably because you've recently opened this project for the first time on this computer.)`
+        return of(r.locateFileRequest(file, message))
+      }
 
       try {
         return from(
@@ -92,9 +96,7 @@ const openFileFailure: AppEpic = (action$, state$, effects) =>
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
     flatMap<OpenFileFailure, Observable<Action>>(
       ({ file, filePath, errorMessage }) => {
-        return of(
-          r.simpleMessageSnackbar('Could not load file: ' + errorMessage)
-        )
+        return of(r.simpleMessageSnackbar(errorMessage))
       }
     )
   )

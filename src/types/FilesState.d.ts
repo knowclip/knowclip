@@ -42,10 +42,7 @@ declare type MediaFile = {
   id: FileId
   parentId: ProjectId
 
-  subtitles: Array<
-    | { type: 'EmbeddedSubtitlesTrack'; id: string; streamIndex: number }
-    | { type: 'ExternalSubtitlesTrack'; id: string }
-  >
+  subtitles: Array<MediaSubtitlesRelation>
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 
   name: MediaFileName
@@ -53,6 +50,19 @@ declare type MediaFile = {
   format: 'UNKNOWN' | string
   isVideo: boolean
   subtitlesTracksStreamIndexes: number[]
+}
+
+declare type MediaSubtitlesRelation =
+  | EmbeddedSubtitlesTrackRelation
+  | ExternalSubtitlesTrackRelation
+declare type EmbeddedSubtitlesTrackRelation = {
+  type: 'EmbeddedSubtitlesTrack'
+  id: string
+  streamIndex: number
+}
+declare type ExternalSubtitlesTrackRelation = {
+  type: 'ExternalSubtitlesTrack'
+  id: string
 }
 
 declare type SubtitlesFile = ExternalSubtitlesFile | VttConvertedSubtitlesFile

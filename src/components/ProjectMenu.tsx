@@ -5,16 +5,16 @@ import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
 import * as r from '../redux'
 import * as actions from '../actions'
 import DarkTheme from './DarkTheme'
-import css from './Header.module.css'
+import css from './MainHeader.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
 
-export const testLabels = {
-  projectTitle: 'project-title',
-  projectTitleInput: 'project-title-input',
-  saveButton: 'save-button',
-  closeButton: 'close-button',
-} as const
+enum $ {
+  projectTitle = 'project-title',
+  projectTitleInput = 'project-title-input',
+  saveButton = 'save-button',
+  closeButton = 'close-button',
+}
 
 const ProjectMenu = ({ className }: { className: string }) => {
   const projectFile = useSelector((state: AppState) =>
@@ -85,12 +85,12 @@ const ProjectMenu = ({ className }: { className: string }) => {
     <DarkTheme>
       <section className={cn(className, css.projectMenu)}>
         <Tooltip title="Close project">
-          <IconButton onClick={closeProjectRequest} id={testLabels.closeButton}>
+          <IconButton onClick={closeProjectRequest} id={$.closeButton}>
             <CloseIcon />
           </IconButton>
         </Tooltip>
         <Tooltip title="Save project">
-          <IconButton onClick={saveProjectRequest} id={testLabels.saveButton}>
+          <IconButton onClick={saveProjectRequest} id={$.saveButton}>
             <SaveIcon />
           </IconButton>
         </Tooltip>{' '}
@@ -102,7 +102,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
               value={text}
               onChange={handleChangeText}
               onBlur={handleBlur}
-              inputProps={{ id: testLabels.projectTitleInput }}
+              inputProps={{ id: $.projectTitleInput }}
             />
           </form>
         ) : (
@@ -110,7 +110,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
             <h1
               className={css.projectName}
               onDoubleClick={startEditing}
-              id={testLabels.projectTitle}
+              id={$.projectTitle}
             >
               {truncate(projectFile.name, 40)}
             </h1>
@@ -122,3 +122,5 @@ const ProjectMenu = ({ className }: { className: string }) => {
 }
 
 export default ProjectMenu
+
+export { $ as projectMenu$ }

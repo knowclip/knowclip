@@ -4,11 +4,11 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { getFileAvailability, getFile } from './files'
+import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
 
-export const getSubtitlesFile = (
+export const getSubtitlesDisplayFile = (
   state: AppState,
   id: string
 ): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
@@ -16,16 +16,24 @@ export const getSubtitlesFile = (
   state.files.ExternalSubtitlesFile[id] ||
   null
 
-export const getSourceSubtitlesFile = (
+const getSubtitlesSourceFileFromFilesSubset = (
+  external: FilesState['ExternalSubtitlesFile'],
+  generated: FilesState['VttConvertedSubtitlesFile'],
+  id: string
+): ExternalSubtitlesFile | VttConvertedSubtitlesFile | null =>
+  external[id] || generated[id] || null
+export const getSubtitlesSourceFile = (
   state: AppState,
   id: string
-): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
-  state.files.ExternalSubtitlesFile[id] ||
-  state.files.VttConvertedSubtitlesFile[id] ||
-  null
+): ExternalSubtitlesFile | VttConvertedSubtitlesFile | null =>
+  getSubtitlesSourceFileFromFilesSubset(
+    state.files.ExternalSubtitlesFile,
+    state.files.VttConvertedSubtitlesFile,
+    id
+  )
 
 export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
-  const record = getSubtitlesFile(state, id)
+  const record = getSubtitlesDisplayFile(state, id)
 
   return record ? getFileAvailability(state, record) : null
 }
@@ -43,35 +51,98 @@ export const getSubtitlesTracks = createSelector(
   }
 )
 
+export type SubtitlesFileWithTrack =
+  | EmbeddedSubtitlesFileWithTrack
+  | ExternalSubtitlesFileWithTrack
+export type EmbeddedSubtitlesFileWithTrack = {
+  relation: EmbeddedSubtitlesTrackRelation
+  label: string
+  embeddedIndex: number
+  file: VttConvertedSubtitlesFile | null // can be null while loading?
+  track: EmbeddedSubtitlesTrack | null
+}
+export type ExternalSubtitlesFileWithTrack = {
+  relation: ExternalSubtitlesTrackRelation
+  label: string
+  externalIndex: number
+  file: ExternalSubtitlesFile | null // should never really be null
+  track: ExternalSubtitlesTrack | null
+}
+
+export type MediaSubtitles = {
+  total: number
+  embedded: EmbeddedSubtitlesFileWithTrack[]
+  external: ExternalSubtitlesFileWithTrack[]
+  all: SubtitlesFileWithTrack[]
+}
+
+export const getSubtitlesFilesWithTracks = createSelector(
+  getCurrentMediaFile,
+  getSubtitles,
+  (state: AppState) => state.files.ExternalSubtitlesFile,
+  (state: AppState) => state.files.VttConvertedSubtitlesFile,
+  (
+    currentFile,
+    subtitlesTracks,
+    externalFiles,
+    convertedFiles
+  ): MediaSubtitles => {
+    let embeddedCount = 0
+    let externalCount = 0
+    const subtitles = currentFile
+      ? currentFile.subtitles.map((t, i) => {
+          // eslint-disable-line array-callback-return
+          switch (t.type) {
+            case 'EmbeddedSubtitlesTrack':
+              const embeddedIndex = ++embeddedCount
+              return {
+                relation: t,
+                embeddedIndex,
+                label: `Embedded subtitles track ${embeddedIndex}`,
+                file: getSubtitlesSourceFileFromFilesSubset(
+                  externalFiles,
+                  convertedFiles,
+                  t.id
+                ),
+                track: subtitlesTracks[t.id] || null,
+              } as EmbeddedSubtitlesFileWithTrack
+
+            case 'ExternalSubtitlesTrack':
+              const externalIndex = ++externalCount
+              return {
+                relation: t,
+                externalIndex,
+                label: `External subtitles track ${externalIndex}`,
+                file: getSubtitlesSourceFileFromFilesSubset(
+                  externalFiles,
+                  convertedFiles,
+                  t.id
+                ),
+                track: subtitlesTracks[t.id] || null,
+              } as ExternalSubtitlesFileWithTrack
+          }
+        })
+      : []
+
+    return {
+      total: subtitles.length,
+      all: subtitles,
+      embedded: subtitles.filter(
+        (s): s is EmbeddedSubtitlesFileWithTrack =>
+          s.relation.type === 'EmbeddedSubtitlesTrack'
+      ),
+      external: subtitles.filter(
+        (s): s is ExternalSubtitlesFileWithTrack =>
+          s.relation.type === 'ExternalSubtitlesTrack'
+      ),
+    }
+  }
+)
+
 export const getSubtitlesTrack = (
   state: AppState,
   id: SubtitlesTrackId
 ): SubtitlesTrack | null => state.subtitles[id] || null
-
-const isEmbedded = (track: SubtitlesTrack): track is EmbeddedSubtitlesTrack =>
-  track.type === 'EmbeddedSubtitlesTrack'
-const isExternal = (track: SubtitlesTrack): track is ExternalSubtitlesTrack =>
-  track.type === 'ExternalSubtitlesTrack'
-export const getEmbeddedSubtitlesTracks = (
-  state: AppState
-): Array<EmbeddedSubtitlesTrack> => getSubtitlesTracks(state).filter(isEmbedded)
-export const getExternalSubtitlesTracks = (
-  state: AppState
-): Array<ExternalSubtitlesTrack> => getSubtitlesTracks(state).filter(isExternal)
-
-export const getExternalSubtitlesTracksWithFiles = (
-  state: AppState
-): Array<{ track: ExternalSubtitlesTrack; file: ExternalSubtitlesFile }> =>
-  getSubtitlesTracks(state)
-    .filter(isExternal)
-    .map(track => ({
-      track,
-      file: getFile(
-        state,
-        'ExternalSubtitlesFile',
-        track.id
-      ) as ExternalSubtitlesFile,
-    }))
 
 export const readVttChunk = (
   state: AppState,
@@ -148,4 +219,57 @@ export const getNewFieldsFromLinkedSubtitles = (
     result[fieldName] = chunks.map(chunk => chunk.text).join('\n')
   }
   return result
+}
+
+type Coords = { start: number; end: number }
+const overlaps = (a: Coords, b: Coords) => a.end >= b.start && b.end >= a.start
+
+export const getNewFlashcardForStretchedClip = (
+  state: AppState,
+  noteType: NoteType,
+  { start, end, flashcard }: Clip,
+  { start: stretchStart, end: stretchEnd }: { start: number; end: number },
+  direction: 'PREPEND' | 'APPEND'
+): Flashcard => {
+  const links = getSubtitlesFlashcardFieldLinks(state)
+  if (!Object.keys(links).length) return flashcard
+
+  const originalFields: TransliterationFlashcardFields = flashcard.fields as any
+  const newFields: TransliterationFlashcardFields = { ...originalFields }
+
+  for (const fn in links) {
+    const fieldName = fn as TransliterationFlashcardFieldName
+    const trackId = links[fieldName]
+    const originalText = originalFields[fieldName]
+    const newlyOverlapped = (chunk: SubtitlesChunk) =>
+      !originalText.trim() || !overlaps({ start, end }, chunk)
+    const chunks = trackId
+      ? getSubtitlesChunksWithinRange(
+          state,
+          trackId,
+          stretchStart,
+          stretchEnd
+        ).filter(newlyOverlapped)
+      : []
+
+    const newText = chunks.map(chunk => chunk.text).join('\n')
+
+    newFields[fieldName] = (direction === 'PREPEND'
+      ? [newText, originalText]
+      : [originalText, newText]
+    )
+      .filter(t => t.trim())
+      .join('\n')
+  }
+
+  if (
+    Object.keys(newFields).every(
+      k =>
+        originalFields[k as TransliterationFlashcardFieldName] ===
+        newFields[k as TransliterationFlashcardFieldName]
+    )
+  )
+    return flashcard
+
+  return { ...flashcard, fields: newFields }
 }

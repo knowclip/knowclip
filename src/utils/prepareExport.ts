@@ -50,6 +50,7 @@ const getCards = (noteType: NoteType) => [
   },
 ]
 
+/** Returns either valid export data or a list of missing media files. */
 export const getApkgExportData = (
   state: AppState,
   project: ProjectFile,

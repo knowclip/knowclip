@@ -18,14 +18,14 @@ import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
 import * as actions from '../actions'
-import css from './Header.module.css'
+import css from './MainHeader.module.css'
 
-export const testLabels = {
-  chooseFirstMediaFileButton: 'choose-media-file-button',
-  openMediaFilesMenuButton: 'open-media-files-menu-button',
-  mediaFileMenuItem: 'media-file-menu-item',
-  addNewAdditionalMediaButton: 'add-new-additional-media-button',
-} as const
+enum $ {
+  chooseFirstMediaFileButton = 'choose-media-file-button',
+  openMediaFilesMenuButton = 'open-media-files-menu-button',
+  mediaFileMenuItem = 'media-file-menu-item',
+  addNewAdditionalMediaButton = 'add-new-additional-media-button',
+}
 
 const MEDIA_FILTERS = [
   {
@@ -52,17 +52,13 @@ const MediaFilesMenu = ({
   className,
   currentProjectId,
 }: MediaFilesMenuProps) => {
-  const {
-    loop,
-    currentFileName,
-    currentFileId,
-    projectMediaFiles,
-  } = useSelector((state: AppState) => ({
-    loop: r.isLoopOn(state),
-    currentFileName: r.getCurrentFileName(state),
-    currentFileId: r.getCurrentFileId(state),
-    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-  }))
+  const { loop, currentFile, projectMediaFiles } = useSelector(
+    (state: AppState) => ({
+      loop: r.isLoopOn(state),
+      currentFile: r.getCurrentMediaFile(state),
+      projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+    })
+  )
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -88,27 +84,24 @@ const MediaFilesMenu = ({
         {projectMediaFiles.length > 0 ? (
           <span
             className={css.mediaFileName}
-            title={currentFileName || undefined}
+            title={currentFile ? currentFile.name : undefined}
           >
             <Button
               className={css.audioButton}
               onClick={popover.open}
-              id={testLabels.openMediaFilesMenuButton}
+              id={$.openMediaFilesMenuButton}
             >
-              {currentFileName
-                ? truncate(currentFileName, 40)
+              {currentFile
+                ? truncate(currentFile.name, 40)
                 : 'Select media file'}
             </Button>
           </span>
         ) : (
-          <Button
-            id={testLabels.chooseFirstMediaFileButton}
-            onClick={chooseMediaFiles}
-          >
+          <Button id={$.chooseFirstMediaFileButton} onClick={chooseMediaFiles}>
             Choose media file
           </Button>
         )}
-        {currentFileId && (
+        {currentFile && (
           <>
             <Tooltip title="Loop audio (Ctrl + L)">
               <IconButton
@@ -139,9 +132,9 @@ const MediaFilesMenu = ({
                   key={media.id}
                   closeMenu={popover.close}
                   mediaFile={media}
-                  selected={media.id === currentFileId}
+                  selected={Boolean(currentFile && currentFile.id === media.id)}
                   currentProjectId={currentProjectId}
-                  className={testLabels.mediaFileMenuItem}
+                  className={$.mediaFileMenuItem}
                 />
               ))}
             </MenuList>
@@ -149,7 +142,7 @@ const MediaFilesMenu = ({
             <MenuItem dense>
               <ListItemText
                 onClick={chooseMediaFiles}
-                id={testLabels.addNewAdditionalMediaButton}
+                id={$.addNewAdditionalMediaButton}
               >
                 Add new media
               </ListItemText>
@@ -195,3 +188,5 @@ function usePlayButtonSync() {
 }
 
 export default MediaFilesMenu
+
+export { $ as mediaFilesMenu$ }

@@ -181,7 +181,7 @@ declare type ExportMp3 = { type: 'EXPORT_MP3'; exportData: ApkgExportData }
 declare type ExportApkgRequest = {
   type: 'EXPORT_APKG_REQUEST'
   clipIds: Array<ClipId>
-  outputFilePath: string
+  mediaOpenPrior: MediaFile | null
 }
 declare type ExportApkgFailure = {
   type: 'EXPORT_APKG_FAILURE'
@@ -213,6 +213,7 @@ declare type MediaAction =
   | ToggleLoop
   | SetLoop
   | SetMediaFolderLocation
+  | DismissMedia
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
@@ -223,7 +224,6 @@ declare type DeleteMediaFromProject = {
   projectId: ProjectId
   mediaFileId: MediaFileId
 }
-
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
@@ -231,6 +231,7 @@ declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
   directoryPath: string | null
 }
+declare type DismissMedia = { type: 'DISMISS_MEDIA' }
 
 declare type SubtitlesAction =
   | AddSubtitlesTrack
@@ -268,7 +269,9 @@ declare type HideSubtitles = {
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId
-  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields>
+  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields> & {
+    transcription: string
+  }
   tags: Array<string>
 }
 declare type ShowSubtitlesClipsDialogRequest = {

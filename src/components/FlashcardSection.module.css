@@ -8,7 +8,7 @@
 }
 
 .intro {
-  padding: 2rem !important;
+  padding: 2rem;
 }
 
 .introText {
@@ -87,6 +87,7 @@
 }
 
 .field:focus .fieldMenuButton,
-  .field:hover .fieldMenuButton {
+  .field:hover .fieldMenuButton,
+  .fieldMenuButton:focus {
   opacity: 1;
 }

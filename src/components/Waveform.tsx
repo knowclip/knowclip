@@ -9,12 +9,12 @@ import {
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
-export const testLabels = {
-  subtitlesTimelinesContainer: 'subtitles-timelines-container',
-  subtitlesTimelines: 'subtitles-timeline',
-  waveformClipsContainer: 'waveform-clips-container',
-  waveformClip: 'waveform-clip',
-} as const
+enum $ {
+  subtitlesTimelinesContainer = 'subtitles-timelines-container',
+  subtitlesTimelines = 'subtitles-timeline',
+  waveformClipsContainer = 'waveform-clips-container',
+  waveformClip = 'waveform-clip',
+}
 
 const { SELECTION_BORDER_WIDTH } = r
 const HEIGHT = 70
@@ -46,7 +46,7 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         className={cn(
           css.waveformClip,
           { [css.highlightedClip]: isHighlighted },
-          testLabels.waveformClip
+          $.waveformClip
         )}
         d={getClipPath(start, end)}
       />
@@ -96,7 +96,7 @@ const Clips = React.memo(
     clips: Clip[]
     highlightedClipId: string | null
   }) => (
-    <g className={testLabels.waveformClipsContainer}>
+    <g className={$.waveformClipsContainer}>
       {clips.map(clip => (
         <Clip
           {...clip}
@@ -179,7 +179,7 @@ const SubtitlesTimelines = memo(
     )
     return (
       <svg
-        className={cn(css.subtitlesSvg, testLabels.subtitlesTimelinesContainer)}
+        className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
         preserveAspectRatio="xMinYMin slice"
         viewBox={getSubtitlesViewBoxString(
           viewBox.xMin,
@@ -190,7 +190,7 @@ const SubtitlesTimelines = memo(
         onClick={handleClick}
       >
         {subtitles.map(({ chunks, id }, trackIndex) => (
-          <g className={testLabels.subtitlesTimelines}>
+          <g className={$.subtitlesTimelines} key={id}>
             {chunks.map((chunk, index) => (
               <SubtitlesChunk
                 key={`${chunk.start}_${chunk.text}`}
@@ -287,3 +287,5 @@ const Waveform = ({ show }: { show: boolean }) => {
 }
 
 export default Waveform
+
+export { $ as waveform$ }

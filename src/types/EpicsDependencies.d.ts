@@ -1,3 +1,5 @@
+/// <reference path="../utils/ffmpeg" />
+
 declare type EpicsDependencies = {
   document: Document
   window: typeof window
@@ -12,11 +14,14 @@ declare type EpicsDependencies = {
   toggleMediaPaused: (() => void)
   getMediaMetadata: (
     path: string
-  ) => Promise<{
-    streams: FfprobeStream[]
-    format: FfprobeFormat
-    chapters: any[]
-  }>
+  ) => Promise<
+    | {
+        streams: FfprobeStream[]
+        format: FfprobeFormat
+        chapters: any[]
+      }
+    | Error
+  >
   getSubtitlesFromFile: (
     state: AppState,
     sourceFilePath: string
@@ -30,7 +35,7 @@ declare type EpicsDependencies = {
     state: AppState,
     file: WaveformPng,
     constantBitrateFilePath: string
-  ) => Promise<string>
+  ) => Promise<string | Error>
   getConstantBitrateMediaPath: (
     path: string,
     oldConstantBitratePath: string | null // not needed

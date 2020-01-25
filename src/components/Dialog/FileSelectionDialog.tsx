@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dialog, DialogContent } from '@material-ui/core'
 import FileSelectionForm from '../FileSelectionForm'
-import { getExtensions } from '../../utils/files'
+import { getExtensions, getHumanFileName } from '../../utils/files'
 import * as actions from '../../actions'
 import { DialogProps } from './DialogProps'
 
@@ -25,10 +25,12 @@ const FileSelectionDialog = ({
         actions.openFileFailure(
           file,
           null,
-          'File-locating action was canceled.'
+          `Could not locate ${getHumanFileName(
+            file
+          )}. Some features may be unavailable until it is located.`
         )
       )
-      actions.closeDialog()
+      dispatch(actions.closeDialog())
     },
     [dispatch, file]
   )

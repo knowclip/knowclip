@@ -1,6 +1,6 @@
 import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
-import { testLabels as mediaFilesMenu } from '../../../components/MediaFilesMenu'
-import { testLabels as waveform } from '../../../components/Waveform'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { waveform$ } from '../../../components/Waveform'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
@@ -8,7 +8,7 @@ export default async function addFirstMediaToProject({
   app,
   client,
 }: TestSetup) {
-  const { chooseFirstMediaFileButton: chooseMediaFileButton } = mediaFilesMenu
+  const { chooseFirstMediaFileButton: chooseMediaFileButton } = mediaFilesMenu$
   const japaneseVideoPath = join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4')
 
   await mockElectronHelpers(app, {
@@ -21,5 +21,5 @@ export default async function addFirstMediaToProject({
 
   expect(await client.getAttribute('video', 'src')).toContain(japaneseVideoPath)
 
-  await client.waitUntilPresent_(waveform.subtitlesTimelinesContainer)
+  await client.waitUntilPresent_(waveform$.subtitlesTimelinesContainer)
 }

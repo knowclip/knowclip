@@ -4,11 +4,9 @@ import {
   stopApp,
   TestSetup,
   TMP_DIRECTORY,
-  FIXTURES_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
 } from '../../spectronApp'
-import { mkdirp, remove, existsSync, copy } from 'fs-extra'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import openSavedProject from './openSavedProject'
 import { join } from 'path'
@@ -17,34 +15,35 @@ import saveAndCloseProject from './saveAndCloseProject'
 
 jest.setTimeout(60000)
 
+const testId = 'savedProject'
+
 describe('opening and saving a previously saved project', () => {
   let context: { app: Application | null } = { app: null }
   let setup: TestSetup
 
   beforeAll(async () => {
-    if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
-    await mkdirp(TMP_DIRECTORY)
-    await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
-    setup = await startApp(context, 'savedProject', persistedState)
+    setup = await startApp(context, testId, persistedState)
 
-    await mockSideEffects(setup.app, {
-      uuid: [
-        'ece1aa0c-2377-47db-b5d1-47d63e918ca7',
-        'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
-        'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
-      ],
-      nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
-    })
+    await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('opens a previously saved project', async () => openSavedProject(setup))
-  test('make some flashcards', async () => makeSomeFlashcards(setup))
-  test('saves and closes project', async () => saveAndCloseProject(setup))
+  test('opens a previously saved project', () => openSavedProject(setup))
+  test('make some flashcards', () => makeSomeFlashcards(setup))
+  test('saves and closes project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
     await stopApp(context)
   })
 })
+
+const sideEffectsMocks = {
+  uuid: [
+    'ece1aa0c-2377-47db-b5d1-47d63e918ca7',
+    'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
+    'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
+  ],
+  nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
+}
 
 const persistedState: Partial<AppState> = {
   files: {
@@ -167,6 +166,7 @@ const persistedState: Partial<AppState> = {
       '37bd5e91-89c5-491b-9308-533c7be7338a': {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
+          testId,
           '95ecfad8a8bf42d562d0e751aa9f8448.vtt'
         ),
         status: 'CURRENTLY_LOADED',
@@ -175,6 +175,7 @@ const persistedState: Partial<AppState> = {
       '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
+          testId,
           '3e59a4e5742e827fdb30511fc40f7e82.vtt'
         ),
         status: 'CURRENTLY_LOADED',
@@ -185,6 +186,7 @@ const persistedState: Partial<AppState> = {
       '535935a3-7d72-4238-87ab-1b7a413c1f71': {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
+          testId,
           '833a0a72cd50d38e26f320c7924f4da6.png'
         ),
         status: 'CURRENTLY_LOADED',
@@ -193,6 +195,7 @@ const persistedState: Partial<AppState> = {
       'fa462524-bfeb-4434-a506-07858cc97151': {
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
+          testId,
           'f492c13cdbdf0c59adf3a72b2cb74e04.png'
         ),
         status: 'CURRENTLY_LOADED',

@@ -26,6 +26,13 @@ export default {
           ),
         ]
       } else {
+        const vttFile = r.getFile(
+          state,
+          'VttConvertedSubtitlesFile',
+          validatedFile.id
+        )
+        if (vttFile) return [r.openFileRequest(vttFile)]
+
         return [
           r.addAndOpenFile({
             type: 'VttConvertedSubtitlesFile',

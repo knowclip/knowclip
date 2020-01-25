@@ -176,12 +176,16 @@ const PROJECT_EDIT_ACTIONS = [
   A.DELETE_MEDIA_FROM_PROJECT,
   A.DELETE_FILE_SUCCESS, // ???
   A.ADD_AND_OPEN_FILE,
+  A.ADD_FILE,
+  A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK, //?,
+  A.SET_PROJECT_NAME,
   A.LOCATE_FILE_SUCCESS, // ????
 ] as const
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
+    filter(() => Boolean(r.getCurrentProjectId(state$.value))),
     map(() => r.setWorkIsUnsaved(true))
   )
 

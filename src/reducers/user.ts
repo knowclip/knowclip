@@ -196,6 +196,9 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         progress: action.progress,
       }
 
+    case A.DISMISS_MEDIA:
+      return { ...state, currentMediaFileId: null, highlightedClipId: null }
+
     default:
       return state
   }

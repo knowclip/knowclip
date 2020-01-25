@@ -25,6 +25,7 @@ export async function startApp(
 
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
+    waitTimeout: 10000, // until apkg generation/ffmpeg stuff is properly mocked
     webdriverOptions: { deprecationWarnings: false },
     path: (electron as unknown) as string,
     env: {

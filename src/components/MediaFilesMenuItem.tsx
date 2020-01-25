@@ -20,7 +20,7 @@ import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
 import * as actions from '../actions'
-import css from './Header.module.css'
+import css from './MainHeader.module.css'
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
   'Are you sure you want to remove this media file? This action will delete any flashcards you might have made with it.'

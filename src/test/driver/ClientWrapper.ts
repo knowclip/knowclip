@@ -19,7 +19,7 @@ export class ClientWrapper {
     this._client = client
   }
 
-  async element(selector: string): Promise<ElementWrapper> {
+  async firstElement(selector: string): Promise<ElementWrapper> {
     try {
       await this.waitUntilPresent(selector)
 
@@ -27,11 +27,11 @@ export class ClientWrapper {
       // if (result.length)
       return await element(this._client, result.value.ELEMENT, selector)
     } catch (err) {
-      throw new Error(`Could not find element "${selector}`)
+      throw new Error(`Could not find element "${selector}"`)
     }
   }
-  async element_(testLabel: string): Promise<ElementWrapper> {
-    return await this.element(getSelector(testLabel))
+  async firstElement_(testLabel: string): Promise<ElementWrapper> {
+    return await this.firstElement(getSelector(testLabel))
   }
 
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
@@ -47,8 +47,9 @@ export class ClientWrapper {
         }, 30000)
       } catch (err) {
         throw new Error(
-          `Could not find ${count} elements with selector "${selector}". Instead found ${elementsSoFar &&
-            elementsSoFar.length} before: ${err.message}`
+          `Could not find ${count} elements with selector "${selector}". Instead found ${
+            elementsSoFar ? elementsSoFar.length : 'none'
+          } before: ${err.message}`
         )
       }
     }
@@ -74,7 +75,7 @@ export class ClientWrapper {
   }
 
   async setFieldValue(selector: string, value: string) {
-    const element = await this.element(selector)
+    const element = await this.firstElement(selector)
     await element.setFieldValue(value)
   }
   async setFieldValue_(testLabel: string, value: string) {
@@ -82,7 +83,7 @@ export class ClientWrapper {
   }
 
   async clickElement(selector: string) {
-    const element = await this.element(selector)
+    const element = await this.firstElement(selector)
     await element.click()
   }
   async clickElement_(testLabel: string) {
@@ -116,7 +117,7 @@ export class ClientWrapper {
   }
 
   async getAttribute(selector: string, attributeName: string) {
-    const element = await this.element(selector)
+    const element = await this.firstElement(selector)
 
     return await element.getAttribute(attributeName)
   }
@@ -125,7 +126,7 @@ export class ClientWrapper {
   }
 
   async waitForText(selector: string, text: string) {
-    const element = await this.element(selector)
+    const element = await this.firstElement(selector)
     await element.waitForText(text)
   }
   async waitForText_(selector: string, text: string) {
@@ -133,17 +134,32 @@ export class ClientWrapper {
   }
 
   async getText(selector: string) {
-    const element = await this.element(selector)
+    const element = await this.firstElement(selector)
     return await element.getText()
   }
   async getText_(selector: string) {
     return await this.getText(getSelector(selector))
   }
 
+  async elementWithText(selector: string, text: string) {
+    await this.waitForText('body', text)
+    const elements = await this.elements(selector)
+    const elementsText = await Promise.all(elements.map(e => e.getText()))
+    const elementWithText = elements.find((e, i) =>
+      elementsText[i].includes(text)
+    )
+
+    if (!elementWithText)
+      throw new Error(
+        `No elements matching "${selector}" contain text "${text}"`
+      )
+    return elementWithText
+  }
+
   async waitForVisible(selector: string) {
     try {
       return await this._client.waitUntil(async () => {
-        const element = await this.element(selector)
+        const element = await this.firstElement(selector)
         return await element.isVisible()
       }, 30000)
     } catch (err) {
@@ -157,7 +173,7 @@ export class ClientWrapper {
   async waitForHidden(selector: string) {
     try {
       return await this._client.waitUntil(async () => {
-        const element = await this.element(selector)
+        const element = await this.firstElement(selector)
         return !(await element.isVisible())
       }, 30000)
     } catch (err) {

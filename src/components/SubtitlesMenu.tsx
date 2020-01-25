@@ -22,8 +22,111 @@ import {
   Divider,
 } from '@material-ui/core'
 import { showOpenDialog } from '../utils/electron'
-import css from './Header.module.css'
+import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
+
+enum $ {
+  openMenuButton = 'subtitles-menu-open-menu-button',
+  trackMenuItems = 'subtitles-menu-track-item',
+  openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
+  locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
+  makeClipsAndCardsButton = 'subtitles-menu-make-clips-and-cards-button',
+}
+
+const SubtitlesMenu = () => {
+  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+
+  const { subtitles, currentFileId } = useSelector((state: AppState) => {
+    const currentFileId = r.getCurrentFileId(state)
+    return {
+      subtitles: r.getSubtitlesFilesWithTracks(state),
+      currentFileId,
+    }
+  })
+
+  const dispatch = useDispatch()
+  const loadExternalTrack = useCallback(
+    async () => {
+      if (!currentFileId)
+        return dispatch(
+          actions.simpleMessageSnackbar('Please open a media file first.')
+        )
+
+      const filePaths = await showOpenDialog([
+        { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
+      ])
+      if (!filePaths) return
+
+      dispatch(
+        actions.loadSubtitlesFromFileRequest(filePaths[0], currentFileId)
+      )
+
+      close()
+    },
+    [dispatch, currentFileId, close]
+  )
+  const subtitlesClipsDialogRequest = useCallback(
+    e => {
+      dispatch(actions.subtitlesClipsDialogRequest())
+      close()
+    },
+    [dispatch, close]
+  )
+
+  return (
+    <Fragment>
+      <Tooltip title="Subtitles">
+        <IconButton
+          buttonRef={anchorCallbackRef}
+          onClick={open}
+          id={$.openMenuButton}
+        >
+          <SubtitlesIcon />
+        </IconButton>
+      </Tooltip>
+      <Menu anchorEl={anchorEl} open={isOpen} onClose={close}>
+        {!subtitles.total && (
+          <MenuItem dense disabled>
+            No subtitles loaded.
+          </MenuItem>
+        )}
+        {subtitles.embedded.map(({ relation, file, track }, i) => (
+          <EmbeddedTrackMenuItem
+            key={relation.id}
+            id={relation.id}
+            file={
+              file as
+                | (VttConvertedSubtitlesFile & { parentType: 'MediaFile' })
+                | null
+            }
+            track={track}
+            title={`Embedded track ${i + 1}`}
+          />
+        ))}
+        {subtitles.external.map(({ relation, file, track }, i) => (
+          <ExternalTrackMenuItem
+            key={relation.id}
+            id={relation.id}
+            track={track}
+            file={file}
+            title={`External track ${i + 1}`}
+          />
+        ))}
+        <Divider />
+        <MenuItem dense onClick={loadExternalTrack}>
+          <ListItemText primary="Load external track" />
+        </MenuItem>
+        <MenuItem
+          dense
+          onClick={subtitlesClipsDialogRequest}
+          id={$.makeClipsAndCardsButton}
+        >
+          <ListItemText primary="Make clips + cards from subtitles" />
+        </MenuItem>
+      </Menu>
+    </Fragment>
+  )
+}
 
 const VisibilityIcon = ({ visible }: { visible: boolean }) => (
   <Icon>
@@ -35,192 +138,153 @@ const VisibilityIcon = ({ visible }: { visible: boolean }) => (
   </Icon>
 )
 
-const ExternalTrackMenuItem = ({
+const EmbeddedTrackMenuItem = ({
+  id,
+  file,
+  track,
   title,
-  visible,
-  show,
-  hide,
-  deleteTrack,
-  locateTrack,
 }: {
+  id: string
+  file: VttConvertedSubtitlesFile & { parentType: 'MediaFile' } | null
+  track: EmbeddedSubtitlesTrack | null
   title: string
-  visible: boolean
-  show: () => void
-  hide: () => void
-  deleteTrack: () => void
-  locateTrack: () => void
+}) => (
+  <MenuItem
+    dense
+    onClick={useToggleVisible(track, id)}
+    className={$.trackMenuItems}
+  >
+    <ListItemIcon>
+      {track ? (
+        <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
+      ) : (
+        <Tooltip title="Problem reading embedded subtitles">
+          <FolderSpecial />
+        </Tooltip>
+      )}
+    </ListItemIcon>
+    <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
+  </MenuItem>
+)
+
+const ExternalTrackMenuItem = ({
+  id,
+  file,
+  track,
+  title,
+}: {
+  id: SubtitlesTrackId
+  file: ExternalSubtitlesFile | null
+  track: ExternalSubtitlesTrack | null
+  title: string
 }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+  const dispatch = useDispatch()
+
+  const deleteExternalSubtitles = useCallback(
+    e => {
+      dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
+      close()
+    },
+    [dispatch, id, close]
+  )
+
+  const locateFileRequest = useCallback(
+    e => {
+      if (file) {
+        dispatch(
+          actions.locateFileRequest(
+            file,
+            `Locate "${file.name}" in your filesystem to use these subtitles.`
+          )
+        )
+
+        close()
+      }
+    },
+    [dispatch, file, close]
+  )
+
+  const toggleVisible = useToggleVisible(track, id)
+
   return (
-    <MenuItem dense onClick={visible ? hide : show}>
-      <ListItemIcon>
-        <VisibilityIcon visible={visible} />
-      </ListItemIcon>
-      <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
+    <>
+      <MenuItem
+        dense
+        onClick={toggleVisible}
+        disabled={!file}
+        className={$.trackMenuItems}
+      >
+        <ListItemIcon>
+          {track ? (
+            <VisibilityIcon
+              visible={Boolean(track && track.mode === 'showing')}
+            />
+          ) : (
+            <Tooltip title="Not found in filesystem">
+              <FolderSpecial />
+            </Tooltip>
+          )}
+        </ListItemIcon>
+
+        <ListItemText
+          className={css.subtitlesMenuListItemText}
+          primary={title}
+        />
+
+        <ListItemSecondaryAction>
+          <IconButton
+            buttonRef={anchorCallbackRef}
+            onClick={open}
+            className={$.openTrackSubmenuButton}
+          >
+            <MoreVert />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </MenuItem>
+
       <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
-        <MenuItem dense>
+        <MenuItem
+          dense
+          onClick={locateFileRequest}
+          disabled={!file}
+          id={$.locateExternalFileButton}
+        >
           <ListItemIcon>
             <Icon>
               <FolderSpecial />
             </Icon>
           </ListItemIcon>
-          <ListItemText
-            primary="Locate subtitles file in filesystem"
-            onClick={locateTrack}
-          />
+          <ListItemText primary="Locate subtitles file in filesystem" />
         </MenuItem>
-        <MenuItem dense>
+        <MenuItem dense disabled={!file} onClick={deleteExternalSubtitles}>
           <ListItemIcon>
             <Icon>
               <DeleteIcon />
             </Icon>
           </ListItemIcon>
-          <ListItemText
-            primary="Remove subtitles track"
-            onClick={deleteTrack}
-          />
+          <ListItemText primary="Remove subtitles track" />
         </MenuItem>
       </Menu>
-      <ListItemSecondaryAction>
-        <IconButton buttonRef={anchorCallbackRef} onClick={open}>
-          <MoreVert />
-        </IconButton>
-      </ListItemSecondaryAction>
-    </MenuItem>
+    </>
   )
 }
 
-const SubtitlesMenu = () => {
-  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
-
-  const {
-    embeddedTracks,
-    externalTracksWithFiles,
-    currentFileId,
-  } = useSelector((state: AppState) => ({
-    embeddedTracks: r.getEmbeddedSubtitlesTracks(state),
-    externalTracksWithFiles: r.getExternalSubtitlesTracksWithFiles(state),
-    currentFileId: r.getCurrentFileId(state),
-  }))
-
+function useToggleVisible(track: SubtitlesTrack | null, id: string) {
   const dispatch = useDispatch()
-
-  const showSubtitles = useCallback(
-    (trackId: string, mediaFileId: string) => {
-      dispatch(actions.showSubtitles(trackId, mediaFileId))
+  return useCallback(
+    e => {
+      if (track)
+        dispatch(
+          track.mode === 'showing'
+            ? actions.hideSubtitles(id, track.mediaFileId)
+            : actions.showSubtitles(id, track.mediaFileId)
+        )
     },
-    [dispatch]
-  )
-  const hideSubtitles = useCallback(
-    (trackId: string, mediaFileId: string) => {
-      dispatch(actions.hideSubtitles(trackId, mediaFileId))
-    },
-    [dispatch]
-  )
-  const subtitlesClipsDialogRequest = useCallback(
-    () => {
-      dispatch(actions.subtitlesClipsDialogRequest())
-    },
-    [dispatch]
-  )
-  const deleteExternalSubtitles = useCallback(
-    (id: string) => {
-      dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
-    },
-    [dispatch]
-  )
-  const locateFileRequest = useCallback(
-    (file: FileMetadata, message: string) => {
-      dispatch(actions.locateFileRequest(file, message))
-    },
-    [dispatch]
-  )
-
-  return (
-    <Fragment>
-      <Tooltip title="Subtitles">
-        <IconButton buttonRef={anchorCallbackRef} onClick={open}>
-          <SubtitlesIcon />
-        </IconButton>
-      </Tooltip>
-      <Menu anchorEl={anchorEl} open={isOpen} onClose={close}>
-        {!(embeddedTracks.length + externalTracksWithFiles.length) && (
-          <MenuItem dense disabled>
-            No subtitles loaded.
-          </MenuItem>
-        )}
-        {embeddedTracks.map((track, i) => (
-          <MenuItem
-            dense
-            key={track.id}
-            onClick={() =>
-              track.mode === 'showing'
-                ? hideSubtitles(track.id, track.mediaFileId)
-                : showSubtitles(track.id, track.mediaFileId)
-            }
-          >
-            <ListItemIcon>
-              <VisibilityIcon visible={track.mode === 'showing'} />
-            </ListItemIcon>
-            <ListItemText
-              className={css.subtitlesMenuListItemText}
-              primary={`Embedded track ${i + 1}`}
-            />
-          </MenuItem>
-        ))}
-        {externalTracksWithFiles.map(({ track, file }, i) => (
-          <ExternalTrackMenuItem
-            key={track.id}
-            title={`External track ${i + 1}`}
-            visible={track.mode === 'showing'}
-            show={() => showSubtitles(track.id, track.mediaFileId)}
-            hide={() => hideSubtitles(track.id, track.mediaFileId)}
-            deleteTrack={() => deleteExternalSubtitles(track.id)}
-            locateTrack={() =>
-              locateFileRequest(
-                file,
-                `Locate "${
-                  file.name
-                }" in your filesystem to use these subtitles.`
-              )
-            }
-          />
-        ))}
-        <Divider />
-        <MenuItem
-          dense
-          onClick={useCallback(
-            async () => {
-              if (!currentFileId)
-                return dispatch(
-                  actions.simpleMessageSnackbar(
-                    'Please open a media file first.'
-                  )
-                )
-
-              const filePaths = await showOpenDialog([
-                { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
-              ])
-              if (!filePaths) return
-
-              dispatch(
-                actions.loadSubtitlesFromFileRequest(
-                  filePaths[0],
-                  currentFileId
-                )
-              )
-            },
-            [dispatch, currentFileId]
-          )}
-        >
-          <ListItemText primary="Load external track" />
-        </MenuItem>
-        <MenuItem dense onClick={() => subtitlesClipsDialogRequest()}>
-          <ListItemText primary="Make clips + cards from subtitles" />
-        </MenuItem>
-      </Menu>
-    </Fragment>
+    [dispatch, id, track]
   )
 }
 
 export default SubtitlesMenu
+
+export { $ as subtitlesMenu$ }

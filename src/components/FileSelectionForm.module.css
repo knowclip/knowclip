@@ -8,6 +8,10 @@
   align-content: center;
 }
 
+.prompt {
+  white-space: pre-line;
+}
+
 .prompt,
 .form {
   flex: 1 0 100%;

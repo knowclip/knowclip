@@ -1,12 +1,12 @@
 import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
-import { testLabels as projectsMenu } from '../../../components/ProjectsMenu'
-import { testLabels as newProjectForm } from '../../../components/Dialog/NewProjectFormDialog'
-import { testLabels as main } from '../../../components/Main'
+import { projectsMenu$ } from '../../../components/ProjectsMenu'
+import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectFormDialog'
+import { main$ } from '../../../components/Main'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
 export default async function createNewProject({ app, client }: TestSetup) {
-  await client.clickElement_(projectsMenu.newProjectButton)
+  await client.clickElement_(projectsMenu$.newProjectButton)
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
@@ -20,7 +20,7 @@ export default async function createNewProject({ app, client }: TestSetup) {
     transcriptionNoteTypeOption,
     saveButton,
     cardsPreview,
-  } = newProjectForm
+  } = newProjectFormDialog$
 
   await client.setFieldValue_(projectNameField, 'My cool new poject')
 
@@ -35,9 +35,9 @@ export default async function createNewProject({ app, client }: TestSetup) {
     'Includes fields for transcription, pronunciation, meaning, and'
   )
 
-  await client.waitUntilGone_(newProjectForm.transcriptionNoteTypeOption)
+  await client.waitUntilGone_(newProjectFormDialog$.transcriptionNoteTypeOption)
 
   await client.clickElement_(saveButton)
 
-  await client.waitUntilPresent_(main.container)
+  await client.waitUntilPresent_(main$.container)
 }

@@ -79,10 +79,22 @@ const stretchClipEpic: AppEpic = (
               stretchedClip &&
               stretchedClip.end > end
             ) {
+              const start = Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD)
+
+              const newCard = r.getNewFlashcardForStretchedClip(
+                state$.value,
+                r.getCurrentNoteType(state$.value) as NoteType,
+                stretchedClip,
+                { start, end: stretchedClip.end },
+                'PREPEND'
+              )
               return from([
                 r.clearPendingStretch(),
                 r.editClip(id, {
-                  start: Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD),
+                  start,
+                  ...(newCard !== stretchedClip.flashcard
+                    ? { flashcard: newCard }
+                    : null),
                 }),
               ])
             }
@@ -92,10 +104,21 @@ const stretchClipEpic: AppEpic = (
               stretchedClip &&
               end > stretchedClip.start
             ) {
+              const newCard = r.getNewFlashcardForStretchedClip(
+                state$.value,
+                r.getCurrentNoteType(state$.value) as NoteType,
+                stretchedClip,
+                { end, start: stretchedClip.start },
+                'APPEND'
+              )
+
               return from([
                 r.clearPendingStretch(),
                 r.editClip(id, {
                   end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD),
+                  ...(newCard !== stretchedClip.flashcard
+                    ? { flashcard: newCard }
+                    : null),
                 }),
               ])
             }

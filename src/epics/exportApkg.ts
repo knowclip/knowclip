@@ -8,8 +8,14 @@ import {
   startWith,
   endWith,
   concat,
+  concatMap,
+  filter,
+  takeUntil,
+  take,
+  ignoreElements,
+  switchMap,
 } from 'rxjs/operators'
-import { ofType, combineEpics } from 'redux-observable'
+import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
 import { of, empty, defer, from } from 'rxjs'
 import * as r from '../redux'
 import { join } from 'path'
@@ -20,10 +26,12 @@ import tempy from 'tempy'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 import { AppEpic } from '../types/AppEpic'
+import { showSaveDialog } from '../utils/electron'
+import { areSameFile } from '../utils/files'
 
 const { writeFile, readFile, unlink: deleteFile } = promises
 
-const exportApkgFailure: AppEpic = (action$, state$) =>
+const exportApkgFailure: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, ExportApkgFailure>(A.EXPORT_APKG_FAILURE),
     tap(() => (document.body.style.cursor = 'default')),
@@ -37,7 +45,7 @@ const exportApkgFailure: AppEpic = (action$, state$) =>
         : empty()
     )
   )
-const exportApkgSuccess: AppEpic = (action$, state$) =>
+const exportApkgSuccess: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, ExportApkgSuccess>(A.EXPORT_APKG_SUCCESS),
     tap(() => (document.body.style.cursor = 'default')),
@@ -47,8 +55,8 @@ const exportApkgSuccess: AppEpic = (action$, state$) =>
 const exportApkg: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportApkgRequest>(A.EXPORT_APKG_REQUEST),
-    flatMap(exportApkgRequest => {
-      const { clipIds, outputFilePath } = exportApkgRequest
+    switchMap(exportApkgRequest => {
+      const { clipIds } = exportApkgRequest
       const directory = tempy.directory()
 
       const currentProject = r.getCurrentProject(state$.value)
@@ -62,64 +70,52 @@ const exportApkg: AppEpic = (action$, state$) =>
       )
 
       if (exportData instanceof Set) {
-        return from([
-          r.closeDialog(),
-          ...[...exportData].map(file =>
-            r.fileSelectionDialog(
-              `You can't make clips from this file until you've located it in the filesystem. Please find "${
-                file.name
-              }" and try again.`,
-              file
-            )
-          ),
-          r.reviewAndExportDialog(),
-        ])
+        return getMissingMedia(exportData, action$, exportApkgRequest)
       }
 
-      document.body.style.cursor = 'progress'
+      return makeApkg(exportData, directory)
+    })
+  )
 
+function makeApkg(exportData: ApkgExportData, directory: string) {
+  return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
+    filter((path): path is string => Boolean(path)),
+    flatMap(outputFilePath => {
+      document.body.style.cursor = 'progress'
       const apkg = new Exporter(exportData.deckName, {
         // @ts-ignore
         sql: window.SQL,
         template: createTemplate(exportData.template),
       })
-
       let count = 0
-
-      const processClipsObservables = exportData.clips.map(
-        (clipSpecs, clipIndex) =>
-          defer(async () => {
-            const {
-              outputFilename,
-              sourceFilePath,
-              startTime,
-              endTime,
-              flashcardSpecs,
-            } = clipSpecs
-
-            const { fields, ...restSpecs } = flashcardSpecs
-            apkg.addCard(fields, restSpecs)
-
-            const clipOutputFilePath = join(directory, outputFilename)
-            await clipAudio(
-              sourceFilePath,
-              startTime,
-              endTime,
-              clipOutputFilePath
-            )
-
-            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
-
-            await deleteFile(clipOutputFilePath)
-
-            count += 1
-            return r.setProgress({
-              percentage: (count / exportData.clips.length) * 100,
-              message: `${count} clips out of ${
-                exportData.clips.length
-              } processed`,
-            })
+      const processClipsObservables = exportData.clips.map(clipSpecs =>
+        defer(async () => {
+          const {
+            outputFilename,
+            sourceFilePath,
+            startTime,
+            endTime,
+            flashcardSpecs,
+          } = clipSpecs
+          const { fields, ...restSpecs } = flashcardSpecs
+          apkg.addCard(fields, restSpecs)
+          const clipOutputFilePath = join(directory, outputFilename)
+          await clipAudio(
+            sourceFilePath,
+            startTime,
+            endTime,
+            clipOutputFilePath
+          )
+          apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
+          await deleteFile(clipOutputFilePath)
+          count += 1
+          return r.setProgress({
+            percentage: (count / exportData.clips.length) * 100,
+            message: `${count} clips out of ${
+              exportData.clips.length
+            } processed`,
           })
+        })
       )
       const mergedProcessClips = from(processClipsObservables).pipe(
         mergeAll(20)
@@ -151,7 +147,6 @@ const exportApkg: AppEpic = (action$, state$) =>
                 flatMap(async (zip: Buffer) => {
                   await writeFile(outputFilePath, zip, 'binary')
                   console.log(`Package has been generated: ${outputFilePath}`)
-
                   return r.exportApkgSuccess(
                     'Flashcards made in ' + outputFilePath
                   )
@@ -161,7 +156,6 @@ const exportApkg: AppEpic = (action$, state$) =>
             ),
             catchError(err => {
               console.error(err)
-
               return from([
                 r.exportApkgFailure(err.message || err.toString()),
                 r.setProgress(null),
@@ -173,5 +167,44 @@ const exportApkg: AppEpic = (action$, state$) =>
       return result
     })
   )
+}
+
+function getMissingMedia(
+  exportData: Set<MediaFile>,
+  action$: ActionsObservable<Action>,
+  exportApkgRequest: ExportApkgRequest
+) {
+  const missingMediaFileIds = [...exportData].map(file => file.id)
+  const openMissingMediaFailure = action$.pipe(
+    ofType<Action, OpenFileFailure>('OPEN_FILE_FAILURE'),
+    filter(
+      a =>
+        a.file.type === 'MediaFile' && missingMediaFileIds.includes(a.file.id)
+    ),
+    take(1)
+  )
+  return from(exportData).pipe(
+    concatMap(file =>
+      of(r.openFileRequest(file)).pipe(
+        concat(
+          action$.pipe(
+            ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
+            filter(a => areSameFile(file, a.validatedFile)),
+            take(1),
+            ignoreElements()
+          )
+        )
+      )
+    ),
+    startWith(r.closeDialog()),
+    takeUntil(openMissingMediaFailure),
+    endWith(
+      r.reviewAndExportDialog(
+        exportApkgRequest.mediaOpenPrior,
+        exportApkgRequest.clipIds
+      )
+    )
+  )
+}
 
 export default combineEpics(exportApkg, exportApkgSuccess, exportApkgFailure)
