@@ -17,6 +17,14 @@ export const highlightClip = (id: ClipId | null): HighlightClip => ({
   id,
 })
 
+export const highlightLeftClipRequest = (): HighlightLeftClipRequest => ({
+  type: A.HIGHLIGHT_LEFT_CLIP_REQUEST,
+})
+
+export const highlightRightClipRequest = (): HighlightRightClipRequest => ({
+  type: A.HIGHLIGHT_RIGHT_CLIP_REQUEST,
+})
+
 export const editClip = (id: ClipId, override: Partial<Clip>): ClipAction => ({
   type: A.EDIT_CLIP,
   id,

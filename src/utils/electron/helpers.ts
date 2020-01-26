@@ -73,7 +73,10 @@ const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 const showMessageBox: (
   options: MessageBoxOptions
 ) => Promise<MessageBoxReturnValue | null> = options =>
-  electron.remote.dialog.showMessageBox(options)
+  electron.remote.dialog.showMessageBox(
+    electron.remote.getCurrentWindow(),
+    options
+  )
 
 export default {
   showSaveDialog,

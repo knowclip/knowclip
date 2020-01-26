@@ -8,6 +8,7 @@
 }
 
 .intro {
+  height: 100%;
   padding: 2rem;
 }
 
@@ -38,6 +39,7 @@
 }
 
 .card {
+  background:white;
   /* min-height: 20rem; */
   /* width: 30rem; */
   /* margin: .5rem !important; */
@@ -50,33 +52,34 @@
 }
 
 .form {
-  font-size: large;
-  max-width: 30em;
-  margin: auto;
-}
-.formBody {
-  max-width: 20em;
-  margin: auto;
+  /* font-size: large; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  padding: 4rem 1rem 1rem;
 }
 
-
-.timeStamp,
-.noteTypeName {
+.formTop {
   opacity: 0.5;
   font-size: 0.8em;
+  text-align: right;
+  /* padding: 0 4em; */
 }
 .timeStamp {
-  text-align: right;
+  /* padding: 0 1rem; */
 }
 
-.bottom {
-  position: absolute !important;
-  bottom: 1rem;
-  right: 1rem;
+.formBody {
+  flex-grow: 1;
+  padding: 0 1rem;
 }
-.noteTypeNameLink {
-  text-decoration: underline;
-  cursor: pointer;
+
+.formBottom {
+  /* position: absolute !important;
+  bottom: 0;
+  left: 1rem; */
 }
 
 .suggestionsList {
@@ -95,8 +98,8 @@
 
 .fieldMenuButton {
   position: absolute !important;
-  left: -53px;
-  top: .6em;
+  left: -2.5rem;
+  top: .7em;
   opacity: 0;
 }
 

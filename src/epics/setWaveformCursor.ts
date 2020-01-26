@@ -1,8 +1,18 @@
-import { fromEvent, Observable } from 'rxjs'
-import { startWith, filter, switchMap, map } from 'rxjs/operators'
+import { fromEvent, Observable, of } from 'rxjs'
+import {
+  startWith,
+  filter,
+  switchMap,
+  map,
+  tap,
+  ignoreElements,
+} from 'rxjs/operators'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
+import { combineEpics } from 'redux-observable'
+
+let seeking = false
 
 const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
@@ -27,14 +37,19 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
             state,
             r.getXAtMilliseconds(state, newlyUpdatedTime * 1000)
           )
+          const wasSeeking = seeking
+          seeking = false
+          console.log(wasSeeking, seeking)
 
-          if (
-            newClipIdToHighlight &&
-            newClipIdToHighlight !== highlightedClipId
-          )
-            return r.highlightClip(newClipIdToHighlight)
+          // if (
+
+          //   newClipIdToHighlight &&
+          //   newClipIdToHighlight !== highlightedClipId
+          // )
+          //   return r.highlightClip(newClipIdToHighlight)
 
           const loopImminent =
+            !wasSeeking &&
             r.isLoopOn(state) &&
             effects.isMediaPlaying() &&
             highlightedClip &&
@@ -46,6 +61,16 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
             )
             effects.setCurrentTime(highlightedClipStart)
           }
+
+          if (wasSeeking && newClipIdToHighlight !== highlightedClipId) {
+            return r.highlightClip(newClipIdToHighlight)
+          }
+
+          if (
+            newClipIdToHighlight &&
+            newClipIdToHighlight !== highlightedClipId
+          )
+            return r.highlightClip(newClipIdToHighlight)
 
           return setCursorAndViewBox(
             state,
@@ -85,4 +110,25 @@ type OpenMediaFileSuccess = {
   validatedFile: MediaFile
 }
 
-export default setWaveformCursorEpic
+const seekingTrackerEpic: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    filter<Action, OpenMediaFileSuccess>(
+      (action): action is OpenMediaFileSuccess =>
+        action.type === 'OPEN_FILE_SUCCESS' &&
+        action.validatedFile.type === 'MediaFile'
+    ),
+    switchMap<OpenMediaFileSuccess, Observable<Action>>(({ validatedFile }) =>
+      fromEvent<Event>(
+        document,
+        'seeking',
+        // @ts-ignore
+        true
+      ).pipe(
+        tap(() => (seeking = true)),
+        startWith(() => of(null).pipe(tap(() => (seeking = false)))),
+        ignoreElements()
+      )
+    )
+  )
+
+export default combineEpics(setWaveformCursorEpic, seekingTrackerEpic)

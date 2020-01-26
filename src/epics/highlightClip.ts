@@ -154,11 +154,86 @@ const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
     map(() => r.highlightClip(null))
   )
 
+const highlightRightEpic: AppEpic = (action$, state$, { getCurrentTime }) =>
+  action$.pipe(
+    ofType<Action, HighlightRightClipRequest>(A.HIGHLIGHT_RIGHT_CLIP_REQUEST),
+    flatMap(() => {
+      const state = state$.value
+      const currentFileId = r.getCurrentFileId(state)
+      if (!currentFileId) return empty()
+
+      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
+
+      const highlightedClipId = r.getHighlightedClipId(state)
+      if (highlightedClipId) {
+        const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
+        const lastIndex = currentFileClipIds.length - 1
+        const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
+        if (nextId) return of(r.highlightClip(nextId))
+      }
+
+      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
+
+      const nextClipId = currentFileClipIds.find(
+        clipId => (r.getClip(state, clipId) || { start: 0 }).start >= x
+      )
+
+      return nextClipId ? of(r.highlightClip(nextClipId)) : empty()
+    })
+  )
+
+const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
+  if (!array.length) return null
+  for (let i = array.length - 1; i >= 0; i -= 1) {
+    const item = array[i]
+    if (predicate(item)) return item
+  }
+}
+
+const highlightLeftEpic: AppEpic = (
+  action$,
+  state$,
+  { window, getCurrentTime }
+) =>
+  action$.pipe(
+    ofType<Action, HighlightLeftClipRequest>(A.HIGHLIGHT_LEFT_CLIP_REQUEST),
+    flatMap(() => {
+      const state = state$.value
+      const currentFileId = r.getCurrentFileId(state)
+      if (!currentFileId) return empty()
+
+      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
+
+      const highlightedClipId = r.getHighlightedClipId(state)
+      if (highlightedClipId) {
+        const highlightedIndex = currentFileClipIds.indexOf(highlightedClipId)
+        const nextId =
+          currentFileClipIds[
+            highlightedIndex === 0
+              ? currentFileClipIds.length - 1
+              : highlightedIndex - 1
+          ]
+        return of(r.highlightClip(nextId))
+      }
+      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
+
+      const prevClipId =
+        findLast(
+          currentFileClipIds,
+          clipId => (r.getClip(state, clipId) || { end: Infinity }).end <= x
+        ) || currentFileClipIds[currentFileClipIds.length - 1]
+
+      return prevClipId ? of(r.highlightClip(prevClipId)) : empty()
+    })
+  )
+
 export default combineEpics(
   highlightEpic,
   highlightClipsOnAddEpic,
   playClipsOnHighlightEpic,
   selectClipOnStretch,
   centerSelectedClip,
-  deselectOnOpenMediaFile
+  deselectOnOpenMediaFile,
+  highlightRightEpic,
+  highlightLeftEpic
 )

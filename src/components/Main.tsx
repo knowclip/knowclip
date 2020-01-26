@@ -64,7 +64,7 @@ const Main = () => {
 
       <section className={css.middle}>
         {audioIsLoading ? (
-          <div className={css.waveformPlaceholder}>
+          <div>
             <CircularProgress />
           </div>
         ) : (
@@ -84,7 +84,7 @@ const Main = () => {
         />
       </section>
 
-      {Boolean(currentMediaFile) && <Waveform show={!audioIsLoading} />}
+      <Waveform show={Boolean(currentMediaFile && !audioIsLoading)} />
 
       <Tooltip title="Review and export flashcards">
         <Fab

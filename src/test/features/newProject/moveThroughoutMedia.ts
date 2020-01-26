@@ -1,8 +1,8 @@
 import { TestSetup } from '../../spectronApp'
-import { dragMouse } from '../../driver/ClientWrapper'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { waveform$ } from '../../../components/Waveform'
 import { setVideoTime } from '../../driver/media'
+import { waveformMouseDrag } from '../../driver/waveform'
 
 export default async function moveThroughoutMedia({ app, client }: TestSetup) {
   const waveformClips = await client.elements_(waveform$.waveformClip)
@@ -18,7 +18,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
     )
   })
 
-  await dragMouse(app, [710, 422], [1008, 422])
+  await waveformMouseDrag(app, client, 710, 1008)
 
   await client.waitUntil(
     async () => (await client.elements_(waveform$.waveformClip)).length === 3

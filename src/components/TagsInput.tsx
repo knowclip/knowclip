@@ -13,7 +13,9 @@ import { blue } from '@material-ui/core/colors'
 import truncate from '../utils/truncate'
 
 enum $ {
-  tagsInputContainer = 'tags-input-container',
+  container = 'tags-input-container',
+  tagChip = 'tags-input-tag-chip',
+  inputField = 'tags-input-field',
 }
 
 const getSuggestionValue: GetSuggestionValue<string> = a => a
@@ -142,6 +144,7 @@ const TagsInput = ({
           onChange: handletextFieldInputChange,
           onAdd: handleAddChip,
           onDelete: handleDeleteChip,
+          InputProps: { inputProps: { className: $.inputField } },
         } as InputProps<string>
       }
       renderInputComponent={useCallback(
@@ -150,7 +153,7 @@ const TagsInput = ({
             margin="dense"
             label="Tags"
             placeholder="Type your tag and press 'enter'"
-            className={cn(css.tagsField, $.tagsInputContainer)}
+            className={cn(css.tagsField, $.container)}
             fullWidth
             onAdd={handleAddChip}
             onDelete={handleDeleteChip}
@@ -176,7 +179,7 @@ const chipRenderer: ChipRenderer = (
 ) => (
   <Chip
     key={key}
-    className={className}
+    className={cn(className, $.tagChip)}
     style={{
       pointerEvents: isDisabled ? 'none' : undefined,
       backgroundColor: isFocused ? blue[300] : undefined,

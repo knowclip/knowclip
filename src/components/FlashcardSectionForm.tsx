@@ -117,21 +117,24 @@ const FlashcardSectionForm = ({
       className={className}
       onSubmit={handleFlashcardSubmit}
       id={$.container}
+      onFocus={handleFocus}
     >
-      <div className={css.formBody} onFocus={handleFocus}>
-        <section className={css.timeStamp}>
+      <section className={css.formTop}>
+        <span className={css.timeStamp}>
           {formatTime(selectedClipTime.start)}
           {' - '}
           {formatTime(selectedClipTime.end)}
-          <Tooltip title="Loop audio (Ctrl + L)">
-            <IconButton
-              onClick={toggleLoop}
-              color={isLoopOn ? 'secondary' : 'default'}
-            >
-              <Loop />
-            </IconButton>
-          </Tooltip>
-        </section>
+        </span>
+        <Tooltip title="Loop audio (Ctrl + L)">
+          <IconButton
+            onClick={toggleLoop}
+            color={isLoopOn ? 'secondary' : 'default'}
+          >
+            <Loop />
+          </IconButton>
+        </Tooltip>
+      </section>
+      <section className={css.formBody}>
         {currentNoteType &&
           getNoteTypeFields(currentNoteType).map((fieldName, i) => (
             <Field
@@ -146,7 +149,10 @@ const FlashcardSectionForm = ({
                 subtitlesFlashcardFieldLinks[fieldName] || null
               }
               mediaFileId={mediaFile.id}
-              inputProps={{ className: $.flashcardFields }}
+              inputProps={{
+                className: $.flashcardFields,
+                style: { minHeight: '20px' },
+              }}
               onKeyDown={loopOnInteract}
             />
           ))}
@@ -156,20 +162,20 @@ const FlashcardSectionForm = ({
           onAddChip={onAddChip}
           onDeleteChip={onDeleteChip}
         />
+      </section>
 
-        <section className={css.bottom}>
-          <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
-            <DeleteIcon />
-          </IconButton>
-          <Menu
-            anchorEl={moreMenuAnchorEl}
-            open={Boolean(moreMenuAnchorEl)}
-            onClose={handleCloseMoreMenu}
-          >
-            <MenuItem onClick={deleteCard}>Delete card</MenuItem>
-          </Menu>
-        </section>
-      </div>
+      <section className={css.formBottom}>
+        <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
+          <DeleteIcon />
+        </IconButton>
+        <Menu
+          anchorEl={moreMenuAnchorEl}
+          open={Boolean(moreMenuAnchorEl)}
+          onClose={handleCloseMoreMenu}
+        >
+          <MenuItem onClick={deleteCard}>Delete card</MenuItem>
+        </Menu>
+      </section>
     </form>
   )
 }

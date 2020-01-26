@@ -8,11 +8,11 @@ export default async function navigateBetweenClips({ app, client }: TestSetup) {
 
   await client.waitUntilPresent_(flashcardForm$.flashcardFields)
 
-  await clickAt(app, [650, 422])
+  await clickAt(app, [650, 655])
 
   await client.waitUntilGone_(flashcardForm$.flashcardFields)
 
-  await clickAt(app, [800, 422])
+  await clickAt(app, [800, 655])
 
   await client.clickElement_(previousClipButton)
 

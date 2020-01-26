@@ -4,7 +4,7 @@ import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/Fla
 import { flashcardFormFieldMenu$ } from '../../../components/FlashcardSectionFormFieldPopoverMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { setVideoTime } from '../../driver/media'
-import { dragMouse } from '../../driver/runEvents'
+import { waveformMouseDrag } from '../../driver/waveform'
 
 export default async function makeFlashcardsWithSubtitles({
   app,
@@ -21,7 +21,7 @@ export default async function makeFlashcardsWithSubtitles({
   await setVideoTime(client, 39)
   await client.waitForHidden_(waveform$.waveformClip)
 
-  await dragMouse(app, [589, 422], [824, 422])
+  await waveformMouseDrag(app, client, 589, 824)
   await client.elements_(waveform$.waveformClip, 4)
 
   const [, , meaningFieldButton] = await client.elements_(
@@ -40,7 +40,7 @@ export default async function makeFlashcardsWithSubtitles({
 
   await client.elements_(waveform$.waveformClip, 3)
 
-  await dragMouse(app, [589, 422], [824, 422])
+  await waveformMouseDrag(app, client, 589, 824)
   await client.elements_(waveform$.waveformClip, 4)
 
   await client.waitForText_(

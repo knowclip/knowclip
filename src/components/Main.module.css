@@ -18,7 +18,8 @@
   flex-shrink: 2;
   height: 100%;
   overflow-y: auto;
-
+  min-width: 30em;
+  flex-basis: 30em;
 }
 
 .media {
@@ -31,6 +32,6 @@
 
 .floatingActionButton {
   position: fixed !important;
-  bottom: 5%;
-  right: 5%;
+  bottom: calc(70px + 3rem);
+  right: 2rem;
 }
