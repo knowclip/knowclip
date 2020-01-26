@@ -2,20 +2,12 @@
   display: none;
 }
 
-/* .videoContainer {
-  overflow-y: auto;
-  height: 20em;
-  resize: vertical;
-  max-width: 100%;
-  display: block;
-} */
 .audio.mediaPlayer {
   width: 100%;
   display: block;
 }
 .video.mediaPlayer {
-  /* height: 100%; */
-  /* padding: 0 1rem 0 0; */
+
   box-sizing: border-box;
   max-width: 100%;
   max-height: 100%;
