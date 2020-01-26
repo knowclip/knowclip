@@ -205,7 +205,7 @@ export class ClientWrapper {
     try {
       await this._client.waitUntil(condition)
     } catch (err) {
-      throw new Error(`Wait condition was not met: ]${condition.toString()}`)
+      throw new Error(`Wait condition was not met: ${condition.toString()}`)
     }
   }
 }

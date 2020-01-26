@@ -1,11 +1,11 @@
-import { fromEvent, Observable, of } from 'rxjs'
+import { fromEvent, Observable, of, from } from 'rxjs'
 import {
   startWith,
   filter,
   switchMap,
-  map,
   tap,
   ignoreElements,
+  flatMap,
 } from 'rxjs/operators'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
@@ -28,7 +28,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
         // @ts-ignore
         true
       ).pipe(
-        map(() => {
+        flatMap(() => {
           const state = state$.value
           const newlyUpdatedTime = effects.getCurrentTime()
           const highlightedClip = r.getHighlightedClip(state)
@@ -39,14 +39,6 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           )
           const wasSeeking = seeking
           seeking = false
-          console.log(wasSeeking, seeking)
-
-          // if (
-
-          //   newClipIdToHighlight &&
-          //   newClipIdToHighlight !== highlightedClipId
-          // )
-          //   return r.highlightClip(newClipIdToHighlight)
 
           const loopImminent =
             !wasSeeking &&
@@ -63,19 +55,32 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           }
 
           if (wasSeeking && newClipIdToHighlight !== highlightedClipId) {
-            return r.highlightClip(newClipIdToHighlight)
+            return from([
+              ...(!newClipIdToHighlight
+                ? [
+                    setCursorAndViewBox(
+                      state,
+                      newlyUpdatedTime,
+                      effects.getWaveformSvgWidth()
+                    ),
+                  ]
+                : []),
+              r.highlightClip(newClipIdToHighlight),
+            ])
           }
 
           if (
             newClipIdToHighlight &&
             newClipIdToHighlight !== highlightedClipId
           )
-            return r.highlightClip(newClipIdToHighlight)
+            return of(r.highlightClip(newClipIdToHighlight))
 
-          return setCursorAndViewBox(
-            state,
-            newlyUpdatedTime,
-            effects.getWaveformSvgWidth()
+          return of(
+            setCursorAndViewBox(
+              state,
+              newlyUpdatedTime,
+              effects.getWaveformSvgWidth()
+            )
           )
         }),
         startWith(setWaveformCursor(0, { xMin: 0 }))

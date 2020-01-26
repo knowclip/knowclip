@@ -64,7 +64,7 @@ const Main = () => {
 
       <section className={css.middle}>
         {audioIsLoading ? (
-          <div>
+          <div className={css.media} style={{ alignItems: 'center' }}>
             <CircularProgress />
           </div>
         ) : (

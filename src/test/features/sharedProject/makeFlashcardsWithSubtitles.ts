@@ -33,7 +33,6 @@ export default async function makeFlashcardsWithSubtitles({
     flashcardFormFieldMenu$.menuItem
   )
   await embeddedSubtitlesTrackButton.click()
-  // await client.waitUntilGone_(flashcardFormFieldMenu.menuItem)
 
   await client.clickElement_(flashcardForm$.deleteButton)
   await client.clickElement_(confirmationDialog$.okButton)
