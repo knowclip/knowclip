@@ -29,7 +29,7 @@ const Media = ({
     | VideoHTMLAttributes<HTMLVideoElement> = {
     loop: loop,
     controls: true,
-    disablePictureInPicture: true,
+    // disablePictureInPicture: true,
     id: 'mediaPlayer',
     controlsList: 'nodownload nofullscreen',
     src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',

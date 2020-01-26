@@ -1,31 +1,72 @@
 import { fromEvent, Observable } from 'rxjs'
-import { map, startWith, filter, switchMap } from 'rxjs/operators'
+import { startWith, filter, switchMap, map } from 'rxjs/operators'
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
-import { isOpenFileSuccess } from '../utils/files'
 
-export const setCursor = (
+const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    filter<Action, OpenMediaFileSuccess>(
+      (action): action is OpenMediaFileSuccess =>
+        action.type === 'OPEN_FILE_SUCCESS' &&
+        action.validatedFile.type === 'MediaFile'
+    ),
+    switchMap<OpenMediaFileSuccess, Observable<Action>>(({ validatedFile }) =>
+      fromEvent<Event>(
+        document,
+        'timeupdate',
+        // @ts-ignore
+        true
+      ).pipe(
+        map(() => {
+          const state = state$.value
+          const newlyUpdatedTime = effects.getCurrentTime()
+          const highlightedClip = r.getHighlightedClip(state)
+          const highlightedClipId = highlightedClip && highlightedClip.id
+          const newClipIdToHighlight = r.getClipIdAt(
+            state,
+            r.getXAtMilliseconds(state, newlyUpdatedTime * 1000)
+          )
+
+          if (
+            newClipIdToHighlight &&
+            newClipIdToHighlight !== highlightedClipId
+          )
+            return r.highlightClip(newClipIdToHighlight)
+
+          const loopImminent =
+            r.isLoopOn(state) &&
+            effects.isMediaPlaying() &&
+            highlightedClip &&
+            newlyUpdatedTime >= r.getSecondsAtX(state, highlightedClip.end)
+          if (loopImminent && highlightedClip) {
+            const highlightedClipStart = r.getSecondsAtX(
+              state,
+              highlightedClip.start
+            )
+            effects.setCurrentTime(highlightedClipStart)
+          }
+
+          return setCursorAndViewBox(
+            state,
+            newlyUpdatedTime,
+            effects.getWaveformSvgWidth()
+          )
+        }),
+        startWith(setWaveformCursor(0, { xMin: 0 }))
+      )
+    )
+  )
+
+const setCursorAndViewBox = (
   state: AppState,
-  currentTime: number,
-  { setCurrentTime, getWaveformSvgWidth }: EpicsDependencies
+  newlySetTime: number,
+  svgWidth: number
 ) => {
   const viewBox = state.waveform.viewBox
 
-  const highlightedId = r.getHighlightedClipId(state)
-  const highlightedClip = highlightedId && r.getClip(state, highlightedId)
-  const timeToLoop =
-    highlightedClip &&
-    r.isLoopOn(state) &&
-    currentTime >= r.getSecondsAtX(state, highlightedClip.end)
-  if (highlightedClip && timeToLoop) {
-    setCurrentTime(r.getSecondsAtX(state, highlightedClip.start))
-  }
+  const newX = Math.round(newlySetTime * 50)
 
-  const newX = Math.round(
-    highlightedClip && timeToLoop ? highlightedClip.start : currentTime * 50
-  )
-  const svgWidth = getWaveformSvgWidth()
   if (newX < viewBox.xMin) {
     return setWaveformCursor(newX, {
       ...viewBox,
@@ -38,22 +79,10 @@ export const setCursor = (
   return setWaveformCursor(newX)
 }
 
-const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
-  action$.pipe(
-    filter<Action, OpenFileSuccessWith<MediaFile>>(
-      isOpenFileSuccess('MediaFile')
-    ),
-    switchMap<OpenFileSuccessWith<MediaFile>, Observable<Action>>(() =>
-      fromEvent<Event>(
-        document,
-        'timeupdate',
-        // @ts-ignore
-        true
-      ).pipe(
-        map(() => setCursor(state$.value, effects.getCurrentTime(), effects)),
-        startWith(setWaveformCursor(0, { xMin: 0 }))
-      )
-    )
-  )
+type OpenMediaFileSuccess = {
+  type: 'OPEN_FILE_SUCCESS'
+  filePath: string
+  validatedFile: MediaFile
+}
 
 export default setWaveformCursorEpic

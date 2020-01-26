@@ -1,8 +1,3 @@
-export const isOpenFileSuccess = <F extends FileMetadata>(
-  fileType: F['type']
-) => (action: Action): action is OpenFileSuccessWith<F> =>
-  action.type === A.OPEN_FILE_SUCCESS && action.validatedFile.type === fileType
-
 export const getExtensions = (file: FileMetadata) => {
   switch (file.type) {
     case 'ConstantBitrateMp3':

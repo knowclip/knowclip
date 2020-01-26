@@ -90,6 +90,14 @@ export class ClientWrapper {
     await this.clickElement(getSelector(testLabel))
   }
 
+  async doubleClickElement(selector: string) {
+    const element = await this.firstElement(selector)
+    await element.doubleClick()
+  }
+  async doubleClickElement_(testLabel: string) {
+    await this.doubleClickElement(getSelector(testLabel))
+  }
+
   async waitUntilPresent(selector: string) {
     try {
       return await this._client.waitForExist(selector)

@@ -20,17 +20,14 @@ enum $ {
   nextClipButton = 'next-clip-button',
 }
 
-const FlashcardSection = ({
-  showing,
-  mediaFile,
-}: {
-  showing: boolean
-  mediaFile: MediaFile | null
-}) => {
-  const { prevId, nextId } = useSelector((state: AppState) => ({
-    prevId: r.getFlashcardIdBeforeCurrent(state),
-    nextId: r.getFlashcardIdAfterCurrent(state),
-  }))
+const FlashcardSection = ({ mediaFile }: { mediaFile: MediaFile | null }) => {
+  const { prevId, nextId, highlightedClipId } = useSelector(
+    (state: AppState) => ({
+      prevId: r.getFlashcardIdBeforeCurrent(state),
+      nextId: r.getFlashcardIdAfterCurrent(state),
+      highlightedClipId: r.getHighlightedClipId(state),
+    })
+  )
   const dispatch = useDispatch()
 
   return (
@@ -51,8 +48,13 @@ const FlashcardSection = ({
       </Tooltip>
       <Card className={css.card}>
         <CardContent>
-          {showing && mediaFile ? (
-            <FlashcardForm className={css.form} mediaFile={mediaFile} />
+          {highlightedClipId && mediaFile ? (
+            <FlashcardForm
+              key={highlightedClipId}
+              className={css.form}
+              mediaFile={mediaFile}
+              clipId={highlightedClipId}
+            />
           ) : (
             <Placeholder />
           )}

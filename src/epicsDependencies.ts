@@ -46,11 +46,22 @@ const dependencies: EpicsDependencies = {
       el.pause()
     }
   },
+  playMedia: () => {
+    const el = getMediaPlayer()
+    if (el) {
+      el.play()
+    }
+  },
   toggleMediaPaused: () => {
     const el = getMediaPlayer()
     if (!el) return
     if (el.paused) el.play()
     else el.pause()
+  },
+  isMediaPlaying: () => {
+    const el = getMediaPlayer()
+    if (!el) return false
+    return !el.paused
   },
   getMediaMetadata,
   getSubtitlesFromFile,

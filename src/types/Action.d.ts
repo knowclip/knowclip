@@ -349,8 +349,6 @@ interface WithRecordType<F extends FileMetadata> {
   file: F
 }
 
-type OpenFileSuccessWith<F extends FileMetadata> = Omit<
-  OpenFileSuccess,
-  'file'
-> &
-  WithRecordType<F>
+type OpenFileSuccessWith<F extends FileMetadata> = OpenFileSuccess & {
+  validatedFile: F
+}
