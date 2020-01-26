@@ -1,10 +1,7 @@
 import React, { Fragment, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
-import {
-  Hearing as HearingIcon,
-  Delete as DeleteIcon,
-} from '@material-ui/icons'
+import { Hearing as HearingIcon } from '@material-ui/icons'
 import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'
 import ProjectMenu from '../components/ProjectMenu'

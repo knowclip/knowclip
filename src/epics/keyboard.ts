@@ -8,7 +8,7 @@ import {
   takeUntil,
   take,
 } from 'rxjs/operators'
-import { fromEvent, from, of, empty, merge, OperatorFunction } from 'rxjs'
+import { fromEvent, from, of, merge, OperatorFunction } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
