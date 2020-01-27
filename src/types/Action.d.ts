@@ -282,6 +282,7 @@ declare type MakeClipsFromSubtitles = {
     transcription: string
   }
   tags: Array<string>
+  includeStill: boolean
 }
 declare type ShowSubtitlesClipsDialogRequest = {
   type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'
