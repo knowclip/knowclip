@@ -121,6 +121,31 @@ const SubtitlesClipsDialog = ({
     [dispatch, currentFileId]
   )
 
+  const onChangeTranscription = useCallback(
+    e => {
+      setField('transcription', e.target.value as string)
+    },
+    [setField]
+  )
+  const onChangePronunciation = useCallback(
+    e => {
+      setField('pronunciation', e.target.value as string)
+    },
+    [setField]
+  )
+  const onChangeMeaning = useCallback(
+    e => {
+      setField('meaning', e.target.value as string)
+    },
+    [setField]
+  )
+  const onChangeNotes = useCallback(
+    e => {
+      setField('notes', e.target.value as string)
+    },
+    [setField]
+  )
+
   return (
     <Dialog open={open}>
       <DialogContent>
@@ -153,11 +178,8 @@ const SubtitlesClipsDialog = ({
           >
             <InputLabel htmlFor="transcription">Transcription</InputLabel>
             <Select
-              inputProps={{ id: 'transcription', name: 'transcription' }}
               value={fields.transcription || ''}
-              onChange={e => {
-                setField('transcription', e.target.value as string)
-              }}
+              onChange={onChangeTranscription}
               id={$.transcriptionField}
             >
               {subtitlesTrackOptions(subtitles)}
@@ -168,11 +190,8 @@ const SubtitlesClipsDialog = ({
             <FormControl fullWidth margin="normal">
               <InputLabel htmlFor="pronunciation">Pronunciation</InputLabel>
               <Select
-                inputProps={{ id: 'pronunciation', name: 'pronunciation' }}
                 value={fields.pronunciation || ''}
-                onChange={e =>
-                  setField('pronunciation', e.target.value as string)
-                }
+                onChange={onChangePronunciation}
                 id={$.pronunciationField}
               >
                 <MenuItem value="">None</MenuItem>
@@ -183,9 +202,8 @@ const SubtitlesClipsDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="meaning">Meaning</InputLabel>
             <Select
-              inputProps={{ id: 'meaning', name: 'meaning' }}
               value={fields.meaning || ''}
-              onChange={e => setField('meaning', e.target.value as string)} // TODO: USECALLBACK!
+              onChange={onChangeMeaning}
               id={$.meaningField}
             >
               <MenuItem value="">None</MenuItem>
@@ -195,9 +213,8 @@ const SubtitlesClipsDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="notes">Notes</InputLabel>
             <Select
-              inputProps={{ id: 'notes', name: 'notes' }}
               value={fields.notes || ''}
-              onChange={e => setField('notes', e.target.value as string)}
+              onChange={onChangeNotes}
               id={$.notesField}
             >
               <MenuItem value="">None</MenuItem>

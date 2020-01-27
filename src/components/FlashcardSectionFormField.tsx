@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
@@ -20,7 +20,7 @@ const FlashcardSectionFormField = ({
   name,
   mediaFileId,
   currentFlashcard,
-  label,
+  label: fieldLabel,
   setFlashcardText,
   subtitles,
   linkedSubtitlesTrack,
@@ -32,8 +32,27 @@ const FlashcardSectionFormField = ({
     e => setFlashcardText(name, e.target.value),
     [setFlashcardText, name]
   )
-  const embeddedSubtitlesTracks = subtitles.filter(isEmbedded)
-  const externalSubtitlesTracks = subtitles.filter(isExternal)
+  const embeddedSubtitlesTracks = useMemo(() => subtitles.filter(isEmbedded), [
+    subtitles,
+  ])
+  const externalSubtitlesTracks = useMemo(() => subtitles.filter(isExternal), [
+    subtitles,
+  ])
+  const label = useMemo(
+    () =>
+      fieldLabel +
+      getLinkedTrackLabel(
+        embeddedSubtitlesTracks,
+        externalSubtitlesTracks,
+        linkedSubtitlesTrack
+      ),
+    [
+      fieldLabel,
+      embeddedSubtitlesTracks,
+      externalSubtitlesTracks,
+      linkedSubtitlesTrack,
+    ]
+  )
 
   return (
     <section className={css.field}>
@@ -62,14 +81,7 @@ const FlashcardSectionFormField = ({
         fullWidth
         multiline
         margin="dense"
-        label={
-          label +
-          getLinkedTrackLabel(
-            embeddedSubtitlesTracks,
-            externalSubtitlesTracks,
-            linkedSubtitlesTrack
-          )
-        }
+        label={label}
       />
     </section>
   )

@@ -122,19 +122,40 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.EDIT_CLIP:
+    case A.EDIT_CLIP: {
+      const { id, override } = action
+      const clip = state.byId[id]
+      const newClip: Clip = {
+        // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
+        id,
+        fileId: clip.fileId,
+        start: override.start || clip.start,
+        end: override.end || clip.end,
+        flashcard: {
+          id,
+          type: clip.flashcard.type,
+          fields: {
+            ...clip.flashcard.fields,
+            ...(override.flashcard ? override.flashcard.fields : null),
+          },
+          tags:
+            override.flashcard && override.flashcard.tags
+              ? override.flashcard.tags.filter((t): t is string => Boolean(t))
+              : clip.flashcard.tags,
+        } as Flashcard,
+      }
+      if (override.flashcard && 'image' in override.flashcard) {
+        newClip.flashcard.image = override.flashcard.image
+      }
+
       return {
         ...state,
         byId: {
           ...state.byId,
-          [action.id]: {
-            ...state.byId[action.id],
-            // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
-            ...action.override,
-          },
+          [id]: newClip,
         },
       }
-
+    }
     case A.MERGE_CLIPS: {
       const { ids } = action // should all have same filepath
       const { fileId } = state.byId[ids[0]]

@@ -3,6 +3,8 @@ import { existsSync } from 'fs'
 import { getFileAvailabilityById } from '../redux'
 import tempy from 'tempy'
 
+const HEIGHT = 150
+
 export const getVideoStill = async (
   state: AppState,
   file: VideoStillImageFile,
@@ -17,10 +19,9 @@ export const getVideoStill = async (
       ffmpeg(constantBitrateFilePath)
         .seekInput(seconds)
         .outputOptions('-vframes 1')
-        .size('?x150')
+        .size(`?x${HEIGHT}`)
         .output(outputFilePath)
         .on('end', function() {
-          console.log('success!! ', outputFilePath)
           res(outputFilePath)
         })
         .on('error', (err: any) => {

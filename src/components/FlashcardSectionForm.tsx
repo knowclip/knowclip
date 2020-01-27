@@ -10,6 +10,7 @@ import {
   CardContent,
 } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import cn from 'classnames'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
@@ -22,6 +23,11 @@ enum $ {
   container = 'flashcard-form-container',
   flashcardFields = 'flashcard-field',
   deleteButton = 'delete-clip-button',
+}
+
+const FIELD_INPUT_PROPS = {
+  className: $.flashcardFields,
+  style: { minHeight: '20px' },
 }
 
 const FlashcardSectionForm = ({
@@ -67,7 +73,14 @@ const FlashcardSectionForm = ({
     },
     [dispatch, isLoopOn]
   )
+
   const [focusedOnLoad, setFocusedOnLoad] = useState(false)
+  useEffect(
+    () => {
+      setFocusedOnLoad(false)
+    },
+    [clip.id]
+  )
   const handleFocus = useCallback(
     () => {
       if (!focusedOnLoad) return setFocusedOnLoad(true)
@@ -165,10 +178,7 @@ const FlashcardSectionForm = ({
                 subtitlesFlashcardFieldLinks[fieldName] || null
               }
               mediaFileId={mediaFile.id}
-              inputProps={{
-                className: $.flashcardFields,
-                style: { minHeight: '20px' },
-              }}
+              inputProps={FIELD_INPUT_PROPS}
               onKeyDown={loopOnInteract}
             />
           ))}
@@ -253,15 +263,36 @@ const VideoStillDisplay = ({
 
   const { filePath } = videoStill.availability
 
+  const handleClick = useCallback(
+    () => {
+      dispatch(
+        clip.flashcard.image
+          ? r.removeFlashcardImage(clip.id)
+          : r.addFlashcardImage(clip.id)
+      )
+    },
+    [clip.flashcard.image, clip.id, dispatch]
+  )
+
   return (
-    <Card className={css.flashcardImageContainer}>
-      <CardMedia
-        className={css.flashcardImage}
-        component="img"
-        alt="Video still"
-        image={filePath ? `file://${filePath}` : undefined}
-      />
-    </Card>
+    <Tooltip
+      title={
+        clip.flashcard.image
+          ? 'Click to leave out image'
+          : 'Click to include image'
+      }
+    >
+      <Card className={css.flashcardImageContainer} onClick={handleClick}>
+        <CardMedia
+          className={cn(css.flashcardImage, {
+            [css.flashcardImageUnused]: !clip.flashcard.image,
+          })}
+          component="img"
+          alt="Video still"
+          image={filePath ? `file://${filePath}` : undefined}
+        />
+      </Card>
+    </Tooltip>
   )
 }
 // const getVideoStill = (state: AppState, mediaFile: MediaFile, clip: Clip): FileWithAvailability<VideoStillImageFile> => {

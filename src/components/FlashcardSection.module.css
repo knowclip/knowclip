@@ -71,7 +71,8 @@
 }
 .flashcardImage{
   height: 100%;
-  width: auto;
+  width: auto !important;
+  /* transition: opacity .25s; */
 }
 .flashcardImageUnused {
   opacity: 0.5;

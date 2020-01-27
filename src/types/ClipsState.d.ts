@@ -43,7 +43,7 @@ declare type TransliterationFlashcard = {
   type: 'Transliteration'
   fields: TransliterationFlashcardFields
   tags: Array<string>
-  image?: FlashcardImage
+  image?: FlashcardImage | null
 }
 declare type SimpleFlashcardFields = Record<SimpleFlashcardFieldName, string>
 declare type TransliterationFlashcardFields = Record<

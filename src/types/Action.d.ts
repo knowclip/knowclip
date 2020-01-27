@@ -81,7 +81,7 @@ declare type AddClips = {
 declare type EditClip = {
   type: 'EDIT_CLIP'
   id: ClipId
-  override: Partial<Clip>
+  override: import('redux').DeepPartial<Clip>
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }

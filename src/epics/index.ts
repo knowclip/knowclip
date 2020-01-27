@@ -5,6 +5,7 @@ import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
 import stretchClip from './stretchClip'
+import editClip from './editClip'
 import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
@@ -52,6 +53,7 @@ const rootEpic: AppEpic = combineEpics(
   setWaveformCursorEpic,
   loopMedia,
   addClip,
+  editClip,
   stretchClip,
   detectSilenceEpic,
   persistStateEpic,

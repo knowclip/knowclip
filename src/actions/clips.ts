@@ -1,3 +1,5 @@
+import { DeepPartial } from 'redux'
+
 export const addClip = (clip: Clip): ClipAction => ({
   type: A.ADD_CLIP,
   clip,
@@ -25,10 +27,37 @@ export const highlightRightClipRequest = (): HighlightRightClipRequest => ({
   type: A.HIGHLIGHT_RIGHT_CLIP_REQUEST,
 })
 
-export const editClip = (id: ClipId, override: Partial<Clip>): ClipAction => ({
+export const editClip = (
+  id: ClipId,
+  override: DeepPartial<Clip>
+): EditClip => ({
   type: A.EDIT_CLIP,
   id,
   override,
+})
+
+export const addFlashcardImage = (id: ClipId): EditClip => {
+  const image: FlashcardImage = {
+    id,
+    type: 'VideoStillImage',
+  }
+  return {
+    type: A.EDIT_CLIP,
+    id,
+    override: {
+      flashcard: {
+        image,
+      },
+    },
+  }
+}
+
+export const removeFlashcardImage = (id: ClipId): EditClip => ({
+  type: A.EDIT_CLIP,
+  id,
+  override: {
+    flashcard: { image: null },
+  },
 })
 
 export const mergeClips = (ids: Array<ClipId>): ClipAction => ({

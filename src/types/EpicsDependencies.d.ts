@@ -1,5 +1,3 @@
-/// <reference path="../utils/ffmpeg" />
-
 declare type EpicsDependencies = {
   document: Document
   window: typeof window
@@ -18,8 +16,8 @@ declare type EpicsDependencies = {
     path: string
   ) => Promise<
     | {
-        streams: FfprobeStream[]
-        format: FfprobeFormat
+        streams: import('fluent-ffmpeg').FfprobeStream[]
+        format: import('fluent-ffmpeg').FfprobeFormat
         chapters: any[]
       }
     | Error
