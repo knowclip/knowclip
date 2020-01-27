@@ -113,57 +113,6 @@ const Export = React.memo(
       [setExpandedTableIndex]
     )
 
-    const dialogContent = (
-      <DialogContent>
-        {currentTabIndex === 0 && (
-          <section className={css.introText}>
-            <p>
-              Export an Anki .apkg file. This format is best for{' '}
-              <strong>starting a new deck.</strong>
-            </p>
-            <p>
-              If you want to update some flashcards you've previously exported,
-              or add some new cards to a previously exported deck, you probably
-              want to export CSV and MP3s.
-            </p>
-          </section>
-        )}
-        {currentTabIndex === 1 && (
-          <section className={css.introText}>
-            <p>Export a Comma-Separated-Values file along with MP3s.</p>
-            <p>
-              This format is best for{' '}
-              <strong>updating or adding to a deck</strong> which you've
-              previously exported.
-            </p>
-          </section>
-        )}
-
-        {currentTabIndex === 2 && (
-          <section className={css.introText}>
-            <p>Export a Markdown file.</p>
-            <p>
-              This lets you <strong>review all your notes</strong> in a handy
-              text format.
-            </p>
-          </section>
-        )}
-        {selectionHasStarted &&
-          projectMedia.map((metadata, i) => (
-            <MediaTable
-              key={metadata.id}
-              open={i === expandedTableIndex}
-              mediaIndex={i}
-              onClick={onClickTable}
-              media={metadata}
-              selectedIds={selectedIds}
-              onSelect={onSelect}
-              onSelectAll={onSelectAll}
-            />
-          ))}
-      </DialogContent>
-    )
-
     return (
       <Dialog
         open={open}
@@ -182,7 +131,24 @@ const Export = React.memo(
             <p className={css.progressMessage}>{progress.message}</p>
           </DialogContent>
         ) : (
-          dialogContent
+          <DialogContent>
+            {!selectionHasStarted && (
+              <IntroText currentTabIndex={currentTabIndex} />
+            )}
+            {selectionHasStarted &&
+              projectMedia.map((metadata, i) => (
+                <MediaTable
+                  key={metadata.id}
+                  open={i === expandedTableIndex}
+                  mediaIndex={i}
+                  onClick={onClickTable}
+                  media={metadata}
+                  selectedIds={selectedIds}
+                  onSelect={onSelect}
+                  onSelectAll={onSelectAll}
+                />
+              ))}
+          </DialogContent>
         )}
 
         {selectionHasStarted ? (
@@ -244,6 +210,46 @@ const Export = React.memo(
     )
   }
 )
+
+function IntroText({ currentTabIndex }: { currentTabIndex: number }) {
+  return (
+    <>
+      {currentTabIndex === 0 && (
+        <section className={css.introText}>
+          <p>
+            Export an Anki .apkg file. This format is best for{' '}
+            <strong>starting a new deck.</strong>
+          </p>
+          <p>
+            If you want to update some flashcards you've previously exported, or
+            add some new cards to a previously exported deck, you probably want
+            to export CSV and MP3s.
+          </p>
+        </section>
+      )}
+      {currentTabIndex === 1 && (
+        <section className={css.introText}>
+          <p>Export a Comma-Separated-Values file along with MP3s.</p>
+          <p>
+            This format is best for{' '}
+            <strong>updating or adding to a deck</strong> which you've
+            previously exported.
+          </p>
+        </section>
+      )}
+
+      {currentTabIndex === 2 && (
+        <section className={css.introText}>
+          <p>Export a Markdown file.</p>
+          <p>
+            This lets you <strong>review all your notes</strong> in a handy text
+            format.
+          </p>
+        </section>
+      )}
+    </>
+  )
+}
 
 export default Export
 

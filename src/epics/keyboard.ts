@@ -8,17 +8,25 @@ import {
   takeUntil,
   take,
 } from 'rxjs/operators'
-import { fromEvent, from, of, empty, merge, OperatorFunction } from 'rxjs'
+import { fromEvent, from, of, merge, OperatorFunction } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 
-const spaceEpic: AppEpic = (action$, state$, { window, toggleMediaPaused }) =>
-  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
+const ctrlSpaceEpic: AppEpic = (
+  action$,
+  state$,
+  { window, toggleMediaPaused }
+) =>
+  fromEvent<KeyboardEvent>(window, 'keyup').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
     tap(e => {
       e.preventDefault()
-      toggleMediaPaused()
+      const activeElement = window.document.activeElement
+      if (
+        !(activeElement && ['VIDEO', 'AUDIO'].includes(activeElement.tagName))
+      )
+        toggleMediaPaused()
     }),
     ignoreElements()
   )
@@ -30,40 +38,8 @@ const ctrlRightBracket: AppEpic = (
 ) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 190 && ctrlKey),
-    flatMap(e => {
-      e.preventDefault()
-
-      const state = state$.value
-      const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return empty()
-
-      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
-
-      const highlightedClipId = r.getHighlightedClipId(state)
-      if (highlightedClipId) {
-        const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
-        const lastIndex = currentFileClipIds.length - 1
-        const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
-        if (nextId) return of(r.highlightClip(nextId))
-      }
-
-      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
-
-      const nextClipId = currentFileClipIds.find(
-        clipId => (r.getClip(state, clipId) || { start: 0 }).start >= x
-      )
-
-      return nextClipId ? of(r.highlightClip(nextClipId)) : empty()
-    })
+    map(() => r.highlightRightClipRequest())
   )
-
-const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
-  if (!array.length) return null
-  for (let i = array.length - 1; i >= 0; i -= 1) {
-    const item = array[i]
-    if (predicate(item)) return item
-  }
-}
 
 const ctrlLeftBracket: AppEpic = (
   action$,
@@ -72,36 +48,7 @@ const ctrlLeftBracket: AppEpic = (
 ) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 188 && ctrlKey),
-    flatMap(e => {
-      e.preventDefault()
-
-      const state = state$.value
-      const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return empty()
-
-      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
-
-      const highlightedClipId = r.getHighlightedClipId(state)
-      if (highlightedClipId) {
-        const highlightedIndex = currentFileClipIds.indexOf(highlightedClipId)
-        const nextId =
-          currentFileClipIds[
-            highlightedIndex === 0
-              ? currentFileClipIds.length - 1
-              : highlightedIndex - 1
-          ]
-        return of(r.highlightClip(nextId))
-      }
-      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
-
-      const prevClipId =
-        findLast(
-          currentFileClipIds,
-          clipId => (r.getClip(state, clipId) || { end: Infinity }).end <= x
-        ) || currentFileClipIds[currentFileClipIds.length - 1]
-
-      return prevClipId ? of(r.highlightClip(prevClipId)) : empty()
-    })
+    map(() => r.highlightLeftClipRequest())
   )
 
 const escEpic: AppEpic = (action$, state$, { window }) =>
@@ -183,7 +130,7 @@ const saveEpic: AppEpic = (action$, state$, { window }) =>
   )
 
 export default combineEpics(
-  spaceEpic,
+  ctrlSpaceEpic,
   escEpic,
   lEpic,
   ctrlRightBracket,

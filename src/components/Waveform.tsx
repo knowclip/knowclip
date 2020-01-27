@@ -10,6 +10,7 @@ import {
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 enum $ {
+  container = 'waveform-container',
   subtitlesTimelinesContainer = 'subtitles-timelines-container',
   subtitlesTimelines = 'subtitles-timeline',
   waveformClipsContainer = 'waveform-clips-container',
@@ -254,27 +255,33 @@ const Waveform = ({ show }: { show: boolean }) => {
   )
   return (
     <Fragment>
-      <svg
-        ref={svgRef}
-        style={show ? {} : { display: 'none' }}
-        id="waveform-svg"
-        viewBox={viewBoxString}
-        preserveAspectRatio="xMinYMin slice"
-        className={css.waveformSvg}
-        width="100%"
-        onMouseDown={onMouseDown}
-        height={HEIGHT}
-      >
-        {path && <image xlinkHref={`file://${path}`} />}
-        <Cursor {...cursor} />
-        <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
-        {pendingClip && (
-          <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
-        )}
-        {pendingStretch && (
-          <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />
-        )}
-      </svg>
+      {show ? (
+        <svg
+          ref={svgRef}
+          id="waveform-svg"
+          viewBox={viewBoxString}
+          preserveAspectRatio="xMinYMin slice"
+          className={cn(css.waveformSvg, $.container)}
+          width="100%"
+          onMouseDown={onMouseDown}
+          height={HEIGHT}
+        >
+          {path && <image xlinkHref={`file://${path}`} />}
+          <Cursor {...cursor} />
+          <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
+          {pendingClip && (
+            <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
+          )}
+          {pendingStretch && (
+            <PendingStretch
+              {...pendingStretch}
+              stepsPerSecond={stepsPerSecond}
+            />
+          )}
+        </svg>
+      ) : (
+        <div className={css.waveformPlaceholder} />
+      )}
       {Boolean(subtitles.length) && (
         <SubtitlesTimelines
           subtitles={subtitles}

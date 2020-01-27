@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { IconButton, Card, CardContent, Tooltip } from '@material-ui/core'
+import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
@@ -20,59 +20,58 @@ enum $ {
   nextClipButton = 'next-clip-button',
 }
 
-const FlashcardSection = ({ mediaFile }: { mediaFile: MediaFile | null }) => {
-  const { prevId, nextId, highlightedClipId } = useSelector(
-    (state: AppState) => ({
-      prevId: r.getFlashcardIdBeforeCurrent(state),
-      nextId: r.getFlashcardIdAfterCurrent(state),
-      highlightedClipId: r.getHighlightedClipId(state),
-    })
-  )
+const FlashcardSection = ({
+  mediaFile,
+  className,
+}: {
+  mediaFile: MediaFile | null
+  className?: string
+}) => {
+  const { highlightedClipId, clipsLength } = useSelector((state: AppState) => ({
+    highlightedClipId: r.getHighlightedClipId(state),
+    clipsLength: mediaFile
+      ? r.getClipIdsByMediaFileId(state, mediaFile.id).length
+      : 0,
+  }))
   const dispatch = useDispatch()
 
   return (
-    <section className={cn(css.container, $.container)}>
+    <section className={cn(className, css.container, $.container, css.card)}>
       <Tooltip title="Previous clip (Ctrl + comma)">
-        <span>
-          <IconButton
-            className={cn(css.navButton, $.previousClipButton)}
-            disabled={!prevId}
-            onClick={useCallback(
-              () => dispatch(actions.highlightClip(prevId)),
-              [dispatch, prevId]
-            )}
-          >
-            <ChevronLeft />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Card className={css.card}>
-        <CardContent>
-          {highlightedClipId && mediaFile ? (
-            <FlashcardForm
-              key={highlightedClipId}
-              className={css.form}
-              mediaFile={mediaFile}
-              clipId={highlightedClipId}
-            />
-          ) : (
-            <Placeholder />
+        <IconButton
+          className={cn(css.prevButton, $.previousClipButton)}
+          disabled={clipsLength < 2}
+          onClick={useCallback(
+            () => dispatch(actions.highlightLeftClipRequest()),
+            [dispatch]
           )}
-        </CardContent>
-      </Card>
+        >
+          <ChevronLeft />
+        </IconButton>
+      </Tooltip>
+
+      {highlightedClipId && mediaFile ? (
+        <FlashcardForm
+          key={highlightedClipId}
+          className={css.form}
+          mediaFile={mediaFile}
+          clipId={highlightedClipId}
+        />
+      ) : (
+        <Placeholder />
+      )}
+
       <Tooltip title="Next clip (Ctrl + period)">
-        <span>
-          <IconButton
-            className={cn(css.navButton, $.nextClipButton)}
-            disabled={!nextId}
-            onClick={useCallback(
-              () => dispatch(actions.highlightClip(nextId)),
-              [dispatch, nextId]
-            )}
-          >
-            <ChevronRight />
-          </IconButton>
-        </span>
+        <IconButton
+          className={cn(css.nextButton, $.nextClipButton)}
+          disabled={clipsLength < 2}
+          onClick={useCallback(
+            () => dispatch(actions.highlightRightClipRequest()),
+            [dispatch]
+          )}
+        >
+          <ChevronRight />
+        </IconButton>
       </Tooltip>
     </section>
   )

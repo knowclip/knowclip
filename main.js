@@ -32,8 +32,11 @@ async function createWindow() {
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    show: false,
     width: Math.min(1027, width),
     height: Math.min(768, height),
+    minWidth: 740,
+    minHeight: 570,
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,
@@ -42,6 +45,10 @@ async function createWindow() {
   })
 
   context.mainWindow = mainWindow
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+  })
 
   // and load the index.html of the app.
   mainWindow.loadURL(

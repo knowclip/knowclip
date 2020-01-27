@@ -1,13 +1,13 @@
 .container {
   display: flex;
   flex-flow: row nowrap;
-  padding: .5rem !important;
   justify-content: center;
   align-items: flex-start;
   overflow: auto;
 }
 
 .intro {
+  height: 100%;
   padding: 2rem;
 }
 
@@ -24,45 +24,50 @@
 }
 
 .navButton {
-  margin: 10rem .5rem .5rem .5rem !important;
+  position: absolute !important;
+  top: 1rem;
+}
+.prevButton {
+  composes: navButton;
+  left: 1rem;
+}
+.nextButton {
+  composes: navButton;
+  right: 1rem;
 }
 
 .card {
-  min-height: 20rem;
-  width: 30rem;
-  margin: .5rem !important;
+  background:white;
   position: relative;
-  padding-bottom: 3rem;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  border-radius: 0;
 }
 
 .form {
-  font-size: large;
-  max-width: 30em;
-  margin: auto;
-}
-.formBody {
-  max-width: 20em;
-  margin: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  padding: 4rem 1rem 1rem;
 }
 
-
-.timeStamp,
-.noteTypeName {
+.formTop {
   opacity: 0.5;
   font-size: 0.8em;
-}
-.timeStamp {
   text-align: right;
 }
-
-.bottom {
-  position: absolute !important;
-  bottom: 1rem;
-  right: 1rem;
+.timeStamp {
 }
-.noteTypeNameLink {
-  text-decoration: underline;
-  cursor: pointer;
+
+.formBody {
+  flex-grow: 1;
+  padding: 0 1rem;
+}
+
+.formBottom {
 }
 
 .suggestionsList {
@@ -81,8 +86,8 @@
 
 .fieldMenuButton {
   position: absolute !important;
-  left: -53px;
-  top: .6em;
+  left: -2.5rem;
+  top: .7em;
   opacity: 0;
 }
 

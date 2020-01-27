@@ -1,22 +1,22 @@
 import { TestSetup } from '../../spectronApp'
-import { dragMouse } from '../../driver/ClientWrapper'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { waveform$ } from '../../../components/Waveform'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
-import { fillInFlashcardFields } from '../../driver/flashcardSection'
+import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
+import { waveformMouseDrag } from '../../driver/waveform'
 
 export default async function makeSomeFlashcards({ app, client }: TestSetup) {
-  const { flashcardFields, deleteButton } = flashcardForm$
+  const { deleteButton } = flashcardForm$
 
-  await dragMouse(app, [351, 422], [438, 422])
-  await fillInFlashcardFields(await client.elements_(flashcardFields), {
+  await waveformMouseDrag(app, client, 351, 438)
+  await fillInTransliterationCardFields(client, {
     transcription: 'Ich bin keine Katze, sagte Frederick böse',
     meaning: 'I am not a cat, said Frederick angrily',
   })
 
-  await dragMouse(app, [921, 422], [1000, 422])
-  await fillInFlashcardFields(await client.elements_(flashcardFields), {
+  await waveformMouseDrag(app, client, 921, 1000)
+  await fillInTransliterationCardFields(client, {
     transcription: "Das hab' ich nicht gesagt",
     meaning: "I didn't say that",
   })
@@ -25,7 +25,7 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
   await setVideoTime(client, 38)
   await client.waitForHidden_(waveform$.waveformClip)
 
-  await dragMouse(app, [176, 422], [355, 422])
+  await waveformMouseDrag(app, client, 176, 355)
 
   await client.elements_(waveform$.waveformClip, 3)
 

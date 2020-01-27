@@ -7,6 +7,7 @@ import { flashcardSectionForm$ } from '../../../components/FlashcardSectionForm'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
+import { snackbar$ } from '../../../components/Snackbar'
 
 export default async function makeCardsFromSubtitles({
   app,
@@ -14,6 +15,7 @@ export default async function makeCardsFromSubtitles({
 }: TestSetup) {
   await client.clickElement_(projectsMenu$.recentProjectsListItem)
   await client.clickElement_(fileSelectionForm$.cancelButton)
+  await client.clickElement_(snackbar$.closeButton)
 
   await client.clickElement_(subtitlesMenu$.openMenuButton)
 
@@ -23,6 +25,7 @@ export default async function makeCardsFromSubtitles({
   await client.clickElement_(subtitleClipsDialog$.okButton)
 
   await client.clickElement_(fileSelectionForm$.cancelButton)
+  await client.clickElement_(snackbar$.closeButton)
 
   await client.clickElement_(subtitleClipsDialog$.okButton)
 

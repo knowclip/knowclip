@@ -49,6 +49,8 @@ declare type ClipAction =
   | EditClip
   | MergeClips
   | HighlightClip
+  | HighlightLeftClipRequest
+  | HighlightRightClipRequest
 
 declare type DeleteCard = { type: 'DELETE_CARD'; id: ClipId }
 declare type DeleteCards = { type: 'DELETE_CARDS'; ids: Array<ClipId> }
@@ -83,7 +85,10 @@ declare type EditClip = {
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
-
+declare type HighlightLeftClipRequest = { type: 'HIGHLIGHT_LEFT_CLIP_REQUEST' }
+declare type HighlightRightClipRequest = {
+  type: 'HIGHLIGHT_RIGHT_CLIP_REQUEST'
+}
 declare type WaveformAction =
   | SetCursorPosition
   | SetWaveformViewBox

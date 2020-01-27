@@ -3,6 +3,7 @@ import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
+import { snackbar$ } from '../../../components/Snackbar'
 
 export default async function openSharedProject({ app, client }: TestSetup) {
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
@@ -23,4 +24,6 @@ export default async function openSharedProject({ app, client }: TestSetup) {
 
   await client.waitForText_(fileSelectionForm$.container, 'pbc_jp.ass')
   await client.clickElement_(fileSelectionForm$.cancelButton)
+  await client.clickElement_(snackbar$.closeButton)
+  await client.waitUntilGone_(snackbar$.closeButton)
 }

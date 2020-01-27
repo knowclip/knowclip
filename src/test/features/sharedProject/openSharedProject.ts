@@ -4,6 +4,7 @@ import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
+import { snackbar$ } from '../../../components/Snackbar'
 
 export default async function openSharedProject({ app, client }: TestSetup) {
   await mockElectronHelpers(app, {
@@ -16,4 +17,5 @@ export default async function openSharedProject({ app, client }: TestSetup) {
   await client.waitUntilPresent_(main$.container)
 
   await client.clickElement_(fileSelectionForm$.cancelButton)
+  await client.clickElement_(snackbar$.closeButton)
 }

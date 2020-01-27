@@ -1,20 +1,18 @@
-import { ElementWrapper } from './ElementWrapper'
+import { ClientWrapper } from './ClientWrapper'
+import { flashcardSectionForm$ } from '../../components/FlashcardSectionForm'
 
-export async function fillInFlashcardFields(
-  transliterationFieldsElements: ElementWrapper[],
-  {
-    transcription,
-    pronunciation,
-    meaning,
-    notes,
-  }: Partial<TransliterationFlashcardFields>
+export async function fillInTransliterationCardFields(
+  client: ClientWrapper,
+  newValues: Partial<TransliterationFlashcardFields>
 ) {
   const [
     transcriptionEl,
     pronunciationEl,
     meaningEl,
     notesEl,
-  ] = transliterationFieldsElements
+  ] = await client.elements_(flashcardSectionForm$.flashcardFields)
+  const { transcription, pronunciation, meaning, notes } = newValues
+
   if (transcription) await transcriptionEl.setFieldValue(transcription)
   if (pronunciation) await pronunciationEl.setFieldValue(pronunciation)
   if (meaning) await meaningEl.setFieldValue(meaning)

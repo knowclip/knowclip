@@ -71,7 +71,7 @@ const ReviewAndExportMediaTable = memo(
       clipsIds,
     ])
 
-    return !clipsIds.length ? null : (
+    return (
       <Paper className={$.container}>
         <Toolbar
           className={cn(css.toolbar, { [css.openToolbar]: open }, $.header)}
@@ -150,6 +150,11 @@ const MediaTableBody = React.memo(
             isHighlighted={highlightedClipId === id}
           />
         ))}
+        {!clipsIds.length && (
+          <p style={{ padding: '0 2em', textAlign: 'center' }}>
+            No clips have been made for this media file.
+          </p>
+        )}
       </TableBody>
     )
   }

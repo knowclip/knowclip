@@ -62,24 +62,29 @@ const Main = () => {
         />
       </DarkTheme>
 
-      <section className={css.media}>
+      <section className={css.middle}>
         {audioIsLoading ? (
-          <div className={css.waveformPlaceholder}>
+          <div className={css.media} style={{ alignItems: 'center' }}>
             <CircularProgress />
           </div>
         ) : (
           <Media
             key={String(constantBitrateFilePath)}
+            className={css.media}
             constantBitrateFilePath={constantBitrateFilePath}
             loop={loop}
             metadata={currentMediaFile}
             subtitles={subtitles}
           />
         )}
+
+        <FlashcardSection
+          mediaFile={currentMediaFile}
+          className={css.flashcardSection}
+        />
       </section>
 
-      {Boolean(currentMediaFile) && <Waveform show={!audioIsLoading} />}
-      <FlashcardSection mediaFile={currentMediaFile} />
+      <Waveform show={Boolean(currentMediaFile && !audioIsLoading)} />
 
       <Tooltip title="Review and export flashcards">
         <Fab

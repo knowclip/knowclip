@@ -1,40 +1,34 @@
 import { TestSetup } from '../../spectronApp'
-import { dragMouse } from '../../driver/ClientWrapper'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/Waveform'
-import { fillInFlashcardFields } from '../../driver/flashcardSection'
+import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
+import { waveformMouseDrag } from '../../driver/waveform'
 
 export default async function makeTwoFlashcards({ app, client }: TestSetup) {
-  await dragMouse(app, [402, 422], [625, 422])
+  await waveformMouseDrag(app, client, 402, 625)
 
-  const { flashcardFields } = flashcardForm$
-  const { tagsInputContainer } = tagsInput$
-
-  await fillInFlashcardFields(await client.elements_(flashcardFields), {
+  await fillInTransliterationCardFields(client, {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
     pronunciation: 'sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa',
     meaning: 'Relaxing while eating bamboo grass is the best',
   })
 
-  await client.clickElement_(`${tagsInputContainer} svg`)
+  await client.elements_(tagsInput$.tagChip, 1)
+  await client.clickElement_(tagsInput$.tagChip)
+  await client.elements_(tagsInput$.tagChip)
+  await client.pressKeys(['Backspace'])
 
-  await client.clickElement_(tagsInputContainer)
-
-  await client.setFieldValue_(`${tagsInputContainer} input`, 'pbc')
-
+  await client.setFieldValue_(tagsInput$.inputField, 'pbc')
   await client.pressKeys(['Enter'])
+  await client.elements_(tagsInput$.tagChip, 1)
+  await client.waitForText_(tagsInput$.tagChip, 'pbc')
+  await waveformMouseDrag(app, client, 756, 920)
+  await waveformMouseDrag(app, client, 917, 888)
 
-  await dragMouse(app, [756, 422], [920, 422])
-  await dragMouse(app, [917, 422], [888, 422])
+  await client.elements_(tagsInput$.tagChip, 1)
+  await client.waitForText_(tagsInput$.tagChip, 'pbc')
 
-  const tagsDeleteButtons = await client.elements_(`${tagsInputContainer} svg`)
-  expect(tagsDeleteButtons).toHaveLength(1)
-
-  const tagsInputContainerEl = await client.firstElement_(tagsInputContainer)
-  await tagsInputContainerEl.waitForText('pbc')
-
-  await fillInFlashcardFields(await client.elements_(flashcardFields), {
+  await fillInTransliterationCardFields(client, {
     transcription: 'またこの子は昼間からゴロゴロして',
     pronunciation: 'mata kono ko-wa hirumá-kara góro-goro shite',
     meaning: 'This kid, lazing about again so early',

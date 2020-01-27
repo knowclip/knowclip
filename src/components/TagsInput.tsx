@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react'
 import cn from 'classnames'
-import { MenuItem, Paper } from '@material-ui/core'
-import ChipInput from 'material-ui-chip-input'
+import { MenuItem, Paper, Chip } from '@material-ui/core'
+import ChipInput, { ChipRenderer } from 'material-ui-chip-input'
 import css from './FlashcardSection.module.css'
 import Autosuggest, {
   RenderSuggestion,
@@ -9,9 +9,13 @@ import Autosuggest, {
   RenderSuggestionsContainer,
   InputProps,
 } from 'react-autosuggest'
+import { blue } from '@material-ui/core/colors'
+import truncate from '../utils/truncate'
 
 enum $ {
-  tagsInputContainer = 'tags-input-container',
+  container = 'tags-input-container',
+  tagChip = 'tags-input-tag-chip',
+  inputField = 'tags-input-field',
 }
 
 const getSuggestionValue: GetSuggestionValue<string> = a => a
@@ -140,6 +144,7 @@ const TagsInput = ({
           onChange: handletextFieldInputChange,
           onAdd: handleAddChip,
           onDelete: handleDeleteChip,
+          InputProps: { inputProps: { className: $.inputField } },
         } as InputProps<string>
       }
       renderInputComponent={useCallback(
@@ -148,7 +153,7 @@ const TagsInput = ({
             margin="dense"
             label="Tags"
             placeholder="Type your tag and press 'enter'"
-            className={cn(css.tagsField, $.tagsInputContainer)}
+            className={cn(css.tagsField, $.container)}
             fullWidth
             onAdd={handleAddChip}
             onDelete={handleDeleteChip}
@@ -158,6 +163,7 @@ const TagsInput = ({
             value={chips}
             clearInputValueOnChange
             inputRef={ref}
+            chipRenderer={chipRenderer}
             {...other}
           />
         ),
@@ -166,6 +172,24 @@ const TagsInput = ({
     />
   )
 }
+
+const chipRenderer: ChipRenderer = (
+  { text, isFocused, isDisabled, handleClick, handleDelete, className },
+  key
+) => (
+  <Chip
+    key={key}
+    className={cn(className, $.tagChip)}
+    style={{
+      pointerEvents: isDisabled ? 'none' : undefined,
+      backgroundColor: isFocused ? blue[300] : undefined,
+    }}
+    onClick={handleClick}
+    onDelete={handleDelete}
+    label={truncate(text, 12)}
+    title={text}
+  />
+)
 
 export default TagsInput
 

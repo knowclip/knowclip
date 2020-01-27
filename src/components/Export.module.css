@@ -6,6 +6,7 @@
 .tabs {
   background-color: #3f51b5 !important;
   color: white;
+  margin-bottom: 1rem;
 }
 
 .mediaFileName {
@@ -48,6 +49,7 @@
 
 .table {
   vertical-align: top !important;
+  margin-top: 1em;
 }
 .tableRow {
   vertical-align: top !important;
