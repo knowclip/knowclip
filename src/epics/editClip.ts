@@ -1,5 +1,5 @@
 import { AppEpic } from '../types/AppEpic'
-import { ofType } from 'redux-observable'
+import { ofType, combineEpics } from 'redux-observable'
 import {
   filter,
   map,
@@ -11,7 +11,7 @@ import {
   concat,
 } from 'rxjs/operators'
 import { empty, of } from 'rxjs'
-import { deleteFileRequest, addAndOpenFile } from '../actions'
+import * as actions from '../actions'
 import { getClip, getCurrentMediaFile, getFile } from '../selectors'
 import { areSameFile } from '../utils/files'
 
@@ -29,7 +29,7 @@ const remakeStill: AppEpic = (action$, state$) =>
         clip.id
       )
       if (still && ('start' in override || 'end' in override))
-        return of(deleteFileRequest(still.type, still.id)).pipe(
+        return of(actions.deleteFileRequest(still.type, still.id)).pipe(
           concat(
             action$.pipe(
               filter(
@@ -40,11 +40,28 @@ const remakeStill: AppEpic = (action$, state$) =>
               ignoreElements()
             )
           ),
-          endWith(addAndOpenFile(still))
+          endWith(actions.addAndOpenFile(still))
         )
 
       return empty()
     })
   )
 
-export default remakeStill
+const setDefaultClipSpecs: AppEpic = (action$, state$) =>
+  action$.pipe(
+    ofType<Action, EditClip>(A.EDIT_CLIP),
+    flatMap(({ override, id }) => {
+      const { flashcard } = override
+      if (!flashcard) return empty()
+
+      const { image } = flashcard
+      if (image === undefined) return empty()
+
+      return of(
+        actions.setDefaultClipSpecs({
+          includeStill: image !== null,
+        })
+      )
+    })
+  )
+export default combineEpics(remakeStill, setDefaultClipSpecs)

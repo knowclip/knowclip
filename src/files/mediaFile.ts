@@ -89,7 +89,7 @@ const getCbr: OpenFileSuccessHandler<MediaFile> = async (
   return []
 }
 
-const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
+const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
   action,
   state,
   effects
@@ -101,7 +101,7 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
     : 0
 
   if (currentFileName && !clipsCount)
-    return [r.setDefaultTags([basename(currentFileName)])]
+    return [r.setDefaultClipSpecs({ tags: [basename(currentFileName)] })]
 
   const commonTags = currentFileId
     ? r.getClips(state, currentFileId).reduce(
@@ -122,9 +122,9 @@ const setDefaultTags: OpenFileSuccessHandler<MediaFile> = async (
         [] as string[]
       )
     : []
-  if (commonTags.length) return [r.setDefaultTags(commonTags)]
+  if (commonTags.length) return [r.setDefaultClipSpecs({ tags: commonTags })]
 
-  return [r.setDefaultTags([])]
+  return [r.setDefaultClipSpecs({ tags: [] })]
 }
 
 export default {
@@ -166,7 +166,7 @@ export default {
     reloadRememberedExternalSubtitles,
     getCbr,
     getWaveform,
-    setDefaultTags,
+    setDefaultClipSpecs,
   ],
   locateRequest: async (action, state, effects) => {
     return [r.fileSelectionDialog(action.message, action.file)]

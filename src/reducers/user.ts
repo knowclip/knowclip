@@ -91,10 +91,14 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         pendingStretch: null,
       }
 
-    case A.SET_DEFAULT_TAGS:
+    case A.SET_DEFAULT_CLIP_SPECS:
       return {
         ...state,
-        defaultTags: action.tags,
+        defaultTags: action.tags || state.defaultTags,
+        defaultIncludeStill:
+          action.includeStill !== undefined
+            ? action.includeStill
+            : state.defaultIncludeStill,
       }
 
     case A.SET_ALL_TAGS:

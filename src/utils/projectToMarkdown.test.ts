@@ -1,6 +1,5 @@
 import projectToMarkdown from './projectToMarkdown'
 import reducer from '../reducers'
-import newClip from '../utils/newClip'
 import { initialState } from '../reducers/files'
 
 describe('projectToMarkdown', () => {
@@ -19,19 +18,23 @@ describe('projectToMarkdown', () => {
       string
     ],
     tags: string[]
-  ) =>
-    newClip(
-      { start, end },
-      mediaFileId,
+  ): Clip => ({
+    start,
+    end,
+    fileId: mediaFileId,
+    id,
+    flashcard: {
       id,
-      {
+      type: 'Transliteration',
+      fields: {
         transcription,
         pronunciation,
         meaning,
         notes,
       },
-      tags
-    )
+      tags,
+    },
+  })
 
   const projectMetadata: ProjectFile = {
     error: null,
@@ -55,6 +58,8 @@ describe('projectToMarkdown', () => {
           durationSeconds: 60,
           format: 'mp4 xxx xxx',
           isVideo: true,
+          width: 640,
+          height: 480,
           id: mediaFileId,
           name: 'Eetto',
           type: 'MediaFile',

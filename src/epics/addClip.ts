@@ -9,7 +9,6 @@ import {
 import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
-import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { uuid } from '../utils/sideEffects'
@@ -86,7 +85,8 @@ const addClipEpic: AppEpic = (
             ? // maybe later, do stretch + merge for overlaps.
               r.clearPendingClip()
             : r.addClip(
-                newClip(
+                r.getNewClip(
+                  state$.value,
                   pendingClip,
                   currentFileId,
                   uuid(),
@@ -94,8 +94,7 @@ const addClipEpic: AppEpic = (
                     state$.value,
                     currentNoteType,
                     pendingClip
-                  ),
-                  r.getDefaultTags(state$.value)
+                  )
                 )
               )
         })

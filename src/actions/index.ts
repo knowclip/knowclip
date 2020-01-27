@@ -88,9 +88,16 @@ export const setAllTags = (tagsToClipIds: {
   tagsToClipIds,
 })
 
-export const setDefaultTags = (tags: string[]): SetDefaultTags => ({
-  type: 'SET_DEFAULT_TAGS',
+export const setDefaultClipSpecs = ({
   tags,
+  includeStill,
+}: {
+  tags?: string[]
+  includeStill?: boolean
+}): SetDefaultClipSpecs => ({
+  type: 'SET_DEFAULT_CLIP_SPECS',
+  tags,
+  includeStill,
 })
 
 export const setProgress = (progress: ProgressInfo | null): SetProgress => ({

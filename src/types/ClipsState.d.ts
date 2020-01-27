@@ -36,7 +36,7 @@ declare type SimpleFlashcard = {
   type: 'Simple'
   fields: SimpleFlashcardFields
   tags: Array<string>
-  image?: FlashcardImage
+  image?: FlashcardImage | null
 }
 declare type TransliterationFlashcard = {
   id: ClipId

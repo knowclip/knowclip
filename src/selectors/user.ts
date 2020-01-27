@@ -39,3 +39,6 @@ export const getAllTags = (state: AppState): Array<string> => {
 }
 export const getDefaultTags = (state: AppState): Array<string> =>
   state.user.defaultTags
+
+export const getDefaultIncludeStill = (state: AppState): boolean =>
+  state.user.defaultIncludeStill

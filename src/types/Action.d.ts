@@ -43,7 +43,7 @@ declare type ClipAction =
   | SetFlashcardField
   | AddFlashcardTag
   | DeleteFlashcardTag
-  | SetDefaultTags
+  | SetDefaultClipSpecs
   | AddClip
   | AddClips
   | EditClip
@@ -71,7 +71,11 @@ declare type DeleteFlashcardTag = {
   index: number
   tag: string
 }
-declare type SetDefaultTags = { type: 'SET_DEFAULT_TAGS'; tags: Array<string> }
+declare type SetDefaultClipSpecs = {
+  type: 'SET_DEFAULT_CLIP_SPECS'
+  tags?: Array<string>
+  includeStill?: boolean
+}
 declare type AddClip = { type: 'ADD_CLIP'; clip: Clip }
 declare type AddClips = {
   type: 'ADD_CLIPS'

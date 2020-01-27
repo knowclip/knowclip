@@ -3,7 +3,6 @@ import { from, Observable } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
-import newClip from '../utils/newClip'
 import { AppEpic } from '../types/AppEpic'
 import { uuid } from '../utils/sideEffects'
 
@@ -84,8 +83,8 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         if (!currentNoteType) throw new Error('Illegal: no note type found')
 
         const newClips = chunks.map(({ start, end }) =>
-          newClip(
-            // shoudl have fewer arguments
+          r.getNewClip(
+            state$.value,
             {
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),
@@ -103,8 +102,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
                   meaning: '',
                   notes: '',
                   pronunciation: '',
-                },
-            r.getDefaultTags(state$.value)
+                }
           )
         )
 

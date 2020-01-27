@@ -18,10 +18,7 @@ const defaultTagsEpic: AppEpic = (action$, state$) =>
           'Could not set default tags: no clip found'
         )
       }
-      return {
-        type: 'SET_DEFAULT_TAGS',
-        tags: clip.flashcard.tags,
-      } as SetDefaultTags
+      return r.setDefaultClipSpecs({ tags: clip.flashcard.tags })
     })
   )
 
