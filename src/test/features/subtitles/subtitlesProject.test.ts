@@ -84,6 +84,8 @@ const persistedState: Partial<AppState> = {
         durationSeconds: 58.24,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
         isVideo: true,
+        width: 480,
+        height: 368,
         subtitlesTracksStreamIndexes: [],
       },
       '535935a3-7d72-4238-87ab-1b7a413c1f71': {
@@ -106,6 +108,8 @@ const persistedState: Partial<AppState> = {
           meaning: '37bd5e91-89c5-491b-9308-533c7be7338a',
         },
         name: 'polar_bear_cafe.mp4',
+        width: 1920,
+        height: 1080,
         durationSeconds: 87.062,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
         isVideo: true,

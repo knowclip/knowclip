@@ -83,6 +83,8 @@ const persistedState: Partial<AppState> = {
         durationSeconds: 87.062,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
         isVideo: true,
+        width: 1920,
+        height: 1080,
         subtitlesTracksStreamIndexes: [2],
       },
       'fa462524-bfeb-4434-a506-07858cc97151': {
@@ -95,6 +97,8 @@ const persistedState: Partial<AppState> = {
         durationSeconds: 58.24,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
         isVideo: true,
+        width: 480,
+        height: 368,
         subtitlesTracksStreamIndexes: [],
       },
     },

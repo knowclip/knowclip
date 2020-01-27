@@ -33,9 +33,6 @@ export const getHighlightedClip = (state: AppState): Clip | null => {
 export const getPendingClip = (state: AppState): PendingClip | null =>
   state.user.pendingClip
 
-export const isAudioLoading = (state: AppState): boolean =>
-  state.user.mediaIsLoading
-
 export const getAllTags = (state: AppState): Array<string> => {
   const tags = Object.keys(state.user.tagsToClipIds)
   return tags.reduce((a, b) => a.concat(b), [] as Array<string>)

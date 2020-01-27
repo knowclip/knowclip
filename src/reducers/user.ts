@@ -6,12 +6,12 @@ const initialState: UserState = {
   pendingStretch: null,
   highlightedClipId: null,
   defaultTags: [],
+  defaultIncludeStill: true,
   currentMediaFileId: null,
   currentProjectId: null,
   workIsUnsaved: false,
   tagsToClipIds: {},
-  mediaIsLoading: false,
-  loopMedia: true,
+  loopMedia: false,
   progress: null,
 }
 
@@ -51,7 +51,6 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         return {
           ...state,
           currentMediaFileId: action.file.id,
-          mediaIsLoading: true,
         }
 
       return state
@@ -173,22 +172,6 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
         ...state,
         loopMedia: action.loop,
       }
-
-    case A.OPEN_FILE_SUCCESS: // temp
-      return action.validatedFile.type === 'MediaFile'
-        ? {
-            ...state,
-            mediaIsLoading: false, // should probably exist in fileAvailabilities state
-          }
-        : state // what about cbr
-
-    case A.OPEN_FILE_FAILURE:
-      return action.file.type === 'MediaFile'
-        ? {
-            ...state,
-            mediaIsLoading: false,
-          }
-        : state // what about cbr
 
     case A.SET_PROGRESS:
       return {

@@ -108,6 +108,8 @@ Object {
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
       "isVideo": true,
+      "width": 1920,
+      "height": 1080,
       "name": "polar_bear_cafe.mp4",
       "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
       "subtitles": Array [
@@ -132,6 +134,8 @@ Object {
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "id": "fa462524-bfeb-4434-a506-07858cc97151",
       "isVideo": true,
+      "width": 480,
+      "height":368,
       "name": "piggeldy_cat.mp4",
       "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
       "subtitles": Array [],

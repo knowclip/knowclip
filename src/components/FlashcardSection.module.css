@@ -67,15 +67,20 @@
 .flashcardImageContainer{
   height: 84px;
   margin: 1rem;
-  border-radius: 0;
+  border-radius: 0 !important;
 }
 .flashcardImage{
   height: 100%;
   width: auto !important;
-  /* transition: opacity .25s; */
+  transition: opacity .1s;
+  cursor: pointer;
+  background-color: lightgray;
 }
 .flashcardImageUnused {
   opacity: 0.5;
+}
+.flashcardImageUnused:hover {
+  opacity: 0.8;
 }
 .timeStamp {
   opacity: 0.5;

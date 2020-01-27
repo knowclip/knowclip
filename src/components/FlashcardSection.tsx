@@ -54,7 +54,7 @@ const FlashcardSection = ({
         <FlashcardForm
           className={css.form}
           mediaFile={mediaFile}
-          clip={highlightedClip}
+          clipId={highlightedClip.id}
         />
       ) : (
         <Placeholder />

@@ -14,6 +14,7 @@ declare type UserState = {
   pendingStretch: PendingStretch | null
   highlightedClipId: ClipId | null
   defaultTags: Array<string>
+  defaultIncludeStill: boolean
   tagsToClipIds: {
     [K: string]: Array<ClipId>
   }
@@ -21,7 +22,6 @@ declare type UserState = {
   currentMediaFileId: MediaFileId | null
   workIsUnsaved: boolean
   loopMedia: boolean
-  mediaIsLoading: boolean // should probably exist in fileAvailabilities state
 
   progress: ProgressInfo | null
 }

@@ -18,6 +18,18 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     case A.LOAD_PERSISTED_STATE:
       return action.fileAvailabilities || state
 
+    case A.OPEN_FILE_REQUEST:
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: {
+            ...state[action.file.type][action.file.id],
+            status: 'LOADING',
+          },
+        },
+      }
+
     case A.OPEN_FILE_SUCCESS: {
       const fileAvailability: FileAvailability = {
         ...state[action.validatedFile.type][action.validatedFile.id],
@@ -32,6 +44,18 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
         },
       }
     }
+
+    case A.OPEN_FILE_FAILURE:
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: {
+            ...state[action.file.type][action.file.id],
+            status: 'REMEMBERED',
+          },
+        },
+      }
 
     case A.ADD_AND_OPEN_FILE:
     case A.ADD_FILE:

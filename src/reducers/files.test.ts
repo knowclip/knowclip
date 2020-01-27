@@ -104,6 +104,8 @@ const baseMediaFile: MediaFile = {
   durationSeconds: 87.062,
   format: 'mov,mp4,m4a,3gp,3g2,mj2',
   isVideo: true,
+  width: 1920,
+  height: 1080,
   subtitlesTracksStreamIndexes: [2],
 }
 

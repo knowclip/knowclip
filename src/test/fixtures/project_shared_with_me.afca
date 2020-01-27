@@ -16,6 +16,8 @@
       "durationSeconds": 58.24,
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "isVideo": true,
+      "width": 480,
+      "height":368,
       "subtitlesTracksStreamIndexes": []
     },
     {

@@ -50,6 +50,7 @@ export const getPersistedState = (): Partial<AppState> => {
       fileAvailability => {
         switch (fileAvailability.status) {
           case 'CURRENTLY_LOADED':
+          case 'LOADING':
             return {
               id: fileAvailability.id,
               status: 'REMEMBERED',

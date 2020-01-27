@@ -37,7 +37,9 @@ declare type ProjectFile = {
   lastOpened: string
   lastSaved: string
 }
-declare type MediaFile = {
+declare type MediaFile = VideoFile | AudioFile
+
+declare type AudioFile = {
   type: 'MediaFile'
   id: FileId
   parentId: ProjectId
@@ -48,7 +50,23 @@ declare type MediaFile = {
   name: MediaFileName
   durationSeconds: number
   format: 'UNKNOWN' | string
-  isVideo: boolean
+  isVideo: false
+  subtitlesTracksStreamIndexes: number[]
+}
+declare type VideoFile = {
+  type: 'MediaFile'
+  id: FileId
+  parentId: ProjectId
+
+  subtitles: Array<MediaSubtitlesRelation>
+  flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
+
+  name: MediaFileName
+  durationSeconds: number
+  format: 'UNKNOWN' | string
+  isVideo: true
+  width: number
+  height: number
   subtitlesTracksStreamIndexes: number[]
 }
 

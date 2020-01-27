@@ -3,19 +3,21 @@ declare type FileAvailabilitiesState = Record<
   Record<FileId, StoredFileAvailability>
 >
 
-declare type FileAvailability =
-  | CurrentlyLoadedFile
-  | NotCurrentlyLoadedFile
-  | NeverLoadedFile
-  | NotFoundFile
+declare type FileAvailability = StoredFile | NeverLoadedFile | NotFoundFile
 
 declare type StoredFileAvailability =
   | CurrentlyLoadedFile
+  | LoadingFile
   | NotCurrentlyLoadedFile
 
 declare type CurrentlyLoadedFile = {
   id: FileId
   status: 'CURRENTLY_LOADED'
+  filePath: FilePath
+}
+declare type LoadingFile = {
+  id: FileId
+  status: 'LOADING'
   filePath: FilePath
 }
 declare type NotCurrentlyLoadedFile = {
