@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, SyntheticEvent } from 'react'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
@@ -92,13 +92,7 @@ const FieldMenuItem = ({
   label: string
   mediaFileId: MediaFileId
   fieldName: TransliterationFlashcardFieldName
-  closeMenu: (
-    event?:
-      | {
-          stopPropagation: () => void
-        }
-      | undefined
-  ) => void
+  closeMenu: (e: SyntheticEvent) => void
 }) => {
   const dispatch = useDispatch()
   const handleClick = useCallback(

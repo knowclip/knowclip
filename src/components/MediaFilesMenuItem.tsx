@@ -82,13 +82,9 @@ const MediaFilesMenuItem = ({
     [dispatch, mediaFile, closeMenu]
   )
   const { fileAvailability } = useSelector((state: AppState) => ({
-    fileAvailability: r.getFileAvailabilityById(
-      state,
-      'MediaFile',
-      mediaFile.id
-    ),
+    fileAvailability: r.getFileAvailability(state, mediaFile),
   }))
-  const needsFilePath = !(fileAvailability && fileAvailability.filePath)
+  const needsFilePath = !fileAvailability.filePath
   useEffect(
     () => {
       if (selected && submenu.anchorEl) submenu.anchorEl.scrollIntoView()

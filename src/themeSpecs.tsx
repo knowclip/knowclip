@@ -19,9 +19,6 @@ const themeSpecs = {
         }
       : null),
   },
-  typography: {
-    useNextVariants: true,
-  },
 }
 
 export default themeSpecs

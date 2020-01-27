@@ -134,6 +134,7 @@ const persistedState: Partial<AppState> = {
       },
     },
     ConstantBitrateMp3: {},
+    VideoStillImage: {},
   },
   fileAvailabilities: {
     ProjectFile: {
@@ -203,5 +204,6 @@ const persistedState: Partial<AppState> = {
       },
     },
     ConstantBitrateMp3: {},
+    VideoStillImage: {},
   },
 }

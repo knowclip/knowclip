@@ -10,6 +10,7 @@ import temporaryVtt from '../files/temporaryVttFile'
 import externalSubtitles from '../files/externalSubtitlesFile'
 import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
+import videoStillImage from '../files/videoStillImageFile'
 import { FileEventHandlers } from '../files/eventHandlers'
 import { getHumanFileName } from '../utils/files'
 
@@ -29,8 +30,7 @@ const fileEventHandlers: Record<
   VttConvertedSubtitlesFile: temporaryVtt,
   WaveformPng: waveformPng,
   ConstantBitrateMp3: constantBitrateMp3,
-  // VideoStillImage: ,
-  // },
+  VideoStillImage: videoStillImage,
 }
 
 const openFileRequest: AppEpic = (action$, state$, effects) =>
@@ -41,17 +41,15 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
       const fileAvailability = r.getFileAvailability(state$.value, file)
 
       if (
-        !fileAvailability ||
         !fileAvailability.filePath ||
         !existsSync(fileAvailability.filePath)
       ) {
         const fileTypeAndName = getHumanFileName(file)
         const fileVerb =
           file.type === 'MediaFile' ? 'making clips with' : 'using'
-        const message =
-          fileAvailability && fileAvailability.filePath
-            ? `This ${fileTypeAndName} appears to have moved or been renamed. Try locating it manually?`
-            : `Please locate your ${fileTypeAndName} in the filesystem so you can ${fileVerb} it.
+        const message = fileAvailability.filePath
+          ? `This ${fileTypeAndName} appears to have moved or been renamed. Try locating it manually?`
+          : `Please locate your ${fileTypeAndName} in the filesystem so you can ${fileVerb} it.
               
               (If you're seeing this message, it's probably because you've recently opened this project for the first time on this computer.)`
         return of(r.locateFileRequest(file, message))
@@ -70,7 +68,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         return of(
           r.openFileFailure(
             file,
-            fileAvailability ? fileAvailability.filePath : null,
+            fileAvailability.filePath,
             err.message || err.toString()
           )
         )

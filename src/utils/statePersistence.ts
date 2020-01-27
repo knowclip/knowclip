@@ -61,12 +61,6 @@ export const getPersistedState = (): Partial<AppState> => {
               status: fileAvailability.status,
               filePath: fileAvailability.filePath,
             }
-          case 'NOT_LOADED':
-            return {
-              id: fileAvailability.id,
-              status: fileAvailability.status,
-              filePath: fileAvailability.filePath,
-            }
         }
       }
     )

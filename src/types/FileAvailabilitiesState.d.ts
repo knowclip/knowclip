@@ -1,12 +1,17 @@
 declare type FileAvailabilitiesState = Record<
   FileMetadata['type'],
-  Record<FileId, FileAvailability>
+  Record<FileId, StoredFileAvailability>
 >
 
 declare type FileAvailability =
   | CurrentlyLoadedFile
   | NotCurrentlyLoadedFile
-  | NotLoadedFile
+  | NeverLoadedFile
+  | NotFoundFile
+
+declare type StoredFileAvailability =
+  | CurrentlyLoadedFile
+  | NotCurrentlyLoadedFile
 
 declare type CurrentlyLoadedFile = {
   id: FileId
@@ -15,11 +20,26 @@ declare type CurrentlyLoadedFile = {
 }
 declare type NotCurrentlyLoadedFile = {
   id: FileId
-  status: 'REMEMBERED' // once loaded on this computer
+  status: 'REMEMBERED'
   filePath: FilePath
 }
-declare type NotLoadedFile = {
+declare type NeverLoadedFile = {
   id: FileId
   status: 'NOT_LOADED'
   filePath: null
 }
+declare type NotFoundFile = {
+  id: FileId
+  status: 'NOT_FOUND'
+  filePath: null
+}
+
+declare type FileWithAvailability<F extends FileMetadata> =
+  | {
+      file: F
+      availability: StoredFileAvailability | NeverLoadedFile
+    }
+  | {
+      file: null
+      availability: NotFoundFile
+    }

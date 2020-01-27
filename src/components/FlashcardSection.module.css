@@ -55,11 +55,29 @@
 }
 
 .formTop {
-  opacity: 0.5;
   font-size: 0.8em;
-  text-align: right;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+.formTopLeft {
+
+}
+.flashcardImageContainer{
+  height: 84px;
+  margin: 1rem;
+  border-radius: 0;
+}
+.flashcardImage{
+  height: 100%;
+  width: auto;
+}
+.flashcardImageUnused {
+  opacity: 0.5;
 }
 .timeStamp {
+  opacity: 0.5;
 }
 
 .formBody {

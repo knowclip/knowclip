@@ -61,11 +61,11 @@ const MediaFilesMenu = ({
 
   const dispatch = useDispatch()
   const chooseMediaFiles = useCallback(
-    async () => {
+    async e => {
       const filePaths = await showOpenDialog(MEDIA_FILTERS, true)
       if (filePaths) {
         dispatch(actions.addMediaToProjectRequest(currentProjectId, filePaths))
-        popover.close()
+        popover.close(e)
       }
     },
     [dispatch, currentProjectId, popover]

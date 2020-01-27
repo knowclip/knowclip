@@ -46,7 +46,7 @@ const SubtitlesMenu = () => {
 
   const dispatch = useDispatch()
   const loadExternalTrack = useCallback(
-    async () => {
+    async e => {
       if (!currentFileId)
         return dispatch(
           actions.simpleMessageSnackbar('Please open a media file first.')
@@ -61,14 +61,14 @@ const SubtitlesMenu = () => {
         actions.loadSubtitlesFromFileRequest(filePaths[0], currentFileId)
       )
 
-      close()
+      close(e)
     },
     [dispatch, currentFileId, close]
   )
   const subtitlesClipsDialogRequest = useCallback(
     e => {
       dispatch(actions.subtitlesClipsDialogRequest())
-      close()
+      close(e)
     },
     [dispatch, close]
   )
@@ -184,7 +184,7 @@ const ExternalTrackMenuItem = ({
   const deleteExternalSubtitles = useCallback(
     e => {
       dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
-      close()
+      close(e)
     },
     [dispatch, id, close]
   )
@@ -199,7 +199,7 @@ const ExternalTrackMenuItem = ({
           )
         )
 
-        close()
+        close(e)
       }
     },
     [dispatch, file, close]

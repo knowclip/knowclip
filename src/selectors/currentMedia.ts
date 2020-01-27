@@ -19,7 +19,6 @@ export const getConstantBitrateFilePath = (
 ): MediaFilePath | null => {
   const fileAvailability = getFileAvailabilityById(state, 'MediaFile', id)
   if (
-    fileAvailability &&
     fileAvailability.filePath &&
     extname(fileAvailability.filePath).toLowerCase() !== '.mp3'
   )

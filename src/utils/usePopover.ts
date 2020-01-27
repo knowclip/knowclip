@@ -10,13 +10,10 @@ const usePopover = () => {
     event.stopPropagation()
     setIsOpen(true)
   }, [])
-  const close = useCallback(
-    (event?: { stopPropagation: SyntheticEvent['stopPropagation'] }) => {
-      if (event) event.stopPropagation()
-      setIsOpen(false)
-    },
-    []
-  )
+  const close = useCallback((event: SyntheticEvent) => {
+    if (event.stopPropagation) event.stopPropagation()
+    setIsOpen(false)
+  }, [])
   const toggle = isOpen ? close : open
 
   return {

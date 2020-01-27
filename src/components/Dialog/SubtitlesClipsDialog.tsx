@@ -156,7 +156,7 @@ const SubtitlesClipsDialog = ({
               inputProps={{ id: 'transcription', name: 'transcription' }}
               value={fields.transcription || ''}
               onChange={e => {
-                setField('transcription', e.target.value)
+                setField('transcription', e.target.value as string)
               }}
               id={$.transcriptionField}
             >
@@ -170,7 +170,9 @@ const SubtitlesClipsDialog = ({
               <Select
                 inputProps={{ id: 'pronunciation', name: 'pronunciation' }}
                 value={fields.pronunciation || ''}
-                onChange={e => setField('pronunciation', e.target.value)}
+                onChange={e =>
+                  setField('pronunciation', e.target.value as string)
+                }
                 id={$.pronunciationField}
               >
                 <MenuItem value="">None</MenuItem>
@@ -183,7 +185,7 @@ const SubtitlesClipsDialog = ({
             <Select
               inputProps={{ id: 'meaning', name: 'meaning' }}
               value={fields.meaning || ''}
-              onChange={e => setField('meaning', e.target.value)}
+              onChange={e => setField('meaning', e.target.value as string)} // TODO: USECALLBACK!
               id={$.meaningField}
             >
               <MenuItem value="">None</MenuItem>
@@ -195,7 +197,7 @@ const SubtitlesClipsDialog = ({
             <Select
               inputProps={{ id: 'notes', name: 'notes' }}
               value={fields.notes || ''}
-              onChange={e => setField('notes', e.target.value)}
+              onChange={e => setField('notes', e.target.value as string)}
               id={$.notesField}
             >
               <MenuItem value="">None</MenuItem>

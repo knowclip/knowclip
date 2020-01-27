@@ -101,7 +101,7 @@ export const getApkgExportData = (
     const file = mediaFiles.find(media => media.id === clip.fileId)
     if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
     const fileLoaded = getFileAvailability(state, file)
-    if (!(fileLoaded && fileLoaded.filePath))
+    if (!fileLoaded.filePath)
       // verified existent via missingMediaFiles above
       throw new Error(`Please open ${file.name} and try again.`)
     const extension = extname(fileLoaded.filePath)

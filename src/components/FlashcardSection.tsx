@@ -27,8 +27,8 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { highlightedClipId, clipsLength } = useSelector((state: AppState) => ({
-    highlightedClipId: r.getHighlightedClipId(state),
+  const { highlightedClip, clipsLength } = useSelector((state: AppState) => ({
+    highlightedClip: r.getHighlightedClip(state),
     clipsLength: mediaFile
       ? r.getClipIdsByMediaFileId(state, mediaFile.id).length
       : 0,
@@ -50,12 +50,12 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClipId && mediaFile ? (
+      {highlightedClip && mediaFile ? (
         <FlashcardForm
-          key={highlightedClipId}
+          key={highlightedClip.id}
           className={css.form}
           mediaFile={mediaFile}
-          clipId={highlightedClipId}
+          clip={highlightedClip}
         />
       ) : (
         <Placeholder />

@@ -125,11 +125,14 @@ const Export = React.memo(
           <Tab label="Export CSV & MP3" onClick={() => chooseTab(1)} />
           <Tab label="Export MD" onClick={() => chooseTab(2)} />
         </Tabs>
+
         {progress ? (
-          <DialogContent>
+          <>
             <LinearProgress variant="determinate" value={progress.percentage} />
-            <p className={css.progressMessage}>{progress.message}</p>
-          </DialogContent>
+            <DialogContent>
+              <p className={css.progressMessage}>{progress.message}</p>
+            </DialogContent>
+          </>
         ) : (
           <DialogContent>
             {!selectionHasStarted && (

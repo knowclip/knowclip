@@ -38,6 +38,12 @@ declare type EpicsDependencies = {
     file: WaveformPng,
     constantBitrateFilePath: string
   ) => Promise<string | Error>
+  getVideoStill: (
+    state: AppState,
+    file: VideoStillImageFile,
+    constantBitrateFilePath: string,
+    seconds: number
+  ) => Promise<string | Error>
   getConstantBitrateMediaPath: (
     path: string,
     oldConstantBitratePath: string | null // not needed

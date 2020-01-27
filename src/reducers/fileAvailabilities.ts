@@ -7,7 +7,7 @@ export const initialState: FileAvailabilitiesState = {
   VttConvertedSubtitlesFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
-  // VideoStillImage: {},
+  VideoStillImage: {},
 }
 
 const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
@@ -42,10 +42,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       const fileAvailability: FileAvailability = currentFile
         ? {
             ...currentFile,
-            status:
-              currentFile.status === 'NOT_LOADED'
-                ? 'REMEMBERED'
-                : currentFile.status,
+            status: currentFile.status,
             filePath: action.filePath,
           }
         : {

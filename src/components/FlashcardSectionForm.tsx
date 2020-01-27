@@ -1,6 +1,14 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Card,
+  CardMedia,
+  CardContent,
+} from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
@@ -19,29 +27,29 @@ enum $ {
 const FlashcardSectionForm = ({
   className,
   mediaFile,
-  clipId,
+  clip,
 }: {
   className?: string
   mediaFile: MediaFile
-  clipId: string
+  clip: Clip
 }) => {
   const {
     allTags,
-    currentFlashcard,
     selectedClipTime,
     currentNoteType,
     isLoopOn,
     subtitlesFlashcardFieldLinks,
   } = useSelector((state: AppState) => ({
     allTags: r.getAllTags(state),
-    currentFlashcard: r.getCurrentFlashcard(state),
     selectedClipTime: r.getSelectedClipTime(state),
     currentNoteType: r.getCurrentNoteType(state),
     isLoopOn: r.isLoopOn(state),
     subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
   }))
 
-  if (!selectedClipTime || !currentFlashcard) throw new Error('Clip not found')
+  if (!selectedClipTime) throw new Error('Clip not found')
+
+  const { flashcard } = clip
 
   const [moreMenuAnchorEl, setMoreMenuAnchorEl] = useState(null)
 
@@ -80,12 +88,12 @@ const FlashcardSectionForm = ({
       dispatch(
         actions.confirmationDialog(
           'Are you sure you want to delete this clip and flashcard?',
-          actions.deleteCard(clipId)
+          actions.deleteCard(clip.id)
         )
       )
       loopOnInteract()
     },
-    [dispatch, clipId, loopOnInteract]
+    [dispatch, clip.id, loopOnInteract]
   )
 
   const handleFlashcardSubmit = useCallback(e => {
@@ -93,23 +101,23 @@ const FlashcardSectionForm = ({
   }, [])
 
   const setFlashcardText = useCallback(
-    (key, text) => dispatch(actions.setFlashcardField(clipId, key, text)),
-    [dispatch, clipId]
+    (key, text) => dispatch(actions.setFlashcardField(clip.id, key, text)),
+    [dispatch, clip.id]
   )
   const deleteCard = useCallback(
     () => {
-      dispatch(actions.deleteCard(clipId))
+      dispatch(actions.deleteCard(clip.id))
     },
-    [dispatch, clipId]
+    [dispatch, clip.id]
   )
 
   const onAddChip = useCallback(
-    (text: string) => dispatch(actions.addFlashcardTag(clipId, text)),
-    [dispatch, clipId]
+    (text: string) => dispatch(actions.addFlashcardTag(clip.id, text)),
+    [dispatch, clip.id]
   )
   const onDeleteChip = useCallback(
-    (index, text) => dispatch(actions.deleteFlashcardTag(clipId, index, text)),
-    [dispatch, clipId]
+    (index, text) => dispatch(actions.deleteFlashcardTag(clip.id, index, text)),
+    [dispatch, clip.id]
   )
 
   return (
@@ -120,28 +128,36 @@ const FlashcardSectionForm = ({
       onFocus={handleFocus}
     >
       <section className={css.formTop}>
-        <span className={css.timeStamp}>
-          {formatTime(selectedClipTime.start)}
-          {' - '}
-          {formatTime(selectedClipTime.end)}
-        </span>
-        <Tooltip title="Loop audio (Ctrl + L)">
-          <IconButton
-            onClick={toggleLoop}
-            color={isLoopOn ? 'secondary' : 'default'}
-          >
-            <Loop />
-          </IconButton>
-        </Tooltip>
+        <div className={css.formTopLeft}>
+          {mediaFile.isVideo && (
+            <VideoStillDisplay clip={clip} videoFile={mediaFile} />
+          )}
+        </div>
+        <div className={css.formTopRight}>
+          {' '}
+          <span className={css.timeStamp}>
+            {formatTime(selectedClipTime.start)}
+            {' - '}
+            {formatTime(selectedClipTime.end)}
+          </span>
+          <Tooltip title="Loop audio (Ctrl + L)">
+            <IconButton
+              onClick={toggleLoop}
+              color={isLoopOn ? 'secondary' : 'default'}
+            >
+              <Loop />
+            </IconButton>
+          </Tooltip>
+        </div>
       </section>
       <section className={css.formBody}>
         {currentNoteType &&
           getNoteTypeFields(currentNoteType).map((fieldName, i) => (
             <Field
-              key={`${fieldName}_${currentFlashcard.id}`}
+              key={`${fieldName}_${flashcard.id}`}
               autoFocus={i === 0}
               name={fieldName}
-              currentFlashcard={currentFlashcard}
+              currentFlashcard={flashcard}
               label={capitalize(fieldName)}
               setFlashcardText={setFlashcardText}
               subtitles={mediaFile.subtitles}
@@ -158,7 +174,7 @@ const FlashcardSectionForm = ({
           ))}
         <TagsInput
           allTags={allTags}
-          tags={currentFlashcard.tags}
+          tags={flashcard.tags}
           onAddChip={onAddChip}
           onDeleteChip={onDeleteChip}
         />
@@ -186,3 +202,69 @@ const capitalize = (string: string) =>
 export default FlashcardSectionForm
 
 export { $ as flashcardSectionForm$ }
+
+const VideoStillDisplay = ({
+  videoFile,
+  clip,
+}: {
+  videoFile: MediaFile
+  clip: Clip
+}) => {
+  const { videoStill, mediaFileAvailability } = useSelector(
+    (state: AppState) => ({
+      videoStill: r.getFileWithAvailability<VideoStillImageFile>(
+        state,
+        'VideoStillImage',
+        clip.id
+      ),
+      mediaFileAvailability: r.getFileAvailability(state, videoFile),
+    })
+  )
+
+  const dispatch = useDispatch()
+
+  useEffect(
+    () => {
+      const videoStillLoaded =
+        videoStill.availability.status === 'CURRENTLY_LOADED'
+      if (
+        !videoStillLoaded &&
+        mediaFileAvailability.status === 'CURRENTLY_LOADED'
+      )
+        dispatch(
+          videoStill.file
+            ? r.openFileRequest(videoStill.file)
+            : r.addAndOpenFile({
+                type: 'VideoStillImage',
+                id: clip.id,
+                mediaFileId: videoFile.id,
+              })
+        )
+    },
+    [
+      clip.id,
+      dispatch,
+      videoFile.id,
+      mediaFileAvailability.status,
+      videoStill.availability.status,
+      videoStill.file,
+    ]
+  )
+
+  const { filePath } = videoStill.availability
+
+  return (
+    <Card className={css.flashcardImageContainer}>
+      <CardMedia
+        className={css.flashcardImage}
+        component="img"
+        alt="Video still"
+        image={filePath ? `file://${filePath}` : undefined}
+      />
+    </Card>
+  )
+}
+// const getVideoStill = (state: AppState, mediaFile: MediaFile, clip: Clip): FileWithAvailability<VideoStillImageFile> => {
+//   const id = clip.flashcard.image && clip.flashcard.image.id
+//   return id? r.getFileWithAvailability(state, 'VideoStillImage', id) : null
+// }

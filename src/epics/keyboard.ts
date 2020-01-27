@@ -18,7 +18,7 @@ const ctrlSpaceEpic: AppEpic = (
   state$,
   { window, toggleMediaPaused }
 ) =>
-  fromEvent<KeyboardEvent>(window, 'keyup').pipe(
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
     tap(e => {
       e.preventDefault()

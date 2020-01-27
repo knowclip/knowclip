@@ -7,8 +7,7 @@ export const initialState: FilesState = {
   VttConvertedSubtitlesFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
-  // VideoStillImage: {},
-  // },
+  VideoStillImage: {},
 }
 
 const edit = <F extends FileMetadata>(

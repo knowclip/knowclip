@@ -36,18 +36,24 @@ declare type SimpleFlashcard = {
   type: 'Simple'
   fields: SimpleFlashcardFields
   tags: Array<string>
+  image?: FlashcardImage
 }
 declare type TransliterationFlashcard = {
   id: ClipId
   type: 'Transliteration'
   fields: TransliterationFlashcardFields
   tags: Array<string>
+  image?: FlashcardImage
 }
 declare type SimpleFlashcardFields = Record<SimpleFlashcardFieldName, string>
 declare type TransliterationFlashcardFields = Record<
   TransliterationFlashcardFieldName,
   string
 >
+declare type FlashcardImage = {
+  type: 'VideoStillImage'
+  id: string
+}
 
 declare type PendingClip = {
   start: WaveformX

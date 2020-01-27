@@ -12,6 +12,8 @@ import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { combineEpics } from 'redux-observable'
 
+const LOOP_BUFFER = 0.25
+
 let seeking = false
 
 const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
@@ -70,6 +72,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           }
 
           if (
+            !loopImminent &&
             newClipIdToHighlight &&
             newClipIdToHighlight !== highlightedClipId
           )
