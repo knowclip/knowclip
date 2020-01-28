@@ -70,3 +70,12 @@ export const locateFileSuccess = (
   file,
   filePath,
 })
+
+export const preloadVideoStills = (
+  file: FileMetadata,
+  clipId: ClipId
+): PreloadVideoStills => ({
+  type: A.PRELOAD_VIDEO_STILLS,
+  clipId,
+  file,
+})

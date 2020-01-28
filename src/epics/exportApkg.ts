@@ -18,7 +18,7 @@ import {
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
 import { of, empty, defer, from } from 'rxjs'
 import * as r from '../redux'
-import { join } from 'path'
+import { join, basename } from 'path'
 import { promises } from 'fs'
 import Exporter from 'anki-apkg-export-multi-field/dist/exporter'
 import createTemplate from 'anki-apkg-export-multi-field/dist/template'
@@ -28,6 +28,7 @@ import clipAudio from '../utils/clipAudio'
 import { AppEpic } from '../types/AppEpic'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
+import { getVideoStill } from '../utils/getVideoStill'
 
 const { writeFile, readFile, unlink: deleteFile } = promises
 
@@ -76,7 +77,7 @@ const exportApkg: AppEpic = (action$, state$) =>
       return makeApkg(exportData, directory)
     })
   )
-
+let coooont = 0
 function makeApkg(exportData: ApkgExportData, directory: string) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
@@ -99,6 +100,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           } = clipSpecs
           const { fields, ...restSpecs } = flashcardSpecs
           apkg.addCard(fields, restSpecs)
+          console.log('whoopiee', coooont++)
           const clipOutputFilePath = join(directory, outputFilename)
           await clipAudio(
             sourceFilePath,
@@ -107,6 +109,17 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
             clipOutputFilePath
           )
           apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
+          if (clipSpecs.flashcardSpecs.image) {
+            const clipId = fields[0]
+
+            const imagePath = await getVideoStill(
+              clipId,
+              sourceFilePath,
+              clipSpecs.flashcardSpecs.image.seconds
+            )
+            if (imagePath instanceof Error) throw imagePath
+            await apkg.addMedia(basename(imagePath), await readFile(imagePath))
+          }
           await deleteFile(clipOutputFilePath)
           count += 1
           return r.setProgress({

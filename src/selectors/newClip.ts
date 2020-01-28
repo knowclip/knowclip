@@ -1,5 +1,6 @@
 import newFlashcard from '../utils/newFlashcard'
 import { getDefaultTags, getDefaultIncludeStill } from './user'
+import { getSecondsAtX } from './waveformTime'
 
 const ascending = (a: number, b: number) => a - b
 
@@ -27,6 +28,20 @@ export const getNewClip = (
     end: +end.toFixed(2),
     id,
     fileId: mediaFileId,
-    flashcard: newFlashcard(id, fields, tags, includeStill),
+    flashcard: newFlashcard(
+      id,
+      fields,
+      tags,
+      includeStill
+        ? {
+            id,
+            type: 'VideoStillImage',
+            seconds: getSecondsAtX(
+              state,
+              start + Math.round((end - start) / 2)
+            ),
+          }
+        : null
+    ),
   }
 }

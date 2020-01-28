@@ -72,32 +72,46 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
 
     case A.ADD_AND_OPEN_FILE:
-    case A.ADD_FILE:
-    case A.LOCATE_FILE_SUCCESS: {
-      if (!action.filePath) return state
-
-      const currentFile = state[action.file.type][action.file.id] || null
-      const fileAvailability: FileAvailability = currentFile
-        ? {
-            id: action.file.id,
-            status: 'REMEMBERED',
-            filePath: action.filePath,
-            isLoading: false,
-          }
-        : {
-            filePath: action.filePath,
-            status: 'REMEMBERED',
-            id: action.file.id,
-            isLoading: false,
-          }
       return {
         ...state,
         [action.file.type]: {
           ...state[action.file.type],
-          [action.file.id]: fileAvailability,
+          [action.file.id]: {
+            filePath: action.filePath,
+            status: 'REMEMBERED',
+            id: action.file.id,
+            isLoading: false,
+          },
         },
       }
-    }
+    case A.ADD_FILE:
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: {
+            filePath: action.filePath,
+            status: 'REMEMBERED',
+            id: action.file.id,
+            isLoading: false,
+          },
+        },
+      }
+    case A.LOCATE_FILE_SUCCESS:
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: {
+            status: state[action.file.type][action.file.id]
+              ? state[action.file.type][action.file.id]
+              : 'REMEMBERED',
+            id: action.file.id,
+            isLoading: false,
+            filePath: action.filePath,
+          },
+        },
+      }
 
     case A.DELETE_FILE_SUCCESS: {
       const { [action.file.id]: _, ...newSubstate } = state[action.file.type]

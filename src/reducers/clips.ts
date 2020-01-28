@@ -185,7 +185,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
             return all
           }, new Set<string>()),
         ],
-        Boolean(state.byId[finalId].flashcard.image)
+        state.byId[finalId].flashcard.image
       )
       const fieldNames = getNoteTypeFields(flashcard.type)
 

@@ -1,22 +1,22 @@
 import ffmpeg, { AsyncError } from '../utils/ffmpeg'
 import { existsSync } from 'fs'
-import { getFileAvailabilityById } from '../redux'
 import tempy from 'tempy'
+import { join, basename } from 'path'
+import filenamify from 'filenamify'
 
 export const VIDEO_STILL_HEIGHT = 150
 
 export const getVideoStill = async (
-  state: AppState,
-  file: VideoStillImageFile,
-  constantBitrateFilePath: string,
+  clipId: ClipId,
+  videoFilePath: string,
   seconds: number
 ): Promise<string | Error> => {
   try {
-    const outputFilePath = getVideoStillPngPath(state, file)
+    const outputFilePath = getVideoStillPngPath(clipId, videoFilePath, seconds)
     if (outputFilePath && existsSync(outputFilePath)) return outputFilePath
 
-    return await new Promise((res, rej) => {
-      ffmpeg(constantBitrateFilePath)
+    await new Promise((res, rej) => {
+      ffmpeg(videoFilePath)
         .seekInput(seconds)
         .outputOptions('-vframes 1')
         .size(`?x${VIDEO_STILL_HEIGHT}`)
@@ -29,19 +29,25 @@ export const getVideoStill = async (
         })
         .run()
     })
+
+    if (!existsSync(outputFilePath))
+      throw new Error('Still could not be created at ' + outputFilePath)
+
+    return outputFilePath
   } catch (err) {
     return new AsyncError(err)
   }
 }
 
-const getVideoStillPngPath = (state: AppState, file: VideoStillImageFile) => {
-  const fileAvailability = getFileAvailabilityById(
-    state,
-    'VideoStillImage',
-    file.id
+export const getVideoStillPngPath = (
+  id: string,
+  videoFilePath: string,
+  seconds: number
+) =>
+  join(
+    tempy.root,
+    `${filenamify(basename(videoFilePath))}_${~~(seconds * 1000)}_${id}.png`
   )
-  if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
-    return fileAvailability.filePath
-  }
-  return tempy.file({ extension: 'png' })
-}
+
+export const getClipMidpoint = (start: number, end: number) =>
+  start + Math.round((end - start) / 2)

@@ -53,6 +53,7 @@ declare type TransliterationFlashcardFields = Record<
 declare type FlashcardImage = {
   type: 'VideoStillImage'
   id: string
+  seconds: number
 }
 
 declare type PendingClip = {
@@ -69,7 +70,9 @@ declare type ClipSpecs = {
   // for export?
   sourceFilePath: string
   outputFilename: string
+  /** milliseconds */
   startTime: number
+  /** milliseconds */
   endTime: number
   flashcardSpecs: FlashcardSpecs
 }
@@ -78,6 +81,7 @@ declare type FlashcardSpecs = {
   tags: Array<string>
   due: number
   sortField: string
+  image: FlashcardImage | null
 }
 
 declare type ApkgExportData = {

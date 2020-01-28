@@ -84,16 +84,20 @@
   width: auto !important;
   transition: opacity .1s;
   cursor: pointer;
-  background-color: lightgray;
+  background-color: #EEEEEE;
   display: flex !important;
   justify-content: center;
   align-items: center;
+  opacity: 0.8
+}
+.flashcardImage:hover {
+  opacity: 1;
 }
 .flashcardImageUnused {
-  opacity: 0.5;
+  opacity: 0.2;
 }
 .flashcardImageUnused:hover {
-  opacity: 0.8;
+  opacity: 0.4;
 }
 
 .formBody {

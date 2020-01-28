@@ -1,5 +1,6 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
+import { getClipMidpoint } from '../utils/getVideoStill'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -14,12 +15,21 @@ export default {
   ],
   locateRequest: async ({ file }, state, effects) => {
     try {
-      const parentFile = r.getFileAvailabilityById(
+      const parentFile = r.getFile<MediaFile>(
         state,
         'MediaFile',
         file.mediaFileId
       )
-      if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
+      const parentFileAvailability = r.getFileAvailabilityById<MediaFile>(
+        state,
+        'MediaFile',
+        file.mediaFileId
+      )
+      if (
+        !parentFile ||
+        !parentFileAvailability ||
+        parentFileAvailability.status !== 'CURRENTLY_LOADED'
+      )
         return [
           r.openFileFailure(file, null, 'You must first locate this file.'),
         ]
@@ -44,9 +54,15 @@ export default {
           ),
         ]
 
-      const clipMidpoint = clip.start + Math.round((clip.end - clip.start) / 2)
-      const seconds = r.getSecondsAtX(state, clipMidpoint)
-      const pngPath = await effects.getVideoStill(state, file, cbr, seconds)
+      const seconds = clip.flashcard.image
+        ? clip.flashcard.image.seconds
+        : r.getSecondsAtX(state, getClipMidpoint(clip.start, clip.end))
+
+      const pngPath = await effects.getVideoStill(
+        file.id,
+        parentFileAvailability.filePath,
+        seconds
+      )
       if (pngPath instanceof Error)
         return [
           r.openFileFailure(

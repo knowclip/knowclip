@@ -18,7 +18,7 @@ const newFlashcard = (
   id: string,
   fields: Flashcard['fields'],
   tags: string[],
-  includeStill: boolean
+  image: Flashcard['image']
 ): Flashcard => ({
   id,
   type: isTransliterationCard(fields) ? 'Transliteration' : 'Simple',
@@ -32,13 +32,8 @@ const newFlashcard = (
           ...blankTransliterationFields,
           ...fields,
         },
-  tags: tags,
-  image: includeStill
-    ? {
-        id,
-        type: 'VideoStillImage',
-      }
-    : null,
+  tags,
+  image,
 })
 
 export default newFlashcard

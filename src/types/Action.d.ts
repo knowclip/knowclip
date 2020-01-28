@@ -309,6 +309,7 @@ declare type FileAction =
   | OpenFileFailure
   | LocateFileRequest
   | LocateFileSuccess
+  | PreloadVideoStills
 declare type AddAndOpenFile = {
   type: 'ADD_AND_OPEN_FILE'
   file: FileMetadata
@@ -353,6 +354,11 @@ declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
   file: FileMetadata
   filePath: FilePath
+}
+declare type PreloadVideoStills = {
+  type: 'PRELOAD_VIDEO_STILLS'
+  file: FileMetadata
+  clipId: ClipId
 }
 
 interface WithRecordType<F extends FileMetadata> {
