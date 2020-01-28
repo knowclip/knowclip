@@ -24,6 +24,7 @@ import { SubtitlesFileWithTrack } from '../../redux'
 import { MediaSubtitles } from '../../selectors'
 
 enum $ {
+  loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
   transcriptionField = 'subtitles-clips-transcription-field',
   pronunciationField = 'subtitles-clips-pronunciation-field',
   meaningField = 'subtitles-clips-meaning-field',
@@ -174,6 +175,7 @@ const SubtitlesClipsDialog = ({
             color="primary"
             variant="contained"
             onClick={onClickLoadExternal}
+            id={$.loadMoreTracksButton}
           >
             Load more subtitles
           </Button>

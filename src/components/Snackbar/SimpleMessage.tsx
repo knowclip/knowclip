@@ -4,6 +4,7 @@ import { Close } from '@material-ui/icons'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import { closeSnackbar } from '../../actions'
+import { snackbar$ } from '.'
 
 const SimpleMessageSnackbar = ({
   message,
@@ -21,6 +22,7 @@ const SimpleMessageSnackbar = ({
 
   return (
     <Snackbar
+      className={snackbar$.container}
       open={open}
       message={message}
       autoHideDuration={15000}

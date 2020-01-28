@@ -11,9 +11,9 @@ export default async function saveAndCloseProject({ client }: TestSetup) {
     await readFile(join(TMP_DIRECTORY, 'project_with_subtitles.afca'), 'utf8')
   )
 
-  expect(actualProjectFileContents).toMatchSnapshot()
-
   await closeProject(client)
+
+  expect(actualProjectFileContents).toMatchSnapshot()
 
   const { recentProjectsListItem } = projectsMenu$
   await client.waitForText_(recentProjectsListItem, 'Project with subtitles')

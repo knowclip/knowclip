@@ -47,7 +47,7 @@ function getStoredFileData(
   const projects = Object.entries(parsed.files.ProjectFile)
   if (projectAvailabilities.length !== 1 || projects.length !== 1)
     throw new Error('Should only be one project file')
-  projectAvailabilities[0][1].filePath = `###join(TMP_DIRECTORY, '${projectFileName}'.afca)###`
+  projectAvailabilities[0][1].filePath = `###join(TMP_DIRECTORY, \`${projectFileName}.afca\`)###`
   projects[0][1].name = projectName
 
   console.log(
@@ -62,4 +62,8 @@ function getStoredFileData(
     )} ${assetsDir}generated/${testId})`
   )
 }
-getStoredFileData('savedProject', 'My cool saved project')
+getStoredFileData(
+  'sharedProject',
+  'project_with_subtitles',
+  'Project with subtitles'
+)

@@ -31,6 +31,7 @@ enum $ {
   openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
   locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
   addTrackButton = 'subtitles-menu-add-track-button',
+  deleteTrackButton = 'subtitles-menu-delete-track-button',
   makeClipsAndCardsButton = 'subtitles-menu-make-clips-and-cards-button',
 }
 
@@ -263,7 +264,12 @@ const ExternalTrackMenuItem = ({
             </ListItemIcon>
             <ListItemText primary="Locate subtitles file in filesystem" />
           </MenuItem>
-          <MenuItem dense disabled={!file} onClick={deleteExternalSubtitles}>
+          <MenuItem
+            dense
+            disabled={!file}
+            onClick={deleteExternalSubtitles}
+            id={$.deleteTrackButton}
+          >
             <ListItemIcon>
               <Icon>
                 <DeleteIcon />

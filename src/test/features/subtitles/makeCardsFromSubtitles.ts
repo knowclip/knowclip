@@ -14,26 +14,25 @@ export default async function makeCardsFromSubtitles({
   client,
 }: TestSetup) {
   await client.clickElement_(projectsMenu$.recentProjectsListItem)
-  await client.clickElement_(fileSelectionForm$.cancelButton)
-  await client.clickElement_(snackbar$.closeButton)
 
   await client.clickElement_(subtitlesMenu$.openMenuButton)
+  await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
+  await client.clickElement_(subtitlesMenu$.deleteTrackButton)
 
   await client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton)
   await client.clickElement_(confirmationDialog$.okButton)
 
-  await client.clickElement_(subtitleClipsDialog$.okButton)
-
-  await client.clickElement_(fileSelectionForm$.cancelButton)
-  await client.clickElement_(snackbar$.closeButton)
-
-  await client.clickElement_(subtitleClipsDialog$.okButton)
-
   await mockElectronHelpers(app, {
     showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
   })
-  await client.clickElement_(fileSelectionForm$.filePathField)
-  await client.clickElement_(fileSelectionForm$.continueButton)
+  await client.clickElement_(subtitleClipsDialog$.loadMoreTracksButton)
+
+  await client.clickElement_(subtitleClipsDialog$.transcriptionField)
+  const [, externalOption] = await client.elements_(
+    subtitleClipsDialog$.selectFieldOption
+  )
+  externalOption.click()
+  await client.waitUntilGone_(subtitleClipsDialog$.selectFieldOption)
 
   await client.clickElement_(subtitleClipsDialog$.okButton)
 

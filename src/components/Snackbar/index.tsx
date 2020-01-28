@@ -4,6 +4,7 @@ import * as r from '../../redux'
 import SimpleMessage from './SimpleMessage'
 
 enum $ {
+  container = 'snackbar-container',
   closeButton = 'close-snackbar-button',
 }
 

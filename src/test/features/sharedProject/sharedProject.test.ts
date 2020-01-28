@@ -18,7 +18,7 @@ describe('opening a shared project', () => {
   beforeAll(async () => {
     setup = await startApp(context, 'sharedProject')
 
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    // await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
   test('open a shared project and locates media in local filesystem', () =>
