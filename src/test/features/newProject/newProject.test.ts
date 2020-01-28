@@ -34,7 +34,6 @@ describe('create a deck from a new project', () => {
   test('move throughout media file', () => moveThroughoutMedia(setup))
   test('add more media to project', () => addMoreMediaToProject(setup))
   test('navigate between media', () => navigateBetweenMedia(setup))
-  // test('create flashcards from subtitles',  () => creatFlashcardsFromSubtitles(setup))
   test('exporting an .apkg', () => reviewAndExportApkg(setup))
   test('saving a project file', () => saveAndCloseProject(setup))
 

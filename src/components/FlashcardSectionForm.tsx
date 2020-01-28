@@ -27,7 +27,6 @@ enum $ {
 }
 
 const FIELD_INPUT_PROPS = {
-  className: $.flashcardFields,
   style: { minHeight: '20px' },
 }
 

@@ -66,6 +66,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       const fileAvailability: FileAvailability = currentFile
         ? {
             ...currentFile,
+            id: action.file.id,
             status: currentFile.status,
             filePath: action.filePath,
           }

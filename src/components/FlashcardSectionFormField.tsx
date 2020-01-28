@@ -3,6 +3,7 @@ import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFormFieldPopoverMenu'
+import { flashcardSectionForm$ } from './FlashcardSectionForm'
 
 type Props = {
   name: FlashcardFieldName
@@ -70,6 +71,7 @@ const FlashcardSectionFormField = memo(
         )}
         <TextField
           autoFocus={autoFocus}
+          className={flashcardSectionForm$.flashcardFields}
           inputProps={inputProps}
           onChange={handleChange}
           onKeyPress={onKeyPress}
