@@ -77,7 +77,6 @@ const exportApkg: AppEpic = (action$, state$) =>
       return makeApkg(exportData, directory)
     })
   )
-let coooont = 0
 function makeApkg(exportData: ApkgExportData, directory: string) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
@@ -100,7 +99,6 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           } = clipSpecs
           const { fields, ...restSpecs } = flashcardSpecs
           apkg.addCard(fields, restSpecs)
-          console.log('whoopiee', coooont++)
           const clipOutputFilePath = join(directory, outputFilename)
           await clipAudio(
             sourceFilePath,
@@ -122,6 +120,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           }
           await deleteFile(clipOutputFilePath)
           count += 1
+
           return r.setProgress({
             percentage: (count / exportData.clips.length) * 100,
             message: `${count} clips out of ${
@@ -130,26 +129,21 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           })
         })
       )
-      const mergedProcessClips = from(processClipsObservables).pipe(
-        mergeAll(20)
-      )
-      const result = mergedProcessClips.pipe(
-        startWith(
-          r.setProgress({
-            percentage: 0,
-            message: 'Processing clips...',
-          })
-        ),
-        endWith(
-          r.setProgress({
-            percentage: 100,
-            message: 'Saving .apkg file...',
-          })
-        ),
+      const result = of(
+        r.setProgress({
+          percentage: 0,
+          message: 'Processing clips...',
+        })
+      ).pipe(
+        concat(from(processClipsObservables).pipe(mergeAll(20))),
         concat(
-          mergedProcessClips.pipe(
-            last(),
-            flatMap(() =>
+          of(
+            r.setProgress({
+              percentage: 100,
+              message: 'Saving .apkg file...',
+            })
+          ).pipe(
+            concatMap(() =>
               from(
                 apkg.save({
                   type: 'nodebuffer',
@@ -166,18 +160,18 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
                 }),
                 endWith(r.setProgress(null))
               )
-            ),
-            catchError(err => {
-              console.error(err)
-              return from([
-                r.exportApkgFailure(err.message || err.toString()),
-                r.setProgress(null),
-              ])
-            })
+            )
           )
         )
       )
       return result
+    }),
+    catchError(err => {
+      console.error(err)
+      return from([
+        r.exportApkgFailure(err.message || err.toString()),
+        r.setProgress(null),
+      ])
     })
   )
 }
