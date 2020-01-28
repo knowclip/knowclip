@@ -159,6 +159,7 @@ const persistedState: Partial<AppState> = {
       'e36ca6de-4893-49f5-bca1-4410ace25d46': {
         filePath: join(TMP_DIRECTORY, 'project_with_subtitles.afca'),
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         id: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
       },
     },
@@ -166,11 +167,13 @@ const persistedState: Partial<AppState> = {
       '535935a3-7d72-4238-87ab-1b7a413c1f71': {
         filePath: join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4'),
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
       },
       'fa462524-bfeb-4434-a506-07858cc97151': {
         filePath: join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'),
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         id: 'fa462524-bfeb-4434-a506-07858cc97151',
       },
     },
@@ -183,6 +186,7 @@ const persistedState: Partial<AppState> = {
           'cafbc25b9c6405df0dd0c77173539bcd.vtt'
         ),
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         id: '37bd5e91-89c5-491b-9308-533c7be7338a',
       },
     },
@@ -194,6 +198,7 @@ const persistedState: Partial<AppState> = {
           '68a8d8c5862e344e7d032006fe1d2c0a.png'
         ),
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
       },
       'fa462524-bfeb-4434-a506-07858cc97151': {
@@ -203,6 +208,7 @@ const persistedState: Partial<AppState> = {
           '992896afa3b7fd044dd8a60bdba4c730.png'
         ),
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         id: 'fa462524-bfeb-4434-a506-07858cc97151',
       },
     },

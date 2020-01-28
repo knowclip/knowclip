@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`opening and saving a previously saved project saves and closes project 1`] = `
+exports[`opening and saving a previously saved project save and closes project 1`] = `
 Object {
   "clips": Array [
     Object {
       "end": 625,
-      "fileId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Relaxing while eating bamboo grass is the best",
@@ -13,9 +13,9 @@ Object {
           "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
           "transcription": "笹を食べながらのんびりするのは最高だなぁ",
         },
-        "id": "b40a5006-71f1-4b6d-b219-303a38f3f29e",
+        "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
         "image": Object {
-          "id": "b40a5006-71f1-4b6d-b219-303a38f3f29e",
+          "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
           "type": "VideoStillImage",
         },
         "tags": Array [
@@ -23,12 +23,12 @@ Object {
         ],
         "type": "Transliteration",
       },
-      "id": "b40a5006-71f1-4b6d-b219-303a38f3f29e",
+      "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
       "start": 402,
     },
     Object {
       "end": 888,
-      "fileId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "This kid, lazing about again so early",
@@ -36,18 +36,18 @@ Object {
           "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
           "transcription": "またこの子は昼間からゴロゴロして",
         },
-        "id": "df75ad79-2be6-4cef-b870-9786888f9af5",
+        "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
         "tags": Array [
           "pbc",
         ],
         "type": "Transliteration",
       },
-      "id": "df75ad79-2be6-4cef-b870-9786888f9af5",
+      "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
       "start": 756,
     },
     Object {
       "end": 4058,
-      "fileId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "",
@@ -55,9 +55,9 @@ Object {
           "pronunciation": "",
           "transcription": "",
         },
-        "id": "63ab2381-aac7-4e33-82a4-3a477ec20ecd",
+        "id": "c33016bd-563b-4a36-851a-802643b6cccb",
         "image": Object {
-          "id": "63ab2381-aac7-4e33-82a4-3a477ec20ecd",
+          "id": "c33016bd-563b-4a36-851a-802643b6cccb",
           "type": "VideoStillImage",
         },
         "tags": Array [
@@ -65,12 +65,12 @@ Object {
         ],
         "type": "Transliteration",
       },
-      "id": "63ab2381-aac7-4e33-82a4-3a477ec20ecd",
+      "id": "c33016bd-563b-4a36-851a-802643b6cccb",
       "start": 3760,
     },
     Object {
       "end": 438,
-      "fileId": "f1190a9a-8275-4119-9feb-26ce53a68c5e",
+      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I am not a cat, said Frederick angrily",
@@ -93,7 +93,7 @@ Object {
     },
     Object {
       "end": 1000,
-      "fileId": "f1190a9a-8275-4119-9feb-26ce53a68c5e",
+      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I didn't say that",
@@ -115,26 +115,28 @@ Object {
       "start": 921,
     },
   ],
-  "id": "14048b9b-8f7e-4491-a618-5507aa6ceba7",
+  "id": "6153116d-faf3-4b70-864b-80475f2e3091",
   "lastOpened": "2020-01-27T22:28:12Z",
   "mediaFiles": Array [
     Object {
       "durationSeconds": 87.062,
-      "flashcardFieldsToSubtitlesTracks": Object {},
+      "flashcardFieldsToSubtitlesTracks": Object {
+        "transcription": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
+      },
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "height": 1080,
-      "id": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "id": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "isVideo": true,
       "name": "polar_bear_cafe.mp4",
-      "parentId": "14048b9b-8f7e-4491-a618-5507aa6ceba7",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
       "subtitles": Array [
         Object {
-          "id": "5d9bc376-2716-4bbb-95f5-3badfc5e8c47",
+          "id": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
           "streamIndex": 2,
           "type": "EmbeddedSubtitlesTrack",
         },
         Object {
-          "id": "136042f2-00bc-4d9b-a3a7-3da1b7868c78",
+          "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
           "type": "ExternalSubtitlesTrack",
         },
       ],
@@ -149,10 +151,10 @@ Object {
       "flashcardFieldsToSubtitlesTracks": Object {},
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "height": 360,
-      "id": "f1190a9a-8275-4119-9feb-26ce53a68c5e",
+      "id": "918d2b17-578f-4c5e-aafa-08d736e52af1",
       "isVideo": true,
       "name": "piggeldy_cat.mp4",
-      "parentId": "14048b9b-8f7e-4491-a618-5507aa6ceba7",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
       "subtitles": Array [],
       "subtitlesTracksStreamIndexes": Array [],
       "type": "MediaFile",
@@ -163,9 +165,9 @@ Object {
   "noteType": "Transliteration",
   "subtitles": Array [
     Object {
-      "id": "136042f2-00bc-4d9b-a3a7-3da1b7868c78",
+      "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
       "name": "pbc_jp.ass",
-      "parentId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "parentId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "type": "ExternalSubtitlesFile",
     },
   ],

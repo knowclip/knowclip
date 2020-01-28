@@ -25,8 +25,8 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
   )
 
   expect(await checkboxesChecked(client, mediaTables$.checkbox)).toMatchObject([
-    false,
     true,
+    false,
   ])
   await client.clickElement_(mediaTableRows$.clipCheckboxes)
   expect(await checkboxesChecked(client, mediaTables$.checkbox)).toMatchObject([
@@ -34,19 +34,14 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     false,
   ])
 
-  const [firstMediaCheckbox, secondMediaCheckbox] = await client.elements_(
+  const [polarBearCafeCheckbox, piggeldyCheckbox] = await client.elements_(
     mediaTables$.checkbox
   )
-  await secondMediaCheckbox.click()
-  expect(await checkboxesChecked(client, mediaTables$.checkbox)).toMatchObject([
-    false,
-    true,
-  ])
 
-  await client.clickElement_(mediaTableRows$.clipCheckboxes)
+  await polarBearCafeCheckbox.click()
   expect(
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
-  ).toMatchObject([false, true, true, true])
+  ).toMatchObject([true, true, true, true])
 
   await client.doubleClickElement_(mediaTableRows$.container)
   await client.waitForText_(
@@ -54,15 +49,16 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     '笹を食べながらのんびりするのは最高だなぁ'
   )
 
-  await client.clickElement_(mediaTables$.header)
+  const [, piggeldyHeader] = await client.elements_(mediaTables$.header)
+  piggeldyHeader.click()
   await client.waitUntilGone_(mediaTableRows$.highlightedClipRow)
   await client.doubleClickElement_(mediaTableRows$.container)
 
   expect(
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
-  ).toMatchObject([false, false, false])
-  await firstMediaCheckbox.click()
+  ).toMatchObject([false, false])
+  await piggeldyCheckbox.click()
   expect(
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
-  ).toMatchObject([true, true, true])
+  ).toMatchObject([true, true])
 }

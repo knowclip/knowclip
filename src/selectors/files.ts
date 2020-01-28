@@ -3,7 +3,7 @@ import { getCurrentMediaFile } from '.'
 export const getFileAvailability = (
   state: AppState,
   file: FileMetadata
-): StoredFileAvailability | NeverLoadedFile =>
+): StoredFile | NeverLoadedFile =>
   state.fileAvailabilities[file.type][file.id] || {
     status: 'NOT_LOADED',
     id: file.id,
@@ -23,7 +23,15 @@ export const getFileWithAvailability = <F extends FileMetadata>(
 ): FileWithAvailability<F> => {
   const file = getFile(state, type, id)
   if (!file)
-    return { file, availability: { status: 'NOT_FOUND', id, filePath: null } }
+    return {
+      file,
+      availability: {
+        status: 'NOT_FOUND',
+        id,
+        filePath: null,
+        isLoading: false,
+      },
+    }
 
   const availability = getFileAvailability(state, file)
   return { file, availability }
@@ -37,7 +45,7 @@ export const getFileAvailabilityById = <F extends FileMetadata>(
   const record = getFile(state, type, id)
   return record
     ? getFileAvailability(state, record)
-    : { status: 'NOT_FOUND', id, filePath: null }
+    : { status: 'NOT_FOUND', id, filePath: null, isLoading: false }
 }
 
 export const getWaveformPath = (state: AppState): string | null => {

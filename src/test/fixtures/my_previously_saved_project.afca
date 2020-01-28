@@ -1,24 +1,24 @@
 {
   "version": "4.1.0",
-  "timestamp": "2020-01-28T10:20:51Z",
+  "timestamp": "2020-01-28T12:30:02Z",
   "name": "My cool saved project",
-  "id": "14048b9b-8f7e-4491-a618-5507aa6ceba7",
+  "id": "6153116d-faf3-4b70-864b-80475f2e3091",
   "noteType": "Transliteration",
-  "lastOpened": "2020-01-28T10:16:05Z",
+  "lastOpened": "2020-01-28T12:29:32Z",
   "mediaFiles": [
     {
-      "id": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "id": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "type": "MediaFile",
-      "parentId": "14048b9b-8f7e-4491-a618-5507aa6ceba7",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
       "subtitles": [
         {
           "type": "EmbeddedSubtitlesTrack",
-          "id": "5d9bc376-2716-4bbb-95f5-3badfc5e8c47",
+          "id": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
           "streamIndex": 2
         },
         {
           "type": "ExternalSubtitlesTrack",
-          "id": "136042f2-00bc-4d9b-a3a7-3da1b7868c78"
+          "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271"
         }
       ],
       "flashcardFieldsToSubtitlesTracks": {},
@@ -33,9 +33,9 @@
       "height": 1080
     },
     {
-      "id": "f1190a9a-8275-4119-9feb-26ce53a68c5e",
+      "id": "918d2b17-578f-4c5e-aafa-08d736e52af1",
       "type": "MediaFile",
-      "parentId": "14048b9b-8f7e-4491-a618-5507aa6ceba7",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
       "subtitles": [],
       "flashcardFieldsToSubtitlesTracks": {},
       "isVideo": true,
@@ -54,10 +54,10 @@
     {
       "start": 402,
       "end": 625,
-      "id": "b40a5006-71f1-4b6d-b219-303a38f3f29e",
-      "fileId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": {
-        "id": "b40a5006-71f1-4b6d-b219-303a38f3f29e",
+        "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
         "type": "Transliteration",
         "fields": {
           "transcription": "笹を食べながらのんびりするのは最高だなぁ",
@@ -69,18 +69,18 @@
           "pbc"
         ],
         "image": {
-          "id": "b40a5006-71f1-4b6d-b219-303a38f3f29e",
+          "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
           "type": "VideoStillImage"
         }
       }
     },
     {
-      "id": "df75ad79-2be6-4cef-b870-9786888f9af5",
-      "fileId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "start": 756,
       "end": 888,
       "flashcard": {
-        "id": "df75ad79-2be6-4cef-b870-9786888f9af5",
+        "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
         "type": "Transliteration",
         "fields": {
           "transcription": "またこの子は昼間からゴロゴロして",
@@ -96,10 +96,10 @@
     {
       "start": 3760,
       "end": 4058,
-      "id": "63ab2381-aac7-4e33-82a4-3a477ec20ecd",
-      "fileId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
+      "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": {
-        "id": "63ab2381-aac7-4e33-82a4-3a477ec20ecd",
+        "id": "c33016bd-563b-4a36-851a-802643b6cccb",
         "type": "Transliteration",
         "fields": {
           "transcription": "",
@@ -111,7 +111,7 @@
           "pbc"
         ],
         "image": {
-          "id": "63ab2381-aac7-4e33-82a4-3a477ec20ecd",
+          "id": "c33016bd-563b-4a36-851a-802643b6cccb",
           "type": "VideoStillImage"
         }
       }
@@ -120,8 +120,8 @@
   "subtitles": [
     {
       "type": "ExternalSubtitlesFile",
-      "parentId": "ca5642ae-e906-4e3b-90f2-bb5fff5d1c02",
-      "id": "136042f2-00bc-4d9b-a3a7-3da1b7868c78",
+      "parentId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
       "name": "pbc_jp.ass"
     }
   ]

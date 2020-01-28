@@ -30,6 +30,7 @@ enum $ {
   trackMenuItems = 'subtitles-menu-track-item',
   openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
   locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
+  addTrackButton = 'subtitles-menu-add-track-button',
   makeClipsAndCardsButton = 'subtitles-menu-make-clips-and-cards-button',
 }
 
@@ -113,7 +114,11 @@ const SubtitlesMenu = () => {
           />
         ))}
         <Divider />
-        <MenuItem dense onClick={loadExternalTrack}>
+        <MenuItem
+          dense
+          onClick={loadExternalTrack}
+          className={$.addTrackButton}
+        >
           <ListItemText primary="Load external track" />
         </MenuItem>
         <MenuItem
@@ -243,29 +248,31 @@ const ExternalTrackMenuItem = ({
         </ListItemSecondaryAction>
       </MenuItem>
 
-      <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
-        <MenuItem
-          dense
-          onClick={locateFileRequest}
-          disabled={!file}
-          id={$.locateExternalFileButton}
-        >
-          <ListItemIcon>
-            <Icon>
-              <FolderSpecial />
-            </Icon>
-          </ListItemIcon>
-          <ListItemText primary="Locate subtitles file in filesystem" />
-        </MenuItem>
-        <MenuItem dense disabled={!file} onClick={deleteExternalSubtitles}>
-          <ListItemIcon>
-            <Icon>
-              <DeleteIcon />
-            </Icon>
-          </ListItemIcon>
-          <ListItemText primary="Remove subtitles track" />
-        </MenuItem>
-      </Menu>
+      {isOpen && (
+        <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
+          <MenuItem
+            dense
+            onClick={locateFileRequest}
+            disabled={!file}
+            id={$.locateExternalFileButton}
+          >
+            <ListItemIcon>
+              <Icon>
+                <FolderSpecial />
+              </Icon>
+            </ListItemIcon>
+            <ListItemText primary="Locate subtitles file in filesystem" />
+          </MenuItem>
+          <MenuItem dense disabled={!file} onClick={deleteExternalSubtitles}>
+            <ListItemIcon>
+              <Icon>
+                <DeleteIcon />
+              </Icon>
+            </ListItemIcon>
+            <ListItemText primary="Remove subtitles track" />
+          </MenuItem>
+        </Menu>
+      )}
     </>
   )
 }

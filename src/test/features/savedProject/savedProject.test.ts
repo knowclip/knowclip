@@ -12,6 +12,7 @@ import openSavedProject from './openSavedProject'
 import { join } from 'path'
 import makeSomeFlashcards from './makeSomeFlashcards'
 import saveAndCloseProject from './saveAndCloseProject'
+import linkSubtitlesToFields from './linkSubtitlesToFields'
 
 jest.setTimeout(60000)
 
@@ -24,12 +25,13 @@ describe('opening and saving a previously saved project', () => {
   beforeAll(async () => {
     setup = await startApp(context, testId, persistedState)
 
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    // await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
   test('opens a previously saved project', () => openSavedProject(setup))
   test('make some flashcards', () => makeSomeFlashcards(setup))
-  test('saves and closes project', () => saveAndCloseProject(setup))
+  test('link subtitles to fields', () => linkSubtitlesToFields(setup))
+  test('save and closes project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
     await stopApp(context)
@@ -48,34 +50,34 @@ const sideEffectsMocks = {
 const persistedState: Partial<AppState> = {
   files: {
     ProjectFile: {
-      '14048b9b-8f7e-4491-a618-5507aa6ceba7': {
+      '6153116d-faf3-4b70-864b-80475f2e3091': {
         type: 'ProjectFile',
-        id: '14048b9b-8f7e-4491-a618-5507aa6ceba7',
+        id: '6153116d-faf3-4b70-864b-80475f2e3091',
         name: 'My cool saved project',
         noteType: 'Transliteration',
         mediaFileIds: [
-          'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
-          'f1190a9a-8275-4119-9feb-26ce53a68c5e',
+          '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+          '918d2b17-578f-4c5e-aafa-08d736e52af1',
         ],
         error: null,
-        lastOpened: '2020-01-28T10:05:31Z',
-        lastSaved: '2020-01-28T10:05:31Z',
+        lastOpened: '2020-01-28T12:29:32Z',
+        lastSaved: '2020-01-28T12:29:32Z',
       },
     },
     MediaFile: {
-      'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02': {
-        id: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
         type: 'MediaFile',
-        parentId: '14048b9b-8f7e-4491-a618-5507aa6ceba7',
+        parentId: '6153116d-faf3-4b70-864b-80475f2e3091',
         subtitles: [
           {
             type: 'EmbeddedSubtitlesTrack',
-            id: '5d9bc376-2716-4bbb-95f5-3badfc5e8c47',
+            id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
             streamIndex: 2,
           },
           {
             type: 'ExternalSubtitlesTrack',
-            id: '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+            id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
           },
         ],
         flashcardFieldsToSubtitlesTracks: {},
@@ -87,10 +89,10 @@ const persistedState: Partial<AppState> = {
         width: 1920,
         height: 1080,
       },
-      'f1190a9a-8275-4119-9feb-26ce53a68c5e': {
-        id: 'f1190a9a-8275-4119-9feb-26ce53a68c5e',
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
         type: 'MediaFile',
-        parentId: '14048b9b-8f7e-4491-a618-5507aa6ceba7',
+        parentId: '6153116d-faf3-4b70-864b-80475f2e3091',
         subtitles: [],
         flashcardFieldsToSubtitlesTracks: {},
         isVideo: true,
@@ -103,125 +105,149 @@ const persistedState: Partial<AppState> = {
       },
     },
     ExternalSubtitlesFile: {
-      '136042f2-00bc-4d9b-a3a7-3da1b7868c78': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         type: 'ExternalSubtitlesFile',
-        parentId: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
-        id: '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+        parentId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
         name: 'pbc_jp.ass',
       },
     },
     VttConvertedSubtitlesFile: {
-      '5d9bc376-2716-4bbb-95f5-3badfc5e8c47': {
+      '31dfe711-758e-4ba4-9dff-0fb73d1ab79a': {
         type: 'VttConvertedSubtitlesFile',
-        parentId: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
-        id: '5d9bc376-2716-4bbb-95f5-3badfc5e8c47',
+        parentId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+        id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
         streamIndex: 2,
         parentType: 'MediaFile',
       },
-      '136042f2-00bc-4d9b-a3a7-3da1b7868c78': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         type: 'VttConvertedSubtitlesFile',
-        id: '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
-        parentId: '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
+        parentId: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
         parentType: 'ExternalSubtitlesFile',
       },
     },
     WaveformPng: {
-      'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02': {
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
         type: 'WaveformPng',
-        parentId: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
-        id: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
+        parentId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
-      'f1190a9a-8275-4119-9feb-26ce53a68c5e': {
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         type: 'WaveformPng',
-        parentId: 'f1190a9a-8275-4119-9feb-26ce53a68c5e',
-        id: 'f1190a9a-8275-4119-9feb-26ce53a68c5e',
+        parentId: '918d2b17-578f-4c5e-aafa-08d736e52af1',
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
       },
     },
     ConstantBitrateMp3: {},
     VideoStillImage: {
-      'b40a5006-71f1-4b6d-b219-303a38f3f29e': {
+      'c3637ef9-ea4d-4049-b604-a768239f721c': {
         type: 'VideoStillImage',
-        id: 'b40a5006-71f1-4b6d-b219-303a38f3f29e',
-        mediaFileId: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
+        id: 'c3637ef9-ea4d-4049-b604-a768239f721c',
+        mediaFileId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
-      'df75ad79-2be6-4cef-b870-9786888f9af5': {
+      '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d': {
         type: 'VideoStillImage',
-        id: 'df75ad79-2be6-4cef-b870-9786888f9af5',
-        mediaFileId: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
+        id: '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d',
+        mediaFileId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
     },
   },
   fileAvailabilities: {
     ProjectFile: {
-      '14048b9b-8f7e-4491-a618-5507aa6ceba7': {
+      '6153116d-faf3-4b70-864b-80475f2e3091': {
         filePath: join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
         status: 'CURRENTLY_LOADED',
-        id: '14048b9b-8f7e-4491-a618-5507aa6ceba7',
+        isLoading: false,
+        id: '6153116d-faf3-4b70-864b-80475f2e3091',
       },
     },
     MediaFile: {
-      'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02': {
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
         filePath: join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4'),
         status: 'CURRENTLY_LOADED',
-        id: 'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02',
+        isLoading: false,
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
-      'f1190a9a-8275-4119-9feb-26ce53a68c5e': {
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         filePath: join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'),
         status: 'CURRENTLY_LOADED',
-        id: 'f1190a9a-8275-4119-9feb-26ce53a68c5e',
+        isLoading: false,
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
       },
     },
     ExternalSubtitlesFile: {
-      '136042f2-00bc-4d9b-a3a7-3da1b7868c78': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         filePath: join(ASSETS_DIRECTORY, 'pbc_jp.ass'),
         status: 'CURRENTLY_LOADED',
-        id: '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+        isLoading: false,
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
       },
     },
     VttConvertedSubtitlesFile: {
-      '5d9bc376-2716-4bbb-95f5-3badfc5e8c47': {
+      '31dfe711-758e-4ba4-9dff-0fb73d1ab79a': {
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '620fffeb0b82a2fe14a6bad161f40e58.vtt'
+          'd9ca9f57367767ad9ebbdc366558738f.vtt'
+        ),
+      },
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
+        filePath: join(
+          GENERATED_ASSETS_DIRECTORY,
+          testId,
+          '9700310870f37b1824fa5f35ace353f7.vtt'
         ),
       },
     },
     WaveformPng: {
-      'ca5642ae-e906-4e3b-90f2-bb5fff5d1c02': {
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          'ddc61a845e870db251cf3a00069d1cde.png'
+          '40371c4096cf908ffab747bcbcce95d3.png'
         ),
       },
-      'f1190a9a-8275-4119-9feb-26ce53a68c5e': {
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          'ca194ff7cc6d48c44a2f13381e6aeba6.png'
+          '34cd4f92fbad0aa454b5252b48f5911c.png'
         ),
       },
     },
     ConstantBitrateMp3: {},
     VideoStillImage: {
-      'b40a5006-71f1-4b6d-b219-303a38f3f29e': {
+      'c3637ef9-ea4d-4049-b604-a768239f721c': {
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: 'c3637ef9-ea4d-4049-b604-a768239f721c',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '73cb06f3983e862ffac8e27174440133.png'
+          'db830c671edb3c27cb3198a95663b6b2.png'
         ),
       },
-      'df75ad79-2be6-4cef-b870-9786888f9af5': {
+      '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d': {
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '77335888f2c798acb05ebe56f21e6d03.png'
+          'c066939580d80abdf4e76f1473e283ba.png'
         ),
       },
     },

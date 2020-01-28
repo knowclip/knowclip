@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, memo } from 'react'
+import React, { useCallback, useState, useEffect, memo, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   IconButton,
@@ -150,6 +150,7 @@ const FlashcardSectionForm = memo(
               <VideoStillDisplay clip={clip} videoFile={mediaFile} />
             )}
           </div>
+
           <div className={css.formTopRight}>
             {' '}
             <span className={css.timeStamp}>

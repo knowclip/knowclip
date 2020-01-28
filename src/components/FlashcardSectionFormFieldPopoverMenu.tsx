@@ -2,6 +2,7 @@ import React, { useCallback, SyntheticEvent } from 'react'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
+import cn from 'classnames'
 import css from './FlashcardSection.module.css'
 import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
@@ -37,10 +38,9 @@ const FlashcardSectionFormFieldPopoverMenu = ({
       >
         <IconButton
           tabIndex={1}
-          className={css.fieldMenuButton}
+          className={cn(css.fieldMenuButton, $.openMenuButton)}
           buttonRef={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
-          id={$.openMenuButton}
         >
           <MoreVert />
         </IconButton>
@@ -109,7 +109,7 @@ const FieldMenuItem = ({
     [dispatch, selected, trackId, fieldName, mediaFileId, closeMenu]
   )
   return (
-    <MenuItem onClick={handleClick} selected={selected} id={$.menuItem}>
+    <MenuItem onClick={handleClick} selected={selected} className={$.menuItem}>
       {label}
     </MenuItem>
   )

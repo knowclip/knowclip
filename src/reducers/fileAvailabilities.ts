@@ -18,22 +18,31 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     case A.LOAD_PERSISTED_STATE:
       return action.fileAvailabilities || state
 
-    case A.OPEN_FILE_REQUEST:
+    case A.OPEN_FILE_REQUEST: {
+      const base: FileAvailability = state[action.file.type][
+        action.file.id
+      ] || {
+        id: action.file.id,
+        status: 'NOT_LOADED',
+        filePath: null,
+      }
       return {
         ...state,
         [action.file.type]: {
           ...state[action.file.type],
           [action.file.id]: {
-            ...state[action.file.type][action.file.id],
-            status: 'LOADING',
+            ...base,
+            isLoading: true,
           },
         },
       }
+    }
 
     case A.OPEN_FILE_SUCCESS: {
       const fileAvailability: FileAvailability = {
         ...state[action.validatedFile.type][action.validatedFile.id],
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         filePath: action.filePath,
       }
       return {
@@ -52,7 +61,12 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
           ...state[action.file.type],
           [action.file.id]: {
             ...state[action.file.type][action.file.id],
-            status: 'REMEMBERED',
+            status:
+              state[action.file.type][action.file.id].status ===
+              'CURRENTLY_LOADED'
+                ? 'REMEMBERED'
+                : state[action.file.type][action.file.id].status,
+            isLoading: false,
           },
         },
       }
@@ -65,15 +79,16 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       const currentFile = state[action.file.type][action.file.id] || null
       const fileAvailability: FileAvailability = currentFile
         ? {
-            ...currentFile,
             id: action.file.id,
-            status: currentFile.status,
+            status: 'REMEMBERED',
             filePath: action.filePath,
+            isLoading: false,
           }
         : {
             filePath: action.filePath,
-            status: 'CURRENTLY_LOADED',
+            status: 'REMEMBERED',
             id: action.file.id,
+            isLoading: false,
           }
       return {
         ...state,

@@ -1,5 +1,7 @@
 function getStoredFileData(
   testId,
+  projectFileName,
+  projectName,
   tmpDir = '/tmp/',
   assetsDir = '/home/justin/code/knowclip/src/test/assets/',
   tmpTestDir = '/home/justin/code/knowclip/tmp-test/'
@@ -39,6 +41,15 @@ function getStoredFileData(
     }
   }
 
+  const projectAvailabilities = Object.entries(
+    parsed.fileAvailabilities.ProjectFile
+  )
+  const projects = Object.entries(parsed.files.ProjectFile)
+  if (projectAvailabilities.length !== 1 || projects.length !== 1)
+    throw new Error('Should only be one project file')
+  projectAvailabilities[0][1].filePath = `###join(TMP_DIRECTORY, '${projectFileName}'.afca)###`
+  projects[0][1].name = projectName
+
   console.log(
     JSON.stringify(parsed)
       .replace(/"###/g, '')
@@ -46,7 +57,9 @@ function getStoredFileData(
   )
 
   console.log(
-    `cd ${tmpDir} && cp ${generated.join(' ')} ${assetsDir}/generated/${testId}`
+    `rm  ${assetsDir}generated/${testId}/** && (cd ${tmpDir} && cp ${generated.join(
+      ' '
+    )} ${assetsDir}generated/${testId})`
   )
 }
-getStoredFileData()
+getStoredFileData('savedProject', 'My cool saved project')

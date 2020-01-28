@@ -11,6 +11,7 @@ import reviewAndExportApkg from './reviewAndExportApkg'
 import moveThroughoutMedia from './moveThroughoutMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects'
+import addSomeSubtitles from './addSomeSubtitles'
 
 jest.setTimeout(60000)
 
@@ -29,6 +30,7 @@ describe('create a deck from a new project', () => {
   }) // should create file
   test('change project name', () => changeProjectName(setup))
   test('add media to project', () => addFirstMediaToProject(setup))
+  test('add a subtitles file', () => addSomeSubtitles(setup))
   test('create clips + flashcards', () => makeSomeFlashcards(setup))
   test('navigate between clips', () => navigateBetweenClips(setup))
   test('move throughout media file', () => moveThroughoutMedia(setup))
@@ -44,18 +46,19 @@ describe('create a deck from a new project', () => {
 
 const sideEffectsMocks = {
   uuid: [
-    'e36ca6de-4893-49f5-bca1-4410ace25d46',
-    '535935a3-7d72-4238-87ab-1b7a413c1f71',
-    '37bd5e91-89c5-491b-9308-533c7be7338a',
-    'ae3239c8-90bd-4488-95e3-bde059632348',
-    '7c348315-8f78-42fd-9be7-b05bc0aade9d',
-    'e62c823d-93c2-4a5e-8181-37e3d540c3e3',
-    'fa462524-bfeb-4434-a506-07858cc97151',
+    '6f58206b-9384-411c-8432-e7ff8d6c958b',
+    '5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0',
+    '7077af99-722b-4737-854e-d2d1a3a3a60f',
+    'a517b52e-e10b-4e9e-90e1-bfecc865b428',
+    '8e92ca1d-8d29-486b-81d1-0a44d2da8366',
+    'a1eb3142-ce18-4595-a3c3-8c867e1058f4',
+    '3eb212dd-8f04-4c63-b36a-06a0bb6957aa',
+    '906db000-f3d2-46c9-9ec9-0a1069304e41',
   ],
   nowUtcTimestamp: [
-    '2020-01-22T07:49:42Z',
-    '2020-01-22T07:49:42Z',
-    '2020-01-22T07:49:42Z',
-    '2020-01-22T07:49:57Z',
+    '2020-01-28T12:35:20Z',
+    '2020-01-28T12:35:20Z',
+    '2020-01-28T12:35:20Z',
+    '2020-01-28T12:35:49Z',
   ],
 }

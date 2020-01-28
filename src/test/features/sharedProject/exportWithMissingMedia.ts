@@ -13,6 +13,10 @@ export default async function exportWithMissingMedia({
   app,
 }: TestSetup) {
   const initialText = await client.getText_(dialog$.container)
+  expect(await checkboxesChecked(client, mediaTables$.checkbox)).toEqual([
+    true,
+    true,
+  ])
   await client.clickElement_(dialog$.exportApkgButton)
 
   await mockElectronHelpers(app, {
@@ -21,14 +25,16 @@ export default async function exportWithMissingMedia({
     ],
   })
   await client.clickElement_(fileSelectionForm$.filePathField)
+  // await client.waitForText('body', join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'))
   await client.clickElement_(fileSelectionForm$.continueButton)
+  await client.waitUntilGone_(fileSelectionForm$.container)
 
   await client.clickElement_(dialog$.continueButton)
   const mediaCheckboxesChecked = await checkboxesChecked(
     client,
     mediaTables$.checkbox
   )
-  expect(mediaCheckboxesChecked).toEqual([true, false])
+  expect(mediaCheckboxesChecked).toEqual([true, true])
 
   expect(initialText).toEqual(await client.getText_(dialog$.container))
 

@@ -17,9 +17,9 @@ import MediaTable from './ReviewAndExportMediaTable'
 
 enum $ {
   container = 'review-and-export-dialog-container',
-  exportApkgButton = 'export-apkg-button',
-  continueButton = 'continue-button',
-  exitButton = 'exit-button',
+  exportApkgButton = 'review-and-export-export-apkg-button',
+  continueButton = 'review-and-export-continue-button',
+  exitButton = 'review-and-export-exit-button',
 }
 
 const Export = React.memo(

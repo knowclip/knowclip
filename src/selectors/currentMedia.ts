@@ -76,14 +76,14 @@ export const isAudioLoading = (state: AppState): boolean => {
   const currentFile = getCurrentMediaFile(state)
   if (!currentFile) return false
   const availability = getFileAvailability(state, currentFile)
-  if (availability.status === 'LOADING') return true
+  if (availability.isLoading) return true
 
   const cbr = getFileWithAvailability(
     state,
     'ConstantBitrateMp3',
     currentFile.id
   )
-  return Boolean(cbr.file && cbr.availability.status === 'LOADING')
+  return Boolean(cbr.file && cbr.availability.isLoading)
 }
 
 export const isWorkUnsaved = (state: AppState): boolean =>

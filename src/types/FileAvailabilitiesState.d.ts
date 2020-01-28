@@ -1,45 +1,42 @@
 declare type FileAvailabilitiesState = Record<
   FileMetadata['type'],
-  Record<FileId, StoredFileAvailability>
+  Record<FileId, StoredFile | NeverLoadedFile>
 >
 
 declare type FileAvailability = StoredFile | NeverLoadedFile | NotFoundFile
 
-declare type StoredFileAvailability =
-  | CurrentlyLoadedFile
-  | LoadingFile
-  | NotCurrentlyLoadedFile
+declare type StoredFile = CurrentlyLoadedFile | NotCurrentlyLoadedFile
 
 declare type CurrentlyLoadedFile = {
+  // loadedthissession
   id: FileId
   status: 'CURRENTLY_LOADED'
   filePath: FilePath
-}
-declare type LoadingFile = {
-  id: FileId
-  status: 'LOADING'
-  filePath: FilePath
+  isLoading: boolean
 }
 declare type NotCurrentlyLoadedFile = {
   id: FileId
   status: 'REMEMBERED'
   filePath: FilePath
+  isLoading: boolean
 }
 declare type NeverLoadedFile = {
   id: FileId
   status: 'NOT_LOADED'
   filePath: null
+  isLoading: boolean
 }
 declare type NotFoundFile = {
   id: FileId
   status: 'NOT_FOUND'
   filePath: null
+  isLoading: false
 }
 
 declare type FileWithAvailability<F extends FileMetadata> =
   | {
       file: F
-      availability: StoredFileAvailability | NeverLoadedFile
+      availability: StoredFile | NeverLoadedFile
     }
   | {
       file: null
