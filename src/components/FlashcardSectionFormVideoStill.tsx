@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Tooltip, Card, CardMedia, CircularProgress } from '@material-ui/core'
 import cn from 'classnames'
@@ -12,35 +12,66 @@ const VideoStillDisplay = ({
   videoFile: VideoFile
   clip: Clip
 }) => {
-  const { videoStill, mediaFileAvailability } = useSelector(
-    (state: AppState) => ({
-      videoStill: r.getFileWithAvailability<VideoStillImageFile>(
-        state,
-        'VideoStillImage',
-        clip.id
-      ),
-      mediaFileAvailability: r.getFileAvailability(state, videoFile),
-    })
+  const {
+    videoStill,
+    mediaFileAvailability,
+    clipsIds,
+    videoStillAvailabilities,
+  } = useSelector((state: AppState) => ({
+    videoStill: r.getFileWithAvailability<VideoStillImageFile>(
+      state,
+      'VideoStillImage',
+      clip.id
+    ),
+    mediaFileAvailability: r.getFileAvailability(state, videoFile),
+    clipsIds: r.getClipIdsByMediaFileId(state, videoFile.id),
+    videoStillAvailabilities: state.fileAvailabilities.VideoStillImage,
+  }))
+
+  const adjacentClipActions = useMemo(
+    () => {
+      const currentIndex = clipsIds.indexOf(clip.id)
+
+      const adjacentIds = [
+        clip.id,
+        ...clipsIds.slice(currentIndex + 1, currentIndex + 5),
+        ...clipsIds
+          .slice(Math.max(currentIndex - 5, 0), currentIndex)
+          .reverse(),
+      ]
+      return adjacentIds
+        .map(id => {
+          const availability =
+            id in videoStillAvailabilities ? videoStillAvailabilities[id] : null
+          if (!availability)
+            return r.addAndOpenFile({
+              type: 'VideoStillImage',
+              id,
+              mediaFileId: videoFile.id,
+            })
+
+          // MUST ADD VIDEOSTILLIMAGE FILES WHEN OPENING PROJECT
+
+          const { status, isLoading } = availability
+          return !isLoading && status !== 'CURRENTLY_LOADED'
+            ? r.openFileRequest({
+                type: 'VideoStillImage',
+                id,
+                mediaFileId: videoFile.id,
+              })
+            : null
+        })
+        .filter(a => a)
+    },
+    [clip.id, clipsIds, videoFile.id, videoStillAvailabilities]
   )
 
   const dispatch = useDispatch()
 
   useEffect(
     () => {
-      const videoStillLoaded =
-        videoStill.availability.status === 'CURRENTLY_LOADED'
       const videoStillAction = () =>
-        !videoStillLoaded &&
-        mediaFileAvailability.status === 'CURRENTLY_LOADED' &&
-        dispatch(
-          videoStill.file
-            ? r.openFileRequest(videoStill.file)
-            : r.addAndOpenFile({
-                type: 'VideoStillImage',
-                id: clip.id,
-                mediaFileId: videoFile.id,
-              })
-        )
+        adjacentClipActions.forEach(a => dispatch(a))
       const timeout = window.setTimeout(videoStillAction, 500)
 
       return () => window.clearTimeout(timeout)
@@ -52,6 +83,7 @@ const VideoStillDisplay = ({
       mediaFileAvailability.status,
       videoStill.availability.status,
       videoStill.file,
+      adjacentClipActions,
     ]
   )
 

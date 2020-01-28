@@ -85,6 +85,9 @@
   transition: opacity .1s;
   cursor: pointer;
   background-color: lightgray;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
 }
 .flashcardImageUnused {
   opacity: 0.5;

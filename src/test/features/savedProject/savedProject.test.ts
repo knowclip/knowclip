@@ -25,7 +25,7 @@ describe('opening and saving a previously saved project', () => {
   beforeAll(async () => {
     setup = await startApp(context, testId, persistedState)
 
-    // await mockSideEffects(setup.app, sideEffectsMocks)
+    await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
   test('opens a previously saved project', () => openSavedProject(setup))

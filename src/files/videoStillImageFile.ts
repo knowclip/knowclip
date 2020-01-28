@@ -5,7 +5,13 @@ export default {
   openRequest: async ({ file }, filePath, state, effects) => {
     return [await r.openFileSuccess(file, filePath)]
   },
-  openSuccess: [],
+  openSuccess: [
+    async ({ validatedFile, filePath }) => {
+      const img = new Image()
+      img.src = `file:///${filePath}`
+      return []
+    },
+  ],
   locateRequest: async ({ file }, state, effects) => {
     try {
       const parentFile = r.getFileAvailabilityById(
