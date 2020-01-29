@@ -69,7 +69,6 @@ const SubtitlesClipsDialog = ({
 
   const [fields, setFields] = useState(fieldsToTracks)
   const { tags, onAddChip, onDeleteChip } = useTagsInput(defaultTags)
-  const [includeStill, setIncludeStill] = useState(defaultIncludeStill)
   const [errorText, setErrorText] = useState('')
 
   const closeDialog = useCallback(() => dispatch(r.closeDialog()), [dispatch])
@@ -100,11 +99,11 @@ const SubtitlesClipsDialog = ({
           currentFileId,
           fieldsWithoutBlankValues,
           tags,
-          includeStill
+          defaultIncludeStill
         )
       )
     },
-    [dispatch, fields, currentFileId, tags, includeStill]
+    [dispatch, fields, currentFileId, tags, defaultIncludeStill]
   )
   const setField = useCallback(
     (key: TransliterationFlashcardFieldName, value: SubtitlesTrackId) => {

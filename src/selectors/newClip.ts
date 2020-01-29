@@ -1,6 +1,5 @@
 import newFlashcard from '../utils/newFlashcard'
 import { getDefaultTags, getDefaultIncludeStill } from './user'
-import { getSecondsAtX } from './waveformTime'
 
 const ascending = (a: number, b: number) => a - b
 

@@ -1,16 +1,7 @@
-import React, { useCallback, useState, useEffect, memo, useMemo } from 'react'
+import React, { useCallback, useState, useEffect, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Card,
-  CardMedia,
-  CardContent,
-} from '@material-ui/core'
+import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
-import cn from 'classnames'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
@@ -34,7 +25,6 @@ const FlashcardSectionForm = memo(
   ({
     className,
     mediaFile,
-    clipId,
   }: {
     className?: string
     mediaFile: MediaFile

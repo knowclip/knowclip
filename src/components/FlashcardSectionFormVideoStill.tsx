@@ -1,12 +1,9 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Tooltip, Card, CardMedia, CircularProgress } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
-import { getMidpoint } from '../utils/getVideoStill'
-
-let x = 0
 
 const VideoStillDisplay = ({
   videoFile,

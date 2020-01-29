@@ -1,5 +1,4 @@
 import { Reducer } from 'redux'
-import { LOCATE_FILE_REQUEST } from '../types/ActionType'
 
 export const initialState: FilesState = {
   ProjectFile: {},
