@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Dialog,
@@ -10,6 +10,8 @@ import {
   MenuItem,
   InputLabel,
   FormHelperText,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core'
 import * as r from '../../redux'
 import { showOpenDialog } from '../../utils/electron'
@@ -47,7 +49,7 @@ const SubtitlesClipsDialog = ({
     currentNoteTypeFields,
     subtitles,
     fieldsToTracks,
-    currentFileId,
+    currentFile,
     allTags,
     defaultTags,
     defaultIncludeStill,
@@ -60,16 +62,35 @@ const SubtitlesClipsDialog = ({
         : [],
       subtitles: r.getSubtitlesFilesWithTracks(state),
       fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-      currentFileId: r.getCurrentFileId(state),
+      currentFile: r.getCurrentMediaFile(state),
       allTags: r.getAllTags(state),
       defaultTags: r.getDefaultTags(state),
       defaultIncludeStill: r.getDefaultIncludeStill(state),
     }
   })
 
+  const currentFileId = currentFile ? currentFile.id : currentFile
+  useEffect(
+    () => {
+      if (!currentFileId) {
+        dispatch(MEDIA_FILE_MISSING_MESSAGE)
+        dispatch(r.closeDialog())
+      }
+    },
+    [currentFileId, dispatch]
+  )
+
   const [fields, setFields] = useState(fieldsToTracks)
   const { tags, onAddChip, onDeleteChip } = useTagsInput(defaultTags)
   const [errorText, setErrorText] = useState('')
+
+  const [useStills, setUseStills] = useState(defaultIncludeStill)
+  const toggleUseStills = useCallback(
+    e => {
+      setUseStills(v => !v)
+    },
+    [setUseStills]
+  )
 
   const closeDialog = useCallback(() => dispatch(r.closeDialog()), [dispatch])
   const onSubmit = useCallback(
@@ -99,11 +120,11 @@ const SubtitlesClipsDialog = ({
           currentFileId,
           fieldsWithoutBlankValues,
           tags,
-          defaultIncludeStill
+          useStills
         )
       )
     },
-    [dispatch, fields, currentFileId, tags, defaultIncludeStill]
+    [dispatch, fields, currentFileId, tags, useStills]
   )
   const setField = useCallback(
     (key: TransliterationFlashcardFieldName, value: SubtitlesTrackId) => {
@@ -230,12 +251,29 @@ const SubtitlesClipsDialog = ({
               {subtitlesTrackOptions(subtitles)}
             </Select>
           </FormControl>
-          <TagsInput
-            allTags={allTags}
-            tags={tags}
-            onAddChip={onAddChip}
-            onDeleteChip={onDeleteChip}
-          />
+          <FormControl fullWidth margin="normal">
+            {currentFile && currentFile.isVideo && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={useStills}
+                    onChange={toggleUseStills}
+                    color="primary"
+                  />
+                }
+                label="Include still images from video in flashcards"
+                labelPlacement="start"
+              />
+            )}
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <TagsInput
+              allTags={allTags}
+              tags={tags}
+              onAddChip={onAddChip}
+              onDeleteChip={onDeleteChip}
+            />
+          </FormControl>
         </form>
       </DialogContent>
       <DialogActions>

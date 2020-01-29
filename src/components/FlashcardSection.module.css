@@ -94,10 +94,10 @@
   opacity: 1;
 }
 .flashcardImageUnused {
-  opacity: 0.2;
+  opacity: 0.15;
 }
 .flashcardImageUnused:hover {
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
 .formBody {
