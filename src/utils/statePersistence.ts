@@ -45,34 +45,32 @@ export const getPersistedState = (): Partial<AppState> => {
       ...storedFiles,
     }
 
-    persistedState.fileAvailabilities = mapFileState(
-      fileAvailabilities,
-      fileAvailability => {
-        switch (fileAvailability.status) {
-          case 'CURRENTLY_LOADED':
-            return {
-              id: fileAvailability.id,
-              status: 'REMEMBERED',
-              filePath: fileAvailability.filePath,
-              isLoading: false,
-            }
-          case 'REMEMBERED':
-            return {
-              id: fileAvailability.id,
-              status: fileAvailability.status,
-              filePath: fileAvailability.filePath,
-              isLoading: false,
-            }
-          case 'NOT_LOADED':
-            return {
-              id: fileAvailability.id,
-              status: fileAvailability.status,
-              filePath: fileAvailability.filePath,
-              isLoading: false,
-            }
-        }
+    persistedState.fileAvailabilities = mapFileState(fileAvailabilities, fa => {
+      const fileAvailability = fa as KnownFile
+      switch (fileAvailability.status) {
+        case 'CURRENTLY_LOADED':
+          return {
+            id: fileAvailability.id,
+            status: 'PREVIOUSLY_LOADED',
+            filePath: fileAvailability.filePath,
+            isLoading: false,
+          }
+        case 'PREVIOUSLY_LOADED':
+          return {
+            id: fileAvailability.id,
+            status: fileAvailability.status,
+            filePath: fileAvailability.filePath,
+            isLoading: false,
+          }
+        case 'NEVER_LOADED':
+          return {
+            id: fileAvailability.id,
+            status: fileAvailability.status,
+            filePath: fileAvailability.filePath,
+            isLoading: false,
+          }
       }
-    )
+    })
   } catch (err) {
     console.error(err)
   }

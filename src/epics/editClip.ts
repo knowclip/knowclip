@@ -40,7 +40,7 @@ const remakeStill: AppEpic = (action$, state$) =>
               ignoreElements()
             )
           ),
-          endWith(actions.addAndOpenFile(still))
+          endWith(actions.openFileRequest(still))
         )
 
       return empty()

@@ -30,7 +30,10 @@ const createProject: AppEpic = (action$, state$, effects) =>
         )
       ).pipe(
         flatMap(() =>
-          from([r.addAndOpenFile(project, filePath), r.setWorkIsUnsaved(false)])
+          from([
+            r.openFileRequest(project, filePath),
+            r.setWorkIsUnsaved(false),
+          ])
         )
       )
     }),
@@ -178,7 +181,6 @@ const PROJECT_EDIT_ACTIONS = [
   A.SET_PROJECT_NAME,
   A.DELETE_FILE_SUCCESS,
   A.ADD_FILE,
-  A.ADD_AND_OPEN_FILE,
   A.LOCATE_FILE_SUCCESS,
 ] as const
 
@@ -203,7 +205,6 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
       switch (action.type) {
         case A.DELETE_FILE_SUCCESS:
         case A.ADD_FILE:
-        case A.ADD_AND_OPEN_FILE:
         case A.LOCATE_FILE_SUCCESS:
           return !isGeneratedFile(action.file)
       }

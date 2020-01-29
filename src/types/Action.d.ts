@@ -300,7 +300,6 @@ declare type GoToSubtitlesChunk = {
 }
 
 declare type FileAction =
-  | AddAndOpenFile
   | AddFile
   | DeleteFileRequest
   | DeleteFileSuccess
@@ -310,11 +309,6 @@ declare type FileAction =
   | LocateFileRequest
   | LocateFileSuccess
   | PreloadVideoStills
-declare type AddAndOpenFile = {
-  type: 'ADD_AND_OPEN_FILE'
-  file: FileMetadata
-  filePath: FilePath | null
-}
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -333,6 +327,8 @@ declare type DeleteFileSuccess = {
 declare type OpenFileRequest = {
   type: 'OPEN_FILE_REQUEST'
   file: FileMetadata
+  /** ignored if there is already a path on record */
+  filePath: FilePath | null
 }
 declare type OpenFileSuccess = {
   type: 'OPEN_FILE_SUCCESS'

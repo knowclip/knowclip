@@ -14,12 +14,6 @@ import videoStillImage from '../files/videoStillImageFile'
 import { FileEventHandlers } from '../files/eventHandlers'
 import { getHumanFileName } from '../utils/files'
 
-const addAndOpenFile: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, AddAndOpenFile>(A.ADD_AND_OPEN_FILE),
-    map<AddAndOpenFile, Action>(({ file }) => r.openFileRequest(file))
-  )
-
 const fileEventHandlers: Record<
   FileMetadata['type'],
   FileEventHandlers<any>
@@ -39,6 +33,8 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
     flatMap<OpenFileRequest, Observable<Action>>(action => {
       const { file } = action
       const fileAvailability = r.getFileAvailability(state$.value, file)
+
+      if (fileAvailability.isLoading) return empty()
 
       if (
         !fileAvailability.filePath ||
@@ -161,7 +157,6 @@ const deleteFileSuccess: AppEpic = (action$, state$, effects) =>
     mergeAll()
   )
 export default combineEpics(
-  addAndOpenFile,
   openFileRequest,
   openFileSuccess,
   openFileFailure,

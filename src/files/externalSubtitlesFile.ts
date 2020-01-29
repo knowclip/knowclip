@@ -31,15 +31,15 @@ export default {
           'VttConvertedSubtitlesFile',
           validatedFile.id
         )
-        if (vttFile) return [r.openFileRequest(vttFile)]
-
         return [
-          r.addAndOpenFile({
-            type: 'VttConvertedSubtitlesFile',
-            id: validatedFile.id,
-            parentId: validatedFile.id, // not needed?
-            parentType: 'ExternalSubtitlesFile',
-          }),
+          r.openFileRequest(
+            vttFile || {
+              type: 'VttConvertedSubtitlesFile',
+              id: validatedFile.id,
+              parentId: validatedFile.id, // not needed?
+              parentType: 'ExternalSubtitlesFile',
+            }
+          ),
         ]
       }
     },

@@ -4,7 +4,6 @@ import {
   map,
   catchError,
   mergeAll,
-  last,
   startWith,
   endWith,
   concat,

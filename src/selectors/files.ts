@@ -3,11 +3,12 @@ import { getCurrentMediaFile } from '.'
 export const getFileAvailability = (
   state: AppState,
   file: FileMetadata
-): StoredFile | NeverLoadedFile =>
+): KnownFile =>
   state.fileAvailabilities[file.type][file.id] || {
-    status: 'NOT_LOADED',
+    status: 'NEVER_LOADED',
     id: file.id,
     filePath: null,
+    isLoading: false,
   }
 
 export const getFile = <F extends FileMetadata>(

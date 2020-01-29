@@ -18,19 +18,19 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     const file = existing
       ? r.getFile(state, 'VttConvertedSubtitlesFile', existing.id)
       : null
-    return file
-      ? r.openFileRequest(file)
-      : r.addAndOpenFile({
-          type: 'VttConvertedSubtitlesFile',
-          parentId: id,
-          // TODO: investigate separating setting current media file
-          // and opening a media file?
-          // this complexity is maybe a sign that we need
-          // two different stages for the event of adding + selecting a media file
-          id: existing ? existing.id : uuid(),
-          streamIndex,
-          parentType: 'MediaFile',
-        })
+    return r.openFileRequest(
+      file || {
+        type: 'VttConvertedSubtitlesFile',
+        parentId: id,
+        // TODO: investigate separating setting current media file
+        // and opening a media file?
+        // this complexity is maybe a sign that we need
+        // two different stages for the event of adding + selecting a media file
+        id: existing ? existing.id : uuid(),
+        streamIndex,
+        parentType: 'MediaFile',
+      }
+    )
   })
 
 const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
@@ -57,13 +57,14 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   effects
 ) => {
   const waveform = r.getFile(state, 'WaveformPng', validatedFile.id)
-  if (waveform) return [r.openFileRequest(waveform)]
   return [
-    r.addAndOpenFile({
-      type: 'WaveformPng',
-      parentId: validatedFile.id,
-      id: validatedFile.id,
-    }),
+    r.openFileRequest(
+      waveform || {
+        type: 'WaveformPng',
+        parentId: validatedFile.id,
+        id: validatedFile.id,
+      }
+    ),
   ]
 }
 
@@ -73,19 +74,18 @@ const getCbr: OpenFileSuccessHandler<MediaFile> = async (
   effects
 ) => {
   if (validatedFile.format.toLowerCase().includes('mp3')) {
-    // TODO: investigate putting this logic (checking if file exists, then delegating to openFileRequest)
-    // into an epic for addAndOpenFile?
     const cbr = r.getFile(state, 'ConstantBitrateMp3', validatedFile.id)
-    return cbr
-      ? [r.openFileRequest(cbr)]
-      : [
-          r.addAndOpenFile({
-            type: 'ConstantBitrateMp3',
-            id: validatedFile.id,
-            parentId: validatedFile.id,
-          }),
-        ]
+    return [
+      r.openFileRequest(
+        cbr || {
+          type: 'ConstantBitrateMp3',
+          id: validatedFile.id,
+          parentId: validatedFile.id,
+        }
+      ),
+    ]
   }
+
   return []
 }
 

@@ -53,7 +53,7 @@ const ReviewAndExportMediaTable = memo(
 
     const fileRemembered = Boolean(
       availability.status === 'CURRENTLY_LOADED' ||
-        availability.status === 'REMEMBERED'
+        availability.status === 'PREVIOUSLY_LOADED'
     )
     const dispatch = useDispatch()
     const toggleOpen = useCallback(
