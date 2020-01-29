@@ -138,19 +138,22 @@ const Export = React.memo(
             {!selectionHasStarted && (
               <IntroText currentTabIndex={currentTabIndex} />
             )}
-            {selectionHasStarted &&
-              projectMedia.map((metadata, i) => (
-                <MediaTable
-                  key={metadata.id}
-                  open={i === expandedTableIndex}
-                  mediaIndex={i}
-                  onClick={onClickTable}
-                  media={metadata}
-                  selectedIds={selectedIds}
-                  onSelect={onSelect}
-                  onSelectAll={onSelectAll}
-                />
-              ))}
+            {selectionHasStarted && (
+              <div className={css.mediaTables}>
+                {projectMedia.map((metadata, i) => (
+                  <MediaTable
+                    key={metadata.id}
+                    open={i === expandedTableIndex}
+                    mediaIndex={i}
+                    onClick={onClickTable}
+                    media={metadata}
+                    selectedIds={selectedIds}
+                    onSelect={onSelect}
+                    onSelectAll={onSelectAll}
+                  />
+                ))}
+              </div>
+            )}
           </DialogContent>
         )}
 
