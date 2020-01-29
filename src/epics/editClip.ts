@@ -2,9 +2,7 @@ import { AppEpic } from '../types/AppEpic'
 import { ofType, combineEpics } from 'redux-observable'
 import {
   filter,
-  map,
   flatMap,
-  takeUntil,
   take,
   ignoreElements,
   endWith,
@@ -47,10 +45,10 @@ const remakeStill: AppEpic = (action$, state$) =>
     })
   )
 
-const setDefaultClipSpecs: AppEpic = (action$, state$) =>
+const setDefaultClipSpecs: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, EditClip>(A.EDIT_CLIP),
-    flatMap(({ override, id }) => {
+    flatMap(({ override }) => {
       const { flashcard } = override
       if (!flashcard) return empty()
 

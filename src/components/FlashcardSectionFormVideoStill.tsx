@@ -4,7 +4,7 @@ import { Tooltip, Card, CardMedia, CircularProgress } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
-import { getClipMidpoint } from '../utils/getVideoStill'
+import { getMidpoint } from '../utils/getVideoStill'
 
 let x = 0
 
@@ -41,10 +41,10 @@ const VideoStillDisplay = ({
       dispatch(
         clip.flashcard.image
           ? r.removeFlashcardImage(clip.id)
-          : r.addFlashcardImage(clip.id, getClipMidpoint(clip.start, clip.end))
+          : r.addFlashcardImage(clip.id)
       )
     },
-    [clip.flashcard.image, clip.id, dispatch, clip.start, clip.end]
+    [clip.flashcard.image, clip.id, dispatch]
   )
 
   return (

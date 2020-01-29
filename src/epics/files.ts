@@ -34,7 +34,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
       const { file } = action
       const fileAvailability = r.getFileAvailability(state$.value, file)
 
-      if (fileAvailability.isLoading) return empty()
+      if (!fileAvailability.isLoading) return empty()
 
       if (
         !fileAvailability.filePath ||

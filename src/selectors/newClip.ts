@@ -36,10 +36,6 @@ export const getNewClip = (
         ? {
             id,
             type: 'VideoStillImage',
-            seconds: getSecondsAtX(
-              state,
-              start + Math.round((end - start) / 2)
-            ),
           }
         : null
     ),

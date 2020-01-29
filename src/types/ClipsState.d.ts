@@ -53,7 +53,8 @@ declare type TransliterationFlashcardFields = Record<
 declare type FlashcardImage = {
   type: 'VideoStillImage'
   id: string
-  seconds: number
+  /** defaults to midpoint */
+  seconds?: number
 }
 
 declare type PendingClip = {

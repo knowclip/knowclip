@@ -5,7 +5,7 @@ import { unparse } from 'papaparse'
 import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability } from '../selectors'
 import { existsSync } from 'fs'
-import { getVideoStillPngPath } from './getVideoStill'
+import { getVideoStillPngPath, getMidpoint } from './getVideoStill'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
@@ -132,7 +132,9 @@ export const getApkgExportData = (
             getVideoStillPngPath(
               clip.flashcard.image.id,
               fileLoaded.filePath,
-              clip.flashcard.image.seconds
+              typeof clip.flashcard.image.seconds === 'number'
+                ? clip.flashcard.image.seconds
+                : getMidpoint(startTime * 1000, endTime * 1000)
             )
           )}" />`
         : ''

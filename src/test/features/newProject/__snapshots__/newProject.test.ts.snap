@@ -16,7 +16,6 @@ Object {
         "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
         "image": Object {
           "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
-          "seconds": 10.28,
           "type": "VideoStillImage",
         },
         "tags": Array [
@@ -59,7 +58,6 @@ Object {
         "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
         "image": Object {
           "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
-          "seconds": 78.18,
           "type": "VideoStillImage",
         },
         "tags": Array [

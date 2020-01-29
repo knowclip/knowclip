@@ -17,7 +17,7 @@ export const getVideoStill = async (
 
     await new Promise((res, rej) => {
       ffmpeg(videoFilePath)
-        .seekInput(seconds)
+        .seekInput(seconds.toFixed(3))
         .outputOptions('-vframes 1')
         .size(`?x${VIDEO_STILL_HEIGHT}`)
         .output(outputFilePath)
@@ -31,7 +31,11 @@ export const getVideoStill = async (
     })
 
     if (!existsSync(outputFilePath))
-      throw new Error('Still could not be created at ' + outputFilePath)
+      throw new Error(
+        `Problem creating still from ${basename(
+          videoFilePath
+        )} at ${seconds} seconds.`
+      )
 
     return outputFilePath
   } catch (err) {
@@ -49,5 +53,5 @@ export const getVideoStillPngPath = (
     `${filenamify(basename(videoFilePath))}_${~~(seconds * 1000)}_${id}.png`
   )
 
-export const getClipMidpoint = (start: number, end: number) =>
+export const getMidpoint = (start: number, end: number) =>
   start + Math.round((end - start) / 2)

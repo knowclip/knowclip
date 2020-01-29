@@ -36,12 +36,14 @@ export const editClip = (
   override,
 })
 
-export const addFlashcardImage = (id: ClipId, seconds: number): EditClip => {
-  const image: FlashcardImage = {
-    id,
-    type: 'VideoStillImage',
-    seconds,
-  }
+export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
+  const image: FlashcardImage = seconds
+    ? {
+        id,
+        type: 'VideoStillImage',
+        seconds,
+      }
+    : { id, type: 'VideoStillImage' }
   return {
     type: A.EDIT_CLIP,
     id,

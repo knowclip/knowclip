@@ -1,6 +1,6 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
-import { getClipMidpoint } from '../utils/getVideoStill'
+import { getMidpoint } from '../utils/getVideoStill'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -54,9 +54,10 @@ export default {
           ),
         ]
 
-      const seconds = clip.flashcard.image
-        ? clip.flashcard.image.seconds
-        : r.getSecondsAtX(state, getClipMidpoint(clip.start, clip.end))
+      const seconds =
+        clip.flashcard.image && typeof clip.flashcard.image.seconds === 'number'
+          ? clip.flashcard.image.seconds
+          : r.getSecondsAtX(state, getMidpoint(clip.start, clip.end))
 
       const pngPath = await effects.getVideoStill(
         file.id,

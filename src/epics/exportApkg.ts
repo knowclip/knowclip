@@ -27,7 +27,7 @@ import clipAudio from '../utils/clipAudio'
 import { AppEpic } from '../types/AppEpic'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
-import { getVideoStill } from '../utils/getVideoStill'
+import { getVideoStill, getMidpoint } from '../utils/getVideoStill'
 
 const { writeFile, readFile, unlink: deleteFile } = promises
 
@@ -87,46 +87,52 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
         template: createTemplate(exportData.template),
       })
       let count = 0
-      const processClipsObservables = exportData.clips.map(clipSpecs =>
-        defer(async () => {
-          const {
-            outputFilename,
-            sourceFilePath,
-            startTime,
-            endTime,
-            flashcardSpecs,
-          } = clipSpecs
-          const { fields, ...restSpecs } = flashcardSpecs
-          apkg.addCard(fields, restSpecs)
-          const clipOutputFilePath = join(directory, outputFilename)
-          await clipAudio(
-            sourceFilePath,
-            startTime,
-            endTime,
-            clipOutputFilePath
-          )
-          apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
-          if (clipSpecs.flashcardSpecs.image) {
-            const clipId = fields[0]
-
-            const imagePath = await getVideoStill(
-              clipId,
+      const processClipsObservables = exportData.clips.map(
+        (clipSpecs: ClipSpecs) =>
+          defer(async () => {
+            const {
+              outputFilename,
               sourceFilePath,
-              clipSpecs.flashcardSpecs.image.seconds
+              startTime,
+              endTime,
+              flashcardSpecs,
+            } = clipSpecs
+            const { fields, ...restSpecs } = flashcardSpecs
+            apkg.addCard(fields, restSpecs)
+            const clipOutputFilePath = join(directory, outputFilename)
+            await clipAudio(
+              sourceFilePath,
+              startTime,
+              endTime,
+              clipOutputFilePath
             )
-            if (imagePath instanceof Error) throw imagePath
-            await apkg.addMedia(basename(imagePath), await readFile(imagePath))
-          }
-          await deleteFile(clipOutputFilePath)
-          count += 1
+            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
+            if (clipSpecs.flashcardSpecs.image) {
+              const clipId = fields[0]
+              const { image } = clipSpecs.flashcardSpecs
+              const imagePath = await getVideoStill(
+                clipId,
+                sourceFilePath,
+                typeof image.seconds === 'number'
+                  ? image.seconds
+                  : Math.round(getMidpoint(startTime, endTime) / 1000)
+              )
+              if (imagePath instanceof Error) throw imagePath
+              await apkg.addMedia(
+                basename(imagePath),
+                await readFile(imagePath)
+              )
+            }
+            await deleteFile(clipOutputFilePath)
+            count += 1
 
-          return r.setProgress({
-            percentage: (count / exportData.clips.length) * 100,
-            message: `${count} clips out of ${
-              exportData.clips.length
-            } processed`,
+            return r.setProgress({
+              percentage: (count / exportData.clips.length) * 100,
+              message: `${count} clips out of ${
+                exportData.clips.length
+              } processed`,
+            })
           })
-        })
       )
       const result = of(
         r.setProgress({
