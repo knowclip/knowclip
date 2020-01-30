@@ -312,7 +312,6 @@ declare type FileAction =
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
-  filePath: FilePath | null
 }
 declare type DeleteFileRequest = {
   type: 'DELETE_FILE_REQUEST'
@@ -334,6 +333,7 @@ declare type OpenFileSuccess = {
   type: 'OPEN_FILE_SUCCESS'
   validatedFile: FileMetadata
   filePath: FilePath
+  timestamp: string
 }
 declare type OpenFileFailure = {
   type: 'OPEN_FILE_FAILURE'
@@ -341,8 +341,10 @@ declare type OpenFileFailure = {
   filePath: FilePath | null
   errorMessage: string
 }
+/** Should only be dispatched with a stored file */
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
+  /** This file should exist in the state already */
   file: FileMetadata
   message: string
 }

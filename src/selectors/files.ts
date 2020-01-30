@@ -9,6 +9,7 @@ export const getFileAvailability = (
     id: file.id,
     filePath: null,
     isLoading: false,
+    lastOpened: null,
   }
 
 export const getFile = <F extends FileMetadata>(
@@ -31,6 +32,7 @@ export const getFileWithAvailability = <F extends FileMetadata>(
         id,
         filePath: null,
         isLoading: false,
+        lastOpened: null,
       },
     }
 
@@ -46,7 +48,13 @@ export const getFileAvailabilityById = <F extends FileMetadata>(
   const record = getFile(state, type, id)
   return record
     ? getFileAvailability(state, record)
-    : { status: 'NOT_FOUND', id, filePath: null, isLoading: false }
+    : {
+        status: 'NOT_FOUND',
+        id,
+        filePath: null,
+        isLoading: false,
+        lastOpened: null,
+      }
 }
 
 export const getWaveformPath = (state: AppState): string | null => {

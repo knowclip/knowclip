@@ -68,3 +68,49 @@ declare type Project4_1_0 = {
   lastOpened: string
   subtitles: Array<ExternalSubtitlesFile>
 }
+
+declare type SlimProject<F extends FlashcardFields> = {
+  name: string
+  noteType: NoteType
+  media: ProjectMediaFile<F>[]
+
+  timestamp: string
+  id: ProjectId
+}
+
+declare type ProjectMediaFile<F extends FlashcardFields> =
+  | {
+      name: MediaFileName
+      subtitles?: Array<MediaSubtitlesRelation>
+      clips: ProjectClip<F>[]
+      flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
+
+      format: 'UNKNOWN' | string
+      durationSeconds: number
+      // subtitlesTracksStreamIndexes?: number[]
+      id: FileId
+    }
+  | {
+      name: MediaFileName
+      subtitles?: Array<MediaSubtitlesRelation>
+      flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
+      clips: ProjectClip<F>[]
+
+      format: 'UNKNOWN' | string
+      width: number
+      height: number
+      durationSeconds: number
+      // subtitlesTracksStreamIndexes?: number[]
+      id: FileId
+    }
+
+declare type ProjectClip<F extends FlashcardFields> = {
+  /** must be before start and after end of any previous clips */
+  start: WaveformX
+  end: WaveformX
+  image?: { type: 'VideoStill'; seconds?: number }
+  fields?: Partial<F>
+  tags?: Array<string>
+
+  id: ClipId
+}

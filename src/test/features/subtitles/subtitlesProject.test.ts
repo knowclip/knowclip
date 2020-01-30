@@ -64,7 +64,6 @@ const persistedState: Partial<AppState> = {
         id: '6153116d-faf3-4b70-864b-80475f2e3091',
         type: 'ProjectFile',
         lastSaved: '2020-01-28T12:48:03Z',
-        lastOpened: '2020-01-28T14:35:42Z',
         mediaFileIds: [
           '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
           '918d2b17-578f-4c5e-aafa-08d736e52af1',
@@ -72,6 +71,7 @@ const persistedState: Partial<AppState> = {
         error: null,
         name: 'Project with subtitles',
         noteType: 'Transliteration',
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     MediaFile: {
@@ -178,6 +178,7 @@ const persistedState: Partial<AppState> = {
         status: 'CURRENTLY_LOADED',
         id: '6153116d-faf3-4b70-864b-80475f2e3091',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     MediaFile: {
@@ -186,12 +187,14 @@ const persistedState: Partial<AppState> = {
         status: 'CURRENTLY_LOADED',
         filePath: join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4'),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
       '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
         status: 'CURRENTLY_LOADED',
         filePath: join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     ExternalSubtitlesFile: {
@@ -200,6 +203,7 @@ const persistedState: Partial<AppState> = {
         status: 'CURRENTLY_LOADED',
         filePath: join(ASSETS_DIRECTORY, 'pbc_jp.ass'),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     VttConvertedSubtitlesFile: {
@@ -212,6 +216,7 @@ const persistedState: Partial<AppState> = {
           '7fac115654a45c5c9edced977a9e3625.vtt'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
       '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
@@ -222,6 +227,7 @@ const persistedState: Partial<AppState> = {
           '2cd6bd926e58ea6ca4ef48ab9bddc92e.vtt'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     WaveformPng: {
@@ -234,6 +240,7 @@ const persistedState: Partial<AppState> = {
           '41507e61e7c3cc5269b28ef1808f457e.png'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
       '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
@@ -244,6 +251,7 @@ const persistedState: Partial<AppState> = {
           'd8dc1f60dd12bca9a24113c1915ece3c.png'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     ConstantBitrateMp3: {},
@@ -257,6 +265,7 @@ const persistedState: Partial<AppState> = {
           '076ed46d8d061d0b2ccd480e19307b60.png'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
       '33255f9b-ae49-495b-8380-e6e8a7bb5835': {
         id: '33255f9b-ae49-495b-8380-e6e8a7bb5835',
@@ -267,6 +276,7 @@ const persistedState: Partial<AppState> = {
           'db87aa3b164f54e7e29de678d4e33026.png'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
       '1e605009-4fc2-4ebc-9210-131244ed132c': {
         id: '1e605009-4fc2-4ebc-9210-131244ed132c',
@@ -277,6 +287,7 @@ const persistedState: Partial<AppState> = {
           '3457599527bf61e30e3cad25c240baab.png'
         ),
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
   },

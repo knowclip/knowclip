@@ -159,6 +159,7 @@ const persistedState: Partial<AppState> = {
         filePath: join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
         id: '6153116d-faf3-4b70-864b-80475f2e3091',
       },
     },
@@ -167,12 +168,16 @@ const persistedState: Partial<AppState> = {
         filePath: join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4'),
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
       '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         filePath: join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'),
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
       },
     },
@@ -181,6 +186,8 @@ const persistedState: Partial<AppState> = {
         filePath: join(ASSETS_DIRECTORY, 'pbc_jp.ass'),
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
       },
     },
@@ -188,6 +195,8 @@ const persistedState: Partial<AppState> = {
       '31dfe711-758e-4ba4-9dff-0fb73d1ab79a': {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
@@ -198,6 +207,8 @@ const persistedState: Partial<AppState> = {
       '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
@@ -210,6 +221,8 @@ const persistedState: Partial<AppState> = {
       '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
@@ -220,6 +233,8 @@ const persistedState: Partial<AppState> = {
       '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
@@ -233,6 +248,8 @@ const persistedState: Partial<AppState> = {
       'c3637ef9-ea4d-4049-b604-a768239f721c': {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: 'c3637ef9-ea4d-4049-b604-a768239f721c',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
@@ -243,6 +260,8 @@ const persistedState: Partial<AppState> = {
       '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d': {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
+        lastOpened: '2020-01-28T14:35:42Z',
+
         id: '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,

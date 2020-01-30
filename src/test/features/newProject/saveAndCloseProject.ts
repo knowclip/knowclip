@@ -5,8 +5,6 @@ import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 
 export default async function saveAndCloseProject({ client }: TestSetup) {
-  // add subtitles here
-
   await saveProjectViaButton(client)
 
   const actualProjectFileContents = JSON.parse(

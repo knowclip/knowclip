@@ -3,8 +3,9 @@ import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
 import { getSubtitlesSourceFile } from './subtitles'
 import getAllTagsFromClips from '../utils/getAllTags'
-import { getClips } from './clips'
+import { getClips, getClipIdsByMediaFileId, getClip } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
+import { getSecondsAtX } from './waveformTime'
 
 const newestToOldest = (
   { lastOpened: a }: ProjectFile,
@@ -57,4 +58,97 @@ export const getProject = (
       [] as ExternalSubtitlesFile[]
     ),
   }
+}
+
+export const getSlimProject = <F extends FlashcardFields>(
+  state: AppState,
+  file: ProjectFile,
+  fieldsTemplate: F
+): SlimProject<F> => {
+  const mediaFiles = getProjectMediaFiles(state, file.id)
+  return {
+    name: file.name,
+    noteType: file.noteType,
+    timestamp: nowUtcTimestamp(),
+    id: file.id,
+
+    media: mediaFiles.map(
+      (mediaFile): ProjectMediaFile<F> => {
+        const { name, format, durationSeconds, subtitles, id } = mediaFile
+
+        return {
+          name,
+          format,
+          durationSeconds,
+          id,
+          ...(subtitles.length ? { subtitles } : null),
+
+          clips: getProjectClips(state, mediaFile, fieldsTemplate),
+        }
+      }
+    ),
+  }
+}
+function getProjectClips<F extends FlashcardFields>(
+  state: AppState,
+  mediaFile: MediaFile,
+  fieldsTemplate: F
+) {
+  const clips = [] as ProjectClip<F>[]
+  for (const id of getClipIdsByMediaFileId(state, mediaFile.id)) {
+    const clip = getClip(state, id)
+    if (clip) {
+      const {
+        start,
+        end,
+        flashcard: { fields, tags, image },
+      } = clip
+
+      const newClip: ProjectClip<F> = {
+        id,
+        start: getSecondsAtX(state, start),
+        end: getSecondsAtX(state, end),
+      }
+
+      const newFields = {}
+      Object.keys(fieldsTemplate).reduce(
+        (all, fn) => {
+          const fieldName: keyof typeof fields = fn as any
+          if (fields[fieldName].trim()) all[fieldName] = fields[fieldName]
+
+          return all
+        },
+        newFields as F
+      )
+      if (Object.keys(newFields).length) newClip.fields = newFields
+
+      if (tags.length) newClip.tags = tags
+
+      if (image)
+        newClip.image = {
+          type: 'VideoStill',
+          ...(typeof image.seconds === 'number'
+            ? { seconds: image.seconds }
+            : null),
+        }
+
+      clips.push(newClip)
+    }
+  }
+
+  return clips
+}
+
+export const getYamlProject = <F extends FlashcardFields>(
+  state: AppState,
+  file: ProjectFile,
+  fieldsTemplate: F
+) => {
+  const { name, noteType, timestamp, id, media } = getSlimProject(
+    state,
+    file,
+    fieldsTemplate
+  )
+
+  return [{ name, noteType, timestamp, id }, ...media]
 }

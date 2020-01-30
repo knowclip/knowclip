@@ -54,6 +54,7 @@ export const getPersistedState = (): Partial<AppState> => {
             status: 'PREVIOUSLY_LOADED',
             filePath: fileAvailability.filePath,
             isLoading: false,
+            lastOpened: fileAvailability.lastOpened,
           }
         case 'PREVIOUSLY_LOADED':
           return {
@@ -61,6 +62,7 @@ export const getPersistedState = (): Partial<AppState> => {
             status: fileAvailability.status,
             filePath: fileAvailability.filePath,
             isLoading: false,
+            lastOpened: fileAvailability.lastOpened,
           }
         case 'NEVER_LOADED':
           return {
@@ -68,6 +70,7 @@ export const getPersistedState = (): Partial<AppState> => {
             status: fileAvailability.status,
             filePath: fileAvailability.filePath,
             isLoading: false,
+            lastOpened: fileAvailability.lastOpened,
           }
       }
     })

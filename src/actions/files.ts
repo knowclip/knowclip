@@ -1,10 +1,8 @@
-export const addFile = <F extends FileMetadata>(
-  file: F,
-  filePath?: FilePath // optional?
-): AddFile => ({
+import { nowUtcTimestamp } from '../utils/sideEffects'
+
+export const addFile = <F extends FileMetadata>(file: F): AddFile => ({
   type: A.ADD_FILE,
   file,
-  filePath: filePath || null,
 })
 
 export const deleteFileRequest = (
@@ -34,11 +32,13 @@ export const openFileRequest = (
 })
 export const openFileSuccess = (
   file: FileMetadata,
-  filePath: FilePath
+  filePath: FilePath,
+  timestamp: string = nowUtcTimestamp()
 ): OpenFileSuccess => ({
   type: 'OPEN_FILE_SUCCESS',
   validatedFile: file,
   filePath,
+  timestamp,
 })
 export const openFileFailure = (
   file: FileMetadata,

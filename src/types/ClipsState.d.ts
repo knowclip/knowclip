@@ -15,9 +15,16 @@ declare type ClipsState = {
   idsByMediaFileId: Record<MediaFileId, ClipId[]>
 }
 
-declare type FlashcardFields =
-  | SimpleFlashcardFields
-  | TransliterationFlashcardFields
+declare interface FlashcardFields {
+  transcription: string
+  meaning: string
+  notes: string
+}
+
+// declare interface SimpleFlashcardFields extends FlashcardFields {}
+// declare interface TransliterationFlashcardFields extends FlashcardFields {
+//   pronunciation: string
+// }
 
 declare type FlashcardFieldName =
   | SimpleFlashcardFieldName
@@ -50,6 +57,27 @@ declare type TransliterationFlashcardFields = Record<
   TransliterationFlashcardFieldName,
   string
 >
+
+// declare type SimpleFlashcardFields = {
+//   [FN in SimpleFlashcardFieldName]: string
+// }
+// declare type TransliterationFlashcardFields = {
+//   [FN in TransliterationFlashcardFieldName]: string
+// }
+
+declare type SimpleFlashcardFields = {
+  transcription: string
+  meaning: string
+  notes: string
+}
+
+declare type TransliterationFlashcardFields = {
+  transcription: string
+  meaning: string
+  notes: string
+  pronunciation: string
+}
+
 declare type FlashcardImage = {
   type: 'VideoStillImage'
   id: string

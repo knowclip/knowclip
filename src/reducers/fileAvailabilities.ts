@@ -47,6 +47,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: action.filePath,
+        lastOpened: action.timestamp,
       }
       return {
         ...state,
@@ -64,6 +65,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
         filePath: base ? base.filePath : null,
         status: 'FAILED_TO_LOAD',
         isLoading: false,
+        lastOpened: base ? base.lastOpened : null,
       }
       return {
         ...state,
@@ -75,19 +77,13 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
 
     case A.ADD_FILE: {
-      const newAvailability: KnownFile = action.filePath
-        ? {
-            filePath: action.filePath,
-            status: 'PREVIOUSLY_LOADED',
-            id: action.file.id,
-            isLoading: false,
-          }
-        : {
-            filePath: null,
-            status: 'NEVER_LOADED',
-            id: action.file.id,
-            isLoading: false,
-          }
+      const newAvailability: KnownFile = {
+        filePath: null,
+        status: 'NEVER_LOADED',
+        id: action.file.id,
+        isLoading: false,
+        lastOpened: null,
+      }
       return {
         ...state,
         [action.file.type]: {
@@ -98,13 +94,10 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
     case A.LOCATE_FILE_SUCCESS: {
       const base = state[action.file.type][action.file.id]
+      if (!base) return state // really shouldn't happen
+
       const newAvailability: KnownFile = {
-        status:
-          base && base.status === 'CURRENTLY_LOADED'
-            ? 'CURRENTLY_LOADED'
-            : 'PREVIOUSLY_LOADED',
-        id: action.file.id,
-        isLoading: false,
+        ...base,
         filePath: action.filePath,
       }
 

@@ -48,7 +48,8 @@
     "subtitle": "^2.0.3",
     "tempy": "^0.3.0",
     "uuid": "^3.3.2",
-    "xss": "^1.0.6"
+    "xss": "^1.0.6",
+    "yaml": "^1.7.2"
   },
   "main": "./main.js",
   "homepage": "./",
@@ -91,6 +92,7 @@
     "@types/reselect": "^2.2.0",
     "@types/subtitle": "^2.0.2",
     "@types/uuid": "^3.4.5",
+    "@types/yaml": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
     "electron": "7.1.9",

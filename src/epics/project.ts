@@ -15,6 +15,13 @@ import fs from 'fs'
 import parseProject from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
+import { getSlimProject, getYamlProject } from '../selectors'
+import {
+  blankSimpleFields,
+  blankTransliterationFields,
+} from '../utils/newFlashcard'
+import YAML from 'yaml'
+import './setYamlOptions'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
@@ -46,44 +53,44 @@ const createProject: AppEpic = (action$, state$, effects) =>
     )
   )
 
-const addAndOpenProject = async (
-  filePath: string,
-  state$: StateObservable<AppState>,
-  { nowUtcTimestamp }: EpicsDependencies
-): Promise<Observable<Action>> => {
-  try {
-    const projectJson = ((await readFile(filePath)) as unknown) as string
-    const project = parseProject(projectJson)
-    if (!project)
-      return of(
-        r.simpleMessageSnackbar(
-          'Could not read project file. Please make sure your software is up to date and try again.'
-        )
-      )
+// const addAndOpenProject = async (
+//   filePath: string,
+//   state$: StateObservable<AppState>,
+//   { nowUtcTimestamp }: EpicsDependencies
+// ): Promise<Observable<Action>> => {
+//   try {
+//     const projectJson = ((await readFile(filePath)) as unknown) as string
+//     const project = parseProject(projectJson)
+//     if (!project)
+//       return of(
+//         r.simpleMessageSnackbar(
+//           'Could not read project file. Please make sure your software is up to date and try again.'
+//         )
+//       )
 
-    const mediaFiles = project.mediaFiles.map(({ id }) => id)
-    const projectFile: ProjectFile = {
-      id: project.id,
-      type: 'ProjectFile',
-      lastSaved: project.timestamp,
-      lastOpened: project.lastOpened,
-      name: project.name,
-      mediaFileIds: mediaFiles,
-      error: null,
-      noteType: project.noteType,
-    }
-    return from([
-      r.addFile(projectFile, filePath),
-      r.openProject(projectFile, project.clips, nowUtcTimestamp()),
-      r.openFileSuccess(projectFile, filePath),
-    ])
-  } catch (err) {
-    console.error(err)
-    return of(
-      r.simpleMessageSnackbar(`Error opening project file: ${err.message}`)
-    )
-  }
-}
+//     const mediaFiles = project.mediaFiles.map(({ id }) => id)
+//     const projectFile: ProjectFile = {
+//       id: project.id,
+//       type: 'ProjectFile',
+//       lastSaved: project.timestamp,
+//       lastOpened: project.lastOpened,
+//       name: project.name,
+//       mediaFileIds: mediaFiles,
+//       error: null,
+//       noteType: project.noteType,
+//     }
+//     return from([
+//       r.addFile(projectFile),
+//       r.openProject(projectFile, project.clips, nowUtcTimestamp()),
+//       r.openFileSuccess(projectFile, filePath),
+//     ])
+//   } catch (err) {
+//     console.error(err)
+//     return of(
+//       r.simpleMessageSnackbar(`Error opening project file: ${err.message}`)
+//     )
+//   }
+// }
 
 const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -109,9 +116,31 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
           filePath
         )
         if (projectIdFromRecents)
-          return from([r.openProjectById(projectIdFromRecents)])
+          return of(r.openProjectById(projectIdFromRecents))
 
-        return await addAndOpenProject(filePath, state$, effects)
+        const projectJson = ((await readFile(filePath)) as unknown) as string
+        const project = parseProject(projectJson)
+        if (!project)
+          return of(
+            r.simpleMessageSnackbar(
+              'Could not read project file. Please make sure your software is up to date and try again.'
+            )
+          )
+
+        //  TODO: write projectToProjectFile
+        const mediaFiles = project.mediaFiles.map(({ id }) => id)
+        const projectFile: ProjectFile = {
+          id: project.id,
+          type: 'ProjectFile',
+          lastSaved: project.timestamp,
+          lastOpened: project.lastOpened,
+          name: project.name,
+          mediaFileIds: mediaFiles,
+          error: null,
+          noteType: project.noteType,
+        }
+
+        return of(r.openFileRequest(projectFile, filePath))
       }
     ),
     mergeAll()
@@ -139,6 +168,7 @@ const saveProject: AppEpic = (action$, state$) =>
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
         if (!projectMetadata) throw new Error('Could not find project metadata')
+
         const json = JSON.stringify(
           r.getProject(state$.value, projectMetadata),
           null,
@@ -150,6 +180,38 @@ const saveProject: AppEpic = (action$, state$) =>
           projectMetadata.id
         ) as CurrentlyLoadedFile
         await writeFile(projectFile.filePath, json, 'utf8')
+        await writeFile(
+          projectFile.filePath + '.json',
+          JSON.stringify(
+            getSlimProject(
+              state$.value,
+              projectMetadata,
+              projectMetadata.noteType === 'Simple'
+                ? blankSimpleFields
+                : blankTransliterationFields
+            ),
+            null,
+            2
+          )
+        )
+        const yamlProject = getYamlProject(
+          state$.value,
+          projectMetadata,
+          projectMetadata.noteType === 'Simple'
+            ? blankSimpleFields
+            : blankTransliterationFields
+        )
+
+        await writeFile(
+          projectFile.filePath + '.yml',
+          yamlProject.reduce((all, y, i) => {
+            if (i !== 0) all += '...\n'
+
+            all += YAML.stringify(y)
+
+            return all
+          }, '')
+        )
 
         return from([
           r.setWorkIsUnsaved(false),

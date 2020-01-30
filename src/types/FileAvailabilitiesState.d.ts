@@ -20,6 +20,7 @@ declare type PreviouslyLoadedFile = {
   status: 'PREVIOUSLY_LOADED'
   filePath: FilePath
   isLoading: boolean
+  lastOpened: string
 }
 
 declare type CurrentlyLoadedFile = {
@@ -30,6 +31,7 @@ declare type CurrentlyLoadedFile = {
   status: 'CURRENTLY_LOADED'
   filePath: FilePath
   isLoading: boolean
+  lastOpened: string
 }
 
 declare type ErroredFile = {
@@ -40,6 +42,7 @@ declare type ErroredFile = {
   status: 'FAILED_TO_LOAD'
   filePath: filePath | null
   isLoading: boolean
+  lastOpened: string | null
 }
 
 declare type NeverLoadedFile = {
@@ -49,8 +52,9 @@ declare type NeverLoadedFile = {
    * for the first time recently.
    */
   status: 'NEVER_LOADED'
-  filePath: null
+  filePath: string | null
   isLoading: boolean
+  lastOpened: null
 }
 /** Not stored in state tree. */
 
@@ -63,6 +67,7 @@ declare type NotFoundFile = {
   status: 'NOT_FOUND'
   filePath: null
   isLoading: false
+  lastOpened: null
 }
 
 declare type FileWithAvailability<F extends FileMetadata> =

@@ -7,6 +7,7 @@ export default function formatTime(seconds: number) {
   return `${minutes}:${String(secondsRemainder).padStart(2, '0')}`
 }
 
+/** must be less than 24 hours */
 export const formatDuration = (duration: moment.Duration) =>
   [
     duration.hours(),

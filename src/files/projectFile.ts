@@ -6,9 +6,42 @@ import { promises } from 'fs'
 const { readFile } = promises
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => [
-    r.openFileSuccess(file, filePath),
-  ],
+  openRequest: async ({ file }, filePath, state, effects) => {
+    try {
+      const projectJson = ((await readFile(filePath)) as unknown) as string
+      const project = parseProject(projectJson)
+      if (!project)
+        return [
+          r.openFileFailure(
+            file,
+            filePath,
+            'Could not read project file. Please make sure your software is up to date and try again.'
+          ),
+        ]
+
+      const mediaFiles = project.mediaFiles.map(({ id }) => id)
+      const projectFile: ProjectFile = {
+        id: project.id,
+        type: 'ProjectFile',
+        lastSaved: project.timestamp,
+        lastOpened: project.lastOpened,
+        name: project.name,
+        mediaFileIds: mediaFiles,
+        error: null,
+        noteType: project.noteType,
+      }
+      return [r.openFileSuccess(projectFile, filePath)]
+    } catch (err) {
+      console.error(err)
+      return [
+        r.openFileFailure(
+          file,
+          filePath,
+          `Error opening project file: ${err.message}`
+        ),
+      ]
+    }
+  },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
       const projectJson = await readFile(filePath, 'utf8')
