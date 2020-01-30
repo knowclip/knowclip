@@ -43,6 +43,14 @@ export const getVideoStill = async (
   }
 }
 
+const sanitizeFileName = (filename: string) =>
+  filenamify(
+    filename
+      .replace(/\s+/g, '')
+      .replace(/\..*$/, '')
+      .slice(0, 40)
+  )
+
 export const getVideoStillPngPath = (
   id: string,
   videoFilePath: string,
@@ -50,7 +58,9 @@ export const getVideoStillPngPath = (
 ) =>
   join(
     tempy.root,
-    `${filenamify(basename(videoFilePath))}_${~~(seconds * 1000)}_${id}.png`
+    `${sanitizeFileName(basename(videoFilePath))}_${seconds
+      .toFixed(3)
+      .replace('.', '-')}_${id}.png`
   )
 
 export const getMidpoint = (start: number, end: number) =>

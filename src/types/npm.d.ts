@@ -4,16 +4,13 @@ declare module 'subsrt' {
 }
 
 declare module 'anki-apkg-export-multi-field/dist/template' {
-  export default function createTemplate(ApkgExportTemplate)
+  export default function createTemplate(template: ApkgExportTemplate)
 }
 declare module 'anki-apkg-export-multi-field/dist/exporter' {
   export default class Exporter {
     constructor(deckName: string, options: Object)
     addMedia(fileName: string, buffer: Buffer)
-    addCard(
-      fields: string[],
-      restSpecs: { tags: string[]; due: number; sortField: string }
-    )
+    addCard(fields: string[], restSpecs: { tags: string[]; due: number })
     save(options: {
       type: string
       base64: boolean

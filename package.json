@@ -20,7 +20,7 @@
     "@types/react-autosuggest": "^9.3.13",
     "@types/react-router-dom": "^5.1.3",
     "@types/webdriverio": "^4.13.0",
-    "anki-apkg-export-multi-field": "^0.1.0",
+    "anki-apkg-export-multi-field": "^0.1.1",
     "asar": "0.14.3",
     "dataurl": "^0.1.0",
     "electron-devtools-installer": "^2.2.4",

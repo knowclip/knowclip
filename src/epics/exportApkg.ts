@@ -108,14 +108,14 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
             )
             apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
             if (clipSpecs.flashcardSpecs.image) {
-              const clipId = fields[0]
+              const clipId = fields[fields.length - 1]
               const { image } = clipSpecs.flashcardSpecs
               const imagePath = await getVideoStill(
                 clipId,
                 sourceFilePath,
                 typeof image.seconds === 'number'
                   ? image.seconds
-                  : Math.round(getMidpoint(startTime, endTime) / 1000)
+                  : +(getMidpoint(startTime, endTime) / 1000).toFixed(3)
               )
               if (imagePath instanceof Error) throw imagePath
               await apkg.addMedia(

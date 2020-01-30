@@ -81,7 +81,6 @@ declare type FlashcardSpecs = {
   fields: Array<string>
   tags: Array<string>
   due: number
-  sortField: string
   image: FlashcardImage | null
 }
 
@@ -98,6 +97,7 @@ declare type ApkgExportTemplate = {
     answerFormat: string
   }>
   css: string
+  sortField: number
 }
 
 declare type ClipPre3_0_0 = {
