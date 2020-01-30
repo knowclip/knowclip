@@ -1,119 +1,66 @@
 {
   "version": "4.1.0",
-  "timestamp": "2020-01-22T13:43:37Z",
+  "timestamp": "2020-01-28T12:48:03Z",
   "name": "My friend's shared project",
-  "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+  "id": "6153116d-faf3-4b70-864b-80475f2e3091",
   "noteType": "Transliteration",
-  "lastOpened": "2020-01-22T13:41:35Z",
+  "lastOpened": "2020-01-28T12:47:52Z",
   "mediaFiles": [
     {
-      "id": "fa462524-bfeb-4434-a506-07858cc97151",
+      "id": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "type": "MediaFile",
-      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
-      "subtitles": [],
-      "flashcardFieldsToSubtitlesTracks": {},
-      "name": "piggeldy_cat.mp4",
-      "durationSeconds": 58.24,
-      "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "isVideo": true,
-      "subtitlesTracksStreamIndexes": []
-    },
-    {
-      "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
-      "type": "MediaFile",
-      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
       "subtitles": [
         {
           "type": "EmbeddedSubtitlesTrack",
-          "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
+          "id": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
           "streamIndex": 2
         },
         {
           "type": "ExternalSubtitlesTrack",
-          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439"
+          "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271"
         }
       ],
       "flashcardFieldsToSubtitlesTracks": {
-        "transcription": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439"
+        "transcription": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271"
       },
+      "isVideo": true,
       "name": "polar_bear_cafe.mp4",
       "durationSeconds": 87.062,
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "isVideo": true,
       "subtitlesTracksStreamIndexes": [
         2
-      ]
+      ],
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "id": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "type": "MediaFile",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
+      "subtitles": [],
+      "flashcardFieldsToSubtitlesTracks": {},
+      "isVideo": true,
+      "name": "piggeldy_cat.mp4",
+      "durationSeconds": 58.24,
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "subtitlesTracksStreamIndexes": [],
+      "width": 480,
+      "height": 360
     }
   ],
   "tags": [
     "pbc",
-    "polar_bear_cafe.mp4"
+    "piggeldy_cat.mp4"
   ],
   "clips": [
-     {
-      "start": 603,
-      "end": 888,
-      "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
-      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
-      "flashcard": {
-        "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
-        "type": "Transliteration",
-        "fields": {
-          "transcription": "Du hast eben gesagt, murrte Piggeldy, eine Katze sieht aus wie ein Schwein, stimmt's?",
-          "meaning": "",
-          "notes": "",
-          "pronunciation": ""
-        },
-        "tags": [
-          "piggeldy_cat.mp4"
-        ]
-      }
-    },
-    {
-      "start": 1074,
-      "end": 1545,
-      "id": "298d069b-1b30-420c-b3b4-2728569a6718",
-      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
-      "flashcard": {
-        "id": "298d069b-1b30-420c-b3b4-2728569a6718",
-        "type": "Transliteration",
-        "fields": {
-          "transcription": "Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«",
-          "meaning": "",
-          "notes": "",
-          "pronunciation": ""
-        },
-        "tags": [
-          "piggeldy_cat.mp4"
-        ]
-      }
-    },
-    {
-      "start": 1571,
-      "end": 2048,
-      "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
-      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
-      "flashcard": {
-        "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
-        "type": "Transliteration",
-        "fields": {
-          "transcription": "Schön! seufzte Piggeldy verzückt.\n\nSchön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse frisst.",
-          "meaning": "",
-          "notes": "",
-          "pronunciation": ""
-        },
-        "tags": [
-          "piggeldy_cat.mp4"
-        ]
-      }
-    },
     {
       "start": 402,
       "end": 625,
-      "id": "ae3239c8-90bd-4488-95e3-bde059632348",
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": {
-        "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+        "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
         "type": "Transliteration",
         "fields": {
           "transcription": "笹を食べながらのんびりするのは最高だなぁ",
@@ -123,16 +70,20 @@
         },
         "tags": [
           "pbc"
-        ]
+        ],
+        "image": {
+          "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+          "type": "VideoStillImage"
+        }
       }
     },
     {
+      "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "start": 756,
       "end": 888,
-      "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
       "flashcard": {
-        "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+        "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
         "type": "Transliteration",
         "fields": {
           "transcription": "またこの子は昼間からゴロゴロして",
@@ -148,10 +99,10 @@
     {
       "start": 3760,
       "end": 4058,
-      "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": {
-        "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+        "id": "c33016bd-563b-4a36-851a-802643b6cccb",
         "type": "Transliteration",
         "fields": {
           "transcription": "",
@@ -161,15 +112,65 @@
         },
         "tags": [
           "pbc"
-        ]
+        ],
+        "image": {
+          "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+          "type": "VideoStillImage"
+        }
+      }
+    },
+    {
+      "start": 351,
+      "end": 438,
+      "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "flashcard": {
+        "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Ich bin keine Katze, sagte Frederick böse",
+          "meaning": "I am not a cat, said Frederick angrily",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ],
+        "image": {
+          "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+          "type": "VideoStillImage"
+        }
+      }
+    },
+    {
+      "start": 921,
+      "end": 1000,
+      "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "flashcard": {
+        "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+        "type": "Transliteration",
+        "fields": {
+          "transcription": "Das hab' ich nicht gesagt",
+          "meaning": "I didn't say that",
+          "notes": "",
+          "pronunciation": ""
+        },
+        "tags": [
+          "piggeldy_cat.mp4"
+        ],
+        "image": {
+          "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+          "type": "VideoStillImage"
+        }
       }
     }
   ],
   "subtitles": [
     {
       "type": "ExternalSubtitlesFile",
-      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
-      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "parentId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
       "name": "pbc_jp.ass"
     }
   ]

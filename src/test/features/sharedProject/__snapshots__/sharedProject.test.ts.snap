@@ -4,67 +4,8 @@ exports[`opening a shared project save and close project 1`] = `
 Object {
   "clips": Array [
     Object {
-      "end": 888,
-      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
-      "flashcard": Object {
-        "fields": Object {
-          "meaning": "",
-          "notes": "",
-          "pronunciation": "",
-          "transcription": "Du hast eben gesagt, murrte Piggeldy, eine Katze sieht aus wie ein Schwein, stimmt's?",
-        },
-        "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
-        "tags": Array [
-          "piggeldy_cat.mp4",
-        ],
-        "type": "Transliteration",
-      },
-      "id": "2f957585-b782-45fa-b0e7-ad6b0486d9ca",
-      "start": 603,
-    },
-    Object {
-      "end": 1545,
-      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
-      "flashcard": Object {
-        "fields": Object {
-          "meaning": "",
-          "notes": "",
-          "pronunciation": "",
-          "transcription": "Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«",
-        },
-        "id": "298d069b-1b30-420c-b3b4-2728569a6718",
-        "tags": Array [
-          "piggeldy_cat.mp4",
-        ],
-        "type": "Transliteration",
-      },
-      "id": "298d069b-1b30-420c-b3b4-2728569a6718",
-      "start": 1074,
-    },
-    Object {
-      "end": 2048,
-      "fileId": "fa462524-bfeb-4434-a506-07858cc97151",
-      "flashcard": Object {
-        "fields": Object {
-          "meaning": "",
-          "notes": "",
-          "pronunciation": "",
-          "transcription": "Schön! seufzte Piggeldy verzückt.
-
-Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse frisst.",
-        },
-        "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
-        "tags": Array [
-          "piggeldy_cat.mp4",
-        ],
-        "type": "Transliteration",
-      },
-      "id": "505afa2a-928d-4ce1-a741-8827c4e9a864",
-      "start": 1571,
-    },
-    Object {
       "end": 625,
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Relaxing while eating bamboo grass is the best",
@@ -72,18 +13,22 @@ Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse fri
           "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
           "transcription": "笹を食べながらのんびりするのは最高だなぁ",
         },
-        "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+        "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+        "image": Object {
+          "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+          "type": "VideoStillImage",
+        },
         "tags": Array [
           "pbc",
         ],
         "type": "Transliteration",
       },
-      "id": "ae3239c8-90bd-4488-95e3-bde059632348",
+      "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
       "start": 402,
     },
     Object {
       "end": 888,
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "This kid, lazing about again so early",
@@ -91,18 +36,18 @@ Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse fri
           "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
           "transcription": "またこの子は昼間からゴロゴロして",
         },
-        "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+        "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
         "tags": Array [
           "pbc",
         ],
         "type": "Transliteration",
       },
-      "id": "7c348315-8f78-42fd-9be7-b05bc0aade9d",
+      "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
       "start": 756,
     },
     Object {
       "end": 2774,
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Don't try to suck me up!",
@@ -111,6 +56,10 @@ Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse fri
           "transcription": "ああー  吸わないで",
         },
         "id": "b9ba2184-cb5c-4d50-98c2-568bf8e75854",
+        "image": Object {
+          "id": "b9ba2184-cb5c-4d50-98c2-568bf8e75854",
+          "type": "VideoStillImage",
+        },
         "tags": Array [
           "pbc",
         ],
@@ -121,7 +70,7 @@ Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse fri
     },
     Object {
       "end": 4058,
-      "fileId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "flashcard": Object {
         "fields": Object {
           "meaning": "",
@@ -129,50 +78,89 @@ Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse fri
           "pronunciation": "",
           "transcription": "",
         },
-        "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+        "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+        "image": Object {
+          "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+          "type": "VideoStillImage",
+        },
         "tags": Array [
           "pbc",
         ],
         "type": "Transliteration",
       },
-      "id": "e62c823d-93c2-4a5e-8181-37e3d540c3e3",
+      "id": "c33016bd-563b-4a36-851a-802643b6cccb",
       "start": 3760,
     },
+    Object {
+      "end": 438,
+      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I am not a cat, said Frederick angrily",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Ich bin keine Katze, sagte Frederick böse",
+        },
+        "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+        "image": Object {
+          "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+          "type": "VideoStillImage",
+        },
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+      "start": 351,
+    },
+    Object {
+      "end": 1000,
+      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "flashcard": Object {
+        "fields": Object {
+          "meaning": "I didn't say that",
+          "notes": "",
+          "pronunciation": "",
+          "transcription": "Das hab' ich nicht gesagt",
+        },
+        "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+        "image": Object {
+          "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+          "type": "VideoStillImage",
+        },
+        "tags": Array [
+          "piggeldy_cat.mp4",
+        ],
+        "type": "Transliteration",
+      },
+      "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+      "start": 921,
+    },
   ],
-  "id": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+  "id": "6153116d-faf3-4b70-864b-80475f2e3091",
   "lastOpened": "2020-01-24T15:09:03Z",
   "mediaFiles": Array [
     Object {
-      "durationSeconds": 58.24,
-      "flashcardFieldsToSubtitlesTracks": Object {},
-      "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "id": "fa462524-bfeb-4434-a506-07858cc97151",
-      "isVideo": true,
-      "name": "piggeldy_cat.mp4",
-      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
-      "subtitles": Array [],
-      "subtitlesTracksStreamIndexes": Array [],
-      "type": "MediaFile",
-    },
-    Object {
       "durationSeconds": 87.062,
       "flashcardFieldsToSubtitlesTracks": Object {
-        "meaning": "37bd5e91-89c5-491b-9308-533c7be7338a",
-        "transcription": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+        "meaning": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
+        "transcription": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
       },
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "id": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "height": 1080,
+      "id": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "isVideo": true,
       "name": "polar_bear_cafe.mp4",
-      "parentId": "e36ca6de-4893-49f5-bca1-4410ace25d46",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
       "subtitles": Array [
         Object {
-          "id": "37bd5e91-89c5-491b-9308-533c7be7338a",
+          "id": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
           "streamIndex": 2,
           "type": "EmbeddedSubtitlesTrack",
         },
         Object {
-          "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+          "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
           "type": "ExternalSubtitlesTrack",
         },
       ],
@@ -180,21 +168,36 @@ Schön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse fri
         2,
       ],
       "type": "MediaFile",
+      "width": 1920,
+    },
+    Object {
+      "durationSeconds": 58.24,
+      "flashcardFieldsToSubtitlesTracks": Object {},
+      "format": "mov,mp4,m4a,3gp,3g2,mj2",
+      "height": 360,
+      "id": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "isVideo": true,
+      "name": "piggeldy_cat.mp4",
+      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
+      "subtitles": Array [],
+      "subtitlesTracksStreamIndexes": Array [],
+      "type": "MediaFile",
+      "width": 480,
     },
   ],
   "name": "My friend's shared project",
   "noteType": "Transliteration",
   "subtitles": Array [
     Object {
-      "id": "2f7a98c0-1bf8-44cf-9b0b-4af64fb86439",
+      "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
       "name": "pbc_jp.ass",
-      "parentId": "535935a3-7d72-4238-87ab-1b7a413c1f71",
+      "parentId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
       "type": "ExternalSubtitlesFile",
     },
   ],
   "tags": Array [
-    "piggeldy_cat.mp4",
     "pbc",
+    "piggeldy_cat.mp4",
   ],
   "timestamp": "2020-01-24T15:09:18Z",
   "version": "4.1.0",

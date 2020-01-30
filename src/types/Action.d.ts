@@ -43,7 +43,7 @@ declare type ClipAction =
   | SetFlashcardField
   | AddFlashcardTag
   | DeleteFlashcardTag
-  | SetDefaultTags
+  | SetDefaultClipSpecs
   | AddClip
   | AddClips
   | EditClip
@@ -71,7 +71,11 @@ declare type DeleteFlashcardTag = {
   index: number
   tag: string
 }
-declare type SetDefaultTags = { type: 'SET_DEFAULT_TAGS'; tags: Array<string> }
+declare type SetDefaultClipSpecs = {
+  type: 'SET_DEFAULT_CLIP_SPECS'
+  tags?: Array<string>
+  includeStill?: boolean
+}
 declare type AddClip = { type: 'ADD_CLIP'; clip: Clip }
 declare type AddClips = {
   type: 'ADD_CLIPS'
@@ -81,7 +85,7 @@ declare type AddClips = {
 declare type EditClip = {
   type: 'EDIT_CLIP'
   id: ClipId
-  override: Partial<Clip>
+  override: import('redux').DeepPartial<Clip>
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
@@ -278,6 +282,7 @@ declare type MakeClipsFromSubtitles = {
     transcription: string
   }
   tags: Array<string>
+  includeStill: boolean
 }
 declare type ShowSubtitlesClipsDialogRequest = {
   type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'
@@ -295,7 +300,6 @@ declare type GoToSubtitlesChunk = {
 }
 
 declare type FileAction =
-  | AddAndOpenFile
   | AddFile
   | DeleteFileRequest
   | DeleteFileSuccess
@@ -304,11 +308,7 @@ declare type FileAction =
   | OpenFileFailure
   | LocateFileRequest
   | LocateFileSuccess
-declare type AddAndOpenFile = {
-  type: 'ADD_AND_OPEN_FILE'
-  file: FileMetadata
-  filePath: FilePath | null
-}
+  | PreloadVideoStills
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -327,6 +327,8 @@ declare type DeleteFileSuccess = {
 declare type OpenFileRequest = {
   type: 'OPEN_FILE_REQUEST'
   file: FileMetadata
+  /** ignored if there is already a path on record */
+  filePath: FilePath | null
 }
 declare type OpenFileSuccess = {
   type: 'OPEN_FILE_SUCCESS'
@@ -348,6 +350,11 @@ declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
   file: FileMetadata
   filePath: FilePath
+}
+declare type PreloadVideoStills = {
+  type: 'PRELOAD_VIDEO_STILLS'
+  file: FileMetadata
+  clipId: ClipId
 }
 
 interface WithRecordType<F extends FileMetadata> {

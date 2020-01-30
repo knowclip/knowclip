@@ -1,12 +1,3 @@
-export const addAndOpenFile = <F extends FileMetadata>(
-  file: F,
-  filePath?: FilePath
-): AddAndOpenFile => ({
-  type: A.ADD_AND_OPEN_FILE,
-  file,
-  filePath: filePath || null,
-})
-
 export const addFile = <F extends FileMetadata>(
   file: F,
   filePath?: FilePath // optional?
@@ -32,9 +23,14 @@ export const deleteFileSuccess = (
   file,
   descendants,
 })
-export const openFileRequest = (file: FileMetadata): OpenFileRequest => ({
+/** Try to open a file, and add it to the state tree if it isn't there yet. */
+export const openFileRequest = (
+  file: FileMetadata,
+  filePath: FilePath | null = null
+): OpenFileRequest => ({
   type: 'OPEN_FILE_REQUEST',
   file,
+  filePath, // necessary?
 })
 export const openFileSuccess = (
   file: FileMetadata,
@@ -69,4 +65,13 @@ export const locateFileSuccess = (
   type: 'LOCATE_FILE_SUCCESS',
   file,
   filePath,
+})
+
+export const preloadVideoStills = (
+  file: FileMetadata,
+  clipId: ClipId
+): PreloadVideoStills => ({
+  type: A.PRELOAD_VIDEO_STILLS,
+  clipId,
+  file,
 })

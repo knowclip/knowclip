@@ -21,7 +21,9 @@ export const getProjectIdByFilePath = (
   filePath: string
 ): ProjectId | null =>
   Object.keys(state.fileAvailabilities.ProjectFile).find(
-    id => state.fileAvailabilities.ProjectFile[id].filePath === filePath
+    id =>
+      (state.fileAvailabilities.ProjectFile[id] as KnownFile).filePath ===
+      filePath
   ) || null
 
 export const getProject = (

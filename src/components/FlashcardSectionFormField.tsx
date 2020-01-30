@@ -1,8 +1,9 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo, memo } from 'react'
 import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFormFieldPopoverMenu'
+import { flashcardSectionForm$ } from './FlashcardSectionForm'
 
 type Props = {
   name: FlashcardFieldName
@@ -13,67 +14,84 @@ type Props = {
   subtitles: MediaFile['subtitles']
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
-  onKeyDown: () => void
+  onKeyPress: () => void
   autoFocus: boolean
 }
-const FlashcardSectionFormField = ({
-  name,
-  mediaFileId,
-  currentFlashcard,
-  label,
-  setFlashcardText,
-  subtitles,
-  linkedSubtitlesTrack,
-  inputProps,
-  onKeyDown,
-  autoFocus,
-}: Props) => {
-  const handleChange = useCallback(
-    e => setFlashcardText(name, e.target.value),
-    [setFlashcardText, name]
-  )
-  const embeddedSubtitlesTracks = subtitles.filter(isEmbedded)
-  const externalSubtitlesTracks = subtitles.filter(isExternal)
+const FlashcardSectionFormField = memo(
+  ({
+    name,
+    mediaFileId,
+    currentFlashcard,
+    label: fieldLabel,
+    setFlashcardText,
+    subtitles,
+    linkedSubtitlesTrack,
+    inputProps,
+    onKeyPress,
+    autoFocus,
+  }: Props) => {
+    const handleChange = useCallback(
+      e => setFlashcardText(name, e.target.value),
+      [setFlashcardText, name]
+    )
+    const embeddedSubtitlesTracks = useMemo(
+      () => subtitles.filter(isEmbedded),
+      [subtitles]
+    )
+    const externalSubtitlesTracks = useMemo(
+      () => subtitles.filter(isExternal),
+      [subtitles]
+    )
+    const label = useMemo(
+      () =>
+        fieldLabel +
+        getLinkedTrackLabel(
+          embeddedSubtitlesTracks,
+          externalSubtitlesTracks,
+          linkedSubtitlesTrack
+        ),
+      [
+        fieldLabel,
+        embeddedSubtitlesTracks,
+        externalSubtitlesTracks,
+        linkedSubtitlesTrack,
+      ]
+    )
 
-  return (
-    <section className={css.field}>
-      {Boolean(subtitles.length) && (
-        <FieldMenu
-          embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-          externalSubtitlesTracks={externalSubtitlesTracks}
-          linkedSubtitlesTrack={linkedSubtitlesTrack}
-          mediaFileId={mediaFileId}
-          fieldName={name as TransliterationFlashcardFieldName}
+    return (
+      <section className={css.field}>
+        {Boolean(subtitles.length) && (
+          <FieldMenu
+            embeddedSubtitlesTracks={embeddedSubtitlesTracks}
+            externalSubtitlesTracks={externalSubtitlesTracks}
+            linkedSubtitlesTrack={linkedSubtitlesTrack}
+            mediaFileId={mediaFileId}
+            fieldName={name as TransliterationFlashcardFieldName}
+          />
+        )}
+        <TextField
+          autoFocus={autoFocus}
+          className={flashcardSectionForm$.flashcardFields}
+          inputProps={inputProps}
+          onChange={handleChange}
+          onKeyPress={onKeyPress}
+          value={
+            name in currentFlashcard.fields
+              ? (currentFlashcard.fields as Record<
+                  TransliterationFlashcardFieldName,
+                  string
+                >)[name]
+              : ''
+          }
+          fullWidth
+          multiline
+          margin="dense"
+          label={label}
         />
-      )}
-      <TextField
-        autoFocus={autoFocus}
-        inputProps={inputProps}
-        onChange={handleChange}
-        onKeyDown={onKeyDown}
-        value={
-          name in currentFlashcard.fields
-            ? (currentFlashcard.fields as Record<
-                TransliterationFlashcardFieldName,
-                string
-              >)[name]
-            : ''
-        }
-        fullWidth
-        multiline
-        margin="dense"
-        label={
-          label +
-          getLinkedTrackLabel(
-            embeddedSubtitlesTracks,
-            externalSubtitlesTracks,
-            linkedSubtitlesTrack
-          )
-        }
-      />
-    </section>
-  )
-}
+      </section>
+    )
+  }
+)
 
 const isEmbedded = (
   t:

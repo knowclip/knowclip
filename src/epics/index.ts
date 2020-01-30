@@ -5,6 +5,7 @@ import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
 import stretchClip from './stretchClip'
+import editClip from './editClip'
 import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
@@ -19,6 +20,7 @@ import subtitles from './subtitles'
 import files from './files'
 import defaultTags from './defaultTags'
 import loopMedia from './loopMedia'
+import preloadVideoStills from './preloadVideoStills'
 import { showMessageBox } from '../utils/electron'
 import { AppEpic } from '../types/AppEpic'
 
@@ -52,6 +54,7 @@ const rootEpic: AppEpic = combineEpics(
   setWaveformCursorEpic,
   loopMedia,
   addClip,
+  editClip,
   stretchClip,
   detectSilenceEpic,
   persistStateEpic,
@@ -65,7 +68,8 @@ const rootEpic: AppEpic = combineEpics(
   highlightClip,
   closeEpic,
   subtitles,
-  files
+  files,
+  preloadVideoStills
 )
 
 export default rootEpic

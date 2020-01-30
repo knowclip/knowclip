@@ -10,8 +10,8 @@ export const getExtensions = (file: FileMetadata) => {
       return ['afca']
     case 'VttConvertedSubtitlesFile':
       return ['vtt']
-    // case 'VideoStillImage':
-    //   return ['png'] // ??
+    case 'VideoStillImage':
+      return ['png']
     case 'WaveformPng':
       return ['png']
   }
@@ -28,6 +28,7 @@ const getHumanFileTypeName = (file: FileMetadata) => {
     case 'ConstantBitrateMp3':
     case 'WaveformPng':
     case 'VttConvertedSubtitlesFile':
+    case 'VideoStillImage':
       return 'generated file' // should not be displayed to user
   }
 }

@@ -1,5 +1,10 @@
 import { basename, extname } from 'path'
-import { getFile, getFileAvailabilityById } from './files'
+import {
+  getFile,
+  getFileAvailabilityById,
+  getFileAvailability,
+  getFileWithAvailability,
+} from './files'
 import {
   getFlashcard,
   getClipsObject,
@@ -19,7 +24,6 @@ export const getConstantBitrateFilePath = (
 ): MediaFilePath | null => {
   const fileAvailability = getFileAvailabilityById(state, 'MediaFile', id)
   if (
-    fileAvailability &&
     fileAvailability.filePath &&
     extname(fileAvailability.filePath).toLowerCase() !== '.mp3'
   )
@@ -66,6 +70,20 @@ export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
   return currentMediaFileId
     ? getFile(state, 'MediaFile', currentMediaFileId)
     : null
+}
+
+export const isAudioLoading = (state: AppState): boolean => {
+  const currentFile = getCurrentMediaFile(state)
+  if (!currentFile) return false
+  const availability = getFileAvailability(state, currentFile)
+  if (availability.isLoading) return true
+
+  const cbr = getFileWithAvailability(
+    state,
+    'ConstantBitrateMp3',
+    currentFile.id
+  )
+  return Boolean(cbr.file && cbr.availability.isLoading)
 }
 
 export const isWorkUnsaved = (state: AppState): boolean =>

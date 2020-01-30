@@ -17,7 +17,8 @@ const isTransliterationCard = (
 const newFlashcard = (
   id: string,
   fields: Flashcard['fields'],
-  tags: string[] | undefined
+  tags: string[],
+  image: Flashcard['image']
 ): Flashcard => ({
   id,
   type: isTransliterationCard(fields) ? 'Transliteration' : 'Simple',
@@ -31,7 +32,8 @@ const newFlashcard = (
           ...blankTransliterationFields,
           ...fields,
         },
-  tags: tags || [],
+  tags,
+  image,
 })
 
 export default newFlashcard

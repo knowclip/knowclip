@@ -5,7 +5,7 @@ declare type FilesState = {
   ExternalSubtitlesFile: Record<FileId, ExternalSubtitlesFile>
   WaveformPng: Record<FileId, WaveformPng>
   ConstantBitrateMp3: Record<FileId, ConstantBitrateMp3>
-  // VideoStillImage: Record<FileId, VideoStillImageRecord>
+  VideoStillImage: Record<FileId, VideoStillImageFile>
 }
 
 declare type FileId = string
@@ -25,7 +25,7 @@ declare type FileMetadata =
   | VttConvertedSubtitlesFile
   | WaveformPng
   | ConstantBitrateMp3
-// | VideoStillImageRecord
+  | VideoStillImageFile
 
 declare type ProjectFile = {
   type: 'ProjectFile'
@@ -37,7 +37,9 @@ declare type ProjectFile = {
   lastOpened: string
   lastSaved: string
 }
-declare type MediaFile = {
+declare type MediaFile = VideoFile | AudioFile
+
+declare type AudioFile = {
   type: 'MediaFile'
   id: FileId
   parentId: ProjectId
@@ -48,7 +50,23 @@ declare type MediaFile = {
   name: MediaFileName
   durationSeconds: number
   format: 'UNKNOWN' | string
-  isVideo: boolean
+  isVideo: false
+  subtitlesTracksStreamIndexes: number[]
+}
+declare type VideoFile = {
+  type: 'MediaFile'
+  id: FileId
+  parentId: ProjectId
+
+  subtitles: Array<MediaSubtitlesRelation>
+  flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
+
+  name: MediaFileName
+  durationSeconds: number
+  format: 'UNKNOWN' | string
+  isVideo: true
+  width: number
+  height: number
   subtitlesTracksStreamIndexes: number[]
 }
 
@@ -97,8 +115,14 @@ declare type ConstantBitrateMp3 = {
   id: FileId
   parentId: MediaFileId
 }
-// declare type VideoStillImageRecord = {
-//   type: 'VideoStillImage'
-//   id: FileId
-//   parentId: ClipId
-// }
+
+declare type VideoStillImageFile = {
+  type: 'VideoStillImage'
+  id: ClipId
+  mediaFileId: MediaFileId
+}
+declare type UserProvidedImageFile = {
+  type: 'UserProvidedImage'
+  id: FileId
+  parentId: ClipId
+}

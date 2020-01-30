@@ -1,6 +1,7 @@
 import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
-import { getWaveformPngPath } from '../utils/localStorage'
+import tempy from 'tempy'
 import { existsSync } from 'fs'
+import { getFileAvailabilityById } from '../selectors'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
@@ -50,4 +51,16 @@ export const getWaveformPng = async (
   } catch (err) {
     return new AsyncError(err)
   }
+}
+
+const getWaveformPngPath = (state: AppState, file: WaveformPng) => {
+  const fileAvailability = getFileAvailabilityById(
+    state,
+    'WaveformPng',
+    file.id
+  )
+  if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
+    return fileAvailability.filePath
+  }
+  return tempy.file({ extension: 'png' })
 }

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Dialog,
@@ -10,6 +10,8 @@ import {
   MenuItem,
   InputLabel,
   FormHelperText,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core'
 import * as r from '../../redux'
 import { showOpenDialog } from '../../utils/electron'
@@ -24,6 +26,7 @@ import { SubtitlesFileWithTrack } from '../../redux'
 import { MediaSubtitles } from '../../selectors'
 
 enum $ {
+  loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
   transcriptionField = 'subtitles-clips-transcription-field',
   pronunciationField = 'subtitles-clips-pronunciation-field',
   meaningField = 'subtitles-clips-meaning-field',
@@ -46,9 +49,10 @@ const SubtitlesClipsDialog = ({
     currentNoteTypeFields,
     subtitles,
     fieldsToTracks,
-    currentFileId,
+    currentFile,
     allTags,
     defaultTags,
+    defaultIncludeStill,
   } = useSelector((state: AppState) => {
     const currentNoteType = r.getCurrentNoteType(state)
     return {
@@ -58,15 +62,35 @@ const SubtitlesClipsDialog = ({
         : [],
       subtitles: r.getSubtitlesFilesWithTracks(state),
       fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-      currentFileId: r.getCurrentFileId(state),
+      currentFile: r.getCurrentMediaFile(state),
       allTags: r.getAllTags(state),
       defaultTags: r.getDefaultTags(state),
+      defaultIncludeStill: r.getDefaultIncludeStill(state),
     }
   })
+
+  const currentFileId = currentFile ? currentFile.id : currentFile
+  useEffect(
+    () => {
+      if (!currentFileId) {
+        dispatch(MEDIA_FILE_MISSING_MESSAGE)
+        dispatch(r.closeDialog())
+      }
+    },
+    [currentFileId, dispatch]
+  )
 
   const [fields, setFields] = useState(fieldsToTracks)
   const { tags, onAddChip, onDeleteChip } = useTagsInput(defaultTags)
   const [errorText, setErrorText] = useState('')
+
+  const [useStills, setUseStills] = useState(defaultIncludeStill)
+  const toggleUseStills = useCallback(
+    e => {
+      setUseStills(v => !v)
+    },
+    [setUseStills]
+  )
 
   const closeDialog = useCallback(() => dispatch(r.closeDialog()), [dispatch])
   const onSubmit = useCallback(
@@ -92,10 +116,15 @@ const SubtitlesClipsDialog = ({
 
       dispatch(r.closeDialog())
       dispatch(
-        makeClipsFromSubtitles(currentFileId, fieldsWithoutBlankValues, tags)
+        makeClipsFromSubtitles(
+          currentFileId,
+          fieldsWithoutBlankValues,
+          tags,
+          useStills
+        )
       )
     },
-    [dispatch, fields, currentFileId, tags]
+    [dispatch, fields, currentFileId, tags, useStills]
   )
   const setField = useCallback(
     (key: TransliterationFlashcardFieldName, value: SubtitlesTrackId) => {
@@ -121,6 +150,31 @@ const SubtitlesClipsDialog = ({
     [dispatch, currentFileId]
   )
 
+  const onChangeTranscription = useCallback(
+    e => {
+      setField('transcription', e.target.value as string)
+    },
+    [setField]
+  )
+  const onChangePronunciation = useCallback(
+    e => {
+      setField('pronunciation', e.target.value as string)
+    },
+    [setField]
+  )
+  const onChangeMeaning = useCallback(
+    e => {
+      setField('meaning', e.target.value as string)
+    },
+    [setField]
+  )
+  const onChangeNotes = useCallback(
+    e => {
+      setField('notes', e.target.value as string)
+    },
+    [setField]
+  )
+
   return (
     <Dialog open={open}>
       <DialogContent>
@@ -141,6 +195,7 @@ const SubtitlesClipsDialog = ({
             color="primary"
             variant="contained"
             onClick={onClickLoadExternal}
+            id={$.loadMoreTracksButton}
           >
             Load more subtitles
           </Button>
@@ -153,11 +208,8 @@ const SubtitlesClipsDialog = ({
           >
             <InputLabel htmlFor="transcription">Transcription</InputLabel>
             <Select
-              inputProps={{ id: 'transcription', name: 'transcription' }}
               value={fields.transcription || ''}
-              onChange={e => {
-                setField('transcription', e.target.value)
-              }}
+              onChange={onChangeTranscription}
               id={$.transcriptionField}
             >
               {subtitlesTrackOptions(subtitles)}
@@ -168,9 +220,8 @@ const SubtitlesClipsDialog = ({
             <FormControl fullWidth margin="normal">
               <InputLabel htmlFor="pronunciation">Pronunciation</InputLabel>
               <Select
-                inputProps={{ id: 'pronunciation', name: 'pronunciation' }}
                 value={fields.pronunciation || ''}
-                onChange={e => setField('pronunciation', e.target.value)}
+                onChange={onChangePronunciation}
                 id={$.pronunciationField}
               >
                 <MenuItem value="">None</MenuItem>
@@ -181,9 +232,8 @@ const SubtitlesClipsDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="meaning">Meaning</InputLabel>
             <Select
-              inputProps={{ id: 'meaning', name: 'meaning' }}
               value={fields.meaning || ''}
-              onChange={e => setField('meaning', e.target.value)}
+              onChange={onChangeMeaning}
               id={$.meaningField}
             >
               <MenuItem value="">None</MenuItem>
@@ -193,21 +243,37 @@ const SubtitlesClipsDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="notes">Notes</InputLabel>
             <Select
-              inputProps={{ id: 'notes', name: 'notes' }}
               value={fields.notes || ''}
-              onChange={e => setField('notes', e.target.value)}
+              onChange={onChangeNotes}
               id={$.notesField}
             >
               <MenuItem value="">None</MenuItem>
               {subtitlesTrackOptions(subtitles)}
             </Select>
           </FormControl>
-          <TagsInput
-            allTags={allTags}
-            tags={tags}
-            onAddChip={onAddChip}
-            onDeleteChip={onDeleteChip}
-          />
+          <FormControl fullWidth margin="normal">
+            {currentFile && currentFile.isVideo && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={useStills}
+                    onChange={toggleUseStills}
+                    color="primary"
+                  />
+                }
+                label="Include still images from video in flashcards"
+                labelPlacement="start"
+              />
+            )}
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <TagsInput
+              allTags={allTags}
+              tags={tags}
+              onAddChip={onAddChip}
+              onDeleteChip={onDeleteChip}
+            />
+          </FormControl>
         </form>
       </DialogContent>
       <DialogActions>

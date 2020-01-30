@@ -11,6 +11,13 @@ export default async function openSharedProject({ app, client }: TestSetup) {
     mediaFilesMenu$.mediaFileMenuItem
   )
   await secondMediaFile.click()
+  await client.clickElement_(fileSelectionForm$.cancelButton)
+
+  await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
+  const [firstMediaFile] = await client.elements_(
+    mediaFilesMenu$.mediaFileMenuItem
+  )
+  await firstMediaFile.click()
 
   await client.waitForText_(fileSelectionForm$.container, 'polar_bear_cafe.mp4')
 

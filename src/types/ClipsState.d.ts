@@ -36,18 +36,26 @@ declare type SimpleFlashcard = {
   type: 'Simple'
   fields: SimpleFlashcardFields
   tags: Array<string>
+  image?: FlashcardImage | null
 }
 declare type TransliterationFlashcard = {
   id: ClipId
   type: 'Transliteration'
   fields: TransliterationFlashcardFields
   tags: Array<string>
+  image?: FlashcardImage | null
 }
 declare type SimpleFlashcardFields = Record<SimpleFlashcardFieldName, string>
 declare type TransliterationFlashcardFields = Record<
   TransliterationFlashcardFieldName,
   string
 >
+declare type FlashcardImage = {
+  type: 'VideoStillImage'
+  id: string
+  /** defaults to midpoint */
+  seconds?: number
+}
 
 declare type PendingClip = {
   start: WaveformX
@@ -63,7 +71,9 @@ declare type ClipSpecs = {
   // for export?
   sourceFilePath: string
   outputFilename: string
+  /** milliseconds */
   startTime: number
+  /** milliseconds */
   endTime: number
   flashcardSpecs: FlashcardSpecs
 }
@@ -71,7 +81,7 @@ declare type FlashcardSpecs = {
   fields: Array<string>
   tags: Array<string>
   due: number
-  sortField: string
+  image: FlashcardImage | null
 }
 
 declare type ApkgExportData = {
@@ -87,6 +97,7 @@ declare type ApkgExportTemplate = {
     answerFormat: string
   }>
   css: string
+  sortField: number
 }
 
 declare type ClipPre3_0_0 = {

@@ -1,12 +1,10 @@
 .introText {
   max-width: 27em;
-  height: 7em;
 }
 
 .tabs {
   background-color: #3f51b5 !important;
   color: white;
-  margin-bottom: 1rem;
 }
 
 .mediaFileName {
@@ -45,10 +43,10 @@
   margin: 0 .2em;
   padding: 0 .5em;
 }
-
-
-.table {
+.table{
   vertical-align: top !important;
+}
+.tableBody {
   margin-top: 1em;
 }
 .tableRow {
@@ -95,4 +93,8 @@
   text-align: center;
   position: relative;
   top: 33%;
+}
+
+.mediaTables {
+  margin-top: 1rem;
 }

@@ -1,9 +1,15 @@
-import { getCurrentMediaFile } from './currentMedia'
+import { getCurrentMediaFile } from '.'
 
 export const getFileAvailability = (
   state: AppState,
   file: FileMetadata
-): FileAvailability | null => state.fileAvailabilities[file.type][file.id]
+): KnownFile =>
+  state.fileAvailabilities[file.type][file.id] || {
+    status: 'NEVER_LOADED',
+    id: file.id,
+    filePath: null,
+    isLoading: false,
+  }
 
 export const getFile = <F extends FileMetadata>(
   state: AppState,
@@ -11,13 +17,36 @@ export const getFile = <F extends FileMetadata>(
   id: FileId
 ): F | null => (state.files[type][id] as F) || null
 
+export const getFileWithAvailability = <F extends FileMetadata>(
+  state: AppState,
+  type: F['type'],
+  id: FileId
+): FileWithAvailability<F> => {
+  const file = getFile(state, type, id)
+  if (!file)
+    return {
+      file,
+      availability: {
+        status: 'NOT_FOUND',
+        id,
+        filePath: null,
+        isLoading: false,
+      },
+    }
+
+  const availability = getFileAvailability(state, file)
+  return { file, availability }
+}
+
 export const getFileAvailabilityById = <F extends FileMetadata>(
   state: AppState,
   type: F['type'],
   id: FileId
-) => {
+): FileAvailability => {
   const record = getFile(state, type, id)
-  return record ? getFileAvailability(state, record) : null
+  return record
+    ? getFileAvailability(state, record)
+    : { status: 'NOT_FOUND', id, filePath: null, isLoading: false }
 }
 
 export const getWaveformPath = (state: AppState): string | null => {

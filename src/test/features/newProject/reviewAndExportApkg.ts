@@ -34,7 +34,7 @@ export default async function reviewAndExportApkg({ client, app }: TestSetup) {
   })
   await client.clickElement_(dialog$.exportApkgButton)
 
-  await client.waitForText('body', 'Flashcards made in ')
+  await client.waitForText_(snackbar$.container, 'Flashcards made in ')
   await client.clickElement_(snackbar$.closeButton)
   await client.waitUntilGone_(snackbar$.closeButton)
 

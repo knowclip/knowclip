@@ -12,6 +12,7 @@ import openSavedProject from './openSavedProject'
 import { join } from 'path'
 import makeSomeFlashcards from './makeSomeFlashcards'
 import saveAndCloseProject from './saveAndCloseProject'
+import linkSubtitlesToFields from './linkSubtitlesToFields'
 
 jest.setTimeout(60000)
 
@@ -29,7 +30,8 @@ describe('opening and saving a previously saved project', () => {
 
   test('opens a previously saved project', () => openSavedProject(setup))
   test('make some flashcards', () => makeSomeFlashcards(setup))
-  test('saves and closes project', () => saveAndCloseProject(setup))
+  test('link subtitles to fields', () => linkSubtitlesToFields(setup))
+  test('save and closes project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
     await stopApp(context)
@@ -38,170 +40,216 @@ describe('opening and saving a previously saved project', () => {
 
 const sideEffectsMocks = {
   uuid: [
-    'ece1aa0c-2377-47db-b5d1-47d63e918ca7',
-    'cab0801b-3d8d-4cf8-a8d0-575beed8d645',
-    'fcf1bb3f-a5a7-419d-9c2c-2d93252f8b71',
+    '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+    '1e62d23d-3f3b-4785-b8ba-5d61dddc78ed',
+    '9a07597c-7885-49bc-97d4-76a2dffdb9aa',
   ],
-  nowUtcTimestamp: ['2020-01-22T07:50:05Z', '2020-01-22T07:50:10Z'],
+  nowUtcTimestamp: ['2020-01-27T22:28:12Z', '2020-01-27T22:28:22Z'],
 }
 
 const persistedState: Partial<AppState> = {
   files: {
     ProjectFile: {
-      'e36ca6de-4893-49f5-bca1-4410ace25d46': {
+      '6153116d-faf3-4b70-864b-80475f2e3091': {
         type: 'ProjectFile',
-        id: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
+        id: '6153116d-faf3-4b70-864b-80475f2e3091',
         name: 'My cool saved project',
         noteType: 'Transliteration',
         mediaFileIds: [
-          '535935a3-7d72-4238-87ab-1b7a413c1f71',
-          'fa462524-bfeb-4434-a506-07858cc97151',
+          '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+          '918d2b17-578f-4c5e-aafa-08d736e52af1',
         ],
         error: null,
-        lastOpened: '2020-01-20T11:43:27Z',
-        lastSaved: '2020-01-20T11:42:45Z',
+        lastOpened: '2020-01-28T12:29:32Z',
+        lastSaved: '2020-01-28T12:29:32Z',
       },
     },
     MediaFile: {
-      '535935a3-7d72-4238-87ab-1b7a413c1f71': {
-        id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
         type: 'MediaFile',
-        parentId: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
+        parentId: '6153116d-faf3-4b70-864b-80475f2e3091',
         subtitles: [
           {
             type: 'EmbeddedSubtitlesTrack',
-            id: '37bd5e91-89c5-491b-9308-533c7be7338a',
+            id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
             streamIndex: 2,
           },
           {
             type: 'ExternalSubtitlesTrack',
-            id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
+            id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
           },
         ],
         flashcardFieldsToSubtitlesTracks: {},
+        isVideo: true,
         name: 'polar_bear_cafe.mp4',
         durationSeconds: 87.062,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
-        isVideo: true,
         subtitlesTracksStreamIndexes: [2],
+        width: 1920,
+        height: 1080,
       },
-      'fa462524-bfeb-4434-a506-07858cc97151': {
-        id: 'fa462524-bfeb-4434-a506-07858cc97151',
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
         type: 'MediaFile',
-        parentId: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
+        parentId: '6153116d-faf3-4b70-864b-80475f2e3091',
         subtitles: [],
         flashcardFieldsToSubtitlesTracks: {},
+        isVideo: true,
         name: 'piggeldy_cat.mp4',
         durationSeconds: 58.24,
         format: 'mov,mp4,m4a,3gp,3g2,mj2',
-        isVideo: true,
         subtitlesTracksStreamIndexes: [],
+        width: 480,
+        height: 360,
       },
     },
     ExternalSubtitlesFile: {
-      '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         type: 'ExternalSubtitlesFile',
-        parentId: '535935a3-7d72-4238-87ab-1b7a413c1f71',
-        id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
+        parentId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
         name: 'pbc_jp.ass',
       },
     },
     VttConvertedSubtitlesFile: {
-      '37bd5e91-89c5-491b-9308-533c7be7338a': {
+      '31dfe711-758e-4ba4-9dff-0fb73d1ab79a': {
         type: 'VttConvertedSubtitlesFile',
-        parentId: '535935a3-7d72-4238-87ab-1b7a413c1f71',
-        id: '37bd5e91-89c5-491b-9308-533c7be7338a',
+        parentId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+        id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
         streamIndex: 2,
         parentType: 'MediaFile',
       },
-      '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         type: 'VttConvertedSubtitlesFile',
-        id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
-        parentId: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
+        parentId: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
         parentType: 'ExternalSubtitlesFile',
       },
     },
     WaveformPng: {
-      '535935a3-7d72-4238-87ab-1b7a413c1f71': {
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
         type: 'WaveformPng',
-        parentId: '535935a3-7d72-4238-87ab-1b7a413c1f71',
-        id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
+        parentId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
-      'fa462524-bfeb-4434-a506-07858cc97151': {
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         type: 'WaveformPng',
-        parentId: 'fa462524-bfeb-4434-a506-07858cc97151',
-        id: 'fa462524-bfeb-4434-a506-07858cc97151',
+        parentId: '918d2b17-578f-4c5e-aafa-08d736e52af1',
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
       },
     },
     ConstantBitrateMp3: {},
+    VideoStillImage: {
+      'c3637ef9-ea4d-4049-b604-a768239f721c': {
+        type: 'VideoStillImage',
+        id: 'c3637ef9-ea4d-4049-b604-a768239f721c',
+        mediaFileId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+      },
+      '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d': {
+        type: 'VideoStillImage',
+        id: '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d',
+        mediaFileId: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
+      },
+    },
   },
   fileAvailabilities: {
     ProjectFile: {
-      'e36ca6de-4893-49f5-bca1-4410ace25d46': {
+      '6153116d-faf3-4b70-864b-80475f2e3091': {
         filePath: join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
         status: 'CURRENTLY_LOADED',
-        id: 'e36ca6de-4893-49f5-bca1-4410ace25d46',
+        isLoading: false,
+        id: '6153116d-faf3-4b70-864b-80475f2e3091',
       },
     },
     MediaFile: {
-      '535935a3-7d72-4238-87ab-1b7a413c1f71': {
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
         filePath: join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4'),
         status: 'CURRENTLY_LOADED',
-        id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
+        isLoading: false,
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
       },
-      'fa462524-bfeb-4434-a506-07858cc97151': {
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
         filePath: join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'),
         status: 'CURRENTLY_LOADED',
-        id: 'fa462524-bfeb-4434-a506-07858cc97151',
+        isLoading: false,
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
       },
     },
     ExternalSubtitlesFile: {
-      '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
         filePath: join(ASSETS_DIRECTORY, 'pbc_jp.ass'),
         status: 'CURRENTLY_LOADED',
-        id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
+        isLoading: false,
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
       },
     },
     VttConvertedSubtitlesFile: {
-      '37bd5e91-89c5-491b-9308-533c7be7338a': {
+      '31dfe711-758e-4ba4-9dff-0fb73d1ab79a': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '31dfe711-758e-4ba4-9dff-0fb73d1ab79a',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '95ecfad8a8bf42d562d0e751aa9f8448.vtt'
+          'd9ca9f57367767ad9ebbdc366558738f.vtt'
         ),
-        status: 'CURRENTLY_LOADED',
-        id: '37bd5e91-89c5-491b-9308-533c7be7338a',
       },
-      '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439': {
+      '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '3e59a4e5742e827fdb30511fc40f7e82.vtt'
+          '9700310870f37b1824fa5f35ace353f7.vtt'
         ),
-        status: 'CURRENTLY_LOADED',
-        id: '2f7a98c0-1bf8-44cf-9b0b-4af64fb86439',
       },
     },
     WaveformPng: {
-      '535935a3-7d72-4238-87ab-1b7a413c1f71': {
+      '6b12235d-ad09-4af7-b7f2-88e19357cb9d': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '6b12235d-ad09-4af7-b7f2-88e19357cb9d',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          '833a0a72cd50d38e26f320c7924f4da6.png'
+          '40371c4096cf908ffab747bcbcce95d3.png'
         ),
-        status: 'CURRENTLY_LOADED',
-        id: '535935a3-7d72-4238-87ab-1b7a413c1f71',
       },
-      'fa462524-bfeb-4434-a506-07858cc97151': {
+      '918d2b17-578f-4c5e-aafa-08d736e52af1': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '918d2b17-578f-4c5e-aafa-08d736e52af1',
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           testId,
-          'f492c13cdbdf0c59adf3a72b2cb74e04.png'
+          '34cd4f92fbad0aa454b5252b48f5911c.png'
         ),
-        status: 'CURRENTLY_LOADED',
-        id: 'fa462524-bfeb-4434-a506-07858cc97151',
       },
     },
     ConstantBitrateMp3: {},
+    VideoStillImage: {
+      'c3637ef9-ea4d-4049-b604-a768239f721c': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: 'c3637ef9-ea4d-4049-b604-a768239f721c',
+        filePath: join(
+          GENERATED_ASSETS_DIRECTORY,
+          testId,
+          'db830c671edb3c27cb3198a95663b6b2.png'
+        ),
+      },
+      '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d': {
+        status: 'CURRENTLY_LOADED',
+        isLoading: false,
+        id: '2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d',
+        filePath: join(
+          GENERATED_ASSETS_DIRECTORY,
+          testId,
+          'c066939580d80abdf4e76f1473e283ba.png'
+        ),
+      },
+    },
   },
 }

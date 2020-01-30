@@ -3,7 +3,9 @@ import { Snackbar, IconButton } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
+import cn from 'classnames'
 import { closeSnackbar } from '../../actions'
+import { snackbar$ } from '.'
 
 const SimpleMessageSnackbar = ({
   message,
@@ -20,7 +22,9 @@ const SimpleMessageSnackbar = ({
   const handleExited = useCallback(e => dispatch(closeSnackbar()), [dispatch])
 
   return (
+    // TODO: distinguish error and success messages
     <Snackbar
+      className={cn(snackbar$.container)}
       open={open}
       message={message}
       autoHideDuration={15000}

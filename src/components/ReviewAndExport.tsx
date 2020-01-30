@@ -17,9 +17,9 @@ import MediaTable from './ReviewAndExportMediaTable'
 
 enum $ {
   container = 'review-and-export-dialog-container',
-  exportApkgButton = 'export-apkg-button',
-  continueButton = 'continue-button',
-  exitButton = 'exit-button',
+  exportApkgButton = 'review-and-export-export-apkg-button',
+  continueButton = 'review-and-export-continue-button',
+  exitButton = 'review-and-export-exit-button',
 }
 
 const Export = React.memo(
@@ -125,29 +125,35 @@ const Export = React.memo(
           <Tab label="Export CSV & MP3" onClick={() => chooseTab(1)} />
           <Tab label="Export MD" onClick={() => chooseTab(2)} />
         </Tabs>
+
         {progress ? (
-          <DialogContent>
+          <>
             <LinearProgress variant="determinate" value={progress.percentage} />
-            <p className={css.progressMessage}>{progress.message}</p>
-          </DialogContent>
+            <DialogContent>
+              <p className={css.progressMessage}>{progress.message}</p>
+            </DialogContent>
+          </>
         ) : (
           <DialogContent>
             {!selectionHasStarted && (
               <IntroText currentTabIndex={currentTabIndex} />
             )}
-            {selectionHasStarted &&
-              projectMedia.map((metadata, i) => (
-                <MediaTable
-                  key={metadata.id}
-                  open={i === expandedTableIndex}
-                  mediaIndex={i}
-                  onClick={onClickTable}
-                  media={metadata}
-                  selectedIds={selectedIds}
-                  onSelect={onSelect}
-                  onSelectAll={onSelectAll}
-                />
-              ))}
+            {selectionHasStarted && (
+              <div className={css.mediaTables}>
+                {projectMedia.map((metadata, i) => (
+                  <MediaTable
+                    key={metadata.id}
+                    open={i === expandedTableIndex}
+                    mediaIndex={i}
+                    onClick={onClickTable}
+                    media={metadata}
+                    selectedIds={selectedIds}
+                    onSelect={onSelect}
+                    onSelectAll={onSelectAll}
+                  />
+                ))}
+              </div>
+            )}
           </DialogContent>
         )}
 

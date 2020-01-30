@@ -14,7 +14,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
           filePaths.map(async filePath => {
             const file = await readMediaFile(filePath, uuid(), projectId)
             if (file instanceof AsyncError) throw file
-            return r.addAndOpenFile(file, filePath)
+            return r.openFileRequest(file, filePath)
           })
         )
     ),

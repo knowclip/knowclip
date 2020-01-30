@@ -2,6 +2,7 @@ import { getMediaMetadata } from './utils/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
+import { getVideoStill } from './utils/getVideoStill'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 import { remote, ipcRenderer } from 'electron'
 import { nowUtcTimestamp } from './utils/sideEffects'
@@ -67,6 +68,7 @@ const dependencies: EpicsDependencies = {
   getSubtitlesFromFile,
   getSubtitlesFilePath,
   getWaveformPng,
+  getVideoStill,
   getConstantBitrateMediaPath,
   existsSync,
   ipcRenderer,

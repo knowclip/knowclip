@@ -55,12 +55,14 @@ export const makeClipsFromSubtitles = (
   fieldNamesToTrackIds: Partial<TransliterationFlashcardFields> & {
     transcription: string
   },
-  tags: Array<string>
+  tags: Array<string>,
+  includeStill: boolean
 ): MakeClipsFromSubtitles => ({
   type: A.MAKE_CLIPS_FROM_SUBTITLES,
   fileId,
   fieldNamesToTrackIds,
   tags,
+  includeStill,
 })
 
 export const subtitlesClipsDialogRequest = (): ShowSubtitlesClipsDialogRequest => ({

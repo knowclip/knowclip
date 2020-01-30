@@ -30,6 +30,8 @@ enum $ {
   trackMenuItems = 'subtitles-menu-track-item',
   openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
   locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
+  addTrackButton = 'subtitles-menu-add-track-button',
+  deleteTrackButton = 'subtitles-menu-delete-track-button',
   makeClipsAndCardsButton = 'subtitles-menu-make-clips-and-cards-button',
 }
 
@@ -46,7 +48,7 @@ const SubtitlesMenu = () => {
 
   const dispatch = useDispatch()
   const loadExternalTrack = useCallback(
-    async () => {
+    async e => {
       if (!currentFileId)
         return dispatch(
           actions.simpleMessageSnackbar('Please open a media file first.')
@@ -61,14 +63,14 @@ const SubtitlesMenu = () => {
         actions.loadSubtitlesFromFileRequest(filePaths[0], currentFileId)
       )
 
-      close()
+      close(e)
     },
     [dispatch, currentFileId, close]
   )
   const subtitlesClipsDialogRequest = useCallback(
     e => {
       dispatch(actions.subtitlesClipsDialogRequest())
-      close()
+      close(e)
     },
     [dispatch, close]
   )
@@ -113,7 +115,11 @@ const SubtitlesMenu = () => {
           />
         ))}
         <Divider />
-        <MenuItem dense onClick={loadExternalTrack}>
+        <MenuItem
+          dense
+          onClick={loadExternalTrack}
+          className={$.addTrackButton}
+        >
           <ListItemText primary="Load external track" />
         </MenuItem>
         <MenuItem
@@ -184,7 +190,7 @@ const ExternalTrackMenuItem = ({
   const deleteExternalSubtitles = useCallback(
     e => {
       dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
-      close()
+      close(e)
     },
     [dispatch, id, close]
   )
@@ -199,7 +205,7 @@ const ExternalTrackMenuItem = ({
           )
         )
 
-        close()
+        close(e)
       }
     },
     [dispatch, file, close]
@@ -243,29 +249,36 @@ const ExternalTrackMenuItem = ({
         </ListItemSecondaryAction>
       </MenuItem>
 
-      <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
-        <MenuItem
-          dense
-          onClick={locateFileRequest}
-          disabled={!file}
-          id={$.locateExternalFileButton}
-        >
-          <ListItemIcon>
-            <Icon>
-              <FolderSpecial />
-            </Icon>
-          </ListItemIcon>
-          <ListItemText primary="Locate subtitles file in filesystem" />
-        </MenuItem>
-        <MenuItem dense disabled={!file} onClick={deleteExternalSubtitles}>
-          <ListItemIcon>
-            <Icon>
-              <DeleteIcon />
-            </Icon>
-          </ListItemIcon>
-          <ListItemText primary="Remove subtitles track" />
-        </MenuItem>
-      </Menu>
+      {isOpen && (
+        <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
+          <MenuItem
+            dense
+            onClick={locateFileRequest}
+            disabled={!file}
+            id={$.locateExternalFileButton}
+          >
+            <ListItemIcon>
+              <Icon>
+                <FolderSpecial />
+              </Icon>
+            </ListItemIcon>
+            <ListItemText primary="Locate subtitles file in filesystem" />
+          </MenuItem>
+          <MenuItem
+            dense
+            disabled={!file}
+            onClick={deleteExternalSubtitles}
+            id={$.deleteTrackButton}
+          >
+            <ListItemIcon>
+              <Icon>
+                <DeleteIcon />
+              </Icon>
+            </ListItemIcon>
+            <ListItemText primary="Remove subtitles track" />
+          </MenuItem>
+        </Menu>
+      )}
     </>
   )
 }

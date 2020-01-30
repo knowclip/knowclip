@@ -20,56 +20,9 @@ export const loadPersistedState = (
   fileAvailabilities,
 })
 
-export const setFlashcardField = (
-  id: ClipId,
-  key: FlashcardFieldName,
-  value: string
-): SetFlashcardField => ({
-  type: A.SET_FLASHCARD_FIELD,
-  id,
-  key,
-  value,
-})
-
-export const addFlashcardTag = (id: ClipId, text: string): Action => ({
-  type: A.ADD_FLASHCARD_TAG,
-  id,
-  text,
-})
-
-export const deleteFlashcardTag = (
-  id: ClipId,
-  index: number,
-  tag: string
-): Action => ({
-  type: A.DELETE_FLASHCARD_TAG,
-  id,
-  index,
-  tag,
-})
-
 export const setCurrentFile = (index: number): Action => ({
   type: A.SET_CURRENT_FILE,
   index,
-})
-
-export const toggleLoop = (): Action => ({
-  type: A.TOGGLE_LOOP,
-})
-
-export const setLoop = (loop: boolean): Action => ({
-  type: A.SET_LOOP,
-  loop,
-})
-
-export const deleteCard = (id: ClipId): Action => ({
-  type: A.DELETE_CARD,
-  id,
-})
-
-export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
-  type: A.DELETE_CARDS,
-  ids,
 })
 
 export const exportApkgRequest = (
@@ -135,9 +88,16 @@ export const setAllTags = (tagsToClipIds: {
   tagsToClipIds,
 })
 
-export const setDefaultTags = (tags: string[]): SetDefaultTags => ({
-  type: 'SET_DEFAULT_TAGS',
+export const setDefaultClipSpecs = ({
   tags,
+  includeStill,
+}: {
+  tags?: string[]
+  includeStill?: boolean
+}): SetDefaultClipSpecs => ({
+  type: 'SET_DEFAULT_CLIP_SPECS',
+  tags,
+  includeStill,
 })
 
 export const setProgress = (progress: ProgressInfo | null): SetProgress => ({

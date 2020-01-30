@@ -24,13 +24,23 @@ export const element = async (
   selector: string
 ): Promise<ElementWrapper> => {
   const getText = async () => {
-    const { state, value, message } = await client.elementIdText(id)
+    const result = await client.elementIdText(id)
+    const { state, value, message } = result
 
     if (state === 'failure') {
       throw new Error(
         `Could not get text for element "${selector}": ${message}`
       )
     }
+
+    if (typeof value !== 'string') {
+      console.error(result, JSON.stringify(result))
+      throw new Error(
+        'Could not get text, instead got ' +
+          (value && JSON.stringify(value as any))
+      )
+    }
+
     return value
   }
   return {
@@ -79,7 +89,11 @@ export const element = async (
         })
       } catch (err) {
         throw new Error(
-          `Text "${text}" would not appear in "${found}": ${err.message}`
+          typeof found === 'string'
+            ? `Selector "${selector}" received not "${text}", but "${found}", and then there was a problem: ${
+                err.message
+              }`
+            : `Could not get text from "${selector}: ` + err.message
         )
       }
     },

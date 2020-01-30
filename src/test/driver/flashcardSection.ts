@@ -10,7 +10,10 @@ export async function fillInTransliterationCardFields(
     pronunciationEl,
     meaningEl,
     notesEl,
-  ] = await client.elements_(flashcardSectionForm$.flashcardFields)
+  ] = await client.elements_(
+    `${flashcardSectionForm$.flashcardFields} textarea:not([aria-hidden])`,
+    4
+  )
   const { transcription, pronunciation, meaning, notes } = newValues
 
   if (transcription) await transcriptionEl.setFieldValue(transcription)

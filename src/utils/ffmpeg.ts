@@ -65,25 +65,40 @@ export const readMediaFile = async (
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): Promise<MediaFile | AsyncError> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)
+  console.log({ ffprobeMetadata })
   if (ffprobeMetadata instanceof AsyncError) return ffprobeMetadata
 
-  return {
+  const videoStream = ffprobeMetadata.streams.find(
+    ({ codec_type }) => codec_type && /video/i.test(codec_type)
+  )
+
+  const base: MediaFile = {
     id,
     type: 'MediaFile',
     parentId: projectId,
     subtitles,
     flashcardFieldsToSubtitlesTracks,
+    isVideo: false,
 
     name: basename(filePath),
     durationSeconds: ffprobeMetadata.format.duration || 0,
     format: ffprobeMetadata.format.format_name || 'UNKNOWN_FORMAT',
-    isVideo:
-      ffprobeMetadata.format.format_name !== 'mp3' &&
-      ffprobeMetadata.streams.some(
-        ({ codec_type }) => codec_type && /video/i.test(codec_type)
-      ),
+
     subtitlesTracksStreamIndexes: ffprobeMetadata.streams
       .filter(stream => stream.codec_type === 'subtitle')
       .map(stream => stream.index),
   }
+
+  return ffprobeMetadata.format.format_name !== 'mp3' && videoStream
+    ? {
+        ...base,
+        isVideo: true,
+
+        width: videoStream.width as number,
+        height: videoStream.height as number,
+      }
+    : {
+        ...base,
+        isVideo: false,
+      }
 }

@@ -52,9 +52,8 @@ const ReviewAndExportMediaTable = memo(
     )
 
     const fileRemembered = Boolean(
-      availability &&
-        (availability.status === 'CURRENTLY_LOADED' ||
-          availability.status === 'REMEMBERED')
+      availability.status === 'CURRENTLY_LOADED' ||
+        availability.status === 'PREVIOUSLY_LOADED'
     )
     const dispatch = useDispatch()
     const toggleOpen = useCallback(
@@ -140,7 +139,7 @@ const MediaTableBody = React.memo(
     highlightedClipId,
   }: MediaTableBodyProps) => {
     return (
-      <TableBody>
+      <TableBody className={css.tableBody}>
         {clipsIds.map(id => (
           <FlashcardRow
             key={id}

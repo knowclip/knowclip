@@ -7,8 +7,7 @@ export const initialState: FilesState = {
   VttConvertedSubtitlesFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
-  // VideoStillImage: {},
-  // },
+  VideoStillImage: {},
 }
 
 const edit = <F extends FileMetadata>(
@@ -45,7 +44,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         },
       }
     case A.ADD_FILE:
-    case A.ADD_AND_OPEN_FILE:
+    case A.OPEN_FILE_REQUEST:
     case A.LOCATE_FILE_SUCCESS: {
       const newState = {
         ...state,
@@ -55,7 +54,10 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         },
       }
 
-      return action.file.type === 'MediaFile'
+      return action.file.type === 'MediaFile' &&
+        !state.ProjectFile[action.file.parentId].mediaFileIds.includes(
+          action.file.id
+        )
         ? edit<ProjectFile>(
             newState,
             'ProjectFile',

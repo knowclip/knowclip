@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
@@ -27,16 +27,26 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { highlightedClipId, clipsLength } = useSelector((state: AppState) => ({
-    highlightedClipId: r.getHighlightedClipId(state),
-    clipsLength: mediaFile
-      ? r.getClipIdsByMediaFileId(state, mediaFile.id).length
-      : 0,
+  const { highlightedClip, clipsIds } = useSelector((state: AppState) => ({
+    highlightedClip: r.getHighlightedClip(state),
+    clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
   }))
+
+  const clipsLength = clipsIds.length
+  const clipIndex = useMemo(
+    () => (highlightedClip ? clipsIds.indexOf(highlightedClip.id) : -1),
+    [clipsIds, highlightedClip]
+  )
   const dispatch = useDispatch()
 
   return (
     <section className={cn(className, css.container, $.container, css.card)}>
+      {highlightedClip ? (
+        <div className={css.clipsCount}>
+          {clipIndex + 1} / {clipsLength}
+        </div>
+      ) : null}
+
       <Tooltip title="Previous clip (Ctrl + comma)">
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
@@ -50,12 +60,11 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClipId && mediaFile ? (
+      {highlightedClip && mediaFile ? (
         <FlashcardForm
-          key={highlightedClipId}
           className={css.form}
           mediaFile={mediaFile}
-          clipId={highlightedClipId}
+          clipId={highlightedClip.id}
         />
       ) : (
         <Placeholder />

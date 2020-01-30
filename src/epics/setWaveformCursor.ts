@@ -70,6 +70,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           }
 
           if (
+            !loopImminent &&
             newClipIdToHighlight &&
             newClipIdToHighlight !== highlightedClipId
           )

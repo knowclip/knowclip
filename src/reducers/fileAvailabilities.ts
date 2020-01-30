@@ -7,7 +7,7 @@ export const initialState: FileAvailabilitiesState = {
   VttConvertedSubtitlesFile: {},
   WaveformPng: {},
   ConstantBitrateMp3: {},
-  // VideoStillImage: {},
+  VideoStillImage: {},
 }
 
 const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
@@ -18,10 +18,34 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     case A.LOAD_PERSISTED_STATE:
       return action.fileAvailabilities || state
 
+    case A.OPEN_FILE_REQUEST: {
+      const type = action.file.type
+      const byType = state[type]
+      const base = byType[action.file.id]
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: base
+            ? {
+                ...base,
+                isLoading: true,
+              }
+            : {
+                id: action.file.id,
+                status: 'NEVER_LOADED',
+                filePath: action.filePath,
+                isLoading: true,
+              },
+        },
+      }
+    }
+
     case A.OPEN_FILE_SUCCESS: {
       const fileAvailability: FileAvailability = {
-        ...state[action.validatedFile.type][action.validatedFile.id],
+        id: action.validatedFile.id,
         status: 'CURRENTLY_LOADED',
+        isLoading: false,
         filePath: action.filePath,
       }
       return {
@@ -33,31 +57,62 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
     }
 
-    case A.ADD_AND_OPEN_FILE:
-    case A.ADD_FILE:
-    case A.LOCATE_FILE_SUCCESS: {
-      if (!action.filePath) return state
+    case A.OPEN_FILE_FAILURE: {
+      const base = state[action.file.type][action.file.id]
+      const newAvailability: KnownFile = {
+        id: action.file.id,
+        filePath: base ? base.filePath : null,
+        status: 'FAILED_TO_LOAD',
+        isLoading: false,
+      }
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: newAvailability,
+        },
+      }
+    }
 
-      const currentFile = state[action.file.type][action.file.id] || null
-      const fileAvailability: FileAvailability = currentFile
+    case A.ADD_FILE: {
+      const newAvailability: KnownFile = action.filePath
         ? {
-            ...currentFile,
-            status:
-              currentFile.status === 'NOT_LOADED'
-                ? 'REMEMBERED'
-                : currentFile.status,
             filePath: action.filePath,
+            status: 'PREVIOUSLY_LOADED',
+            id: action.file.id,
+            isLoading: false,
           }
         : {
-            filePath: action.filePath,
-            status: 'CURRENTLY_LOADED',
+            filePath: null,
+            status: 'NEVER_LOADED',
             id: action.file.id,
+            isLoading: false,
           }
       return {
         ...state,
         [action.file.type]: {
           ...state[action.file.type],
-          [action.file.id]: fileAvailability,
+          [action.file.id]: newAvailability,
+        },
+      }
+    }
+    case A.LOCATE_FILE_SUCCESS: {
+      const base = state[action.file.type][action.file.id]
+      const newAvailability: KnownFile = {
+        status:
+          base && base.status === 'CURRENTLY_LOADED'
+            ? 'CURRENTLY_LOADED'
+            : 'PREVIOUSLY_LOADED',
+        id: action.file.id,
+        isLoading: false,
+        filePath: action.filePath,
+      }
+
+      return {
+        ...state,
+        [action.file.type]: {
+          ...state[action.file.type],
+          [action.file.id]: newAvailability,
         },
       }
     }

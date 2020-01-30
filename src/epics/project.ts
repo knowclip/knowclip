@@ -30,7 +30,10 @@ const createProject: AppEpic = (action$, state$, effects) =>
         )
       ).pipe(
         flatMap(() =>
-          from([r.addAndOpenFile(project, filePath), r.setWorkIsUnsaved(false)])
+          from([
+            r.openFileRequest(project, filePath),
+            r.setWorkIsUnsaved(false),
+          ])
         )
       )
     }),
@@ -174,17 +177,39 @@ const PROJECT_EDIT_ACTIONS = [
   A.ADD_CLIPS,
   A.MERGE_CLIPS,
   A.DELETE_MEDIA_FROM_PROJECT,
-  A.DELETE_FILE_SUCCESS, // ???
-  A.ADD_AND_OPEN_FILE,
-  A.ADD_FILE,
-  A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK, //?,
+  A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK,
   A.SET_PROJECT_NAME,
-  A.LOCATE_FILE_SUCCESS, // ????
+  A.DELETE_FILE_SUCCESS,
+  A.ADD_FILE,
+  A.LOCATE_FILE_SUCCESS,
 ] as const
+
+const isGeneratedFile = (file: FileMetadata): boolean => {
+  switch (file.type) {
+    case 'VttConvertedSubtitlesFile':
+    case 'WaveformPng':
+    case 'ConstantBitrateMp3':
+    case 'VideoStillImage':
+      return true
+    case 'ProjectFile':
+    case 'MediaFile':
+    case 'ExternalSubtitlesFile':
+      return false
+  }
+}
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
+    filter(action => {
+      switch (action.type) {
+        case A.DELETE_FILE_SUCCESS:
+        case A.ADD_FILE:
+        case A.LOCATE_FILE_SUCCESS:
+          return !isGeneratedFile(action.file)
+      }
+      return true
+    }),
     filter(() => Boolean(r.getCurrentProjectId(state$.value))),
     map(() => r.setWorkIsUnsaved(true))
   )

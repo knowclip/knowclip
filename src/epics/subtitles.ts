@@ -13,7 +13,6 @@ import {
 } from 'rxjs/operators'
 import { of, Observable } from 'rxjs'
 import * as r from '../redux'
-import newClip from '../utils/newClip'
 import { from } from 'rxjs'
 import { AppEpic } from '../types/AppEpic'
 import { uuid } from '../utils/sideEffects'
@@ -24,6 +23,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
     ofType<Action, MakeClipsFromSubtitles>(A.MAKE_CLIPS_FROM_SUBTITLES),
     flatMap<MakeClipsFromSubtitles, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags }) => {
+        const includeStill = false
         const tracksValidation = validateTracks(
           state$.value,
           fieldNamesToTrackIds
@@ -83,14 +83,14 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
           tracksValidation.transcriptionTrack,
           fieldNamesToTrackIds,
           state$.value,
-          fileId,
-          tags
+          fileId
         )
 
         return from([
           r.deleteCards(
             r.getClipIdsByMediaFileId(state$.value, currentFile.id)
           ),
+          r.setDefaultClipSpecs({ tags, includeStill }),
           ...Object.keys(fieldNamesToTrackIds).map(badTypefieldName => {
             const fieldName = badTypefieldName as FlashcardFieldName
             const trackId = fieldNamesToTrackIds[fieldName] || null
@@ -205,46 +205,58 @@ function getClipsAndCardsFromSubtitles(
   transcriptionTrack: SubtitlesTrack,
   fieldNamesToTrackIds: SubtitlesGenerationFieldMapping,
   state: AppState,
-  fileId: string,
-  tags: string[]
+  fileId: string
 ) {
   const currentNoteType = r.getCurrentNoteType(state)
   if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
 
-  return transcriptionTrack.chunks
-    .sort(({ start: a }, { start: b }) => a - b)
-    .map(chunk => {
-      const fields =
-        currentNoteType === 'Simple'
-          ? {
-              transcription: chunk.text,
-              meaning: '',
-              notes: '',
-            }
-          : {
-              transcription: chunk.text,
-              meaning: '',
-              notes: '',
-              pronunciation: '',
-            }
-      ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(
-        fieldName => {
-          const trackId = fieldNamesToTrackIds[fieldName]
-          fields[fieldName] = trackId
-            ? r
-                .getSubtitlesChunksWithinRange(
-                  state,
-                  trackId,
-                  chunk.start,
-                  chunk.end
-                )
-                .map(chunk => chunk.text)
-                .join(' ')
-            : ''
-        }
-      )
-      return newClip(chunk, fileId, uuid(), fields, tags)
+  // careful, pretty sure this mutates
+  const sortedChunks = transcriptionTrack.chunks.sort(
+    ({ start: a }, { start: b }) => a - b
+  )
+  return sortedChunks.map((chunk, chunkIndex) => {
+    const fields =
+      currentNoteType === 'Simple'
+        ? {
+            transcription: chunk.text,
+            meaning: '',
+            notes: '',
+          }
+        : {
+            transcription: chunk.text,
+            meaning: '',
+            notes: '',
+            pronunciation: '',
+          }
+    ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(fieldName => {
+      const trackId = fieldNamesToTrackIds[fieldName]
+      fields[fieldName] = trackId
+        ? r
+            .getSubtitlesChunksWithinRange(
+              state,
+              trackId,
+              chunk.start,
+              chunk.end
+            )
+            .map(chunk => chunk.text)
+            .join(' ')
+        : ''
     })
+    return r.getNewClip(
+      state,
+      {
+        start: chunk.start,
+        end:
+          sortedChunks[chunkIndex + 1] &&
+          chunk.end === sortedChunks[chunkIndex + 1].start
+            ? chunk.end - 1
+            : chunk.end,
+      },
+      fileId,
+      uuid(),
+      fields
+    )
+  })
 }
 
 export default combineEpics(
