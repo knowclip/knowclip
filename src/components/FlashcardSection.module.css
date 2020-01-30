@@ -78,25 +78,38 @@
   height: 84px;
   margin: 1rem;
   border-radius: 0 !important;
+  transition: opacity .1s;
+  opacity: 0.8;
+  box-shadow: rgba(0,0,0,0.2) 1px 1px 2px;
+
+  /* background: none;
+	color: inherit; */
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }
 .flashcardImage{
   height: 100%;
   width: auto !important;
-  transition: opacity .1s;
   cursor: pointer;
   background-color: #EEEEEE;
   display: flex !important;
   justify-content: center;
   align-items: center;
-  opacity: 0.8
 }
-.flashcardImage:hover {
+.flashcardImageContainer:hover,
+.flashcardImageContainer:focus {
   opacity: 1;
+  box-shadow: rgba(0,0,0,0.2) 3px 3px 5px;
+
 }
 .flashcardImageUnused {
   opacity: 0.15;
 }
-.flashcardImageUnused:hover {
+.flashcardImageUnused:hover,
+  .flashcardImageUnused:focus {
   opacity: 0.6;
 }
 

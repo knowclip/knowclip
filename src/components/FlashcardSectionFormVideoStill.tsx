@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Tooltip, Card, CardMedia, CircularProgress } from '@material-ui/core'
+import { Tooltip, CardMedia, CircularProgress } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
@@ -44,26 +44,25 @@ const VideoStillDisplay = ({
     [clip.flashcard.image, clip.id, dispatch]
   )
 
+  const title = clip.flashcard.image
+    ? 'Click to leave out image'
+    : 'Click to include image'
+
   return (
-    <Tooltip
-      title={
-        clip.flashcard.image
-          ? 'Click to leave out image'
-          : 'Click to include image'
-      }
-    >
-      <Card
-        className={css.flashcardImageContainer}
+    <Tooltip tabIndex={0} title={title}>
+      <button
+        className={cn(css.flashcardImageContainer, {
+          [css.flashcardImageUnused]: !clip.flashcard.image,
+        })}
         onClick={handleClick}
+        name={title}
         style={{
           width: Math.round((videoFile.width / videoFile.height) * 85) + 'px',
           height: 85 + 'px',
         }}
       >
         <CardMedia
-          className={cn(css.flashcardImage, {
-            [css.flashcardImageUnused]: !clip.flashcard.image,
-          })}
+          className={cn(css.flashcardImage)}
           image={filePath ? `file://${filePath}` : undefined}
         >
           {videoStill.availability.status !== 'CURRENTLY_LOADED' &&
@@ -71,7 +70,7 @@ const VideoStillDisplay = ({
             <CircularProgress />
           ) : null}
         </CardMedia>
-      </Card>
+      </button>
     </Tooltip>
   )
 }
