@@ -68,7 +68,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
           return newState
         }
 
-        if (parentProjectFile.mediaFileIds.includes(action.file.id))
+        if (!parentProjectFile.mediaFileIds.includes(action.file.id))
           return edit(
             newState,
             'ProjectFile',

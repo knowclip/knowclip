@@ -39,6 +39,8 @@ export async function startApp(
 
   await app.start()
 
+  app.webContents.send('start-test', testId)
+
   if (persistedState) {
     for (const [key, value] of Object.entries(persistedState))
       await app.client.localStorage('POST', {
@@ -64,6 +66,8 @@ export async function stopApp(context: {
 
   const { app } = context
   if (app) {
+    app.webContents.send('end-test')
+
     await app.stop()
   }
 

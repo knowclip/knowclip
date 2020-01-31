@@ -21,7 +21,12 @@ export default function spectronMocks<M extends ModuleLike>(
   logMocks: (app: Application) => Promise<void>
 } {
   const now = moment.utc().format()
-  const logFilePath = join(process.cwd(), `${moduleId}-mocks-${now}.log`)
+  let currentTestId = ''
+  const logFilePath = () =>
+    join(
+      process.cwd(),
+      `${currentTestId && currentTestId + '__'}${moduleId}-mocks-${now}.log`
+    )
   const mockMessageName = 'mock-' + moduleId
   const logMessageName = 'log-mocks-' + moduleId
   const mocked: MockedModule<M> = { ...actualModule }
@@ -50,7 +55,7 @@ export default function spectronMocks<M extends ModuleLike>(
 
       logged[functionName].push(actualReturnValue)
 
-      promises.writeFile(logFilePath, JSON.stringify(logged, null, 2))
+      promises.writeFile(logFilePath(), JSON.stringify(logged, null, 2))
 
       return actualReturnValue
     }
@@ -61,6 +66,13 @@ export default function spectronMocks<M extends ModuleLike>(
   }
 
   window.document.addEventListener('DOMContentLoaded', () => {
+    ipcRenderer.on('start-test', (e, testId) => {
+      currentTestId = testId
+    })
+    ipcRenderer.on('end-test', () => {
+      currentTestId = ''
+    })
+
     ipcRenderer.on(mockMessageName, (event, functionName, newReturnValue) => {
       returnValues[functionName].push(deserializeReturnValue(newReturnValue))
     })
@@ -70,7 +82,7 @@ export default function spectronMocks<M extends ModuleLike>(
     })
 
     ipcRenderer.on(logMessageName, () => {
-      promises.writeFile(logFilePath, JSON.stringify(logged, null, 2))
+      promises.writeFile(logFilePath(), JSON.stringify(logged, null, 2))
     })
   })
 

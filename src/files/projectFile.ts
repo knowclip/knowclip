@@ -58,23 +58,12 @@ export default {
         )
         .map(validatedFile => r.addFile(validatedFile))
 
-      // is this bit even necessary?
-      const addNewSubtitlesFiles = project.subtitles
-        .filter(
-          subtitlesFile =>
-            !r.getFile(state, subtitlesFile.type, subtitlesFile.id)
-        )
-        .map(file => r.addFile(file))
-
       const loadFirstMediaFile = project.mediaFiles.length
         ? [r.openFileRequest(project.mediaFiles[0])]
         : []
 
       return [
         ...addNewMediaFiles,
-        // maybe should happen when opening media
-        // OR actually probably better in useEffect in components that need the data
-        // ...addNewSubtitlesFiles,
         ...loadFirstMediaFile,
         ...persistFiles(state, effects.setLocalStorage),
       ]
