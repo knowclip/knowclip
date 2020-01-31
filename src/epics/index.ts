@@ -33,11 +33,11 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 
     const choice = await showMessageBox({
       type: 'question',
-      buttons: ['Quit', 'Cancel'],
+      buttons: ['Cancel', 'Quit'],
       title: 'Confirm',
       message: 'Are you sure you want to quit without saving your work?',
     })
-    if (!choice || choice.response === 1) {
+    if (!choice || choice.response === 0) {
       // e.preventDefault()
       return await { type: "DON'T QUIT ON ME!!" }
     } else {
