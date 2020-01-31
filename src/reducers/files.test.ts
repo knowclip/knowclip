@@ -23,11 +23,12 @@ describe('files reducer', () => {
           track1Id
         )
       )
-      expect(
-        newState.MediaFile[mediaFile.id].flashcardFieldsToSubtitlesTracks
-      ).toEqual({
-        transcription: track1Id,
-      })
+      expect(newState.MediaFile[mediaFile.id]).toHaveProperty(
+        'flashcardFieldsToSubtitlesTracks',
+        {
+          transcription: track1Id,
+        }
+      )
     })
 
     it('allows a track to be linked to only one field', () => {
@@ -52,11 +53,12 @@ describe('files reducer', () => {
           track1Id
         )
       )
-      expect(
-        newState.MediaFile[mediaFile.id].flashcardFieldsToSubtitlesTracks
-      ).toEqual({
-        pronunciation: track1Id,
-      })
+      expect(newState.MediaFile[mediaFile.id]).toHaveProperty(
+        'flashcardFieldsToSubtitlesTracks',
+        {
+          pronunciation: track1Id,
+        }
+      )
     })
 
     it('unlinks a field from a track', () => {
@@ -77,9 +79,10 @@ describe('files reducer', () => {
         },
         linkFlashcardFieldToSubtitlesTrack('transcription', mediaFile.id, null)
       )
-      expect(
-        newState.MediaFile[mediaFile.id].flashcardFieldsToSubtitlesTracks
-      ).toEqual({})
+      expect(newState.MediaFile[mediaFile.id]).toHaveProperty(
+        'flashcardFieldsToSubtitlesTracks',
+        {}
+      )
     })
   })
 })

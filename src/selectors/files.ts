@@ -77,7 +77,7 @@ export const getFileDescendants = (
   // TODO: speed this up jic there are lots of files
   for (const filesHash of Object.values(state.files)) {
     for (const fileId in filesHash) {
-      const file = filesHash[fileId]
+      const file = filesHash[fileId] as FileMetadata
       // TODO: check if we should check parentType as well
       if (
         !descendants.includes(file) &&

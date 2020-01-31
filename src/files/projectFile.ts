@@ -24,13 +24,16 @@ export default {
         id: project.id,
         type: 'ProjectFile',
         lastSaved: project.timestamp,
-        lastOpened: project.lastOpened,
         name: project.name,
         mediaFileIds: mediaFiles,
         error: null,
         noteType: project.noteType,
       }
-      return [r.openFileSuccess(projectFile, filePath)]
+      return [
+        r.openProject(file, project.clips, effects.nowUtcTimestamp()),
+
+        r.openFileSuccess(projectFile, filePath),
+      ]
     } catch (err) {
       console.error(err)
       return [
@@ -72,7 +75,6 @@ export default {
         // maybe should happen when opening media
         // OR actually probably better in useEffect in components that need the data
         // ...addNewSubtitlesFiles,
-        r.openProject(validatedFile, project.clips, effects.nowUtcTimestamp()),
         ...loadFirstMediaFile,
         ...persistFiles(state, effects.setLocalStorage),
       ]

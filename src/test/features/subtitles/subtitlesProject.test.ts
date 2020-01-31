@@ -71,7 +71,6 @@ const persistedState: Partial<AppState> = {
         error: null,
         name: 'Project with subtitles',
         noteType: 'Transliteration',
-        lastOpened: '2020-01-28T14:35:42Z',
       },
     },
     MediaFile: {

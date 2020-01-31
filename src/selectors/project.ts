@@ -6,16 +6,24 @@ import getAllTagsFromClips from '../utils/getAllTags'
 import { getClips, getClipIdsByMediaFileId, getClip } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
-import { normalize, schema } from 'normalizr'
+// import { normalize, schema } from 'normalizr'
 
 const newestToOldest = (
-  { lastOpened: a }: ProjectFile,
-  { lastOpened: b }: ProjectFile
-) => moment(b).valueOf() - moment(a).valueOf()
+  { lastOpened: a }: FileAvailability,
+  { lastOpened: b }: FileAvailability
+): number => {
+  if (!a) return 1
+  if (!b) return -1
+  return moment(b).valueOf() - moment(a).valueOf()
+}
 export const getProjects = createSelector(
   (state: AppState) => state.files.ProjectFile,
-  (projectFiles): Array<ProjectFile> =>
-    Object.values(projectFiles).sort(newestToOldest)
+  (state: AppState) => state.fileAvailabilities.ProjectFile,
+  (projectFiles, availabilities): Array<ProjectFile> =>
+    (Object.values(availabilities) as KnownFile[])
+      .sort(newestToOldest)
+      .map(({ id }) => projectFiles[id])
+      .filter((p): p is ProjectFile => Boolean(p))
 )
 
 export const getProjectIdByFilePath = (
@@ -39,7 +47,7 @@ export const getProject = (
     name: file.name,
     id: file.id,
     noteType: file.noteType,
-    lastOpened: file.lastOpened,
+    lastOpened: nowUtcTimestamp(),
     mediaFiles,
     tags: [...getAllTagsFromClips(state.clips.byId)],
     clips: mediaFiles.reduce(
@@ -159,6 +167,7 @@ export const fillOutSlimProject = <F extends FlashcardFields>(
 ): {
   project: ProjectFile
   media: MediaFile[]
+  // clips: Clip[]
   // subtitles: SubtitlesFile[]
 } => {
   const project: ProjectFile = {
@@ -167,7 +176,6 @@ export const fillOutSlimProject = <F extends FlashcardFields>(
     noteType: slimProject.noteType,
     name: slimProject.name,
     mediaFileIds: slimProject.media.map(m => m.id),
-    lastOpened: 'PLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEHOLDER',
     type: 'ProjectFile',
     error: null,
   }

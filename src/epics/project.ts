@@ -133,7 +133,6 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
           id: project.id,
           type: 'ProjectFile',
           lastSaved: project.timestamp,
-          lastOpened: project.lastOpened,
           name: project.name,
           mediaFileIds: mediaFiles,
           error: null,

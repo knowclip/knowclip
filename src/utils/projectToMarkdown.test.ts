@@ -42,7 +42,6 @@ describe('projectToMarkdown', () => {
     id: 'xxx',
     name: 'Basic Japanese',
     lastSaved: '2015-11-16T09:44:45Z',
-    lastOpened: '2015-11-16T09:44:45Z',
 
     noteType: 'Transliteration',
     mediaFileIds: [mediaFileId],

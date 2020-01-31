@@ -1,11 +1,11 @@
 declare type FilesState = {
-  ProjectFile: Record<FileId, ProjectFile>
-  MediaFile: Record<FileId, MediaFile>
-  VttConvertedSubtitlesFile: Record<FileId, VttConvertedSubtitlesFile>
-  ExternalSubtitlesFile: Record<FileId, ExternalSubtitlesFile>
-  WaveformPng: Record<FileId, WaveformPng>
-  ConstantBitrateMp3: Record<FileId, ConstantBitrateMp3>
-  VideoStillImage: Record<FileId, VideoStillImageFile>
+  ProjectFile: Dict<FileId, ProjectFile>
+  MediaFile: Dict<FileId, MediaFile>
+  VttConvertedSubtitlesFile: Dict<FileId, VttConvertedSubtitlesFile>
+  ExternalSubtitlesFile: Dict<FileId, ExternalSubtitlesFile>
+  WaveformPng: Dict<FileId, WaveformPng>
+  ConstantBitrateMp3: Dict<FileId, ConstantBitrateMp3>
+  VideoStillImage: Dict<FileId, VideoStillImageFile>
 }
 
 declare type FileId = string
@@ -34,7 +34,6 @@ declare type ProjectFile = {
   noteType: NoteType
   mediaFileIds: Array<MediaFileId>
   error: string | null
-  lastOpened: string
   lastSaved: string
 }
 declare type MediaFile = VideoFile | AudioFile

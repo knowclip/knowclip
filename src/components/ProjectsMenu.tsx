@@ -65,7 +65,6 @@ const ProjectsMenu = () => {
     projects: r.getProjects(state),
     currentProjectId: r.getCurrentProjectId(state),
   }))
-
   const dispatch = useDispatch()
   const handleClickNewProject = useCallback(
     () => {

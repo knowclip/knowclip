@@ -37,9 +37,11 @@ declare type CurrentlyLoadedFile = {
 declare type ErroredFile = {
   id: FileId
   /** A file that has failed to open at the most
-   * recent attempt during this session.
+   * recent attempt during this session. OR SHOULD THIS BE NOT JUST FOR THE SESSION?
    */
   status: 'FAILED_TO_LOAD'
+  // error message as well?
+  // should show in UI for media files/subtitles when one is in this state
   filePath: filePath | null
   isLoading: boolean
   lastOpened: string | null

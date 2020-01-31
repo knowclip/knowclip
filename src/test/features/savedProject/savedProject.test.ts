@@ -60,7 +60,6 @@ const persistedState: Partial<AppState> = {
           '918d2b17-578f-4c5e-aafa-08d736e52af1',
         ],
         error: null,
-        lastOpened: '2020-01-28T12:29:32Z',
         lastSaved: '2020-01-28T12:29:32Z',
       },
     },
