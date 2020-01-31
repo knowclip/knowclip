@@ -54,6 +54,8 @@ export default {
           validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
         .map(validatedFile => r.addFile(validatedFile))
+
+      // is this bit even necessary?
       const addNewSubtitlesFiles = project.subtitles
         .filter(
           subtitlesFile =>
@@ -67,7 +69,9 @@ export default {
 
       return [
         ...addNewMediaFiles,
-        ...addNewSubtitlesFiles, // maybe should happen when opening media
+        // maybe should happen when opening media
+        // OR actually probably better in useEffect in components that need the data
+        // ...addNewSubtitlesFiles,
         r.openProject(validatedFile, project.clips, effects.nowUtcTimestamp()),
         ...loadFirstMediaFile,
         ...persistFiles(state, effects.setLocalStorage),

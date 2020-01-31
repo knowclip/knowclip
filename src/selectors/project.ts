@@ -6,6 +6,7 @@ import getAllTagsFromClips from '../utils/getAllTags'
 import { getClips, getClipIdsByMediaFileId, getClip } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
+import { normalize, schema } from 'normalizr'
 
 const newestToOldest = (
   { lastOpened: a }: ProjectFile,
@@ -81,7 +82,7 @@ export const getSlimProject = <F extends FlashcardFields>(
           format,
           durationSeconds,
           id,
-          ...(subtitles.length ? { subtitles } : null),
+          // ...(subtitles.length ? { subtitles } : null),
 
           clips: getProjectClips(state, mediaFile, fieldsTemplate),
         }
@@ -151,4 +152,101 @@ export const getYamlProject = <F extends FlashcardFields>(
   )
 
   return [{ name, noteType, timestamp, id }, ...media]
+}
+
+export const fillOutSlimProject = <F extends FlashcardFields>(
+  slimProject: SlimProject<F>
+): {
+  project: ProjectFile
+  media: MediaFile[]
+  // subtitles: SubtitlesFile[]
+} => {
+  const project: ProjectFile = {
+    id: slimProject.id,
+    lastSaved: slimProject.timestamp,
+    noteType: slimProject.noteType,
+    name: slimProject.name,
+    mediaFileIds: slimProject.media.map(m => m.id),
+    lastOpened: 'PLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEHOLDER',
+    type: 'ProjectFile',
+    error: null,
+  }
+  const media: MediaFile[] = slimProject.media.map(m => {
+    const subtitles = m.subtitles
+      ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
+      : []
+    const base: AudioFile = {
+      name: m.name,
+      type: 'MediaFile',
+      id: m.id,
+      parentId: slimProject.id,
+      durationSeconds: m.durationSeconds,
+      format: m.format,
+      subtitles,
+      flashcardFieldsToSubtitlesTracks:
+        m.flashcardFieldsToSubtitlesTracks || {},
+      subtitlesTracksStreamIndexes: subtitles
+        .filter(
+          (s): s is EmbeddedSubtitlesTrackRelation =>
+            s.type === 'EmbeddedSubtitlesTrack'
+        )
+        .map(s => s.streamIndex),
+      isVideo: false,
+    }
+
+    if ('width' in m) {
+      return {
+        ...base,
+        isVideo: true,
+        width: m.width,
+        height: m.height,
+      }
+    }
+
+    return base
+  })
+
+  // const subtitles : SubtitlesFile[] = m.subtitles.map(s =>toSubtitlesFile(s, m) )
+
+  return { project, media }
+}
+
+function toMediaSubtitlesRelation(s: ProjectSubtitles): MediaSubtitlesRelation {
+  switch (s.type) {
+    case 'Embedded':
+      return {
+        type: 'EmbeddedSubtitlesTrack',
+        id: s.id,
+        streamIndex: s.streamIndex,
+      }
+
+    case 'External':
+      return {
+        type: 'ExternalSubtitlesTrack',
+        id: s.id,
+      }
+  }
+}
+function toSubtitlesFile(
+  s: ProjectSubtitles,
+  mediaFileId: MediaFileId
+): SubtitlesFile {
+  switch (s.type) {
+    case 'Embedded':
+      return {
+        type: 'VttConvertedSubtitlesFile',
+        id: s.id,
+        streamIndex: s.streamIndex,
+        parentId: mediaFileId,
+        parentType: 'MediaFile',
+      }
+
+    case 'External':
+      return {
+        type: 'ExternalSubtitlesFile',
+        name: s.name,
+        id: s.id,
+        parentId: s.id,
+      }
+  }
 }

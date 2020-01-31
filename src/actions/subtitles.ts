@@ -1,5 +1,5 @@
 import { basename } from 'path'
-import { locateFileSuccess } from './files'
+import { locateFileSuccess, openFileRequest } from './files'
 import { uuid } from '../utils/sideEffects'
 
 export const showSubtitles = (
@@ -27,11 +27,11 @@ export const addSubtitlesTrack = (
   track,
 })
 
-export const loadSubtitlesFromFileRequest = (
+export const loadNewSubtitlesFile = (
   filePath: string,
   mediaFileId: MediaFileId
-): LocateFileSuccess =>
-  locateFileSuccess(
+): OpenFileRequest =>
+  openFileRequest(
     {
       type: 'ExternalSubtitlesFile',
       parentId: mediaFileId,

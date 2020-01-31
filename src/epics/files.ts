@@ -41,8 +41,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         !existsSync(fileAvailability.filePath)
       ) {
         const fileTypeAndName = getHumanFileName(file)
-        const fileVerb =
-          file.type === 'MediaFile' ? 'making clips with' : 'using'
+        const fileVerb = file.type === 'MediaFile' ? 'make clips with' : 'use'
         const message = fileAvailability.filePath
           ? `This ${fileTypeAndName} appears to have moved or been renamed. Try locating it manually?`
           : `Please locate your ${fileTypeAndName} in the filesystem so you can ${fileVerb} it.

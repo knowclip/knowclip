@@ -60,7 +60,7 @@ const SubtitlesMenu = () => {
       if (!filePaths) return
 
       dispatch(
-        actions.loadSubtitlesFromFileRequest(filePaths[0], currentFileId)
+        actions.loadNewSubtitlesFile(filePaths[0], currentFileId)
       )
 
       close(e)

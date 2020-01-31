@@ -84,6 +84,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       )
 
     case A.ADD_SUBTITLES_TRACK:
+      debugger
       return edit<MediaFile>(
         state,
         'MediaFile',

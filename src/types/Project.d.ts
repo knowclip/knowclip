@@ -81,7 +81,7 @@ declare type SlimProject<F extends FlashcardFields> = {
 declare type ProjectMediaFile<F extends FlashcardFields> =
   | {
       name: MediaFileName
-      subtitles?: Array<MediaSubtitlesRelation>
+      subtitles?: Array<ProjectSubtitles>
       clips: ProjectClip<F>[]
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
 
@@ -92,7 +92,7 @@ declare type ProjectMediaFile<F extends FlashcardFields> =
     }
   | {
       name: MediaFileName
-      subtitles?: Array<MediaSubtitlesRelation>
+      subtitles?: Array<ProjectSubtitles>
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
       clips: ProjectClip<F>[]
 
@@ -114,3 +114,15 @@ declare type ProjectClip<F extends FlashcardFields> = {
 
   id: ClipId
 }
+
+declare type ProjectSubtitles =
+  | {
+      type: 'Embedded'
+      streamIndex: number
+      id: string
+    }
+  | {
+      type: 'External'
+      name: string
+      id: string
+    }

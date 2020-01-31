@@ -33,10 +33,8 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     )
   })
 
-const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
-  MediaFile
-> = async (
-  { validatedFile: { subtitles, name }, filePath },
+const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
+  { validatedFile: { subtitles, name, id: mediaFileId }, filePath },
   state,
   effects
 ) => [
@@ -44,10 +42,14 @@ const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
     .filter(s => s.type === 'ExternalSubtitlesTrack')
     .map(({ id }) => {
       const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
-      if (externalSubtitles) return r.openFileRequest(externalSubtitles)
-
-      return r.simpleMessageSnackbar(
-        'Could not open external subtitles for ' + name
+      return r.openFileRequest(
+        externalSubtitles || {
+          id,
+          type: 'ExternalSubtitlesFile',
+          // name: 'PLACEHOLDERR',
+          name: 'pbc_jp.ass', // 'PLACEHOLDERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+          parentId: mediaFileId,
+        }
       )
     }),
 ]
@@ -168,7 +170,7 @@ export default {
 
   openSuccess: [
     addEmbeddedSubtitles,
-    reloadRememberedExternalSubtitles,
+    loadExternalSubtitles,
     getCbr,
     getWaveform,
     setDefaultClipSpecs,

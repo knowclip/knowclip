@@ -19,7 +19,7 @@ import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
 import { DialogProps } from './DialogProps'
 import {
-  loadSubtitlesFromFileRequest,
+  loadNewSubtitlesFile,
   makeClipsFromSubtitles,
 } from '../../actions'
 import { SubtitlesFileWithTrack } from '../../redux'
@@ -145,7 +145,7 @@ const SubtitlesClipsDialog = ({
       ])
       if (!filePaths) return
 
-      dispatch(loadSubtitlesFromFileRequest(filePaths[0], currentFileId))
+      dispatch(loadNewSubtitlesFile(filePaths[0], currentFileId))
     },
     [dispatch, currentFileId]
   )

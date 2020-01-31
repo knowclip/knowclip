@@ -210,7 +210,7 @@ const saveProject: AppEpic = (action$, state$) =>
             all += YAML.stringify(y)
 
             return all
-          }, '')
+          }, `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n`)
         )
 
         return from([
