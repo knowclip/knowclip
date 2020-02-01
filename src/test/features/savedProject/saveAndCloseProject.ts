@@ -1,6 +1,4 @@
-import { join } from 'path'
-import { readFile } from 'fs-extra'
-import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
+import { TestSetup } from '../../spectronApp'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 

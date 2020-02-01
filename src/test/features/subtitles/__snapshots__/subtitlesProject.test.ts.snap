@@ -5,7 +5,7 @@ Object {
   "clips": Array [
     Object {
       "end": 626,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Chilling and eating bamboo 
@@ -29,7 +29,7 @@ grass is the best thing ever.",
     },
     Object {
       "end": 882.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Hey now. Look at you, being so lazy 
@@ -53,7 +53,7 @@ so early in the day.",
     },
     Object {
       "end": 1063,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "You're in the way of my cleaning. Scoot.",
@@ -76,7 +76,7 @@ so early in the day.",
     },
     Object {
       "end": 1136,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Okay.",
@@ -99,7 +99,7 @@ so early in the day.",
     },
     Object {
       "end": 1372.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Seconds please, Mom.",
@@ -122,7 +122,7 @@ so early in the day.",
     },
     Object {
       "end": 1609.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Exactly what do you have 
@@ -146,7 +146,7 @@ planned for your future?",
     },
     Object {
       "end": 1961,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Jeez... Could we not talk about my future when I'm relaxing?",
@@ -169,7 +169,7 @@ planned for your future?",
     },
     Object {
       "end": 2131.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "If you have so much time to relax, you could go look for a part-time job.",
@@ -192,7 +192,7 @@ planned for your future?",
     },
     Object {
       "end": 2464.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I'm too busy relaxing, 
@@ -216,7 +216,7 @@ so I'll do it later.",
     },
     Object {
       "end": 2755,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Don't try to suck me up!",
@@ -239,7 +239,7 @@ so I'll do it later.",
     },
     Object {
       "end": 2912,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Jeez...",
@@ -262,7 +262,7 @@ so I'll do it later.",
     },
     Object {
       "end": 3233.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I wonder why Mom can't understand how much time relaxing takes up.",
@@ -285,7 +285,7 @@ so I'll do it later.",
     },
     Object {
       "end": 4099,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Excuse me, which of these will have jobs where I can get paid to do nothing?",
@@ -308,7 +308,7 @@ so I'll do it later.",
     },
     Object {
       "end": 4254.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I don't think there is one.",
@@ -331,7 +331,7 @@ so I'll do it later.",
     },
     Object {
       "end": 4336.5,
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "fileId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "flashcard": Object {
         "fields": Object {
           "meaning": "Really?",
@@ -354,7 +354,7 @@ so I'll do it later.",
     },
     Object {
       "end": 438,
-      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "fileId": "f5053503-8e5f-45c3-9afc-26f5e6eab8a8",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I am not a cat, said Frederick angrily",
@@ -362,9 +362,9 @@ so I'll do it later.",
           "pronunciation": "",
           "transcription": "Ich bin keine Katze, sagte Frederick böse",
         },
-        "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+        "id": "152077c6-336b-47d6-88e6-1ba4410db553",
         "image": Object {
-          "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+          "id": "152077c6-336b-47d6-88e6-1ba4410db553",
           "type": "VideoStillImage",
         },
         "tags": Array [
@@ -372,12 +372,12 @@ so I'll do it later.",
         ],
         "type": "Transliteration",
       },
-      "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+      "id": "152077c6-336b-47d6-88e6-1ba4410db553",
       "start": 351,
     },
     Object {
       "end": 1000,
-      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "fileId": "f5053503-8e5f-45c3-9afc-26f5e6eab8a8",
       "flashcard": Object {
         "fields": Object {
           "meaning": "I didn't say that",
@@ -385,9 +385,9 @@ so I'll do it later.",
           "pronunciation": "",
           "transcription": "Das hab' ich nicht gesagt",
         },
-        "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+        "id": "864d822f-d482-438e-9620-684b2730a688",
         "image": Object {
-          "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+          "id": "864d822f-d482-438e-9620-684b2730a688",
           "type": "VideoStillImage",
         },
         "tags": Array [
@@ -395,28 +395,28 @@ so I'll do it later.",
         ],
         "type": "Transliteration",
       },
-      "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+      "id": "864d822f-d482-438e-9620-684b2730a688",
       "start": 921,
     },
   ],
-  "id": "6153116d-faf3-4b70-864b-80475f2e3091",
-  "lastOpened": "2020-01-24T23:44:33Z",
+  "id": "ef3a2602-37a0-4158-89d6-47b75edb5bea",
+  "lastOpened": "2020-02-01T16:25:27Z",
   "mediaFiles": Array [
     Object {
       "durationSeconds": 87.062,
       "flashcardFieldsToSubtitlesTracks": Object {
-        "meaning": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
+        "meaning": "5f581055-dbf5-4f3b-bcee-a3215e405ffc",
         "transcription": "94367f0c-92ef-4542-a80a-6fbaf8e1ad76",
       },
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "height": 1080,
-      "id": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "isVideo": true,
       "name": "polar_bear_cafe.mp4",
-      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
+      "parentId": "ef3a2602-37a0-4158-89d6-47b75edb5bea",
       "subtitles": Array [
         Object {
-          "id": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
+          "id": "5f581055-dbf5-4f3b-bcee-a3215e405ffc",
           "streamIndex": 2,
           "type": "EmbeddedSubtitlesTrack",
         },
@@ -436,10 +436,10 @@ so I'll do it later.",
       "flashcardFieldsToSubtitlesTracks": Object {},
       "format": "mov,mp4,m4a,3gp,3g2,mj2",
       "height": 360,
-      "id": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "id": "f5053503-8e5f-45c3-9afc-26f5e6eab8a8",
       "isVideo": true,
       "name": "piggeldy_cat.mp4",
-      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
+      "parentId": "ef3a2602-37a0-4158-89d6-47b75edb5bea",
       "subtitles": Array [],
       "subtitlesTracksStreamIndexes": Array [],
       "type": "MediaFile",
@@ -452,7 +452,7 @@ so I'll do it later.",
     Object {
       "id": "94367f0c-92ef-4542-a80a-6fbaf8e1ad76",
       "name": "pbc_jp.ass",
-      "parentId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "parentId": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
       "type": "ExternalSubtitlesFile",
     },
   ],
@@ -460,7 +460,7 @@ so I'll do it later.",
     "piggeldy_cat.mp4",
     "pbc",
   ],
-  "timestamp": "2020-01-24T23:44:38Z",
+  "timestamp": "2020-02-01T16:25:27Z",
   "version": "4.1.0",
 }
 `;
