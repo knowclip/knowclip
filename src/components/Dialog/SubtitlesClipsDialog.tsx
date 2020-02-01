@@ -18,10 +18,7 @@ import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
 import { DialogProps } from './DialogProps'
-import {
-  loadNewSubtitlesFile,
-  makeClipsFromSubtitles,
-} from '../../actions'
+import { loadNewSubtitlesFile, makeClipsFromSubtitles } from '../../actions'
 import { SubtitlesFileWithTrack } from '../../redux'
 import { MediaSubtitles } from '../../selectors'
 

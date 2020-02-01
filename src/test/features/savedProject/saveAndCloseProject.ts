@@ -4,20 +4,14 @@ import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 
-export default async function saveAndCloseProject({ client }: TestSetup) {
+export default async function saveAndCloseProject(
+  { client }: TestSetup,
+  projectTitle: string
+) {
   await saveProjectViaButton(client)
-
-  const actualProjectFileContents = JSON.parse(
-    await readFile(
-      join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
-      'utf8'
-    )
-  )
-
-  expect(actualProjectFileContents).toMatchSnapshot()
 
   await closeProject(client)
 
   const { recentProjectsListItem } = projectsMenu$
-  await client.waitForText_(recentProjectsListItem, 'My cool saved project')
+  await client.waitForText_(recentProjectsListItem, projectTitle)
 }

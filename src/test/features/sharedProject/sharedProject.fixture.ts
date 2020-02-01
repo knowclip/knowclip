@@ -1,19 +1,23 @@
 import { Application } from 'spectron'
-import { startApp, stopApp, TestSetup } from '../../spectronApp'
-import openSharedProject from './openSharedProject'
-import navigateBetweenMedia from './navigateBetweenMedia'
-import makeFlashcardsWithSubtitles from './makeFlashcardsWithSubtitles'
-import manuallyLocateAsset from './manuallyLocateAsset'
-import reviewWithMissingMedia from './reviewWithMissingMedia'
-import exportWithMissingMedia from './exportWithMissingMedia'
-import saveAndCloseProject from './saveAndCloseProject'
+import {
+  startApp,
+  stopApp,
+  TestSetup,
+  TMP_DIRECTORY,
+  FIXTURES_DIRECTORY,
+} from '../../spectronApp'
 import { mockSideEffects } from '../../../utils/sideEffects'
+import { runAll } from '../step'
+import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
+import { copyFile } from 'fs-extra'
+import { join } from 'path'
+import { savedProjectTestSteps } from '../savedProject/savedProjectTestSteps'
 
 jest.setTimeout(60000)
 
 const testId = 'sharedProject'
 
-describe('opening a shared project', () => {
+describe('make a project file for testing shared projects', () => {
   let context: { app: Application | null; testId: string } = {
     app: null,
     testId,
@@ -22,25 +26,33 @@ describe('opening a shared project', () => {
 
   beforeAll(async () => {
     setup = await startApp(context)
-
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('open a shared project and locates media in local filesystem', () =>
-    openSharedProject(setup))
-  test('navigate between as-of-yet unloaded media', () =>
-    navigateBetweenMedia(setup))
-  test('make some flashcards', () => makeFlashcardsWithSubtitles(setup))
-  test('manually locate missing assets', () => manuallyLocateAsset(setup))
-  test('review with missing media', () => reviewWithMissingMedia(setup))
-  test('export deck with missing media', () => exportWithMissingMedia(setup))
-  test('save and close project', () => saveAndCloseProject(setup))
+  runAll(
+    [
+      ...newProjectTestSteps({
+        projectFileName: 'project_shared_with_me',
+        projectTitle: "My friend's shared project",
+      }),
+      ...savedProjectTestSteps({
+        projectTitle: "My friend's shared project",
+      }),
+    ],
+    () => setup
+  )
 
   afterAll(async () => {
+    await copyFile(
+      join(TMP_DIRECTORY, 'project_shared_with_me.afca'),
+      join(FIXTURES_DIRECTORY, 'project_shared_with_me.afca')
+    )
+
+    await setup.logPersistedData()
+
     await stopApp(context)
   })
 })
-
 const sideEffectsMocks = {
   uuid: [
     '2aeda2ce-af4b-48b4-9797-49015557f34f',

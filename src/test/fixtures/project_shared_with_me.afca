@@ -1,28 +1,28 @@
 {
   "version": "4.1.0",
-  "timestamp": "2020-01-28T12:48:03Z",
+  "timestamp": "2020-02-01T15:59:10Z",
   "name": "My friend's shared project",
-  "id": "6153116d-faf3-4b70-864b-80475f2e3091",
+  "id": "2aeda2ce-af4b-48b4-9797-49015557f34f",
   "noteType": "Transliteration",
-  "lastOpened": "2020-01-28T12:47:52Z",
+  "lastOpened": "2020-02-01T15:59:10Z",
   "mediaFiles": [
     {
-      "id": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "71da02b1-12e7-47aa-8edf-868dbf33f0d3",
       "type": "MediaFile",
-      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
+      "parentId": "2aeda2ce-af4b-48b4-9797-49015557f34f",
       "subtitles": [
         {
           "type": "EmbeddedSubtitlesTrack",
-          "id": "31dfe711-758e-4ba4-9dff-0fb73d1ab79a",
+          "id": "18d2d70a-a575-47b4-ad4c-5e1cb196aebc",
           "streamIndex": 2
         },
         {
           "type": "ExternalSubtitlesTrack",
-          "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271"
+          "id": "603cd2a3-1aa6-4964-88e2-7ed3e7c85d15"
         }
       ],
       "flashcardFieldsToSubtitlesTracks": {
-        "transcription": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271"
+        "transcription": "603cd2a3-1aa6-4964-88e2-7ed3e7c85d15"
       },
       "isVideo": true,
       "name": "polar_bear_cafe.mp4",
@@ -35,9 +35,9 @@
       "height": 1080
     },
     {
-      "id": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "id": "6fb35c19-02ed-42a7-b518-89f94273c028",
       "type": "MediaFile",
-      "parentId": "6153116d-faf3-4b70-864b-80475f2e3091",
+      "parentId": "2aeda2ce-af4b-48b4-9797-49015557f34f",
       "subtitles": [],
       "flashcardFieldsToSubtitlesTracks": {},
       "isVideo": true,
@@ -57,10 +57,10 @@
     {
       "start": 402,
       "end": 625,
-      "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "786f7023-0862-4cf7-863f-2c32ec6a3975",
+      "fileId": "71da02b1-12e7-47aa-8edf-868dbf33f0d3",
       "flashcard": {
-        "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+        "id": "786f7023-0862-4cf7-863f-2c32ec6a3975",
         "type": "Transliteration",
         "fields": {
           "transcription": "笹を食べながらのんびりするのは最高だなぁ",
@@ -72,18 +72,18 @@
           "pbc"
         ],
         "image": {
-          "id": "c3637ef9-ea4d-4049-b604-a768239f721c",
+          "id": "786f7023-0862-4cf7-863f-2c32ec6a3975",
           "type": "VideoStillImage"
         }
       }
     },
     {
-      "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "b177def7-d7ca-4eae-ba97-03b92cba8657",
+      "fileId": "71da02b1-12e7-47aa-8edf-868dbf33f0d3",
       "start": 756,
       "end": 888,
       "flashcard": {
-        "id": "2a4c9389-8d9f-4b50-8b33-5dd62aa7aa4d",
+        "id": "b177def7-d7ca-4eae-ba97-03b92cba8657",
         "type": "Transliteration",
         "fields": {
           "transcription": "またこの子は昼間からゴロゴロして",
@@ -99,10 +99,10 @@
     {
       "start": 3760,
       "end": 4058,
-      "id": "c33016bd-563b-4a36-851a-802643b6cccb",
-      "fileId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
+      "id": "5bcf962d-b74f-4eb5-a973-20374b1ab470",
+      "fileId": "71da02b1-12e7-47aa-8edf-868dbf33f0d3",
       "flashcard": {
-        "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+        "id": "5bcf962d-b74f-4eb5-a973-20374b1ab470",
         "type": "Transliteration",
         "fields": {
           "transcription": "",
@@ -114,7 +114,7 @@
           "pbc"
         ],
         "image": {
-          "id": "c33016bd-563b-4a36-851a-802643b6cccb",
+          "id": "5bcf962d-b74f-4eb5-a973-20374b1ab470",
           "type": "VideoStillImage"
         }
       }
@@ -122,10 +122,10 @@
     {
       "start": 351,
       "end": 438,
-      "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
-      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "id": "08f0661f-ab1b-48d5-b64c-ef0afbcb9e83",
+      "fileId": "6fb35c19-02ed-42a7-b518-89f94273c028",
       "flashcard": {
-        "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+        "id": "08f0661f-ab1b-48d5-b64c-ef0afbcb9e83",
         "type": "Transliteration",
         "fields": {
           "transcription": "Ich bin keine Katze, sagte Frederick böse",
@@ -137,7 +137,7 @@
           "piggeldy_cat.mp4"
         ],
         "image": {
-          "id": "88b8a0b3-19d1-41b2-b100-6d97474bddd4",
+          "id": "08f0661f-ab1b-48d5-b64c-ef0afbcb9e83",
           "type": "VideoStillImage"
         }
       }
@@ -145,10 +145,10 @@
     {
       "start": 921,
       "end": 1000,
-      "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
-      "fileId": "918d2b17-578f-4c5e-aafa-08d736e52af1",
+      "id": "adda6b96-effd-463a-9998-509864e2f792",
+      "fileId": "6fb35c19-02ed-42a7-b518-89f94273c028",
       "flashcard": {
-        "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+        "id": "adda6b96-effd-463a-9998-509864e2f792",
         "type": "Transliteration",
         "fields": {
           "transcription": "Das hab' ich nicht gesagt",
@@ -160,7 +160,7 @@
           "piggeldy_cat.mp4"
         ],
         "image": {
-          "id": "c389b3fb-98b4-4ac3-9b4c-84959cf7b8df",
+          "id": "adda6b96-effd-463a-9998-509864e2f792",
           "type": "VideoStillImage"
         }
       }
@@ -169,8 +169,8 @@
   "subtitles": [
     {
       "type": "ExternalSubtitlesFile",
-      "parentId": "6b12235d-ad09-4af7-b7f2-88e19357cb9d",
-      "id": "9e5c0e3f-6670-4dcd-86fd-2b4d90bfb271",
+      "parentId": "71da02b1-12e7-47aa-8edf-868dbf33f0d3",
+      "id": "603cd2a3-1aa6-4964-88e2-7ed3e7c85d15",
       "name": "pbc_jp.ass"
     }
   ]

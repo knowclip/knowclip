@@ -8,11 +8,11 @@ import {
   GENERATED_ASSETS_DIRECTORY,
 } from '../../spectronApp'
 import { mockSideEffects } from '../../../utils/sideEffects'
-import openSavedProject from './openSavedProject'
 import { join } from 'path'
-import makeSomeFlashcards from './makeSomeFlashcards'
-import saveAndCloseProject from './saveAndCloseProject'
-import linkSubtitlesToFields from './linkSubtitlesToFields'
+
+import { readFile } from 'fs-extra'
+import { runAll } from '../step'
+import { savedProjectTestSteps } from './savedProjectTestSteps'
 
 jest.setTimeout(60000)
 
@@ -31,10 +31,23 @@ describe('opening and saving a previously saved project', () => {
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('opens a previously saved project', () => openSavedProject(setup))
-  test('make some flashcards', () => makeSomeFlashcards(setup))
-  test('link subtitles to fields', () => linkSubtitlesToFields(setup))
-  test('save and closes project', () => saveAndCloseProject(setup))
+  runAll(
+    savedProjectTestSteps({
+      projectTitle: 'My cool saved project',
+    }),
+    () => setup
+  )
+
+  test('resulting project file matches snapshot', async () => {
+    const actualProjectFileContents = JSON.parse(
+      await readFile(
+        join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
+        'utf8'
+      )
+    )
+
+    expect(actualProjectFileContents).toMatchSnapshot()
+  })
 
   afterAll(async () => {
     await stopApp(context)
