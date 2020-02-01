@@ -200,7 +200,7 @@ const saveProject: AppEpic = (action$, state$) =>
             ? blankSimpleFields
             : blankTransliterationFields
         )
-
+        console.log('saving yaml?')
         await writeFile(
           projectFile.filePath + '.yml',
           yamlProject.reduce((all, y, i) => {

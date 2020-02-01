@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`create a deck from a new project saving a project file 1`] = `
+exports[`create a deck from a new project resulting project file matches snapshot 1`] = `
 Object {
   "clips": Array [
     Object {
@@ -70,7 +70,7 @@ Object {
     },
   ],
   "id": "6f58206b-9384-411c-8432-e7ff8d6c958b",
-  "lastOpened": "2020-01-28T12:35:20Z",
+  "lastOpened": "2020-01-31T14:27:08Z",
   "mediaFiles": Array [
     Object {
       "durationSeconds": 87.062,
@@ -126,7 +126,7 @@ Object {
   "tags": Array [
     "pbc",
   ],
-  "timestamp": "2020-01-28T12:35:49Z",
+  "timestamp": "2020-01-31T14:27:08Z",
   "version": "4.1.0",
 }
 `;

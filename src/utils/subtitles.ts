@@ -3,7 +3,7 @@ import tempy from 'tempy'
 import fs from 'fs'
 import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import * as r from '../redux'
-import { extname } from 'path'
+import { extname, basename, join } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import { getMillisecondsAtX } from '../selectors'
@@ -12,6 +12,7 @@ const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
 export const getSubtitlesFilePathFromMedia = async (
+  file: SubtitlesFile,
   mediaFilePath: MediaFilePath,
   streamIndex: number
 ): Promise<string | null> => {
@@ -26,7 +27,13 @@ export const getSubtitlesFilePathFromMedia = async (
   ) {
     return null
   }
-  const outputFilePath = tempy.file({ extension: 'vtt' })
+  const outputFilePath = join(
+    tempy.root,
+    basename(mediaFilePath + '_' + streamIndex.toString()) +
+      '_' +
+      file.id +
+      '.vtt'
+  )
 
   return await new Promise((res, rej) =>
     ffmpeg(mediaFilePath)
@@ -45,11 +52,16 @@ export const getSubtitlesFilePathFromMedia = async (
 
 export const getExternalSubtitlesVttPath = async (
   state: AppState,
+  file: SubtitlesFile,
   filePath: string
 ) => {
   const extension = extname(filePath).toLowerCase()
+
   const vttFilePath =
-    extension === '.vtt' ? filePath : tempy.file({ extension: 'vtt' })
+    extension === '.vtt'
+      ? filePath
+      : join(tempy.root, basename(filePath) + '_' + file.id + '.vtt')
+
   const fileContents = await readFile(filePath, 'utf8')
   const chunks = parseSubtitles(state, fileContents, extension)
 
@@ -75,13 +87,14 @@ export const getSubtitlesFilePath = async (
   file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
 ) => {
   if (file.type === 'ExternalSubtitlesFile') {
-    return await getExternalSubtitlesVttPath(state, sourceFilePath)
+    return await getExternalSubtitlesVttPath(state, file, sourceFilePath)
   }
   switch (file.parentType) {
     case 'ExternalSubtitlesFile':
-      return await getExternalSubtitlesVttPath(state, sourceFilePath)
+      return await getExternalSubtitlesVttPath(state, file, sourceFilePath)
     case 'MediaFile':
       const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
+        file,
         sourceFilePath,
         file.streamIndex
       )

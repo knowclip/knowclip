@@ -12,13 +12,14 @@ export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 export type TestSetup = {
   app: Application
   client: ClientWrapper
+  logPersistedData: () => Promise<void>
 }
 
 export async function startApp(
   context: {
     app: Application | null
+    testId: string
   },
-  testId: string,
   persistedState?: Partial<AppState>
 ): Promise<TestSetup> {
   await copyFixtures()
@@ -39,7 +40,7 @@ export async function startApp(
 
   await app.start()
 
-  app.webContents.send('start-test', testId)
+  app.webContents.send('start-test', context.testId)
 
   if (persistedState) {
     for (const [key, value] of Object.entries(persistedState))
@@ -53,18 +54,26 @@ export async function startApp(
   const setup = {
     app,
     client: new ClientWrapper(app.client),
+    logPersistedData: async () => {
+      app.webContents.send('log-persisted-data', context.testId, {
+        ASSETS_DIRECTORY,
+        GENERATED_ASSETS_DIRECTORY,
+        TMP_DIRECTORY,
+      })
+    },
   }
   return setup
 }
 
 export async function stopApp(context: {
   app: Application | null
+  testId: string
 }): Promise<null> {
+  const { app } = context
   if (process.env.INTEGRATION_DEV) {
     return null
   }
 
-  const { app } = context
   if (app) {
     app.webContents.send('end-test')
 
@@ -77,6 +86,7 @@ export async function stopApp(context: {
 
   return null
 }
+
 async function copyFixtures() {
   if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
   await mkdirp(TMP_DIRECTORY)

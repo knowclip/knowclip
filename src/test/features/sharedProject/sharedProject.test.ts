@@ -11,12 +11,17 @@ import { mockSideEffects } from '../../../utils/sideEffects'
 
 jest.setTimeout(60000)
 
+const testId = 'sharedProject'
+
 describe('opening a shared project', () => {
-  let context: { app: Application | null } = { app: null }
+  let context: { app: Application | null; testId: string } = {
+    app: null,
+    testId,
+  }
   let setup: TestSetup
 
   beforeAll(async () => {
-    setup = await startApp(context, 'sharedProject')
+    setup = await startApp(context)
 
     await mockSideEffects(setup.app, sideEffectsMocks)
   })

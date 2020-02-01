@@ -17,11 +17,14 @@ jest.setTimeout(60000)
 const testId = 'subtitlesProject'
 
 describe('make clips and cards from subtitles', () => {
-  let context: { app: Application | null } = { app: null }
+  let context: { app: Application | null; testId: string } = {
+    app: null,
+    testId,
+  }
   let setup: TestSetup
 
   beforeAll(async () => {
-    setup = await startApp(context, testId, persistedState)
+    setup = await startApp(context, persistedState)
 
     await mockSideEffects(setup.app, sideEffectsMocks)
   })

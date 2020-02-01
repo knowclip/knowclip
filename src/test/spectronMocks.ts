@@ -27,12 +27,16 @@ export default function spectronMocks<M extends ModuleLike>(
       process.cwd(),
       `${currentTestId && currentTestId + '__'}${moduleId}-mocks-${now}.log`
     )
+
   const mockMessageName = 'mock-' + moduleId
   const logMessageName = 'log-mocks-' + moduleId
   const mocked: MockedModule<M> = { ...actualModule }
   const logged = {} as { [K in keyof M]: ReturnType<M[K]>[] }
-
   const returnValues = {} as { [K in keyof M]: ReturnType<M[K]>[] }
+
+  const writeLog = () =>
+    promises.writeFile(logFilePath(), JSON.stringify(logged, null, 2))
+
   for (const functionName in actualModule) {
     logged[functionName] = []
 
@@ -55,7 +59,7 @@ export default function spectronMocks<M extends ModuleLike>(
 
       logged[functionName].push(actualReturnValue)
 
-      promises.writeFile(logFilePath(), JSON.stringify(logged, null, 2))
+      writeLog()
 
       return actualReturnValue
     }
@@ -82,7 +86,7 @@ export default function spectronMocks<M extends ModuleLike>(
     })
 
     ipcRenderer.on(logMessageName, () => {
-      promises.writeFile(logFilePath(), JSON.stringify(logged, null, 2))
+      writeLog()
     })
   })
 
