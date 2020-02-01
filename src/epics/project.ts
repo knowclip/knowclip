@@ -15,7 +15,13 @@ import fs from 'fs'
 import parseProject from '../utils/parseProject'
 import { saveProjectToLocalStorage } from '../utils/localStorage'
 import { AppEpic } from '../types/AppEpic'
-import { getSlimProject, getYamlProject } from '../selectors'
+import {
+  getSlimProject,
+  getYamlProject,
+  fillOutSlimProject,
+  ProjectYamlDocuments,
+  yamlDocumentsToSlimProject,
+} from '../selectors'
 import {
   blankSimpleFields,
   blankTransliterationFields,
@@ -118,8 +124,27 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
         if (projectIdFromRecents)
           return of(r.openProjectById(projectIdFromRecents))
 
+        if (filePath.endsWith('yml')) {
+          const [project, ...media] = (await readFile(filePath, 'utf8'))
+            .split('\n...\n')
+            .map(d => YAML.parse(d))
+          // first validation though
+          const yamlProject: ProjectYamlDocuments<
+            TransliterationFlashcardFields
+          > = { project, media }
+          const { project: projectFile } = fillOutSlimProject(
+            yamlDocumentsToSlimProject(yamlProject)
+          )
+
+          return of(r.openFileRequest(projectFile, filePath))
+
+          // const projectJson = ((await readFile(filePath)) as unknown) as string
+          // const project = parseProject(projectJson)
+        }
+
         const projectJson = ((await readFile(filePath)) as unknown) as string
         const project = parseProject(projectJson)
+        // if (!project)
         if (!project)
           return of(
             r.simpleMessageSnackbar(
@@ -128,6 +153,7 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
           )
 
         //  TODO: write projectToProjectFile
+
         const mediaFiles = project.mediaFiles.map(({ id }) => id)
         const projectFile: ProjectFile = {
           id: project.id,
@@ -138,7 +164,6 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
           error: null,
           noteType: project.noteType,
         }
-
         return of(r.openFileRequest(projectFile, filePath))
       }
     ),
@@ -193,7 +218,7 @@ const saveProject: AppEpic = (action$, state$) =>
             2
           )
         )
-        const yamlProject = getYamlProject(
+        const { project, media } = getYamlProject(
           state$.value,
           projectMetadata,
           projectMetadata.noteType === 'Simple'
@@ -202,14 +227,9 @@ const saveProject: AppEpic = (action$, state$) =>
         )
         console.log('saving yaml?')
         await writeFile(
-          projectFile.filePath + '.yml',
-          yamlProject.reduce((all, y, i) => {
-            if (i !== 0) all += '...\n'
-
-            all += YAML.stringify(y)
-
-            return all
-          }, `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n`)
+          projectFile.filePath + '.knowclip.yml',
+          `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
+            [project, ...media].join('\n...\n')
         )
 
         return from([

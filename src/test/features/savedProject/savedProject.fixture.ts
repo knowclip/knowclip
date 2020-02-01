@@ -42,6 +42,11 @@ describe('make a project file for testing saved projects', () => {
       join(FIXTURES_DIRECTORY, 'my_previously_saved_project.afca')
     )
 
+    await copyFile(
+      join(TMP_DIRECTORY, 'my_previously_saved_project.afca.yml'),
+      join(FIXTURES_DIRECTORY, 'my_previously_saved_project.afca.yml')
+    )
+
     await setup.logPersistedData()
 
     await stopApp(context)

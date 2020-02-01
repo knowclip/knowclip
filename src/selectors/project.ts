@@ -152,15 +152,33 @@ export const getYamlProject = <F extends FlashcardFields>(
   state: AppState,
   file: ProjectFile,
   fieldsTemplate: F
-) => {
+): ProjectYamlDocuments<F> => {
   const { name, noteType, timestamp, id, media } = getSlimProject(
     state,
     file,
     fieldsTemplate
   )
 
-  return [{ name, noteType, timestamp, id }, ...media]
+  return { project: { name, noteType, timestamp, id }, media }
 }
+
+export type ProjectYamlDocuments<F extends FlashcardFields> = {
+  project: {
+    name: string
+    noteType: NoteType
+    timestamp: string
+    id: ProjectId
+  }
+  media: ProjectMediaFile<F>[]
+}
+
+export const yamlDocumentsToSlimProject = <F extends FlashcardFields>({
+  project,
+  media,
+}: ProjectYamlDocuments<F>): SlimProject<F> => ({
+  ...project,
+  media,
+})
 
 export const fillOutSlimProject = <F extends FlashcardFields>(
   slimProject: SlimProject<F>
@@ -199,6 +217,7 @@ export const fillOutSlimProject = <F extends FlashcardFields>(
             s.type === 'EmbeddedSubtitlesTrack'
         )
         .map(s => s.streamIndex),
+
       isVideo: false,
     }
 
