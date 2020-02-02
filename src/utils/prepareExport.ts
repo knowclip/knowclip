@@ -6,6 +6,7 @@ import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability } from '../selectors'
 import { existsSync } from 'fs'
 import { getVideoStillPngPath, getMidpoint } from './getVideoStill'
+import { sanitizeFileName } from './sanitizeFilename'
 const SAFE_SEPARATOR = '-'
 const SAFE_MILLISECONDS_SEPARATOR = '_'
 
@@ -114,16 +115,12 @@ export const getApkgExportData = (
 
       const startTime = r.getMillisecondsAtX(state, clip.start)
       const endTime = r.getMillisecondsAtX(state, clip.end)
-      const outputFilename = `${filenameWithoutExtension
-        .replace(/\[/g, '__br__')
-        .replace(/\]/g, '__rb__')}___${toTimestamp(
-        startTime,
-        SAFE_SEPARATOR
-      )}-${toTimestamp(
-        endTime,
-        SAFE_SEPARATOR,
-        SAFE_MILLISECONDS_SEPARATOR
-      )}___afcaId${id}${'.mp3'}`
+      const outputFilename =
+        sanitizeFileName(
+          `${filenameWithoutExtension}__${toTimestamp(startTime)}_${toTimestamp(
+            endTime
+          )}`
+        ) + '.mp3'
 
       const fieldValues = Object.values(clip.flashcard.fields).map(roughEscape)
 

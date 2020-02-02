@@ -82,32 +82,30 @@ declare type ProjectMediaFile<F extends FlashcardFields> =
   | {
       name: MediaFileName
       subtitles?: Array<ProjectSubtitles>
-      clips: ProjectClip<F>[]
+      clips?: ProjectClip<F>[]
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
 
       format: 'UNKNOWN' | string
       durationSeconds: number
-      // subtitlesTracksStreamIndexes?: number[]
       id: FileId
     }
   | {
       name: MediaFileName
       subtitles?: Array<ProjectSubtitles>
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
-      clips: ProjectClip<F>[]
+      clips?: ProjectClip<F>[]
 
       format: 'UNKNOWN' | string
       width: number
       height: number
       durationSeconds: number
-      // subtitlesTracksStreamIndexes?: number[]
       id: FileId
     }
 
 declare type ProjectClip<F extends FlashcardFields> = {
   /** must be before start and after end of any previous clips */
-  start: WaveformX
-  end: WaveformX
+  start: string
+  end: string
   image?: { type: 'VideoStill'; seconds?: number }
   fields?: Partial<F>
   tags?: Array<string>

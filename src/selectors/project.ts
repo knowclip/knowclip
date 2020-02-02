@@ -6,6 +6,7 @@ import getAllTagsFromClips from '../utils/getAllTags'
 import { getClips, getClipIdsByMediaFileId, getClip } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
+import { formatDurationWithMilliseconds } from '../utils/formatTime'
 // import { normalize, schema } from 'normalizr'
 
 const newestToOldest = (
@@ -83,17 +84,41 @@ export const getSlimProject = <F extends FlashcardFields>(
 
     media: mediaFiles.map(
       (mediaFile): ProjectMediaFile<F> => {
-        const { name, format, durationSeconds, subtitles, id } = mediaFile
+        const { name, format, durationSeconds, id } = mediaFile
 
-        return {
+        const subtitles: ProjectSubtitles[] = mediaFile.subtitles.map(s =>
+          s.type === 'EmbeddedSubtitlesTrack'
+            ? {
+                id: s.id,
+                streamIndex: s.streamIndex,
+                type: 'Embedded',
+              }
+            : {
+                id: s.id,
+                type: 'External',
+                name: (
+                  (getSubtitlesSourceFile(
+                    state,
+                    s.id
+                  ) as ExternalSubtitlesFile | null) || {
+                    name: 'External subtitles file',
+                  }
+                ).name,
+              }
+        )
+        const clips = getProjectClips(state, mediaFile, fieldsTemplate)
+        if (subtitles.length) console.log({ subtitles }, mediaFile.subtitles)
+        const newMediaFile: ProjectMediaFile<F> = {
           name,
           format,
           durationSeconds,
           id,
-          // ...(subtitles.length ? { subtitles } : null),
-
-          clips: getProjectClips(state, mediaFile, fieldsTemplate),
         }
+
+        if (subtitles.length) newMediaFile.subtitles = subtitles
+        if (clips.length) newMediaFile.clips = clips
+
+        return newMediaFile
       }
     ),
   }
@@ -115,8 +140,16 @@ function getProjectClips<F extends FlashcardFields>(
 
       const newClip: ProjectClip<F> = {
         id,
-        start: getSecondsAtX(state, start),
-        end: getSecondsAtX(state, end),
+        start: formatDurationWithMilliseconds(
+          moment.duration({
+            seconds: getSecondsAtX(state, start),
+          })
+        ),
+        end: formatDurationWithMilliseconds(
+          moment.duration({
+            seconds: getSecondsAtX(state, end),
+          })
+        ),
       }
 
       const newFields = {}

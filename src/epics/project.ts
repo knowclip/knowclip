@@ -28,6 +28,7 @@ import {
 } from '../utils/newFlashcard'
 import YAML from 'yaml'
 import './setYamlOptions'
+import { basename, join, dirname } from 'path'
 
 const writeFile = promisify(fs.writeFile)
 const readFile = promisify(fs.readFile)
@@ -125,9 +126,19 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
           return of(r.openProjectById(projectIdFromRecents))
 
         if (filePath.endsWith('yml')) {
-          const [project, ...media] = (await readFile(filePath, 'utf8'))
-            .split('\n...\n')
-            .map(d => YAML.parse(d))
+          const docs = YAML.parseAllDocuments(await readFile(filePath, 'utf8'))
+
+          const errors = docs.flatMap(v => v.errors)
+          if (errors.length)
+            return of(
+              r.simpleMessageSnackbar(
+                'Could not open project: ' + errors.join(' ')
+              )
+            )
+
+          console.log(docs)
+          const [project, ...media] = docs.map(d => d.toJSON())
+
           // first validation though
           const yamlProject: ProjectYamlDocuments<
             TransliterationFlashcardFields
@@ -227,9 +238,12 @@ const saveProject: AppEpic = (action$, state$) =>
         )
         console.log('saving yaml?')
         await writeFile(
-          projectFile.filePath + '.knowclip.yml',
+          join(
+            dirname(projectFile.filePath),
+            basename(projectFile.filePath, '.afca')
+          ) + '.kyml',
           `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
-            [project, ...media].join('\n...\n')
+            [project, ...media].map(o => YAML.stringify(o)).join('...\n')
         )
 
         return from([

@@ -7,7 +7,7 @@ export const getExtensions = (file: FileMetadata) => {
     case 'MediaFile':
       return []
     case 'ProjectFile':
-      return ['knowclip.yml']
+      return ['kyml']
     case 'VttConvertedSubtitlesFile':
       return ['vtt']
     case 'VideoStillImage':

@@ -77,7 +77,7 @@ const ProjectsMenu = () => {
       const filePaths = await showOpenDialog([
         {
           name: 'Knowclip project file',
-          extensions: ['knowclip.yml'],
+          extensions: ['afca', 'kyml'],
         },
       ])
 

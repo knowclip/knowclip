@@ -1,0 +1,73 @@
+# This file was created by Knowclip!
+# Edit it manually at your own risk.
+name: My friend's shared project
+noteType: Transliteration
+timestamp: 2020-02-01T23:54:30Z
+id: 2aeda2ce-af4b-48b4-9797-49015557f34f
+...
+name: polar_bear_cafe.mp4
+format: mov,mp4,m4a,3gp,3g2,mj2
+durationSeconds: 87.062
+id: 71da02b1-12e7-47aa-8edf-868dbf33f0d3
+subtitles:
+  - id: 18d2d70a-a575-47b4-ad4c-5e1cb196aebc
+    streamIndex: 2
+    type: Embedded
+  - id: 603cd2a3-1aa6-4964-88e2-7ed3e7c85d15
+    type: External
+    name: External subtitles file
+clips:
+  - id: 786f7023-0862-4cf7-863f-2c32ec6a3975
+    start: 00:08.04
+    end: 00:12.5
+    fields:
+      transcription: 笹を食べながらのんびりするのは最高だなぁ
+      pronunciation: sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa
+      meaning: Relaxing while eating bamboo grass is the best
+    tags:
+      - pbc
+    image:
+      type: VideoStill
+  - id: b177def7-d7ca-4eae-ba97-03b92cba8657
+    start: 00:15.12
+    end: 00:17.76
+    fields:
+      transcription: またこの子は昼間からゴロゴロして
+      pronunciation: mata kono ko-wa hirumá-kara góro-goro shite
+      meaning: This kid, lazing about again so early
+      notes: '"Goro-goro" is the sound of something big rolling around.'
+    tags:
+      - pbc
+  - id: 5bcf962d-b74f-4eb5-a973-20374b1ab470
+    start: 01:15.2
+    end: 01:21.16
+    tags:
+      - pbc
+    image:
+      type: VideoStill
+...
+name: piggeldy_cat.mp4
+format: mov,mp4,m4a,3gp,3g2,mj2
+durationSeconds: 58.24
+id: 6fb35c19-02ed-42a7-b518-89f94273c028
+clips:
+  - id: 08f0661f-ab1b-48d5-b64c-ef0afbcb9e83
+    start: 00:07.02
+    end: 00:08.76
+    fields:
+      transcription: Ich bin keine Katze, sagte Frederick böse
+      meaning: I am not a cat, said Frederick angrily
+    tags:
+      - piggeldy_cat.mp4
+    image:
+      type: VideoStill
+  - id: adda6b96-effd-463a-9998-509864e2f792
+    start: 00:18.42
+    end: 00:20.0
+    fields:
+      transcription: Das hab' ich nicht gesagt
+      meaning: I didn't say that
+    tags:
+      - piggeldy_cat.mp4
+    image:
+      type: VideoStill

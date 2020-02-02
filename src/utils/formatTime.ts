@@ -7,10 +7,9 @@ export default function formatTime(seconds: number) {
   return `${minutes}:${String(secondsRemainder).padStart(2, '0')}`
 }
 
-/** must be less than 24 hours */
 export const formatDuration = (duration: moment.Duration) =>
   [
-    duration.hours(),
+    ~~duration.asHours(),
     duration
       .minutes()
       .toString()
@@ -22,3 +21,22 @@ export const formatDuration = (duration: moment.Duration) =>
   ]
     .filter(v => v)
     .join(':')
+
+export const formatDurationWithMilliseconds = (duration: moment.Duration) => {
+  const milliseconds = Math.round(duration.milliseconds())
+  return [
+    formatDuration(duration),
+    milliseconds
+      ? milliseconds
+          .toString()
+          .padStart(3, '0')
+          .replace(/0+$/, '')
+      : '0',
+  ]
+    .filter(v => v)
+    .join('.')
+}
+
+export const parseFormattedDuration = (formatted: string): number => {
+  return moment.duration(formatted).asSeconds()
+}
