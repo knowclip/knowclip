@@ -37,6 +37,7 @@ export const formatDurationWithMilliseconds = (duration: moment.Duration) => {
     .join('.')
 }
 
-export const parseFormattedDuration = (formatted: string): number => {
-  return moment.duration(formatted).asSeconds()
+export const parseFormattedDuration = (formatted: string) => {
+  const split = formatted.split(':')
+  return moment.duration(split.length <= 2 ? `00:${formatted}` : formatted)
 }

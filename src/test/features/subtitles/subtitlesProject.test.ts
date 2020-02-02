@@ -57,7 +57,23 @@ const sideEffectsMocks = {
     '90bf45fc-00e0-41b7-b82e-fda29473761e',
     'f85a53cc-4763-41a7-bfb2-ef615e2fc84d',
   ],
-  nowUtcTimestamp: ['2020-01-24T23:44:33Z', '2020-01-24T23:44:38Z'],
+  nowUtcTimestamp: [
+    '2020-01-24T23:44:33Z',
+    '2020-01-24T23:44:38Z',
+    '2020-02-02T15:29:14Z',
+    '2020-02-02T15:29:14Z',
+    '2020-02-02T15:29:15Z',
+    '2020-02-02T15:29:15Z',
+    '2020-02-02T15:29:15Z',
+    '2020-02-02T15:29:17Z',
+    '2020-02-02T15:29:17Z',
+    '2020-02-02T15:29:19Z',
+    '2020-02-02T15:29:19Z',
+    '2020-02-02T15:29:19Z',
+    '2020-02-02T15:29:19Z',
+    '2020-02-02T15:29:19Z',
+    '2020-02-02T15:29:19Z',
+  ],
 }
 
 const persistedState: Partial<AppState> = {
@@ -193,7 +209,7 @@ const persistedState: Partial<AppState> = {
         id: 'ef3a2602-37a0-4158-89d6-47b75edb5bea',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
-        filePath: join(TMP_DIRECTORY, '/project_with_subtitles.afca'),
+        filePath: join(TMP_DIRECTORY, '/project_with_subtitles.kyml'),
         lastOpened: '2020-02-01T16:11:17Z',
       },
     },

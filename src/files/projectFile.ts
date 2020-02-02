@@ -1,15 +1,14 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
-import parseProject from '../utils/parseProject'
-import { promises } from 'fs'
-
-const { readFile } = promises
+import { parseYamlProject, normalizeProjectData } from '../utils/parseProject'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
     try {
-      const projectJson = ((await readFile(filePath)) as unknown) as string
-      const project = parseProject(projectJson)
+      const parse = await parseYamlProject(filePath)
+      if (parse.errors) throw new Error(parse.errors.join('; '))
+
+      const { project, clips } = normalizeProjectData(state, parse.value)
       if (!project)
         return [
           r.openFileFailure(
@@ -19,20 +18,10 @@ export default {
           ),
         ]
 
-      const mediaFiles = project.mediaFiles.map(({ id }) => id)
-      const projectFile: ProjectFile = {
-        id: project.id,
-        type: 'ProjectFile',
-        lastSaved: project.timestamp,
-        name: project.name,
-        mediaFileIds: mediaFiles,
-        error: null,
-        noteType: project.noteType,
-      }
       return [
-        r.openProject(file, project.clips, effects.nowUtcTimestamp()),
+        r.openProject(file, clips, effects.nowUtcTimestamp()),
 
-        r.openFileSuccess(projectFile, filePath),
+        r.openFileSuccess(project, filePath),
       ]
     } catch (err) {
       console.error(err)
@@ -47,19 +36,21 @@ export default {
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      const projectJson = await readFile(filePath, 'utf8')
-      const project = parseProject(projectJson)
+      const parse = await parseYamlProject(filePath)
+      if (parse.errors) throw new Error(parse.errors.join('; '))
+
+      const { project, media } = normalizeProjectData(state, parse.value)
 
       if (!project) return [r.simpleMessageSnackbar('Could not open project')]
 
-      const addNewMediaFiles = project.mediaFiles
+      const addNewMediaFiles = media
         .filter(
           validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
         .map(validatedFile => r.addFile(validatedFile))
 
-      const loadFirstMediaFile = project.mediaFiles.length
-        ? [r.openFileRequest(project.mediaFiles[0])]
+      const loadFirstMediaFile = media.length
+        ? [r.openFileRequest(media[0])]
         : []
 
       return [

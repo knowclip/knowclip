@@ -21,7 +21,18 @@ export const getProjects = createSelector(
   (state: AppState) => state.files.ProjectFile,
   (state: AppState) => state.fileAvailabilities.ProjectFile,
   (projectFiles, availabilities): Array<ProjectFile> =>
-    (Object.values(availabilities) as KnownFile[])
+    Object.entries(availabilities)
+      .map(
+        ([id, availability]): FileAvailability =>
+          availability ||
+          console.log(id, projectFiles[id]) || {
+            id,
+            filePath: null,
+            status: 'NOT_FOUND',
+            isLoading: false,
+            lastOpened: null,
+          }
+      )
       .sort(newestToOldest)
       .map(({ id }) => projectFiles[id])
       .filter((p): p is ProjectFile => Boolean(p))
@@ -106,17 +117,25 @@ export const getSlimProject = <F extends FlashcardFields>(
                 ).name,
               }
         )
+
         const clips = getProjectClips(state, mediaFile, fieldsTemplate)
-        if (subtitles.length) console.log({ subtitles }, mediaFile.subtitles)
+
         const newMediaFile: ProjectMediaFile<F> = {
           name,
           format,
-          durationSeconds,
+          duration: formatDurationWithMilliseconds(
+            moment.duration({
+              seconds: durationSeconds,
+            })
+          ),
           id,
         }
 
         if (subtitles.length) newMediaFile.subtitles = subtitles
         if (clips.length) newMediaFile.clips = clips
+        if (mediaFile.flashcardFieldsToSubtitlesTracks)
+          newMediaFile.flashcardFieldsToSubtitlesTracks =
+            mediaFile.flashcardFieldsToSubtitlesTracks
 
         return newMediaFile
       }
@@ -193,120 +212,4 @@ export const getYamlProject = <F extends FlashcardFields>(
   )
 
   return { project: { name, noteType, timestamp, id }, media }
-}
-
-export type ProjectYamlDocuments<F extends FlashcardFields> = {
-  project: {
-    name: string
-    noteType: NoteType
-    timestamp: string
-    id: ProjectId
-  }
-  media: ProjectMediaFile<F>[]
-}
-
-export const yamlDocumentsToSlimProject = <F extends FlashcardFields>({
-  project,
-  media,
-}: ProjectYamlDocuments<F>): SlimProject<F> => ({
-  ...project,
-  media,
-})
-
-export const fillOutSlimProject = <F extends FlashcardFields>(
-  slimProject: SlimProject<F>
-): {
-  project: ProjectFile
-  media: MediaFile[]
-  // clips: Clip[]
-  // subtitles: SubtitlesFile[]
-} => {
-  const project: ProjectFile = {
-    id: slimProject.id,
-    lastSaved: slimProject.timestamp,
-    noteType: slimProject.noteType,
-    name: slimProject.name,
-    mediaFileIds: slimProject.media.map(m => m.id),
-    type: 'ProjectFile',
-    error: null,
-  }
-  const media: MediaFile[] = slimProject.media.map(m => {
-    const subtitles = m.subtitles
-      ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
-      : []
-    const base: AudioFile = {
-      name: m.name,
-      type: 'MediaFile',
-      id: m.id,
-      parentId: slimProject.id,
-      durationSeconds: m.durationSeconds,
-      format: m.format,
-      subtitles,
-      flashcardFieldsToSubtitlesTracks:
-        m.flashcardFieldsToSubtitlesTracks || {},
-      subtitlesTracksStreamIndexes: subtitles
-        .filter(
-          (s): s is EmbeddedSubtitlesTrackRelation =>
-            s.type === 'EmbeddedSubtitlesTrack'
-        )
-        .map(s => s.streamIndex),
-
-      isVideo: false,
-    }
-
-    if ('width' in m) {
-      return {
-        ...base,
-        isVideo: true,
-        width: m.width,
-        height: m.height,
-      }
-    }
-
-    return base
-  })
-
-  // const subtitles : SubtitlesFile[] = m.subtitles.map(s =>toSubtitlesFile(s, m) )
-
-  return { project, media }
-}
-
-function toMediaSubtitlesRelation(s: ProjectSubtitles): MediaSubtitlesRelation {
-  switch (s.type) {
-    case 'Embedded':
-      return {
-        type: 'EmbeddedSubtitlesTrack',
-        id: s.id,
-        streamIndex: s.streamIndex,
-      }
-
-    case 'External':
-      return {
-        type: 'ExternalSubtitlesTrack',
-        id: s.id,
-      }
-  }
-}
-function toSubtitlesFile(
-  s: ProjectSubtitles,
-  mediaFileId: MediaFileId
-): SubtitlesFile {
-  switch (s.type) {
-    case 'Embedded':
-      return {
-        type: 'VttConvertedSubtitlesFile',
-        id: s.id,
-        streamIndex: s.streamIndex,
-        parentId: mediaFileId,
-        parentType: 'MediaFile',
-      }
-
-    case 'External':
-      return {
-        type: 'ExternalSubtitlesFile',
-        name: s.name,
-        id: s.id,
-        parentId: s.id,
-      }
-  }
 }

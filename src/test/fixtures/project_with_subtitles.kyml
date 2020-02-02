@@ -2,12 +2,12 @@
 # Edit it manually at your own risk.
 name: Project with subtitles
 noteType: Transliteration
-timestamp: 2020-02-01T23:54:36Z
+timestamp: 2020-02-01T16:11:28Z
 id: ef3a2602-37a0-4158-89d6-47b75edb5bea
 ...
 name: polar_bear_cafe.mp4
 format: mov,mp4,m4a,3gp,3g2,mj2
-durationSeconds: 87.062
+duration: 01:27.062
 id: bd8aca85-de21-4666-bbab-a33fd21d03f1
 subtitles:
   - id: 5f581055-dbf5-4f3b-bcee-a3215e405ffc
@@ -15,7 +15,7 @@ subtitles:
     type: Embedded
   - id: a8b64692-dba0-4ef4-b5e7-8c887956a69a
     type: External
-    name: External subtitles file
+    name: pbc_jp.ass
 clips:
   - id: 6b02575a-0a4f-402a-8ea3-31f457cb5d8c
     start: 00:08.04
@@ -25,6 +25,7 @@ clips:
       pronunciation: sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa
       meaning: Relaxing while eating bamboo grass is the best
     tags:
+      &a1
       - pbc
     image:
       type: VideoStill
@@ -36,19 +37,19 @@ clips:
       pronunciation: mata kono ko-wa hirumá-kara góro-goro shite
       meaning: This kid, lazing about again so early
       notes: '"Goro-goro" is the sound of something big rolling around.'
-    tags:
-      - pbc
+    tags: *a1
   - id: a3a0c3eb-3841-4d2f-851a-5af95cd14855
     start: 01:15.2
     end: 01:21.16
-    tags:
-      - pbc
+    tags: *a1
     image:
       type: VideoStill
+flashcardFieldsToSubtitlesTracks:
+  transcription: a8b64692-dba0-4ef4-b5e7-8c887956a69a
 ...
 name: piggeldy_cat.mp4
 format: mov,mp4,m4a,3gp,3g2,mj2
-durationSeconds: 58.24
+duration: 00:58.24
 id: f5053503-8e5f-45c3-9afc-26f5e6eab8a8
 clips:
   - id: 152077c6-336b-47d6-88e6-1ba4410db553
@@ -58,6 +59,7 @@ clips:
       transcription: Ich bin keine Katze, sagte Frederick böse
       meaning: I am not a cat, said Frederick angrily
     tags:
+      &a1
       - piggeldy_cat.mp4
     image:
       type: VideoStill
@@ -67,7 +69,7 @@ clips:
     fields:
       transcription: Das hab' ich nicht gesagt
       meaning: I didn't say that
-    tags:
-      - piggeldy_cat.mp4
+    tags: *a1
     image:
       type: VideoStill
+flashcardFieldsToSubtitlesTracks: {}

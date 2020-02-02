@@ -15,7 +15,6 @@ type Directories = {
 
 export function getPersistedDataSnapshot(
   testId: string,
-  // projectFileName: string,
   directories: Directories
 ) {
   const newLocalStorageSnapshot = {
@@ -25,7 +24,7 @@ export function getPersistedDataSnapshot(
     ) as string) as FileAvailabilitiesState,
   }
   const generatedFilePaths: string[] = []
-  for (const [type, availabilities] of Object.entries(
+  for (const [, availabilities] of Object.entries(
     newLocalStorageSnapshot.fileAvailabilities
   )) {
     // replace filepaths with template strings
@@ -64,15 +63,6 @@ export function getPersistedDataSnapshot(
       }
     }
   }
-
-  // const projectAvailabilities = Object.entries(
-  //   newLocalStorageSnapshot.fileAvailabilities.ProjectFile
-  // )
-  // const projects = Object.entries(newLocalStorageSnapshot.files.ProjectFile)
-  // if (projectAvailabilities.length !== 1 || projects.length !== 1)
-  //   throw new Error('Should only be one project file')
-  // projectAvailabilities[0][1].filePath = `###join(TMP_DIRECTORY, \`${projectFileName}.afca\`)###`
-  // projects[0][1].name = projectName
 
   const generatedAssetsSubdirectory = join(
     directories.GENERATED_ASSETS_DIRECTORY,

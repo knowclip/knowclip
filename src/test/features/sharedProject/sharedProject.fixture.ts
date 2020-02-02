@@ -44,8 +44,8 @@ describe('make a project file for testing shared projects', () => {
 
   afterAll(async () => {
     await copyFile(
-      join(TMP_DIRECTORY, 'project_shared_with_me.afca'),
-      join(FIXTURES_DIRECTORY, 'project_shared_with_me.afca')
+      join(TMP_DIRECTORY, 'project_shared_with_me.kyml'),
+      join(FIXTURES_DIRECTORY, 'project_shared_with_me.kyml')
     )
 
     await setup.logPersistedData()

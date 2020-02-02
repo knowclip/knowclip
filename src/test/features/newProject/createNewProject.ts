@@ -15,7 +15,7 @@ export default async function createNewProject(
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
-      Promise.resolve(join(TMP_DIRECTORY, projectFileName + '.afca')),
+      Promise.resolve(join(TMP_DIRECTORY, projectFileName + '.kyml')),
     ],
   })
   const {

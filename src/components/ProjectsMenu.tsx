@@ -10,6 +10,8 @@ import {
   IconButton,
   Menu,
   RootRef,
+  ListSubheader,
+  Tooltip,
 } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
@@ -18,6 +20,7 @@ import css from './ProjectsMenu.module.css'
 import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
+import { basename, join, dirname } from 'path'
 
 enum $ {
   recentProjectsListItem = 'recent-projects-list-item',
@@ -27,6 +30,11 @@ enum $ {
 
 const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+
+  const { availability } = useSelector((state: AppState) => ({
+    availability: r.getFileAvailability(state, project),
+  }))
+
   const dispatch = useDispatch()
   const removeFromRecents = useCallback(
     () => dispatch(actions.deleteFileRequest('ProjectFile', project.id)),
@@ -50,7 +58,23 @@ const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
       )}
       <MenuItem onClick={openProjectById} className={$.recentProjectsListItem}>
         <RootRef rootRef={anchorCallbackRef}>
-          <ListItemText>{project.name}</ListItemText>
+          <ListItemText
+            primary={project.name}
+            secondary={
+              availability && (
+                <Tooltip title={availability.filePath}>
+                  <span>
+                    {availability.filePath
+                      ? join(
+                          basename(dirname(availability.filePath)),
+                          basename(availability.filePath)
+                        )
+                      : 'File not found'}
+                  </span>
+                </Tooltip>
+              )
+            }
+          />
         </RootRef>
         <IconButton onClick={open}>
           <MoreVertIcon />
@@ -77,7 +101,7 @@ const ProjectsMenu = () => {
       const filePaths = await showOpenDialog([
         {
           name: 'Knowclip project file',
-          extensions: ['afca', 'kyml'],
+          extensions: ['kyml'],
         },
       ])
 

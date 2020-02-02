@@ -44,8 +44,8 @@ describe('make a project file for testing generating clips from subtitles', () =
 
   afterAll(async () => {
     await copyFile(
-      join(TMP_DIRECTORY, 'project_with_subtitles.afca'),
-      join(FIXTURES_DIRECTORY, 'project_with_subtitles.afca')
+      join(TMP_DIRECTORY, 'project_with_subtitles.kyml'),
+      join(FIXTURES_DIRECTORY, 'project_with_subtitles.kyml')
     )
 
     await setup.logPersistedData()

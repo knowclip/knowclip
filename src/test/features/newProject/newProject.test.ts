@@ -3,8 +3,8 @@ import { startApp, stopApp, TestSetup, TMP_DIRECTORY } from '../../spectronApp'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import { runAll } from '../step'
 import { newProjectTestSteps } from './newProjectTestSteps'
-import { readFile } from 'fs-extra'
 import { join } from 'path'
+import { parseYamlProject } from '../../../utils/parseProject'
 
 jest.setTimeout(60000)
 
@@ -30,8 +30,8 @@ describe('create a deck from a new project', () => {
   )
 
   test('resulting project file matches snapshot', async () => {
-    const actualProjectFileContents = JSON.parse(
-      await readFile(join(TMP_DIRECTORY, 'my_cool_new_project.afca'), 'utf8')
+    const actualProjectFileContents = await parseYamlProject(
+      join(TMP_DIRECTORY, 'my_cool_new_project.kyml')
     )
 
     expect(actualProjectFileContents).toMatchSnapshot()

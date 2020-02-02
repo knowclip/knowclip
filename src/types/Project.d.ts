@@ -86,7 +86,7 @@ declare type ProjectMediaFile<F extends FlashcardFields> =
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
 
       format: 'UNKNOWN' | string
-      durationSeconds: number
+      duration: string
       id: FileId
     }
   | {
@@ -98,7 +98,7 @@ declare type ProjectMediaFile<F extends FlashcardFields> =
       format: 'UNKNOWN' | string
       width: number
       height: number
-      durationSeconds: number
+      duration: string
       id: FileId
     }
 
@@ -106,7 +106,7 @@ declare type ProjectClip<F extends FlashcardFields> = {
   /** must be before start and after end of any previous clips */
   start: string
   end: string
-  image?: { type: 'VideoStill'; seconds?: number }
+  image?: { type: 'VideoStill'; time?: string }
   fields?: Partial<F>
   tags?: Array<string>
 
@@ -124,3 +124,20 @@ declare type ProjectSubtitles =
       name: string
       id: string
     }
+
+declare type ProjectYamlDocuments<F extends FlashcardFields> = {
+  project: {
+    name: string
+    noteType: NoteType
+    timestamp: string
+    id: ProjectId
+  }
+  media: ProjectMediaFile<F>[]
+}
+
+type NormalizedProjectFileData = {
+  project: ProjectFile
+  media: MediaFile[]
+  clips: Clip[]
+  // subtitles: SubtitlesFile[]
+}

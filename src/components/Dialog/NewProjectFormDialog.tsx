@@ -170,9 +170,7 @@ const NewProjectFormDialog = ({
 
   const showSaveAfcaDialog = useCallback(
     async () => {
-      const filePath = await showSaveDialog('Knowclip project File', [
-        'kyml',
-      ])
+      const filePath = await showSaveDialog('Knowclip project File', ['kyml'])
       return filePath ? setFilePathText(filePath) : null
     },
     [setFilePathText]

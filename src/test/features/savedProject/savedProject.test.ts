@@ -9,10 +9,9 @@ import {
 } from '../../spectronApp'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import { join } from 'path'
-
-import { readFile } from 'fs-extra'
 import { runAll } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
+import { parseYamlProject } from '../../../utils/parseProject'
 
 jest.setTimeout(60000)
 
@@ -39,11 +38,8 @@ describe('opening and saving a previously saved project', () => {
   )
 
   test('resulting project file matches snapshot', async () => {
-    const actualProjectFileContents = JSON.parse(
-      await readFile(
-        join(TMP_DIRECTORY, 'my_previously_saved_project.afca'),
-        'utf8'
-      )
+    const actualProjectFileContents = await parseYamlProject(
+      join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
     )
 
     expect(actualProjectFileContents).toMatchSnapshot()
@@ -60,9 +56,30 @@ const sideEffectsMocks = {
     '1e62d23d-3f3b-4785-b8ba-5d61dddc78ed',
     '9a07597c-7885-49bc-97d4-76a2dffdb9aa',
   ],
-  nowUtcTimestamp: ['2020-01-27T22:28:12Z', '2020-01-27T22:28:22Z'],
+  nowUtcTimestamp: [
+    '2020-01-27T22:28:12Z',
+    '2020-01-27T22:28:22Z',
+    '2020-02-02T15:31:34Z',
+    '2020-02-02T15:31:35Z',
+    '2020-02-02T15:31:35Z',
+    '2020-02-02T15:31:35Z',
+    '2020-02-02T15:31:35Z',
+    '2020-02-02T15:31:36Z',
+    '2020-02-02T15:31:37Z',
+    '2020-02-02T15:31:37Z',
+    '2020-02-02T15:31:40Z',
+    '2020-02-02T15:31:42Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:43Z',
+    '2020-02-02T15:31:44Z',
+  ],
 }
-
 const persistedState: Partial<AppState> = {
   files: {
     ProjectFile: {
@@ -179,7 +196,7 @@ const persistedState: Partial<AppState> = {
         id: '91bfd159-155c-4b61-bdd5-d71e2e944773',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
-        filePath: join(TMP_DIRECTORY, '/my_previously_saved_project.afca'),
+        filePath: join(TMP_DIRECTORY, '/my_previously_saved_project.kyml'),
         lastOpened: '2020-02-01T13:20:55Z',
       },
     },

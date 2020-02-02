@@ -9,7 +9,7 @@ import { snackbar$ } from '../../../components/Snackbar'
 export default async function openSharedProject({ app, client }: TestSetup) {
   await mockElectronHelpers(app, {
     showOpenDialog: [
-      Promise.resolve([join(TMP_DIRECTORY, 'project_shared_with_me.afca')]),
+      Promise.resolve([join(TMP_DIRECTORY, 'project_shared_with_me.kyml')]),
     ],
   })
   await client.clickElement_(projectsMenu$.openExistingProjectButton)
