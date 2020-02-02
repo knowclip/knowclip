@@ -13,12 +13,6 @@ import { promisify } from 'util'
 import fs from 'fs'
 import { parseYamlProject, normalizeProjectData } from '../utils/parseProject'
 import { AppEpic } from '../types/AppEpic'
-import { getYamlProject } from '../selectors'
-import {
-  blankSimpleFields,
-  blankTransliterationFields,
-} from '../utils/newFlashcard'
-import YAML from 'yaml'
 import './setYamlOptions'
 
 const writeFile = promisify(fs.writeFile)
@@ -27,11 +21,7 @@ const createProject: AppEpic = (action$, state$) =>
   action$.ofType<CreateProject>(A.CREATE_PROJECT).pipe(
     switchMap(({ project, filePath }) => {
       return from(
-        writeFile(
-          filePath,
-          JSON.stringify(r.getProject(state$.value, project), null, 2),
-          'utf8'
-        )
+        writeFile(filePath, r.getProjectFileContents(state$.value, project))
       ).pipe(
         flatMap(() =>
           from([
@@ -119,18 +109,10 @@ const saveProject: AppEpic = (action$, state$) =>
           'ProjectFile',
           projectMetadata.id
         ) as CurrentlyLoadedFile
-        const { project, media } = getYamlProject(
-          state$.value,
-          projectMetadata,
-          projectMetadata.noteType === 'Simple'
-            ? blankSimpleFields
-            : blankTransliterationFields
-        )
-        console.log('saving yaml?')
+
         await writeFile(
           projectFile.filePath,
-          `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
-            [project, ...media].map(o => YAML.stringify(o)).join('...\n')
+          r.getProjectFileContents(state$.value, projectMetadata)
         )
 
         return from([

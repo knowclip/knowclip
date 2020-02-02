@@ -2,12 +2,15 @@ import moment from 'moment'
 import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
 import { getSubtitlesSourceFile } from './subtitles'
-import getAllTagsFromClips from '../utils/getAllTags'
-import { getClips, getClipIdsByMediaFileId, getClip } from './clips'
+import { getClipIdsByMediaFileId, getClip } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
-// import { normalize, schema } from 'normalizr'
+import {
+  blankSimpleFields,
+  blankTransliterationFields,
+} from '../utils/newFlashcard'
+import { stringify } from 'yaml'
 
 const newestToOldest = (
   { lastOpened: a }: FileAvailability,
@@ -47,39 +50,6 @@ export const getProjectIdByFilePath = (
       (state.fileAvailabilities.ProjectFile[id] as KnownFile).filePath ===
       filePath
   ) || null
-
-export const getProject = (
-  state: AppState,
-  file: ProjectFile
-): Project4_1_0 => {
-  const mediaFiles = getProjectMediaFiles(state, file.id)
-  return {
-    version: '4.1.0',
-    timestamp: nowUtcTimestamp(),
-    name: file.name,
-    id: file.id,
-    noteType: file.noteType,
-    lastOpened: nowUtcTimestamp(),
-    mediaFiles,
-    tags: [...getAllTagsFromClips(state.clips.byId)],
-    clips: mediaFiles.reduce(
-      (clips, { id }) => [...clips, ...getClips(state, id)],
-      [] as Clip[]
-    ),
-    subtitles: mediaFiles.reduce(
-      (subtitlesFiles, { id, subtitles }) => [
-        ...subtitlesFiles,
-        ...subtitles
-          .map(({ id }) => getSubtitlesSourceFile(state, id))
-          .filter(
-            (file): file is ExternalSubtitlesFile =>
-              Boolean(file && file.type === 'ExternalSubtitlesFile')
-          ),
-      ],
-      [] as ExternalSubtitlesFile[]
-    ),
-  }
-}
 
 export const getSlimProject = <F extends FlashcardFields>(
   state: AppState,
@@ -212,4 +182,22 @@ export const getYamlProject = <F extends FlashcardFields>(
   )
 
   return { project: { name, noteType, timestamp, id }, media }
+}
+
+const getFieldsTemplate = (file: ProjectFile) =>
+  file.noteType === 'Simple' ? blankSimpleFields : blankTransliterationFields
+
+export const getProjectFileContents = (
+  state: AppState,
+  projectFile: ProjectFile
+): string => {
+  const { project, media } = getYamlProject(
+    state,
+    projectFile,
+    getFieldsTemplate(projectFile)
+  )
+  return (
+    `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
+    [project, ...media].map(o => stringify(o)).join('...\n')
+  )
 }

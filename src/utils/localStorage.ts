@@ -3,9 +3,9 @@ import { getPersistedDataSnapshot } from '../test/getPersistedDataSnapshot'
 import { writeFileSync } from 'fs-extra'
 import { join } from 'path'
 
-export const saveProjectToLocalStorage = (project: Project4_1_0) => {
-  localStorage.setItem('project_' + project.id, JSON.stringify(project))
-}
+// export const saveProjectToLocalStorage = (project: Project4_1_0) => {
+//   localStorage.setItem('project_' + project.id, JSON.stringify(project))
+// }
 
 if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON) {
   window.document.addEventListener('DOMContentLoaded', () => {
