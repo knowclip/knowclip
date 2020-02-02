@@ -51,11 +51,11 @@ export const getProjectIdByFilePath = (
       filePath
   ) || null
 
-export const getSlimProject = <F extends FlashcardFields>(
+export const getProjectJson = <F extends FlashcardFields>(
   state: AppState,
   file: ProjectFile,
   fieldsTemplate: F
-): SlimProject<F> => {
+): ProjectJson<F> => {
   const mediaFiles = getProjectMediaFiles(state, file.id)
   return {
     name: file.name,
@@ -64,10 +64,10 @@ export const getSlimProject = <F extends FlashcardFields>(
     id: file.id,
 
     media: mediaFiles.map(
-      (mediaFile): ProjectMediaFile<F> => {
+      (mediaFile): MediaJson<F> => {
         const { name, format, durationSeconds, id } = mediaFile
 
-        const subtitles: ProjectSubtitles[] = mediaFile.subtitles.map(s =>
+        const subtitles: SubtitlesJson[] = mediaFile.subtitles.map(s =>
           s.type === 'EmbeddedSubtitlesTrack'
             ? {
                 id: s.id,
@@ -90,7 +90,7 @@ export const getSlimProject = <F extends FlashcardFields>(
 
         const clips = getProjectClips(state, mediaFile, fieldsTemplate)
 
-        const newMediaFile: ProjectMediaFile<F> = {
+        const newMediaFile: MediaJson<F> = {
           name,
           format,
           duration: formatDurationWithMilliseconds(
@@ -117,7 +117,7 @@ function getProjectClips<F extends FlashcardFields>(
   mediaFile: MediaFile,
   fieldsTemplate: F
 ) {
-  const clips = [] as ProjectClip<F>[]
+  const clips = [] as ClipJson<F>[]
   for (const id of getClipIdsByMediaFileId(state, mediaFile.id)) {
     const clip = getClip(state, id)
     if (clip) {
@@ -127,7 +127,7 @@ function getProjectClips<F extends FlashcardFields>(
         flashcard: { fields, tags, image },
       } = clip
 
-      const newClip: ProjectClip<F> = {
+      const newClip: ClipJson<F> = {
         id,
         start: formatDurationWithMilliseconds(
           moment.duration({
@@ -175,7 +175,7 @@ export const getYamlProject = <F extends FlashcardFields>(
   file: ProjectFile,
   fieldsTemplate: F
 ): ProjectYamlDocuments<F> => {
-  const { name, noteType, timestamp, id, media } = getSlimProject(
+  const { name, noteType, timestamp, id, media } = getProjectJson(
     state,
     file,
     fieldsTemplate
@@ -198,6 +198,6 @@ export const getProjectFileContents = (
   )
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
-    [project, ...media].map(o => stringify(o)).join('...\n')
+    [project, ...media].map(o => stringify(o)).join('---\n')
   )
 }

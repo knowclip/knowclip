@@ -13,7 +13,7 @@ export const normalizeProjectData = <F extends FlashcardFields>(
   parsedYaml: ProjectYamlDocuments<F>
 ): NormalizedProjectFileData => {
   //validate here?
-  return fillOutSlimProject(state, yamlDocumentsToSlimProject(parsedYaml))
+  return fillOutProjectJson(state, yamlDocumentsToProjectJson(parsedYaml))
 }
 
 export const parseYamlProject = async <F extends FlashcardFields>(
@@ -37,17 +37,17 @@ export const parseYamlProject = async <F extends FlashcardFields>(
   }
 }
 
-export const yamlDocumentsToSlimProject = <F extends FlashcardFields>({
+export const yamlDocumentsToProjectJson = <F extends FlashcardFields>({
   project,
   media,
-}: ProjectYamlDocuments<F>): SlimProject<F> => ({
+}: ProjectYamlDocuments<F>): ProjectJson<F> => ({
   ...project,
   media,
 })
 
-export const fillOutSlimProject = <F extends FlashcardFields>(
+export const fillOutProjectJson = <F extends FlashcardFields>(
   state: AppState,
-  slimProject: SlimProject<F>
+  slimProject: ProjectJson<F>
 ): NormalizedProjectFileData => {
   const project: ProjectFile = {
     id: slimProject.id,
@@ -113,13 +113,13 @@ export const fillOutSlimProject = <F extends FlashcardFields>(
 const getMediaClipsGetter = <F extends FlashcardFields>(
   state: AppState,
   project: ProjectFile,
-  media: ProjectMediaFile<F>
+  media: MediaJson<F>
 ) => () => getMediaClips(state, project, media)
 
 function getMediaClips<F extends FlashcardFields>(
   state: AppState,
   project: ProjectFile,
-  media: ProjectMediaFile<F>
+  media: MediaJson<F>
 ): Clip[] {
   return (media.clips || []).map(
     (c): Clip => {
@@ -163,7 +163,7 @@ function getMediaClips<F extends FlashcardFields>(
   )
 }
 
-function toMediaSubtitlesRelation(s: ProjectSubtitles): MediaSubtitlesRelation {
+function toMediaSubtitlesRelation(s: SubtitlesJson): MediaSubtitlesRelation {
   switch (s.type) {
     case 'Embedded':
       return {

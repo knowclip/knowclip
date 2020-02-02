@@ -1,19 +1,19 @@
 declare type ProjectId = string
 
-declare type SlimProject<F extends FlashcardFields> = {
+declare type ProjectJson<F extends FlashcardFields> = {
   name: string
   noteType: NoteType
-  media: ProjectMediaFile<F>[]
+  media: MediaJson<F>[]
 
   timestamp: string
   id: ProjectId
 }
 
-declare type ProjectMediaFile<F extends FlashcardFields> =
+declare type MediaJson<F extends FlashcardFields> =
   | {
       name: MediaFileName
-      subtitles?: Array<ProjectSubtitles>
-      clips?: ProjectClip<F>[]
+      subtitles?: Array<SubtitlesJson>
+      clips?: ClipJson<F>[]
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
 
       format: 'UNKNOWN' | string
@@ -22,9 +22,9 @@ declare type ProjectMediaFile<F extends FlashcardFields> =
     }
   | {
       name: MediaFileName
-      subtitles?: Array<ProjectSubtitles>
+      subtitles?: Array<SubtitlesJson>
       flashcardFieldsToSubtitlesTracks?: SubtitlesFlashcardFieldsLinks
-      clips?: ProjectClip<F>[]
+      clips?: ClipJson<F>[]
 
       format: 'UNKNOWN' | string
       width: number
@@ -33,7 +33,7 @@ declare type ProjectMediaFile<F extends FlashcardFields> =
       id: FileId
     }
 
-declare type ProjectClip<F extends FlashcardFields> = {
+declare type ClipJson<F extends FlashcardFields> = {
   /** must be before start and after end of any previous clips */
   start: string
   end: string
@@ -44,7 +44,7 @@ declare type ProjectClip<F extends FlashcardFields> = {
   id: ClipId
 }
 
-declare type ProjectSubtitles =
+declare type SubtitlesJson =
   | {
       type: 'Embedded'
       streamIndex: number
@@ -63,7 +63,7 @@ declare type ProjectYamlDocuments<F extends FlashcardFields> = {
     timestamp: string
     id: ProjectId
   }
-  media: ProjectMediaFile<F>[]
+  media: MediaJson<F>[]
 }
 
 type NormalizedProjectFileData = {
