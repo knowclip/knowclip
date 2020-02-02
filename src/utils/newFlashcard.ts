@@ -1,3 +1,8 @@
+import {
+  SimpleFlashcardFields,
+  TransliterationFlashcardFields,
+} from '../types/Project'
+
 export const blankSimpleFields: SimpleFlashcardFields = {
   transcription: '',
   meaning: '',

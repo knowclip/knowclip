@@ -11,6 +11,12 @@ import {
   blankTransliterationFields,
 } from '../utils/newFlashcard'
 import { stringify } from 'yaml'
+import {
+  MediaJson,
+  SubtitlesJson,
+  ClipJson,
+  ProjectJson,
+} from '../types/Project'
 
 const newestToOldest = (
   { lastOpened: a }: FileAvailability,
@@ -58,10 +64,12 @@ export const getProjectJson = <F extends FlashcardFields>(
 ): ProjectJson<F> => {
   const mediaFiles = getProjectMediaFiles(state, file.id)
   return {
-    name: file.name,
-    noteType: file.noteType,
-    timestamp: nowUtcTimestamp(),
-    id: file.id,
+    project: {
+      name: file.name,
+      noteType: file.noteType,
+      timestamp: nowUtcTimestamp(),
+      id: file.id,
+    },
 
     media: mediaFiles.map(
       (mediaFile): MediaJson<F> => {
@@ -170,20 +178,6 @@ function getProjectClips<F extends FlashcardFields>(
   return clips
 }
 
-export const getYamlProject = <F extends FlashcardFields>(
-  state: AppState,
-  file: ProjectFile,
-  fieldsTemplate: F
-): ProjectYamlDocuments<F> => {
-  const { name, noteType, timestamp, id, media } = getProjectJson(
-    state,
-    file,
-    fieldsTemplate
-  )
-
-  return { project: { name, noteType, timestamp, id }, media }
-}
-
 const getFieldsTemplate = (file: ProjectFile) =>
   file.noteType === 'Simple' ? blankSimpleFields : blankTransliterationFields
 
@@ -191,7 +185,7 @@ export const getProjectFileContents = (
   state: AppState,
   projectFile: ProjectFile
 ): string => {
-  const { project, media } = getYamlProject(
+  const { project, media } = getProjectJson(
     state,
     projectFile,
     getFieldsTemplate(projectFile)

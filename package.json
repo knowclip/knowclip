@@ -48,6 +48,7 @@
     "subsrt": "^1.0.0",
     "subtitle": "^2.0.3",
     "tempy": "^0.3.0",
+    "ts-json-schema-generator": "^0.58.1",
     "uuid": "^3.3.2",
     "xss": "^1.0.6",
     "yaml": "^1.7.2"
@@ -70,6 +71,7 @@
     "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.{js,ts,tsx}\"",
     "format:write": "yarn format --write",
     "tsc": "tsc",
+    "build-project-schema": "ts-json-schema-generator --path ./src/types/Project.ts --tsconfig ./tsconfig.json --out ./src/utils/projectSchema.json",
     "tidy": "yarn format --list-different && yarn lint && yarn tsc",
     "electron-builder": "electron-builder",
     "dist": "yarn build:ci && yarn electron-builder"

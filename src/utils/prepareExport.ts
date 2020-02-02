@@ -7,8 +7,6 @@ import { getFileAvailability } from '../selectors'
 import { existsSync } from 'fs'
 import { getVideoStillPngPath, getMidpoint } from './getVideoStill'
 import { sanitizeFileName } from './sanitizeFilename'
-const SAFE_SEPARATOR = '-'
-const SAFE_MILLISECONDS_SEPARATOR = '_'
 
 const roughEscape = (text: string) => text.replace(/\n/g, '<br />')
 

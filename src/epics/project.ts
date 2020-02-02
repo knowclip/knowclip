@@ -11,7 +11,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs from 'fs'
-import { parseYamlProject, normalizeProjectData } from '../utils/parseProject'
+import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import { AppEpic } from '../types/AppEpic'
 import './setYamlOptions'
 
@@ -66,10 +66,10 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
         if (projectIdFromRecents)
           return of(r.openProjectById(projectIdFromRecents))
 
-        const parse = await parseYamlProject(filePath)
+        const parse = await parseProjectJson(filePath)
         if (parse.errors) throw new Error(parse.errors.join('; '))
 
-        const { project } = normalizeProjectData(state$.value, parse.value)
+        const { project } = normalizeProjectJson(state$.value, parse.value)
         return of(r.openFileRequest(project, filePath))
       }
     ),

@@ -1,14 +1,14 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
-import { parseYamlProject, normalizeProjectData } from '../utils/parseProject'
+import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
     try {
-      const parse = await parseYamlProject(filePath)
+      const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
-      const { project, clips } = normalizeProjectData(state, parse.value)
+      const { project, clips } = normalizeProjectJson(state, parse.value)
       if (!project)
         return [
           r.openFileFailure(
@@ -36,10 +36,10 @@ export default {
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      const parse = await parseYamlProject(filePath)
+      const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
-      const { project, media } = normalizeProjectData(state, parse.value)
+      const { project, media } = normalizeProjectJson(state, parse.value)
 
       if (!project) return [r.simpleMessageSnackbar('Could not open project')]
 

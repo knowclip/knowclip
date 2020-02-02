@@ -1,6 +1,7 @@
 import { basename } from 'path'
-import { locateFileSuccess, openFileRequest } from './files'
+import { openFileRequest } from './files'
 import { uuid } from '../utils/sideEffects'
+import { TransliterationFlashcardFields } from '../types/Project'
 
 export const showSubtitles = (
   id: SubtitlesTrackId,

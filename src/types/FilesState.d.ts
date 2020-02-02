@@ -38,6 +38,8 @@ declare type ProjectFile = {
 }
 declare type MediaFile = VideoFile | AudioFile
 
+type SubtitlesFlashcardFieldsLinks = import('./Project').SubtitlesFlashcardFieldsLinks
+
 declare type AudioFile = {
   type: 'MediaFile'
   id: FileId

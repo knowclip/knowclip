@@ -1,30 +1,32 @@
 import YAML from 'yaml'
 import { readFile } from 'fs-extra'
-import { getXAtMilliseconds } from '../selectors'
+import { getXAtMilliseconds, getProjectJson } from '../selectors'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
+import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'
 
 type Result<T> = Failure | Success<T>
 type Failure = { errors: string[]; value?: undefined }
 type Success<T> = { value: T; errors?: undefined }
 
-export const normalizeProjectData = <F extends FlashcardFields>(
-  state: AppState,
-  parsedYaml: ProjectYamlDocuments<F>
-): NormalizedProjectFileData => {
-  //validate here?
-  return fillOutProjectJson(state, yamlDocumentsToProjectJson(parsedYaml))
+type NormalizedProjectFileData = {
+  project: ProjectFile
+  media: MediaFile[]
+  clips: Clip[]
+  // subtitles: SubtitlesFile[]
 }
 
-export const parseYamlProject = async <F extends FlashcardFields>(
+export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
-): Promise<Result<ProjectYamlDocuments<F>>> => {
+): Promise<Result<ProjectJson<F>>> => {
   try {
     const docs = YAML.parseAllDocuments(await readFile(filePath, 'utf8'))
     const errors = docs.flatMap(v => v.errors)
     if (errors.length) return { errors: errors.map(e => e.message) }
 
     const [project, ...media] = docs.map(d => d.toJSON())
+
+    // validate here
 
     return {
       value: {
@@ -37,28 +39,20 @@ export const parseYamlProject = async <F extends FlashcardFields>(
   }
 }
 
-export const yamlDocumentsToProjectJson = <F extends FlashcardFields>({
-  project,
-  media,
-}: ProjectYamlDocuments<F>): ProjectJson<F> => ({
-  ...project,
-  media,
-})
-
-export const fillOutProjectJson = <F extends FlashcardFields>(
+export const normalizeProjectJson = <F extends FlashcardFields>(
   state: AppState,
-  slimProject: ProjectJson<F>
+  { project: projectJson, media: mediaJson }: ProjectJson<F>
 ): NormalizedProjectFileData => {
   const project: ProjectFile = {
-    id: slimProject.id,
-    lastSaved: slimProject.timestamp,
-    noteType: slimProject.noteType,
-    name: slimProject.name,
-    mediaFileIds: slimProject.media.map(m => m.id),
+    id: projectJson.id,
+    lastSaved: projectJson.timestamp,
+    noteType: projectJson.noteType,
+    name: projectJson.name,
+    mediaFileIds: mediaJson.map(m => m.id),
     type: 'ProjectFile',
     error: null,
   }
-  const media: [MediaFile, () => Clip[]][] = slimProject.media.map(m => {
+  const media: [MediaFile, () => Clip[]][] = mediaJson.map(m => {
     const subtitles = m.subtitles
       ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
       : []
@@ -66,7 +60,7 @@ export const fillOutProjectJson = <F extends FlashcardFields>(
       name: m.name,
       type: 'MediaFile',
       id: m.id,
-      parentId: slimProject.id,
+      parentId: projectJson.id,
       durationSeconds: parseFormattedDuration(m.duration).asSeconds(),
       format: m.format,
       subtitles,

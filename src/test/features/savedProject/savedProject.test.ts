@@ -11,7 +11,7 @@ import { mockSideEffects } from '../../../utils/sideEffects'
 import { join } from 'path'
 import { runAll } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
-import { parseYamlProject } from '../../../utils/parseProject'
+import { parseProjectJson } from '../../../utils/parseProject'
 
 jest.setTimeout(60000)
 
@@ -38,7 +38,7 @@ describe('opening and saving a previously saved project', () => {
   )
 
   test('resulting project file matches snapshot', async () => {
-    const actualProjectFileContents = await parseYamlProject(
+    const actualProjectFileContents = await parseProjectJson(
       join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
     )
 

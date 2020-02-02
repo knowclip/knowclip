@@ -278,7 +278,9 @@ declare type HideSubtitles = {
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId
-  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields> & {
+  fieldNamesToTrackIds: Partial<
+    import('./Project').TransliterationFlashcardFields
+  > & {
     transcription: string
   }
   tags: Array<string>

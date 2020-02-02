@@ -7,6 +7,10 @@ import {
 import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
+import {
+  TransliterationFlashcardFields,
+  SubtitlesFlashcardFieldsLinks,
+} from '../types/Project'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,

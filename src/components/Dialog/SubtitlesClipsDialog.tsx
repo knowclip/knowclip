@@ -21,6 +21,7 @@ import { DialogProps } from './DialogProps'
 import { loadNewSubtitlesFile, makeClipsFromSubtitles } from '../../actions'
 import { SubtitlesFileWithTrack } from '../../redux'
 import { MediaSubtitles } from '../../selectors'
+import { TransliterationFlashcardFields } from '../../types/Project'
 
 enum $ {
   loadMoreTracksButton = 'subtitles-clips-load-more-tracks',

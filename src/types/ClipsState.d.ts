@@ -41,41 +41,16 @@ declare type Flashcard = SimpleFlashcard | TransliterationFlashcard
 declare type SimpleFlashcard = {
   id: ClipId
   type: 'Simple'
-  fields: SimpleFlashcardFields
+  fields: import('./Project').SimpleFlashcardFields
   tags: Array<string>
   image?: FlashcardImage | null
 }
 declare type TransliterationFlashcard = {
   id: ClipId
   type: 'Transliteration'
-  fields: TransliterationFlashcardFields
+  fields: import('./Project').TransliterationFlashcardFields
   tags: Array<string>
   image?: FlashcardImage | null
-}
-declare type SimpleFlashcardFields = Record<SimpleFlashcardFieldName, string>
-declare type TransliterationFlashcardFields = Record<
-  TransliterationFlashcardFieldName,
-  string
->
-
-// declare type SimpleFlashcardFields = {
-//   [FN in SimpleFlashcardFieldName]: string
-// }
-// declare type TransliterationFlashcardFields = {
-//   [FN in TransliterationFlashcardFieldName]: string
-// }
-
-declare type SimpleFlashcardFields = {
-  transcription: string
-  meaning: string
-  notes: string
-}
-
-declare type TransliterationFlashcardFields = {
-  transcription: string
-  meaning: string
-  notes: string
-  pronunciation: string
 }
 
 declare type FlashcardImage = {
