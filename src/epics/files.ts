@@ -36,13 +36,12 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 
       if (!fileAvailability.isLoading) return empty()
 
-      if (
-        !fileAvailability.filePath ||
-        !existsSync(fileAvailability.filePath)
-      ) {
+      const filePath = action.filePath || fileAvailability.filePath
+
+      if (!filePath || !existsSync(filePath)) {
         const fileTypeAndName = getHumanFileName(file)
         const fileVerb = file.type === 'MediaFile' ? 'make clips with' : 'use'
-        const message = fileAvailability.filePath
+        const message = filePath
           ? `This ${fileTypeAndName} appears to have moved or been renamed. Try locating it manually?`
           : `Please locate your ${fileTypeAndName} in the filesystem so you can ${fileVerb} it.
               
@@ -54,18 +53,19 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         return from(
           fileEventHandlers[file.type].openRequest(
             action,
-            fileAvailability.filePath,
+            filePath,
             state$.value,
             effects
           )
         ).pipe(mergeAll())
       } catch (err) {
         return of(
-          r.openFileFailure(
-            file,
-            fileAvailability.filePath,
-            err.message || err.toString()
-          )
+          // need this like in locatefilesuccess?
+          //  {
+          //   ...file,
+          //   ...r.getFile(state$.value, file.type, file.id),
+          // }
+          r.openFileFailure(file, filePath, err.message || err.toString())
         )
       }
     })
@@ -118,7 +118,17 @@ const locateFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileSuccess>(A.LOCATE_FILE_SUCCESS),
     map<LocateFileSuccess, Action>(({ file, filePath }) =>
-      r.openFileRequest(file)
+      r.openFileRequest(
+        (console.log({
+          //
+          inAction: file,
+          inState: r.getFile(state$.value, file.type, file.id),
+        }),
+        {
+          ...file,
+          ...r.getFile(state$.value, file.type, file.id),
+        })
+      )
     )
   )
 
@@ -126,15 +136,16 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, DeleteFileRequest>(A.DELETE_FILE_REQUEST),
     flatMap(({ fileType, id }) => {
-      const file = r.getFile(state$.value, fileType, id)
+      const availability = r.getFileAvailabilityById(state$.value, fileType, id)
 
-      return file
+      return availability
         ? from(
             fileEventHandlers[fileType].deleteRequest.flatMap(handler =>
               from(
                 handler(
-                  file,
-                  r.getFileDescendants(state$.value, file.id),
+                  r.getFile(state$.value, fileType, id),
+                  availability,
+                  r.getFileDescendants(state$.value, availability.id),
                   state$.value,
                   effects
                 )

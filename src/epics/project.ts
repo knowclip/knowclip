@@ -10,7 +10,7 @@ import { of, from, Observable, empty } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
-import fs from 'fs'
+import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import { AppEpic } from '../types/AppEpic'
 import './setYamlOptions'
@@ -44,11 +44,28 @@ const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.OPEN_PROJECT_REQUEST_BY_ID),
     map(({ id }) => {
-      const project = r.getFile<ProjectFile>(state$.value, 'ProjectFile', id)
-      if (!project)
-        return r.simpleMessageSnackbar(`Could not find project ${id}.`)
+      const project = r.getFileAvailabilityById<ProjectFile>(
+        state$.value,
+        'ProjectFile',
+        id
+      )
+      if (!project.filePath || !existsSync(project.filePath)) {
+        const projectFile: ProjectFile = {
+          id: id,
+          type: 'ProjectFile',
+          lastSaved: 'PLACEHOLDER',
+          noteType: 'Simple',
+          mediaFileIds: [],
+          error: null,
+          name: project.name,
+        }
 
-      return r.openFileRequest(project)
+        return r.locateFileRequest(
+          projectFile,
+          'This project was either moved or renamed.'
+        )
+      }
+      return r.openProjectByFilePath(project.filePath)
     })
   )
 
@@ -59,13 +76,6 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     ),
     flatMap<OpenProjectRequestByFilePath, Promise<Observable<Action>>>(
       async ({ filePath }) => {
-        const projectIdFromRecents = r.getProjectIdByFilePath(
-          state$.value,
-          filePath
-        )
-        if (projectIdFromRecents)
-          return of(r.openProjectById(projectIdFromRecents))
-
         const parse = await parseProjectJson(filePath)
         if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
@@ -115,6 +125,7 @@ const saveProject: AppEpic = (action$, state$) =>
 
         return from([
           r.setWorkIsUnsaved(false),
+          r.commitFileDeletions(),
           r.simpleMessageSnackbar(`Project saved in ${projectFile.filePath}`),
         ])
       } catch (err) {
@@ -146,8 +157,8 @@ const PROJECT_EDIT_ACTIONS = [
   A.LOCATE_FILE_SUCCESS,
 ] as const
 
-const isGeneratedFile = (file: FileMetadata): boolean => {
-  switch (file.type) {
+const isGeneratedFile = (type: FileMetadata['type']): boolean => {
+  switch (type) {
     case 'VttConvertedSubtitlesFile':
     case 'WaveformPng':
     case 'ConstantBitrateMp3':
@@ -165,10 +176,10 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
     ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
     filter(action => {
       switch (action.type) {
-        case A.DELETE_FILE_SUCCESS:
         case A.ADD_FILE:
         case A.LOCATE_FILE_SUCCESS:
-          return !isGeneratedFile(action.file)
+        case A.DELETE_FILE_SUCCESS:
+          return !isGeneratedFile(action.file.type)
       }
       return true
     }),

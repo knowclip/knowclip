@@ -11,7 +11,7 @@ const persistStateEpic: AppEpic = (action$, state$, { setLocalStorage }) =>
         'fileAvailabilities',
         JSON.stringify(state$.value.fileAvailabilities)
       )
-      setLocalStorage('files', JSON.stringify(state$.value.files))
+      // setLocalStorage('files', JSON.stringify(state$.value.files))
     }),
     ignoreElements()
   )

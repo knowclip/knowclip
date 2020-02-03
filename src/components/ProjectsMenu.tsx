@@ -28,21 +28,21 @@ enum $ {
   openExistingProjectButton = 'open-existing-project-button',
 }
 
-const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
+const ProjectMenuItem = ({
+  project: availability,
+}: {
+  project: FileAvailability
+}) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
-
-  const { availability } = useSelector((state: AppState) => ({
-    availability: r.getFileAvailability(state, project),
-  }))
 
   const dispatch = useDispatch()
   const removeFromRecents = useCallback(
-    () => dispatch(actions.deleteFileRequest('ProjectFile', project.id)),
-    [dispatch, project.id]
+    () => dispatch(actions.deleteFileRequest('ProjectFile', availability.id)),
+    [dispatch, availability.id]
   )
   const openProjectById = useCallback(
-    () => dispatch(actions.openProjectById(project.id)),
-    [dispatch, project.id]
+    () => dispatch(actions.openProjectById(availability.id)),
+    [dispatch, availability.id]
   )
   return (
     <Fragment>
@@ -59,7 +59,7 @@ const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
       <MenuItem onClick={openProjectById} className={$.recentProjectsListItem}>
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText
-            primary={project.name}
+            primary={availability.name}
             secondary={
               availability && (
                 <Tooltip title={availability.filePath}>

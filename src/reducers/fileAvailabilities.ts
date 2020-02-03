@@ -28,7 +28,10 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
           ...state[action.file.type],
           [action.file.id]: base
             ? {
-                ...base,
+                id: base.id,
+                status: base.status,
+                // does the action need filepath even?
+                filePath: action.filePath || base.filePath,
                 isLoading: true,
               }
             : {
@@ -43,7 +46,16 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
 
     case A.OPEN_FILE_SUCCESS: {
       const fileAvailability: FileAvailability = {
+        type: action.validatedFile.type,
         id: action.validatedFile.id,
+        parentId:
+          'parentId' in action.validatedFile
+            ? action.validatedFile.parentId
+            : null,
+        name:
+          'name' in action.validatedFile
+            ? action.validatedFile.name
+            : action.validatedFile.type,
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: action.filePath,
@@ -60,13 +72,27 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
 
     case A.OPEN_FILE_FAILURE: {
       const base = state[action.file.type][action.file.id]
-      const newAvailability: KnownFile = {
-        id: action.file.id,
-        filePath: base ? base.filePath : null,
-        status: 'FAILED_TO_LOAD',
-        isLoading: false,
-        lastOpened: base ? base.lastOpened : null,
-      }
+      const newAvailability: KnownFile = base
+        ? {
+            id: action.file.id,
+            type: action.file.type,
+            parentId: base.parentId,
+            name: base.name,
+            filePath: base.filePath,
+            status: 'FAILED_TO_LOAD',
+            isLoading: false,
+            lastOpened: base.lastOpened,
+          }
+        : {
+            id: action.file.id,
+            type: action.file.type,
+            parentId: 'parentId' in action.file ? action.file.parentId : null,
+            name: 'name' in action.file ? action.file.name : action.file.type,
+            filePath: null,
+            status: 'FAILED_TO_LOAD',
+            isLoading: false,
+            lastOpened: null,
+          }
       return {
         ...state,
         [action.file.type]: {
@@ -77,10 +103,14 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
 
     case A.ADD_FILE: {
-      const newAvailability: KnownFile = {
+      const base = state[action.file.type][action.file.id]
+      const newAvailability: KnownFile = base || {
         filePath: null,
         status: 'NEVER_LOADED',
         id: action.file.id,
+        type: action.file.type,
+        parentId: 'parentId' in action.file ? action.file.parentId : null,
+        name: 'name' in action.file ? action.file.name : action.file.type,
         isLoading: false,
         lastOpened: null,
       }
@@ -111,20 +141,74 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
 
     case A.DELETE_FILE_SUCCESS: {
-      const { [action.file.id]: _, ...newSubstate } = state[action.file.type]
-      const newState = { ...state, [action.file.type]: newSubstate }
-      for (const descendant of action.descendants) {
-        if (
-          newState[descendant.type] &&
-          newState[descendant.type][descendant.id]
-        )
-          delete newState[descendant.type][descendant.id]
+      const deleted = getDeletedFile(action.file)
+
+      {
+        const newState = {} as typeof state
+        for (const t in state) {
+          const type = t as keyof typeof state
+          // @ts-ignore
+          newState[type] = { ...state[type] }
+        }
+
+        newState[action.file.type][action.file.id] = deleted
+
+        for (const descendant of action.descendants) {
+          newState[descendant.type][descendant.id] = getDeletedFile(descendant)
+        }
+        return newState
       }
+    }
+
+    case A.COMMIT_FILE_DELETIONS: {
+      const newState = {} as typeof state
+
+      for (const t in state) {
+        const type: keyof typeof state = t as any
+        const files = state[type]
+
+        newState[type] = {} as typeof files
+
+        for (const id in files) {
+          const file = newState[type][id]
+          if (file && file.status !== 'PENDING_DELETION')
+            newState[type][id] = file
+        }
+      }
+
       return newState
     }
+
     default:
       return state
   }
+}
+
+const getDeletedFile = (file: FileAvailability): PendingDeletionFile => {
+  const { filePath, lastOpened } = file
+  const newAvailability: KnownFile =
+    filePath && lastOpened
+      ? {
+          id: file.id,
+          type: file.type,
+          parentId: file.parentId,
+          name: file.name,
+          filePath: filePath,
+          lastOpened: lastOpened,
+          status: 'PENDING_DELETION',
+          isLoading: false,
+        }
+      : {
+          id: file.id,
+          type: file.type,
+          parentId: file.parentId,
+          name: file.name,
+          filePath: null,
+          lastOpened: null,
+          status: 'PENDING_DELETION',
+          isLoading: false,
+        }
+  return newAvailability
 }
 
 export default fileAvailabilities

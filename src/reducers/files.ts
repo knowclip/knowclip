@@ -48,8 +48,8 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         },
       }
     case A.ADD_FILE:
-    case A.OPEN_FILE_REQUEST:
-    case A.LOCATE_FILE_SUCCESS: {
+    case A.OPEN_FILE_REQUEST: {
+      // case A.LOCATE_FILE_SUCCESS:
       const newState = {
         ...state,
         [action.file.type]: {
@@ -243,14 +243,17 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
     }
 
     case A.DELETE_FILE_SUCCESS: {
-      const { [action.file.id]: _, ...newSubstate } = state[action.file.type]
-      const newState = { ...state, [action.file.type]: newSubstate }
+      const newState = {} as typeof state
+      for (const t in state) {
+        const type = t as keyof typeof state
+        // @ts-ignore
+        newState[type] = { ...state[type] }
+      }
+
+      delete newState[action.file.type][action.file.id]
+
       for (const descendant of action.descendants) {
-        if (
-          newState[descendant.type] &&
-          newState[descendant.type][descendant.id]
-        )
-          delete newState[descendant.type][descendant.id]
+        delete newState[descendant.type][descendant.id]
       }
       return newState
     }

@@ -6,7 +6,7 @@ export type FileEventHandlers<F extends FileMetadata> = {
   locateSuccess: LocateFileSuccessHandler<F> | null
   deleteRequest: DeleteFileRequestHandler<F>[]
   // DESCENDANTS' DELETE HOOKS ARE NOT TRIGGERED
-  deleteSuccess: DeleteFileSuccessHandler<F>[]
+  deleteSuccess: DeleteFileSuccessHandler[]
 }
 
 export type OpenFileRequestHandler<F extends FileMetadata> = (
@@ -41,15 +41,16 @@ export type LocateFileSuccessHandler<F extends FileMetadata> = (
 ) => Promise<Array<Action>>
 
 export type DeleteFileRequestHandler<F extends FileMetadata> = (
-  file: F,
-  descendants: Array<FileMetadata>,
+  file: F | null,
+  availability: FileAvailability,
+  descendants: Array<FileAvailability>,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
 // DESCENDANTS' DELETE HOOKS ARE NOT TRIGGERED
-export type DeleteFileSuccessHandler<F extends FileMetadata> = (
-  action: DeleteFileSuccess & { file: F },
+export type DeleteFileSuccessHandler = (
+  action: DeleteFileSuccess,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>

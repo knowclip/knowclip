@@ -32,7 +32,9 @@ const remakeStill: AppEpic = (action$, state$) =>
             action$.pipe(
               filter(
                 a =>
-                  a.type === 'DELETE_FILE_SUCCESS' && areSameFile(a.file, still)
+                  a.type === 'DELETE_FILE_SUCCESS' &&
+                  a.file.id === still.id &&
+                  a.file.type === still.type
               ),
               take(1),
               ignoreElements()

@@ -310,6 +310,7 @@ declare type FileAction =
   | OpenFileFailure
   | LocateFileRequest
   | LocateFileSuccess
+  | CommitFileDeletions
   | PreloadVideoStills
 declare type AddFile = {
   type: 'ADD_FILE'
@@ -322,13 +323,15 @@ declare type DeleteFileRequest = {
 }
 declare type DeleteFileSuccess = {
   type: 'DELETE_FILE_SUCCESS'
-  file: FileMetadata
-  descendants: Array<FileMetadata>
+  file: FileAvailability
+  descendants: Array<FileAvailability>
+}
+declare type CommitFileDeletions = {
+  type: 'COMMIT_FILE_DELETIONS'
 }
 declare type OpenFileRequest = {
   type: 'OPEN_FILE_REQUEST'
   file: FileMetadata
-  /** ignored if there is already a path on record */
   filePath: FilePath | null
 }
 declare type OpenFileSuccess = {
@@ -355,6 +358,10 @@ declare type LocateFileSuccess = {
   file: FileMetadata
   filePath: FilePath
 }
+declare type CommitFileDeletions = {
+  type: 'COMMIT_FILE_DELETIONS'
+}
+
 declare type PreloadVideoStills = {
   type: 'PRELOAD_VIDEO_STILLS'
   file: FileMetadata

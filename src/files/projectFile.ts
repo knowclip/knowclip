@@ -75,13 +75,14 @@ export default {
   locateSuccess: async (action, state, { setLocalStorage }) =>
     persistFiles(state, setLocalStorage),
   deleteRequest: [
-    async (file, descendants, state, effects) => [
-      r.deleteFileSuccess(file, descendants),
+    async (file, availability, descendants, state) => [
+      r.deleteFileSuccess(availability.id, descendants),
     ],
   ],
   deleteSuccess: [
     async (action, state, { setLocalStorage }) =>
       persistFiles(state, setLocalStorage),
+    async (action, state) => [r.commitFileDeletions()],
   ],
 } as FileEventHandlers<ProjectFile>
 
