@@ -5,7 +5,7 @@ export * from './dialog'
 export * from './projects'
 export * from './subtitles'
 export * from './files'
-export * from './user'
+export * from './session'
 
 export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,

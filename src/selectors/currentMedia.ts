@@ -12,11 +12,11 @@ import {
   getClipsByIds,
   getClip,
 } from './clips'
-import { getHighlightedClipId } from './user'
+import { getHighlightedClipId } from './session'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_WIDTH } from './waveform'
 
-export const isLoopOn = (state: AppState) => state.user.loopMedia
+export const isLoopOn = (state: AppState) => state.session.loopMedia
 
 export const getConstantBitrateFilePath = (
   state: AppState,
@@ -39,7 +39,7 @@ export const getConstantBitrateFilePath = (
 }
 
 export const getCurrentProjectId = (state: AppState): ProjectId | null =>
-  state.user.currentProjectId
+  state.session.currentProjectId
 
 export const getCurrentProject = (state: AppState): ProjectFile | null => {
   const currentProjectId = getCurrentProjectId(state)
@@ -49,7 +49,7 @@ export const getCurrentProject = (state: AppState): ProjectFile | null => {
 }
 
 export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
-  const currentFileId = state.user.currentMediaFileId
+  const currentFileId = state.session.currentMediaFileId
   if (!currentFileId) return null
 
   const currentFile = getFileAvailabilityById(state, 'MediaFile', currentFileId)
@@ -61,12 +61,12 @@ export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
 export const getCurrentMediaConstantBitrateFilePath = (
   state: AppState
 ): MediaFilePath | null =>
-  state.user.currentMediaFileId
-    ? getConstantBitrateFilePath(state, state.user.currentMediaFileId)
+  state.session.currentMediaFileId
+    ? getConstantBitrateFilePath(state, state.session.currentMediaFileId)
     : null
 
 export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
-  const { currentMediaFileId } = state.user
+  const { currentMediaFileId } = state.session
   return currentMediaFileId
     ? getFile(state, 'MediaFile', currentMediaFileId)
     : null
@@ -87,15 +87,15 @@ export const isAudioLoading = (state: AppState): boolean => {
 }
 
 export const isWorkUnsaved = (state: AppState): boolean =>
-  state.user.workIsUnsaved
+  state.session.workIsUnsaved
 
 export const getCurrentFileName = (state: AppState): MediaFileName | null => {
   const filePath = getCurrentFilePath(state)
   return filePath && basename(filePath)
 }
 
-export const getCurrentFileId = ({ user }: AppState): MediaFileId | null =>
-  user.currentMediaFileId
+export const getCurrentFileId = ({ session }: AppState): MediaFileId | null =>
+  session.currentMediaFileId
 
 const empty: Array<ClipId> = []
 export const getClipsOrder = (

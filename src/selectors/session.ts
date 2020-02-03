@@ -10,7 +10,7 @@ export const getPendingStretch = (
   state: AppState
 ): ExpandedPendingStretch | null => {
   if (!state.clips) return null
-  const { pendingStretch } = state.user
+  const { pendingStretch } = state.session
   if (!pendingStretch) return null
 
   const stretchedClip = getClip(state, pendingStretch.id)
@@ -23,7 +23,7 @@ export const getPendingStretch = (
 }
 
 export const getHighlightedClipId = (state: AppState): ClipId | null =>
-  state.user.highlightedClipId
+  state.session.highlightedClipId
 
 export const getHighlightedClip = (state: AppState): Clip | null => {
   const highlightedClipId = getHighlightedClipId(state)
@@ -31,14 +31,14 @@ export const getHighlightedClip = (state: AppState): Clip | null => {
 }
 
 export const getPendingClip = (state: AppState): PendingClip | null =>
-  state.user.pendingClip
+  state.session.pendingClip
 
 export const getAllTags = (state: AppState): Array<string> => {
-  const tags = Object.keys(state.user.tagsToClipIds)
+  const tags = Object.keys(state.session.tagsToClipIds)
   return tags.reduce((a, b) => a.concat(b), [] as Array<string>)
 }
 export const getDefaultTags = (state: AppState): Array<string> =>
-  state.user.defaultTags
+  state.session.defaultTags
 
 export const getDefaultIncludeStill = (state: AppState): boolean =>
-  state.user.defaultIncludeStill
+  state.session.defaultIncludeStill

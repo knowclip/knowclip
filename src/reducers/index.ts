@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 
 import waveform from './waveform'
 import clips from './clips'
-import user from './user'
+import session from './session'
 import snackbar from './snackbar'
 import dialog from './dialog'
 import subtitles from './subtitles'
@@ -13,7 +13,7 @@ import files from './files'
 export default combineReducers<AppState>({
   waveform,
   clips,
-  user,
+  session,
   snackbar,
   dialog,
   subtitles,

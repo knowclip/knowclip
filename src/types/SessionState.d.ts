@@ -9,7 +9,7 @@ declare type PendingStretch = {
   end: WaveformX
 }
 
-declare type UserState = {
+declare type SessionState = {
   pendingClip: PendingClip | null
   pendingStretch: PendingStretch | null
   highlightedClipId: ClipId | null
