@@ -15,7 +15,7 @@ import { savedProjectTestSteps } from '../savedProject/savedProjectTestSteps'
 
 jest.setTimeout(60000)
 
-const testId = 'sharedProject'
+const testId = 'subtitlesProject'
 
 describe('make a project file for testing generating clips from subtitles', () => {
   let context: { app: Application | null; testId: string } = {

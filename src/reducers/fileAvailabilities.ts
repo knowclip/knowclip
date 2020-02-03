@@ -143,21 +143,21 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     case A.DELETE_FILE_SUCCESS: {
       const deleted = getDeletedFile(action.file)
 
-      {
-        const newState = {} as typeof state
-        for (const t in state) {
-          const type = t as keyof typeof state
-          // @ts-ignore
-          newState[type] = { ...state[type] }
-        }
-
-        newState[action.file.type][action.file.id] = deleted
-
-        for (const descendant of action.descendants) {
-          newState[descendant.type][descendant.id] = getDeletedFile(descendant)
-        }
-        return newState
+      console.log(action)
+      const newState = {} as typeof state
+      for (const t in state) {
+        const type = t as keyof typeof state
+        // @ts-ignore
+        newState[type] = { ...state[type] }
       }
+      console.log(newState)
+
+      newState[action.file.type][action.file.id] = deleted
+
+      for (const descendant of action.descendants) {
+        newState[descendant.type][descendant.id] = getDeletedFile(descendant)
+      }
+      return newState
     }
 
     case A.COMMIT_FILE_DELETIONS: {
@@ -177,6 +177,29 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
 
       return newState
+    }
+
+    case A.SET_PROJECT_NAME: {
+      // TODO: investigate whether to generalize for all file types?
+      const existingProjectFile = state.ProjectFile[action.id]
+      if (!existingProjectFile) {
+        console.error(
+          `Action ${action.type} was dispatched during illegal state.`
+        )
+        console.log(action, state)
+        // should be impossible
+        return state
+      }
+
+      return {
+        ...state,
+        ProjectFile: {
+          [action.id]: {
+            ...existingProjectFile,
+            name: action.name,
+          },
+        },
+      }
     }
 
     default:

@@ -81,119 +81,13 @@ const sideEffectsMocks = {
   ],
 }
 const persistedState: Partial<AppState> = {
-  files: {
-    ProjectFile: {
-      '91bfd159-155c-4b61-bdd5-d71e2e944773': {
-        id: '91bfd159-155c-4b61-bdd5-d71e2e944773',
-        type: 'ProjectFile',
-        lastSaved: '2020-02-01T13:20:55Z',
-        name: 'My cool saved project',
-        mediaFileIds: [
-          '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-          'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
-        ],
-        error: null,
-        noteType: 'Transliteration',
-      },
-    },
-    MediaFile: {
-      '10fd95ee-ba1a-424f-95fb-66a28c91faf1': {
-        id: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-        type: 'MediaFile',
-        parentId: '91bfd159-155c-4b61-bdd5-d71e2e944773',
-        subtitles: [
-          {
-            type: 'EmbeddedSubtitlesTrack',
-            id: 'd680807d-3a5f-4a25-967f-71871b7d5057',
-            streamIndex: 2,
-          },
-          {
-            type: 'ExternalSubtitlesTrack',
-            id: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
-          },
-        ],
-        flashcardFieldsToSubtitlesTracks: {},
-        isVideo: true,
-        name: 'polar_bear_cafe.mp4',
-        durationSeconds: 87.062,
-        format: 'mov,mp4,m4a,3gp,3g2,mj2',
-        subtitlesTracksStreamIndexes: [2],
-        width: 1920,
-        height: 1080,
-      },
-      'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77': {
-        id: 'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
-        type: 'MediaFile',
-        parentId: '91bfd159-155c-4b61-bdd5-d71e2e944773',
-        subtitles: [],
-        flashcardFieldsToSubtitlesTracks: {},
-        isVideo: true,
-        name: 'piggeldy_cat.mp4',
-        durationSeconds: 58.24,
-        format: 'mov,mp4,m4a,3gp,3g2,mj2',
-        subtitlesTracksStreamIndexes: [],
-        width: 480,
-        height: 360,
-      },
-    },
-    ExternalSubtitlesFile: {
-      'b3347257-97c4-4c9a-8eae-9bf88a8edc23': {
-        type: 'ExternalSubtitlesFile',
-        parentId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-        id: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
-        name: 'pbc_jp.ass',
-      },
-    },
-    VttConvertedSubtitlesFile: {
-      'd680807d-3a5f-4a25-967f-71871b7d5057': {
-        type: 'VttConvertedSubtitlesFile',
-        parentId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-        id: 'd680807d-3a5f-4a25-967f-71871b7d5057',
-        streamIndex: 2,
-        parentType: 'MediaFile',
-      },
-      'b3347257-97c4-4c9a-8eae-9bf88a8edc23': {
-        type: 'VttConvertedSubtitlesFile',
-        id: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
-        parentId: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
-        parentType: 'ExternalSubtitlesFile',
-      },
-    },
-    WaveformPng: {
-      '10fd95ee-ba1a-424f-95fb-66a28c91faf1': {
-        type: 'WaveformPng',
-        parentId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-        id: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-      },
-      'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77': {
-        type: 'WaveformPng',
-        parentId: 'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
-        id: 'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
-      },
-    },
-    ConstantBitrateMp3: {},
-    VideoStillImage: {
-      '632a6cff-7fd7-4d0f-b657-0b9636204261': {
-        id: '632a6cff-7fd7-4d0f-b657-0b9636204261',
-        type: 'VideoStillImage',
-        mediaFileId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-      },
-      'a272b282-4d89-4af0-9d17-baa807793f1f': {
-        id: 'a272b282-4d89-4af0-9d17-baa807793f1f',
-        type: 'VideoStillImage',
-        mediaFileId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-      },
-      '6fce08e8-9312-4930-9601-c14b470e57ab': {
-        id: '6fce08e8-9312-4930-9601-c14b470e57ab',
-        type: 'VideoStillImage',
-        mediaFileId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
-      },
-    },
-  },
   fileAvailabilities: {
     ProjectFile: {
       '91bfd159-155c-4b61-bdd5-d71e2e944773': {
+        type: 'ProjectFile',
         id: '91bfd159-155c-4b61-bdd5-d71e2e944773',
+        parentId: null,
+        name: 'My cool saved project',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(TMP_DIRECTORY, '/my_previously_saved_project.kyml'),
@@ -202,23 +96,32 @@ const persistedState: Partial<AppState> = {
     },
     MediaFile: {
       '10fd95ee-ba1a-424f-95fb-66a28c91faf1': {
+        type: 'MediaFile',
         id: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
+        parentId: '91bfd159-155c-4b61-bdd5-d71e2e944773',
+        name: 'polar_bear_cafe.mp4',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(ASSETS_DIRECTORY, '/polar_bear_cafe.mp4'),
-        lastOpened: '2020-02-01T13:21:21Z',
+        lastOpened: '2020-02-01T13:21:20Z',
       },
       'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77': {
+        type: 'MediaFile',
         id: 'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
+        parentId: '91bfd159-155c-4b61-bdd5-d71e2e944773',
+        name: 'piggeldy_cat.mp4',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(ASSETS_DIRECTORY, '/piggeldy_cat.mp4'),
-        lastOpened: '2020-02-01T13:21:20Z',
+        lastOpened: '2020-02-01T13:21:19Z',
       },
     },
     ExternalSubtitlesFile: {
       'b3347257-97c4-4c9a-8eae-9bf88a8edc23': {
+        type: 'ExternalSubtitlesFile',
         id: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
+        parentId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
+        name: 'pbc_jp.ass',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(ASSETS_DIRECTORY, '/pbc_jp.ass'),
@@ -227,7 +130,10 @@ const persistedState: Partial<AppState> = {
     },
     VttConvertedSubtitlesFile: {
       'd680807d-3a5f-4a25-967f-71871b7d5057': {
+        type: 'VttConvertedSubtitlesFile',
         id: 'd680807d-3a5f-4a25-967f-71871b7d5057',
+        parentId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
+        name: 'VttConvertedSubtitlesFile',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
@@ -237,7 +143,10 @@ const persistedState: Partial<AppState> = {
         lastOpened: '2020-02-01T13:21:21Z',
       },
       'b3347257-97c4-4c9a-8eae-9bf88a8edc23': {
+        type: 'VttConvertedSubtitlesFile',
         id: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
+        parentId: 'b3347257-97c4-4c9a-8eae-9bf88a8edc23',
+        name: 'VttConvertedSubtitlesFile',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
@@ -249,7 +158,10 @@ const persistedState: Partial<AppState> = {
     },
     WaveformPng: {
       '10fd95ee-ba1a-424f-95fb-66a28c91faf1': {
+        type: 'WaveformPng',
         id: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
+        parentId: '10fd95ee-ba1a-424f-95fb-66a28c91faf1',
+        name: 'WaveformPng',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
@@ -259,7 +171,10 @@ const persistedState: Partial<AppState> = {
         lastOpened: '2020-02-01T13:21:21Z',
       },
       'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77': {
+        type: 'WaveformPng',
         id: 'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
+        parentId: 'bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77',
+        name: 'WaveformPng',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
@@ -272,34 +187,43 @@ const persistedState: Partial<AppState> = {
     ConstantBitrateMp3: {},
     VideoStillImage: {
       '632a6cff-7fd7-4d0f-b657-0b9636204261': {
+        type: 'VideoStillImage',
         id: '632a6cff-7fd7-4d0f-b657-0b9636204261',
+        parentId: null,
+        name: 'VideoStillImage',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe_10-280_632a6cff-7fd7-4d0f-b657-0b9636204261.png'
         ),
-        lastOpened: '2020-02-01T13:21:00Z',
+        lastOpened: '2020-02-01T13:20:59Z',
       },
       'a272b282-4d89-4af0-9d17-baa807793f1f': {
+        type: 'VideoStillImage',
         id: 'a272b282-4d89-4af0-9d17-baa807793f1f',
+        parentId: null,
+        name: 'VideoStillImage',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
-          '/polar_bear_cafe_16-440_a272b282-4d89-4af0-9d17-baa807793f1f.png'
+          '/polar_bear_cafe_16-760_a272b282-4d89-4af0-9d17-baa807793f1f.png'
         ),
         lastOpened: '2020-02-01T13:21:08Z',
       },
       '6fce08e8-9312-4930-9601-c14b470e57ab': {
+        type: 'VideoStillImage',
         id: '6fce08e8-9312-4930-9601-c14b470e57ab',
+        parentId: null,
+        name: 'VideoStillImage',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe_78-180_6fce08e8-9312-4930-9601-c14b470e57ab.png'
         ),
-        lastOpened: '2020-02-01T13:21:19Z',
+        lastOpened: '2020-02-01T13:21:08Z',
       },
     },
   },

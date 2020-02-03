@@ -4,7 +4,7 @@ name: Project with subtitles
 noteType: Transliteration
 timestamp: 2020-02-01T16:11:28Z
 id: ef3a2602-37a0-4158-89d6-47b75edb5bea
-...
+---
 name: polar_bear_cafe.mp4
 format: mov,mp4,m4a,3gp,3g2,mj2
 duration: 01:27.062
@@ -46,7 +46,7 @@ clips:
       type: VideoStill
 flashcardFieldsToSubtitlesTracks:
   transcription: a8b64692-dba0-4ef4-b5e7-8c887956a69a
-...
+---
 name: piggeldy_cat.mp4
 format: mov,mp4,m4a,3gp,3g2,mj2
 duration: 00:58.24

@@ -90,7 +90,6 @@ function persistFiles(
   state: AppState,
   setLocalStorage: (arg0: string, arg1: string) => void
 ) {
-  setLocalStorage('files', JSON.stringify(state.files))
   setLocalStorage(
     'fileAvailabilities',
     JSON.stringify(state.fileAvailabilities)
