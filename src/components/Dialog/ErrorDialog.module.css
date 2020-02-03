@@ -1,0 +1,8 @@
+.log {
+  white-space: pre-line;
+  padding: 1rem;
+  font-family: monospace;
+  background-color: #dddddd;
+  max-height:35em;
+  overflow-y:auto
+}

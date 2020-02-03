@@ -86,9 +86,10 @@ export type FlashcardFields =
   | SimpleFlashcardFields
   | TransliterationFlashcardFields
 
-export type ProjectSimpleJson = ProjectJson<SimpleFlashcardFields>
-export type ProjectTransliterationJson = ProjectJson<
-  TransliterationFlashcardFields
->
+export type $ProjectMetadataJson =
+  | ProjectMetadataJson<SimpleFlashcardFields>
+  | ProjectMetadataJson<TransliterationFlashcardFields>
 
-export type ProjectGenericJson = ProjectSimpleJson | ProjectTransliterationJson
+export type $MediaJson =
+  | MediaJson<SimpleFlashcardFields>
+  | MediaJson<TransliterationFlashcardFields>

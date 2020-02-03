@@ -13,9 +13,6 @@ declare type FilePath = string
 
 declare type ParentFileId = string
 
-// parent can be a file or any entity
-// TODO: to trigger fileAvailability's deletion on parent file deleted/removed from state
-
 declare type FilePath = string
 
 declare type FileMetadata =

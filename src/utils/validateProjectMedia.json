@@ -1,6 +1,17 @@
 {
+  "$ref": "#/definitions/%24MediaJson",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "$MediaJson": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/MediaJson%3CSimpleFlashcardFields%3E"
+        },
+        {
+          "$ref": "#/definitions/MediaJson%3CTransliterationFlashcardFields%3E"
+        }
+      ]
+    },
     "ClipJson<SimpleFlashcardFields>": {
       "additionalProperties": false,
       "properties": {
@@ -123,16 +134,6 @@
         "id"
       ],
       "type": "object"
-    },
-    "FlashcardFields": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/SimpleFlashcardFields"
-        },
-        {
-          "$ref": "#/definitions/TransliterationFlashcardFields"
-        }
-      ]
     },
     "MediaJson<SimpleFlashcardFields>": {
       "anyOf": [
@@ -314,130 +315,6 @@
         }
       ]
     },
-    "ProjectGenericJson": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/ProjectSimpleJson"
-        },
-        {
-          "$ref": "#/definitions/ProjectTransliterationJson"
-        }
-      ]
-    },
-    "ProjectJson<SimpleFlashcardFields>": {
-      "additionalProperties": false,
-      "properties": {
-        "media": {
-          "items": {
-            "$ref": "#/definitions/MediaJson%3CSimpleFlashcardFields%3E"
-          },
-          "type": "array"
-        },
-        "project": {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "noteType": {
-              "enum": [
-                "Simple",
-                "Transliteration"
-              ],
-              "type": "string"
-            },
-            "timestamp": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "noteType",
-            "timestamp",
-            "id"
-          ],
-          "type": "object"
-        }
-      },
-      "required": [
-        "project",
-        "media"
-      ],
-      "type": "object"
-    },
-    "ProjectJson<TransliterationFlashcardFields>": {
-      "additionalProperties": false,
-      "properties": {
-        "media": {
-          "items": {
-            "$ref": "#/definitions/MediaJson%3CTransliterationFlashcardFields%3E"
-          },
-          "type": "array"
-        },
-        "project": {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "noteType": {
-              "enum": [
-                "Simple",
-                "Transliteration"
-              ],
-              "type": "string"
-            },
-            "timestamp": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "noteType",
-            "timestamp",
-            "id"
-          ],
-          "type": "object"
-        }
-      },
-      "required": [
-        "project",
-        "media"
-      ],
-      "type": "object"
-    },
-    "ProjectSimpleJson": {
-      "$ref": "#/definitions/ProjectJson%3CSimpleFlashcardFields%3E"
-    },
-    "ProjectTransliterationJson": {
-      "$ref": "#/definitions/ProjectJson%3CTransliterationFlashcardFields%3E"
-    },
-    "SimpleFlashcardFields": {
-      "additionalProperties": false,
-      "properties": {
-        "meaning": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        },
-        "transcription": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "transcription",
-        "meaning",
-        "notes"
-      ],
-      "type": "object"
-    },
     "SubtitlesFlashcardFieldsLinks": {
       "additionalProperties": false,
       "properties": {
@@ -505,30 +382,6 @@
           "type": "object"
         }
       ]
-    },
-    "TransliterationFlashcardFields": {
-      "additionalProperties": false,
-      "properties": {
-        "meaning": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        },
-        "pronunciation": {
-          "type": "string"
-        },
-        "transcription": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "transcription",
-        "pronunciation",
-        "meaning",
-        "notes"
-      ],
-      "type": "object"
     }
   }
 }

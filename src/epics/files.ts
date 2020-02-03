@@ -87,15 +87,18 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
 const openFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
-    flatMap<OpenFileFailure, Observable<Action>>(
-      ({ file, filePath, errorMessage }) => {
-        return of(r.simpleMessageSnackbar(errorMessage))
-      }
-    )
+    flatMap<OpenFileFailure, Observable<Action>>(action => {
+      const openFailureHandler = fileEventHandlers[action.file.type].openFailure
+      return openFailureHandler
+        ? from(openFailureHandler(action, state$.value, effects)).pipe(
+            mergeAll()
+          )
+        : of(r.simpleMessageSnackbar(action.errorMessage))
+    })
   )
 
 const flatten = (asyncArray: Promise<Action[]>) =>
-  from(asyncArray).pipe(flatMap(array => from(array)))
+  from(asyncArray).pipe(mergeAll())
 
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(

@@ -1,0 +1,72 @@
+{
+  "$ref": "#/definitions/%24ProjectMetadataJson",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "$ProjectMetadataJson": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ProjectMetadataJson%3CSimpleFlashcardFields%3E"
+        },
+        {
+          "$ref": "#/definitions/ProjectMetadataJson%3CTransliterationFlashcardFields%3E"
+        }
+      ]
+    },
+    "ProjectMetadataJson<SimpleFlashcardFields>": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "noteType": {
+          "enum": [
+            "Simple",
+            "Transliteration"
+          ],
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "noteType",
+        "timestamp",
+        "id"
+      ],
+      "type": "object"
+    },
+    "ProjectMetadataJson<TransliterationFlashcardFields>": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "noteType": {
+          "enum": [
+            "Simple",
+            "Transliteration"
+          ],
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "noteType",
+        "timestamp",
+        "id"
+      ],
+      "type": "object"
+    }
+  }
+}

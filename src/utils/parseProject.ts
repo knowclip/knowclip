@@ -4,6 +4,7 @@ import { getXAtMilliseconds, getProjectJson } from '../selectors'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
 import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'
+import validateProject from './validateProject'
 
 type Result<T> = Failure | Success<T>
 type Failure = { errors: string[]; value?: undefined }
@@ -26,7 +27,16 @@ export const parseProjectJson = async <F extends FlashcardFields>(
 
     const [project, ...media] = docs.map(d => d.toJSON())
 
-    // validate here
+    const validation = validateProject(project, media)
+
+    if (validation.errors)
+      return {
+        errors: Object.entries(validation.errors).map(
+          ([sectionName, bigErrorMessage]) => {
+            return `Invalid data for ${sectionName}:\n\n${bigErrorMessage}`
+          }
+        ),
+      }
 
     return {
       value: {

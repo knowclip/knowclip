@@ -67,7 +67,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
           return of(r.openProjectById(projectIdFromRecents))
 
         const parse = await parseProjectJson(filePath)
-        if (parse.errors) throw new Error(parse.errors.join('; '))
+        if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
         const { project } = normalizeProjectJson(state$.value, parse.value)
         return of(r.openFileRequest(project, filePath))
@@ -75,9 +75,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     ),
     mergeAll(),
     catchError(err =>
-      of(
-        r.simpleMessageSnackbar('Problem opening project file: ' + err.message)
-      )
+      of(r.errorDialog('Problem opening project file:', err.message))
     )
   )
 

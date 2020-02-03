@@ -61,6 +61,10 @@ export default {
     },
   ],
 
+  openFailure: async ({ file, filePath, errorMessage }) => [
+    r.errorDialog('Problem opening project file:', errorMessage),
+  ],
+
   locateRequest: async ({ file }, state, effects) => [
     r.fileSelectionDialog(
       `Please locate this project file "${file.name}"`,
