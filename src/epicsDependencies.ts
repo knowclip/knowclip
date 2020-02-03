@@ -24,8 +24,6 @@ const dependencies: EpicsDependencies = {
   document,
   window,
   getCurrentWindow: () => remote.getCurrentWindow(),
-  setLocalStorage: (key, value) => window.localStorage.setItem(key, value),
-  getLocalStorage: key => window.localStorage.getItem(key),
   getWaveformSvgElement,
   getWaveformSvgWidth: () => {
     const el = getWaveformSvgElement()

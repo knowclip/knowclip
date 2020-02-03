@@ -23,23 +23,35 @@ const mapFileState = <F, G>(
     {} as FilesyState<G>
   )
 
-if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON) {
-  console.log('will listen for log message')
-  window.document.addEventListener('DOMContentLoaded', () => {
-    console.log('listening for log message')
-    electron.ipcRenderer.on('log-persisted-data', (e, testId, directories) => {
-      const snapshot = getPersistedDataSnapshot(testId, directories)
+export const listenForPersistedDataLogMessage = (getState: () => AppState) => {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    process.env.REACT_APP_SPECTRON
+  ) {
+    console.log('will listen for log message')
+    window.document.addEventListener('DOMContentLoaded', () => {
+      console.log('listening for log message')
+      electron.ipcRenderer.on(
+        'log-persisted-data',
+        (e, testId, directories) => {
+          const snapshot = getPersistedDataSnapshot(
+            getState(),
+            testId,
+            directories
+          )
 
-      console.log(snapshot)
-      snapshot.keepTmpFiles()
-      console.log(snapshot.localStorageSnapshot)
+          console.log(snapshot)
+          snapshot.keepTmpFiles()
+          console.log(snapshot.json)
 
-      writeFileSync(
-        join(process.cwd(), testId + '_persistedDataSnapshot.js'),
-        snapshot.localStorageSnapshot
+          writeFileSync(
+            join(process.cwd(), testId + '_persistedDataSnapshot.js'),
+            snapshot.json
+          )
+        }
       )
     })
-  })
+  }
 }
 
 export function resetFileAvailabilities(

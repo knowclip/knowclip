@@ -1,8 +1,3 @@
-// import {
-//   ASSETS_DIRECTORY,
-//   TMP_DIRECTORY as TMP_DIRECTORY,
-//   GENERATED_ASSETS_DIRECTORY,
-// } from './spectronApp'
 import tempy from 'tempy'
 import { join, basename } from 'path'
 import { copyFile, remove, existsSync, mkdirp } from 'fs-extra'
@@ -14,18 +9,17 @@ type Directories = {
 }
 
 export function getPersistedDataSnapshot(
+  state: AppState,
   testId: string,
   directories: Directories
 ) {
-  const newLocalStorageSnapshot = {
-    files: JSON.parse(localStorage.getItem('files') as string) as FilesState,
-    fileAvailabilities: JSON.parse(localStorage.getItem(
-      'fileAvailabilities'
-    ) as string) as FileAvailabilitiesState,
+  const newPersistedDataSnapshot = {
+    fileAvailabilities: state.fileAvailabilities,
+    // TODO: settings
   }
   const generatedFilePaths: string[] = []
   for (const [, availabilities] of Object.entries(
-    newLocalStorageSnapshot.fileAvailabilities
+    newPersistedDataSnapshot.fileAvailabilities
   )) {
     // replace filepaths with template strings
     // to be converted later into code for dynamic filepaths
@@ -87,14 +81,11 @@ export function getPersistedDataSnapshot(
   }
 
   return {
-    localStorageSnapshot: JSON.stringify(newLocalStorageSnapshot, null, 2)
+    json: JSON.stringify(newPersistedDataSnapshot, null, 2)
       .replace(/"###/g, '')
       .replace(/###"/g, ''),
     tmpFiles: generatedFilePaths,
     keepTmpFiles,
-    // copyTmpFilesCommand: `rm  ${ASSETS_DIRECTORY}generated/${testId}/** && (cd ${TMP_DIRECTORY} && cp ${generatedFilePaths.join(
-    //   ' '
-    // )} ${ASSETS_DIRECTORY}generated/${testId})`,
   }
 }
 

@@ -10,7 +10,6 @@ import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
-import persistStateEpic from './persistState'
 import addMediaToProject from './addMediaToProject'
 import deleteAllCurrentFileClips from './deleteAllCurrentFileClips'
 import keyboard from './keyboard'
@@ -57,7 +56,6 @@ const rootEpic: AppEpic = combineEpics(
   editClip,
   stretchClip,
   detectSilenceEpic,
-  persistStateEpic,
   exportCsvAndMp3,
   exportApkg,
   exportMarkdown,

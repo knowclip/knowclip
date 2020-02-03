@@ -209,21 +209,6 @@ const closeProjectRequest: AppEpic = (action$, state$) =>
     })
   )
 
-const closeProject: AppEpic = (action$, state$, { getLocalStorage }) =>
-  action$.pipe(
-    ofType(A.CLOSE_PROJECT),
-    map(() => {
-      const filesRaw = getLocalStorage('files')
-      const fileAvailabilitiesRaw = getLocalStorage('fileAvailabilities')
-
-      const files = filesRaw ? (JSON.parse(filesRaw) as FilesState) : null
-      const fileAvailabilities = fileAvailabilitiesRaw
-        ? (JSON.parse(fileAvailabilitiesRaw) as FileAvailabilitiesState)
-        : null
-      return r.loadPersistedState(files, fileAvailabilities)
-    })
-  )
-
 export default combineEpics(
   createProject,
   openProjectByFilePath,
@@ -232,6 +217,5 @@ export default combineEpics(
   registerUnsavedWork,
   // autoSaveProject,
   deleteMediaFileFromProject,
-  closeProjectRequest,
-  closeProject
+  closeProjectRequest
 )

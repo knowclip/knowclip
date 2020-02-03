@@ -2,7 +2,10 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
 import reducer from './reducers'
 import epic from './epics'
-import { resetFileAvailabilities } from './utils/statePersistence'
+import {
+  resetFileAvailabilities,
+  listenForPersistedDataLogMessage,
+} from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
 import { persistStore, persistReducer, createTransform } from 'redux-persist'
 import createElectronStorage from 'redux-persist-electron-storage'
@@ -54,6 +57,8 @@ export default function getStore() {
     initialState,
     composeEnhancers(applyMiddleware(epicMiddleware))
   )
+
+  listenForPersistedDataLogMessage(store.getState)
 
   const persistor = persistStore(store)
 
