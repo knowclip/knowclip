@@ -106,7 +106,7 @@ const saveProject: AppEpic = (action$, state$) =>
           projectFile.filePath &&
           fs.existsSync(projectFile.filePath)
       )
-    }), // while can't find project file path in local storage, or file doesn't exist
+    }), // while can't find project file path in storage, or file doesn't exist
     flatMap(async () => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)

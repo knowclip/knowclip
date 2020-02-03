@@ -55,37 +55,8 @@ export const listenForPersistedDataLogMessage = (getState: () => AppState) => {
 }
 
 export function resetFileAvailabilities(
-  fileAvailabilities:
-    | {
-        ProjectFile: Partial<Record<string, KnownFile>>
-        MediaFile: Partial<Record<string, KnownFile>>
-        ExternalSubtitlesFile: Partial<Record<string, KnownFile>>
-        VttConvertedSubtitlesFile: Partial<Record<string, KnownFile>>
-        WaveformPng: Partial<Record<string, KnownFile>>
-        ConstantBitrateMp3: Partial<Record<string, KnownFile>>
-        VideoStillImage: Partial<Record<string, KnownFile>>
-      }
-    | {
-        ProjectFile: Partial<Record<string, KnownFile>>
-        MediaFile: Partial<Record<string, KnownFile>>
-        ExternalSubtitlesFile: Partial<Record<string, KnownFile>>
-        VttConvertedSubtitlesFile: Partial<Record<string, KnownFile>>
-        WaveformPng: Partial<Record<string, KnownFile>>
-        ConstantBitrateMp3: Partial<Record<string, KnownFile>>
-        VideoStillImage: Partial<Record<string, KnownFile>>
-      }
-):
-  | Record<
-      | 'ProjectFile'
-      | 'MediaFile'
-      | 'ExternalSubtitlesFile'
-      | 'VttConvertedSubtitlesFile'
-      | 'WaveformPng'
-      | 'ConstantBitrateMp3'
-      | 'VideoStillImage',
-      Partial<Record<string, KnownFile>>
-    >
-  | undefined {
+  fileAvailabilities: FileAvailabilitiesState
+): FileAvailabilitiesState {
   return mapFileState(
     fileAvailabilities,
     (type, fa): KnownFile => {

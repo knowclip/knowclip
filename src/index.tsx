@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import App from './components/App'
-import getStore from './getStore'
+import store from './store'
 import './index.css'
 import { AppContainer, setConfig, cold } from 'react-hot-loader'
 
@@ -13,8 +13,6 @@ setConfig({
       String(type).indexOf('useEffect') > 0) &&
     cold(type),
 })
-
-const { store, persistor } = getStore()
 
 const render = (Component: typeof React.Component.constructor) =>
   ReactDOM.render(

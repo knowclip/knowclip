@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON)
     : undefined
 
 const transform = createTransform(
-  (inbound: any) => inbound,
+  (inbound: FileAvailabilitiesState) => inbound,
   (outbound: FileAvailabilitiesState) => resetFileAvailabilities(outbound),
   {
     whitelist: ['fileAvailabilities'],
@@ -33,6 +33,7 @@ const persistedReducer = persistReducer(
     key: 'root',
     storage: createElectronStorage(),
     transforms: [transform],
+    whitelist: ['fileAvailabilities', 'settings'],
   },
   reducer
 )
@@ -47,7 +48,7 @@ const getDevToolsCompose = () => {
 const composeEnhancers =
   process.env.NODE_ENV === 'development' ? getDevToolsCompose() : compose
 
-export default function getStore() {
+function getStore() {
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
   })
@@ -64,14 +65,20 @@ export default function getStore() {
 
   epicMiddleware.run(epic as any)
 
-  // should this go before running epic middleware?
-  // @ts-ignore
-  if (module.hot) {
-    // @ts-ignore
-    module.hot.accept('./reducers', () => {
-      store.replaceReducer(reducer)
-    })
-  }
-
   return { store, persistor }
+}
+
+const { store, persistor } = getStore()
+
+export default store
+
+export { persistor }
+
+// should this go before running epic middleware?
+// @ts-ignore
+if (module.hot) {
+  // @ts-ignore
+  module.hot.accept('./reducers', () => {
+    store.replaceReducer(reducer)
+  })
 }
