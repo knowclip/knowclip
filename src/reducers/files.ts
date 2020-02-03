@@ -54,7 +54,10 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         ...state,
         [action.file.type]: {
           ...state[action.file.type],
-          [action.file.id]: action.file,
+          [action.file.id]: {
+            ...state[action.file.type][action.file.id], // needed?
+            ...action.file,
+          },
         },
       }
       if (action.file.type === 'MediaFile') {

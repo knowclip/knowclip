@@ -14,7 +14,7 @@ setConfig({
     cold(type),
 })
 
-const store = getStore()
+const { store, persistor } = getStore()
 
 const render = (Component: typeof React.Component.constructor) =>
   ReactDOM.render(

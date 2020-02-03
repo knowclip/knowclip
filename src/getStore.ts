@@ -2,9 +2,37 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
 import reducer from './reducers'
 import epic from './epics'
-import { getPersistedState } from './utils/statePersistence'
-import { initialState as initialSettingsState } from './reducers/settings'
+import { resetFileAvailabilities } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
+import { persistStore, persistReducer, createTransform } from 'redux-persist'
+import createElectronStorage from 'redux-persist-electron-storage'
+import electron from 'electron'
+import { readFileSync } from 'fs-extra'
+
+let initialState: Partial<AppState> | undefined
+if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON)
+  initialState = electron.remote.process.env.PERSISTED_STATE_PATH
+    ? JSON.parse(
+        readFileSync(electron.remote.process.env.PERSISTED_STATE_PATH, 'utf8')
+      )
+    : undefined
+
+const transform = createTransform(
+  (inbound: any) => inbound,
+  (outbound: FileAvailabilitiesState) => resetFileAvailabilities(outbound),
+  {
+    whitelist: ['fileAvailabilities'],
+  }
+)
+
+const persistedReducer = persistReducer(
+  {
+    key: 'root',
+    storage: createElectronStorage(),
+    transforms: [transform],
+  },
+  reducer
+)
 
 const getDevToolsCompose = () => {
   const devToolsCompose = ((window as unknown) as {
@@ -21,22 +49,13 @@ export default function getStore() {
     dependencies: epicsDependencies,
   })
 
-  const persistedState = getPersistedState()
-
-  const { settings: persistedSettings } = persistedState
-  const state: Partial<AppState> = {
-    ...persistedState,
-    settings: {
-      ...initialSettingsState,
-      ...persistedSettings,
-    },
-  }
-
   const store = createStore(
-    reducer,
-    state,
+    persistedReducer,
+    initialState,
     composeEnhancers(applyMiddleware(epicMiddleware))
   )
+
+  const persistor = persistStore(store)
 
   epicMiddleware.run(epic as any)
 
@@ -49,5 +68,5 @@ export default function getStore() {
     })
   }
 
-  return store
+  return { store, persistor }
 }

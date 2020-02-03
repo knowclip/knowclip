@@ -1,4 +1,5 @@
 import { Reducer } from 'redux'
+import { getHumanFileName } from '../utils/files'
 
 export const initialState: FileAvailabilitiesState = {
   ProjectFile: {},
@@ -22,24 +23,29 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       const type = action.file.type
       const byType = state[type]
       const base = byType[action.file.id]
+
+      const newFile: KnownFile =
+        base && base.status !== 'PENDING_DELETION'
+          ? getLoadingFile(base, action)
+          : {
+              id: action.file.id,
+              type: action.file.type,
+              parentId: 'parentId' in action.file ? action.file.parentId : null,
+              name:
+                'name' in action.file
+                  ? action.file.name
+                  : 'Unknown ' + getHumanFileName(action.file),
+              status: 'NEVER_LOADED',
+              filePath: action.filePath,
+              lastOpened: null,
+              isLoading: true,
+            }
+
       return {
         ...state,
         [action.file.type]: {
           ...state[action.file.type],
-          [action.file.id]: base
-            ? {
-                id: base.id,
-                status: base.status,
-                // does the action need filepath even?
-                filePath: action.filePath || base.filePath,
-                isLoading: true,
-              }
-            : {
-                id: action.file.id,
-                status: 'NEVER_LOADED',
-                filePath: action.filePath,
-                isLoading: true,
-              },
+          [action.file.id]: newFile,
         },
       }
     }
@@ -232,6 +238,68 @@ const getDeletedFile = (file: FileAvailability): PendingDeletionFile => {
           isLoading: false,
         }
   return newAvailability
+}
+
+const getLoadingFile = (
+  base:
+    | PreviouslyLoadedFile
+    | ErroredFile
+    | CurrentlyLoadedFile
+    | NeverLoadedFile,
+  action: OpenFileRequest
+): KnownFile => {
+  switch (base.status) {
+    case 'PREVIOUSLY_LOADED':
+      return {
+        id: base.id,
+        type: base.type,
+        parentId: base.parentId,
+        name: base.name,
+        status: 'PREVIOUSLY_LOADED',
+        // does the action need filepath even?
+        filePath: action.filePath || base.filePath,
+        isLoading: true,
+        lastOpened: base.lastOpened,
+      }
+    case 'CURRENTLY_LOADED':
+      return {
+        id: base.id,
+        type: base.type,
+        parentId: base.parentId,
+        name: base.name,
+        status: 'PREVIOUSLY_LOADED',
+        // does the action need filepath even?
+        filePath: action.filePath || base.filePath,
+        isLoading: true,
+        lastOpened: base.lastOpened,
+      }
+
+    case 'FAILED_TO_LOAD':
+      return {
+        id: base.id,
+        type: base.type,
+        parentId: base.parentId,
+        name: base.name,
+        status: 'FAILED_TO_LOAD',
+        // does the action need filepath even?
+        filePath: action.filePath || base.filePath,
+        isLoading: true,
+        lastOpened: base.lastOpened,
+      }
+
+    case 'NEVER_LOADED':
+      return {
+        id: base.id,
+        type: base.type,
+        parentId: base.parentId,
+        name: base.name,
+        status: 'NEVER_LOADED',
+        // does the action need filepath even?
+        filePath: action.filePath || base.filePath,
+        isLoading: true,
+        lastOpened: base.lastOpened,
+      }
+  }
 }
 
 export default fileAvailabilities
