@@ -60,7 +60,7 @@
   "scripts": {
     "start": "react-scripts start",
     "start:integration": "REACT_APP_SPECTRON=true react-scripts start",
-    "build": "build-schemas && react-scripts build",
+    "build": "yarn build-schemas && react-scripts build",
     "build:ci": "CI=false yarn build",
     "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test --setupTestFrameworkScriptFile=./src/utils/initializeActionTypeGlobals.ts",
     "integration": "REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
