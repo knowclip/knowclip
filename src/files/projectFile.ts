@@ -76,7 +76,7 @@ export default {
     persistFiles(state, setLocalStorage),
   deleteRequest: [
     async (file, availability, descendants, state) => [
-      r.deleteFileSuccess(availability.id, descendants),
+      r.deleteFileSuccess(availability, descendants),
     ],
   ],
   deleteSuccess: [
