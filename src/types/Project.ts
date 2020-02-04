@@ -1,10 +1,14 @@
-type NoteType = 'Simple' | 'Transliteration' // duplicated
+// *********************** NOTE: **********************
+// run `yarn build-schemas` if you change stuff here!
+// it will be run before production builds though,
+// so probably the worst thing that could happen
+// if you forget to do this is that your project files
+// won't open during dev.
 
-export type ProjectMetadataJson<F extends FlashcardFields> = {
+type NoteType = 'Simple' | 'Transliteration' // TODO: remove this duplication
+export type ProjectMetadataJson = {
   name: string
   noteType: NoteType
-  // media: MediaJson<F>[]
-
   timestamp: string
   id: string
 }
@@ -85,10 +89,6 @@ export type TransliterationFlashcardFields = Record<
 export type FlashcardFields =
   | SimpleFlashcardFields
   | TransliterationFlashcardFields
-
-export type $ProjectMetadataJson =
-  | ProjectMetadataJson<SimpleFlashcardFields>
-  | ProjectMetadataJson<TransliterationFlashcardFields>
 
 export type $MediaJson =
   | MediaJson<SimpleFlashcardFields>

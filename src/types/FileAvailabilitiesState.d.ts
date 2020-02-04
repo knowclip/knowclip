@@ -45,11 +45,11 @@ declare type ErroredFile = {
   parentId: FileId | null
   name: string
   /** A file that has failed to open at the most
-   * recent attempt during this session. OR SHOULD THIS BE NOT JUST FOR THE SESSION?
+   * recent attempt.
    */
   status: 'FAILED_TO_LOAD'
   // error message as well?
-  // should show in UI for media files/subtitles when one is in this state
+  // TODO: should show in UI for media files/subtitles when one is in this state
   filePath: string | null
   isLoading: boolean
   lastOpened: string | null

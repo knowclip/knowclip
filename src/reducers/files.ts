@@ -20,7 +20,6 @@ const edit = <T extends FileMetadata['type']>(
   /** CAREFUL: TS type inference is broken here, so don't forget return type! */
   transform: (file?: FindByTag<FileMetadata, T>) => FindByTag<FileMetadata, T>
 ) => {
-  // type FileType = FindByTag<FileMetadata, T>
   const substate = state[type] as Dict<string, FindByTag<FileMetadata, T>>
 
   const newValue = transform(substate[id])
@@ -45,7 +44,6 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       }
     case A.ADD_FILE:
     case A.OPEN_FILE_REQUEST: {
-      // case A.LOCATE_FILE_SUCCESS:
       const newState = {
         ...state,
         [action.file.type]: {

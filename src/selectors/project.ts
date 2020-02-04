@@ -27,7 +27,6 @@ const newestToOldest = (
   return moment(b).valueOf() - moment(a).valueOf()
 }
 export const getProjects = createSelector(
-  // (state: AppState) => state.files.ProjectFile,
   (state: AppState) => state.fileAvailabilities.ProjectFile,
   (availabilities): Array<FileAvailability> =>
     Object.entries(availabilities)

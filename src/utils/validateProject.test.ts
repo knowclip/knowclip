@@ -13,7 +13,7 @@ describe('validateProject', () => {
   })
 
   it('returns errors for invalid media', () => {
-    const validProjectJson: ProjectMetadataJson<SimpleFlashcardFields> = {
+    const validProjectJson: ProjectMetadataJson = {
       id: 'abcde-fghij-klmno',
       name: 'my cool project',
       timestamp: '2020-01-28T12:35:20Z',
@@ -25,7 +25,7 @@ describe('validateProject', () => {
   })
 
   it('returns data for valid project', () => {
-    const validProjectJson: ProjectMetadataJson<SimpleFlashcardFields> = {
+    const validProjectJson: ProjectMetadataJson = {
       id: 'abcde-fghij-klmno',
       name: 'my cool project',
       timestamp: '2020-01-28T12:35:20Z',

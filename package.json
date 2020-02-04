@@ -76,7 +76,7 @@
     "format:write": "yarn format --write",
     "tsc": "tsc",
     "build-schemas": "yarn build-schema:project && yarn build-schema:media",
-    "build-schema:project": "yarn build-schema --out ./src/utils/validateProjectMetadata.json --type \\$ProjectMetadataJson ",
+    "build-schema:project": "yarn build-schema --out ./src/utils/validateProjectMetadata.json --type \\ProjectMetadataJson ",
     "build-schema:media": "yarn build-schema --out ./src/utils/validateProjectMedia.json --type \\$MediaJson",
     "build-schema": "ts-json-schema-generator --path ./src/types/Project.ts --tsconfig ./tsconfig.json",
     "tidy": "yarn format --list-different && yarn lint && yarn tsc",
@@ -86,7 +86,8 @@
   "husky": {
     "hooks": {
       "pre-commit": "yarn tidy",
-      "post-commit": "git diff"
+      "post-commit": "git diff",
+      "post-push": "echo '############ BUILDING JSON SCHEMAS JUST IN CASE! ############### && yarn build-schemas"
     }
   },
   "browserslist": [

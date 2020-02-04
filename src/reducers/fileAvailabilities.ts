@@ -144,18 +144,13 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
 
     case A.DELETE_FILE_SUCCESS: {
-      const deleted = getDeletedFile(action.file)
-
-      console.log(action)
       const newState = {} as typeof state
       for (const t in state) {
         const type = t as keyof typeof state
-        // @ts-ignore
         newState[type] = { ...state[type] }
       }
-      console.log(newState)
 
-      newState[action.file.type][action.file.id] = deleted
+      newState[action.file.type][action.file.id] = getDeletedFile(action.file)
 
       for (const descendant of action.descendants) {
         newState[descendant.type][descendant.id] = getDeletedFile(descendant)
