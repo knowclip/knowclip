@@ -1,6 +1,6 @@
 import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
-import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
+import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { snackbar$ } from '../../../components/Snackbar'

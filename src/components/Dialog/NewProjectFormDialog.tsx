@@ -238,8 +238,15 @@ const NewProjectFormDialog = ({
         <CardPreview noteType={fieldValues.noteType} />
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog}>Exit</Button>
-        <Button onClick={handleSubmit} id={$.saveButton} type="submit">
+        <Button onClick={closeDialog} color="primary">
+          Exit
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          id={$.saveButton}
+          type="submit"
+          color="primary"
+        >
           Save
         </Button>
       </DialogActions>

@@ -1,3 +1,7 @@
+declare type DialogState = {
+  queue: Array<DialogData>
+}
+
 declare type DialogData =
   | ConfirmationDialogData
   | MediaFolderLocationFormDialogData
@@ -7,6 +11,7 @@ declare type DialogData =
   | CsvAndMp3ExportDialogData
   | SubtitlesClipsDialogData
   | ErrorDialogData
+  | SettingsDialogData
 
 declare type ConfirmationDialogData = {
   type: 'Confirmation'
@@ -52,6 +57,6 @@ declare type ErrorDialogData = {
   log: string
 }
 
-declare type DialogState = {
-  queue: Array<DialogData>
+declare type SettingsDialogData = {
+  type: 'Settings'
 }

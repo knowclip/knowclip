@@ -158,7 +158,7 @@ const Export = React.memo(
         )}
 
         {selectionHasStarted ? (
-          <DialogActions>
+          <DialogActions color="primary">
             <Button
               onClick={closeDialog}
               disabled={Boolean(progress)}
@@ -200,10 +200,15 @@ const Export = React.memo(
           </DialogActions>
         ) : (
           <DialogActions>
-            <Button disabled={Boolean(progress)} onClick={closeDialog}>
+            <Button
+              color="primary"
+              disabled={Boolean(progress)}
+              onClick={closeDialog}
+            >
               Exit
             </Button>
             <Button
+              color="primary"
               disabled={Boolean(progress)}
               onClick={startSelection}
               id={$.continueButton}

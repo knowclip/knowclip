@@ -8,6 +8,7 @@ const {
   showSaveDialog,
   showOpenDialog,
   showOpenDirectoryDialog,
+  showOpenDirectoriesDialog,
   openInBrowser,
   showMessageBox,
 } =
@@ -19,6 +20,7 @@ export {
   showSaveDialog,
   showOpenDialog,
   showOpenDirectoryDialog,
+  showOpenDirectoriesDialog,
   openInBrowser,
   showMessageBox,
 }

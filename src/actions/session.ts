@@ -9,8 +9,7 @@ export const setLoop = (loop: boolean): Action => ({
   loop,
 })
 
-// export const playMedia =
-
-// export const pauseMedia
-
-// export const toggleMediaPlaying
+// TODO:
+// playMedia
+// pauseMedia
+// toggleMediaPlaying

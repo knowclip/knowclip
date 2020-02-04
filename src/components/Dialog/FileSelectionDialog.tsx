@@ -1,10 +1,30 @@
-import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import { Dialog, DialogContent } from '@material-ui/core'
-import FileSelectionForm from '../FileSelectionForm'
+import React, { useCallback, useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  FormControlLabel,
+  Checkbox,
+  Button,
+} from '@material-ui/core'
 import { getExtensions, getHumanFileName } from '../../utils/files'
 import * as actions from '../../actions'
 import { DialogProps } from './DialogProps'
+import css from './FileSelectionForm.module.css'
+import { dirname } from 'path'
+import { showOpenDialog } from '../../utils/electron'
+import { removeAssetsDirectories, addAssetsDirectories } from '../../actions'
+import { getFileAvailability } from '../../selectors'
+
+enum $ {
+  container = 'file-selection-form-container',
+  filePathField = 'file-selection-form-file-path-field',
+  cancelButton = 'file-selection-form-cancel-button',
+  continueButton = 'file-selection-form-continue-button',
+}
 
 const FileSelectionDialog = ({
   open,
@@ -19,33 +39,172 @@ const FileSelectionDialog = ({
     },
     [dispatch, file]
   )
-  const openFileFailure = useCallback(
+
+  const availability = useSelector((state: AppState) =>
+    getFileAvailability(state, file)
+  )
+
+  const {
+    locationText,
+    errorText,
+    onLocationTextFocus,
+    handleSubmit,
+    checkFolderAutomatically,
+    toggleCheckFolderAutomatically,
+  } = useLocationForm(getExtensions(file), onSubmit)
+
+  const cancel = useCallback(
     () => {
-      dispatch(
-        actions.openFileFailure(
-          file,
-          null,
-          `Could not locate ${getHumanFileName(
-            file
-          )}. Some features may be unavailable until it is located.`
+      if (availability.isLoading)
+        dispatch(
+          actions.openFileFailure(
+            file,
+            null,
+            `Could not locate ${getHumanFileName(
+              file
+            )}. Some features may be unavailable until it is located.`
+          )
         )
-      )
       dispatch(actions.closeDialog())
     },
-    [dispatch, file]
+    [availability.isLoading, dispatch, file]
   )
+  const closeAndGoToSettings = useCallback(
+    () => {
+      cancel()
+      dispatch(actions.settingsDialog())
+    },
+    [cancel, dispatch]
+  )
+
   return (
     <Dialog open={open}>
       <DialogContent>
-        <FileSelectionForm
-          message={message}
-          onSubmit={onSubmit}
-          extensions={getExtensions(file)}
-          cancel={openFileFailure}
-        />
+        <section className={css.container} id={$.container}>
+          <p className={css.prompt}>{message}</p>
+          <form className={css.form}>
+            <TextField
+              id={$.filePathField}
+              className={css.textField}
+              value={locationText}
+              onClick={onLocationTextFocus}
+              onKeyPress={onLocationTextFocus}
+              error={Boolean(errorText)}
+              helperText={errorText}
+              label="File location"
+            />
+
+            <FormControl fullWidth margin="normal">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checkFolderAutomatically}
+                    onChange={toggleCheckFolderAutomatically}
+                    color="primary"
+                  />
+                }
+                label="Check in this folder automatically next time a file is missing"
+              />
+            </FormControl>
+          </form>
+        </section>
       </DialogContent>
+      <DialogActions className={css.buttons}>
+        <Button onClick={closeAndGoToSettings}>Settings</Button>
+        <div className={css.buttonsRight}>
+          <Button onClick={cancel} id={$.cancelButton} color="primary">
+            Cancel
+          </Button>
+
+          <Button onClick={handleSubmit} id={$.continueButton} color="primary">
+            Continue
+          </Button>
+        </div>
+      </DialogActions>
     </Dialog>
   )
 }
 
+const useLocationForm = (
+  extensions: string[],
+  onSubmit: (string: string) => void
+) => {
+  const dispatch = useDispatch()
+
+  const [locationText, setLocationText] = useState('')
+  const [errorText, setErrorText] = useState('')
+  const [checkFolderAutomatically, setCheckFolderAutomatically] = useState(
+    false
+  )
+
+  const autoCheckFolders = useSelector(
+    (state: AppState) => state.settings.assetsDirectories
+  )
+  useEffect(
+    () => {
+      const trimmedLocation = locationText.trim()
+      setCheckFolderAutomatically(
+        Boolean(
+          trimmedLocation && autoCheckFolders.includes(dirname(trimmedLocation))
+        )
+      )
+    },
+    [autoCheckFolders, locationText]
+  )
+
+  const fillInLocation = useCallback(text => {
+    setLocationText(text)
+    setErrorText('')
+  }, [])
+  const onLocationTextFocus = useCallback(
+    async e => {
+      const filePaths = await showOpenDialog(
+        extensions.map(ext => ({ name: 'File', extensions: [ext] }))
+      )
+
+      if (!filePaths) return
+
+      const [directory] = filePaths
+      fillInLocation(directory)
+    },
+    [extensions, fillInLocation]
+  )
+  const handleSubmit = useCallback(
+    e => {
+      if (locationText) {
+        const directory = dirname(locationText.trim())
+        if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
+          dispatch(removeAssetsDirectories([directory]))
+        if (!autoCheckFolders.includes(directory) && checkFolderAutomatically)
+          dispatch(addAssetsDirectories([directory]))
+        onSubmit(locationText)
+      } else {
+        setErrorText('Please choose a location to continue.')
+      }
+    },
+    [
+      autoCheckFolders,
+      checkFolderAutomatically,
+      dispatch,
+      locationText,
+      onSubmit,
+    ]
+  )
+
+  return {
+    locationText,
+    errorText,
+    checkFolderAutomatically,
+    onLocationTextFocus,
+    handleSubmit,
+    toggleCheckFolderAutomatically: useCallback(
+      e => {
+        setCheckFolderAutomatically(checked => !checked)
+      },
+      [setCheckFolderAutomatically]
+    ),
+  }
+}
+
 export default FileSelectionDialog
+export { $ as fileSelectionForm$ }

@@ -216,6 +216,9 @@ declare type MediaAction =
   | SetLoop
   | SetMediaFolderLocation
   | DismissMedia
+  | AddAssetsDirectories
+  | RemoveAssetsDirectories
+  | OverrideSettings
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
@@ -233,6 +236,19 @@ declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
   directoryPath: string | null
 }
+declare type AddAssetsDirectories = {
+  type: 'ADD_ASSETS_DIRECTORIES'
+  directoryPaths: strings[]
+}
+declare type RemoveAssetsDirectories = {
+  type: 'REMOVE_ASSETS_DIRECTORIES'
+  directoryPaths: strings[]
+}
+declare type OverrideSettings = {
+  type: 'OVERRIDE_SETTINGS'
+  settings: PartialSettings<SettingsState>
+}
+
 declare type DismissMedia = { type: 'DISMISS_MEDIA' }
 
 declare type SubtitlesAction =

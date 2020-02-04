@@ -7,7 +7,14 @@ import {
   listenForPersistedDataLogMessage,
 } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
-import { persistStore, persistReducer, createTransform } from 'redux-persist'
+import {
+  persistStore,
+  persistReducer,
+  createTransform,
+  createMigrate,
+  PersistedState,
+  MigrationManifest,
+} from 'redux-persist'
 import createElectronStorage from 'redux-persist-electron-storage'
 import electron from 'electron'
 import { readFileSync } from 'fs-extra'

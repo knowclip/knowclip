@@ -275,10 +275,10 @@ const SubtitlesClipsDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog} id={$.cancelButton}>
+        <Button onClick={closeDialog} id={$.cancelButton} color="primary">
           Cancel
         </Button>
-        <Button onClick={onSubmit} id={$.okButton}>
+        <Button onClick={onSubmit} id={$.okButton} color="primary">
           Ok
         </Button>
       </DialogActions>

@@ -6,6 +6,7 @@ export * from './projects'
 export * from './subtitles'
 export * from './files'
 export * from './session'
+export * from './settings'
 
 export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
@@ -54,11 +55,6 @@ export const exportCsv = (
 export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({
   type: A.EXPORT_MARKDOWN,
   clipIds,
-})
-
-export const setMediaFolderLocation = (directoryPath: string): Action => ({
-  type: A.SET_MEDIA_FOLDER_LOCATION,
-  directoryPath,
 })
 
 export const detectSilenceRequest = (): Action => ({

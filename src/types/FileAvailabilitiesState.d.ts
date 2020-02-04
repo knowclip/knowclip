@@ -1,3 +1,7 @@
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
+
 declare type FileAvailabilitiesState = Record<
   FileMetadata['type'],
   Dict<FileId, KnownFile>
@@ -12,6 +16,9 @@ declare type KnownFile =
   | NeverLoadedFile
   | PendingDeletionFile
 
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
 declare type PreviouslyLoadedFile = {
   id: FileId
   parentId: FileId | null
@@ -26,6 +33,9 @@ declare type PreviouslyLoadedFile = {
   type: FileMetadata['type']
 }
 
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
 declare type CurrentlyLoadedFile = {
   id: FileId
   parentId: FileId | null
@@ -40,12 +50,15 @@ declare type CurrentlyLoadedFile = {
   type: FileMetadata['type']
 }
 
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
 declare type ErroredFile = {
   id: FileId
   parentId: FileId | null
   name: string
   /** A file that has failed to open at the most
-   * recent attempt.
+   * recent attempt during this session or before.
    */
   status: 'FAILED_TO_LOAD'
   // error message as well?
@@ -56,6 +69,9 @@ declare type ErroredFile = {
   type: FileMetadata['type']
 }
 
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
 declare type NeverLoadedFile = {
   id: FileId
   parentId: FileId | null
@@ -71,6 +87,9 @@ declare type NeverLoadedFile = {
   type: FileMetadata['type']
 }
 
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
 declare type PendingDeletionFile = {
   id: FileId
   parentId: FileId | null
@@ -86,6 +105,9 @@ declare type PendingDeletionFile = {
   type: FileMetadata['type']
 }
 
+/** Don't forget to add migration/validation
+ * for redux-persist if this structure changes
+ */
 declare type NotFoundFile = {
   id: FileId
   parentId: FileId | null

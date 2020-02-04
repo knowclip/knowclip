@@ -136,19 +136,19 @@ const MediaFilesMenuItem = ({
         }, [])}
       >
         <MenuList>
-          <MenuItem dense style={{ width: 200 }} onClick={loadAndClose}>
+          <MenuItem dense onClick={loadAndClose}>
             <ListItemIcon>
               <PlayArrow />
             </ListItemIcon>
             <ListItemText>Open</ListItemText>
           </MenuItem>
-          <MenuItem dense style={{ width: 200 }} onClick={deleteAndClose}>
+          <MenuItem dense onClick={deleteAndClose}>
             <ListItemIcon>
               <DeleteIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
-          <MenuItem dense style={{ width: 200 }} onClick={locateAndClose}>
+          <MenuItem dense onClick={locateAndClose}>
             <ListItemIcon>
               <FolderSpecial />
             </ListItemIcon>
