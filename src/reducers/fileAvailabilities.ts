@@ -176,7 +176,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
         newState[type] = {} as typeof files
 
         for (const id in files) {
-          const file = newState[type][id]
+          const file = state[type][id]
           if (file && file.status !== 'PENDING_DELETION')
             newState[type][id] = file
         }

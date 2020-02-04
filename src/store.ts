@@ -13,7 +13,7 @@ import electron from 'electron'
 import { readFileSync } from 'fs-extra'
 
 let initialState: Partial<AppState> | undefined
-if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON)
+if (process.env.REACT_APP_SPECTRON)
   initialState = electron.remote.process.env.PERSISTED_STATE_PATH
     ? JSON.parse(
         readFileSync(electron.remote.process.env.PERSISTED_STATE_PATH, 'utf8')

@@ -25,8 +25,9 @@ export async function startApp(
 ): Promise<TestSetup> {
   await copyFixtures()
 
-  const persistedStatePath = tempy.file()
-  await writeFile(persistedStatePath, JSON.stringify(persistedState))
+  const persistedStatePath = persistedState ? tempy.file() : null
+  if (persistedStatePath)
+    await writeFile(persistedStatePath, JSON.stringify(persistedState))
 
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
@@ -37,7 +38,9 @@ export async function startApp(
       NODE_ENV: 'test',
       REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
       INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
-      PERSISTED_STATE_PATH: persistedStatePath,
+      ...(persistedStatePath
+        ? { PERSISTED_STATE_PATH: persistedStatePath }
+        : null),
     },
     args: [join(__dirname, '..', '..')],
   })

@@ -47,12 +47,17 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     .filter(s => s.type === 'ExternalSubtitlesTrack')
     .map(({ id }) => {
       const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
+      const availability = r.getFileAvailabilityById(
+        state,
+        'ExternalSubtitlesFile',
+        id
+      )
       return r.openFileRequest(
         externalSubtitles || {
           id,
           type: 'ExternalSubtitlesFile',
           // name: 'PLACEHOLDERR',
-          name: 'pbc_jp.ass', // 'PLACEHOLDERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+          name: availability.name,
           parentId: mediaFileId,
         }
       )

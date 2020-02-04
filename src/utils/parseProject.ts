@@ -14,7 +14,7 @@ type NormalizedProjectFileData = {
   project: ProjectFile
   media: MediaFile[]
   clips: Clip[]
-  // subtitles: SubtitlesFile[]
+  subtitles: SubtitlesFile[]
 }
 
 export const parseProjectJson = async <F extends FlashcardFields>(
@@ -62,46 +62,65 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
     type: 'ProjectFile',
     error: null,
   }
-  const media: [MediaFile, () => Clip[]][] = mediaJson.map(m => {
-    const subtitles = m.subtitles
-      ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
-      : []
-    const base: AudioFile = {
-      name: m.name,
-      type: 'MediaFile',
-      id: m.id,
-      parentId: projectJson.id,
-      durationSeconds: parseFormattedDuration(m.duration).asSeconds(),
-      format: m.format,
-      subtitles,
-      flashcardFieldsToSubtitlesTracks:
-        m.flashcardFieldsToSubtitlesTracks || {},
-      subtitlesTracksStreamIndexes: subtitles
-        .filter(
-          (s): s is EmbeddedSubtitlesTrackRelation =>
-            s.type === 'EmbeddedSubtitlesTrack'
-        )
-        .map(s => s.streamIndex),
+  const media: [MediaFile, () => Clip[], SubtitlesFile[]][] = mediaJson.map(
+    m => {
+      const subtitles = m.subtitles
+        ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
+        : []
+      const subtitlesFiles: SubtitlesFile[] = (m.subtitles || []).map(s =>
+        s.type === 'Embedded'
+          ? {
+              type: 'VttConvertedSubtitlesFile',
+              id: s.id,
+              streamIndex: s.streamIndex,
+              parentId: m.id,
+              parentType: 'MediaFile',
+            }
+          : {
+              type: 'ExternalSubtitlesFile',
+              id: s.id,
+              name: s.name,
+              parentId: m.id,
+              parentType: 'MediaFiles',
+            }
+      )
+      const base: AudioFile = {
+        name: m.name,
+        type: 'MediaFile',
+        id: m.id,
+        parentId: projectJson.id,
+        durationSeconds: parseFormattedDuration(m.duration).asSeconds(),
+        format: m.format,
+        subtitles,
+        flashcardFieldsToSubtitlesTracks:
+          m.flashcardFieldsToSubtitlesTracks || {},
+        subtitlesTracksStreamIndexes: subtitles
+          .filter(
+            (s): s is EmbeddedSubtitlesTrackRelation =>
+              s.type === 'EmbeddedSubtitlesTrack'
+          )
+          .map(s => s.streamIndex),
 
-      isVideo: false,
+        isVideo: false,
+      }
+
+      if ('width' in m) {
+        return [
+          {
+            ...base,
+            isVideo: true,
+            width: m.width,
+            height: m.height,
+          },
+          getMediaClipsGetter<F>(state, project, m),
+          subtitlesFiles,
+        ]
+      }
+
+      return [base, getMediaClipsGetter<F>(state, project, m), subtitlesFiles]
     }
+  )
 
-    if ('width' in m) {
-      return [
-        {
-          ...base,
-          isVideo: true,
-          width: m.width,
-          height: m.height,
-        },
-        getMediaClipsGetter<F>(state, project, m),
-      ]
-    }
-
-    return [base, getMediaClipsGetter<F>(state, project, m)]
-  })
-
-  // const subtitles : SubtitlesFile[] = m.subtitles.map(s =>toSubtitlesFile(s, m) )
   let clips: Clip[]
 
   return {
@@ -111,6 +130,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
       clips = clips || media.flatMap(([, c]) => c())
       return clips
     },
+    subtitles: media.flatMap(([, , s]) => s),
   }
 }
 

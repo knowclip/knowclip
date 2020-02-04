@@ -39,7 +39,10 @@ export default {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
-      const { project, media } = normalizeProjectJson(state, parse.value)
+      const { project, media, subtitles } = normalizeProjectJson(
+        state,
+        parse.value
+      )
 
       if (!project) return [r.simpleMessageSnackbar('Could not open project')]
 
@@ -48,12 +51,21 @@ export default {
           validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
         .map(validatedFile => r.addFile(validatedFile))
+      const addNewSubtitlesFiles = subtitles
+        .filter(
+          validatedFile => !r.getSubtitlesSourceFile(state, validatedFile.id)
+        )
+        .map(validatedFile => r.addFile(validatedFile))
 
       const loadFirstMediaFile = media.length
         ? [r.openFileRequest(media[0])]
         : []
 
-      return [...addNewMediaFiles, ...loadFirstMediaFile]
+      return [
+        ...addNewMediaFiles,
+        ...addNewSubtitlesFiles,
+        ...loadFirstMediaFile,
+      ]
     },
   ],
 

@@ -70,7 +70,21 @@ declare type NeverLoadedFile = {
   lastOpened: null
   type: FileMetadata['type']
 }
-/** Not stored in state tree. */
+
+declare type PendingDeletionFile = {
+  id: FileId
+  parentId: FileId | null
+  name: string
+  /** A file whose record is being kept
+   * in case the user does not save the parent project
+   * after choosing to delete it.
+   */
+  status: 'PENDING_DELETION'
+  filePath: string | null
+  isLoading: false
+  lastOpened: string | null
+  type: FileMetadata['type']
+}
 
 declare type NotFoundFile = {
   id: FileId
@@ -87,20 +101,6 @@ declare type NotFoundFile = {
   type: FileMetadata['type']
 }
 
-declare type PendingDeletionFile = {
-  id: FileId
-  parentId: FileId | null
-  name: string
-  /** A file whose record is being kept
-   * in case the user does not save the parent project
-   * after choosing to delete it.
-   */
-  status: 'PENDING_DELETION'
-  filePath: string | null
-  isLoading: false
-  lastOpened: string | null
-  type: FileMetadata['type']
-}
 declare type FileWithAvailability<F extends FileMetadata> = {
   file: F | null
   availability: FileAvailability
