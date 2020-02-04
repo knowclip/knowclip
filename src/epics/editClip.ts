@@ -11,7 +11,6 @@ import {
 import { empty, of } from 'rxjs'
 import * as actions from '../actions'
 import { getClip, getCurrentMediaFile, getFile } from '../selectors'
-import { areSameFile } from '../utils/files'
 
 const remakeStill: AppEpic = (action$, state$) =>
   action$.pipe(

@@ -4,10 +4,7 @@ import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile, AsyncError } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
-import {
-  formatDuration,
-  formatDurationWithMilliseconds,
-} from '../utils/formatTime'
+import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (

@@ -3,7 +3,6 @@ import tempy from 'tempy'
 import { existsSync } from 'fs'
 import { getFileAvailabilityById } from '../selectors'
 import { basename, join } from 'path'
-import { uuid } from './sideEffects'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'

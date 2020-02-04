@@ -1,6 +1,6 @@
 import YAML from 'yaml'
 import { readFile } from 'fs-extra'
-import { getXAtMilliseconds, getProjectJson } from '../selectors'
+import { getXAtMilliseconds } from '../selectors'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
 import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'

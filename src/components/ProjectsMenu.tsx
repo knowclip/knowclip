@@ -10,7 +10,6 @@ import {
   IconButton,
   Menu,
   RootRef,
-  ListSubheader,
   Tooltip,
 } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
