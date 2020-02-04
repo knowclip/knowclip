@@ -60,11 +60,6 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         ).pipe(mergeAll())
       } catch (err) {
         return of(
-          // need this like in locatefilesuccess?
-          //  {
-          //   ...file,
-          //   ...r.getFile(state$.value, file.type, file.id),
-          // }
           r.openFileFailure(file, filePath, err.message || err.toString())
         )
       }
@@ -118,17 +113,7 @@ const locateFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileSuccess>(A.LOCATE_FILE_SUCCESS),
     map<LocateFileSuccess, Action>(({ file, filePath }) =>
-      r.openFileRequest(
-        (console.log({
-          //
-          inAction: file,
-          inState: r.getFile(state$.value, file.type, file.id),
-        }),
-        {
-          ...file,
-          ...r.getFile(state$.value, file.type, file.id),
-        })
-      )
+      r.openFileRequest(file)
     )
   )
 

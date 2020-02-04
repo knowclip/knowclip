@@ -16,9 +16,6 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.LOAD_PERSISTED_STATE:
-      return action.fileAvailabilities || state
-
     case A.OPEN_FILE_REQUEST: {
       const type = action.file.type
       const byType = state[type]
