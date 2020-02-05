@@ -171,7 +171,7 @@ const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
     })
   )
 
-const closeProjectRequest: AppEpic = (action$, state$) =>
+const closeProjectRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.CLOSE_PROJECT_REQUEST),
     map(() => {
@@ -181,7 +181,7 @@ const closeProjectRequest: AppEpic = (action$, state$) =>
           r.closeProject()
         )
       else {
-        // TOGGLE PROEJCT OPTIONS HERE
+        effects.setAppMenuProjectSubmenuPermissions(false)
 
         return r.closeProject()
       }

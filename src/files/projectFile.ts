@@ -5,7 +5,6 @@ import { join, basename } from 'path'
 import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
 import { AsyncError } from '../utils/ffmpeg'
-import electron from 'electron'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -23,12 +22,7 @@ export default {
           ),
         ]
 
-      // setupMenu(electron.remote, electron.remote.getCurrentWindow(), true)
-
-      const menu = electron.remote.Menu.getApplicationMenu()
-      const submenu = menu && menu.getMenuItemById('File').submenu
-      if (submenu) submenu.getMenuItemById('Save project').enabled = true
-      if (submenu) submenu.getMenuItemById('Close project').enabled = true
+      effects.setAppMenuProjectSubmenuPermissions(true)
 
       return [
         r.openProject(file, clips, effects.nowUtcTimestamp()),

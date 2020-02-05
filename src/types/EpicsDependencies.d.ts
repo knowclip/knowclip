@@ -42,4 +42,5 @@ declare type EpicsDependencies = {
   existsSync: (string) => boolean
   ipcRenderer: Electron.IpcRenderer
   nowUtcTimestamp: () => string
+  setAppMenuProjectSubmenuPermissions: (projectOpened: boolean) => void
 }

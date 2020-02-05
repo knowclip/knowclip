@@ -6,6 +6,7 @@ import { getVideoStill } from './utils/getVideoStill'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 import { remote, ipcRenderer } from 'electron'
 import { nowUtcTimestamp } from './utils/sideEffects'
+import { setAppMenuProjectSubmenuPermissions } from './utils/appMenu'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -70,6 +71,7 @@ const dependencies: EpicsDependencies = {
   getConstantBitrateMediaPath,
   existsSync,
   ipcRenderer,
+  setAppMenuProjectSubmenuPermissions,
   nowUtcTimestamp,
 }
 export default dependencies

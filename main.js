@@ -8,7 +8,7 @@ const setUpMenu = require('./electron/appMenu')
 
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
-const installDevtools = require('./src/electron/devtools')
+const installDevtools = require('./electron/devtools')
 const useDevtools = Boolean(
   process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : !isPackaged
 )

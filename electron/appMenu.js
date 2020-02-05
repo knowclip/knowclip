@@ -1,4 +1,4 @@
-const template = (app, mainWindow, projectIsOpen = false) => [
+const template = (app, mainWindow) => [
   {
     label: 'Application',
     submenu: [
@@ -25,19 +25,19 @@ const template = (app, mainWindow, projectIsOpen = false) => [
         id: 'Save project',
         label: 'Save project',
         accelerator: 'CmdOrCtrl+S',
-        enabled: projectIsOpen,
+        enabled: false,
         click: () => mainWindow.webContents.send('save-project'),
       },
       {
         id: 'Close project',
         label: 'Close project',
-        enabled: projectIsOpen,
+        enabled: false,
         click: () => mainWindow.webContents.send('close-project'),
       },
       {
         id: 'Open project',
         label: 'Open project',
-        enabled: !projectIsOpen,
+        enabled: true,
         click: () => mainWindow.webContents.send('open-project'),
       },
     ],
@@ -63,6 +63,7 @@ const template = (app, mainWindow, projectIsOpen = false) => [
       { accelerator: 'CmdOrCtrl+=', role: 'zoomin' },
       { accelerator: 'CmdOrCtrl+-', role: 'zoomout' },
       { role: 'togglefullscreen' },
+      { type: 'separator' },
       {
         role: 'toggledevtools',
       },
