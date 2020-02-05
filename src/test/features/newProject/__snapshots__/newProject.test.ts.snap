@@ -49,7 +49,6 @@ Object {
           },
         ],
         "duration": "01:27.062",
-        "flashcardFieldsToSubtitlesTracks": Object {},
         "format": "mov,mp4,m4a,3gp,3g2,mj2",
         "id": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
         "name": "polar_bear_cafe.mp4",
@@ -68,7 +67,6 @@ Object {
       },
       Object {
         "duration": "00:58.24",
-        "flashcardFieldsToSubtitlesTracks": Object {},
         "format": "mov,mp4,m4a,3gp,3g2,mj2",
         "id": "906db000-f3d2-46c9-9ec9-0a1069304e41",
         "name": "piggeldy_cat.mp4",
