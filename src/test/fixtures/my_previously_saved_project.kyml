@@ -44,10 +44,8 @@ clips:
     tags: *a1
     image:
       type: VideoStill
-flashcardFieldsToSubtitlesTracks: {}
 ---
 name: piggeldy_cat.mp4
 format: mov,mp4,m4a,3gp,3g2,mj2
 duration: 00:58.24
 id: bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77
-flashcardFieldsToSubtitlesTracks: {}

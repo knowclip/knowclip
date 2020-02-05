@@ -4,8 +4,7 @@
   "version": "0.5.0",
   "private": true,
   "engines": {
-    "node": "^12.4.0",
-    "npm": "^6.9.0"
+    "node": "^12.4.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -122,7 +121,7 @@
     "appId": "com.electron.knowclip",
     "asar": true,
     "productName": "Knowclip",
-    "copyright": "Copyright 2019 Justin Silvestre",
+    "copyright": "Copyright 2020 Justin Silvestre",
     "files": [
       "./build",
       "./icons",

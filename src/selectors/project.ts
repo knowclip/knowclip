@@ -110,7 +110,7 @@ export const getProjectJson = <F extends FlashcardFields>(
 
         if (subtitles.length) newMediaFile.subtitles = subtitles
         if (clips.length) newMediaFile.clips = clips
-        if (mediaFile.flashcardFieldsToSubtitlesTracks)
+        if (Object.keys(mediaFile.flashcardFieldsToSubtitlesTracks).length)
           newMediaFile.flashcardFieldsToSubtitlesTracks =
             mediaFile.flashcardFieldsToSubtitlesTracks
 
