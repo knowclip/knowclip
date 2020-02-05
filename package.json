@@ -127,7 +127,7 @@
       "./build",
       "./icons",
       "./main.js",
-      "./src/electron"
+      "./electron"
     ],
     "win": {
       "target": [
