@@ -1,7 +1,7 @@
 const electron = require('electron')
 const path = require('path')
 const url = require('url')
-const { app, ipcMain } = electron
+const { app, ipcMain, autoUpdater } = electron
 const { isPackaged } = app
 const { BrowserWindow } = electron
 const setUpMenu = require('./electron/appMenu')
@@ -44,10 +44,32 @@ async function createWindow() {
     },
   })
 
+  const splash = new BrowserWindow({
+    show: false,
+    width: 400,
+    height: 400,
+    frame: false,
+    backgroundColor: '#DDDDDD',
+  })
+
+  splash.loadURL(
+    url.format({
+      pathname: path.join(__dirname, 'icons', 'icon.png'),
+      protocol: 'file',
+      slashes: 'true',
+    })
+  )
+
+  if (process.env.NODE_ENV !== 'test')
+    splash.once('ready-to-show', () => {
+      splash.show()
+    })
+
   context.mainWindow = mainWindow
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
+    splash.close()
   })
 
   // and load the index.html of the app.
@@ -85,7 +107,7 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
-  setUpMenu(electron, context)
+  setUpMenu(electron, context, useDevtools)
 })
 
 app.on('will-quit', () => {

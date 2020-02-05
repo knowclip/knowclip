@@ -1,4 +1,6 @@
-const template = (app, mainWindow) => [
+const isLinux = process.platform !== 'win32' && process.platform !== 'darwin'
+
+const template = ({ app, autoUpdater, shell }, mainWindow, useDevTools) => [
   {
     label: 'Application',
     submenu: [
@@ -64,15 +66,28 @@ const template = (app, mainWindow) => [
       { accelerator: 'CmdOrCtrl+-', role: 'zoomout' },
       { role: 'togglefullscreen' },
       { type: 'separator' },
-      {
-        role: 'toggledevtools',
-      },
+      ...(useDevTools
+        ? [
+            {
+              role: 'toggledevtools',
+            },
+          ]
+        : []),
     ],
   },
 
   {
     label: '&Help',
     submenu: [
+      {
+        label: 'Check for Updates',
+        click: () => {
+          if (isLinux || process.platform === 'darwin')
+            return mainWindow.webContents.send('manual-check-for-updates')
+
+          if (app.isPackaged) autoUpdater.checkForUpdates()
+        },
+      },
       {
         label: 'About Application',
         click: () => mainWindow.webContents.send('show-about-dialog'),
@@ -81,7 +96,9 @@ const template = (app, mainWindow) => [
   },
 ]
 
-module.exports = ({ Menu, app }, mainWindow, projectIsOpen = false) =>
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate(template(app, mainWindow.mainWindow), projectIsOpen)
+module.exports = (electron, { mainWindow }, useDevTools = false) => {
+  const { Menu } = electron
+  return Menu.setApplicationMenu(
+    Menu.buildFromTemplate(template(electron, mainWindow, useDevTools))
   )
+}
