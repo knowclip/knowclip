@@ -44,32 +44,36 @@ async function createWindow() {
     },
   })
 
-  const splash = new BrowserWindow({
-    show: false,
-    width: 512,
-    height: 512,
-    frame: false,
-    backgroundColor: '#DDDDDD',
-  })
+  const splash =
+    process.env.NODE_ENV !== 'test'
+      ? new BrowserWindow({
+          show: false,
+          width: 512,
+          height: 512,
+          frame: false,
+          backgroundColor: '#DDDDDD',
+        })
+      : null
 
-  splash.loadURL(
-    url.format({
-      pathname: path.join(__dirname, 'icons', 'icon.png'),
-      protocol: 'file',
-      slashes: 'true',
-    })
-  )
+  if (splash) {
+    splash.loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'icons', 'icon.png'),
+        protocol: 'file',
+        slashes: 'true',
+      })
+    )
 
-  if (process.env.NODE_ENV !== 'test')
     splash.once('ready-to-show', () => {
       splash.show()
     })
+  }
 
   context.mainWindow = mainWindow
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-    splash.close()
+    if (splash) splash.close()
   })
 
   // and load the index.html of the app.
