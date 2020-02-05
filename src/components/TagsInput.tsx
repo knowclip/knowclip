@@ -170,7 +170,7 @@ const TagsInput = ({
             {...other}
           />
         ),
-        [handleAddChip, handleDeleteChip, allTags]
+        [handleAddChip, handleDeleteChip, allTags, onFocus]
       )}
     />
   )

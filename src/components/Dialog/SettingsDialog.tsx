@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from 'react'
+import React, { useCallback, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Dialog,
@@ -7,13 +7,10 @@ import {
   Button,
   IconButton,
   FormControl,
-  FormControlLabel,
-  InputLabel,
   List,
   ListItem,
   ListItemText,
   DialogTitle,
-  Divider,
   ListItemSecondaryAction,
   Paper,
   MenuItem,
@@ -23,11 +20,7 @@ import * as actions from '../../actions'
 import { DialogProps } from './DialogProps'
 import reducer from '../../reducers/settings'
 import FilePathTextField from '../FilePathTextField'
-import {
-  openInBrowser,
-  showOpenDirectoryDialog,
-  showOpenDirectoriesDialog,
-} from '../../utils/electron'
+import { openInBrowser, showOpenDirectoriesDialog } from '../../utils/electron'
 import css from './SettingsDialog.module.css'
 import { Delete, Add } from '@material-ui/icons'
 import truncate from '../../utils/truncate'
@@ -36,11 +29,6 @@ enum $ {
   cancelButton = 'settings-dialog-cancel-button',
   saveButton = 'settings-dialog-save-button',
 }
-
-type FormAction =
-  | SetMediaFolderLocation
-  | AddAssetsDirectories
-  | RemoveAssetsDirectories
 
 const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   const dispatch = useDispatch()

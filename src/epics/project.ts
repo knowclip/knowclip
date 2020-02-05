@@ -14,7 +14,6 @@ import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import { AppEpic } from '../types/AppEpic'
 import './setYamlOptions'
-import electron from 'electron'
 
 const writeFile = promisify(fs.writeFile)
 
