@@ -14,6 +14,7 @@ import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import { AppEpic } from '../types/AppEpic'
 import './setYamlOptions'
+import electron from 'electron'
 
 const writeFile = promisify(fs.writeFile)
 
@@ -179,7 +180,11 @@ const closeProjectRequest: AppEpic = (action$, state$) =>
           'Are you sure you want to close this project without saving your work?',
           r.closeProject()
         )
-      else return r.closeProject()
+      else {
+        // TOGGLE PROEJCT OPTIONS HERE
+
+        return r.closeProject()
+      }
     })
   )
 

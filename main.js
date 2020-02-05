@@ -8,7 +8,7 @@ const setUpMenu = require('./electron/appMenu')
 
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
-const installDevtools = require('./electron/devtools')
+const installDevtools = require('./src/electron/devtools')
 const useDevtools = Boolean(
   process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : !isPackaged
 )
@@ -85,9 +85,7 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
-  app.showAboutPanel()
-
-  setUpMenu(app, context)
+  setUpMenu(electron, context)
 })
 
 app.on('will-quit', () => {
