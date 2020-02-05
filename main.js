@@ -46,8 +46,8 @@ async function createWindow() {
 
   const splash = new BrowserWindow({
     show: false,
-    width: 400,
-    height: 400,
+    width: 512,
+    height: 512,
     frame: false,
     backgroundColor: '#DDDDDD',
   })
