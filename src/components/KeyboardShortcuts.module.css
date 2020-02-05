@@ -9,7 +9,7 @@
 
 .card {
   padding-bottom: 16px !important;
-  width: 20em;
+  width: 26em;
 }
 
 .closed {
@@ -31,6 +31,10 @@
 .group:last-child {
    margin-bottom: 0;
 }
+.group:not(:first-of-type) {
+  border-top: solid 1px #eeeeee;
+  padding-top: 1em;
+}
 
 .shortcut {
   display: flex;
@@ -48,6 +52,6 @@
 }
 
 .heading {
-  margin: 0 0 .4em 0;
-  font-size: inherit;
+  font-size: 1.2em;
+  margin: 0;
 }

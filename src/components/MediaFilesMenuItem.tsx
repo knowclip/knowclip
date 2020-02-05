@@ -75,7 +75,7 @@ const MediaFilesMenuItem = ({
   const locateAndClose = useCallback(
     e => {
       dispatch(
-        actions.locateFileRequest(mediaFile, 'Please locate this media file.')
+        actions.fileSelectionDialog('Please locate this media file.', mediaFile)
       )
       closeMenu(e)
     },
@@ -152,7 +152,7 @@ const MediaFilesMenuItem = ({
             <ListItemIcon>
               <FolderSpecial />
             </ListItemIcon>
-            <ListItemText>Locate in file system</ListItemText>
+            <ListItemText>Manually locate in file system</ListItemText>
           </MenuItem>
         </MenuList>
       </Menu>

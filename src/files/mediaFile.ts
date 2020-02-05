@@ -1,11 +1,12 @@
 import * as r from '../redux'
-import { basename } from 'path'
+import { basename, join } from 'path'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile, AsyncError } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
+import { existsSync } from 'fs-extra'
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
@@ -182,7 +183,20 @@ export default {
     getWaveform,
     setDefaultClipSpecs,
   ],
-  locateRequest: async (action, state, effects) => {
+  locateRequest: async (action, availability, state, effects) => {
+    const autoSearchDirectories = r.getAssetsDirectories(state)
+
+    // works while fileavailability names can't be changed...
+    for (const directory of autoSearchDirectories) {
+      const nameMatch = join(directory, basename(availability.name))
+      const matchingFile =
+        existsSync(nameMatch) &&
+        (await validateMediaFile(action.file, nameMatch))
+
+      if (matchingFile && !(matchingFile instanceof AsyncError))
+        return [r.locateFileSuccess(action.file, nameMatch)]
+    }
+
     return [r.fileSelectionDialog(action.message, action.file)]
   },
   locateSuccess: null,
@@ -194,7 +208,7 @@ export default {
   deleteSuccess: [],
 } as FileEventHandlers<MediaFile>
 
-const validateMediaFile = async (
+export const validateMediaFile = async (
   existingFile: MediaFile,
   filePath: string
 ): Promise<[string | null, MediaFile] | AsyncError> => {

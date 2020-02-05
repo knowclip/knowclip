@@ -1,8 +1,12 @@
 import { nowUtcTimestamp } from '../utils/sideEffects'
 
-export const addFile = <F extends FileMetadata>(file: F): AddFile => ({
+export const addFile = <F extends FileMetadata>(
+  file: F,
+  path?: string
+): AddFile => ({
   type: A.ADD_FILE,
   file,
+  path,
 })
 
 export const deleteFileRequest = (

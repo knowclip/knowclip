@@ -73,4 +73,4 @@ export const subtitlesClipDialog = (): DialogAction =>
   enqueueDialog({ type: 'SubtitlesClips' })
 
 export const settingsDialog = (): DialogAction =>
-  enqueueDialog({ type: 'Settings' })
+  enqueueDialog({ type: 'Settings' }, true)

@@ -13,7 +13,7 @@ export default {
       return []
     },
   ],
-  locateRequest: async ({ file }, state, effects) => {
+  locateRequest: async ({ file }, availability, state, effects) => {
     try {
       const parentFile = r.getFile<MediaFile>(
         state,

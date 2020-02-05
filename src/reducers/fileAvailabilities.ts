@@ -108,7 +108,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     case A.ADD_FILE: {
       const base = state[action.file.type][action.file.id]
       const newAvailability: KnownFile = base || {
-        filePath: null,
+        filePath: action.path || null,
         status: 'NEVER_LOADED',
         id: action.file.id,
         type: action.file.type,

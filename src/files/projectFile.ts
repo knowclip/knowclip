@@ -1,6 +1,10 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
+import { join, basename } from 'path'
+import { existsSync } from 'fs-extra'
+import { validateMediaFile } from './mediaFile'
+import { AsyncError } from '../utils/ffmpeg'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -46,11 +50,36 @@ export default {
 
       if (!project) return [r.simpleMessageSnackbar('Could not open project')]
 
+      // TODO: trigger this in media menu items + export tables instead
+      const newlyAutoFoundMediaFilePaths: {
+        [id: string]: string | undefined
+      } = {}
+
+      for (const mediaFile of media.filter(
+        m => !(r.getFileAvailability(state, m) || { filePath: null }).filePath
+      )) {
+        // works while fileavailability names can't be changed...
+        for (const directory of r.getAssetsDirectories(state)) {
+          const nameMatch = join(directory, basename(mediaFile.name))
+          const matchingFile =
+            existsSync(nameMatch) &&
+            (await validateMediaFile(mediaFile, nameMatch))
+
+          if (matchingFile && !(matchingFile instanceof AsyncError))
+            newlyAutoFoundMediaFilePaths[mediaFile.id] = nameMatch
+        }
+      }
+
       const addNewMediaFiles = media
         .filter(
           validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
-        .map(validatedFile => r.addFile(validatedFile))
+        .map(validatedFile => {
+          return r.addFile(
+            validatedFile,
+            newlyAutoFoundMediaFilePaths[validatedFile.id]
+          )
+        })
       const addNewSubtitlesFiles = subtitles
         .filter(
           validatedFile => !r.getSubtitlesSourceFile(state, validatedFile.id)
@@ -73,7 +102,7 @@ export default {
     r.errorDialog('Problem opening project file:', errorMessage),
   ],
 
-  locateRequest: async ({ file }, state, effects) => [
+  locateRequest: async ({ file }, availability, state, effects) => [
     r.fileSelectionDialog(
       `Please locate this project file "${file.name}"`,
       file

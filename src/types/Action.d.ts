@@ -329,6 +329,7 @@ declare type FileAction =
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
+  path?: string
 }
 declare type DeleteFileRequest = {
   type: 'DELETE_FILE_REQUEST'

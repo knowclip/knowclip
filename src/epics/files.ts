@@ -102,6 +102,7 @@ const locateFileRequest: AppEpic = (action$, state$, effects) =>
       flatten(
         fileEventHandlers[action.file.type].locateRequest(
           action,
+          r.getFileAvailability(state$.value, action.file),
           state$.value,
           effects
         )

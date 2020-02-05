@@ -13,6 +13,8 @@
   width: 1.5em; 
   height: auto;
   background:white;
+  vertical-align: bottom;
+  margin-right: .3em;
 }
 
 .main {

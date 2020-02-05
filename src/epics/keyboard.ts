@@ -51,13 +51,20 @@ const ctrlLeftBracket: AppEpic = (
     map(() => r.highlightLeftClipRequest())
   )
 
-const escEpic: AppEpic = (action$, state$, { window }) =>
+const escEpic: AppEpic = (action$, state$, { window, isMediaPlaying }) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 27),
-    map(e => {
+    flatMap(e => {
       return r.getCurrentDialog(state$.value)
-        ? (({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
-        : r.highlightClip(null)
+        ? of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
+        : of(
+            isMediaPlaying()
+              ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
+                r.getHighlightedClipId(state$.value)
+                ? r.setLoop(false)
+                : r.highlightClip(null)
+              : r.highlightClip(null)
+          )
     })
   )
 

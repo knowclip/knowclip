@@ -65,7 +65,6 @@ export const readMediaFile = async (
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): Promise<MediaFile | AsyncError> => {
   const ffprobeMetadata = await getMediaMetadata(filePath)
-  console.log({ ffprobeMetadata })
   if (ffprobeMetadata instanceof AsyncError) return ffprobeMetadata
 
   const videoStream = ffprobeMetadata.streams.find(
