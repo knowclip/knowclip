@@ -1,4 +1,4 @@
-import { ignoreElements, mergeAll, filter, map } from 'rxjs/operators'
+import { ignoreElements, mergeAll } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import * as r from '../redux'

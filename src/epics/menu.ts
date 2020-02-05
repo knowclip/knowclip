@@ -1,6 +1,6 @@
 import { filter, map, ignoreElements, tap, flatMap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
-import { fromEvent, from, empty, of } from 'rxjs'
+import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { showMessageBox, showOpenDialog } from '../utils/electron'
