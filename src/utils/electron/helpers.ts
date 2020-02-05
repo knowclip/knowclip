@@ -4,6 +4,7 @@ import electron, {
   MessageBoxOptions,
   MessageBoxReturnValue,
 } from 'electron'
+import { extname } from 'path'
 
 const showSaveDialog = (
   name: string,
@@ -17,7 +18,16 @@ const showSaveDialog = (
           filters: [{ name, extensions }],
         }
       )
-      return await res(filePath)
+
+      if (!filePath) return await res(filePath)
+
+      const extension = extname(filePath)
+      const withExtension =
+        !extensions.length ||
+        extensions.some(ext => ext.toLowerCase() === extension.toLowerCase())
+          ? filePath
+          : filePath + '.' + extensions[0]
+      return await res(withExtension)
     } catch (err) {
       return await rej(err)
     }

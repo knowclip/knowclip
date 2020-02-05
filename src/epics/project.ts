@@ -1,33 +1,27 @@
 import {
   flatMap,
-  debounce,
   map,
   filter,
   mergeAll,
   switchMap,
   catchError,
 } from 'rxjs/operators'
-import { timer, of, from, Observable, empty } from 'rxjs'
-import { ofType, combineEpics, StateObservable } from 'redux-observable'
+import { of, from, Observable, empty } from 'rxjs'
+import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
-import fs from 'fs'
-import parseProject from '../utils/parseProject'
-import { saveProjectToLocalStorage } from '../utils/localStorage'
+import fs, { existsSync } from 'fs'
+import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import { AppEpic } from '../types/AppEpic'
+import './setYamlOptions'
 
 const writeFile = promisify(fs.writeFile)
-const readFile = promisify(fs.readFile)
 
-const createProject: AppEpic = (action$, state$, effects) =>
+const createProject: AppEpic = (action$, state$) =>
   action$.ofType<CreateProject>(A.CREATE_PROJECT).pipe(
     switchMap(({ project, filePath }) => {
       return from(
-        writeFile(
-          filePath,
-          JSON.stringify(r.getProject(state$.value, project), null, 2),
-          'utf8'
-        )
+        writeFile(filePath, r.getProjectFileContents(state$.value, project))
       ).pipe(
         flatMap(() =>
           from([
@@ -46,75 +40,53 @@ const createProject: AppEpic = (action$, state$, effects) =>
     )
   )
 
-const addAndOpenProject = async (
-  filePath: string,
-  state$: StateObservable<AppState>,
-  { nowUtcTimestamp }: EpicsDependencies
-): Promise<Observable<Action>> => {
-  try {
-    const projectJson = ((await readFile(filePath)) as unknown) as string
-    const project = parseProject(projectJson)
-    if (!project)
-      return of(
-        r.simpleMessageSnackbar(
-          'Could not read project file. Please make sure your software is up to date and try again.'
-        )
-      )
-
-    const mediaFiles = project.mediaFiles.map(({ id }) => id)
-    const projectFile: ProjectFile = {
-      id: project.id,
-      type: 'ProjectFile',
-      lastSaved: project.timestamp,
-      lastOpened: project.lastOpened,
-      name: project.name,
-      mediaFileIds: mediaFiles,
-      error: null,
-      noteType: project.noteType,
-    }
-    return from([
-      r.addFile(projectFile, filePath),
-      r.openProject(projectFile, project.clips, nowUtcTimestamp()),
-      r.openFileSuccess(projectFile, filePath),
-    ])
-  } catch (err) {
-    console.error(err)
-    return of(
-      r.simpleMessageSnackbar(`Error opening project file: ${err.message}`)
-    )
-  }
-}
-
 const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.OPEN_PROJECT_REQUEST_BY_ID),
     map(({ id }) => {
-      const project = r.getFile<ProjectFile>(state$.value, 'ProjectFile', id)
-      if (!project)
-        return r.simpleMessageSnackbar(`Could not find project ${id}.`)
+      const project = r.getFileAvailabilityById<ProjectFile>(
+        state$.value,
+        'ProjectFile',
+        id
+      )
+      if (!project.filePath || !existsSync(project.filePath)) {
+        const projectFile: ProjectFile = {
+          id: id,
+          type: 'ProjectFile',
+          lastSaved: 'PLACEHOLDER',
+          noteType: 'Simple',
+          mediaFileIds: [],
+          error: null,
+          name: project.name,
+        }
 
-      return r.openFileRequest(project)
+        return r.locateFileRequest(
+          projectFile,
+          'This project was either moved or renamed.'
+        )
+      }
+      return r.openProjectByFilePath(project.filePath)
     })
   )
 
-const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
+const openProjectByFilePath: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestByFilePath>(
       A.OPEN_PROJECT_REQUEST_BY_FILE_PATH
     ),
     flatMap<OpenProjectRequestByFilePath, Promise<Observable<Action>>>(
       async ({ filePath }) => {
-        const projectIdFromRecents = r.getProjectIdByFilePath(
-          state$.value,
-          filePath
-        )
-        if (projectIdFromRecents)
-          return from([r.openProjectById(projectIdFromRecents)])
+        const parse = await parseProjectJson(filePath)
+        if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
-        return await addAndOpenProject(filePath, state$, effects)
+        const { project } = normalizeProjectJson(state$.value, parse.value)
+        return of(r.openFileRequest(project, filePath))
       }
     ),
-    mergeAll()
+    mergeAll(),
+    catchError(err =>
+      of(r.errorDialog('Problem opening project file:', err.message))
+    )
   )
 
 const saveProject: AppEpic = (action$, state$) =>
@@ -134,25 +106,26 @@ const saveProject: AppEpic = (action$, state$) =>
           projectFile.filePath &&
           fs.existsSync(projectFile.filePath)
       )
-    }), // while can't find project file path in local storage, or file doesn't exist
+    }), // while can't find project file path in storage, or file doesn't exist
     flatMap(async () => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
         if (!projectMetadata) throw new Error('Could not find project metadata')
-        const json = JSON.stringify(
-          r.getProject(state$.value, projectMetadata),
-          null,
-          2
-        )
+
         const projectFile = r.getFileAvailabilityById(
           state$.value,
           'ProjectFile',
           projectMetadata.id
         ) as CurrentlyLoadedFile
-        await writeFile(projectFile.filePath, json, 'utf8')
+
+        await writeFile(
+          projectFile.filePath,
+          r.getProjectFileContents(state$.value, projectMetadata)
+        )
 
         return from([
           r.setWorkIsUnsaved(false),
+          r.commitFileDeletions(),
           r.simpleMessageSnackbar(`Project saved in ${projectFile.filePath}`),
         ])
       } catch (err) {
@@ -184,8 +157,8 @@ const PROJECT_EDIT_ACTIONS = [
   A.LOCATE_FILE_SUCCESS,
 ] as const
 
-const isGeneratedFile = (file: FileMetadata): boolean => {
-  switch (file.type) {
+const isGeneratedFile = (type: FileMetadata['type']): boolean => {
+  switch (type) {
     case 'VttConvertedSubtitlesFile':
     case 'WaveformPng':
     case 'ConstantBitrateMp3':
@@ -203,37 +176,15 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
     ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
     filter(action => {
       switch (action.type) {
-        case A.DELETE_FILE_SUCCESS:
         case A.ADD_FILE:
         case A.LOCATE_FILE_SUCCESS:
-          return !isGeneratedFile(action.file)
+        case A.DELETE_FILE_SUCCESS:
+          return !isGeneratedFile(action.file.type)
       }
       return true
     }),
     filter(() => Boolean(r.getCurrentProjectId(state$.value))),
     map(() => r.setWorkIsUnsaved(true))
-  )
-
-const THREE_SECONDS = 3000
-const autoSaveProject: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
-    debounce(() => timer(THREE_SECONDS)),
-    map(() => {
-      try {
-        const projectMetadata = r.getCurrentProject(state$.value)
-        if (!projectMetadata) return ({ type: 'AUTOSAVE' } as unknown) as Action
-
-        saveProjectToLocalStorage(r.getProject(state$.value, projectMetadata))
-
-        return ({ type: 'AUTOSAVE' } as unknown) as Action
-      } catch (err) {
-        console.error(err)
-        return r.simpleMessageSnackbar(
-          `Problem saving project file: ${err.message}`
-        )
-      }
-    })
   )
 
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
@@ -258,21 +209,6 @@ const closeProjectRequest: AppEpic = (action$, state$) =>
     })
   )
 
-const closeProject: AppEpic = (action$, state$, { getLocalStorage }) =>
-  action$.pipe(
-    ofType(A.CLOSE_PROJECT),
-    map(() => {
-      const filesRaw = getLocalStorage('files')
-      const fileAvailabilitiesRaw = getLocalStorage('fileAvailabilities')
-
-      const files = filesRaw ? (JSON.parse(filesRaw) as FilesState) : null
-      const fileAvailabilities = fileAvailabilitiesRaw
-        ? (JSON.parse(fileAvailabilitiesRaw) as FileAvailabilitiesState)
-        : null
-      return r.loadPersistedState(files, fileAvailabilities)
-    })
-  )
-
 export default combineEpics(
   createProject,
   openProjectByFilePath,
@@ -281,6 +217,5 @@ export default combineEpics(
   registerUnsavedWork,
   // autoSaveProject,
   deleteMediaFileFromProject,
-  closeProjectRequest,
-  closeProject
+  closeProjectRequest
 )

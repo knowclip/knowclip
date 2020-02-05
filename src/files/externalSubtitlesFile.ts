@@ -52,16 +52,18 @@ export default {
   locateSuccess: null,
 
   deleteRequest: [
-    async (file, descendants, state, effects) => [
-      r.deleteFileSuccess(file, descendants),
+    async (file, availability, descendants, state, effects) => [
+      r.deleteFileSuccess(availability, descendants),
     ],
   ],
 
   deleteSuccess: [
-    async ({ file }, state, effects) => {
-      const mediaFile = r.getFile(state, 'MediaFile', file.parentId)
+    async (action, state, effects) => {
+      const mediaFile = Object.values(state.files.MediaFile).find(
+        m => m && m.subtitles.some(({ id }) => id === action.file.id)
+      )
       return mediaFile
-        ? [r.deleteSubtitlesTrackFromMedia(file.id, file.parentId)]
+        ? [r.deleteSubtitlesTrackFromMedia(action.file.id, mediaFile.id)]
         : []
     },
   ],

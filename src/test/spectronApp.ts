@@ -2,7 +2,8 @@ import { Application } from 'spectron'
 import electron from 'electron'
 import { join } from 'path'
 import { ClientWrapper } from './driver/ClientWrapper'
-import { mkdirp, remove, existsSync, copy } from 'fs-extra'
+import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
+import tempy from 'tempy'
 
 export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
@@ -12,16 +13,21 @@ export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 export type TestSetup = {
   app: Application
   client: ClientWrapper
+  logPersistedData: () => Promise<void>
 }
 
 export async function startApp(
   context: {
     app: Application | null
+    testId: string
   },
-  testId: string,
   persistedState?: Partial<AppState>
 ): Promise<TestSetup> {
   await copyFixtures()
+
+  const persistedStatePath = persistedState ? tempy.file() : null
+  if (persistedStatePath)
+    await writeFile(persistedStatePath, JSON.stringify(persistedState))
 
   const app = new Application({
     chromeDriverArgs: ['--disable-extensions', '--debug'],
@@ -32,6 +38,9 @@ export async function startApp(
       NODE_ENV: 'test',
       REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
       INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
+      ...(persistedStatePath
+        ? { PERSISTED_STATE_PATH: persistedStatePath }
+        : null),
     },
     args: [join(__dirname, '..', '..')],
   })
@@ -39,31 +48,34 @@ export async function startApp(
 
   await app.start()
 
-  if (persistedState) {
-    for (const [key, value] of Object.entries(persistedState))
-      await app.client.localStorage('POST', {
-        key,
-        value: JSON.stringify(value),
-      })
-    await app.client.refresh()
-  }
+  app.webContents.send('start-test', context.testId)
 
   const setup = {
     app,
     client: new ClientWrapper(app.client),
+    logPersistedData: async () => {
+      app.webContents.send('log-persisted-data', context.testId, {
+        ASSETS_DIRECTORY,
+        GENERATED_ASSETS_DIRECTORY,
+        TMP_DIRECTORY,
+      })
+    },
   }
   return setup
 }
 
 export async function stopApp(context: {
   app: Application | null
+  testId: string
 }): Promise<null> {
+  const { app } = context
   if (process.env.INTEGRATION_DEV) {
     return null
   }
 
-  const { app } = context
   if (app) {
+    app.webContents.send('end-test')
+
     await app.stop()
   }
 
@@ -73,6 +85,7 @@ export async function stopApp(context: {
 
   return null
 }
+
 async function copyFixtures() {
   if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
   await mkdirp(TMP_DIRECTORY)

@@ -4,12 +4,12 @@ import { waveform$ } from '../../../components/Waveform'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
-export default async function addFirstMediaToProject({
-  app,
-  client,
-}: TestSetup) {
+export default async function addFirstMediaToProject(
+  { app, client }: TestSetup,
+  videoFilePath: string
+) {
   const { chooseFirstMediaFileButton: chooseMediaFileButton } = mediaFilesMenu$
-  const japaneseVideoPath = join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4')
+  const japaneseVideoPath = join(ASSETS_DIRECTORY, videoFilePath)
 
   await mockElectronHelpers(app, {
     showOpenDialog: [Promise.resolve([japaneseVideoPath])],
@@ -17,7 +17,7 @@ export default async function addFirstMediaToProject({
 
   await client.clickElement_(chooseMediaFileButton)
 
-  await client.waitForText('body', 'polar_bear_cafe.mp4')
+  await client.waitForText('body', videoFilePath)
 
   expect(await client.getAttribute('video', 'src')).toContain(japaneseVideoPath)
 

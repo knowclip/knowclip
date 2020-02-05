@@ -2,6 +2,7 @@ import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import tempy from 'tempy'
 import { existsSync } from 'fs'
 import { getFileAvailabilityById } from '../selectors'
+import { basename, join } from 'path'
 
 const BG_COLOR = '#f0f8ff'
 const WAVE_COLOR = '#555555'
@@ -22,7 +23,11 @@ export const getWaveformPng = async (
     const { stepsPerSecond, stepLength } = state.waveform
     const width = ~~(duration * (stepsPerSecond * stepLength))
 
-    const outputFilename = getWaveformPngPath(state, file)
+    const outputFilename = getWaveformPngPath(
+      state,
+      constantBitrateFilePath,
+      file
+    )
     if (outputFilename && existsSync(outputFilename)) return outputFilename
 
     return await new Promise((res, rej) => {
@@ -53,7 +58,11 @@ export const getWaveformPng = async (
   }
 }
 
-const getWaveformPngPath = (state: AppState, file: WaveformPng) => {
+const getWaveformPngPath = (
+  state: AppState,
+  constantBitrateFilePath: string,
+  file: WaveformPng
+) => {
   const fileAvailability = getFileAvailabilityById(
     state,
     'WaveformPng',
@@ -62,5 +71,8 @@ const getWaveformPngPath = (state: AppState, file: WaveformPng) => {
   if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
     return fileAvailability.filePath
   }
-  return tempy.file({ extension: 'png' })
+  return join(
+    tempy.root,
+    basename(constantBitrateFilePath) + '_' + file.id + '.png'
+  )
 }

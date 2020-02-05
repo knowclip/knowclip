@@ -22,6 +22,15 @@ export const confirmationDialog = (
     },
     skipQueue
   )
+export const errorDialog = (message: string, log: string) =>
+  enqueueDialog(
+    {
+      type: 'Error',
+      message,
+      log,
+    },
+    true
+  )
 
 export const mediaFolderLocationFormDialog = (
   action: Action | null,

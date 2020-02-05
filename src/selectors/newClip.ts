@@ -1,5 +1,5 @@
 import newFlashcard from '../utils/newFlashcard'
-import { getDefaultTags, getDefaultIncludeStill } from './user'
+import { getDefaultTags, getDefaultIncludeStill } from './session'
 
 const ascending = (a: number, b: number) => a - b
 
@@ -11,12 +11,12 @@ interface ClipPoints {
 const sortClipPoints = ({ start, end }: ClipPoints) =>
   [start, end].sort(ascending)
 
-export const getNewClip = (
+export const getNewClip = <F extends FlashcardFields>(
   state: AppState,
   pendingClip: PendingClip,
   mediaFileId: string,
   id: ClipId,
-  fields: FlashcardFields
+  fields: F
 ): Clip => {
   const tags = getDefaultTags(state)
   const includeStill = getDefaultIncludeStill(state)

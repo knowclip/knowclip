@@ -3,7 +3,7 @@ export * from './waveform'
 export * from './snackbar'
 export * from './dialog'
 export * from './subtitles'
-export * from './user'
+export * from './session'
 export * from './files'
 export * from './settings'
 

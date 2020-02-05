@@ -36,14 +36,12 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 
       if (!fileAvailability.isLoading) return empty()
 
-      if (
-        !fileAvailability.filePath ||
-        !existsSync(fileAvailability.filePath)
-      ) {
+      const filePath = action.filePath || fileAvailability.filePath
+
+      if (!filePath || !existsSync(filePath)) {
         const fileTypeAndName = getHumanFileName(file)
-        const fileVerb =
-          file.type === 'MediaFile' ? 'making clips with' : 'using'
-        const message = fileAvailability.filePath
+        const fileVerb = file.type === 'MediaFile' ? 'make clips with' : 'use'
+        const message = filePath
           ? `This ${fileTypeAndName} appears to have moved or been renamed. Try locating it manually?`
           : `Please locate your ${fileTypeAndName} in the filesystem so you can ${fileVerb} it.
               
@@ -55,18 +53,14 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
         return from(
           fileEventHandlers[file.type].openRequest(
             action,
-            fileAvailability.filePath,
+            filePath,
             state$.value,
             effects
           )
         ).pipe(mergeAll())
       } catch (err) {
         return of(
-          r.openFileFailure(
-            file,
-            fileAvailability.filePath,
-            err.message || err.toString()
-          )
+          r.openFileFailure(file, filePath, err.message || err.toString())
         )
       }
     })
@@ -88,15 +82,18 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
 const openFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
-    flatMap<OpenFileFailure, Observable<Action>>(
-      ({ file, filePath, errorMessage }) => {
-        return of(r.simpleMessageSnackbar(errorMessage))
-      }
-    )
+    flatMap<OpenFileFailure, Observable<Action>>(action => {
+      const openFailureHandler = fileEventHandlers[action.file.type].openFailure
+      return openFailureHandler
+        ? from(openFailureHandler(action, state$.value, effects)).pipe(
+            mergeAll()
+          )
+        : of(r.simpleMessageSnackbar(action.errorMessage))
+    })
   )
 
 const flatten = (asyncArray: Promise<Action[]>) =>
-  from(asyncArray).pipe(flatMap(array => from(array)))
+  from(asyncArray).pipe(mergeAll())
 
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
@@ -124,15 +121,16 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, DeleteFileRequest>(A.DELETE_FILE_REQUEST),
     flatMap(({ fileType, id }) => {
-      const file = r.getFile(state$.value, fileType, id)
+      const availability = r.getFileAvailabilityById(state$.value, fileType, id)
 
-      return file
+      return availability
         ? from(
             fileEventHandlers[fileType].deleteRequest.flatMap(handler =>
               from(
                 handler(
-                  file,
-                  r.getFileDescendants(state$.value, file.id),
+                  r.getFile(state$.value, fileType, id),
+                  availability,
+                  r.getFileDescendants(state$.value, availability.id),
                   state$.value,
                   effects
                 )

@@ -81,7 +81,7 @@ export const readMediaFile = async (
     isVideo: false,
 
     name: basename(filePath),
-    durationSeconds: ffprobeMetadata.format.duration || 0,
+    durationSeconds: +(ffprobeMetadata.format.duration || 0).toFixed(3),
     format: ffprobeMetadata.format.format_name || 'UNKNOWN_FORMAT',
 
     subtitlesTracksStreamIndexes: ffprobeMetadata.streams

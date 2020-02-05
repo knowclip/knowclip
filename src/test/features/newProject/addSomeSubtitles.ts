@@ -4,11 +4,16 @@ import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 
-export default async function addSomeSubtitles({ client, app }: TestSetup) {
+export default async function addSomeSubtitles(
+  { client, app }: TestSetup,
+  subtitlesFilePath: string
+) {
   await client.clickElement_(subtitlesMenu$.openMenuButton)
 
   await mockElectronHelpers(app, {
-    showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
+    showOpenDialog: [
+      Promise.resolve([join(ASSETS_DIRECTORY, subtitlesFilePath)]),
+    ],
   })
   await client.clickElement_(subtitlesMenu$.addTrackButton)
 

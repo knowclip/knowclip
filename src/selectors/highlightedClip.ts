@@ -1,4 +1,4 @@
-import { getHighlightedClipId } from './user'
+import { getHighlightedClipId } from './session'
 import { getFlashcard, getClipTime } from './clips'
 
 export const getCurrentFlashcard = (state: AppState): Flashcard | null => {

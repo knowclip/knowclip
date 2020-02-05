@@ -1,0 +1,34 @@
+{
+  "$ref": "#/definitions/ProjectMetadataJson",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ProjectMetadataJson": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "noteType": {
+          "enum": [
+            "Simple",
+            "Transliteration"
+          ],
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "noteType",
+        "timestamp",
+        "id"
+      ],
+      "type": "object"
+    }
+  }
+}

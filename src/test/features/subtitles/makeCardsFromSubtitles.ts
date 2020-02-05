@@ -32,6 +32,12 @@ export default async function makeCardsFromSubtitles({
   externalOption.click()
   await client.waitUntilGone_(subtitleClipsDialog$.selectFieldOption)
 
+  await client.clickElement_(subtitleClipsDialog$.meaningField)
+  const [embeddedOption] = await client.elements_(
+    subtitleClipsDialog$.selectFieldOption
+  )
+  embeddedOption.click()
+  await client.waitUntilGone_(subtitleClipsDialog$.selectFieldOption)
   await client.clickElement_(subtitleClipsDialog$.okButton)
 
   await client.waitForText_(

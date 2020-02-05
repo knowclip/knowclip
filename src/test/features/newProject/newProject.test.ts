@@ -1,43 +1,41 @@
 import { Application } from 'spectron'
-import { startApp, stopApp, TestSetup } from '../../spectronApp'
-import createNewProject from './createNewProject'
-import changeProjectName from './changeProjectName'
-import addFirstMediaToProject from './addFirstMediaToProject'
-import makeSomeFlashcards from './makeSomeFlashcards'
-import navigateBetweenClips from './navigateBetweenClips'
-import addMoreMediaToProject from './addMoreMediaToProject'
-import navigateBetweenMedia from './navigateBetweenMedia'
-import reviewAndExportApkg from './reviewAndExportApkg'
-import moveThroughoutMedia from './moveThroughoutMedia'
-import saveAndCloseProject from './saveAndCloseProject'
+import { startApp, stopApp, TestSetup, TMP_DIRECTORY } from '../../spectronApp'
 import { mockSideEffects } from '../../../utils/sideEffects'
-import addSomeSubtitles from './addSomeSubtitles'
+import { runAll } from '../step'
+import { newProjectTestSteps } from './newProjectTestSteps'
+import { join } from 'path'
+import { parseProjectJson } from '../../../utils/parseProject'
 
 jest.setTimeout(60000)
 
 describe('create a deck from a new project', () => {
-  let context: { app: Application | null } = { app: null }
+  let context: { app: Application | null; testId: string } = {
+    app: null,
+    testId: 'newProject',
+  }
   let setup: TestSetup
 
   beforeAll(async () => {
-    setup = await startApp(context, 'newProjectTest')
+    setup = await startApp(context)
 
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('create a new project', async () => {
-    return createNewProject(setup)
-  }) // should create file
-  test('change project name', () => changeProjectName(setup))
-  test('add media to project', () => addFirstMediaToProject(setup))
-  test('add a subtitles file', () => addSomeSubtitles(setup))
-  test('create clips + flashcards', () => makeSomeFlashcards(setup))
-  test('navigate between clips', () => navigateBetweenClips(setup))
-  test('move throughout media file', () => moveThroughoutMedia(setup))
-  test('add more media to project', () => addMoreMediaToProject(setup))
-  test('navigate between media', () => navigateBetweenMedia(setup))
-  test('exporting an .apkg', () => reviewAndExportApkg(setup))
-  test('saving a project file', () => saveAndCloseProject(setup))
+  runAll(
+    newProjectTestSteps({
+      projectFileName: 'my_cool_new_project',
+      projectTitle: 'My cool new project',
+    }),
+    () => setup
+  )
+
+  test('resulting project file matches snapshot', async () => {
+    const actualProjectFileContents = await parseProjectJson(
+      join(TMP_DIRECTORY, 'my_cool_new_project.kyml')
+    )
+
+    expect(actualProjectFileContents).toMatchSnapshot()
+  })
 
   afterAll(async () => {
     await stopApp(context)
@@ -60,5 +58,37 @@ const sideEffectsMocks = {
     '2020-01-28T12:35:20Z',
     '2020-01-28T12:35:20Z',
     '2020-01-28T12:35:49Z',
+    '2020-01-31T14:26:39Z',
+    '2020-01-31T14:26:40Z',
+    '2020-01-31T14:26:41Z',
+    '2020-01-31T14:26:42Z',
+    '2020-01-31T14:26:42Z',
+    '2020-01-31T14:26:43Z',
+    '2020-01-31T14:26:44Z',
+    '2020-01-31T14:26:52Z',
+    '2020-01-31T14:26:52Z',
+    '2020-01-31T14:27:03Z',
+    '2020-01-31T14:27:04Z',
+    '2020-01-31T14:27:04Z',
+    '2020-01-31T14:27:05Z',
+    '2020-01-31T14:27:05Z',
+    '2020-01-31T14:27:05Z',
+    '2020-01-31T14:27:05Z',
+    '2020-01-31T14:27:05Z',
+    '2020-01-31T14:27:08Z',
+    '2020-01-31T14:27:08Z',
+    '2020-01-31T14:27:08Z',
+    '2020-01-31T14:27:08Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:18Z',
+    '2020-01-31T14:29:19Z',
+    '2020-01-31T14:29:19Z',
+    '2020-01-31T14:29:19Z',
+    '2020-01-31T14:29:19Z',
   ],
 }

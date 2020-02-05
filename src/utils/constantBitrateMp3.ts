@@ -1,7 +1,7 @@
 import tempy from 'tempy'
 import fs from 'fs'
 import ffmpeg from '../utils/ffmpeg'
-import { extname } from 'path'
+import { extname, basename, join } from 'path'
 
 export const coerceMp3ToConstantBitrate = (
   path: string,
@@ -14,7 +14,10 @@ export const coerceMp3ToConstantBitrate = (
     if (oldConstantBitratePath && fs.existsSync(oldConstantBitratePath))
       return res(oldConstantBitratePath)
 
-    const constantBitratePath = tempy.file({ extension: 'mp4' })
+    const constantBitratePath = join(
+      tempy.root,
+      basename(path, '.mp3') + '.mp4'
+    )
 
     // I guess by default it does CBR
     // though maybe we should check that

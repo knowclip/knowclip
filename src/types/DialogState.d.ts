@@ -6,6 +6,7 @@ declare type DialogData =
   | FileSelectionDialogData
   | CsvAndMp3ExportDialogData
   | SubtitlesClipsDialogData
+  | ErrorDialogData
 
 declare type ConfirmationDialogData = {
   type: 'Confirmation'
@@ -43,6 +44,12 @@ declare type CsvAndMp3ExportDialogData = {
 
 declare type SubtitlesClipsDialogData = {
   type: 'SubtitlesClips'
+}
+
+declare type ErrorDialogData = {
+  type: 'Error'
+  message: string
+  log: string
 }
 
 declare type DialogState = {

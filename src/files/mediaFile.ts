@@ -4,6 +4,8 @@ import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile, AsyncError } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
+import { formatDurationWithMilliseconds } from '../utils/formatTime'
+import moment from 'moment'
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
@@ -33,10 +35,8 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     )
   })
 
-const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
-  MediaFile
-> = async (
-  { validatedFile: { subtitles, name }, filePath },
+const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
+  { validatedFile: { subtitles, name, id: mediaFileId }, filePath },
   state,
   effects
 ) => [
@@ -44,10 +44,19 @@ const reloadRememberedExternalSubtitles: OpenFileSuccessHandler<
     .filter(s => s.type === 'ExternalSubtitlesTrack')
     .map(({ id }) => {
       const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
-      if (externalSubtitles) return r.openFileRequest(externalSubtitles)
-
-      return r.simpleMessageSnackbar(
-        'Could not open external subtitles for ' + name
+      const availability = r.getFileAvailabilityById(
+        state,
+        'ExternalSubtitlesFile',
+        id
+      )
+      return r.openFileRequest(
+        externalSubtitles || {
+          id,
+          type: 'ExternalSubtitlesFile',
+          // name: 'PLACEHOLDERR',
+          name: availability.name,
+          parentId: mediaFileId,
+        }
       )
     }),
 ]
@@ -168,7 +177,7 @@ export default {
 
   openSuccess: [
     addEmbeddedSubtitles,
-    reloadRememberedExternalSubtitles,
+    loadExternalSubtitles,
     getCbr,
     getWaveform,
     setDefaultClipSpecs,
@@ -178,8 +187,8 @@ export default {
   },
   locateSuccess: null,
   deleteRequest: [
-    async (file, descendants, state, effects) => [
-      r.deleteFileSuccess(file, descendants),
+    async (file, availability, descendants, state) => [
+      r.deleteFileSuccess(availability, descendants),
     ],
   ],
   deleteSuccess: [],
@@ -199,24 +208,40 @@ const validateMediaFile = async (
 
   if (newFile instanceof AsyncError) return newFile
 
-  const differences = []
+  const differences: { [attribute: string]: [string, string] } = {}
 
-  if (existingFile.name !== newFile.name) differences.push('name')
+  if (existingFile.name !== newFile.name)
+    differences.name = [existingFile.name, newFile.name]
   if (existingFile.durationSeconds !== newFile.durationSeconds)
-    differences.push('duration')
-  if (existingFile.durationSeconds !== newFile.durationSeconds)
-    differences.push('format')
+    differences.duration = [
+      formatDurationWithMilliseconds(
+        moment.duration({ seconds: existingFile.durationSeconds })
+      ),
+      formatDurationWithMilliseconds(
+        moment.duration({ seconds: newFile.durationSeconds })
+      ),
+    ]
+  if (existingFile.format !== newFile.format)
+    differences.format = [existingFile.format, newFile.format]
   if (
     existingFile.subtitlesTracksStreamIndexes.sort().toString() !==
     newFile.subtitlesTracksStreamIndexes.sort().toString()
   )
-    differences.push('subtitles tracks')
+    differences['subtitles streams'] = [
+      existingFile.subtitlesTracksStreamIndexes.join(', '),
+      newFile.subtitlesTracksStreamIndexes.join(', '),
+    ]
 
-  if (differences.length) {
+  if (Object.keys(differences).length) {
     return [
-      `This media file differs from the one on record by: ${differences.join(
-        ', '
-      )}.`,
+      `This media file differs from the one on record by:\n\n ${Object.entries(
+        differences
+      )
+        .map(
+          ([attr, [old, current]]) =>
+            `${attr}: "${current}" for this file instead of "${old}"`
+        )
+        .join('\n')}.`,
       newFile,
     ]
   }

@@ -1,5 +1,6 @@
 import clips from './clips'
 import * as r from '../redux'
+import { TransliterationFlashcardFields } from '../types/Project'
 
 const newClip = (
   { start, end }: { start: number; end: number },

@@ -1,132 +1,85 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`create a deck from a new project saving a project file 1`] = `
+exports[`create a deck from a new project resulting project file matches snapshot 1`] = `
 Object {
-  "clips": Array [
-    Object {
-      "end": 625,
-      "fileId": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
-      "flashcard": Object {
-        "fields": Object {
-          "meaning": "Relaxing while eating bamboo grass is the best",
-          "notes": "",
-          "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
-          "transcription": "笹を食べながらのんびりするのは最高だなぁ",
-        },
-        "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
-        "image": Object {
-          "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
-          "type": "VideoStillImage",
-        },
-        "tags": Array [
-          "pbc",
+  "value": Object {
+    "media": Array [
+      Object {
+        "clips": Array [
+          Object {
+            "end": "00:12.5",
+            "fields": Object {
+              "meaning": "Relaxing while eating bamboo grass is the best",
+              "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
+              "transcription": "笹を食べながらのんびりするのは最高だなぁ",
+            },
+            "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
+            "image": Object {
+              "type": "VideoStill",
+            },
+            "start": "00:08.04",
+            "tags": Array [
+              "pbc",
+            ],
+          },
+          Object {
+            "end": "00:17.76",
+            "fields": Object {
+              "meaning": "This kid, lazing about again so early",
+              "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
+              "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
+              "transcription": "またこの子は昼間からゴロゴロして",
+            },
+            "id": "a1eb3142-ce18-4595-a3c3-8c867e1058f4",
+            "start": "00:15.12",
+            "tags": Array [
+              "pbc",
+            ],
+          },
+          Object {
+            "end": "01:21.16",
+            "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
+            "image": Object {
+              "type": "VideoStill",
+            },
+            "start": "01:15.2",
+            "tags": Array [
+              "pbc",
+            ],
+          },
         ],
-        "type": "Transliteration",
-      },
-      "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
-      "start": 402,
-    },
-    Object {
-      "end": 888,
-      "fileId": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
-      "flashcard": Object {
-        "fields": Object {
-          "meaning": "This kid, lazing about again so early",
-          "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
-          "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
-          "transcription": "またこの子は昼間からゴロゴロして",
-        },
-        "id": "a1eb3142-ce18-4595-a3c3-8c867e1058f4",
-        "tags": Array [
-          "pbc",
+        "duration": "01:27.062",
+        "flashcardFieldsToSubtitlesTracks": Object {},
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "id": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
+        "name": "polar_bear_cafe.mp4",
+        "subtitles": Array [
+          Object {
+            "id": "7077af99-722b-4737-854e-d2d1a3a3a60f",
+            "streamIndex": 2,
+            "type": "Embedded",
+          },
+          Object {
+            "id": "a517b52e-e10b-4e9e-90e1-bfecc865b428",
+            "name": "pbc_jp.ass",
+            "type": "External",
+          },
         ],
-        "type": "Transliteration",
       },
-      "id": "a1eb3142-ce18-4595-a3c3-8c867e1058f4",
-      "start": 756,
-    },
-    Object {
-      "end": 4058,
-      "fileId": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
-      "flashcard": Object {
-        "fields": Object {
-          "meaning": "",
-          "notes": "",
-          "pronunciation": "",
-          "transcription": "",
-        },
-        "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
-        "image": Object {
-          "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
-          "type": "VideoStillImage",
-        },
-        "tags": Array [
-          "pbc",
-        ],
-        "type": "Transliteration",
+      Object {
+        "duration": "00:58.24",
+        "flashcardFieldsToSubtitlesTracks": Object {},
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "id": "906db000-f3d2-46c9-9ec9-0a1069304e41",
+        "name": "piggeldy_cat.mp4",
       },
-      "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
-      "start": 3760,
+    ],
+    "project": Object {
+      "id": "6f58206b-9384-411c-8432-e7ff8d6c958b",
+      "name": "My cool new project",
+      "noteType": "Transliteration",
+      "timestamp": "2020-01-31T14:27:05Z",
     },
-  ],
-  "id": "6f58206b-9384-411c-8432-e7ff8d6c958b",
-  "lastOpened": "2020-01-28T12:35:20Z",
-  "mediaFiles": Array [
-    Object {
-      "durationSeconds": 87.062,
-      "flashcardFieldsToSubtitlesTracks": Object {},
-      "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "height": 1080,
-      "id": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
-      "isVideo": true,
-      "name": "polar_bear_cafe.mp4",
-      "parentId": "6f58206b-9384-411c-8432-e7ff8d6c958b",
-      "subtitles": Array [
-        Object {
-          "id": "7077af99-722b-4737-854e-d2d1a3a3a60f",
-          "streamIndex": 2,
-          "type": "EmbeddedSubtitlesTrack",
-        },
-        Object {
-          "id": "a517b52e-e10b-4e9e-90e1-bfecc865b428",
-          "type": "ExternalSubtitlesTrack",
-        },
-      ],
-      "subtitlesTracksStreamIndexes": Array [
-        2,
-      ],
-      "type": "MediaFile",
-      "width": 1920,
-    },
-    Object {
-      "durationSeconds": 58.24,
-      "flashcardFieldsToSubtitlesTracks": Object {},
-      "format": "mov,mp4,m4a,3gp,3g2,mj2",
-      "height": 360,
-      "id": "906db000-f3d2-46c9-9ec9-0a1069304e41",
-      "isVideo": true,
-      "name": "piggeldy_cat.mp4",
-      "parentId": "6f58206b-9384-411c-8432-e7ff8d6c958b",
-      "subtitles": Array [],
-      "subtitlesTracksStreamIndexes": Array [],
-      "type": "MediaFile",
-      "width": 480,
-    },
-  ],
-  "name": "My cool new project",
-  "noteType": "Transliteration",
-  "subtitles": Array [
-    Object {
-      "id": "a517b52e-e10b-4e9e-90e1-bfecc865b428",
-      "name": "pbc_jp.ass",
-      "parentId": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
-      "type": "ExternalSubtitlesFile",
-    },
-  ],
-  "tags": Array [
-    "pbc",
-  ],
-  "timestamp": "2020-01-28T12:35:49Z",
-  "version": "4.1.0",
+  },
 }
 `;

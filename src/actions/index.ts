@@ -5,19 +5,10 @@ export * from './dialog'
 export * from './projects'
 export * from './subtitles'
 export * from './files'
-export * from './user'
+export * from './session'
 
 export const initializeApp = (): Action => ({
   type: A.INITIALIZE_APP,
-})
-
-export const loadPersistedState = (
-  files: FilesState | null,
-  fileAvailabilities: FileAvailabilitiesState | null
-): LoadPersistedState => ({
-  type: A.LOAD_PERSISTED_STATE,
-  files,
-  fileAvailabilities,
 })
 
 export const setCurrentFile = (index: number): Action => ({

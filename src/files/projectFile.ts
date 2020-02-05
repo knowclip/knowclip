@@ -1,45 +1,76 @@
 import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
-import parseProject from '../utils/parseProject'
-import { promises } from 'fs'
-
-const { readFile } = promises
+import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => [
-    r.openFileSuccess(file, filePath),
-  ],
+  openRequest: async ({ file }, filePath, state, effects) => {
+    try {
+      const parse = await parseProjectJson(filePath)
+      if (parse.errors) throw new Error(parse.errors.join('; '))
+
+      const { project, clips } = normalizeProjectJson(state, parse.value)
+      if (!project)
+        return [
+          r.openFileFailure(
+            file,
+            filePath,
+            'Could not read project file. Please make sure your software is up to date and try again.'
+          ),
+        ]
+
+      return [
+        r.openProject(file, clips, effects.nowUtcTimestamp()),
+
+        r.openFileSuccess(project, filePath),
+      ]
+    } catch (err) {
+      console.error(err)
+      return [
+        r.openFileFailure(
+          file,
+          filePath,
+          `Error opening project file: ${err.message}`
+        ),
+      ]
+    }
+  },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      const projectJson = await readFile(filePath, 'utf8')
-      const project = parseProject(projectJson)
+      const parse = await parseProjectJson(filePath)
+      if (parse.errors) throw new Error(parse.errors.join('; '))
+
+      const { project, media, subtitles } = normalizeProjectJson(
+        state,
+        parse.value
+      )
 
       if (!project) return [r.simpleMessageSnackbar('Could not open project')]
 
-      const addNewMediaFiles = project.mediaFiles
+      const addNewMediaFiles = media
         .filter(
           validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
         )
         .map(validatedFile => r.addFile(validatedFile))
-      const addNewSubtitlesFiles = project.subtitles
+      const addNewSubtitlesFiles = subtitles
         .filter(
-          subtitlesFile =>
-            !r.getFile(state, subtitlesFile.type, subtitlesFile.id)
+          validatedFile => !r.getSubtitlesSourceFile(state, validatedFile.id)
         )
-        .map(file => r.addFile(file))
+        .map(validatedFile => r.addFile(validatedFile))
 
-      const loadFirstMediaFile = project.mediaFiles.length
-        ? [r.openFileRequest(project.mediaFiles[0])]
+      const loadFirstMediaFile = media.length
+        ? [r.openFileRequest(media[0])]
         : []
 
       return [
         ...addNewMediaFiles,
-        ...addNewSubtitlesFiles, // maybe should happen when opening media
-        r.openProject(validatedFile, project.clips, effects.nowUtcTimestamp()),
+        ...addNewSubtitlesFiles,
         ...loadFirstMediaFile,
-        ...persistFiles(state, effects.setLocalStorage),
       ]
     },
+  ],
+
+  openFailure: async ({ file, filePath, errorMessage }) => [
+    r.errorDialog('Problem opening project file:', errorMessage),
   ],
 
   locateRequest: async ({ file }, state, effects) => [
@@ -49,27 +80,11 @@ export default {
     ),
   ],
 
-  locateSuccess: async (action, state, { setLocalStorage }) =>
-    persistFiles(state, setLocalStorage),
+  locateSuccess: async (action, state) => [],
   deleteRequest: [
-    async (file, descendants, state, effects) => [
-      r.deleteFileSuccess(file, descendants),
+    async (file, availability, descendants, state) => [
+      r.deleteFileSuccess(availability, descendants),
     ],
   ],
-  deleteSuccess: [
-    async (action, state, { setLocalStorage }) =>
-      persistFiles(state, setLocalStorage),
-  ],
+  deleteSuccess: [async (action, state) => [r.commitFileDeletions()]],
 } as FileEventHandlers<ProjectFile>
-
-function persistFiles(
-  state: AppState,
-  setLocalStorage: (arg0: string, arg1: string) => void
-) {
-  setLocalStorage('files', JSON.stringify(state.files))
-  setLocalStorage(
-    'fileAvailabilities',
-    JSON.stringify(state.fileAvailabilities)
-  )
-  return []
-}

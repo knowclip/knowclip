@@ -1,7 +1,6 @@
 declare type Action =
   | { type: '@@INIT' }
   | InitializeApp
-  | LoadPersistedState
   | SnackbarAction
   | DialogAction
   | WaveformAction
@@ -16,12 +15,6 @@ declare type Action =
   | SetAllTags
   | SetProgress
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
-
-declare type LoadPersistedState = {
-  type: 'LOAD_PERSISTED_STATE'
-  files: FilesState | null
-  fileAvailabilities: FileAvailabilitiesState | null
-}
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
 declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }
@@ -278,7 +271,9 @@ declare type HideSubtitles = {
 declare type MakeClipsFromSubtitles = {
   type: 'MAKE_CLIPS_FROM_SUBTITLES'
   fileId: MediaFileId
-  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields> & {
+  fieldNamesToTrackIds: Partial<
+    import('./Project').TransliterationFlashcardFields
+  > & {
     transcription: string
   }
   tags: Array<string>
@@ -308,11 +303,11 @@ declare type FileAction =
   | OpenFileFailure
   | LocateFileRequest
   | LocateFileSuccess
+  | CommitFileDeletions
   | PreloadVideoStills
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
-  filePath: FilePath | null
 }
 declare type DeleteFileRequest = {
   type: 'DELETE_FILE_REQUEST'
@@ -321,19 +316,22 @@ declare type DeleteFileRequest = {
 }
 declare type DeleteFileSuccess = {
   type: 'DELETE_FILE_SUCCESS'
-  file: FileMetadata
-  descendants: Array<FileMetadata>
+  file: FileAvailability
+  descendants: Array<FileAvailability>
+}
+declare type CommitFileDeletions = {
+  type: 'COMMIT_FILE_DELETIONS'
 }
 declare type OpenFileRequest = {
   type: 'OPEN_FILE_REQUEST'
   file: FileMetadata
-  /** ignored if there is already a path on record */
   filePath: FilePath | null
 }
 declare type OpenFileSuccess = {
   type: 'OPEN_FILE_SUCCESS'
   validatedFile: FileMetadata
   filePath: FilePath
+  timestamp: string
 }
 declare type OpenFileFailure = {
   type: 'OPEN_FILE_FAILURE'
@@ -341,8 +339,10 @@ declare type OpenFileFailure = {
   filePath: FilePath | null
   errorMessage: string
 }
+/** Should only be dispatched with a stored file */
 declare type LocateFileRequest = {
   type: 'LOCATE_FILE_REQUEST'
+  /** This file should exist in the state already */
   file: FileMetadata
   message: string
 }
@@ -351,6 +351,10 @@ declare type LocateFileSuccess = {
   file: FileMetadata
   filePath: FilePath
 }
+declare type CommitFileDeletions = {
+  type: 'COMMIT_FILE_DELETIONS'
+}
+
 declare type PreloadVideoStills = {
   type: 'PRELOAD_VIDEO_STILLS'
   file: FileMetadata

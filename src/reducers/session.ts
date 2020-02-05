@@ -1,7 +1,7 @@
 import { Reducer } from 'redux'
 import deleteKey from '../utils/deleteKey'
 
-const initialState: UserState = {
+const initialState: SessionState = {
   pendingClip: null,
   pendingStretch: null,
   highlightedClipId: null,
@@ -15,7 +15,10 @@ const initialState: UserState = {
   progress: null,
 }
 
-const user: Reducer<UserState, Action> = (state = initialState, action) => {
+const session: Reducer<SessionState, Action> = (
+  state = initialState,
+  action
+) => {
   switch (action.type) {
     case A.DELETE_CARD:
       return action.id === state.highlightedClipId
@@ -191,4 +194,4 @@ const user: Reducer<UserState, Action> = (state = initialState, action) => {
   }
 }
 
-export default user
+export default session

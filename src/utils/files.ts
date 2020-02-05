@@ -7,7 +7,7 @@ export const getExtensions = (file: FileMetadata) => {
     case 'MediaFile':
       return []
     case 'ProjectFile':
-      return ['afca']
+      return ['kyml']
     case 'VttConvertedSubtitlesFile':
       return ['vtt']
     case 'VideoStillImage':
@@ -17,7 +17,7 @@ export const getExtensions = (file: FileMetadata) => {
   }
 }
 
-const getHumanFileTypeName = (file: FileMetadata) => {
+const getHumanFileTypeName = (file: { type: string; name?: string }) => {
   switch (file.type) {
     case 'MediaFile':
       return 'media file'
@@ -32,7 +32,7 @@ const getHumanFileTypeName = (file: FileMetadata) => {
       return 'generated file' // should not be displayed to user
   }
 }
-export const getHumanFileName = (file: FileMetadata) => {
+export const getHumanFileName = (file: { type: string; name?: string }) => {
   return getHumanFileTypeName(file) + ('name' in file ? ` "${file.name}"` : '')
 }
 

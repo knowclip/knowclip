@@ -2,8 +2,6 @@ declare type EpicsDependencies = {
   document: Document
   window: typeof window
   getCurrentWindow: () => Electron.BrowserWindow
-  setLocalStorage: (key: string, value: string) => void
-  getLocalStorage: (key: string) => string | null
   getWaveformSvgElement: () => SVGElement | null
   getWaveformSvgWidth: () => number
   getCurrentTime: () => number

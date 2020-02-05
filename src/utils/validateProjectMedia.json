@@ -1,0 +1,387 @@
+{
+  "$ref": "#/definitions/%24MediaJson",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "$MediaJson": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/MediaJson%3CSimpleFlashcardFields%3E"
+        },
+        {
+          "$ref": "#/definitions/MediaJson%3CTransliterationFlashcardFields%3E"
+        }
+      ]
+    },
+    "ClipJson<SimpleFlashcardFields>": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "type": "string"
+        },
+        "fields": {
+          "additionalProperties": false,
+          "properties": {
+            "meaning": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            },
+            "transcription": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "time": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "VideoStill"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        "start": {
+          "description": "must be before start and after end of any previous clips",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "id"
+      ],
+      "type": "object"
+    },
+    "ClipJson<TransliterationFlashcardFields>": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "type": "string"
+        },
+        "fields": {
+          "additionalProperties": false,
+          "properties": {
+            "meaning": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            },
+            "pronunciation": {
+              "type": "string"
+            },
+            "transcription": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image": {
+          "additionalProperties": false,
+          "properties": {
+            "time": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "VideoStill"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        "start": {
+          "description": "must be before start and after end of any previous clips",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "id"
+      ],
+      "type": "object"
+    },
+    "MediaJson<SimpleFlashcardFields>": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "clips": {
+              "items": {
+                "$ref": "#/definitions/ClipJson%3CSimpleFlashcardFields%3E"
+              },
+              "type": "array"
+            },
+            "duration": {
+              "type": "string"
+            },
+            "flashcardFieldsToSubtitlesTracks": {
+              "$ref": "#/definitions/SubtitlesFlashcardFieldsLinks"
+            },
+            "format": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "subtitles": {
+              "items": {
+                "$ref": "#/definitions/SubtitlesJson"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "name",
+            "format",
+            "duration",
+            "id"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "clips": {
+              "items": {
+                "$ref": "#/definitions/ClipJson%3CSimpleFlashcardFields%3E"
+              },
+              "type": "array"
+            },
+            "duration": {
+              "type": "string"
+            },
+            "flashcardFieldsToSubtitlesTracks": {
+              "$ref": "#/definitions/SubtitlesFlashcardFieldsLinks"
+            },
+            "format": {
+              "type": "string"
+            },
+            "height": {
+              "type": "number"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "subtitles": {
+              "items": {
+                "$ref": "#/definitions/SubtitlesJson"
+              },
+              "type": "array"
+            },
+            "width": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "name",
+            "format",
+            "width",
+            "height",
+            "duration",
+            "id"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "MediaJson<TransliterationFlashcardFields>": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "clips": {
+              "items": {
+                "$ref": "#/definitions/ClipJson%3CTransliterationFlashcardFields%3E"
+              },
+              "type": "array"
+            },
+            "duration": {
+              "type": "string"
+            },
+            "flashcardFieldsToSubtitlesTracks": {
+              "$ref": "#/definitions/SubtitlesFlashcardFieldsLinks"
+            },
+            "format": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "subtitles": {
+              "items": {
+                "$ref": "#/definitions/SubtitlesJson"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "name",
+            "format",
+            "duration",
+            "id"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "clips": {
+              "items": {
+                "$ref": "#/definitions/ClipJson%3CTransliterationFlashcardFields%3E"
+              },
+              "type": "array"
+            },
+            "duration": {
+              "type": "string"
+            },
+            "flashcardFieldsToSubtitlesTracks": {
+              "$ref": "#/definitions/SubtitlesFlashcardFieldsLinks"
+            },
+            "format": {
+              "type": "string"
+            },
+            "height": {
+              "type": "number"
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "subtitles": {
+              "items": {
+                "$ref": "#/definitions/SubtitlesJson"
+              },
+              "type": "array"
+            },
+            "width": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "name",
+            "format",
+            "width",
+            "height",
+            "duration",
+            "id"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "SubtitlesFlashcardFieldsLinks": {
+      "additionalProperties": false,
+      "properties": {
+        "meaning": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "pronunciation": {
+          "type": "string"
+        },
+        "transcription": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SubtitlesJson": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "streamIndex": {
+              "type": "number"
+            },
+            "type": {
+              "enum": [
+                "Embedded"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "streamIndex",
+            "id"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "External"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "name",
+            "id"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@ import ffmpeg, { AsyncError } from '../utils/ffmpeg'
 import { existsSync } from 'fs'
 import tempy from 'tempy'
 import { join, basename } from 'path'
-import filenamify from 'filenamify'
+import { sanitizeFileName } from './sanitizeFilename'
 
 export const VIDEO_STILL_HEIGHT = 150
 
@@ -42,14 +42,6 @@ export const getVideoStill = async (
     return new AsyncError(err)
   }
 }
-
-const sanitizeFileName = (filename: string) =>
-  filenamify(
-    filename
-      .replace(/\s+/g, '')
-      .replace(/\..*$/, '')
-      .slice(0, 40)
-  )
 
 export const getVideoStillPngPath = (
   id: string,

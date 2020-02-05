@@ -5,12 +5,17 @@ import { main$ } from '../../../components/Main'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 
-export default async function createNewProject({ app, client }: TestSetup) {
+export default async function createNewProject(
+  { app, client }: TestSetup,
+  /** Not including extension */
+  projectFileName: string,
+  projectTitle: string
+) {
   await client.clickElement_(projectsMenu$.newProjectButton)
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
-      Promise.resolve(join(TMP_DIRECTORY, 'my_cool_new_project.afca')),
+      Promise.resolve(join(TMP_DIRECTORY, projectFileName + '.kyml')),
     ],
   })
   const {
@@ -22,7 +27,7 @@ export default async function createNewProject({ app, client }: TestSetup) {
     cardsPreview,
   } = newProjectFormDialog$
 
-  await client.setFieldValue_(projectNameField, 'My cool new poject')
+  await client.setFieldValue_(projectNameField, projectTitle)
 
   await client.clickElement_(projectFileLocationField)
 

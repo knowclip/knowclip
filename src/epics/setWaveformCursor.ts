@@ -114,6 +114,7 @@ type OpenMediaFileSuccess = {
   type: 'OPEN_FILE_SUCCESS'
   filePath: string
   validatedFile: MediaFile
+  timestamp: string
 }
 
 const seekingTrackerEpic: AppEpic = (action$, state$, effects) =>

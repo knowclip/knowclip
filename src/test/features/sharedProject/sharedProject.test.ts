@@ -11,12 +11,17 @@ import { mockSideEffects } from '../../../utils/sideEffects'
 
 jest.setTimeout(60000)
 
+const testId = 'sharedProject'
+
 describe('opening a shared project', () => {
-  let context: { app: Application | null } = { app: null }
+  let context: { app: Application | null; testId: string } = {
+    app: null,
+    testId,
+  }
   let setup: TestSetup
 
   beforeAll(async () => {
-    setup = await startApp(context, 'sharedProject')
+    setup = await startApp(context)
 
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
@@ -45,5 +50,23 @@ const sideEffectsMocks = {
     '2020-01-24T15:09:02Z',
     '2020-01-24T15:09:03Z',
     '2020-01-24T15:09:18Z',
+    '2020-02-02T15:26:22Z',
+    '2020-02-02T15:26:22Z',
+    '2020-02-02T15:26:24Z',
+    '2020-02-02T15:26:24Z',
+    '2020-02-02T15:26:24Z',
+    '2020-02-02T15:26:26Z',
+    '2020-02-02T15:26:28Z',
+    '2020-02-02T15:26:29Z',
+    '2020-02-02T15:26:29Z',
+    '2020-02-02T15:26:30Z',
+    '2020-02-02T15:26:34Z',
+    '2020-02-02T15:26:34Z',
+    '2020-02-02T15:26:39Z',
+    '2020-02-02T15:26:39Z',
+    '2020-02-02T15:26:39Z',
+    '2020-02-02T15:26:39Z',
+    '2020-02-02T15:26:39Z',
+    '2020-02-02T15:26:39Z',
   ],
 }

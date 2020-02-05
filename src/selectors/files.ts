@@ -1,4 +1,5 @@
 import { getCurrentMediaFile } from '.'
+import { getHumanFileName } from '../utils/files'
 
 export const getFileAvailability = (
   state: AppState,
@@ -6,9 +7,13 @@ export const getFileAvailability = (
 ): KnownFile =>
   state.fileAvailabilities[file.type][file.id] || {
     status: 'NEVER_LOADED',
+    type: file.type,
+    parentId: 'parentId' in file ? file.parentId : null,
+    name: `Unknown ${getHumanFileName(file)}`,
     id: file.id,
     filePath: null,
     isLoading: false,
+    lastOpened: null,
   }
 
 export const getFile = <F extends FileMetadata>(
@@ -17,36 +22,34 @@ export const getFile = <F extends FileMetadata>(
   id: FileId
 ): F | null => (state.files[type][id] as F) || null
 
+export const getFileAvailabilityById = <F extends FileMetadata>(
+  state: AppState,
+  type: F['type'],
+  id: FileId
+): FileAvailability => {
+  return (
+    state.fileAvailabilities[type][id] || {
+      status: 'NOT_FOUND',
+      type,
+      parentId: null,
+      name: `Unknown ${getHumanFileName({ type })}`,
+      id,
+      filePath: null,
+      isLoading: false,
+      lastOpened: null,
+    }
+  )
+}
+
 export const getFileWithAvailability = <F extends FileMetadata>(
   state: AppState,
   type: F['type'],
   id: FileId
 ): FileWithAvailability<F> => {
   const file = getFile(state, type, id)
-  if (!file)
-    return {
-      file,
-      availability: {
-        status: 'NOT_FOUND',
-        id,
-        filePath: null,
-        isLoading: false,
-      },
-    }
 
-  const availability = getFileAvailability(state, file)
+  const availability = getFileAvailabilityById(state, type, id)
   return { file, availability }
-}
-
-export const getFileAvailabilityById = <F extends FileMetadata>(
-  state: AppState,
-  type: F['type'],
-  id: FileId
-): FileAvailability => {
-  const record = getFile(state, type, id)
-  return record
-    ? getFileAvailability(state, record)
-    : { status: 'NOT_FOUND', id, filePath: null, isLoading: false }
 }
 
 export const getWaveformPath = (state: AppState): string | null => {
@@ -64,12 +67,12 @@ export const getWaveformPath = (state: AppState): string | null => {
 export const getFileDescendants = (
   state: AppState,
   id: FileId,
-  descendants: Array<FileMetadata> = []
-): Array<FileMetadata> => {
+  descendants: Array<FileAvailability> = []
+): Array<FileAvailability> => {
   // TODO: speed this up jic there are lots of files
-  for (const filesHash of Object.values(state.files)) {
+  for (const filesHash of Object.values(state.fileAvailabilities)) {
     for (const fileId in filesHash) {
-      const file = filesHash[fileId]
+      const file = filesHash[fileId] as FileAvailability
       // TODO: check if we should check parentType as well
       if (
         !descendants.includes(file) &&

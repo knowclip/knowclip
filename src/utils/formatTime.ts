@@ -9,7 +9,7 @@ export default function formatTime(seconds: number) {
 
 export const formatDuration = (duration: moment.Duration) =>
   [
-    duration.hours(),
+    ~~duration.asHours(),
     duration
       .minutes()
       .toString()
@@ -21,3 +21,23 @@ export const formatDuration = (duration: moment.Duration) =>
   ]
     .filter(v => v)
     .join(':')
+
+export const formatDurationWithMilliseconds = (duration: moment.Duration) => {
+  const milliseconds = Math.round(duration.milliseconds())
+  return [
+    formatDuration(duration),
+    milliseconds
+      ? milliseconds
+          .toString()
+          .padStart(3, '0')
+          .replace(/0+$/, '')
+      : '0',
+  ]
+    .filter(v => v)
+    .join('.')
+}
+
+export const parseFormattedDuration = (formatted: string) => {
+  const split = formatted.split(':')
+  return moment.duration(split.length <= 2 ? `00:${formatted}` : formatted)
+}

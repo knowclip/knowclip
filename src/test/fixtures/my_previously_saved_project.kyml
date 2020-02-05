@@ -1,0 +1,53 @@
+# This file was created by Knowclip!
+# Edit it manually at your own risk.
+name: My cool saved project
+noteType: Transliteration
+timestamp: 2020-02-01T13:21:21Z
+id: 91bfd159-155c-4b61-bdd5-d71e2e944773
+---
+name: polar_bear_cafe.mp4
+format: mov,mp4,m4a,3gp,3g2,mj2
+duration: 01:27.062
+id: 10fd95ee-ba1a-424f-95fb-66a28c91faf1
+subtitles:
+  - id: d680807d-3a5f-4a25-967f-71871b7d5057
+    streamIndex: 2
+    type: Embedded
+  - id: b3347257-97c4-4c9a-8eae-9bf88a8edc23
+    type: External
+    name: pbc_jp.ass
+clips:
+  - id: 632a6cff-7fd7-4d0f-b657-0b9636204261
+    start: 00:08.04
+    end: 00:12.5
+    fields:
+      transcription: 笹を食べながらのんびりするのは最高だなぁ
+      pronunciation: sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa
+      meaning: Relaxing while eating bamboo grass is the best
+    tags:
+      &a1
+      - pbc
+    image:
+      type: VideoStill
+  - id: a272b282-4d89-4af0-9d17-baa807793f1f
+    start: 00:15.12
+    end: 00:17.76
+    fields:
+      transcription: またこの子は昼間からゴロゴロして
+      pronunciation: mata kono ko-wa hirumá-kara góro-goro shite
+      meaning: This kid, lazing about again so early
+      notes: '"Goro-goro" is the sound of something big rolling around.'
+    tags: *a1
+  - id: 6fce08e8-9312-4930-9601-c14b470e57ab
+    start: 01:15.2
+    end: 01:21.16
+    tags: *a1
+    image:
+      type: VideoStill
+flashcardFieldsToSubtitlesTracks: {}
+---
+name: piggeldy_cat.mp4
+format: mov,mp4,m4a,3gp,3g2,mj2
+duration: 00:58.24
+id: bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77
+flashcardFieldsToSubtitlesTracks: {}

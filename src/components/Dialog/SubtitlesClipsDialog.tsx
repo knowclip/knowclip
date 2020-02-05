@@ -18,12 +18,10 @@ import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
 import { DialogProps } from './DialogProps'
-import {
-  loadSubtitlesFromFileRequest,
-  makeClipsFromSubtitles,
-} from '../../actions'
+import { loadNewSubtitlesFile, makeClipsFromSubtitles } from '../../actions'
 import { SubtitlesFileWithTrack } from '../../redux'
 import { MediaSubtitles } from '../../selectors'
+import { TransliterationFlashcardFields } from '../../types/Project'
 
 enum $ {
   loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
@@ -145,7 +143,7 @@ const SubtitlesClipsDialog = ({
       ])
       if (!filePaths) return
 
-      dispatch(loadSubtitlesFromFileRequest(filePaths[0], currentFileId))
+      dispatch(loadNewSubtitlesFile(filePaths[0], currentFileId))
     },
     [dispatch, currentFileId]
   )

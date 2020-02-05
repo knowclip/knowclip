@@ -35,7 +35,7 @@ const Export = React.memo(
           currentMedia,
           currentFileId: r.getCurrentFileId(state),
           projectMedia: r.getCurrentProjectMediaFiles(state),
-          progress: state.user.progress,
+          progress: state.session.progress,
         }
       }
     )

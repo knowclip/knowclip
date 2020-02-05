@@ -10,6 +10,7 @@ import {
   IconButton,
   Menu,
   RootRef,
+  Tooltip,
 } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import * as r from '../redux'
@@ -18,6 +19,7 @@ import css from './ProjectsMenu.module.css'
 import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
+import { basename, join, dirname } from 'path'
 
 enum $ {
   recentProjectsListItem = 'recent-projects-list-item',
@@ -25,16 +27,21 @@ enum $ {
   openExistingProjectButton = 'open-existing-project-button',
 }
 
-const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
+const ProjectMenuItem = ({
+  project: availability,
+}: {
+  project: FileAvailability
+}) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+
   const dispatch = useDispatch()
   const removeFromRecents = useCallback(
-    () => dispatch(actions.deleteFileRequest('ProjectFile', project.id)),
-    [dispatch, project.id]
+    () => dispatch(actions.deleteFileRequest('ProjectFile', availability.id)),
+    [dispatch, availability.id]
   )
   const openProjectById = useCallback(
-    () => dispatch(actions.openProjectById(project.id)),
-    [dispatch, project.id]
+    () => dispatch(actions.openProjectById(availability.id)),
+    [dispatch, availability.id]
   )
   return (
     <Fragment>
@@ -50,7 +57,23 @@ const ProjectMenuItem = ({ project }: { project: ProjectFile }) => {
       )}
       <MenuItem onClick={openProjectById} className={$.recentProjectsListItem}>
         <RootRef rootRef={anchorCallbackRef}>
-          <ListItemText>{project.name}</ListItemText>
+          <ListItemText
+            primary={availability.name}
+            secondary={
+              availability && (
+                <Tooltip title={availability.filePath}>
+                  <span>
+                    {availability.filePath
+                      ? join(
+                          basename(dirname(availability.filePath)),
+                          basename(availability.filePath)
+                        )
+                      : 'File not found'}
+                  </span>
+                </Tooltip>
+              )
+            }
+          />
         </RootRef>
         <IconButton onClick={open}>
           <MoreVertIcon />
@@ -65,7 +88,6 @@ const ProjectsMenu = () => {
     projects: r.getProjects(state),
     currentProjectId: r.getCurrentProjectId(state),
   }))
-
   const dispatch = useDispatch()
   const handleClickNewProject = useCallback(
     () => {
@@ -77,8 +99,8 @@ const ProjectsMenu = () => {
     async () => {
       const filePaths = await showOpenDialog([
         {
-          name: 'AFCA project file',
-          extensions: ['afca'],
+          name: 'Knowclip project file',
+          extensions: ['kyml'],
         },
       ])
 
