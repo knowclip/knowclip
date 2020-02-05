@@ -8,9 +8,11 @@ import css from './FlashcardSection.module.css'
 const VideoStillDisplay = ({
   videoFile,
   clip,
+  onFocus,
 }: {
   videoFile: VideoFile
   clip: Clip
+  onFocus: (event: any) => void
 }) => {
   const { videoStill, mediaFileAvailability } = useSelector(
     (state: AppState) => ({
@@ -60,6 +62,7 @@ const VideoStillDisplay = ({
           width: Math.round((videoFile.width / videoFile.height) * 85) + 'px',
           height: 85 + 'px',
         }}
+        onFocus={onFocus}
       >
         <CardMedia
           className={cn(css.flashcardImage)}

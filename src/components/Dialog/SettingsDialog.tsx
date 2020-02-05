@@ -17,6 +17,7 @@ import {
   ListItemSecondaryAction,
   Paper,
   MenuItem,
+  ListItemIcon,
 } from '@material-ui/core'
 import * as actions from '../../actions'
 import { DialogProps } from './DialogProps'
@@ -28,7 +29,7 @@ import {
   showOpenDirectoriesDialog,
 } from '../../utils/electron'
 import css from './SettingsDialog.module.css'
-import { Delete } from '@material-ui/icons'
+import { Delete, Add } from '@material-ui/icons'
 import truncate from '../../utils/truncate'
 
 enum $ {
@@ -86,7 +87,12 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                   </ListItem>
                 )
               })}
-              <MenuItem onClick={addAssetsDirectories}>Add folder</MenuItem>
+              <MenuItem onClick={addAssetsDirectories}>
+                <ListItemIcon>
+                  <Add />
+                </ListItemIcon>
+                <ListItemText>Add folder</ListItemText>
+              </MenuItem>
             </List>
           </Paper>
 

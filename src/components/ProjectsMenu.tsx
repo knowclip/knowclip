@@ -20,6 +20,7 @@ import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 import { basename, join, dirname } from 'path'
+import icon from '../icon.png'
 
 enum $ {
   recentProjectsListItem = 'recent-projects-list-item',
@@ -116,7 +117,9 @@ const ProjectsMenu = () => {
   return (
     <section className={mainCss.container}>
       <header className={css.header}>
-        <h1 className={css.mainHeading}>Knowclip</h1>
+        <h1 className={css.mainHeading}>
+          <img className={css.icon} src={icon} alt="Knowclip icon" /> Knowclip
+        </h1>
       </header>
       <section className={css.main}>
         <section className={css.menu}>

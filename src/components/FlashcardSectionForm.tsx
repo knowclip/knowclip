@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, memo } from 'react'
+import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
@@ -37,6 +37,7 @@ const FlashcardSectionForm = memo(
       isLoopOn,
       subtitlesFlashcardFieldLinks,
       clip,
+      mediaIsPlaying,
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),
       selectedClipTime: r.getSelectedClipTime(state),
@@ -44,6 +45,7 @@ const FlashcardSectionForm = memo(
       isLoopOn: r.isLoopOn(state),
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
       clip: r.getHighlightedClip(state),
+      mediaIsPlaying: r.isMediaPlaying(state),
     }))
 
     if (!selectedClipTime || !clip) throw new Error('Clip not found')
@@ -57,30 +59,39 @@ const FlashcardSectionForm = memo(
     const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
       dispatch,
     ])
+    const focusRef = useRef<HTMLInputElement>()
 
-    const [focusedOnLoad, setFocusedOnLoad] = useState(false)
+    // focus first field on highlight clip
+    // and, while playing, trigger loop during further field/button interactions
+    const [initialFocus, setInitialFocusComplete] = useState(false)
     const loopOnInteract = useCallback(
       () => {
-        const media = document.getElementById('mediaPlayer')
-        const mediaIsPlaying =
-          media && !(media as HTMLVideoElement | HTMLAudioElement).paused
         if (mediaIsPlaying && !isLoopOn) dispatch(actions.setLoop(true))
       },
-      [dispatch, isLoopOn]
+      [dispatch, isLoopOn, mediaIsPlaying]
     )
 
     useEffect(
       () => {
-        setFocusedOnLoad(false)
+        setInitialFocusComplete(false)
       },
       [clip.id]
     )
+    useEffect(
+      () => {
+        if (!initialFocus) {
+          focusRef.current && focusRef.current.focus()
+          if (mediaIsPlaying) setInitialFocusComplete(true)
+        }
+      },
+      [mediaIsPlaying, initialFocus]
+    )
     const handleFocus = useCallback(
       () => {
-        if (!focusedOnLoad) setFocusedOnLoad(true)
+        if (!initialFocus) setInitialFocusComplete(true)
         else loopOnInteract()
       },
-      [focusedOnLoad, setFocusedOnLoad, loopOnInteract]
+      [initialFocus, loopOnInteract]
     )
 
     const handleCloseMoreMenu = useCallback(
@@ -132,12 +143,15 @@ const FlashcardSectionForm = memo(
         className={className}
         onSubmit={handleFlashcardSubmit}
         id={$.container}
-        onFocus={handleFocus}
       >
         <section className={css.formTop}>
           <div className={css.formTopLeft}>
             {mediaFile.isVideo && (
-              <VideoStillDisplay clip={clip} videoFile={mediaFile} />
+              <VideoStillDisplay
+                clip={clip}
+                videoFile={mediaFile}
+                onFocus={handleFocus}
+              />
             )}
           </div>
 
@@ -163,7 +177,7 @@ const FlashcardSectionForm = memo(
             getNoteTypeFields(currentNoteType).map((fieldName, i) => (
               <Field
                 key={`${fieldName}_${flashcard.id}`}
-                autoFocus={i === 0}
+                inputRef={i === 0 ? focusRef : undefined}
                 name={fieldName}
                 currentFlashcard={flashcard}
                 label={capitalize(fieldName)}
@@ -175,6 +189,7 @@ const FlashcardSectionForm = memo(
                 mediaFileId={mediaFile.id}
                 inputProps={FIELD_INPUT_PROPS}
                 onKeyPress={loopOnInteract}
+                onFocus={!initialFocus && i === 0 ? () => {} : handleFocus}
               />
             ))}
           <TagsInput
@@ -182,6 +197,7 @@ const FlashcardSectionForm = memo(
             tags={flashcard.tags}
             onAddChip={onAddChip}
             onDeleteChip={onDeleteChip}
+            onFocus={handleFocus}
           />
         </section>
 

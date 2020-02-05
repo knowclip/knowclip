@@ -43,11 +43,13 @@ const TagsInput = ({
   tags,
   onAddChip,
   onDeleteChip,
+  onFocus,
 }: {
   allTags: string[]
   tags: string[]
   onAddChip: (text: string) => void
   onDeleteChip: (index: number, text: string) => void
+  onFocus?: (event: any) => void
 }) => {
   const autosuggestComponent = useRef<Autosuggest<string, any>>(null)
 
@@ -144,7 +146,7 @@ const TagsInput = ({
           onChange: handletextFieldInputChange,
           onAdd: handleAddChip,
           onDelete: handleDeleteChip,
-          InputProps: { inputProps: { className: $.inputField } },
+          InputProps: { inputProps: { className: $.inputField, onFocus } },
         } as InputProps<string>
       }
       renderInputComponent={useCallback(
@@ -164,6 +166,7 @@ const TagsInput = ({
             clearInputValueOnChange
             inputRef={ref}
             chipRenderer={chipRenderer}
+            onFocus={onFocus}
             {...other}
           />
         ),

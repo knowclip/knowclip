@@ -1,4 +1,4 @@
-import { ignoreElements, mergeAll } from 'rxjs/operators'
+import { ignoreElements, mergeAll, filter, map } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import * as r from '../redux'
@@ -20,6 +20,7 @@ import files from './files'
 import defaultTags from './defaultTags'
 import loopMedia from './loopMedia'
 import preloadVideoStills from './preloadVideoStills'
+import menu from './menu'
 import { showMessageBox } from '../utils/electron'
 import { AppEpic } from '../types/AppEpic'
 
@@ -67,7 +68,8 @@ const rootEpic: AppEpic = combineEpics(
   closeEpic,
   subtitles,
   files,
-  preloadVideoStills
+  preloadVideoStills,
+  menu
 )
 
 export default rootEpic

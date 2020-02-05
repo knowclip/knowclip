@@ -1,15 +1,13 @@
 export const dismissMedia = (): DismissMedia => ({ type: 'DISMISS_MEDIA' })
 
-export const toggleLoop = (): Action => ({
+export const toggleLoop = (): ToggleLoop => ({
   type: A.TOGGLE_LOOP,
 })
 
-export const setLoop = (loop: boolean): Action => ({
+export const setLoop = (loop: boolean): SetLoop => ({
   type: A.SET_LOOP,
   loop,
 })
 
-// TODO:
-// playMedia
-// pauseMedia
-// toggleMediaPlaying
+export const playMedia = (): PlayMedia => ({ type: A.PLAY_MEDIA })
+export const pauseMedia = (): PauseMedia => ({ type: A.PAUSE_MEDIA })

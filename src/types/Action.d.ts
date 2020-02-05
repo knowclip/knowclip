@@ -214,6 +214,8 @@ declare type MediaAction =
   | SetCurrentFile
   | ToggleLoop
   | SetLoop
+  | PlayMedia
+  | PauseMedia
   | SetMediaFolderLocation
   | DismissMedia
   | AddAssetsDirectories
@@ -232,6 +234,9 @@ declare type DeleteMediaFromProject = {
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
+declare type PlayMedia = { type: 'PLAY_MEDIA' }
+declare type PauseMedia = { type: 'PAUSE_MEDIA' }
+
 declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
   directoryPath: string | null

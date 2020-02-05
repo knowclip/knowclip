@@ -12,6 +12,7 @@ const initialState: SessionState = {
   workIsUnsaved: false,
   tagsToClipIds: {},
   loopMedia: false,
+  mediaIsPlaying: false,
   progress: null,
 }
 
@@ -179,6 +180,11 @@ const session: Reducer<SessionState, Action> = (
         ...state,
         loopMedia: action.loop,
       }
+
+    case A.PLAY_MEDIA:
+      return { ...state, mediaIsPlaying: true }
+    case A.PAUSE_MEDIA:
+      return { ...state, mediaIsPlaying: false }
 
     case A.SET_PROGRESS:
       return {

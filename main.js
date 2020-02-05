@@ -85,6 +85,8 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
+  app.showAboutPanel()
+
   setUpMenu(app, context)
 })
 

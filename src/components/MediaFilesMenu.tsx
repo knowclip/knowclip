@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Button,
@@ -140,19 +140,29 @@ const MediaFilesMenu = ({
 }
 
 function usePlayButtonSync() {
-  const [playing, setPlaying] = useState(false)
-  useEffect(() => {
-    const startPlaying = () => setPlaying(true)
+  const playing = useSelector(r.isMediaPlaying)
+  const dispatch = useDispatch()
+  const playMedia = useCallback(() => dispatch(r.playMedia()), [dispatch])
+  const pauseMedia = useCallback(() => dispatch(r.pauseMedia()), [dispatch])
 
-    document.addEventListener('play', startPlaying, true)
-    return () => document.removeEventListener('play', startPlaying, true)
-  }, [])
-  useEffect(() => {
-    const stopPlaying = () => setPlaying(false)
+  useEffect(
+    () => {
+      const startPlaying = () => playMedia()
 
-    document.addEventListener('pause', stopPlaying, true)
-    return () => document.removeEventListener('pause', stopPlaying, true)
-  }, [])
+      document.addEventListener('play', startPlaying, true)
+      return () => document.removeEventListener('play', startPlaying, true)
+    },
+    [playMedia]
+  )
+  useEffect(
+    () => {
+      const stopPlaying = () => pauseMedia()
+
+      document.addEventListener('pause', stopPlaying, true)
+      return () => document.removeEventListener('pause', stopPlaying, true)
+    },
+    [pauseMedia]
+  )
 
   const playOrPauseAudio = useCallback(() => {
     const player = document.getElementById('mediaPlayer') as
@@ -163,11 +173,14 @@ function usePlayButtonSync() {
     player.paused ? player.play() : player.pause()
   }, [])
 
-  useEffect(() => {
-    const resetPlayButton = () => setPlaying(false)
-    document.addEventListener('loadeddata', resetPlayButton, true)
-    return () => document.removeEventListener('loadeddata', resetPlayButton)
-  }, [])
+  useEffect(
+    () => {
+      const resetPlayButton = () => pauseMedia()
+      document.addEventListener('loadeddata', resetPlayButton, true)
+      return () => document.removeEventListener('loadeddata', resetPlayButton)
+    },
+    [pauseMedia]
+  )
 
   return { playOrPauseAudio, playing }
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, memo } from 'react'
+import React, { useCallback, useMemo, memo, MutableRefObject } from 'react'
 import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
@@ -15,7 +15,9 @@ type Props = {
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
   onKeyPress: () => void
-  autoFocus: boolean
+  onFocus: (event: any) => void
+  autoFocus?: boolean
+  inputRef?: MutableRefObject<HTMLInputElement | undefined>
 }
 const FlashcardSectionFormField = memo(
   ({
@@ -28,7 +30,9 @@ const FlashcardSectionFormField = memo(
     linkedSubtitlesTrack,
     inputProps,
     onKeyPress,
-    autoFocus,
+    autoFocus = false,
+    onFocus,
+    inputRef,
   }: Props) => {
     const handleChange = useCallback(
       e => setFlashcardText(name, e.target.value),
@@ -75,6 +79,9 @@ const FlashcardSectionFormField = memo(
           inputProps={inputProps}
           onChange={handleChange}
           onKeyPress={onKeyPress}
+          onFocus={onFocus}
+          name={name}
+          inputRef={inputRef}
           value={
             name in currentFlashcard.fields
               ? (currentFlashcard.fields as Record<

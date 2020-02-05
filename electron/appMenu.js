@@ -4,7 +4,14 @@ const template = (app, { mainWindow }) => [
   {
     label: 'Application',
     submenu: [
-      { label: 'About Application', selector: 'orderFrontStandardAboutPanel:' },
+      {
+        label: 'Settings',
+        click: () => mainWindow.webContents.send('show-settings-dialog'),
+      },
+      {
+        label: 'About Application',
+        click: () => mainWindow.webContents.send('show-about-dialog'),
+      },
       {
         label: 'Show developer tools',
         accelerator: 'CmdOrCtrl+K',

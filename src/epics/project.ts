@@ -152,37 +152,11 @@ const PROJECT_EDIT_ACTIONS = [
   A.DELETE_MEDIA_FROM_PROJECT,
   A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK,
   A.SET_PROJECT_NAME,
-  A.DELETE_FILE_SUCCESS,
-  A.ADD_FILE,
-  A.LOCATE_FILE_SUCCESS,
 ] as const
-
-const isGeneratedFile = (type: FileMetadata['type']): boolean => {
-  switch (type) {
-    case 'VttConvertedSubtitlesFile':
-    case 'WaveformPng':
-    case 'ConstantBitrateMp3':
-    case 'VideoStillImage':
-      return true
-    case 'ProjectFile':
-    case 'MediaFile':
-    case 'ExternalSubtitlesFile':
-      return false
-  }
-}
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
-    filter(action => {
-      switch (action.type) {
-        case A.ADD_FILE:
-        case A.LOCATE_FILE_SUCCESS:
-        case A.DELETE_FILE_SUCCESS:
-          return !isGeneratedFile(action.file.type)
-      }
-      return true
-    }),
     filter(() => Boolean(r.getCurrentProjectId(state$.value))),
     map(() => r.setWorkIsUnsaved(true))
   )

@@ -83,6 +83,7 @@ const showOpenDirectoriesDialog = (
     try {
       const properties = [
         'openDirectory' as const,
+        'multiSelections' as const,
         ...(showHiddenFiles ? (['showHiddenFiles'] as const) : []),
       ]
       const {
