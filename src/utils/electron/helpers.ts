@@ -21,7 +21,7 @@ const showSaveDialog = (
 
       if (!filePath) return await res(filePath)
 
-      const extension = extname(filePath)
+      const extension = extname(filePath).replace(/^\./, '')
       const withExtension =
         !extensions.length ||
         extensions.some(ext => ext.toLowerCase() === extension.toLowerCase())
