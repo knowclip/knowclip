@@ -6,6 +6,7 @@ import { flashcardSectionForm$ } from '../../../components/FlashcardSectionForm'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
+import { waveform$ } from '../../../components/Waveform'
 
 export default async function makeCardsFromSubtitles({
   app,
@@ -16,6 +17,7 @@ export default async function makeCardsFromSubtitles({
   await client.clickElement_(subtitlesMenu$.openMenuButton)
   await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
   await client.clickElement_(subtitlesMenu$.deleteTrackButton)
+  await client.elements_(waveform$.subtitlesTimelines, 1)
 
   await client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton)
   await client.clickElement_(confirmationDialog$.okButton)
