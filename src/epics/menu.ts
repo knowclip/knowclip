@@ -4,7 +4,9 @@ import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
 import { AppEpic } from '../types/AppEpic'
 import { showMessageBox, showOpenDialog } from '../utils/electron'
-import electron from 'electron'
+import electron, { shell } from 'electron'
+import icon from '../icon.png'
+import { join } from 'path'
 
 const showSettingsDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'show-settings-dialog').pipe(
@@ -17,18 +19,27 @@ const aboutMessage = [
   `Build #${process.env.REACT_APP_TRAVIS_BUILD_NUMBER || '[DEV BUILD]'}`,
   'Distributed under GNU General Public License 3.0.',
   '© 2020 Justin Silvestre',
-  'justinsilvestre@gmail.com',
 ].join('\n\n')
 
 const showAboutDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'show-about-dialog').pipe(
-    tap(() =>
+    flatMap(() =>
       showMessageBox({
+        type: 'info',
+        icon: electron.remote.nativeImage.createFromPath(
+          join(electron.remote.process.cwd(), 'icons', 'icon.png')
+        ),
         title: 'Knowclip v' + electron.remote.app.getVersion(),
         message: aboutMessage,
-        buttons: ['OK'],
+        buttons: ['OK', 'Go to website'],
       })
     ),
+    tap(messageBoxReturnValue => {
+      if (messageBoxReturnValue) {
+        if (messageBoxReturnValue.response === 1)
+          shell.openExternal('http://knowclip.com')
+      }
+    }),
     ignoreElements()
   )
 
