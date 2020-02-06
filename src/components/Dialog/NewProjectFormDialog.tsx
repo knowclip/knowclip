@@ -17,7 +17,7 @@ import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'classnames'
 import { DialogProps } from './DialogProps'
-import { closeDialog, createProject } from '../../actions'
+import * as actions from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
 enum $ {
@@ -116,6 +116,10 @@ const NewProjectFormDialog = ({
     [errors, fieldValues]
   )
 
+  const closeDialog = useCallback(() => dispatch(actions.closeDialog()), [
+    dispatch,
+  ])
+
   const handleSubmit = useCallback(
     () => {
       const errors = validate()
@@ -124,7 +128,7 @@ const NewProjectFormDialog = ({
 
       const { filePath, name } = fieldValues
       dispatch(
-        createProject(
+        actions.createProject(
           uuid(),
           name,
           (fieldValues.noteType as unknown) as NoteType, // guaranteed after validation
@@ -132,7 +136,7 @@ const NewProjectFormDialog = ({
           nowUtcTimestamp()
         )
       )
-      dispatch(closeDialog())
+      dispatch(actions.closeDialog())
     },
     [dispatch, fieldValues, validate]
   )
@@ -239,7 +243,7 @@ const NewProjectFormDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog} color="primary">
-          Exit
+          Cancel
         </Button>
         <Button
           onClick={handleSubmit}
