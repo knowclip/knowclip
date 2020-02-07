@@ -93,7 +93,7 @@ const MediaFilesMenu = ({
           </span>
         ) : (
           <Button id={$.chooseFirstMediaFileButton} onClick={chooseMediaFiles}>
-            Choose media file
+            Add media
           </Button>
         )}
         {currentFile && (

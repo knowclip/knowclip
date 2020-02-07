@@ -12,6 +12,11 @@ export default async function linkSubtitlesToFields({
     mediaFilesMenu$.mediaFileMenuItem
   )
   await polarBearCafe.click()
+  await client.waitUntil(
+    async () =>
+      (await client.getAttribute('video', 'src')) === 'polar_bear_cafe.mp4'
+  )
+
   await client.clickElement_(waveform$.waveformClip)
 
   await client.clickElement_(flashcardFormFieldMenu$.openMenuButton)

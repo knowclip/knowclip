@@ -138,21 +138,24 @@
       "target": [
         "portable"
       ],
-      "icon": "./icons/icon.ico"
+      "icon": "./icons/icon.ico",
+      "artifactName": "${productName}_${version}_${os}.${ext}"
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
-      "category": "Education"
+      "category": "Education",
+      "artifactName": "${productName}_${version}_${os}.${ext}"
     },
     "mac": {
       "target": [
         "zip"
       ],
       "category": "public.app-category.education",
-      "icon": "./icons/icon.icns"
+      "icon": "./icons/icon.icns",
+      "artifactName": "${productName}_${version}_${os}.${ext}"
     }
   }
 }
