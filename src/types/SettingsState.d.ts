@@ -5,5 +5,6 @@
 declare type SettingsState = {
   mediaFolderLocation: string | null
   assetsDirectories: string[]
+  checkForUpdatesAutomatically: boolean
   // TODO: save recent `ProjectFile`s here?
 }

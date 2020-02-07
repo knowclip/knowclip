@@ -1,6 +1,4 @@
-const isLinux = process.platform !== 'win32' && process.platform !== 'darwin'
-
-const template = ({ app, autoUpdater, shell }, mainWindow, useDevTools) => [
+const template = ({ app }, mainWindow, useDevTools) => [
   {
     label: 'Application',
     submenu: [
@@ -22,7 +20,7 @@ const template = ({ app, autoUpdater, shell }, mainWindow, useDevTools) => [
   {
     label: 'File',
     id: 'File',
-    submenu: console.log('setting menu!') || [
+    submenu: [
       {
         id: 'Save project',
         label: 'Save project',
@@ -82,10 +80,7 @@ const template = ({ app, autoUpdater, shell }, mainWindow, useDevTools) => [
       {
         label: 'Check for Updates',
         click: () => {
-          if (isLinux || process.platform === 'darwin')
-            return mainWindow.webContents.send('manual-check-for-updates')
-
-          if (app.isPackaged) autoUpdater.checkForUpdates()
+          mainWindow.webContents.send('check-for-updates')
         },
       },
       {

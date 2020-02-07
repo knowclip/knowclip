@@ -12,7 +12,6 @@ import * as r from '../redux'
 import { promisify } from 'util'
 import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
-import { AppEpic } from '../types/AppEpic'
 import './setYamlOptions'
 
 const writeFile = promisify(fs.writeFile)

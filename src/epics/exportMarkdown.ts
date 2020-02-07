@@ -6,7 +6,6 @@ import fs from 'fs'
 import * as r from '../redux'
 import { showSaveDialog } from '../utils/electron'
 import projectToMarkdown from '../utils/projectToMarkdown'
-import { AppEpic } from '../types/AppEpic'
 
 const writeFile = promisify(fs.writeFile)
 

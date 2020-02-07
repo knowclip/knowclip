@@ -1,7 +1,6 @@
 import { flatMap, map, mergeAll } from 'rxjs/operators'
 import { of, Observable, from, empty } from 'rxjs'
 import * as r from '../redux'
-import { AppEpic } from '../types/AppEpic'
 import { existsSync } from 'fs'
 import { combineEpics, ofType } from 'redux-observable'
 import project from '../files/projectFile'

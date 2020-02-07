@@ -7,6 +7,7 @@ declare type Action =
   | ClipAction
   | ProjectAction
   | MediaAction
+  | SettingsAction
   | SubtitlesAction
   | FileAction
   | DetectSilence
@@ -216,11 +217,7 @@ declare type MediaAction =
   | SetLoop
   | PlayMedia
   | PauseMedia
-  | SetMediaFolderLocation
   | DismissMedia
-  | AddAssetsDirectories
-  | RemoveAssetsDirectories
-  | OverrideSettings
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
@@ -237,6 +234,13 @@ declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
 declare type PlayMedia = { type: 'PLAY_MEDIA' }
 declare type PauseMedia = { type: 'PAUSE_MEDIA' }
 
+declare type SettingsAction =
+  | SetMediaFolderLocation
+  | AddAssetsDirectories
+  | RemoveAssetsDirectories
+  | SetCheckForUpdatesAutomatically
+  | OverrideSettings
+
 declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
   directoryPath: string | null
@@ -248,6 +252,10 @@ declare type AddAssetsDirectories = {
 declare type RemoveAssetsDirectories = {
   type: 'REMOVE_ASSETS_DIRECTORIES'
   directoryPaths: strings[]
+}
+declare type SetCheckForUpdatesAutomatically = {
+  type: 'SET_CHECK_FOR_UPDATES_AUTOMATICALLY'
+  check: boolean
 }
 declare type OverrideSettings = {
   type: 'OVERRIDE_SETTINGS'

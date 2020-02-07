@@ -15,6 +15,8 @@ import {
   Paper,
   MenuItem,
   ListItemIcon,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core'
 import * as actions from '../../actions'
 import { DialogProps } from './DialogProps'
@@ -114,9 +116,8 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
           </Paper>
 
           <section className={css.settingsGroupDescription}>
-            {' '}
             <p>
-              The location of your{' '}
+              This should be the location of your{' '}
               <a
                 href="https://apps.ankiweb.net/docs/manual.html#files"
                 onClick={openInBrowser}
@@ -127,6 +128,40 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
               saved.
             </p>
             <p>(Does not apply to Anki deck .apkg exports.)</p>
+          </section>
+        </section>
+
+        <section className={css.settingsGroup}>
+          <Paper className={css.settingsGroupBody}>
+            <h3 className={css.heading}>Software updates</h3>
+            <FormControl className={css.formControl} fullWidth margin="normal">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={settings.checkForUpdatesAutomatically}
+                    onChange={useCallback(
+                      e =>
+                        dispatchLocal(
+                          actions.setCheckForUpdatesAutomatically(
+                            e.target.checked
+                          )
+                        ),
+                      [dispatchLocal]
+                    )}
+                    color="primary"
+                  />
+                }
+                label="Check for updates on automatically on startup"
+              />
+            </FormControl>
+          </Paper>
+
+          <section className={css.settingsGroupDescription}>
+            <p>
+              Check this box if you want to be notified when you're running
+              outdated software. Knowclip will check for updates over the
+              network each time you open the app.
+            </p>
           </section>
         </section>
       </DialogContent>

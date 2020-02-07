@@ -3,6 +3,7 @@ import { Reducer } from 'redux'
 export const initialState: SettingsState = {
   mediaFolderLocation: null,
   assetsDirectories: [],
+  checkForUpdatesAutomatically: true,
 }
 
 const settings: Reducer<SettingsState, Action> = (
@@ -30,6 +31,12 @@ const settings: Reducer<SettingsState, Action> = (
         assetsDirectories: state.assetsDirectories.filter(
           path => !action.directoryPaths.includes(path)
         ),
+      }
+
+    case A.SET_CHECK_FOR_UPDATES_AUTOMATICALLY:
+      return {
+        ...state,
+        checkForUpdatesAutomatically: action.check,
       }
 
     case A.OVERRIDE_SETTINGS:

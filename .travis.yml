@@ -48,7 +48,7 @@ before_cache:
 branches:
   only:
   - master
-  - /v\d+\.\d+.\d+(-.+)/
+  - /v\d+\.\d+.\d+(-.+)?/
 
 addons:
   apt:

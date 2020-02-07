@@ -3,7 +3,6 @@ import { from, Observable } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
-import { AppEpic } from '../types/AppEpic'
 import { uuid } from '../utils/sideEffects'
 
 const detectSilence = (

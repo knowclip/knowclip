@@ -21,7 +21,7 @@ const getMediaPlayer = () =>
 const getWaveformSvgElement = () =>
   (document.getElementById('waveform-svg') as SVGElement | null) || null
 
-const dependencies: EpicsDependencies = {
+const dependencies = {
   document,
   window,
   getCurrentWindow: () => remote.getCurrentWindow(),
@@ -74,4 +74,7 @@ const dependencies: EpicsDependencies = {
   setAppMenuProjectSubmenuPermissions,
   nowUtcTimestamp,
 }
+
 export default dependencies
+
+export type EpicsDependencies = typeof dependencies

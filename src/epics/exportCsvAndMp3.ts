@@ -7,7 +7,6 @@ import * as r from '../redux'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
-import { AppEpic } from '../types/AppEpic'
 
 const exportFailureSnackbar = (err: Error) =>
   r.simpleMessageSnackbar(`There was a problem making clips: ${err.message}`)

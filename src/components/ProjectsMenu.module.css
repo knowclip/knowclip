@@ -7,7 +7,12 @@
   /* max-width: 600px; */
   text-align: center;
   margin: 10% auto 1em auto;
-}  
+}
+
+.versionNumber {
+  font-size: x-small;
+  color: darkgray;
+}
 
 .icon {
   width: 1.5em; 

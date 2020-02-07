@@ -1,11 +1,18 @@
-import { filter, map, ignoreElements, tap, flatMap } from 'rxjs/operators'
+import {
+  filter,
+  map,
+  ignoreElements,
+  tap,
+  flatMap,
+  mergeAll,
+} from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, empty, of } from 'rxjs'
 import * as r from '../redux'
-import { AppEpic } from '../types/AppEpic'
 import { showMessageBox, showOpenDialog } from '../utils/electron'
 import electron, { shell } from 'electron'
-import icon from '../icon.png'
+import rcompare from 'semver/functions/rcompare'
+import gt from 'semver/functions/gt'
 import { join } from 'path'
 
 const showSettingsDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
@@ -71,15 +78,144 @@ const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
     })
   )
 
-const checkForLinuxUpdates: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'manual-check-for-updates').pipe(
-    tap(() =>
+const startupCheckForUpdates: AppEpic = (
+  action$,
+  state$,
+  { ipcRenderer, window }
+) =>
+  action$.ofType<InitializeApp>('INITIALIZE_APP').pipe(
+    flatMap(async () => {
+      const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
+      if (!checkAtStartup) return empty()
+
+      const { errors, value: newestRelease } = await checkForUpdates()
+
+      if (errors) {
+        const messageBoxResult = await showMessageBox({
+          title: 'Check for updates',
+          message:
+            "The most recent update info can't be fetched at this time. Would you like to visit the web site to check for updates manually?",
+          buttons: ['Yes', 'No thanks'],
+          cancelId: 1,
+        })
+
+        if (messageBoxResult && messageBoxResult.response === 0)
+          electron.shell.openExternal(
+            'https://github.com/knowclip/knowclip/releases'
+          )
+      }
+
+      const newSettings =
+        newestRelease &&
+        (await showDownloadPrompt(checkAtStartup, newestRelease.tag_name))
+
+      return newSettings ? of(r.overrideSettings(newSettings)) : empty()
+    }),
+    mergeAll()
+  )
+
+const menuCheckForUpdates: AppEpic = (
+  action$,
+  state$,
+  { ipcRenderer, window }
+) =>
+  fromEvent(ipcRenderer, 'check-for-updates').pipe(
+    flatMap(async () => {
+      if (!window.navigator.onLine) return empty()
+
+      const { errors, value: newestRelease } = await checkForUpdates()
+
+      if (errors) {
+        console.error(errors.join('; '))
+        return empty()
+      }
+      const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
+
+      const newSettings = newestRelease
+        ? await showDownloadPrompt(checkAtStartup, newestRelease.tag_name)
+        : await showUpToDateMessageBox(checkAtStartup)
+
+      return newSettings ? of(r.overrideSettings(newSettings)) : empty()
+    }),
+    mergeAll()
+  )
+
+const checkForUpdates = process.env.REACT_APP_SPECTRON
+  ? async (): Promise<Result<{ tag_name: string } | null>> => ({
+      value: null,
+    })
+  : async (): Promise<Result<{ tag_name: string } | null>> => {
+      try {
+        const response = await fetch(
+          'https://api.github.com/repos/knowclip/knowclip/releases',
+          {
+            headers: {
+              Accept: 'application/vnd.github.v3+json',
+            },
+          }
+        )
+        const releases: { tag_name: string }[] = await response.json()
+        const newestRelease = releases
+
+          .sort((r1, r2) => rcompare(r1.tag_name, r2.tag_name))
+          .find(({ tag_name: tagName }) =>
+            gt(tagName, electron.remote.app.getVersion())
+          )
+
+        return { value: newestRelease || null }
+      } catch (err) {
+        return { errors: [`${err}`] }
+      }
+    }
+
+async function showDownloadPrompt(
+  checkAtStartup: boolean,
+  tagName: string
+): Promise<Partial<SettingsState> | null> {
+  const messageBoxResult = await showMessageBox({
+    title: 'An update is available!',
+    message: `An newer version of Knowclip (${tagName}) is currently available for download.\n
+Would you like to go to the download page now for details?\n`,
+    checkboxChecked: checkAtStartup,
+    checkboxLabel: 'Check for updates again next time I open Knowclip',
+    buttons: ['Yes', 'No thanks'],
+    cancelId: 1,
+  })
+  if (messageBoxResult) {
+    if (messageBoxResult.response === 0)
       electron.shell.openExternal(
         'https://github.com/knowclip/knowclip/releases'
       )
-    ),
-    ignoreElements()
-  )
+
+    const checkAtStartupChanged =
+      messageBoxResult && messageBoxResult.checkboxChecked !== checkAtStartup
+    return checkAtStartupChanged
+      ? { checkForUpdatesAutomatically: messageBoxResult.checkboxChecked }
+      : null
+  }
+
+  return null
+}
+
+async function showUpToDateMessageBox(checkAtStartup: boolean) {
+  const messageBoxResult = await showMessageBox({
+    title: `You're up to date!`,
+    message: `You're already running the latest version of Knowclip (${electron.remote.app.getVersion()}).`,
+    checkboxLabel: 'Check for updates again next time I open Knowclip',
+    checkboxChecked: checkAtStartup,
+    buttons: ['OK'],
+    cancelId: 1,
+  })
+
+  if (messageBoxResult) {
+    const checkAtStartupChanged =
+      messageBoxResult && messageBoxResult.checkboxChecked !== checkAtStartup
+    return checkAtStartupChanged
+      ? { checkForUpdatesAutomatically: messageBoxResult.checkboxChecked }
+      : null
+  }
+  return null
+}
 
 export default combineEpics(
   showSettingsDialog,
@@ -87,5 +223,6 @@ export default combineEpics(
   saveProject,
   closeProject,
   openProject,
-  checkForLinuxUpdates
+  startupCheckForUpdates,
+  menuCheckForUpdates
 )

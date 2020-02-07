@@ -16,6 +16,13 @@ export const removeAssetsDirectories = (
   directoryPaths,
 })
 
+export const setCheckForUpdatesAutomatically = (
+  check: boolean
+): SetCheckForUpdatesAutomatically => ({
+  type: A.SET_CHECK_FOR_UPDATES_AUTOMATICALLY,
+  check,
+})
+
 export const overrideSettings = (
   settings: Partial<SettingsState>
 ): OverrideSettings => ({

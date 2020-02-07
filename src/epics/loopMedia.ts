@@ -1,4 +1,3 @@
-import { AppEpic } from '../types/AppEpic'
 import * as r from '../redux'
 import { filter, tap, ignoreElements } from 'rxjs/operators'
 

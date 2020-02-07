@@ -1,6 +1,6 @@
 import { ignoreElements, mergeAll } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
-import { fromEvent } from 'rxjs'
+import { fromEvent, of } from 'rxjs'
 import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
@@ -22,7 +22,6 @@ import loopMedia from './loopMedia'
 import preloadVideoStills from './preloadVideoStills'
 import menu from './menu'
 import { showMessageBox } from '../utils/electron'
-import { AppEpic } from '../types/AppEpic'
 
 const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'app-close', async () => {
@@ -49,7 +48,10 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
     ignoreElements()
   )
 
+const initialize: AppEpic = () => of(r.initializeApp())
+
 const rootEpic: AppEpic = combineEpics(
+  initialize,
   addMediaToProject,
   setWaveformCursorEpic,
   loopMedia,

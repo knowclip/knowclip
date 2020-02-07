@@ -11,7 +11,6 @@ import {
 import { fromEvent, from, of, merge, OperatorFunction } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
-import { AppEpic } from '../types/AppEpic'
 
 const ctrlSpaceEpic: AppEpic = (
   action$,

@@ -1,7 +1,7 @@
 const electron = require('electron')
 const path = require('path')
 const url = require('url')
-const { app, ipcMain, autoUpdater } = electron
+const { app, ipcMain } = electron
 const { isPackaged } = app
 const { BrowserWindow } = electron
 const setUpMenu = require('./electron/appMenu')

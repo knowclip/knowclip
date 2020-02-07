@@ -6,10 +6,6 @@ import { parseFormattedDuration } from './formatTime'
 import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'
 import validateProject from './validateProject'
 
-type Result<T> = Failure | Success<T>
-type Failure = { errors: string[]; value?: undefined }
-type Success<T> = { value: T; errors?: undefined }
-
 type NormalizedProjectFileData = {
   project: ProjectFile
   media: MediaFile[]

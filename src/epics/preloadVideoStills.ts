@@ -1,4 +1,3 @@
-import { AppEpic } from '../types/AppEpic'
 import { switchMap } from 'rxjs/operators'
 import * as r from '../redux'
 import { ofType } from 'redux-observable'
