@@ -1,7 +1,7 @@
 {
   "name": "knowclip",
   "productName": "Knowclip",
-  "version": "0.6.0-alpha",
+  "version": "0.6.1-alpha",
   "private": true,
   "engines": {
     "node": "^12.4.0"

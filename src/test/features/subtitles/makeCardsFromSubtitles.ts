@@ -7,12 +7,18 @@ import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
 import { waveform$ } from '../../../components/Waveform'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 
 export default async function makeCardsFromSubtitles({
   app,
   client,
 }: TestSetup) {
   await client.clickElement_(projectsMenu$.recentProjectsListItem)
+  await client.waitForText_(
+    mediaFilesMenu$.openMediaFilesMenuButton,
+    'polar_bear_cafe.mp4'
+  )
+  await client.elements_(waveform$.subtitlesTimelines, 2)
 
   await client.clickElement_(subtitlesMenu$.openMenuButton)
   await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
