@@ -65,7 +65,7 @@ export default {
     },
   ],
 
-  locateRequest: async ({ file }, state, effects) => {
+  locateRequest: async ({ file }, availability, state, effects) => {
     try {
       const source = r.getFileAvailabilityById(
         state,

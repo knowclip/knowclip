@@ -21,7 +21,7 @@ const showSaveDialog = (
 
       if (!filePath) return await res(filePath)
 
-      const extension = extname(filePath)
+      const extension = extname(filePath).replace(/^\./, '')
       const withExtension =
         !extensions.length ||
         extensions.some(ext => ext.toLowerCase() === extension.toLowerCase())
@@ -59,17 +59,44 @@ const showOpenDirectoryDialog = (
 ): Promise<string | null> =>
   new Promise(async (res, rej) => {
     try {
+      const properties = [
+        'openDirectory' as const,
+        ...(showHiddenFiles ? (['showHiddenFiles'] as const) : []),
+      ]
       const {
         filePaths: directoryPaths,
       } = await electron.remote.dialog.showOpenDialog(
         electron.remote.getCurrentWindow(),
         {
-          properties: showHiddenFiles
-            ? ['openDirectory', 'showHiddenFiles']
-            : ['openDirectory'],
+          properties,
         }
       )
       return await res(directoryPaths ? directoryPaths[0] : null)
+    } catch (err) {
+      return await rej(err)
+    }
+  })
+const showOpenDirectoriesDialog = (
+  showHiddenFiles = true
+): Promise<string[] | null> =>
+  new Promise(async (res, rej) => {
+    try {
+      const properties = [
+        'openDirectory' as const,
+        'multiSelections' as const,
+        ...(showHiddenFiles ? (['showHiddenFiles'] as const) : []),
+      ]
+      const {
+        filePaths: directoryPaths,
+      } = await electron.remote.dialog.showOpenDialog(
+        electron.remote.getCurrentWindow(),
+        {
+          properties,
+        }
+      )
+      return await res(
+        directoryPaths && directoryPaths.length ? directoryPaths : null
+      )
     } catch (err) {
       return await rej(err)
     }
@@ -92,6 +119,7 @@ export default {
   showSaveDialog,
   showOpenDialog,
   showOpenDirectoryDialog,
+  showOpenDirectoriesDialog,
   openInBrowser,
   showMessageBox,
 }

@@ -6,7 +6,7 @@ export default {
     return [await r.openFileSuccess(file, filePath)]
   },
   openSuccess: [],
-  locateRequest: async ({ file }, state, effects) => {
+  locateRequest: async ({ file }, availability, state, effects) => {
     try {
       const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
       if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')

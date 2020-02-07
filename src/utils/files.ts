@@ -40,3 +40,17 @@ export const areSameFile = <F extends FileMetadata>(
   a: F,
   b: FileMetadata
 ): boolean => a.id === b.id && a.type === b.type
+
+export const isGeneratedFile = (type: FileMetadata['type']): boolean => {
+  switch (type) {
+    case 'VttConvertedSubtitlesFile':
+    case 'WaveformPng':
+    case 'ConstantBitrateMp3':
+    case 'VideoStillImage':
+      return true
+    case 'ProjectFile':
+    case 'MediaFile':
+    case 'ExternalSubtitlesFile':
+      return false
+  }
+}

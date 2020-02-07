@@ -22,6 +22,7 @@ declare type SessionState = {
   currentMediaFileId: MediaFileId | null
   workIsUnsaved: boolean
   loopMedia: boolean
+  mediaIsPlaying: boolean
 
   progress: ProgressInfo | null
 }

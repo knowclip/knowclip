@@ -30,6 +30,7 @@ export type OpenFileFailureHandler<F extends FileMetadata> = (
 
 export type LocateFileRequestHandler<F extends FileMetadata> = (
   action: LocateFileRequest & { file: F },
+  availability: FileAvailability,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>

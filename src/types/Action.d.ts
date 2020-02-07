@@ -7,6 +7,7 @@ declare type Action =
   | ClipAction
   | ProjectAction
   | MediaAction
+  | SettingsAction
   | SubtitlesAction
   | FileAction
   | DetectSilence
@@ -214,7 +215,8 @@ declare type MediaAction =
   | SetCurrentFile
   | ToggleLoop
   | SetLoop
-  | SetMediaFolderLocation
+  | PlayMedia
+  | PauseMedia
   | DismissMedia
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
@@ -229,10 +231,37 @@ declare type DeleteMediaFromProject = {
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
+declare type PlayMedia = { type: 'PLAY_MEDIA' }
+declare type PauseMedia = { type: 'PAUSE_MEDIA' }
+
+declare type SettingsAction =
+  | SetMediaFolderLocation
+  | AddAssetsDirectories
+  | RemoveAssetsDirectories
+  | SetCheckForUpdatesAutomatically
+  | OverrideSettings
+
 declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
   directoryPath: string | null
 }
+declare type AddAssetsDirectories = {
+  type: 'ADD_ASSETS_DIRECTORIES'
+  directoryPaths: strings[]
+}
+declare type RemoveAssetsDirectories = {
+  type: 'REMOVE_ASSETS_DIRECTORIES'
+  directoryPaths: strings[]
+}
+declare type SetCheckForUpdatesAutomatically = {
+  type: 'SET_CHECK_FOR_UPDATES_AUTOMATICALLY'
+  check: boolean
+}
+declare type OverrideSettings = {
+  type: 'OVERRIDE_SETTINGS'
+  settings: PartialSettings<SettingsState>
+}
+
 declare type DismissMedia = { type: 'DISMISS_MEDIA' }
 
 declare type SubtitlesAction =
@@ -308,6 +337,7 @@ declare type FileAction =
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
+  path?: string
 }
 declare type DeleteFileRequest = {
   type: 'DELETE_FILE_REQUEST'

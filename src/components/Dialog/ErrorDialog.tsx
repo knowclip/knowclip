@@ -26,7 +26,9 @@ const ErrorDialog = ({
         <p className={css.log}>{log}</p>
       </DialogContent>
       <DialogActions>
-        <Button onClick={close}>Close</Button>
+        <Button onClick={close} color="primary">
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   )

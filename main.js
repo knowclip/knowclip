@@ -44,10 +44,36 @@ async function createWindow() {
     },
   })
 
+  const splash =
+    process.env.NODE_ENV !== 'test'
+      ? new BrowserWindow({
+          show: false,
+          width: 512,
+          height: 512,
+          frame: false,
+          backgroundColor: '#DDDDDD',
+        })
+      : null
+
+  if (splash) {
+    splash.loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'icons', 'icon.png'),
+        protocol: 'file',
+        slashes: 'true',
+      })
+    )
+
+    splash.once('ready-to-show', () => {
+      splash.show()
+    })
+  }
+
   context.mainWindow = mainWindow
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
+    if (splash) splash.close()
   })
 
   // and load the index.html of the app.
@@ -85,7 +111,7 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
-  setUpMenu(app, context)
+  setUpMenu(electron, context, useDevtools)
 })
 
 app.on('will-quit', () => {

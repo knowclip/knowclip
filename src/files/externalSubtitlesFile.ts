@@ -45,7 +45,7 @@ export default {
     },
   ],
 
-  locateRequest: async ({ file, message }, state, effects) => {
+  locateRequest: async ({ file, message }, availability, state, effects) => {
     return [r.fileSelectionDialog(message, file)]
   },
 

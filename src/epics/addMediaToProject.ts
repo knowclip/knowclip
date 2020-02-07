@@ -2,7 +2,6 @@ import { flatMap, catchError, mergeAll } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import { readMediaFile, AsyncError } from '../utils/ffmpeg'
-import { AppEpic } from '../types/AppEpic'
 import { uuid } from '../utils/sideEffects'
 
 const addMediaToProject: AppEpic = (action$, state$) =>

@@ -35,7 +35,7 @@ export class ClientWrapper {
   }
 
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
-    if (!count || count === 1) {
+    if (!count) {
       await this.waitUntilPresent(selector)
     } else {
       let elementsSoFar: ElementWrapper[] | undefined

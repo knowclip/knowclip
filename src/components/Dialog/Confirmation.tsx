@@ -35,10 +35,10 @@ const ConfirmationDialog = ({
     <Dialog open={open}>
       <DialogContent>{message}</DialogContent>
       <DialogActions>
-        <Button onClick={cancel} id={$.cancelButton}>
+        <Button onClick={cancel} id={$.cancelButton} color="primary">
           Cancel
         </Button>
-        <Button onClick={dispatchAction} id={$.okButton}>
+        <Button onClick={dispatchAction} id={$.okButton} color="primary">
           Ok
         </Button>
       </DialogActions>

@@ -23,11 +23,9 @@ jobs:
         repo: knowclip/knowclip
         tags: true
       draft: false
+      file_glob: true
       file:
-        - dist/knowclip_0.5.0_amd64.deb
-        - dist/Knowclip-0.5.0.AppImage
-        - dist/Knowclip 0.5.0.exe
-        - dist/Knowclip-0.5.0-mac.zip
+        - dist/Knowclip_*
 cache:
   directories:
   - node_modules
@@ -37,7 +35,7 @@ cache:
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    yarn && yarn integration &&./docker/docker_run.sh --linux --win --mac
+    yarn && yarn integration && ./docker/docker_run.sh --linux --win --mac
   else	
     yarn && yarn integration
   fi
@@ -48,7 +46,7 @@ before_cache:
 branches:
   only:
   - master
-  - /v\d+\.\d+.\d+(-.+)/
+  - /v\d+\.\d+.\d+(-.+)?/
 
 addons:
   apt:

@@ -140,8 +140,12 @@ const CsvAndMp3ExportDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog}>Cancel</Button>
-        <Button onClick={onSubmit}>Ok</Button>
+        <Button onClick={closeDialog} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={onSubmit} color="primary">
+          Ok
+        </Button>
       </DialogActions>
     </Dialog>
   )

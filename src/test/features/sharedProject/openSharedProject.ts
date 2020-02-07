@@ -1,7 +1,7 @@
 import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
 import { main$ } from '../../../components/Main'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
-import { fileSelectionForm$ } from '../../../components/FileSelectionForm'
+import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { snackbar$ } from '../../../components/Snackbar'

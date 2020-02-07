@@ -8,6 +8,7 @@ import CsvAndMp3Export from './CsvAndMp3ExportDialog'
 import SubtitlesClips from './SubtitlesClipsDialog'
 import FileSelection from './FileSelectionDialog'
 import ErrorDialog from './ErrorDialog'
+import SettingsDialog from './SettingsDialog'
 import { getCurrentDialog } from '../../selectors'
 
 const DialogView = () => {
@@ -34,6 +35,8 @@ const DialogView = () => {
       return <FileSelection open={true} data={currentDialog} />
     case 'Error':
       return <ErrorDialog open={true} data={currentDialog} />
+    case 'Settings':
+      return <SettingsDialog open={true} data={currentDialog} />
   }
 }
 

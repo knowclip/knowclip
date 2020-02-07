@@ -10,7 +10,7 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { stringify } from 'yaml'
+import YAML from 'yaml'
 import {
   MediaJson,
   SubtitlesJson,
@@ -110,7 +110,7 @@ export const getProjectJson = <F extends FlashcardFields>(
 
         if (subtitles.length) newMediaFile.subtitles = subtitles
         if (clips.length) newMediaFile.clips = clips
-        if (mediaFile.flashcardFieldsToSubtitlesTracks)
+        if (Object.keys(mediaFile.flashcardFieldsToSubtitlesTracks).length)
           newMediaFile.flashcardFieldsToSubtitlesTracks =
             mediaFile.flashcardFieldsToSubtitlesTracks
 
@@ -191,6 +191,6 @@ export const getProjectFileContents = (
   )
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
-    [project, ...media].map(o => stringify(o)).join('---\n')
+    [project, ...media].map(o => YAML.stringify(o)).join('---\n')
   )
 }

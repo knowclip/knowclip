@@ -1,0 +1,41 @@
+.container{
+  height: 100%;
+}
+
+.margin {
+  margin: 1rem;
+}
+
+.settingsGroup {
+  composes: margin;
+
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.heading {
+  flex-basis: 100%;
+  margin: 1rem;
+}
+
+.settingsGroupBody {
+  composes: margin;
+  
+  flex: 1;
+}
+
+.settingsGroupDescription {
+  composes: margin;
+
+  flex-basis: 20em;
+}
+
+.settingsGroupDescription p {
+ margin: 0 0 1em 0;
+}
+
+
+.formControl {
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}

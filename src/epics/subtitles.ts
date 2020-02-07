@@ -1,4 +1,4 @@
-import { Epic, ofType, combineEpics } from 'redux-observable'
+import { ofType, combineEpics } from 'redux-observable'
 import {
   flatMap,
   map,
@@ -10,11 +10,11 @@ import {
   takeUntil,
   endWith,
   concat,
+  tap,
 } from 'rxjs/operators'
 import { of, Observable } from 'rxjs'
 import * as r from '../redux'
 import { from } from 'rxjs'
-import { AppEpic } from '../types/AppEpic'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
 
@@ -132,23 +132,20 @@ const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
     })
   )
 
-const goToSubtitlesChunk: Epic<Action, any, AppState, EpicsDependencies> = (
-  action$,
-  state$,
-  { setCurrentTime }
-) =>
+const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
   action$.pipe(
     ofType<Action, GoToSubtitlesChunk>(A.GO_TO_SUBTITLES_CHUNK),
-    map(({ chunkIndex, subtitlesTrackId }) => {
+    tap(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
       if (!track) {
         console.error('Track not found')
-        return { type: 'Subtitles track not found' }
+        return
       }
       const { start } = track.chunks[chunkIndex]
       setCurrentTime(r.getSecondsAtX(state$.value, start))
-      return { type: 'moved to', start }
-    })
+      return
+    }),
+    ignoreElements()
   )
 
 type SubtitlesGenerationFieldMapping = Partial<

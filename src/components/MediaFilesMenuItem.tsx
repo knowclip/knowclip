@@ -75,7 +75,7 @@ const MediaFilesMenuItem = ({
   const locateAndClose = useCallback(
     e => {
       dispatch(
-        actions.locateFileRequest(mediaFile, 'Please locate this media file.')
+        actions.fileSelectionDialog('Please locate this media file.', mediaFile)
       )
       closeMenu(e)
     },
@@ -136,23 +136,23 @@ const MediaFilesMenuItem = ({
         }, [])}
       >
         <MenuList>
-          <MenuItem dense style={{ width: 200 }} onClick={loadAndClose}>
+          <MenuItem dense onClick={loadAndClose}>
             <ListItemIcon>
               <PlayArrow />
             </ListItemIcon>
             <ListItemText>Open</ListItemText>
           </MenuItem>
-          <MenuItem dense style={{ width: 200 }} onClick={deleteAndClose}>
+          <MenuItem dense onClick={deleteAndClose}>
             <ListItemIcon>
               <DeleteIcon />
             </ListItemIcon>
             <ListItemText>Delete</ListItemText>
           </MenuItem>
-          <MenuItem dense style={{ width: 200 }} onClick={locateAndClose}>
+          <MenuItem dense onClick={locateAndClose}>
             <ListItemIcon>
               <FolderSpecial />
             </ListItemIcon>
-            <ListItemText>Locate in file system</ListItemText>
+            <ListItemText>Manually locate in file system</ListItemText>
           </MenuItem>
         </MenuList>
       </Menu>

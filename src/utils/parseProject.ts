@@ -6,10 +6,6 @@ import { parseFormattedDuration } from './formatTime'
 import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'
 import validateProject from './validateProject'
 
-type Result<T> = Failure | Success<T>
-type Failure = { errors: string[]; value?: undefined }
-type Success<T> = { value: T; errors?: undefined }
-
 type NormalizedProjectFileData = {
   project: ProjectFile
   media: MediaFile[]
@@ -21,7 +17,14 @@ export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
 ): Promise<Result<ProjectJson<F>>> => {
   try {
-    const docs = YAML.parseAllDocuments(await readFile(filePath, 'utf8'))
+    const docs = YAML.parseAllDocuments(await readFile(filePath, 'utf8'), {
+      // default of 100 is easily reached
+      // when i.e. detecting silences in file > ~2 hours long.
+      // TODO: investigate setting this to smarter default
+      //       and then retrying after confirmation without limit
+      //       after user confirmation.
+      maxAliasCount: -1,
+    } as YAML.ParseOptions)
     const errors = docs.flatMap(v => v.errors)
     if (errors.length) return { errors: errors.map(e => e.message) }
 

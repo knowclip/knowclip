@@ -72,4 +72,3 @@ clips:
     tags: *a1
     image:
       type: VideoStill
-flashcardFieldsToSubtitlesTracks: {}

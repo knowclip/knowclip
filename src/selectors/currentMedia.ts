@@ -18,6 +18,8 @@ import { SELECTION_BORDER_WIDTH } from './waveform'
 
 export const isLoopOn = (state: AppState) => state.session.loopMedia
 
+export const isMediaPlaying = (state: AppState) => state.session.mediaIsPlaying
+
 export const getConstantBitrateFilePath = (
   state: AppState,
   id: MediaFileId

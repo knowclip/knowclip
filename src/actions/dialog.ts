@@ -71,3 +71,6 @@ export const csvAndMp3ExportDialog = (clipIds: Array<ClipId>): DialogAction =>
 
 export const subtitlesClipDialog = (): DialogAction =>
   enqueueDialog({ type: 'SubtitlesClips' })
+
+export const settingsDialog = (): DialogAction =>
+  enqueueDialog({ type: 'Settings' }, true)

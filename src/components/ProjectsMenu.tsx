@@ -13,13 +13,15 @@ import {
   Tooltip,
 } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
+import { basename, join, dirname } from 'path'
+import electron from 'electron'
 import * as r from '../redux'
 import * as actions from '../actions'
 import css from './ProjectsMenu.module.css'
 import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
-import { basename, join, dirname } from 'path'
+import icon from '../icon.png'
 
 enum $ {
   recentProjectsListItem = 'recent-projects-list-item',
@@ -116,7 +118,13 @@ const ProjectsMenu = () => {
   return (
     <section className={mainCss.container}>
       <header className={css.header}>
-        <h1 className={css.mainHeading}>Knowclip</h1>
+        <h1 className={css.mainHeading}>
+          <img className={css.icon} src={icon} alt="Knowclip icon" /> Knowclip
+          <small className={css.versionNumber}>
+            {' '}
+            {electron.remote.app.getVersion().split('-')[0]}
+          </small>
+        </h1>
       </header>
       <section className={css.main}>
         <section className={css.menu}>

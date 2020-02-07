@@ -1,4 +1,3 @@
-import { AppEpic } from '../types/AppEpic'
 import { ofType, combineEpics } from 'redux-observable'
 import {
   filter,

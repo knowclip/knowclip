@@ -9,7 +9,6 @@ import {
 import { fromEvent, merge } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
-import { AppEpic } from '../types/AppEpic'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { uuid } from '../utils/sideEffects'
 
