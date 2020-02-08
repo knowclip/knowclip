@@ -1,0 +1,9 @@
+.mainContent {
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+.footer {
+  composes: mainContent;
+  padding: 1em;
+}

@@ -1,9 +1,9 @@
 {
-  "name": "gatsby-starter-default",
+  "name": "knowclip-homepage",
   "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
+  "description": "The homepage for the Knowclip app",
   "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "author": "Justin Silvestre <justinsilvestre@gmail.com>",
   "dependencies": {
     "gatsby": "^2.19.7",
     "gatsby-image": "^2.2.39",
@@ -11,6 +11,7 @@
     "gatsby-plugin-offline": "^3.0.32",
     "gatsby-plugin-react-helmet": "^3.1.21",
     "gatsby-plugin-sharp": "^2.4.3",
+    "gatsby-plugin-web-font-loader": "^1.0.4",
     "gatsby-source-filesystem": "^2.1.46",
     "gatsby-transformer-sharp": "^2.3.13",
     "prop-types": "^15.7.2",
@@ -24,7 +25,6 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "MIT",
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
@@ -36,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+    "url": "https://github.com/knowclip/knowclip"
   },
   "bugs": {
     "url": "https://github.com/gatsbyjs/gatsby/issues"
