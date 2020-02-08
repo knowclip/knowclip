@@ -88,6 +88,8 @@ const startupCheckForUpdates: AppEpic = (
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
       if (!checkAtStartup) return empty()
 
+      if (!window.navigator.onLine) return empty()
+
       const { errors, value: newestRelease } = await checkForUpdates()
 
       if (errors) {
@@ -121,7 +123,22 @@ const menuCheckForUpdates: AppEpic = (
 ) =>
   fromEvent(ipcRenderer, 'check-for-updates').pipe(
     flatMap(async () => {
-      if (!window.navigator.onLine) return empty()
+      if (!window.navigator.onLine) {
+        const messageBoxResult = await showMessageBox({
+          title: 'Check for updates',
+          message:
+            "The most recent update info can't be fetched at this time. Would you like to visit the web site to check for updates manually?",
+          buttons: ['Yes', 'No thanks'],
+          cancelId: 1,
+        })
+
+        if (messageBoxResult && messageBoxResult.response === 0)
+          electron.shell.openExternal(
+            'https://github.com/knowclip/knowclip/releases'
+          )
+
+        return empty()
+      }
 
       const { errors, value: newestRelease } = await checkForUpdates()
 
