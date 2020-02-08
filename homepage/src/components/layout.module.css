@@ -1,3 +1,7 @@
+html {
+  background-color: #fbfdff;
+}
+
 .mainContent {
   max-width: 950px;
   margin: 0 auto;

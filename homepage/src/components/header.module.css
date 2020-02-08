@@ -1,5 +1,4 @@
 .container {
-  background-color: white;
   z-index: -2;
   overflow: hidden;
   height: 8em;
@@ -10,8 +9,7 @@
   vertical-align: middle;
   z-index: 2;
   margin-right: .5em;
-
-  /* box-shadow: rgba(255,255,255,.4) 2px 2px 30px; */
+  
   filter: drop-shadow(2px 2px 30px rgba(255, 255, 255, 0.8));
 }
 
@@ -37,9 +35,10 @@
   left: -3em;
   z-index: -1;
   transform: translateY(-50%) rotate(1deg);
+  overflow: hidden;
 
   outline:  #0e283c dotted  3px;
   outline:  white dotted  3px;
   outline-offset: -4px;
-  overflow: hidden;
+  box-shadow: .1em .1em .3em rgba(0, 0, 0, 0.4);
 }

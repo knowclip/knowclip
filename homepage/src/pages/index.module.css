@@ -1,5 +1,6 @@
 .content {
   composes: mainContent from '../components/layout.module.css';
+
   padding: 0 1em;
 }
 
@@ -11,12 +12,18 @@
   color: #667e96;
   font-weight: 300;
 }
+.heading:focus,
+.heading:focus-within,
+.heading:active {
+  color: blue;
+}
 
 .middle {
+  composes: content;
+
   display: flex;
   flex-flow: row wrap;
   overflow: hidden;
-  composes: content;
 }
 
 .demoVideo {
@@ -31,9 +38,14 @@
 
 .downloadHeading {
   composes: filmBackground from '../components/header.module.css';
+
+  height: 5em;
   position: relative;
+  overflow: hidden;
+
   color: white;
   text-align: center;
+  padding: 2em;
 }
 
 .downloadHeading::before {
@@ -45,9 +57,58 @@
 .steps {
   flex: 1 1 15em;
   min-width: 15em;
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.stepsList {
+  position: relative;
+  list-style-type: none;
+  counter-reset: li;
+  margin-left: 3em;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.stepsList li {
+  margin-bottom: 1.45rem;
+  position: relative;
+  flex-basis: 19%;
+}
+
+.stepsList li::before {
+  content: counter(li);
+  counter-increment: li;
+  display: block;
+  position: absolute;
+  left: -3rem;
+  font-weight: bold;
+  font-size: 1.4rem;
+  background: black;
+  border-radius: 50%;
+  width: 1.4em;
+  height: 1.4em;
+  color: white;
+  text-align: center;
+  padding: 0.2em 0.1em;
 }
 
 .anki {
   composes: content;
 }
 
+.anki:focus {
+  animation: flash 2s;
+}
+
+@keyframes flash {
+  0% {
+    color: yellow;
+  }
+  100% {
+    color: initial;
+  }
+}
