@@ -18,11 +18,11 @@ export interface ElementWrapper {
   getAttribute: (attributeName: string) => Promise<string>
 }
 
-export const element = async (
+export const element = (
   client: SpectronClient,
   id: string,
   selector: string
-): Promise<ElementWrapper> => {
+): ElementWrapper => {
   const getText = async () => {
     const result = await client.elementIdText(id)
     const { state, value, message } = result

@@ -35,35 +35,24 @@ export class ClientWrapper {
   }
 
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
-    if (!count) {
-      await this.waitUntilPresent(selector)
-    } else {
-      let elementsSoFar: ElementWrapper[] | undefined
-      try {
+    let elementsSoFar: RawResult<Element>[] | undefined
+    try {
+      if (count)
         await this._client.waitUntil(async () => {
-          const elements = await this.elements(selector)
+          const elements: RawResult<Element>[] = await this._client.$$(selector)
           elementsSoFar = elements
           return elements.length === count
-        }, 30000)
-      } catch (err) {
-        throw new Error(
-          `Could not find ${count} elements with selector "${selector}". Instead found ${
-            elementsSoFar ? elementsSoFar.length : 'none'
-          } before: ${err.message}`
-        )
-      }
-    }
+        }, 10000)
+      else elementsSoFar = await this._client.$$(selector)
 
-    try {
-      const result: RawResult<Element>[] = await this._client.$$(selector)
-      return await Promise.all(
-        result.map(el => element(this._client, el.value.ELEMENT, selector))
+      return (elementsSoFar as RawResult<Element>[]).map(v =>
+        element(this._client, v.value.ELEMENT, selector)
       )
     } catch (err) {
       throw new Error(
-        `Could not find${
-          count ? ' ' + count : ''
-        } elements with selector "${selector}": ${err.message}`
+        `Could not find ${count} elements with selector "${selector}". Instead found ${
+          elementsSoFar ? elementsSoFar.length : 'none'
+        } before: ${err.message}`
       )
     }
   }
