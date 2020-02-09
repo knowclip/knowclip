@@ -1,5 +1,6 @@
 sudo docker run --rm -ti --env ELECTRON_CACHE="/root/.cache/electron" \
   --env ELECTRON_BUILDER_CACHE="/root/.cache/electron-builder" \
+  --env TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER \
   -v ${PWD}:/project \
   -v ${PWD##*/}-node-modules:/project/node_modules \
   -v ~/.cache/electron:/root/.cache/electron \

@@ -1,7 +1,7 @@
 {
   "name": "knowclip",
   "productName": "Knowclip",
-  "version": "0.6.2-alpha",
+  "version": "0.6.3-alpha",
   "private": true,
   "engines": {
     "node": "^12.4.0"
@@ -67,7 +67,7 @@
   "scripts": {
     "start": "react-scripts start",
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
-    "build": "REACT_APP_TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER yarn build-schemas && react-scripts build",
+    "build": "yarn build-schemas && REACT_APP_TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",
     "build:ci": "CI=false yarn build",
     "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test --setupTestFrameworkScriptFile=./src/utils/initializeActionTypeGlobals.ts",
     "integration": "REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
