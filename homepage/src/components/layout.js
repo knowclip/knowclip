@@ -27,13 +27,18 @@ const Layout = ({ children }) => {
   return (
     <>
       <Header siteTitle={data.site.siteMetadata.title} />
-      <div>
-        <main className={css.main}>{children}</main>
-        <footer className={css.footer}>
+      <main className={css.main}>{children}</main>
+      <footer className={css.footer}>
+        <ul>
+          <li>Twitter</li>
+          <li>Patreon</li>
+          <li>Github</li>
+        </ul>
+        <p>
           © {new Date().getFullYear()} Justin Silvestre{" "}
           <a href="http://whoisjust.in">www.whoisjust.in</a>
-        </footer>
-      </div>
+        </p>
+      </footer>
     </>
   )
 }

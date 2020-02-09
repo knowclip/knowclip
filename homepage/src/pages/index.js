@@ -69,7 +69,7 @@ const IndexPage = () => (
       </p>
     </section>
 
-    <section className={css.anki}>
+    <section className={css.anki} onClick={e => e.preventDefault()}>
       <h2 className={css.heading}>I have a feature request!</h2>
       <p>LIST PLANNED FEATURES</p>
       <p>Great! I'd love to hear your feedback.</p>

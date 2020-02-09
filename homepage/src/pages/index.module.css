@@ -12,11 +12,6 @@
   color: #667e96;
   font-weight: 300;
 }
-.heading:focus,
-.heading:focus-within,
-.heading:active {
-  color: blue;
-}
 
 .middle {
   composes: content;
@@ -101,6 +96,10 @@
 }
 
 .anki:focus {
+  animation: flash 2s;
+}
+
+.anki:focus .heading {
   animation: flash 2s;
 }
 
