@@ -46,8 +46,8 @@ a:active {
   flex-flow: row wrap;
   justify-content: center;
 }
-downloadText {
-  flex-basis: 33%;
+.downloadText {
+  /* flex-basis: 33%; */
 }
 .latestVersion {
   text-align: center;
@@ -120,6 +120,9 @@ downloadText {
   width: 100%;
   display: flex;
   flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: .2;
 }
 .downloadOsBody.hidden {
   display: none;
@@ -136,18 +139,18 @@ downloadText {
 .downloadButton {
   composes: downloadSubsection;
   
-  width: 12em;
-  max-height: 12em;
+  max-width: 20em;
   display: block;
   color: white;
   background-color: #28323c;
-  padding: .6em;
-  border: solid 1px #667e96;
-  border-radius: .1rem;
-  cursor: pointer;
+  background-color: #18518a;
+  padding: 1rem;
+  border-radius: .3em;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
 }
 .downloadButton:hover {
   background-color: #4a8dce;
+  color: white;
 }
 
 .downloadText {
@@ -158,7 +161,7 @@ downloadText {
   composes: downloadSubsection;
 
   flex: 1 1;
-
+  min-width: 20em;
   padding: 1em;
 }
 

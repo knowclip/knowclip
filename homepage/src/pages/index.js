@@ -158,7 +158,7 @@ const DownloadSection = () => {
         current={os}
         setOs={setOs}
         osName="Windows"
-        buttonText="Windows 78/10 (64 bit)"
+        buttonText="Windows 7/8/10 (64 bit)"
         fileName={getFileName("win", "exe")}
       >
         <ol>
@@ -194,7 +194,7 @@ const DownloadSection = () => {
         current={os}
         setOs={setOs}
         osName="Linux"
-        buttonText="Debian installer (amd64)"
+        buttonText="Debian archive (amd64)"
         fileName={getFileName("linux", "deb")}
       >
         <h5>Debian-based distributions (Ubuntu, ElementaryOS, etc.)</h5>
