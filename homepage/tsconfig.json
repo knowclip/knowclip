@@ -24,7 +24,7 @@
     "src",
   ],
   "exclude": [
-    "homepage",
-    "**/node_modules/*"
+    "../src",
+    "../node_modules/*"
   ]
 }

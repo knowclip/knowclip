@@ -1,7 +1,7 @@
 import { Link } from "gatsby"
 import PropTypes from "prop-types"
 import React from "react"
-import Image from "../components/image"
+import Image from "./lightbulb"
 import css from "./header.module.css"
 import cn from "classnames"
 

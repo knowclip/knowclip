@@ -2,6 +2,8 @@ html {
   background-color: #fbfdff;
 }
 
+.main {}
+
 .mainContent {
   max-width: 950px;
   margin: 0 auto;

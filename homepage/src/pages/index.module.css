@@ -4,12 +4,25 @@
   padding: 0 1em;
 }
 
+a:link,
+a:visited {
+  color: #0076ec;
+}
+a:hover,
+a:active {
+  color: #6bb5ff;
+}
+
 .intro {
   composes: content;
 }
 
-.heading {
+.headingTextColor {
   color: #667e96;
+
+}
+.heading {
+  composes: headingTextColor;
   font-weight: 300;
 }
 
@@ -29,6 +42,18 @@
 
 .download {
   composes: content;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+downloadText {
+  flex-basis: 33%;
+}
+.latestVersion {
+  text-align: center;
+}
+.versionNumber {
+  white-space: nowrap;
 }
 
 .downloadHeading {
@@ -36,11 +61,12 @@
 
   height: 5em;
   position: relative;
+  margin-bottom: 0;
+  padding: 2em;
   overflow: hidden;
 
   color: white;
   text-align: center;
-  padding: 2em;
 }
 
 .downloadHeading::before {
@@ -48,6 +74,94 @@
   width: calc(100% + 20em);
   transform: translateY(-50%) rotate(-1deg);
 }
+
+.downloadOsName {
+  composes: headingTextColor;
+
+  width: 100%;
+  order: 0;
+  box-sizing: border-box;
+  padding: .3em;
+  border: solid 3px;
+  border-color: rgba(0,0,0,0);
+  border-radius: .2em;
+  min-width: 5em;
+  margin: .1em;
+  font-weight: normal;
+  
+  text-align: center;
+  transition: background .3s, border-color .3s;
+}
+.downloadOsName:hover {
+  border-color: #667e9633;
+  cursor: pointer;
+}
+.currentOsName {
+  border-color: #667e966b;
+  font-weight: bold;
+}
+.currentOsName:hover {
+  border-color: #667e966b;
+}
+@media only screen and (min-width: 400px) {
+  .downloadOsName {
+    width: auto;
+  }
+}
+
+.downloadSubsection {
+  margin: 0.5rem;
+}
+
+.downloadOsBody {
+  composes: downloadSubsection;
+
+  order: 1;
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+}
+.downloadOsBody.hidden {
+  display: none;
+}
+
+
+.downloadIcon {
+  width: 3.5em;
+  height: auto;
+  float:left;
+}
+
+
+.downloadButton {
+  composes: downloadSubsection;
+  
+  width: 12em;
+  max-height: 12em;
+  display: block;
+  color: white;
+  background-color: #28323c;
+  padding: .6em;
+  border: solid 1px #667e96;
+  border-radius: .1rem;
+  cursor: pointer;
+}
+.downloadButton:hover {
+  background-color: #4a8dce;
+}
+
+.downloadText {
+  font-size: 1.4rem;
+}
+
+.installationInstructions {
+  composes: downloadSubsection;
+
+  flex: 1 1;
+
+  padding: 1em;
+}
+
 
 .steps {
   flex: 1 1 15em;
@@ -91,15 +205,23 @@
   padding: 0.2em 0.1em;
 }
 
-.anki {
-  composes: content;
+.hr {
+  max-width: 500px;
+  width: 60%;
+  margin: 3rem auto;
 }
 
-.anki:focus {
+.anki {
+  composes: content;
+
+  max-width: 600px;
+}
+
+.anki.focusedOnce {
   animation: flash 2s;
 }
 
-.anki:focus .heading {
+.anki.focusedOncefocus .heading {
   animation: flash 2s;
 }
 
