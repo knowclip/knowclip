@@ -1,4 +1,3 @@
-services: docker
 jobs:
   include:
   - stage: mac integration tests
@@ -9,12 +8,7 @@ jobs:
     env:
     - ELECTRON_CACHE=$HOME/.cache/electron
     - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-  - stage: linux + windows integration tests and all platforms build
-    os: linux
-    language: node_js
-    node_js: '12'
-    services: docker
-    deploy:
+    deploy: &deploy_base
       skip_cleanup: true
       provider: releases
       api_key:
@@ -26,6 +20,18 @@ jobs:
       file_glob: true
       file:
         - dist/Knowclip_*
+      draft: true
+  - stage: linux + windows integration tests and all platforms build
+    os: linux
+    language: node_js
+    node_js: '12'
+    env:
+    - ELECTRON_CACHE=$HOME/.cache/electron
+    - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+    services: docker
+    deploy:
+      <<: *deploy_base
+      draft: false
 cache:
   directories:
   - node_modules
@@ -35,9 +41,9 @@ cache:
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    yarn && yarn integration && ./docker/docker_run.sh --linux --win --mac
+    yarn && yarn integration && ./docker/docker_run.sh --linux --win
   else	
-    yarn && yarn integration
+    yarn && yarn dist --mac && yarn integration
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
