@@ -14,7 +14,7 @@ assignees: ''
 <!--- reported the same bug. Thanks for valuing developer time! --->
 <!----------------------------------------------------------------->
 
-**Did you already check https://github.com/knowclip/knowclip/issues to see if this bug was already reported?**
+**Did you already check to see if this bug was already reported at https://github.com/knowclip/knowclip/issues?**
 ---
 - [ ] Yes, I did
 
