@@ -15,9 +15,9 @@ assignees: ''
 <!---  requested the same feature. Thanks for valuing developer time! --->
 <!----------------------------------------------------------------------->
 
-**Did you already check to see if this feature was already requested at https://github.com/knowclip/knowclip/issues?**
+**Have you already checked to see if this feature was already requested at https://github.com/knowclip/knowclip/issues?**
 ---
-- [ ] Yes, I did
+- [ ] Yes, I have
 
 **Is your feature request related to a problem? Please describe.**
 ---
