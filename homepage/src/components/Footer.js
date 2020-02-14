@@ -1,25 +1,29 @@
 import React from "react"
 import css from "./Footer.module.css"
 import cn from "classnames"
-import Lightbulb from "./icon"
+import Lightbulb from "./iconSmall"
 import { Twitter, Patreon, Github } from "@icons-pack/react-simple-icons"
 
 const Footer = ({ className }) => (
   <footer className={cn(className, css.container)}>
     <div className={css.body}>
       <section className={css.branding}>
-        <Lightbulb />
-        <p>Knowclip</p>
-      </section>
-
-      <section className={css.download}>
-        <a href="#download" className={css.link}>
-          Download the app
+        <a href="/" className={css.link}>
+          <h4 className={css.brandingHeading}>
+            <Lightbulb className={css.icon} />
+            Knowclip
+          </h4>
         </a>
+        <p>
+          {" "}
+          <a href="#download" className={css.link}>
+            Download the app
+          </a>
+        </p>
       </section>
 
       <section className={css.contact}>
-        <h4 className={css.contactHeading}>Contact the developer</h4>
+        <h4 className={css.contactHeading}>Contact the developer:</h4>
         <p>
           <a className={css.link} href="https://twitter.com/@knowclip">
             Tweet @knowclip

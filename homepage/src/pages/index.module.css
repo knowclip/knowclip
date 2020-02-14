@@ -306,7 +306,7 @@ composes: content;
   text-decoration: none;
 }
 .downloadLink:hover {
-  color: #53abd4;
+  color: #6bb5ff;
 }
 
 @keyframes flash {

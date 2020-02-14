@@ -277,8 +277,22 @@ const IndexPage = () => {
       >
         <>
           <p>
-            It depends! You can use pretty much any audio or video file on your
-            computer with Knowclip. What's most important is that you{" "}
+            Since Knowclip works with pretty much any audio or video format, the
+            possibilities are endless--where to look really depends on what
+            language you're learning and what your personally interested in. I
+            plan to update this site with specific recommendations over the
+            coming weeks. (
+            <a
+              href="https://twitter.com/@knowclip"
+              className={css.link}
+              {...TARGET_BLANK}
+            >
+              Follow me on Twitter
+            </a>{" "}
+            to stay updated.)
+          </p>
+          <p>
+            What's most important is that you{" "}
             <strong>find something that holds your interest</strong>. Something
             like your favorite TV show is ideal--if you're familiar with the
             story, it can help you stay engaged and{" "}
@@ -288,10 +302,9 @@ const IndexPage = () => {
             .
           </p>
           <p>
-            Of course, finding that content to download is easier said than
-            done. I would love to build a platform to make this easier, either
-            as a web site, or as an integrated feature in Knowclip. Please
-            consider{" "}
+            Of course, finding that content to download isn't always that easy.
+            I would love to build a platform to make this easier, either as a
+            web site, or as an integrated feature in Knowclip. Please consider{" "}
             <a href="https://patreon.com/knowclip" className={css.link}>
               supporting me on Patreon
             </a>{" "}
@@ -328,7 +341,7 @@ const IndexPage = () => {
             </ol>
           </p>
           <p>
-            Software can't replace with #2, at least not yet{" "}
+            Software can't replace #2, at least not yet{" "}
             <span role="img" aria-label="smile">
               😉️
             </span>{" "}
@@ -366,40 +379,67 @@ const IndexPage = () => {
         setOpenSections={setOpenSections}
       >
         <p>
-          This is just a passion project of mine, but I've got big plans for the
-          future of Knowclip. Some features I already have in mind are:
+          Though Knowclip is just something I've been building in my free time,
+          I've got big plans for the future. Some features I already have in
+          mind include:
         </p>
 
         <p>
           <ul>
             <li>in-app popup dictionaries</li>
             <li>speech-to-text integration</li>
-            <li>better podcasts/audiobooks support</li>
             <li>sentence difficulty ratings based on word frequency</li>
-            <li>other export formats besides Anki .apkg</li>
-            <li>integration with streaming services</li>
-            <li>fixing out-of-sync subtitles within Knowclip</li>
             <li>
-              support for different kinds of cards (i.e. not just for learning
-              languages)
+              ...so much more! See all planned features on{" "}
+              <a
+                href="https://github.com/knowclip/knowclip/projects/3"
+                className={css.link}
+                {...TARGET_BLANK}
+              >
+                Github
+              </a>
+              .
             </li>
           </ul>
         </p>
 
         <p>
-          Keep in mind Knowclip is currently being developed by one person (me!)
-          purely as a passion project. If you can support me on Patreon, you'll
-          be helping me a great deal to continue working on Knowclip in my free
-          time.
+          If you don't see your idea already in the{" "}
+          <a
+            href="https://github.com/knowclip/knowclip/projects/3"
+            className={css.link}
+            {...TARGET_BLANK}
+          >
+            list of planned features{" "}
+          </a>
+          , go ahead and tweet{" "}
+          <a
+            href="https://twitter.com/@knowclip"
+            className={css.link}
+            {...TARGET_BLANK}
+          >
+            @knowclip
+          </a>{" "}
+          or open an issue on Github.
         </p>
 
-        <p>Prioritize features most requested by supporters and in general</p>
+        <p>
+          Please consider supporting me on{" "}
+          <a href="https://patreon.com/knowclip" className={css.link}>
+            Patreon
+          </a>
+          . You'd be directly enabling me to roll out new features and bugfixes
+          on a regular basis, and you'll be helping me follow my dream of{" "}
+          <strong>making quality language education free for everyone</strong>!
+        </p>
       </FaqSubsection>
+
+      <br />
     </Layout>
   )
 }
 
-const unsignedProgramMessage = () => {
+const downloadMessage = ({ os }) => {
   return (
     <section>
       <h2>Thanks for downloading Knowclip!</h2>

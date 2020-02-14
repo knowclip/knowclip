@@ -19,17 +19,34 @@
   padding: 3rem 1rem 2rem;
   display: flex;
   flex-flow: row wrap;
-  justify-content: center;
+  justify-content: space-around;
+}
+
+
+.branding {
+  padding: 1rem;
+  min-width: 14rem;
+}
+.brandingHeading {
+  font-size: 1.4rem;
+}
+
+.icon {
+  vertical-align: middle;
+  margin: 0 .2em 0 0;
 }
 
 .contact {
   padding: 1rem;
+  min-width: 14rem;
 }
 
 .socialLinksList {
   list-style-type: none;
-  margin: 0;
+  margin-left: 0;
   padding: 1rem;
+  min-width: 14rem;
+
 }
 
 .socialLinkLi {
