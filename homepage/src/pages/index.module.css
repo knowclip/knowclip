@@ -259,7 +259,7 @@ composes: content;
 .info.focused .infoHeading {
   animation: flashHeading 3s;
 }
-.openInfo:focus .infoHeading {
+.info:focus .infoHeading {
   color: #0080ff;
 }
 

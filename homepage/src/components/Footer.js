@@ -12,12 +12,24 @@ const Footer = ({ className }) => (
         <p>Knowclip</p>
       </section>
 
-      <section className={css.contact}>
-        <h4>Contact the developer</h4>
-        <a className={css.link} href="mailto:knowclip@protonmail.com">
-          knowclip@protonmail.com
+      <section className={css.download}>
+        <a href="#download" className={css.link}>
+          Download the app
         </a>
-        <Twitter size={14} /> @knowclip
+      </section>
+
+      <section className={css.contact}>
+        <h4 className={css.contactHeading}>Contact the developer</h4>
+        <p>
+          <a className={css.link} href="https://twitter.com/@knowclip">
+            Tweet @knowclip
+          </a>
+          <br />
+          <a className={css.link} href="mailto:knowclip@protonmail.com">
+            knowclip@protonmail.com
+          </a>
+        </p>
+        <p></p>
       </section>
 
       <ul className={css.socialLinksList}>

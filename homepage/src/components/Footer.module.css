@@ -19,11 +19,17 @@
   padding: 3rem 1rem 2rem;
   display: flex;
   flex-flow: row wrap;
+  justify-content: center;
+}
+
+.contact {
+  padding: 1rem;
 }
 
 .socialLinksList {
   list-style-type: none;
   margin: 0;
+  padding: 1rem;
 }
 
 .socialLinkLi {
