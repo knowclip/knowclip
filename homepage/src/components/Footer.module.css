@@ -1,0 +1,63 @@
+.container {
+  background-color: #1a1d20;
+  color: white;
+}
+
+.link:link,
+.link:visited,
+.link:active {
+  color: white;
+  text-decoration: none;
+}
+.link:hover {
+  color: #abb4c8;
+}
+
+.body {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1rem 2rem;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.socialLinksList {
+  list-style-type: none;
+  margin: 0;
+}
+
+.socialLinkLi {
+
+}
+.socialLink {
+  display: block;
+  transition: color .2s;
+}
+.socialLink:link,
+.socialLink:active,
+.socialLink:visited {
+  color: inherit;
+  text-decoration:none;
+}
+.socialLink:hover {
+  color: #abb4c8;
+}
+
+.socialLinkIcon {
+  vertical-align: middle;
+  margin-right: 1em;
+  transition: fill .2s;
+}
+.socialLink:hover .socialLinkIcon {
+  fill: #abb4c8;
+}
+
+.bottom {
+  text-align: center;
+  flex: 1 0 100%;
+}
+
+.impressum {
+  color: gray !important;
+  text-decoration: none;
+}

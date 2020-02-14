@@ -1,3 +1,11 @@
+.link:link,
+.link:visited {
+  color: #0076ec;
+}
+.link:hover,
+.link:active {
+  color: #6bb5ff;
+}
 html {
   font-family: Roboto, sans-serif;
   -ms-text-size-adjust: 100%;

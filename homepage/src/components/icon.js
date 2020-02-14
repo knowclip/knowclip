@@ -1,7 +1,6 @@
 import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Img from "gatsby-image"
-import css from "./header.module.css"
 
 /*
  * This component is built using `gatsby-image` to automatically serve optimized
@@ -14,12 +13,12 @@ import css from "./header.module.css"
  * - `useStaticQuery`: https://www.gatsbyjs.org/docs/use-static-query/
  */
 
-const Image = () => {
+const Image = ({ className }) => {
   const data = useStaticQuery(graphql`
     query {
       placeholderImage: file(relativePath: { eq: "icon.png" }) {
         childImageSharp {
-          fixed(width: 60) {
+          fixed(width: 80) {
             ...GatsbyImageSharpFixed
           }
         }
@@ -30,7 +29,7 @@ const Image = () => {
   return (
     <Img
       fixed={data.placeholderImage.childImageSharp.fixed}
-      className={css.knowclipIcon}
+      className={className}
     />
   )
 }

@@ -10,6 +10,5 @@ html {
 }
 
 .footer {
-  composes: mainContent;
-  padding: 1em;
+  margin-top: 3rem;
 }

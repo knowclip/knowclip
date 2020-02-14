@@ -1,15 +1,19 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .content {
   composes: mainContent from '../components/layout.module.css';
 
   padding: 0 1em;
 }
 
-a:link,
-a:visited {
+.link:link,
+.link:visited {
   color: #0076ec;
 }
-a:hover,
-a:active {
+.link:hover,
+.link:active {
   color: #6bb5ff;
 }
 
@@ -25,6 +29,12 @@ a:active {
   composes: headingTextColor;
   font-weight: 300;
 }
+.subheading {
+  composes: headingTextColor;
+  font-size: 1.2rem;
+  font-weight: normal;
+
+}
 
 .middle {
   composes: content;
@@ -32,12 +42,17 @@ a:active {
   display: flex;
   flex-flow: row wrap;
   overflow: hidden;
+  margin-bottom: 1em;
 }
 
 .demoVideo {
   flex-grow: 1;
   flex-basis: 50%;
   padding: 0 1em;
+}
+
+.introBottom {
+composes: content;
 }
 
 .download {
@@ -82,7 +97,7 @@ a:active {
   order: 0;
   box-sizing: border-box;
   padding: .3em;
-  border: solid 3px;
+  border: solid 2px;
   border-color: rgba(0,0,0,0);
   border-radius: .2em;
   min-width: 5em;
@@ -98,7 +113,6 @@ a:active {
 }
 .currentOsName {
   border-color: #667e966b;
-  font-weight: bold;
 }
 .currentOsName:hover {
   border-color: #667e966b;
@@ -130,9 +144,8 @@ a:active {
 
 
 .downloadIcon {
-  width: 3.5em;
   height: auto;
-  float:left;
+  margin: .5em;
 }
 
 
@@ -141,19 +154,25 @@ a:active {
   
   max-width: 20em;
   display: block;
-  color: white;
+  color: inherit;
   background-color: #28323c;
   background-color: #18518a;
+  background-color: #dbedff;
   padding: 1rem;
   border-radius: .3em;
   box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+  text-decoration: none;
+  text-align: center;
+  transition: box-shadow .2s, background-color .1s;
 }
 .downloadButton:hover {
-  background-color: #4a8dce;
-  color: white;
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.5);
+  background-color: #aac5e0;
+  /* background-color: #4a8dce; */
+  color: inherit;
 }
 
-.downloadText {
+.callToAction {
   font-size: 1.4rem;
 }
 
@@ -214,18 +233,80 @@ a:active {
   margin: 3rem auto;
 }
 
-.anki {
+.info {
   composes: content;
 
   max-width: 600px;
+  padding-top: 1rem;
+}
+.info:focus {
+  outline: 0 !important;
 }
 
-.anki.focusedOnce {
-  animation: flash 2s;
+.infoHeading {
+  composes: heading;
+  margin-bottom: 0;
+  padding-right: 1em;
+  position: relative;
+  cursor: pointer;
+  line-height: 1.4;
 }
 
-.anki.focusedOncefocus .heading {
-  animation: flash 2s;
+.info.focused {
+  animation: flash 3s !important;
+}
+
+.info.focused .infoHeading {
+  animation: flashHeading 3s;
+}
+.openInfo:focus .infoHeading {
+  color: #0080ff;
+}
+
+.openInfo .infoHeading {
+  margin-bottom: 1.45rem;
+}
+
+.info p {
+  display: none;
+
+}
+.openInfo p {
+  display: block;
+  animation: fadeIn .4s;
+}
+.openInfo {
+  padding-bottom: 2em;
+}
+
+.infoHeading:hover {
+ color: #459ef8;
+}
+
+.infoHeading::before {
+  content: "⌄";
+  display: inline;
+  position: absolute;
+  right: 0;
+  top: -8px;
+}
+.openInfo .infoHeading::before {
+  content: "⌃";
+  top: 5px;
+}
+
+.downloadLinkP {
+  text-align: right;
+}
+
+.downloadLink:link,
+.downloadLink:visited,
+.downloadLink:active {
+  color: #949494;
+  text-decoration: none;
+}
+.downloadLink:hover {
+  color: #53abd4;
 }
 
 @keyframes flash {
@@ -236,3 +317,25 @@ a:active {
     color: initial;
   }
 }
+
+@keyframes flashHeading {
+  0% {
+    color: yellow;
+  }
+  100% {
+    color: #459ef8;
+  }
+}
+
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(0, -1em);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+

@@ -30,7 +30,7 @@ const Image = () => {
   return (
     <Img
       fixed={data.placeholderImage.childImageSharp.fixed}
-      className={css.knowclipIcon}
+      className={css.lightbulbIcon}
     />
   )
 }
