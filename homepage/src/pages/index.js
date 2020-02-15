@@ -30,10 +30,6 @@ const IndexPage = () => {
       }),
     []
   )
-  const handleClickFaq = useCallback(
-    id => setOpenSections(o => ({ ...o, [id]: !o[id] })),
-    []
-  )
 
   const [ankiFocused, setAnkiFocused] = useState(false)
   const focusAnki = useCallback(() => {
@@ -50,6 +46,12 @@ const IndexPage = () => {
     setTimeout(() => {
       setHowFocused(false)
     }, 3000)
+  }, [])
+
+  const [inputVideoIsOpen, setInputVideoIsOpen] = useState(false)
+  const openInputVideo = useCallback(e => {
+    e.preventDefault()
+    setInputVideoIsOpen(true)
   }, [])
 
   return (
@@ -83,15 +85,17 @@ const IndexPage = () => {
             </li>
           </ol>
         </section>
-        <iframe
-          className={css.demoVideo}
-          title="demo-video"
-          width="560"
-          height="315"
-          src="https://www.youtube-nocookie.com/embed/kFEfS8dyKQ8"
-          frameBorder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        />
+        <div className={css.responsiveVideo}>
+          <iframe
+            className={css.demoVideo}
+            title="demo-video"
+            width="560"
+            height="315"
+            src="https://www.youtube-nocookie.com/embed/kFEfS8dyKQ8"
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          />
+        </div>
       </div>
       <section className={css.introBottom}>
         <p>
@@ -165,7 +169,7 @@ const IndexPage = () => {
           <p>
             Everyone knows the best way to learn a language is to{" "}
             <strong>immerse yourself in it</strong>. Thanks to the Internet,
-            it's now possible to do this without ever leaving your home--you can
+            it's now possible to do this without ever leaving your home—you can
             immerse yourself in a new language via TV series, movies, podcasts,
             and audiobooks!
           </p>
@@ -185,7 +189,7 @@ const IndexPage = () => {
             <strong>
               there's more to the immersion story than most people realize
             </strong>
-            . Knowclip's design acknowledges this, and helps you get{" "}
+            . Knowclip was designed to help you get{" "}
             <a href="#immersion" className={css.link}>
               the right kind of immersion
             </a>{" "}
@@ -230,12 +234,26 @@ const IndexPage = () => {
             <a
               href="https://youtu.be/J_EQDtpYSNM?t=230"
               className={css.link}
+              onClick={openInputVideo}
               {...TARGET_BLANK}
             >
               truly acquire a language
             </a>
             , versus just learning <em>about</em> it, like you would in a
             classroom.{" "}
+            {inputVideoIsOpen && (
+              <div className={css.responsiveVideo}>
+                <iframe
+                  title="What I've Learned on language acquisition"
+                  width="560"
+                  height="315"
+                  src="https://www.youtube.com/embed/J_EQDtpYSNM?start=230&autoplay=1"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            )}
             <strong>
               You don't need vocabulary lists or conjugation tables
             </strong>
@@ -278,8 +296,8 @@ const IndexPage = () => {
         <>
           <p>
             Since Knowclip works with pretty much any audio or video format, the
-            possibilities are endless--where to look really depends on what
-            language you're learning and what your personally interested in. I
+            possibilities are endless—where to look really depends on what
+            language you're learning and what you're personally interested in. I
             plan to update this site with specific recommendations over the
             coming weeks. (
             <a
@@ -287,14 +305,14 @@ const IndexPage = () => {
               className={css.link}
               {...TARGET_BLANK}
             >
-              Follow me on Twitter
+              Follow @knowclip on Twitter
             </a>{" "}
             to stay updated.)
           </p>
           <p>
             What's most important is that you{" "}
             <strong>find something that holds your interest</strong>. Something
-            like your favorite TV show is ideal--if you're familiar with the
+            like your favorite TV show is ideal—if you're familiar with the
             story, it can help you stay engaged and{" "}
             <a href="#immersion" className={css.link}>
               make sense of the language
@@ -302,9 +320,9 @@ const IndexPage = () => {
             .
           </p>
           <p>
-            Of course, finding that content to download isn't always that easy.
-            I would love to build a platform to make this easier, either as a
-            web site, or as an integrated feature in Knowclip. Please consider{" "}
+            Of course, finding that content to download isn't always easy. I'm
+            hoping to build a platform to make this easier, either as a web
+            site, or as an integrated feature in Knowclip—please consider{" "}
             <a href="https://patreon.com/knowclip" className={css.link}>
               supporting me on Patreon
             </a>{" "}
@@ -312,10 +330,10 @@ const IndexPage = () => {
             download and use!
           </p>
           <p>
-            If you're a content creator, I would love to collaborate with you to
-            make your work more easily available for use with Knowclip, while
-            making sure you're fairly compensated. If that sounds interesting to
-            you, please feel free to{" "}
+            <strong>If you're a content creator</strong>, I would love to
+            collaborate with you to make your work more easily available for use
+            with Knowclip, while making sure you're fairly compensated. If that
+            sounds interesting to you, please feel free to{" "}
             <a href="mailto:knowclip@protonmail.com" className={css.link}>
               get in touch
             </a>
@@ -332,12 +350,13 @@ const IndexPage = () => {
       >
         <>
           <p>
-            The only way to learn to speak a language with real humans is by
+            The only way to get good at speaking a language with real humans is
+            to
           </p>
           <p>
             <ol>
-              <li>Learning to understand the language</li>
-              <li>Practicing speaking with real humans</li>
+              <li>Learn to understand the language</li>
+              <li>Practice speaking with real humans</li>
             </ol>
           </p>
           <p>
@@ -357,7 +376,7 @@ const IndexPage = () => {
             <strong>
               #1 <em>must</em> happen before #2
             </strong>
-            --you can't have a conversation with someone unless you can
+            —you can't have a conversation with someone unless you can
             understand what they're saying! There are even people who advocate
             for a{" "}
             <a
@@ -410,7 +429,7 @@ const IndexPage = () => {
             className={css.link}
             {...TARGET_BLANK}
           >
-            list of planned features{" "}
+            list of planned features
           </a>
           , go ahead and tweet{" "}
           <a

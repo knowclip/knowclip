@@ -15,9 +15,8 @@ const Footer = ({ className }) => (
           </h4>
         </a>
         <p>
-          {" "}
           <a href="#download" className={css.link}>
-            Download the app
+            Download the app free
           </a>
         </p>
       </section>
@@ -33,7 +32,14 @@ const Footer = ({ className }) => (
             knowclip@protonmail.com
           </a>
         </p>
-        <p></p>
+        <p>
+          <a href="https://patreon.com/knowclip" className={css.link}>
+            Support me on Patreon!{" "}
+            <span role="img" aria-label="green heart">
+              💚️
+            </span>
+          </a>
+        </p>
       </section>
 
       <ul className={css.socialLinksList}>
@@ -47,7 +53,7 @@ const Footer = ({ className }) => (
           className={css.patreon}
           title="Patreon"
           Icon={Patreon}
-          href="https://patreon.com/justinsilvestre"
+          href="https://patreon.com/knowclip"
         />
         <SocialLink
           className={css.github}

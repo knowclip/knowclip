@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import css from "../pages/index.module.css"
 import Icon from "../components/icon"
 import cn from "classnames"
@@ -6,9 +6,9 @@ import TARGET_BLANK from "../helpers/targetBlank"
 
 import packageJson from "../../../package.json"
 
-const WINDOWS = "WINDOWS"
-const MAC = "MAC"
-const LINUX = "LINUX"
+const WINDOWS = "win"
+const MAC = "mac"
+const LINUX = "linux"
 const getOs = ({ userAgent }) => {
   if (userAgent.includes("MacOS")) return MAC
   if (userAgent.includes("Linux")) return LINUX
@@ -19,65 +19,122 @@ const getOs = ({ userAgent }) => {
 const getFileName = (osCode, ext) =>
   `Knowclip_${packageJson.version}_${osCode}.${ext}`
 
+const getDownloadUrl = (osCode, ext) =>
+  `https://github.com/knowclip/knowclip/releases/download/v${
+    packageJson.version
+  }/${getFileName(osCode, ext)}`
+
 const DownloadSection = () => {
   const [os, setOs] = useState()
 
   useEffect(() => {
-    console.log("hiiii", getOs(window.navigator))
     setOs(getOs(window.navigator))
+  }, [])
+
+  const [macInstallVideoIsOpen, setMacInstallVideoIsOpen] = useState(false)
+  const openMacInstallVideo = useCallback(e => {
+    e.preventDefault()
+    setMacInstallVideoIsOpen(true)
   }, [])
 
   return (
     <section className={css.download}>
       <DownloadOsSection
-        os={WINDOWS}
         current={os}
         setOs={setOs}
+        os={WINDOWS}
+        defaultExt={"exe"}
         osName="Windows"
         buttonText="for Windows 7+"
-        fileName={getFileName("win", "exe")}
       >
-        <ol>
-          <li>Download the .exe file.</li>
-          <li>Open the .exe</li>
-          <li>
-            Follow any prompts you may see to give Windows permission to run the
-            app.
-          </li>
-        </ol>
-        <p>
-          Note that the app is only available on 64-bit machines. (You probably
-          don't have to worry about this unless you have a really old computer{" "}
-          <span role="img" aria-label="smile">
-            🙂️
-          </span>
-          )
-        </p>
+        {showPostDownloadMessage => (
+          <>
+            <ol>
+              <li>
+                <a
+                  href={getDownloadUrl(os, "exe")}
+                  className={css.link}
+                  onClick={showPostDownloadMessage}
+                  {...TARGET_BLANK}
+                >
+                  Download
+                </a>{" "}
+                the .exe file.
+              </li>
+              <li>Open the .exe file.</li>
+              <li>
+                Follow any prompts you may see to give Windows permission to run
+                the app.
+              </li>
+            </ol>
+            <p>
+              Note that the app is currently only available on 64-bit machines.
+              (You probably don't have to worry about this unless you have a
+              really old computer{" "}
+              <span role="img" aria-label="smile">
+                🙂️
+              </span>
+              )
+            </p>
+          </>
+        )}
       </DownloadOsSection>
       <DownloadOsSection
-        os={MAC}
         current={os}
-        osName="Mac"
         setOs={setOs}
-        buttonText="for Mac OSX 10.10+"
-        fileName={getFileName("mac", "dmg")}
+        os={MAC}
+        osName="Mac"
+        buttonText="for Mac OS X 10.10+"
+        defaultExt="dmg"
       >
-        <ol>
-          <li>Download the .dmg archive.</li>
-          <li>Open the .dmg and drag the app into your Applications folder.</li>
-          <li>Open your Applications folder</li>
-          <li>
-            <strong>While holding the Ctrl key, single-click on the app</strong>
-            . Press "Open" when you see a prompt, like in{" "}
-            <a
-              href="https://www.youtube.com/watch?v=AnCyEeOt82I"
-              className={css.link}
-            >
-              this video
-            </a>
-            .
-          </li>
-        </ol>
+        {showPostDownloadMessage => (
+          <>
+            <ol>
+              <li>
+                <a
+                  href={getDownloadUrl(os, "dmg")}
+                  className={css.link}
+                  onClick={showPostDownloadMessage}
+                  {...TARGET_BLANK}
+                >
+                  Download
+                </a>{" "}
+                the .dmg archive.
+              </li>
+              <li>
+                Open the .dmg and drag the app into your Applications folder.
+              </li>
+              <li>Open your Applications folder.</li>
+              <li>
+                <strong>
+                  While holding the Ctrl key, single-click on the app
+                </strong>{" "}
+                and select "Open". Press "Open" when you see a prompt, like in{" "}
+                <a
+                  href="https://www.youtube.com/watch?v=AnCyEeOt82I"
+                  className={css.link}
+                  onClick={openMacInstallVideo}
+                >
+                  this 30-second video
+                </a>
+                .
+                {macInstallVideoIsOpen && (
+                  <div className={css.responsiveVideo}>
+                    <iframe
+                      title="Install Mac Video"
+                      width="560"
+                      height="315"
+                      src="https://www.youtube.com/embed/AnCyEeOt82I?start=0&autoplay=1"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                )}
+              </li>
+            </ol>
+          </>
+        )}
       </DownloadOsSection>
       <DownloadOsSection
         os={LINUX}
@@ -85,39 +142,53 @@ const DownloadSection = () => {
         setOs={setOs}
         osName="Linux"
         buttonText="Debian archive (amd64)"
-        fileName={getFileName("linux", "deb")}
+        defaultExt="deb"
       >
-        <h5 className={css.subheading}>
-          Debian-based distributions (Ubuntu, ElementaryOS, etc.)
-        </h5>
-        <ol>
-          <li>Download the .deb package.</li>
-          <li>
-            Install it in your preferred manner, or via
-            <pre>
-              cd /your/download/folder/ # replace this!
-              {"\n"}sudo dpkg -i {getFileName("linux", "deb")}
-            </pre>
-          </li>
-          <li>
-            Open up knowclip as you would any program, or in the terminal via{" "}
-            <pre>knowclip</pre>
-          </li>
-        </ol>
-        <h5 className={css.subheading}>AppImage</h5>
-        <p>
-          For other distributions, there's an{" "}
-          <a
-            href={`https://github.com/knowclip/knowclip/releases/download/v${
-              packageJson.version
-            }/${getFileName("linux", "AppImage")}`}
-            className={css.link}
-            {...TARGET_BLANK}
-          >
-            AppImage
-          </a>{" "}
-          available for download, though it hasn't been as thoroughly tested.
-        </p>
+        {showPostDownloadMessage => (
+          <>
+            <h5 className={css.subheading}>
+              Debian-based distributions (Ubuntu, ElementaryOS, etc.)
+            </h5>
+            <ol>
+              <li>
+                <a
+                  href={getDownloadUrl(os, "deb")}
+                  className={css.link}
+                  onClick={showPostDownloadMessage}
+                  {...TARGET_BLANK}
+                >
+                  Download
+                </a>{" "}
+                the .deb package.
+              </li>
+              <li>
+                Install it in your preferred manner, or via
+                <pre>
+                  cd /your/download/folder/ # replace this!
+                  {"\n"}sudo dpkg -i {getFileName("linux", "deb")}
+                </pre>
+              </li>
+              <li>
+                Open up knowclip as you would any program, or in the terminal
+                via <pre>knowclip</pre>
+              </li>
+            </ol>
+            <h5 className={css.subheading}>AppImage</h5>
+            <p>
+              For other distributions, there's an{" "}
+              <a
+                href={getDownloadUrl("linux", "AppImage")}
+                className={css.link}
+                onClick={showPostDownloadMessage}
+                {...TARGET_BLANK}
+              >
+                AppImage
+              </a>{" "}
+              available for download, though it hasn't been as thoroughly
+              tested.
+            </p>
+          </>
+        )}
       </DownloadOsSection>
     </section>
   )
@@ -125,14 +196,23 @@ const DownloadSection = () => {
 
 const DownloadOsSection = ({
   os,
+  defaultExt,
   current,
   osName,
   setOs,
   children,
   buttonText,
-  fileName,
 }) => {
   const isCurrent = current === os
+
+  const [
+    postDownloadMessageIsShowing,
+    setPostDownloadMessageIsShowing,
+  ] = useState(false)
+  const showPostDownloadMessage = useCallback(() => {
+    setPostDownloadMessageIsShowing(true)
+  }, [])
+
   return (
     <>
       <h3
@@ -149,10 +229,17 @@ const DownloadOsSection = ({
           [css.hidden]: current && !isCurrent,
         })}
       >
+        {postDownloadMessageIsShowing && (
+          <div className={css.postDownloadMessage}>
+            <PostDownloadMessage />
+          </div>
+        )}
+
         <section className={css.downloadButtonSection}>
           <a
             className={css.downloadButton}
-            href={`https://github.com/knowclip/knowclip/releases/download/v${packageJson.version}/${fileName}`}
+            href={getDownloadUrl(os, defaultExt)}
+            onClick={showPostDownloadMessage}
           >
             <div className={css.callToAction}>Download latest</div>
             <Icon className={css.downloadIcon} alt="Knowclip icon" />
@@ -165,13 +252,36 @@ const DownloadOsSection = ({
             </div>
           </a>
         </section>
+
         <section className={css.installationInstructions}>
           <h4 className={css.subheading}>Installation</h4>
-          {children}
+          {children(showPostDownloadMessage)}
         </section>
       </section>
     </>
   )
 }
+
+const PostDownloadMessage = () => (
+  <>
+    <p>Thanks for downloading Knowclip!</p>
+    <p>
+      <strong>Be sure to follow the installation instructions below</strong>{" "}
+      once the download has finished.
+    </p>
+    <p>
+      Knowclip is free to download and use, and I'm committed to keeping it that
+      way. Please consider <PatreonLink>supporting me on Patreon</PatreonLink>{" "}
+      to help me follow my dream of making quality language education free for
+      everyone!
+    </p>
+  </>
+)
+
+const PatreonLink = ({ children }) => (
+  <a href="https://patreon.com/knowclip" className={css.link}>
+    {children}
+  </a>
+)
 
 export default DownloadSection

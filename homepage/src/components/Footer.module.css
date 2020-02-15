@@ -40,6 +40,9 @@
   padding: 1rem;
   min-width: 14rem;
 }
+.contactHeading {
+  margin-bottom: 0.5em;
+}
 
 .socialLinksList {
   list-style-type: none;

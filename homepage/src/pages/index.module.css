@@ -17,6 +17,22 @@ html {
   color: #6bb5ff;
 }
 
+.responsiveVideo {
+  overflow: hidden;
+  padding-bottom: 56.25%;
+  position: relative;
+  height: 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.responsiveVideo > iframe{
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
 .intro {
   composes: content;
 }
@@ -157,6 +173,7 @@ composes: content;
   color: inherit;
   background-color: #28323c;
   background-color: #18518a;
+  background-color: #f7fbff;
   background-color: #dbedff;
   padding: 1rem;
   border-radius: .3em;
@@ -167,9 +184,12 @@ composes: content;
 }
 .downloadButton:hover {
   box-shadow: 5px 5px 12px rgba(0,0,0,0.5);
+  text-shadow: 0px 0px 0.2em rgba(255,255,255,0.5);
   background-color: #aac5e0;
-  /* background-color: #4a8dce; */
   color: inherit;
+}
+.downloadButton:hover .downloadIcon {
+  filter: drop-shadow(2px 2px 15px rgba(255, 255, 255, 1));
 }
 
 .callToAction {
@@ -184,6 +204,20 @@ composes: content;
   padding: 1em;
 }
 
+.postDownloadMessage {
+  animation: slideDown 1s;
+  height: auto;
+  overflow: hidden;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: white;
+  border-radius: .5rem;
+  border: solid 1px #8da9c5;
+}
+@keyframes slideDown {
+  0% { max-height: 0; margin: 0; padding-top: 0; padding-bottom: 0; }
+  100% { max-height: 20em}
+}
 
 .steps {
   flex: 1 1 15em;
