@@ -7,7 +7,6 @@ import { snackbar$ } from '../../../components/Snackbar'
 
 export default async function openSharedProject({ app, client }: TestSetup) {
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
-  console.log(await client.elements_(mediaFilesMenu$.mediaFileMenuItem))
   const [, secondMediaFile] = await client.elements_(
     mediaFilesMenu$.mediaFileMenuItem,
     2
