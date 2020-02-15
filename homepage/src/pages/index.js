@@ -25,7 +25,7 @@ const IndexPage = () => {
     () =>
       setOpenSections(o => {
         const result = {}
-        for (const k in o) result[k] = false
+        for (const k in o) result[k] = window.location.hash === `#${k}`
         return result
       }),
     []
@@ -85,16 +85,17 @@ const IndexPage = () => {
             </li>
           </ol>
         </section>
-        <div className={css.responsiveVideo}>
-          <iframe
-            className={css.demoVideo}
-            title="demo-video"
-            width="560"
-            height="315"
-            src="https://www.youtube-nocookie.com/embed/kFEfS8dyKQ8"
-            frameBorder="0"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          />
+        <div className={css.demoVideo}>
+          <div className={css.responsiveVideo}>
+            <iframe
+              title="demo-video"
+              width="560"
+              height="315"
+              src="https://www.youtube-nocookie.com/embed/kFEfS8dyKQ8"
+              frameBorder="0"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            />
+          </div>
         </div>
       </div>
       <section className={css.introBottom}>
@@ -455,39 +456,6 @@ const IndexPage = () => {
 
       <br />
     </Layout>
-  )
-}
-
-const downloadMessage = ({ os }) => {
-  return (
-    <section>
-      <h2>Thanks for downloading Knowclip!</h2>
-
-      <p>
-        Since you're running xxxxx, please don't forget to xxxxxxxxxx the
-        installation instructions.
-      </p>
-
-      <h3>Why the extra step?</h3>
-
-      <p>
-        I'm just one lone developer making this app my free time, and I've
-        released it for free because I believe education should be available to
-        everyone.
-      </p>
-
-      <p>
-        But Apple has a "code-signing" process that wasn't made with independent
-        open-source developers like me in mind. They will only let users install
-        my app the regular way if I 1) own an Apple computer and 2) pay a $99
-        yearly fee.
-      </p>
-
-      <p>
-        Maybe one day I might get enough supporters on Patreon to justify the
-        cost. But for now, please bear with me :)
-      </p>
-    </section>
   )
 }
 

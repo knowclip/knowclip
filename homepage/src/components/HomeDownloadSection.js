@@ -231,7 +231,7 @@ const DownloadOsSection = ({
       >
         {postDownloadMessageIsShowing && (
           <div className={css.postDownloadMessage}>
-            <PostDownloadMessage />
+            <PostDownloadMessage os={os} />
           </div>
         )}
 
