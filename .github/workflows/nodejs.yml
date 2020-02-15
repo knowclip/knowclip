@@ -25,5 +25,6 @@ jobs:
         yarn tsc
         yarn build:ci
         yarn test
+        (cd homepage && yarn build)
       env:
         CI: true
