@@ -1,15 +1,11 @@
-import React, { useState, useCallback, useEffect, useRef } from "react"
-import { Link } from "gatsby"
+import React, { useState, useCallback, useEffect } from "react"
 import css from "./index.module.css"
-import Icon from "../components/icon"
 import cn from "classnames"
 import Layout from "../components/layout"
 import FaqSubsection from "../components/HomeFaqSubsection"
 import DownloadSection from "../components/HomeDownloadSection"
 import SEO from "../components/seo"
 import TARGET_BLANK from "../helpers/targetBlank"
-
-import packageJson from "../../../package.json"
 
 const IndexPage = () => {
   const [openSections, setOpenSections] = useState({
