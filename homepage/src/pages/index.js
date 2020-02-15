@@ -424,11 +424,11 @@ const IndexPage = () => {
         </p>
 
         <p>
-          Please consider supporting me on{" "}
+          Please consider{" "}
           <a href="https://patreon.com/knowclip" className={css.link}>
-            Patreon
+            supporting me on Patreon
           </a>
-          . You'd be directly enabling me to roll out new features and bugfixes
+          . You'll be directly enabling me to roll out new features and bugfixes
           on a regular basis, and you'll be helping me follow my dream of{" "}
           <strong>making quality language education free for everyone</strong>!
         </p>
