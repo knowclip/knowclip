@@ -43,7 +43,7 @@ script:
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     yarn && yarn integration && ./docker/docker_run.sh --linux --win
   else	
-    yarn && yarn dist --mac && yarn integration
+    yarn && yarn dist --mac
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine

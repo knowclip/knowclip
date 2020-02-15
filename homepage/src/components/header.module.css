@@ -1,0 +1,45 @@
+.container {
+  z-index: -2;
+  overflow: hidden;
+  height: 8em;
+  padding: 1em;
+}
+
+.lightbulbIcon {
+  vertical-align: middle;
+  z-index: 2;
+  margin-right: .5em;
+  
+  filter: drop-shadow(2px 2px 30px rgba(255, 255, 255, 0.8));
+}
+
+.heading {
+  position: relative;
+  z-index: 2;
+  margin-left: -2rem;
+
+  text-align: center;
+}
+
+.filmBackground {
+  position: relative;
+}
+
+.filmBackground::before {
+  content: "";
+  background:black;
+  width: calc(100% + 6em);
+
+  height: 2em;
+  position: absolute;
+  top: 50%;
+  left: -3em;
+  z-index: -1;
+  transform: translateY(-50%) rotate(1deg);
+  overflow: hidden;
+
+  outline:  #0e283c dotted  3px;
+  outline:  white dotted  3px;
+  outline-offset: -4px;
+  box-shadow: .1em .1em .3em rgba(0, 0, 0, 0.4);
+}

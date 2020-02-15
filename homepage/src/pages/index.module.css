@@ -1,0 +1,378 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.content {
+  composes: mainContent from '../components/layout.module.css';
+
+  padding: 0 1em;
+}
+
+.link:link,
+.link:visited {
+  color: #0076ec;
+}
+.link:hover,
+.link:active {
+  color: #6bb5ff;
+}
+
+.responsiveVideo {
+  overflow: hidden;
+  padding-bottom: 56.25%;
+  position: relative;
+  height: 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.responsiveVideo > iframe{
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.intro {
+  composes: content;
+}
+
+.headingTextColor {
+  color: #667e96;
+
+}
+.heading {
+  composes: headingTextColor;
+  font-weight: 300;
+}
+.subheading {
+  composes: headingTextColor;
+  font-size: 1.2rem;
+  font-weight: normal;
+
+}
+
+.middle {
+  composes: content;
+
+  display: flex;
+  flex-flow: row wrap;
+  overflow: hidden;
+  margin-bottom: 1em;
+}
+
+.demoVideo {
+  flex-grow: 1;
+  flex-basis: 50%;
+  padding: 0 1em;
+}
+.demoVideo .responsiveVideo {
+  margin: 0;
+}
+
+.introBottom {
+composes: content;
+}
+
+.download {
+  composes: content;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+.downloadText {
+  /* flex-basis: 33%; */
+}
+.latestVersion {
+  text-align: center;
+}
+.versionNumber {
+  white-space: nowrap;
+}
+
+.downloadHeading {
+  composes: filmBackground from '../components/header.module.css';
+
+  height: 5em;
+  position: relative;
+  margin-bottom: 0;
+  padding: 2em;
+  overflow: hidden;
+
+  color: white;
+  text-align: center;
+}
+
+.downloadHeading::before {
+  /* overflow: hidden; */
+  width: calc(100% + 20em);
+  transform: translateY(-50%) rotate(-1deg);
+}
+
+.downloadOsName {
+  composes: headingTextColor;
+
+  width: 100%;
+  order: 0;
+  box-sizing: border-box;
+  padding: .3em;
+  border: solid 2px;
+  border-color: rgba(0,0,0,0);
+  border-radius: .2em;
+  min-width: 5em;
+  margin: .1em;
+  font-weight: normal;
+  
+  text-align: center;
+  transition: background .3s, border-color .3s;
+}
+.downloadOsName:hover {
+  border-color: #667e9633;
+  cursor: pointer;
+}
+.currentOsName {
+  border-color: #667e966b;
+}
+.currentOsName:hover {
+  border-color: #667e966b;
+}
+@media only screen and (min-width: 400px) {
+  .downloadOsName {
+    width: auto;
+  }
+}
+
+.downloadSubsection {
+  margin: 0.5rem;
+}
+
+.downloadOsBody {
+  composes: downloadSubsection;
+
+  order: 1;
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  border-radius: .2;
+}
+.downloadOsBody.hidden {
+  display: none;
+}
+
+
+.downloadIcon {
+  height: auto;
+  margin: .5em;
+}
+
+
+.downloadButton {
+  composes: downloadSubsection;
+  
+  max-width: 20em;
+  display: block;
+  color: inherit;
+  background-color: #28323c;
+  background-color: #18518a;
+  background-color: #f7fbff;
+  background-color: #dbedff;
+  padding: 1rem;
+  border-radius: .3em;
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+  text-decoration: none;
+  text-align: center;
+  transition: box-shadow .2s, background-color .1s;
+}
+.downloadButton:hover {
+  box-shadow: 5px 5px 12px rgba(0,0,0,0.5);
+  text-shadow: 0px 0px 0.2em rgba(255,255,255,0.5);
+  background-color: #aac5e0;
+  color: inherit;
+}
+.downloadButton:hover .downloadIcon {
+  filter: drop-shadow(2px 2px 15px rgba(255, 255, 255, 1));
+}
+
+.callToAction {
+  font-size: 1.4rem;
+}
+
+.installationInstructions {
+  composes: downloadSubsection;
+
+  flex: 1 1;
+  min-width: 20em;
+  padding: 1em;
+}
+
+.postDownloadMessage {
+  animation: slideDown 1s;
+  height: auto;
+  overflow: hidden;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: white;
+  border-radius: .5rem;
+  border: solid 1px #8da9c5;
+}
+@keyframes slideDown {
+  0% { max-height: 0; margin: 0; padding-top: 0; padding-bottom: 0; }
+  100% { max-height: 20em}
+}
+
+.steps {
+  flex: 1 1 15em;
+  min-width: 15em;
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.stepsList {
+  position: relative;
+  list-style-type: none;
+  counter-reset: li;
+  margin-left: 3em;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.stepsList li {
+  margin-bottom: 1.45rem;
+  position: relative;
+  flex-basis: 19%;
+}
+
+.stepsList li::before {
+  content: counter(li);
+  counter-increment: li;
+  display: block;
+  position: absolute;
+  left: -3rem;
+  font-weight: bold;
+  font-size: 1.4rem;
+  background: black;
+  border-radius: 50%;
+  width: 1.4em;
+  height: 1.4em;
+  color: white;
+  text-align: center;
+  padding: 0.2em 0.1em;
+}
+
+.hr {
+  max-width: 500px;
+  width: 60%;
+  margin: 3rem auto;
+}
+
+.info {
+  composes: content;
+
+  max-width: 600px;
+  padding-top: 1rem;
+}
+.info:focus {
+  outline: 0 !important;
+}
+
+.infoHeading {
+  composes: heading;
+  margin-bottom: 0;
+  padding-right: 1em;
+  position: relative;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.info.focused {
+  animation: flash 3s !important;
+}
+
+.info.focused .infoHeading {
+  animation: flashHeading 3s;
+}
+.info:focus .infoHeading {
+  color: #0080ff;
+}
+
+.openInfo .infoHeading {
+  margin-bottom: 1.45rem;
+}
+
+.info p {
+  display: none;
+
+}
+.openInfo p {
+  display: block;
+  animation: fadeIn .4s;
+}
+.openInfo {
+  padding-bottom: 2em;
+}
+
+.infoHeading:hover {
+ color: #459ef8;
+}
+
+.infoHeading::before {
+  content: "⌄";
+  display: inline;
+  position: absolute;
+  right: 0;
+  top: -8px;
+}
+.openInfo .infoHeading::before {
+  content: "⌃";
+  top: 5px;
+}
+
+.downloadLinkP {
+  text-align: right;
+}
+
+.downloadLink:link,
+.downloadLink:visited,
+.downloadLink:active {
+  color: #949494;
+  text-decoration: none;
+}
+.downloadLink:hover {
+  color: #6bb5ff;
+}
+
+@keyframes flash {
+  0% {
+    color: yellow;
+  }
+  100% {
+    color: initial;
+  }
+}
+
+@keyframes flashHeading {
+  0% {
+    color: yellow;
+  }
+  100% {
+    color: #459ef8;
+  }
+}
+
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(0, -1em);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
