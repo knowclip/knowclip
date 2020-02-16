@@ -49,6 +49,12 @@ before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
 - rm -rf node_modules/.cache/terser-webpack-plugin
 - rm -rf node_modules/.cache/babel-loader
+before_install:
+- |
+  git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '^homepage/' || {
+    echo "Only homepage was updated, stopping build process."
+    exit
+  }
 branches:
   only:
   - master
