@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useLayoutEffect } from "react"
 import css from "./index.module.css"
 import cn from "classnames"
 import Layout from "../components/layout"

@@ -2,6 +2,10 @@ html {
   scroll-behavior: smooth;
 }
 
+.noJs {
+  display: initial;
+}
+
 .content {
   composes: mainContent from '../components/layout.module.css';
 
@@ -300,20 +304,35 @@ composes: content;
   color: #0080ff;
 }
 
-.openInfo .infoHeading {
-  margin-bottom: 1.45rem;
+html.noJs .info:not(:focus-within) .infoBody,
+html.noJs .info:not(:focus-within) .downloadLinkP {
+  position:absolute;
+  left:-10000px;
+  top:auto;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+html.noJs .info:focus .infoBody {
+  display: block !important;
 }
 
-.info p {
+.infoBody {
   display: none;
-
 }
-.openInfo p {
+.openInfo .infoBody {
   display: block;
+}
+html.noJs .info:focus .infoBody,
+html:not(.noJs) .openInfo .infoBody {
   animation: fadeIn .4s;
 }
-.openInfo {
+
+html:not(.noJs) .openInfo {
   padding-bottom: 2em;
+}
+html:not(.noJs) .openInfo .infoHeading {
+  margin-bottom: 1.45rem;
 }
 
 .infoHeading:hover {
