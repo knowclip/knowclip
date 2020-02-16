@@ -57,7 +57,7 @@ const FaqSubsection = ({
       >
         {heading}
       </h2>
-      {children}
+      <div className={css.infoBody}>{children}</div>
       {isOpen && (
         <p className={css.downloadLinkP}>
           <a href="#download" className={css.downloadLink} onClick={close}>

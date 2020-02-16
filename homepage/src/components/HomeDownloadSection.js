@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useLayoutEffect } from "react"
 import css from "../pages/index.module.css"
 import Icon from "../components/icon"
 import cn from "classnames"
@@ -26,10 +26,21 @@ const getDownloadUrl = (osCode, ext) =>
 
 const DownloadSection = () => {
   const [os, setOs] = useState()
+  const [firstOs, setFirstOs] = useState()
 
   useEffect(() => {
-    setOs(getOs(window.navigator))
+    const firstOs = getOs(window.navigator)
+    setOs(firstOs)
+    setFirstOs(firstOs)
   }, [])
+  useLayoutEffect(() => {
+    const hash = window.location.hash || ""
+    const focusedId = hash.replace("#", "")
+    const focusedElement = focusedId && document.getElementById(focusedId)
+    focusedElement &&
+      focusedElement.scrollIntoView &&
+      focusedElement.scrollIntoView()
+  }, [firstOs])
 
   const [macInstallVideoIsOpen, setMacInstallVideoIsOpen] = useState(false)
   const openMacInstallVideo = useCallback(e => {
