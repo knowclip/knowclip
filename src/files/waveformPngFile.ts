@@ -10,9 +10,7 @@ export default {
     try {
       const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
       if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-        return [
-          r.openFileFailure(file, null, 'You must first locate this file.'),
-        ]
+        return [r.openFileFailure(file, null, null)]
 
       const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
       if (!cbr) return []

@@ -13,9 +13,7 @@ export default {
       file.parentId
     )
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-      return [
-        await r.openFileFailure(file, null, 'You must first locate this file.'),
-      ]
+      return [await r.openFileFailure(file, null, null)]
 
     const vttFilePath = await effects.getSubtitlesFilePath(
       state,

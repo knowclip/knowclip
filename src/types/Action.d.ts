@@ -367,7 +367,7 @@ declare type OpenFileFailure = {
   type: 'OPEN_FILE_FAILURE'
   file: FileMetadata
   filePath: FilePath | null
-  errorMessage: string
+  errorMessage: string | null
 }
 /** Should only be dispatched with a stored file */
 declare type LocateFileRequest = {

@@ -47,7 +47,7 @@ export const openFileSuccess = (
 export const openFileFailure = (
   file: FileMetadata,
   filePath: FilePath | null,
-  errorMessage: string
+  errorMessage: string | null
 ): OpenFileFailure => ({
   type: A.OPEN_FILE_FAILURE,
   file,

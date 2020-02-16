@@ -101,7 +101,7 @@ export default {
   ],
 
   openFailure: async ({ file, filePath, errorMessage }) => [
-    r.errorDialog('Problem opening project file:', errorMessage),
+    r.errorDialog('Problem opening project file:', errorMessage || ''),
   ],
 
   locateRequest: async ({ file }, availability, state, effects) => [

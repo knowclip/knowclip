@@ -26,9 +26,7 @@ export default {
   locateRequest: async ({ file }, availability, state, effects) => {
     const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-      return await [
-        r.openFileFailure(file, null, 'You must first locate this file.'), // TODO: test!!! maybe should delete?
-      ]
+      return await [r.openFileFailure(file, null, null)]
 
     const cbrFilePath = await effects.getConstantBitrateMediaPath(
       parentFile.filePath,
