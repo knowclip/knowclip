@@ -67,7 +67,7 @@ const FlashcardSection = ({
           clipId={highlightedClip.id}
         />
       ) : (
-        <Placeholder />
+        <Placeholder clipsIds={clipsIds} />
       )}
 
       <Tooltip title="Next clip (Ctrl + period)">
@@ -86,32 +86,39 @@ const FlashcardSection = ({
   )
 }
 
-const Placeholder = () => (
-  <section className={css.intro}>
-    <p className={css.introText}>
-      You can <strong>create clips</strong> in a few different ways:
-    </p>
-    <ul className={css.introList}>
-      <li>
-        Manually <strong>click and drag</strong> on the waveform
-      </li>
+const Placeholder = ({ clipsIds }: { clipsIds: string[] }) => {
+  const preview = useSelector((state: AppState) => r.getCardPreview(state))
+  return clipsIds.length ? (
+    <section className={css.intro}>
+      <pre>{JSON.stringify(preview, null, 2)}</pre>
+    </section>
+  ) : (
+    <section className={css.intro}>
+      <p className={css.introText}>
+        You can <strong>create clips</strong> in a few different ways:
+      </p>
+      <ul className={css.introList}>
+        <li>
+          Manually <strong>click and drag</strong> on the waveform
+        </li>
 
-      <li>
-        Use <Hearing className={css.icon} /> <strong>silence detection</strong>{' '}
-        to automatically make clips from audio containing little background
-        noise.
-      </li>
-      <li>
-        Use <Subtitles className={css.icon} /> <strong>subtitles</strong> to
-        automatically create both clips and flashcards.
-      </li>
-    </ul>
-    <p className={css.introText}>
-      When you're done, press the <Layers className={css.icon} />{' '}
-      <strong>export button</strong>.
-    </p>
-  </section>
-)
+        <li>
+          Use <Hearing className={css.icon} />{' '}
+          <strong>silence detection</strong> to automatically make clips from
+          audio containing little background noise.
+        </li>
+        <li>
+          Use <Subtitles className={css.icon} /> <strong>subtitles</strong> to
+          automatically create both clips and flashcards.
+        </li>
+      </ul>
+      <p className={css.introText}>
+        When you're done, press the <Layers className={css.icon} />{' '}
+        <strong>export button</strong>.
+      </p>
+    </section>
+  )
+}
 
 export default FlashcardSection
 
