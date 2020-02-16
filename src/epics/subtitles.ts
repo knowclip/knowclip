@@ -12,11 +12,12 @@ import {
   concat,
   tap,
 } from 'rxjs/operators'
-import { of, Observable } from 'rxjs'
+import { of, Observable, empty } from 'rxjs'
 import * as r from '../redux'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
+import { TransliterationFlashcardFields } from '../types/Project'
 
 const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -148,6 +149,39 @@ const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
     ignoreElements()
   )
 
+const linkCardToTrack: AppEpic = (action$, state$) =>
+  action$
+    .ofType<LinkFlashcardFieldToSubtitlesTrack>(
+      A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK
+    )
+    .pipe(
+      flatMap(action => {
+        const highlightedClip = r.getHighlightedClip(state$.value)
+        if (!highlightedClip) return empty()
+
+        const currentNoteType = r.getCurrentNoteType(state$.value)
+        if (!currentNoteType) return empty()
+
+        const {
+          [action.flashcardFieldName]: newValue,
+        } = r.getNewFieldsFromLinkedSubtitles(
+          state$.value,
+          currentNoteType,
+          highlightedClip
+        ) as TransliterationFlashcardFields
+
+        if (!newValue.trim()) return empty()
+
+        return of(
+          r.editClip(highlightedClip.id, {
+            flashcard: {
+              fields: { [action.flashcardFieldName]: newValue },
+            },
+          })
+        )
+      })
+    )
+
 type SubtitlesGenerationFieldMapping = Partial<
   Record<TransliterationFlashcardFieldName, SubtitlesTrackId>
 > & {
@@ -259,5 +293,6 @@ function getClipsAndCardsFromSubtitles(
 export default combineEpics(
   makeClipsFromSubtitles,
   subtitlesClipsDialogRequest,
-  goToSubtitlesChunk
+  goToSubtitlesChunk,
+  linkCardToTrack
 )
