@@ -56,9 +56,16 @@ const Media = ({
 
   useSyncSubtitlesVisibility(subtitles, mediaRef)
 
+  if (!metadata)
+    return (
+      <section className={className}>
+        <div />
+      </section>
+    )
+
   return (
     <section className={className}>
-      {metadata && metadata.isVideo ? (
+      {metadata.isVideo ? (
         <video
           {...props}
           ref={mediaRef as MutableRefObject<HTMLVideoElement>}
