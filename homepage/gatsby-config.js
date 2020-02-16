@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: `Knowclip`,
-    description: `Transform any video or audio file into effective language-learning materials`,
+    description: `Transform any video or audio file into effective language-learning materials. `,
     author: `@knowclip`,
   },
   plugins: [
@@ -31,7 +31,7 @@ module.exports = {
       resolve: "gatsby-plugin-web-font-loader",
       options: {
         google: {
-          families: ["Karla", "Roboto:300,400"],
+          families: ["Roboto:300,400"],
         },
       },
     },
