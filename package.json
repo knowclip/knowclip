@@ -14,7 +14,7 @@
     "type": "git",
     "url": "https://github.com/knowclip/knowclip.git"
   },
-  "license": "GPL-3.0-or-later",
+  "license": "AGPL-3.0-only",
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
