@@ -7,6 +7,7 @@
 }
 
 .intro {
+  width: 100%;
   height: 100%;
   padding: 2rem;
 }
@@ -153,13 +154,34 @@
 }
 
 .preview {
-  font-size: 1.1rem;
+  margin-top: 2rem;
+  text-align: center;
   color: #6b6b6b;
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+}
+.previewFields {
+  flex-grow: 1;
 }
 .previewField {
   position: relative;
   width: 100%;
+  min-height: 3rem;
+}
+.previewFieldTranscription {
+  font-size: 1.2rem;
 }
 .previewFieldValue {
-
+  margin: 0rem !important;
+  padding: 1rem 0.5rem;
+}
+.emptyFieldPlaceholder {
+  font-size: 16px;
+  font-style: italic;
+  opacity: .5;
+}
+.previewTags {
+  padding: 1rem;
+  font-size: .8rem;
 }

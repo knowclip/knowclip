@@ -23,44 +23,93 @@ const FlashcardSectionPreview = ({
   clipsIds,
   preview,
   mediaFile,
+  fieldsToTracks,
 }: {
   clipsIds: string[]
   preview: CardPreview | null
   mediaFile: MediaFile
+  fieldsToTracks: SubtitlesFlashcardFieldsLinks
 }) => {
-  const { fieldsToTracks } = useSelector((state: AppState) => ({
-    fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-  }))
-
   const { subtitles, id } = mediaFile
   const fields = (preview
     ? preview.fields
     : {}) as TransliterationFlashcardFields
   return (
     <section className={cn(css.preview)}>
-      <Field
-        fieldName="transcription"
-        subtitles={subtitles}
-        linkedTracks={fieldsToTracks}
-        mediaFileId={mediaFile.id}
-      >
-        <p className={cn('transcription', css.previewFieldValue)}>
-          {fields.transcription}
-        </p>
-      </Field>
+      <section className={cn(css.previewFields)}>
+        <Field
+          fieldName="transcription"
+          subtitles={subtitles}
+          linkedTracks={fieldsToTracks}
+          mediaFileId={mediaFile.id}
+        >
+          <p
+            className={cn(css.previewFieldValue, css.previewFieldTranscription)}
+          >
+            {preview && (
+              <FieldValue
+                fieldName="transcription"
+                value={fields.transcription}
+              />
+            )}
+          </p>
+        </Field>
 
-      {'pronunciation' in fields && (
-        <p className={cn('pronunciation', css.previewFieldValue)}>
-          {fields.pronunciation}
-        </p>
-      )}
-      <p className={cn('meaning', css.previewFieldValue)}>{fields.meaning}</p>
-      {fields.notes && (
-        <p className={cn('notes', css.previewFieldValue)}>{fields.notes}</p>
-      )}
+        {'pronunciation' in fields && fields.pronunciation && (
+          <Field
+            fieldName="pronunciation"
+            subtitles={subtitles}
+            linkedTracks={fieldsToTracks}
+            mediaFileId={mediaFile.id}
+          >
+            <p className={cn(css.previewFieldValue)}>
+              {preview && (
+                <FieldValue
+                  fieldName="pronunciation"
+                  value={fields.pronunciation}
+                />
+              )}
+            </p>
+          </Field>
+        )}
+        <Field
+          fieldName="meaning"
+          subtitles={subtitles}
+          linkedTracks={fieldsToTracks}
+          mediaFileId={mediaFile.id}
+        >
+          <p className={cn(css.previewFieldValue)}>
+            {preview && (
+              <FieldValue fieldName="meaning" value={fields.meaning} />
+            )}
+          </p>
+        </Field>
+        {fields.notes && (
+          <Field
+            fieldName="notes"
+            subtitles={subtitles}
+            linkedTracks={fieldsToTracks}
+            mediaFileId={mediaFile.id}
+          >
+            <p className={cn(css.previewFieldValue)}>{fields.notes}</p>
+          </Field>
+        )}
+      </section>
     </section>
   )
 }
+const FieldValue = ({
+  fieldName,
+  value,
+}: {
+  fieldName: FlashcardFieldName
+  value: string | null
+}) =>
+  value ? (
+    <>{value}</>
+  ) : (
+    <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
+  )
 
 const Field = ({
   children,

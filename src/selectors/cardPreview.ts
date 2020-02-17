@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { getCurrentMediaFile } from './currentMedia'
+import { getCurrentMediaFile, getCurrentNoteType } from './currentMedia'
 import {
   getSubtitlesFlashcardFieldLinks,
   getSubtitlesChunksWithinRange,
@@ -8,6 +8,10 @@ import {
 import { getDefaultTags, getHighlightedClip } from './session'
 import { getWaveform } from './waveform'
 import { TransliterationFlashcardFields } from '../types/Project'
+import {
+  blankSimpleFields,
+  blankTransliterationFields,
+} from '../utils/newFlashcard'
 
 export type CardPreview = {
   fields: FlashcardFields
@@ -20,17 +24,25 @@ export const getCardPreview = createSelector(
   (state: AppState) => state.subtitles,
   getSubtitlesFlashcardFieldLinks,
   getDefaultTags,
+  getCurrentNoteType,
   (
     highlightedClip,
     waveform,
     subtitles,
     fieldsToTracks,
-    defaultTags
+    defaultTags,
+    noteType
   ): CardPreview | null => {
     if (highlightedClip) return null
 
     const currentPosition = waveform.cursor.x
-    const fields = {} as TransliterationFlashcardFields
+    console.log({ noteType })
+    if (!noteType) return null
+    const fields = {
+      ...(noteType === 'Simple'
+        ? blankSimpleFields
+        : blankTransliterationFields),
+    } as TransliterationFlashcardFields
 
     let none = true
     for (const fn in fieldsToTracks) {
