@@ -18,21 +18,21 @@ enum $ {
 }
 
 const { SELECTION_BORDER_WIDTH } = r
-const HEIGHT = 70
+const WAVEFORM_HEIGHT = 70
 
-const Cursor = ({ x }: { x: number }) => (
+const Cursor = ({ x, height }: { x: number; height: number }) => (
   <line
-    stroke="black"
+    stroke="orange"
     x1={x}
     y1="-1"
     x2={x}
-    y2={HEIGHT}
+    y2={height}
     shapeRendering="crispEdges"
   />
 )
 
 const getClipPath = (start: number, end: number) =>
-  `M${start} 0 L${end} 0 L${end} ${HEIGHT} L${start} ${HEIGHT} L${start} 0`
+  `M${start} 0 L${end} 0 L${end} ${WAVEFORM_HEIGHT} L${start} ${WAVEFORM_HEIGHT} L${start} 0`
 
 type ClipProps = {
   id: string
@@ -59,7 +59,7 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         x={start}
         y="0"
         width={SELECTION_BORDER_WIDTH}
-        height={HEIGHT}
+        height={WAVEFORM_HEIGHT}
       />
       <rect
         className={cn(css.waveformClipBorder, {
@@ -68,7 +68,7 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         x={end - SELECTION_BORDER_WIDTH}
         y="0"
         width={SELECTION_BORDER_WIDTH}
-        height={HEIGHT}
+        height={WAVEFORM_HEIGHT}
       />
     </g>
   )
@@ -85,7 +85,8 @@ const PendingStretch = ({ start, end }: ChunkProps) => (
   <path className={css.waveformPendingStretch} d={getClipPath(start, end)} />
 )
 
-const getViewBoxString = (xMin: number) => `${xMin} 0 3000 ${HEIGHT}`
+const getViewBoxString = (xMin: number, height: number) =>
+  `${xMin} 0 3000 ${height}`
 const getSubtitlesViewBoxString = (xMin: number, yMax: number) =>
   `${xMin} 0 3000 ${yMax}`
 
@@ -130,36 +131,53 @@ const SubtitlesChunk = ({
   trackIndex: number
   chunkIndex: number
   trackId: string
-}) => (
-  <g
-    className={css.subtitlesChunk}
-    data-chunk-index={chunkIndex}
-    data-track-id={trackId}
-  >
-    <path
-      className={css.subtitlesChunkRectangle}
-      data-track-id={trackId}
-      data-chunk-index={chunkIndex}
-      d={getSubtitlesPath(
-        chunk.start,
-        chunk.end,
-        trackIndex * SUBTITLES_CHUNK_HEIGHT,
-        (trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT
-      )}
-    />
-    <text
-      data-chunk-index={chunkIndex}
-      data-track-id={trackId}
-      className={css.subtitlesText}
-      x={chunk.start + 4}
-      y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6}
-      width={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - chunk.start}
-    >
-      {chunk.text}
-    </text>
-  </g>
-)
+}) => {
+  const clipPathId = `${trackId}__${chunkIndex}`
+  const width = chunk.end - chunk.start
 
+  const rect = {
+    x: chunk.start,
+    y: WAVEFORM_HEIGHT + trackIndex * SUBTITLES_CHUNK_HEIGHT,
+    width: width,
+    height: SUBTITLES_CHUNK_HEIGHT,
+  }
+  return (
+    <g
+      className={css.subtitlesChunk}
+      data-chunk-index={chunkIndex}
+      data-track-id={trackId}
+    >
+      <clipPath id={clipPathId}>
+        <rect {...rect} width={width - 10} />
+      </clipPath>
+      <rect
+        className={css.subtitlesChunkRectangle}
+        data-track-id={trackId}
+        data-chunk-index={chunkIndex}
+        {...rect}
+        rx={SUBTITLES_CHUNK_HEIGHT / 2}
+      />
+      <text
+        clipPath={`url(#${clipPathId})`}
+        data-chunk-index={chunkIndex}
+        data-track-id={trackId}
+        className={css.subtitlesText}
+        x={chunk.start + 10}
+        y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6 + WAVEFORM_HEIGHT}
+      >
+        {chunk.text}
+        {/* <textPath
+          width={width}
+          height={SUBTITLES_CHUNK_HEIGHT}
+          x={chunk.start + 4}
+          y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6}
+        >
+          {chunk.text}
+        </textPath> */}
+      </text>
+    </g>
+  )
+}
 const SubtitlesTimelines = memo(
   ({
     subtitles,
@@ -171,23 +189,19 @@ const SubtitlesTimelines = memo(
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
   }) => {
     const handleClick = useCallback(
-      e =>
+      e => {
+        e.stopPropagation()
         goToSubtitlesChunk(
           e.target.dataset.trackId,
           e.target.dataset.chunkIndex
-        ),
+        )
+      },
       [goToSubtitlesChunk]
     )
     return (
-      <svg
+      <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
-        preserveAspectRatio="xMinYMin slice"
-        viewBox={getSubtitlesViewBoxString(
-          viewBox.xMin,
-          subtitles.length * SUBTITLES_CHUNK_HEIGHT
-        )}
         width="100%"
-        height={subtitles.length * SUBTITLES_CHUNK_HEIGHT}
         onClick={handleClick}
       >
         {subtitles.map(({ chunks, id }, trackIndex) => (
@@ -203,7 +217,7 @@ const SubtitlesTimelines = memo(
             ))}
           </g>
         ))}
-      </svg>
+      </g>
     )
   }
 )
@@ -236,7 +250,8 @@ const Waveform = ({ show }: { show: boolean }) => {
   )
 
   const { viewBox, cursor, stepsPerSecond } = waveform
-  const viewBoxString = getViewBoxString(viewBox.xMin)
+  const height = WAVEFORM_HEIGHT + subtitles.length * SUBTITLES_CHUNK_HEIGHT
+  const viewBoxString = getViewBoxString(viewBox.xMin, height)
   const svgRef = useRef(null)
   const onMouseDown = useCallback(
     e => {
@@ -253,35 +268,29 @@ const Waveform = ({ show }: { show: boolean }) => {
     },
     [waveform]
   )
-  return (
-    <Fragment>
-      {show ? (
-        <svg
-          ref={svgRef}
-          id="waveform-svg"
-          viewBox={viewBoxString}
-          preserveAspectRatio="xMinYMin slice"
-          className={cn(css.waveformSvg, $.container)}
-          width="100%"
-          onMouseDown={onMouseDown}
-          height={HEIGHT}
-        >
-          {path && <image xlinkHref={`file://${path}`} />}
-          <Cursor {...cursor} />
-          <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
-          {pendingClip && (
-            <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
-          )}
-          {pendingStretch && (
-            <PendingStretch
-              {...pendingStretch}
-              stepsPerSecond={stepsPerSecond}
-            />
-          )}
-        </svg>
-      ) : (
-        <div className={css.waveformPlaceholder} />
+  return show ? (
+    <svg
+      ref={svgRef}
+      id="waveform-svg"
+      viewBox={viewBoxString}
+      preserveAspectRatio="xMinYMin slice"
+      className={cn(css.waveformSvg, $.container)}
+      width="100%"
+      onMouseDown={onMouseDown}
+      height={height}
+    >
+      <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
+      {pendingClip && (
+        <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
       )}
+      {pendingStretch && (
+        <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />
+      )}
+      {path && (
+        <image xlinkHref={`file://${path}`} style={{ pointerEvents: 'none' }} />
+      )}
+      <Cursor {...cursor} height={height} />
+
       {Boolean(subtitles.length) && (
         <SubtitlesTimelines
           subtitles={subtitles}
@@ -289,7 +298,9 @@ const Waveform = ({ show }: { show: boolean }) => {
           goToSubtitlesChunk={goToSubtitlesChunk}
         />
       )}
-    </Fragment>
+    </svg>
+  ) : (
+    <div className={css.waveformPlaceholder} />
   )
 }
 

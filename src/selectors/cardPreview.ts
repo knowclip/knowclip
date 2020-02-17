@@ -9,7 +9,7 @@ import { getDefaultTags, getHighlightedClip } from './session'
 import { getWaveform } from './waveform'
 import { TransliterationFlashcardFields } from '../types/Project'
 
-type CardPreview = {
+export type CardPreview = {
   fields: FlashcardFields
   tags: string[]
 }

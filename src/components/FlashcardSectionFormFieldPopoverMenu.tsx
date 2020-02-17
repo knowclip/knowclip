@@ -1,4 +1,4 @@
-import React, { useCallback, SyntheticEvent } from 'react'
+import React, { useCallback, SyntheticEvent, useMemo } from 'react'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
@@ -114,6 +114,48 @@ const FieldMenuItem = ({
     </MenuItem>
   )
 }
+
+export function useSubtitlesBySource(subtitles: MediaSubtitlesRelation[]) {
+  const embeddedSubtitlesTracks = useMemo(() => subtitles.filter(isEmbedded), [
+    subtitles,
+  ])
+  const externalSubtitlesTracks = useMemo(() => subtitles.filter(isExternal), [
+    subtitles,
+  ])
+  return { embeddedSubtitlesTracks, externalSubtitlesTracks }
+}
+
+const isEmbedded = (
+  t:
+    | {
+        type: 'EmbeddedSubtitlesTrack'
+        id: string
+        streamIndex: number
+      }
+    | {
+        type: 'ExternalSubtitlesTrack'
+        id: string
+      }
+): t is {
+  type: 'EmbeddedSubtitlesTrack'
+  id: string
+  streamIndex: number
+} => t.type === 'EmbeddedSubtitlesTrack'
+const isExternal = (
+  t:
+    | {
+        type: 'EmbeddedSubtitlesTrack'
+        id: string
+        streamIndex: number
+      }
+    | {
+        type: 'ExternalSubtitlesTrack'
+        id: string
+      }
+): t is {
+  type: 'ExternalSubtitlesTrack'
+  id: string
+} => t.type === 'ExternalSubtitlesTrack'
 
 export default FlashcardSectionFormFieldPopoverMenu
 

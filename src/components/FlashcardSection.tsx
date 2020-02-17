@@ -13,6 +13,7 @@ import {
 } from '@material-ui/icons'
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
+import Preview from './FlashcardSectionPreview'
 
 enum $ {
   container = 'flashcard-section-container',
@@ -67,7 +68,7 @@ const FlashcardSection = ({
           clipId={highlightedClip.id}
         />
       ) : (
-        <Placeholder clipsIds={clipsIds} />
+        <Placeholder clipsIds={clipsIds} mediaFile={mediaFile} />
       )}
 
       <Tooltip title="Next clip (Ctrl + period)">
@@ -86,11 +87,17 @@ const FlashcardSection = ({
   )
 }
 
-const Placeholder = ({ clipsIds }: { clipsIds: string[] }) => {
+const Placeholder = ({
+  clipsIds,
+  mediaFile,
+}: {
+  clipsIds: string[]
+  mediaFile: MediaFile | null
+}) => {
   const preview = useSelector((state: AppState) => r.getCardPreview(state))
-  return clipsIds.length ? (
+  return clipsIds.length && mediaFile ? (
     <section className={css.intro}>
-      <pre>{JSON.stringify(preview, null, 2)}</pre>
+      <Preview preview={preview} clipsIds={clipsIds} mediaFile={mediaFile} />
     </section>
   ) : (
     <section className={css.intro}>

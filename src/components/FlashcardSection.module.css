@@ -144,7 +144,22 @@
 }
 
 .field:focus .fieldMenuButton,
-  .field:hover .fieldMenuButton,
+.field:hover .fieldMenuButton,
+.previewField:focus .fieldMenuButton,
+.previewField:hover .fieldMenuButton,
+  
   .fieldMenuButton:focus {
   opacity: 1;
+}
+
+.preview {
+  font-size: 1.1rem;
+  color: #6b6b6b;
+}
+.previewField {
+  position: relative;
+  width: 100%;
+}
+.previewFieldValue {
+
 }

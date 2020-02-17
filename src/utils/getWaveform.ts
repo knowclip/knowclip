@@ -4,8 +4,8 @@ import { existsSync } from 'fs'
 import { getFileAvailabilityById } from '../selectors'
 import { basename, join } from 'path'
 
-const BG_COLOR = '#f0f8ff'
-const WAVE_COLOR = '#555555'
+const WAVE_COLOR = '#b7cee0'
+const BG_COLOR = '#00000000'
 const CORRECTION_OFFSET = 0
 
 export const getWaveformPng = async (
@@ -28,7 +28,7 @@ export const getWaveformPng = async (
       constantBitrateFilePath,
       file
     )
-    if (outputFilename && existsSync(outputFilename)) return outputFilename
+    // if (outputFilename && existsSync(outputFilename)) return outputFilename
 
     return await new Promise((res, rej) => {
       ffmpeg(constantBitrateFilePath)

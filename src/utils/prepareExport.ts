@@ -26,32 +26,65 @@ const IMAGE = `{{#image}}
 <div class="image">{{image}}</div>
 {{/image}}`
 
-const getCards = (noteType: NoteType) => [
-  {
-    name: 'Listening',
-    questionFormat: [IMAGE, `♫{{sound}}`].join('\n'),
-    answerFormat: [
-      FRONT_SIDE,
-      HR,
-      TRANSCRIPTION,
-      PRONUNCIATION,
-      MEANING,
-      NOTES,
-    ].join('\n\n'),
-  },
-  {
-    name: 'Reading',
-    questionFormat: [IMAGE, TRANSCRIPTION].join('\n'),
-    answerFormat: [
-      FRONT_SIDE,
-      HR,
-      '{{sound}}',
-      PRONUNCIATION,
-      MEANING,
-      NOTES,
-    ].join('\n\n'),
-  },
-]
+const LISTENING_CARD = {
+  name: 'Listening',
+  questionFormat: [IMAGE, `♫{{sound}}`].join('\n'),
+  answerFormat: [
+    FRONT_SIDE,
+    HR,
+    TRANSCRIPTION,
+    PRONUNCIATION,
+    MEANING,
+    NOTES,
+  ].join('\n\n'),
+}
+const READING_CARD = {
+  name: 'Reading',
+  questionFormat: [IMAGE, TRANSCRIPTION].join('\n'),
+  answerFormat: [
+    FRONT_SIDE,
+    HR,
+    '{{sound}}',
+    PRONUNCIATION,
+    MEANING,
+    NOTES,
+  ].join('\n\n'),
+}
+
+const getCards = (noteType: NoteType) => [LISTENING_CARD, READING_CARD]
+
+export const TEMPLATE_CSS = `.card {
+  font-family: Helvetica, Arial;
+  font-size: 16px;
+  text-align: center;
+  color: black;
+  background-color: white;
+  line-height: 1.25
+}
+
+.transcription {
+  font-size: 2em;
+}
+
+.pronunciation {
+  font-style: italic;
+  font-size: 1.4em;
+}
+
+.meaning {
+  margin-top: 4em;
+  margin-bottom: 4em;
+}
+
+.notes {
+  background-color: #efefef;
+  padding: .8em;
+  border-radius: .2em;
+  text-align: justify;
+  max-width: 40em;
+  margin-left: auto;
+  margin-right: auto;
+}`
 
 /** Returns either valid export data or a list of missing media files. */
 export const getApkgExportData = (
@@ -156,38 +189,7 @@ export const getApkgExportData = (
 
       fields: [...fieldNames, 'sound', 'image', 'Knowclip ID'],
       cards: getCards(project.noteType),
-      css: `.card {
-  font-family: Helvetica, Arial;
-  font-size: 16px;
-  text-align: center;
-  color: black;
-  background-color: white;
-  line-height: 1.25
-}
-
-.transcription {
-  font-size: 2em;
-}
-
-.pronunciation {
-  font-style: italic;
-  font-size: 1.4em;
-}
-
-.meaning {
-  margin-top: 4em;
-  margin-bottom: 4em;
-}
-
-.notes {
-  background-color: #efefef;
-  padding: .8em;
-  border-radius: .2em;
-  text-align: justify;
-  max-width: 40em;
-  margin-left: auto;
-  margin-right: auto;
-}`,
+      css: TEMPLATE_CSS,
     },
     clips,
   }
