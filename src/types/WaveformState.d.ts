@@ -6,6 +6,7 @@ declare type WaveformState = {
     y: number
   }
   viewBox: WaveformViewBox
+  length: number
 }
 
 declare type WaveformViewBox = {

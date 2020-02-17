@@ -33,7 +33,9 @@ const FlashcardSectionPreview = ({
   }))
 
   const { subtitles, id } = mediaFile
-  const fields =( preview ? preview.fields : {} )as TransliterationFlashcardFields
+  const fields = (preview
+    ? preview.fields
+    : {}) as TransliterationFlashcardFields
   return (
     <section className={cn(css.preview)}>
       <Field

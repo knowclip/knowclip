@@ -7,11 +7,7 @@
 
 .waveformSvg,
 .waveformPlaceholder {
-  /* background-color: aliceblue; */
-  /* background-color: #9ba9b5; */
-  background: #222222;
-  background: #222222;
-  /* flex-basis: 70px; */
+  background: gray;
   flex-grow: 0;
   flex-shrink: 0;
 }
@@ -21,15 +17,12 @@
 }
 
 .waveformClip {
-  /* stroke: rgba(255, 245, 187, 0.2); */
-  fill: rgba(255, 237, 133, 0.2);
-  fill: #69758a;
   fill: hsla(205, 10%, 40%, 0.7);
-
 }
 
 .waveformClipBorder {
-  fill: rgba(255, 230, 146, 0.4);
+  /* fill: hsla(205, 10%, 40%, 0.7); */
+  fill: transparent;
   stroke: none;
   cursor: ew-resize;
   z-index: 10;
@@ -67,13 +60,7 @@
 }
 
 .subtitlesChunkRectangle {
-  stroke: #303f9f;
   stroke-width: 1px;
-  fill: #e4ecf7;
-  fill: rgb(183, 206, 224);
-  fill: hsl(206, 10%, 30%);
-  fill: #454e54;
-  fill: hsla(205, 10%, 40%, 0.7);
   fill: hsla(205, 20%, 70%, 0.3);
 }
 
@@ -85,17 +72,14 @@
 }
 .subtitlesChunk:hover .subtitlesText {
   font-size: 14px;
-  fill: #616161;
-  fill: rgb(71, 71, 71);
+  fill: #474747;
 }
 .subtitlesChunk:hover .subtitlesText {
   font-size: 14px;
-  fill: #616161;
   fill: black;
 }
  
 .subtitlesChunk:hover .subtitlesChunkRectangle {
-  fill: aliceblue;
   fill: #e4ecf7;
   opacity: 1;
 }

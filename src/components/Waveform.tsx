@@ -1,4 +1,4 @@
-import React, { Fragment, memo, useRef, useCallback } from 'react'
+import React, { memo, useRef, useCallback } from 'react'
 import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import * as r from '../redux'
@@ -22,7 +22,7 @@ const WAVEFORM_HEIGHT = 70
 
 const Cursor = ({ x, height }: { x: number; height: number }) => (
   <line
-    stroke="orange"
+    stroke="white"
     x1={x}
     y1="-1"
     x2={x}
@@ -31,25 +31,30 @@ const Cursor = ({ x, height }: { x: number; height: number }) => (
   />
 )
 
-const getClipPath = (start: number, end: number) =>
-  `M${start} 0 L${end} 0 L${end} ${WAVEFORM_HEIGHT} L${start} ${WAVEFORM_HEIGHT} L${start} 0`
+const getClipRectProps = (start: number, end: number, height: number) => ({
+  x: start,
+  y: 0,
+  width: end - start,
+  height: height,
+})
 
 type ClipProps = {
   id: string
   start: number
   end: number
   isHighlighted: boolean
+  height: number
 }
-const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
+const Clip = ({ id, start, end, isHighlighted, height }: ClipProps) => {
   return (
     <g id={id}>
-      <path
+      <rect
         className={cn(
           css.waveformClip,
           { [css.highlightedClip]: isHighlighted },
           $.waveformClip
         )}
-        d={getClipPath(start, end)}
+        {...getClipRectProps(start, end, height)}
       />
 
       <rect
@@ -59,7 +64,7 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         x={start}
         y="0"
         width={SELECTION_BORDER_WIDTH}
-        height={WAVEFORM_HEIGHT}
+        height={height}
       />
       <rect
         className={cn(css.waveformClipBorder, {
@@ -68,35 +73,45 @@ const Clip = ({ id, start, end, isHighlighted }: ClipProps) => {
         x={end - SELECTION_BORDER_WIDTH}
         y="0"
         width={SELECTION_BORDER_WIDTH}
-        height={WAVEFORM_HEIGHT}
+        height={height}
       />
     </g>
   )
-  // <path className="waveform-clip-border" d={`M${start} 0 L${leftBorderInnerEdge} 0 L`} />
 }
 
-type ChunkProps = { start: number; end: number; stepsPerSecond: number }
+type ChunkProps = {
+  start: number
+  end: number
+  stepsPerSecond: number
+  height: number
+}
 
-const PendingClip = ({ start, end }: ChunkProps) => (
-  <path className={css.waveformPendingClip} d={getClipPath(start, end)} />
+const PendingClip = ({ start, end, height }: ChunkProps) => (
+  <rect
+    className={css.waveformPendingClip}
+    {...getClipRectProps(start, end, height)}
+  />
 )
 
-const PendingStretch = ({ start, end }: ChunkProps) => (
-  <path className={css.waveformPendingStretch} d={getClipPath(start, end)} />
+const PendingStretch = ({ start, end, height }: ChunkProps) => (
+  <rect
+    className={css.waveformPendingStretch}
+    {...getClipRectProps(start, end, height)}
+  />
 )
 
 const getViewBoxString = (xMin: number, height: number) =>
   `${xMin} 0 3000 ${height}`
-const getSubtitlesViewBoxString = (xMin: number, yMax: number) =>
-  `${xMin} 0 3000 ${yMax}`
 
 const Clips = React.memo(
   ({
     clips,
     highlightedClipId,
+    height,
   }: {
     clips: Clip[]
     highlightedClipId: string | null
+    height: number
   }) => (
     <g className={$.waveformClipsContainer}>
       {clips.map(clip => (
@@ -104,20 +119,12 @@ const Clips = React.memo(
           {...clip}
           key={clip.id}
           isHighlighted={clip.id === highlightedClipId}
+          height={height}
         />
       ))}
     </g>
   )
 )
-
-const getSubtitlesPath = (
-  startX: number,
-  endX: number,
-  startY: number,
-  endY: number
-) => {
-  return `M${startX} ${startY} L${endX} ${startY} L${endX} ${endY} L${startX} ${endY} L${startX} ${startY}`
-}
 
 const SUBTITLES_CHUNK_HEIGHT = 24
 
@@ -166,14 +173,6 @@ const SubtitlesChunk = ({
         y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6 + WAVEFORM_HEIGHT}
       >
         {chunk.text}
-        {/* <textPath
-          width={width}
-          height={SUBTITLES_CHUNK_HEIGHT}
-          x={chunk.start + 4}
-          y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6}
-        >
-          {chunk.text}
-        </textPath> */}
       </text>
     </g>
   )
@@ -181,11 +180,9 @@ const SubtitlesChunk = ({
 const SubtitlesTimelines = memo(
   ({
     subtitles,
-    viewBox,
     goToSubtitlesChunk,
   }: {
     subtitles: SubtitlesTrack[]
-    viewBox: WaveformViewBox
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
   }) => {
     const handleClick = useCallback(
@@ -279,25 +276,39 @@ const Waveform = ({ show }: { show: boolean }) => {
       onMouseDown={onMouseDown}
       height={height}
     >
-      <Clips {...{ clips, highlightedClipId, stepsPerSecond }} />
+      <rect
+        fill="#222222"
+        x={0}
+        y={0}
+        width={waveform.length}
+        height={height}
+      />
+      <Clips {...{ clips, highlightedClipId, stepsPerSecond, height }} />
       {pendingClip && (
-        <PendingClip {...pendingClip} stepsPerSecond={stepsPerSecond} />
+        <PendingClip
+          {...pendingClip}
+          stepsPerSecond={stepsPerSecond}
+          height={height}
+        />
       )}
       {pendingStretch && (
-        <PendingStretch {...pendingStretch} stepsPerSecond={stepsPerSecond} />
+        <PendingStretch
+          {...pendingStretch}
+          stepsPerSecond={stepsPerSecond}
+          height={height}
+        />
       )}
       {path && (
         <image xlinkHref={`file://${path}`} style={{ pointerEvents: 'none' }} />
       )}
-      <Cursor {...cursor} height={height} />
 
       {Boolean(subtitles.length) && (
         <SubtitlesTimelines
           subtitles={subtitles}
-          viewBox={viewBox}
           goToSubtitlesChunk={goToSubtitlesChunk}
         />
       )}
+      <Cursor {...cursor} height={height} />
     </svg>
   ) : (
     <div className={css.waveformPlaceholder} />
