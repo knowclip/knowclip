@@ -66,17 +66,11 @@
 
 .subtitlesText {
   fill: #e4ecf7;
-}
-.subtitlesChunk:hover {
-  cursor: pointer;
+  font-size: 9px;
 }
 .subtitlesChunk:hover .subtitlesText {
-  font-size: 14px;
-  fill: #474747;
-}
-.subtitlesChunk:hover .subtitlesText {
-  font-size: 14px;
   fill: black;
+  cursor: default;
 }
  
 .subtitlesChunk:hover .subtitlesChunkRectangle {

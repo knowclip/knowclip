@@ -126,7 +126,7 @@ const Clips = React.memo(
   )
 )
 
-const SUBTITLES_CHUNK_HEIGHT = 24
+const SUBTITLES_CHUNK_HEIGHT = 14
 
 const SubtitlesChunk = ({
   chunk,
@@ -169,8 +169,8 @@ const SubtitlesChunk = ({
         data-chunk-index={chunkIndex}
         data-track-id={trackId}
         className={css.subtitlesText}
-        x={chunk.start + 10}
-        y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 6 + WAVEFORM_HEIGHT}
+        x={chunk.start + 6}
+        y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
       >
         {chunk.text}
       </text>
