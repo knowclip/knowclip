@@ -158,16 +158,16 @@ const useLocationForm = (
   }, [])
   const onLocationTextFocus = useCallback(
     async e => {
-      const filePaths = await showOpenDialog(
-        extensions.map(ext => ({ name: 'File', extensions: [ext] }))
-      )
+      const filePaths = await showOpenDialog([
+        { name: 'Subtitles file', extensions: ['srt', 'ass', 'vtt'] },
+      ])
 
       if (!filePaths) return
 
       const [directory] = filePaths
       fillInLocation(directory)
     },
-    [extensions, fillInLocation]
+    [fillInLocation]
   )
   const handleSubmit = useCallback(
     e => {

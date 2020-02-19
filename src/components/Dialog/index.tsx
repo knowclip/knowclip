@@ -32,7 +32,13 @@ const DialogView = () => {
     case 'SubtitlesClips':
       return <SubtitlesClips open={true} data={currentDialog} />
     case 'FileSelection':
-      return <FileSelection open={true} data={currentDialog} />
+      return (
+        <FileSelection
+          open={true}
+          data={currentDialog}
+          key={currentDialog.file.id}
+        />
+      )
     case 'Error':
       return <ErrorDialog open={true} data={currentDialog} />
     case 'Settings':

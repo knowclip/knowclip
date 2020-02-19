@@ -218,6 +218,7 @@ declare type MediaAction =
   | PlayMedia
   | PauseMedia
   | DismissMedia
+  | SetViewMode
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
@@ -233,6 +234,7 @@ declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
 declare type PlayMedia = { type: 'PLAY_MEDIA' }
 declare type PauseMedia = { type: 'PAUSE_MEDIA' }
+declare type SetViewMode = { type: 'SET_VIEW_MODE'; viewMode: ViewMode }
 
 declare type SettingsAction =
   | SetMediaFolderLocation

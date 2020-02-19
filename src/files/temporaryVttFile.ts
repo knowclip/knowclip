@@ -31,6 +31,7 @@ export default {
         validatedFile.parentId
       ) as CurrentlyLoadedFile
       const chunks = await effects.getSubtitlesFromFile(state, filePath)
+      console.log({ chunks })
       if (validatedFile.parentType === 'MediaFile')
         return [
           r.addSubtitlesTrack(

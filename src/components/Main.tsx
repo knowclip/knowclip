@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { CircularProgress, Tooltip, Fab } from '@material-ui/core'
 import { Layers } from '@material-ui/icons'
 import { Redirect } from 'react-router-dom'
+import cn from 'classnames'
 import Media from '../components/Media'
 import Waveform from '../components/Waveform'
 import FlashcardSection from '../components/FlashcardSection'
@@ -27,6 +28,7 @@ const Main = () => {
     currentMediaFile,
     clipsIdsForExport,
     subtitles,
+    viewMode,
   } = useSelector((state: AppState) => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
@@ -39,6 +41,7 @@ const Main = () => {
         ? state.clips.idsByMediaFileId[currentMediaFile.id]
         : [],
       subtitles: r.getSubtitlesTracks(state),
+      viewMode: state.settings.viewMode,
     }
   })
   const dispatch = useDispatch()
@@ -62,7 +65,11 @@ const Main = () => {
         />
       </DarkTheme>
 
-      <section className={css.middle}>
+      <section
+        className={cn(css.middle, {
+          [css.horizontal]: viewMode === 'HORIZONTAL',
+        })}
+      >
         {audioIsLoading ? (
           <div className={css.media} style={{ alignItems: 'center' }}>
             <CircularProgress />

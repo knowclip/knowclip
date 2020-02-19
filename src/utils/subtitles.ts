@@ -1,6 +1,5 @@
-import { promisify } from 'util'
 import tempy from 'tempy'
-import fs from 'fs'
+import fs, { promises } from 'fs'
 import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import * as r from '../redux'
 import { extname, basename, join } from 'path'
@@ -8,8 +7,7 @@ import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import { getMillisecondsAtX } from '../selectors'
 
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
+const { readFile, writeFile } = promises
 
 export const getSubtitlesFilePathFromMedia = async (
   file: SubtitlesFile,
@@ -71,8 +69,8 @@ export const getExternalSubtitlesVttPath = async (
       vttFilePath,
       stringifyVtt(
         chunks.map(chunk => ({
-          start: getMillisecondsAtX(state, chunk.start),
-          end: getMillisecondsAtX(state, chunk.end),
+          start: Math.round(getMillisecondsAtX(state, chunk.start)),
+          end: Math.round(getMillisecondsAtX(state, chunk.end)),
           text: chunk.text,
         }))
       ),
@@ -123,16 +121,23 @@ const parseSubtitles = (
   state: AppState,
   fileContents: string,
   extension: string
-) =>
-  extension === '.ass'
-    ? subsrt
+) => {
+  switch (extension) {
+    case '.ass':
+      return subsrt
         .parse(fileContents)
         .filter(({ type }) => type === 'caption')
         .map(chunk => r.readSubsrtChunk(state, chunk))
         .filter(({ text }) => text)
-    : parse(fileContents)
+    case '.vtt':
+    case '.srt':
+      return parse(fileContents)
         .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
         .filter(({ text }) => text)
+    default:
+      throw new Error('Unknown subtitles format')
+  }
+}
 
 export const getSubtitlesFromFile = async (
   state: AppState,

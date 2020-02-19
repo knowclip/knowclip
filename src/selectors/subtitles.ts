@@ -44,12 +44,16 @@ export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
 
 const getSubtitles = (state: AppState) => state.subtitles
 
+const getCurrentMediaFileSubtitles = (state: AppState) => {
+  const currentMediaFile = getCurrentMediaFile(state)
+  return currentMediaFile ? currentMediaFile.subtitles : []
+}
 export const getSubtitlesTracks = createSelector(
-  getCurrentMediaFile,
+  getCurrentMediaFileSubtitles,
   getSubtitles,
-  (currentFile, subtitles): Array<SubtitlesTrack> => {
-    if (!currentFile) return []
-    return currentFile.subtitles
+  (currentFileSubtitles, subtitles): Array<SubtitlesTrack> => {
+    if (!currentFileSubtitles.length) return []
+    return currentFileSubtitles
       .map(({ id }) => subtitles[id])
       .filter((track): track is SubtitlesTrack => Boolean(track))
   }
@@ -165,7 +169,22 @@ export const readVttChunk = (
   end: getXAtMilliseconds(state, end),
   text: (stripHtml(text) || '').trim(),
 })
-
+export const readParseSrtChunk = (
+  state: AppState,
+  {
+    start,
+    end,
+    text,
+  }: {
+    start: number
+    end: number
+    text: string
+  }
+): SubtitlesChunk => ({
+  start: getXAtMilliseconds(state, start * 1000),
+  end: getXAtMilliseconds(state, end * 1000),
+  text: (stripHtml(text) || '').trim(),
+})
 export const readSubsrtChunk = readVttChunk
 
 const overlap = (
