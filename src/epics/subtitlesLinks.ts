@@ -2,7 +2,6 @@ import { combineEpics } from 'redux-observable'
 import { flatMap, map } from 'rxjs/operators'
 import { of, empty } from 'rxjs'
 import * as r from '../redux'
-import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
@@ -11,36 +10,54 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
       A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST
     )
     .pipe(
-      map(({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
-        const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
-        const previouslyLinkedTrack = previousLinks[flashcardFieldName]
+      map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
+        ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
+          const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
+          const previouslyLinkedTrack = previousLinks[flashcardFieldName]
 
-        if (
-          !previouslyLinkedTrack ||
-          !r.getClipIdsByMediaFileId(state$.value, mediaFileId).length
-        )
-          return r.linkFlashcardFieldToSubtitlesTrack(
-            flashcardFieldName,
-            mediaFileId,
-            subtitlesTrackId
+          if (
+            !previouslyLinkedTrack ||
+            !r.getClipIdsByMediaFileId(state$.value, mediaFileId).length
           )
+            return r.linkFlashcardFieldToSubtitlesTrack(
+              flashcardFieldName,
+              mediaFileId,
+              subtitlesTrackId
+            )
 
-        if (previouslyLinkedTrack) {
-          const previouslyLinkedField = Object.keys(previousLinks).find(fn => {
-            const fieldName = fn as TransliterationFlashcardFieldName
-            return previousLinks[fieldName] === subtitlesTrackId
-          })
+          if (previouslyLinkedTrack) {
+            const previouslyLinkedField = Object.keys(previousLinks).find(
+              fn => {
+                const fieldName = fn as TransliterationFlashcardFieldName
+                return previousLinks[fieldName] === subtitlesTrackId
+              }
+            )
 
-          const overwriteMessage = previouslyLinkedField
-            ? `This action will clear the ${previouslyLinkedField} field and overwrite the ${flashcardFieldName} field for all these existing cards.`
-            : `This action will overwrite the ${flashcardFieldName} field for all these existing cards.`
-          const message =
-            "It looks like you've already made some flashcards from this media file." +
-            '\n\n' +
-            overwriteMessage +
-            '\n\n' +
-            'Is that OK?'
+            const overwriteMessage = previouslyLinkedField
+              ? `This action will clear the ${previouslyLinkedField} field and overwrite the ${flashcardFieldName} field for all these existing cards.`
+              : `This action will overwrite the ${flashcardFieldName} field for all these existing cards.`
+            const message =
+              "It looks like you've already made some flashcards from this media file." +
+              '\n\n' +
+              overwriteMessage +
+              '\n\n' +
+              'Is that OK?'
 
+            return r.confirmationDialog(
+              message,
+              r.linkFlashcardFieldToSubtitlesTrack(
+                flashcardFieldName,
+                mediaFileId,
+                subtitlesTrackId
+              )
+            )
+          }
+
+          const message = `It looks like you've already made some flashcards from this media file.\n
+This action will ${
+            subtitlesTrackId ? 'overwrite' : 'clear'
+          } the ${flashcardFieldName} field for all these existing cards.\n
+Is that OK? `
           return r.confirmationDialog(
             message,
             r.linkFlashcardFieldToSubtitlesTrack(
@@ -50,25 +67,7 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
             )
           )
         }
-
-        const message = `It looks like you've already made some flashcards from this media file.\n
-This action will clear the ${flashcardFieldName} field for all these existing cards.\n
-Is that OK? `
-        return r.confirmationDialog(
-          message,
-          r.linkFlashcardFieldToSubtitlesTrack(
-            flashcardFieldName,
-            mediaFileId,
-            subtitlesTrackId
-          )
-        )
-
-        // check if field was linked to another track
-        // if unlinking, ask if should delete field contents for existing cards
-        // if linking, ask if should overwrite field contents for existing cards
-
-        // if field was not already linked, go ahead and link
-      })
+      )
     )
 
 const linkFieldToTrack: AppEpic = (action$, state$) =>
@@ -104,4 +103,4 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       })
     )
 
-export default combineEpics(linkFieldToTrack)
+export default combineEpics(linkFieldToTrackRequest, linkFieldToTrack)

@@ -8,6 +8,7 @@ declare type Clip = {
   end: WaveformX
   fileId: MediaFileId
   flashcard: Flashcard
+  linkedSubtitlesChunk?: number
 }
 
 declare type ClipsState = {

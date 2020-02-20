@@ -102,8 +102,7 @@ const Placeholder = ({
         }
       : {}
   )
-  return clipsIds.length &&
-    mediaFile &&
+  return mediaFile &&
     fieldsToTracks &&
     preview &&
     Object.keys(fieldsToTracks).length ? (

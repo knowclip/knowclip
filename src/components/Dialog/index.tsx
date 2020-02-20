@@ -10,7 +10,6 @@ import FileSelection from './FileSelectionDialog'
 import ErrorDialog from './ErrorDialog'
 import SettingsDialog from './SettingsDialog'
 import { getCurrentDialog } from '../../selectors'
-import { linkSubtitlesDialog } from '../../actions'
 import LinkSubtitlesDialog from './LinkSubtitlesDialog'
 
 const DialogView = () => {

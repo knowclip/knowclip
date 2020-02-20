@@ -76,9 +76,11 @@ export const settingsDialog = (): DialogAction =>
   enqueueDialog({ type: 'Settings' }, true)
 
 export const linkSubtitlesDialog = (
-  subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles
+  subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles,
+  mediaFileId: MediaFileId
 ): DialogAction =>
   enqueueDialog({
     type: 'LinkSubtitles',
     subtitles,
+    mediaFileId,
   })
