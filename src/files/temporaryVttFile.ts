@@ -30,36 +30,59 @@ export default {
         validatedFile.parentType,
         validatedFile.parentId
       ) as CurrentlyLoadedFile
+
       const chunks = await effects.getSubtitlesFromFile(state, filePath)
-      console.log({ chunks })
-      if (validatedFile.parentType === 'MediaFile')
+
+      if (validatedFile.parentType === 'MediaFile') {
+        const track = newEmbeddedSubtitlesTrack(
+          validatedFile.id,
+          validatedFile.parentId,
+          chunks,
+          validatedFile.streamIndex,
+          filePath
+        )
+        const mediaFile = r.getFile<MediaFile>(
+          state,
+          'MediaFile',
+          validatedFile.parentId
+        )
         return [
-          r.mountSubtitlesTrack(
-            newEmbeddedSubtitlesTrack(
-              validatedFile.id,
-              validatedFile.parentId,
-              chunks,
-              validatedFile.streamIndex,
-              filePath
-            )
-          ),
+          ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
+            ? [
+                r.addSubtitlesTrack(track),
+                r.linkSubtitlesDialog(validatedFile, mediaFile.id),
+              ]
+            : []),
+          r.mountSubtitlesTrack(track),
         ]
+      }
 
       const external = r.getFile(
         state,
         'ExternalSubtitlesFile',
         validatedFile.parentId
       ) as ExternalSubtitlesFile
+      const track = newExternalSubtitlesTrack(
+        validatedFile.id,
+        external.parentId,
+        chunks,
+        sourceFile.filePath,
+        filePath
+      )
+      const mediaFile = r.getFile<MediaFile>(
+        state,
+        'MediaFile',
+        external.parentId
+      )
+
       return [
-        r.mountSubtitlesTrack(
-          newExternalSubtitlesTrack(
-            validatedFile.id,
-            external.parentId,
-            chunks,
-            sourceFile.filePath,
-            filePath
-          )
-        ),
+        ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
+          ? [
+              r.addSubtitlesTrack(track),
+              r.linkSubtitlesDialog(external, mediaFile.id),
+            ]
+          : []),
+        r.mountSubtitlesTrack(track),
       ]
     },
   ],
@@ -83,18 +106,12 @@ export default {
 
         switch (file.parentType) {
           case 'MediaFile': {
-            return await Promise.all(
-              (sourceFile as MediaFile).subtitlesTracksStreamIndexes.map(
-                async streamIndex => {
-                  const tmpFilePath = await effects.getSubtitlesFilePath(
-                    state,
-                    source.filePath,
-                    file
-                  )
-                  return r.locateFileSuccess(file, tmpFilePath)
-                }
-              )
+            const tmpFilePath = await effects.getSubtitlesFilePath(
+              state,
+              source.filePath,
+              file
             )
+            return [r.locateFileSuccess(file, tmpFilePath)]
           }
           case 'ExternalSubtitlesFile':
             const tmpFilePath = await effects.getSubtitlesFilePath(

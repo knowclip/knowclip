@@ -28,6 +28,13 @@ export const mountSubtitlesTrack = (
   track,
 })
 
+export const addSubtitlesTrack = (
+  track: SubtitlesTrack
+): AddSubtitlesTrack => ({
+  type: A.ADD_SUBTITLES_TRACK,
+  track,
+})
+
 export const loadNewSubtitlesFile = (
   filePath: string,
   mediaFileId: MediaFileId

@@ -267,6 +267,7 @@ declare type OverrideSettings = {
 declare type DismissMedia = { type: 'DISMISS_MEDIA' }
 
 declare type SubtitlesAction =
+  | AddSubtitlesTrack
   | MountSubtitlesTrack
   | DeleteSubtitlesTrack
   | ShowSubtitles
@@ -283,6 +284,10 @@ declare type LoadSubtitlesFailure = {
 }
 declare type MountSubtitlesTrack = {
   type: 'MOUNT_SUBTITLES_TRACK'
+  track: SubtitlesTrack
+}
+declare type AddSubtitlesTrack = {
+  type: 'ADD_SUBTITLES_TRACK'
   track: SubtitlesTrack
 }
 declare type DeleteSubtitlesTrack = {

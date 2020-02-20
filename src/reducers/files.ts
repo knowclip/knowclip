@@ -87,7 +87,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.MOUNT_SUBTITLES_TRACK: {
+    case A.ADD_SUBTITLES_TRACK: {
       const existingMediaFile = state.MediaFile[action.track.mediaFileId]
       if (!existingMediaFile) {
         console.error(
@@ -104,7 +104,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         action.track.mediaFileId,
         (file = existingMediaFile): MediaFile => ({
           ...file,
-          subtitles: file.subtitles.some(s => s.id === action.track.id)
+          subtitles: file.subtitles.some(s => s.id === action.track.id) // should not happen... but just in case
             ? file.subtitles
             : [
                 ...file.subtitles,

@@ -44,16 +44,26 @@ export default {
     async ({ validatedFile, filePath }, state, effects) => {
       if (isVtt(filePath)) {
         const chunks = await effects.getSubtitlesFromFile(state, filePath)
+        const track = newExternalSubtitlesTrack(
+          validatedFile.id,
+          validatedFile.parentId,
+          chunks,
+          filePath,
+          filePath
+        )
+        const mediaFile = r.getFile<MediaFile>(
+          state,
+          'MediaFile',
+          validatedFile.parentId
+        )
         return [
-          r.mountSubtitlesTrack(
-            newExternalSubtitlesTrack(
-              validatedFile.id,
-              validatedFile.parentId,
-              chunks,
-              filePath,
-              filePath
-            )
-          ),
+          ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
+            ? [
+                r.addSubtitlesTrack(track),
+                r.linkSubtitlesDialog(validatedFile, mediaFile.id),
+              ]
+            : []),
+          r.mountSubtitlesTrack(track), // maybe should only do this after linkSubtitlesDialog in case this is first time mounting,
         ]
       } else {
         const vttFile = r.getFile(

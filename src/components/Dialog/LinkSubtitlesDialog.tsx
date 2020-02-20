@@ -10,7 +10,6 @@ import {
   Select,
   InputLabel,
 } from '@material-ui/core'
-import MediaFolderLocationForm from '../MediaFolderLocationForm'
 import { DialogProps } from './DialogProps'
 import { closeDialog, linkFlashcardFieldToSubtitlesTrack } from '../../actions'
 import {
@@ -23,7 +22,6 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../../utils/newFlashcard'
-import { useSubtitlesBySource } from '../FlashcardSectionFormFieldPopoverMenu'
 
 const LinkSubtitlesDialog = ({
   open,
@@ -119,34 +117,35 @@ const LinkSubtitlesDialog = ({
 
   return (
     <Dialog open={open}>
-      <form onSubmit={handleSubmit} />
-      <DialogContent>
-        {prompt}
-        <FormControl fullWidth margin="normal">
-          <InputLabel htmlFor="field">Field</InputLabel>
-          <Select value={fieldSelection} onChange={onChangeField}>
-            {fieldNames.map(fieldName => {
-              const label =
-                fieldNamesToTrackLabels[
-                  fieldName as TransliterationFlashcardFieldName
-                ]
-              return (
-                <MenuItem value={fieldName} key={fieldName}>
-                  {fieldName} {label && `(Replace ${label})`}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button variant="contained" onClick={close}>
-          Skip
-        </Button>
-        <Button variant="contained" type="submit">
-          Link subtitles to chosen flashcard field
-        </Button>
-      </DialogActions>
+      <form onSubmit={handleSubmit}>
+        <DialogContent>
+          {prompt}
+          <FormControl fullWidth margin="normal">
+            <InputLabel htmlFor="field">Field</InputLabel>
+            <Select value={fieldSelection} onChange={onChangeField}>
+              {fieldNames.map(fieldName => {
+                const label =
+                  fieldNamesToTrackLabels[
+                    fieldName as TransliterationFlashcardFieldName
+                  ]
+                return (
+                  <MenuItem value={fieldName} key={fieldName}>
+                    {fieldName} {label && `(Replace ${label})`}
+                  </MenuItem>
+                )
+              })}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={close}>
+            Skip
+          </Button>
+          <Button variant="contained" type="submit">
+            Link subtitles to chosen flashcard field
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   )
 }
