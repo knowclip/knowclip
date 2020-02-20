@@ -87,7 +87,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.ADD_SUBTITLES_TRACK: {
+    case A.MOUNT_SUBTITLES_TRACK: {
       const existingMediaFile = state.MediaFile[action.track.mediaFileId]
       if (!existingMediaFile) {
         console.error(

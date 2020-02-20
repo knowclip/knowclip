@@ -36,7 +36,6 @@ export const getCardPreview = createSelector(
     if (highlightedClip) return null
 
     const currentPosition = waveform.cursor.x
-    console.log({ noteType })
     if (!noteType) return null
     const fields = {
       ...(noteType === 'Simple'

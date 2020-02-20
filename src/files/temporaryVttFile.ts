@@ -34,7 +34,7 @@ export default {
       console.log({ chunks })
       if (validatedFile.parentType === 'MediaFile')
         return [
-          r.addSubtitlesTrack(
+          r.mountSubtitlesTrack(
             newEmbeddedSubtitlesTrack(
               validatedFile.id,
               validatedFile.parentId,
@@ -51,7 +51,7 @@ export default {
         validatedFile.parentId
       ) as ExternalSubtitlesFile
       return [
-        r.addSubtitlesTrack(
+        r.mountSubtitlesTrack(
           newExternalSubtitlesTrack(
             validatedFile.id,
             external.parentId,

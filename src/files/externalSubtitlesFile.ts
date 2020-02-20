@@ -18,11 +18,10 @@ export default {
     //
     // so maybe the way to go for showing this linkSubtitlesDialog
     // at the right time would be to have an epic around the
-    // action ADD_SUBTITLES_TRACK?
+    // action MOUNT_SUBTITLES_TRACK?
     //
-    // but ADD_SUBTITLES_TRACK is being triggered AFTER the subtitles
+    // but MOUNT_SUBTITLES_TRACK is being triggered AFTER the subtitles
     // file is added, so now i'm confused...
-    // maybe that needs to be renamed MOUNT_SUBTITLES_TRACK.
     //
     // in any event, the ideal flow would go something like:
     // 1 open media file with embedded subtitles
@@ -46,7 +45,7 @@ export default {
       if (isVtt(filePath)) {
         const chunks = await effects.getSubtitlesFromFile(state, filePath)
         return [
-          r.addSubtitlesTrack(
+          r.mountSubtitlesTrack(
             newExternalSubtitlesTrack(
               validatedFile.id,
               validatedFile.parentId,

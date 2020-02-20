@@ -21,10 +21,10 @@ export const hideSubtitles = (
   mediaFileId,
 })
 
-export const addSubtitlesTrack = (
+export const mountSubtitlesTrack = (
   track: SubtitlesTrack
-): AddSubtitlesTrack => ({
-  type: A.ADD_SUBTITLES_TRACK,
+): MountSubtitlesTrack => ({
+  type: A.MOUNT_SUBTITLES_TRACK,
   track,
 })
 
