@@ -23,6 +23,11 @@ import {
   blankTransliterationFields,
 } from '../../utils/newFlashcard'
 
+enum $ {
+  container = 'link-subtitles-dialog-container',
+  skipButton = 'link-subtitles-dialog-skip-button',
+}
+
 const LinkSubtitlesDialog = ({
   open,
   data: { subtitles, mediaFileId },
@@ -100,6 +105,7 @@ const LinkSubtitlesDialog = ({
         Would you like to link this subtitles track to a specific flashcard
         field to help you create flashcards?
         <br />
+        <br />
         You can always change this later.
       </p>
     ) : (
@@ -117,7 +123,7 @@ const LinkSubtitlesDialog = ({
 
   return (
     <Dialog open={open}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} id={$.container}>
         <DialogContent>
           {prompt}
           <FormControl fullWidth margin="normal">
@@ -138,10 +144,10 @@ const LinkSubtitlesDialog = ({
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={close}>
+          <Button onClick={close} id={$.skipButton}>
             Skip
           </Button>
-          <Button variant="contained" type="submit">
+          <Button variant="contained" color="primary" type="submit">
             Link subtitles to chosen flashcard field
           </Button>
         </DialogActions>
@@ -151,3 +157,5 @@ const LinkSubtitlesDialog = ({
 }
 
 export default LinkSubtitlesDialog
+
+export { $ as linkSubtitlesDialog$ }

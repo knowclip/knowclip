@@ -13,6 +13,10 @@ const linkedSubtitles: Reducer<LinkedSubtitlesState> = (
     case A.OPEN_FILE_REQUEST:
       return action.file.type === 'MediaFile' ? initialState : state
 
+    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
+      return state
+    // return action.
+
     // case A.DELETE_SUBTITLES_TRACK: {
     //   const { [action.id]: _, ...newState } = state
     //   return newState

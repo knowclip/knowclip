@@ -3,6 +3,7 @@ import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { waveform$ } from '../../../components/Waveform'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
 
 export default async function addFirstMediaToProject(
   { app, client }: TestSetup,
@@ -20,6 +21,8 @@ export default async function addFirstMediaToProject(
   await client.waitForText('body', videoFilePath)
 
   expect(await client.getAttribute('video', 'src')).toContain(japaneseVideoPath)
+
+  await client.clickElement_(linkSubtitlesDialog$.skipButton)
 
   await client.waitUntilPresent_(waveform$.subtitlesTimelinesContainer)
 }

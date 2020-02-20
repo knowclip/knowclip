@@ -187,15 +187,16 @@ export const readParseSrtChunk = (
 })
 export const readSubsrtChunk = readVttChunk
 
-const overlap = (
+const overlapsSignificantly = (
   chunk: SubtitlesChunk,
   start: WaveformX,
   end: WaveformX,
   halfSecond: WaveformX
 ): boolean =>
-  (start >= chunk.start && chunk.end - start >= halfSecond) ||
-  (end <= chunk.end && end - chunk.start >= halfSecond) ||
-  (chunk.start >= start && chunk.end <= end)
+  // (start >= chunk.start && chunk.end - start >= halfSecond) ||
+  // (end <= chunk.end && end - chunk.start >= halfSecond) ||
+  // (chunk.start >= start && chunk.end <= end)
+  start <= chunk.end - halfSecond && end >= chunk.start + halfSecond
 
 export const getSubtitlesChunksWithinRange = (
   state: AppState,
@@ -212,6 +213,7 @@ export const getSubtitlesChunksWithinRange = (
   )
 
 export const getSubtitlesChunksWithinRangeFromTracksState = (
+  // TODO: get rid of this!
   state: AppState['subtitles'],
   waveform: WaveformState,
   subtitlesTrackId: SubtitlesTrackId,
@@ -229,7 +231,7 @@ export const getSubtitlesChunksWithinRangeFromTracksState = (
     if (chunk.start > end) break
 
     if (
-      overlap(
+      overlapsSignificantly(
         chunk,
         start,
         end,

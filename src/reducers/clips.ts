@@ -136,6 +136,10 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         flashcard: {
           id,
           type: clip.flashcard.type,
+          image:
+            override.flashcard && 'image' in override.flashcard
+              ? override.flashcard.image
+              : clip.flashcard.image,
           fields: {
             ...clip.flashcard.fields,
             ...(override.flashcard ? override.flashcard.fields : null),
@@ -145,9 +149,6 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
               ? override.flashcard.tags.filter((t): t is string => Boolean(t))
               : clip.flashcard.tags,
         } as Flashcard,
-      }
-      if (override.flashcard && 'image' in override.flashcard) {
-        newClip.flashcard.image = override.flashcard.image
       }
 
       return {
