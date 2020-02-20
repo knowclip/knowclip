@@ -45,7 +45,13 @@ const DialogView = () => {
     case 'Settings':
       return <SettingsDialog open={true} data={currentDialog} />
     case 'LinkSubtitles':
-      return <LinkSubtitlesDialog open={true} data={currentDialog} />
+      return (
+        <LinkSubtitlesDialog
+          open={true}
+          data={currentDialog}
+          key={currentDialog.subtitles.id}
+        />
+      )
   }
 }
 
