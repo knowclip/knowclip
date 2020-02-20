@@ -273,6 +273,7 @@ declare type SubtitlesAction =
   | HideSubtitles
   | MakeClipsFromSubtitles
   | ShowSubtitlesClipsDialogRequest
+  | LinkFlashcardFieldToSubtitlesTrackRequest
   | LinkFlashcardFieldToSubtitlesTrack
   | GoToSubtitlesChunk
 
@@ -319,6 +320,13 @@ declare type LinkFlashcardFieldToSubtitlesTrack = {
   flashcardFieldName: FlashcardFieldName
   subtitlesTrackId: SubtitlesTrackId | null
 }
+declare type LinkFlashcardFieldToSubtitlesTrackRequest = {
+  type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST'
+  mediaFileId: MediaFileId
+  flashcardFieldName: FlashcardFieldName
+  subtitlesTrackId: SubtitlesTrackId | null
+}
+
 declare type GoToSubtitlesChunk = {
   type: 'GO_TO_SUBTITLES_CHUNK'
   subtitlesTrackId: SubtitlesTrackId

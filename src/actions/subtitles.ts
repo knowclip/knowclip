@@ -70,6 +70,17 @@ export const subtitlesClipsDialogRequest = (): ShowSubtitlesClipsDialogRequest =
   type: A.SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST,
 })
 
+export const linkFlashcardFieldToSubtitlesTrackRequest = (
+  flashcardFieldName: FlashcardFieldName,
+  mediaFileId: MediaFileId,
+  subtitlesTrackId: SubtitlesTrackId | null
+): LinkFlashcardFieldToSubtitlesTrackRequest => ({
+  type: A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST,
+  flashcardFieldName,
+  mediaFileId,
+  subtitlesTrackId,
+})
+
 export const linkFlashcardFieldToSubtitlesTrack = (
   flashcardFieldName: FlashcardFieldName,
   mediaFileId: MediaFileId,

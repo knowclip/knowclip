@@ -7,6 +7,37 @@ const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => [
+    // maybe we can tell if this is the first time
+    // opening this file by checking the fileAvailability status?
+    // currently new files are NEVER_LOADED when they are added
+    // to fileAvailabilites
+    //
+    // but NEVER_LOADED is also for files that were loaded from shared projects.
+    // so then we would need to have a new status NEWLY_ADDED or something
+    // to b able to do that there.
+    //
+    // so maybe the way to go for showing this linkSubtitlesDialog
+    // at the right time would be to have an epic around the
+    // action ADD_SUBTITLES_TRACK?
+    //
+    // but ADD_SUBTITLES_TRACK is being triggered AFTER the subtitles
+    // file is added, so now i'm confused...
+    // maybe that needs to be renamed MOUNT_SUBTITLES_TRACK.
+    //
+    // in any event, the ideal flow would go something like:
+    // 1 open media file with embedded subtitles
+    // 2 embedded subtitles files are added
+    // 3 for newly added embedded subtitles, show link subtitles dialog
+    // 4 mount subtitles with any links
+    // and for external, similarly
+    // 1 external subtitles file is added
+    // 2 show link subtitles dialog
+    // 3 mount subtitles with any links
+    //
+    // maybe the issue is that the add-file is triggering the
+    //  mount + connection between media+subtitles,
+    //  when the connection should trigger the add + the mount
+
     r.openFileSuccess(file, filePath),
   ],
 
