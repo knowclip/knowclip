@@ -1,5 +1,5 @@
 import tempy from 'tempy'
-import fs, { promises } from 'fs'
+import { promises } from 'fs'
 import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import * as r from '../redux'
 import { extname, basename, join } from 'path'

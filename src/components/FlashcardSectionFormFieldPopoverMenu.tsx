@@ -3,7 +3,6 @@ import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
-import css from './FlashcardSection.module.css'
 import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
 
