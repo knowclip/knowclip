@@ -24,12 +24,14 @@ const FlashcardSectionPreview = ({
   chunkIndex,
   mediaFile,
   fieldsToTracks,
+  viewMode,
 }: {
   clipsIds: string[]
   cardBases: r.SubtitlesCardBases
   chunkIndex: number
   mediaFile: MediaFile
   fieldsToTracks: SubtitlesFlashcardFieldsLinks
+  viewMode: ViewMode
 }) => {
   const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
     cardBases.cards[chunkIndex]
@@ -42,7 +44,11 @@ const FlashcardSectionPreview = ({
   }
 
   return (
-    <section className={cn(css.preview)}>
+    <section
+      className={cn(css.preview, {
+        [css.horizontalPreview]: viewMode === 'HORIZONTAL',
+      })}
+    >
       <section className={cn(css.previewFields)}>
         <Field
           fieldName="transcription"
@@ -139,6 +145,7 @@ const Field = ({
   return (
     <div className={css.previewField}>
       <FieldMenu
+        className={css.previewFieldMenuButton}
         embeddedSubtitlesTracks={embeddedSubtitlesTracks}
         externalSubtitlesTracks={externalSubtitlesTracks}
         linkedSubtitlesTrack={linkedSubtitlesTrack}

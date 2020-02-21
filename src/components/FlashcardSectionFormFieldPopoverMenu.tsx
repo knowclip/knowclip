@@ -18,12 +18,14 @@ const FlashcardSectionFormFieldPopoverMenu = ({
   linkedSubtitlesTrack,
   mediaFileId,
   fieldName,
+  className,
 }: {
   embeddedSubtitlesTracks: MediaFile['subtitles']
   externalSubtitlesTracks: MediaFile['subtitles']
   linkedSubtitlesTrack: string | null
   mediaFileId: MediaFileId
   fieldName: TransliterationFlashcardFieldName
+  className: string
 }) => {
   const subtitlesPopover = usePopover()
 
@@ -38,7 +40,7 @@ const FlashcardSectionFormFieldPopoverMenu = ({
       >
         <IconButton
           tabIndex={1}
-          className={cn(css.fieldMenuButton, $.openMenuButton)}
+          className={cn(className, $.openMenuButton)}
           buttonRef={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
         >

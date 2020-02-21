@@ -112,35 +112,40 @@ const Placeholder = ({
     item: SubtitlesCardBase
   } | null
 }) => {
-  const {
-    fieldsToTracks,
-    subtitles,
-    // previewChunkIndex
-  } = useSelector((state: AppState) =>
-    mediaFile && mediaFile.subtitles.length
-      ? {
-          fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-          subtitles: r.getSubtitlesCardBases(state),
-          // previewChunkIndex: r.getCurrentCardPreviewIndex(state)
-        }
-      : {}
+  const { fieldsToTracks, subtitles, viewMode } = useSelector(
+    (state: AppState) => {
+      const subtitlesMounted = mediaFile && mediaFile.subtitles.length
+      return {
+        fieldsToTracks: subtitlesMounted
+          ? r.getSubtitlesFlashcardFieldLinks(state)
+          : null,
+        subtitles: subtitlesMounted ? r.getSubtitlesCardBases(state) : null,
+        viewMode: state.settings.viewMode,
+      }
+    }
   )
+
+  const className = cn(css.intro, {
+    [css.horizontalIntro]: viewMode === 'HORIZONTAL',
+  })
+
   return mediaFile &&
     fieldsToTracks &&
     subtitles &&
     selection &&
     selection.item ? (
-    <section className={css.intro}>
+    <section className={className}>
       <Preview
         cardBases={subtitles}
         chunkIndex={selection.index}
         clipsIds={clipsIds}
         mediaFile={mediaFile}
         fieldsToTracks={fieldsToTracks}
+        viewMode={viewMode}
       />
     </section>
   ) : (
-    <section className={css.intro}>
+    <section className={className}>
       <p className={css.introText}>
         You can <strong>create clips</strong> in a few different ways:
       </p>

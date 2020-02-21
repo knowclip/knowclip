@@ -64,6 +64,7 @@ const FlashcardSectionFormField = memo(
       <section className={css.field}>
         {Boolean(subtitles.length) && (
           <FieldMenu
+            className={css.fieldMenuButton}
             embeddedSubtitlesTracks={embeddedSubtitlesTracks}
             externalSubtitlesTracks={externalSubtitlesTracks}
             linkedSubtitlesTrack={linkedSubtitlesTrack}

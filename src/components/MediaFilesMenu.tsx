@@ -10,14 +10,7 @@ import {
   Divider,
   Popover,
 } from '@material-ui/core'
-import {
-  PlayArrow,
-  Pause,
-  HorizontalSplitTwoTone,
-  VerticalSplitTwoTone,
-  VerticalSplitSharp,
-  HorizontalSplitSharp,
-} from '@material-ui/icons'
+import { PlayArrow, Pause } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import MediaFilesMenuItem from './MediaFilesMenuItem'
 import { showOpenDialog } from '../utils/electron'

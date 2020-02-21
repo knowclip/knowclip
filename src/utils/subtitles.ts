@@ -157,7 +157,7 @@ export const newEmbeddedSubtitlesTrack = (
 ): EmbeddedSubtitlesTrack => ({
   type: 'EmbeddedSubtitlesTrack',
   id,
-  mode: 'showing',
+  mode: 'hidden',
   chunks,
   mediaFileId,
   streamIndex,
@@ -171,7 +171,7 @@ export const newExternalSubtitlesTrack = (
   filePath: string,
   vttFilePath: string
 ): ExternalSubtitlesTrack => ({
-  mode: 'showing',
+  mode: 'hidden',
   type: 'ExternalSubtitlesTrack',
   id,
   mediaFileId,

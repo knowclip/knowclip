@@ -2,10 +2,6 @@
   position: relative;
 }
 
-/* .video::-webkit-media-controls-toggle-closed-captions-button {
-  display: none;
-} */
-
 .audio.mediaPlayer {
   width: 100%;
   display: block;
@@ -18,16 +14,16 @@
 }
 
 .viewModeButton {
-  position: absolute;
+  position: absolute !important;
   z-index: 1;
   top: 1rem;
   left: 1rem;
   opacity: 0;
-  transition: opacity .2s;
-  background-color: white;
+  transition: opacity .2s, background-color .2s;
+  background-color: white !important;
 }
 .viewModeButton:hover {
-  background-color: white;
+  background-color: #eee !important;
 }
 
 .container:hover .viewModeButton,
