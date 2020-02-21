@@ -23,7 +23,10 @@ export const getPendingStretch = (
 }
 
 export const getHighlightedClipId = (state: AppState): ClipId | null =>
-  state.session.highlightedClipId
+  state.session.waveformSelection &&
+  state.session.waveformSelection.type === 'Clip'
+    ? state.session.waveformSelection.id
+    : null
 
 export const getHighlightedClip = (state: AppState): Clip | null => {
   const highlightedClipId = getHighlightedClipId(state)
