@@ -18,7 +18,6 @@ export default async function makeCardsFromSubtitles({
     mediaFilesMenu$.openMediaFilesMenuButton,
     'polar_bear_cafe.mp4'
   )
-  await client.elements_(waveform$.subtitlesTimelines, 2)
 
   await client.clickElement_(subtitlesMenu$.openMenuButton)
   await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)

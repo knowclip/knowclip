@@ -59,7 +59,8 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           const setCursorAction = setCursorAndViewBox(
             state,
             newlyUpdatedTime,
-            effects.getWaveformSvgWidth()
+            effects.getWaveformSvgWidth(),
+            newSelection
           )
 
           if (newSelection && !areSelectionsEqual(selection, newSelection)) {
@@ -80,20 +81,28 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
 const setCursorAndViewBox = (
   state: AppState,
   newlySetTime: number,
-  svgWidth: number
+  svgWidth: number,
+  newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>
 ) => {
   const viewBox = state.waveform.viewBox
 
   const newX = Math.round(newlySetTime * 50)
 
+  const buffer = Math.round(svgWidth * 0.1)
+
   if (newX < viewBox.xMin) {
+    console.log('newX - svgWidth * 0.9', newX - svgWidth * 0.1, {
+      newX,
+      svgWidth,
+    })
     return setWaveformCursor(newX, {
       ...viewBox,
-      xMin: Math.max(0, newX - svgWidth * 0.9),
+      xMin: Math.max(0, newX - buffer),
     })
   }
   if (newX > svgWidth + viewBox.xMin) {
-    return setWaveformCursor(newX, { ...viewBox, xMin: newX })
+    const xMin = newSelection ? newSelection.item.end + buffer : newX
+    return setWaveformCursor(newX, { ...viewBox, xMin })
   }
   return setWaveformCursor(newX)
 }

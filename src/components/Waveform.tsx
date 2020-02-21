@@ -32,9 +32,9 @@ const Cursor = ({ x, height }: { x: number; height: number }) => (
 )
 
 const getClipRectProps = (start: number, end: number, height: number) => ({
-  x: start,
+  x: start < end ? start : end,
   y: 0,
-  width: end - start,
+  width: start < end ? end - start : start - end,
   height: height,
 })
 
