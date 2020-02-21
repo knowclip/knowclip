@@ -6,7 +6,6 @@ import session from './session'
 import snackbar from './snackbar'
 import dialog from './dialog'
 import subtitles from './subtitles'
-import linkedSubtitles from './linkedSubtitles'
 import settings from './settings'
 import fileAvailabilities from './fileAvailabilities'
 import files from './files'
@@ -18,7 +17,6 @@ export default combineReducers<AppState>({
   snackbar,
   dialog,
   subtitles,
-  linkedSubtitles,
   settings,
   fileAvailabilities,
   files,

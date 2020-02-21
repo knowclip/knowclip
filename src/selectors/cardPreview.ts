@@ -7,11 +7,11 @@ import { getClip } from './clips'
 import { getClipIdAt } from './currentMedia'
 
 export type SubtitlesCardBase = {
-  // start and end from cues base?
   fields: Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
   start: number
   end: number
 }
+type SubtitlesChunkIndex = number
 
 const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
   'transcription',
