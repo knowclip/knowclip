@@ -82,6 +82,7 @@ const Main = () => {
             loop={loop}
             metadata={currentMediaFile}
             subtitles={subtitles}
+            viewMode={viewMode}
           />
         )}
 

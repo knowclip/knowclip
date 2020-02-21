@@ -4,11 +4,14 @@ import React, {
   MutableRefObject,
   AudioHTMLAttributes,
   VideoHTMLAttributes,
+  useCallback,
 } from 'react'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './Media.module.css'
+import { Tooltip, IconButton } from '@material-ui/core'
+import { VerticalSplitSharp, HorizontalSplitSharp } from '@material-ui/icons'
 
 type MediaProps = {
   constantBitrateFilePath: string | null
@@ -16,6 +19,7 @@ type MediaProps = {
   metadata: MediaFile | null
   subtitles: SubtitlesTrack[]
   className?: string
+  viewMode: ViewMode
 }
 const Media = ({
   constantBitrateFilePath,
@@ -23,6 +27,7 @@ const Media = ({
   metadata,
   subtitles,
   className,
+  viewMode,
 }: MediaProps) => {
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
 
@@ -56,6 +61,16 @@ const Media = ({
 
   useSyncSubtitlesVisibility(subtitles, mediaRef)
 
+  const dispatch = useDispatch()
+  const toggleViewMode = useCallback(
+    () => {
+      dispatch(
+        r.setViewMode(viewMode === 'HORIZONTAL' ? 'VERTICAL' : 'HORIZONTAL')
+      )
+    },
+    [dispatch, viewMode]
+  )
+
   if (!metadata)
     return (
       <section className={className}>
@@ -64,7 +79,27 @@ const Media = ({
     )
 
   return (
-    <section className={className}>
+    <section className={cn(className, css.container)}>
+      <Tooltip
+        title={
+          viewMode === 'HORIZONTAL'
+            ? 'Switch to vertical view'
+            : 'Switch to horizontal view'
+        }
+      >
+        <IconButton
+          style={{ transform: 'rotate(180deg)' }}
+          onClick={toggleViewMode}
+          className={css.viewModeButton}
+        >
+          {viewMode === 'HORIZONTAL' ? (
+            <VerticalSplitSharp />
+          ) : (
+            <HorizontalSplitSharp />
+          )}
+        </IconButton>
+      </Tooltip>
+
       {metadata.isVideo ? (
         <video
           {...props}

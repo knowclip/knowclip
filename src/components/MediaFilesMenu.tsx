@@ -59,14 +59,11 @@ const MediaFilesMenu = ({
   className,
   currentProjectId,
 }: MediaFilesMenuProps) => {
-  const { currentFile, projectMediaFiles, viewMode } = useSelector(
-    (state: AppState) => ({
-      loop: r.isLoopOn(state),
-      currentFile: r.getCurrentMediaFile(state),
-      projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-      viewMode: state.settings.viewMode,
-    })
-  )
+  const { currentFile, projectMediaFiles } = useSelector((state: AppState) => ({
+    loop: r.isLoopOn(state),
+    currentFile: r.getCurrentMediaFile(state),
+    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+  }))
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -79,14 +76,6 @@ const MediaFilesMenu = ({
       }
     },
     [dispatch, currentProjectId, popover]
-  )
-  const toggleViewMode = useCallback(
-    () => {
-      dispatch(
-        r.setViewMode(viewMode === 'HORIZONTAL' ? 'VERTICAL' : 'HORIZONTAL')
-      )
-    },
-    [dispatch, viewMode]
   )
 
   const { playing, playOrPauseAudio } = usePlayButtonSync()
@@ -123,24 +112,7 @@ const MediaFilesMenu = ({
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip
-          title={
-            viewMode === 'HORIZONTAL'
-              ? 'Switch to vertical view'
-              : 'Switch to horizontal view'
-          }
-        >
-          <IconButton
-            style={{ transform: 'rotate(180deg)' }}
-            onClick={toggleViewMode}
-          >
-            {viewMode === 'HORIZONTAL' ? (
-              <VerticalSplitSharp />
-            ) : (
-              <HorizontalSplitSharp />
-            )}
-          </IconButton>
-        </Tooltip>
+
         {popover.isOpen && (
           <Popover
             anchorEl={popover.anchorEl}
