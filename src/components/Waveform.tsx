@@ -44,10 +44,18 @@ type ClipProps = {
   end: number
   isHighlighted: boolean
   height: number
+  index: number
 }
-const Clip = ({ id, start, end, isHighlighted, height }: ClipProps) => {
+const Clip = ({ id, start, end, isHighlighted, height, index }: ClipProps) => {
+  const clickDataProps = {
+    'data-clip-id': id,
+    'data-clip-start': start,
+    'data-clip-end': end,
+    'data-clip-is-highlighted': isHighlighted,
+    'data-clip-index': index,
+  }
   return (
-    <g id={id}>
+    <g id={id} {...clickDataProps}>
       <rect
         className={cn(
           css.waveformClip,
@@ -55,6 +63,7 @@ const Clip = ({ id, start, end, isHighlighted, height }: ClipProps) => {
           $.waveformClip
         )}
         {...getClipRectProps(start, end, height)}
+        {...clickDataProps}
       />
 
       <rect
@@ -65,6 +74,7 @@ const Clip = ({ id, start, end, isHighlighted, height }: ClipProps) => {
         y="0"
         width={SELECTION_BORDER_WIDTH}
         height={height}
+        {...clickDataProps}
       />
       <rect
         className={cn(css.waveformClipBorder, {
@@ -74,6 +84,7 @@ const Clip = ({ id, start, end, isHighlighted, height }: ClipProps) => {
         y="0"
         width={SELECTION_BORDER_WIDTH}
         height={height}
+        {...clickDataProps}
       />
     </g>
   )
@@ -108,22 +119,49 @@ const Clips = React.memo(
     clips,
     highlightedClipId,
     height,
+    waveform,
   }: {
     clips: Clip[]
     highlightedClipId: string | null
     height: number
-  }) => (
-    <g className={$.waveformClipsContainer}>
-      {clips.map(clip => (
-        <Clip
-          {...clip}
-          key={clip.id}
-          isHighlighted={clip.id === highlightedClipId}
-          height={height}
-        />
-      ))}
-    </g>
-  )
+    waveform: WaveformState
+  }) => {
+    const handleClick = useCallback(
+      e => {
+        console.log(e, e.target.dataset, e.target)
+        const { dataset } = e.target
+        if (dataset && dataset.clipId) {
+          if (!dataset.isHighlighted) {
+            const player = document.getElementById(
+              'mediaPlayer'
+            ) as HTMLVideoElement
+            if (player)
+              player.currentTime = getSecondsAtXFromWaveform(
+                waveform,
+                clips[dataset.clipIndex].start
+              )
+
+            e.stopPropagation()
+          } else {
+          }
+        }
+      },
+      [clips, waveform]
+    )
+    return (
+      <g className={$.waveformClipsContainer} onClick={handleClick}>
+        {clips.map((clip, i) => (
+          <Clip
+            {...clip}
+            index={i}
+            key={clip.id}
+            isHighlighted={clip.id === highlightedClipId}
+            height={height}
+          />
+        ))}
+      </g>
+    )
+  }
 )
 
 const SUBTITLES_CHUNK_HEIGHT = 14
@@ -325,7 +363,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
   const viewBoxString = getViewBoxString(viewBox.xMin, height)
   const svgRef = useRef(null)
-  const onMouseDown = useCallback(
+  const handleMouseDown = useCallback(
     e => {
       const coords = toWaveformCoordinates(
         e,
@@ -340,6 +378,23 @@ const Waveform = ({ show }: { show: boolean }) => {
     },
     [waveform]
   )
+
+  const handleClick = useCallback(
+    e => {
+      const player = document.getElementById('mediaPlayer') as HTMLVideoElement
+      if (player) {
+        const coords = toWaveformCoordinates(
+          e,
+          e.currentTarget,
+          waveform.viewBox.xMin
+        )
+        const seconds = getSecondsAtXFromWaveform(waveform, coords.x)
+        player.currentTime = seconds
+      }
+    },
+    [waveform]
+  )
+
   return show ? (
     <svg
       ref={svgRef}
@@ -348,7 +403,8 @@ const Waveform = ({ show }: { show: boolean }) => {
       preserveAspectRatio="xMinYMin slice"
       className={cn(css.waveformSvg, $.container)}
       width="100%"
-      onMouseDown={onMouseDown}
+      onMouseDown={handleMouseDown}
+      onClick={handleClick}
       height={height}
     >
       <rect
@@ -358,7 +414,9 @@ const Waveform = ({ show }: { show: boolean }) => {
         width={waveform.length}
         height={height}
       />
-      <Clips {...{ clips, highlightedClipId, stepsPerSecond, height }} />
+      <Clips
+        {...{ clips, highlightedClipId, stepsPerSecond, height, waveform }}
+      />
       {pendingClip && (
         <PendingClip
           {...pendingClip}

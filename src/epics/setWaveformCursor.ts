@@ -1,4 +1,4 @@
-import { fromEvent, Observable, of, from } from 'rxjs'
+import { fromEvent, Observable, of, from, empty } from 'rxjs'
 import {
   startWith,
   filter,
@@ -21,7 +21,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
         action.type === 'OPEN_FILE_SUCCESS' &&
         action.validatedFile.type === 'MediaFile'
     ),
-    switchMap<OpenMediaFileSuccess, Observable<Action>>(({ validatedFile }) =>
+    switchMap<OpenMediaFileSuccess, Observable<Action>>(() =>
       fromEvent<Event>(
         document,
         'timeupdate',
@@ -53,37 +53,24 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
               selection.item.start
             )
             effects.setCurrentTime(selectionStartTime)
+            return empty()
           }
 
-          if (wasSeeking && !areSelectionsEqual(selection, newSelection)) {
-            return from([
-              ...(!newSelection
-                ? [
-                    setCursorAndViewBox(
-                      state,
-                      newlyUpdatedTime,
-                      effects.getWaveformSvgWidth()
-                    ),
-                  ]
-                : []),
-              r.selectWaveformItem(newSelection),
-            ])
+          const setCursorAction = setCursorAndViewBox(
+            state,
+            newlyUpdatedTime,
+            effects.getWaveformSvgWidth()
+          )
+
+          if (newSelection && !areSelectionsEqual(selection, newSelection)) {
+            return from([setCursorAction, r.selectWaveformItem(newSelection)])
           }
 
-          if (
-            !loopImminent &&
-            newSelection &&
-            !areSelectionsEqual(selection, newSelection)
-          )
-            return of(r.selectWaveformItem(newSelection))
+          if (!newSelection && wasSeeking) {
+            return from([setCursorAction, r.clearWaveformSelection()])
+          }
 
-          return of(
-            setCursorAndViewBox(
-              state,
-              newlyUpdatedTime,
-              effects.getWaveformSvgWidth()
-            )
-          )
+          return from([setCursorAction])
         }),
         startWith(setWaveformCursor(0, { xMin: 0 }))
       )
@@ -118,14 +105,14 @@ type OpenMediaFileSuccess = {
   timestamp: string
 }
 
-const seekingTrackerEpic: AppEpic = (action$, state$, effects) =>
+const seekingTrackerEpic: AppEpic = action$ =>
   action$.pipe(
     filter<Action, OpenMediaFileSuccess>(
       (action): action is OpenMediaFileSuccess =>
         action.type === 'OPEN_FILE_SUCCESS' &&
         action.validatedFile.type === 'MediaFile'
     ),
-    switchMap<OpenMediaFileSuccess, Observable<Action>>(({ validatedFile }) =>
+    switchMap<OpenMediaFileSuccess, Observable<Action>>(() =>
       fromEvent<Event>(
         document,
         'seeking',

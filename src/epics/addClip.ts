@@ -23,7 +23,7 @@ const pendingClipIsBigEnough = (state: AppState) => {
 const addClipEpic: AppEpic = (
   action$,
   state$,
-  { window, getWaveformSvgElement, document }
+  { window, setCurrentTime, document }
 ) =>
   fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
     filter(
@@ -80,7 +80,17 @@ const addClipEpic: AppEpic = (
           if (!currentFileId)
             throw new Error('Could not find current note type')
 
-          return pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
+          const tooSmall =
+            pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
+
+          setCurrentTime(
+            r.getSecondsAtX(
+              state$.value,
+              tooSmall ? pendingClip.end : pendingClip.start
+            )
+          )
+
+          return tooSmall
             ? // maybe later, do stretch + merge for overlaps.
               r.clearPendingClip()
             : r.addClip(
