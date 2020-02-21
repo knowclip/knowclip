@@ -75,6 +75,10 @@ export const commitFileDeletions = (): CommitFileDeletions => ({
   type: A.COMMIT_FILE_DELETIONS,
 })
 
+export const abortFileDeletions = (): AbortFileDeletions => ({
+  type: A.ABORT_FILE_DELETIONS,
+})
+
 export const preloadVideoStills = (
   file: FileMetadata,
   clipId: ClipId

@@ -70,22 +70,23 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
       const subtitles = m.subtitles
         ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
         : []
-      const subtitlesFiles: SubtitlesFile[] = (m.subtitles || []).map(s =>
-        s.type === 'Embedded'
-          ? {
-              type: 'VttConvertedSubtitlesFile',
-              id: s.id,
-              streamIndex: s.streamIndex,
-              parentId: m.id,
-              parentType: 'MediaFile',
-            }
-          : {
-              type: 'ExternalSubtitlesFile',
-              id: s.id,
-              name: s.name,
-              parentId: m.id,
-              parentType: 'MediaFiles',
-            }
+      const subtitlesFiles: SubtitlesFile[] = (m.subtitles || []).map(
+        (s): SubtitlesFile =>
+          s.type === 'Embedded'
+            ? {
+                type: 'VttConvertedSubtitlesFile',
+                id: s.id,
+                streamIndex: s.streamIndex,
+                parentId: m.id,
+                parentType: 'MediaFile',
+              }
+            : {
+                type: 'ExternalSubtitlesFile',
+                id: s.id,
+                name: s.name,
+                parentId: m.id,
+                parentType: 'MediaFile',
+              }
       )
       const base: AudioFile = {
         name: m.name,

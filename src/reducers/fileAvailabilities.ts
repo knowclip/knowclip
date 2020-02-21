@@ -178,6 +178,30 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       return newState
     }
 
+    case A.ABORT_FILE_DELETIONS: {
+      const newState = {} as typeof state
+
+      for (const t in state) {
+        const type: keyof typeof state = t as any
+        const files = state[type]
+
+        newState[type] = {} as typeof files
+
+        for (const id in files) {
+          const file = state[type][id]
+          if (file) {
+            const newFile: KnownFile =
+              file.status === 'PENDING_DELETION'
+                ? resetPendingDeletionFile(file)
+                : file
+            newState[type][id] = newFile
+          }
+        }
+      }
+
+      return newState
+    }
+
     case A.SET_PROJECT_NAME: {
       // TODO: investigate whether to generalize for all file types?
       const existingProjectFile = state.ProjectFile[action.id]
@@ -231,6 +255,36 @@ const getDeletedFile = (file: FileAvailability): PendingDeletionFile => {
           isLoading: false,
         }
   return newAvailability
+}
+
+export const resetPendingDeletionFile = (
+  file: PendingDeletionFile
+): KnownFile => {
+  if (file.filePath && file.lastOpened) {
+    const previouslyLoadedFile: PreviouslyLoadedFile = {
+      id: file.id,
+      status: 'PREVIOUSLY_LOADED',
+      filePath: file.filePath,
+      parentId: file.parentId,
+      lastOpened: file.lastOpened,
+      isLoading: false,
+      name: file.name,
+      type: file.type,
+    }
+    return previouslyLoadedFile
+  }
+
+  const neverLoadedFile: NeverLoadedFile = {
+    id: file.id,
+    status: 'NEVER_LOADED',
+    filePath: null,
+    parentId: file.parentId,
+    lastOpened: null,
+    isLoading: false,
+    name: file.name,
+    type: file.type,
+  }
+  return neverLoadedFile
 }
 
 const getLoadingFile = (
