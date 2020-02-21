@@ -1,5 +1,6 @@
 import { Reducer } from 'redux'
 import deleteKey from '../utils/deleteKey'
+import { areSelectionsEqual } from '../utils/waveformSelection'
 
 const initialState: SessionState = {
   pendingClip: null,
@@ -203,17 +204,6 @@ const session: Reducer<SessionState, Action> = (
     default:
       return state
   }
-}
-
-const areSelectionsEqual = (
-  a: WaveformSelection | null,
-  b: WaveformSelection | null
-): boolean => {
-  if (a === b) return true
-  if (a && a.type === 'Preview' && b && b.type === 'Preview')
-    return a.index === b.index
-  if (a && a.type === 'Clip' && b && b.type === 'Clip') return a.id === b.id
-  return false
 }
 
 export default session

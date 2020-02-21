@@ -27,18 +27,26 @@ const FlashcardSectionPreview = ({
 }: {
   clipsIds: string[]
   cardBases: r.SubtitlesCardBases
-  chunkIndex: number | null
+  chunkIndex: number
   mediaFile: MediaFile
   fieldsToTracks: SubtitlesFlashcardFieldsLinks
 }) => {
-  const { subtitles, id } = mediaFile
-  const fields = (cardBases ? {} : {}) as TransliterationFlashcardFields
+  const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
+    cardBases.cards[chunkIndex]
+  )
+  const fields = {} as TransliterationFlashcardFields
+  for (const fieldName of cardBases.fieldNames) {
+    const trackId = fieldsToTracks[fieldName]
+    const text = trackId && tracksToFieldsText[trackId]
+    fields[fieldName] = text || ''
+  }
+
   return (
     <section className={cn(css.preview)}>
       <section className={cn(css.previewFields)}>
         <Field
           fieldName="transcription"
-          subtitles={subtitles}
+          subtitles={mediaFile.subtitles}
           linkedTracks={fieldsToTracks}
           mediaFileId={mediaFile.id}
         >
@@ -57,7 +65,7 @@ const FlashcardSectionPreview = ({
         {'pronunciation' in fields && fields.pronunciation && (
           <Field
             fieldName="pronunciation"
-            subtitles={subtitles}
+            subtitles={mediaFile.subtitles}
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
           >
@@ -73,7 +81,7 @@ const FlashcardSectionPreview = ({
         )}
         <Field
           fieldName="meaning"
-          subtitles={subtitles}
+          subtitles={mediaFile.subtitles}
           linkedTracks={fieldsToTracks}
           mediaFileId={mediaFile.id}
         >
@@ -86,7 +94,7 @@ const FlashcardSectionPreview = ({
         {fields.notes && (
           <Field
             fieldName="notes"
-            subtitles={subtitles}
+            subtitles={mediaFile.subtitles}
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
           >

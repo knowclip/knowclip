@@ -36,7 +36,7 @@ const FlashcardSection = ({
 
   const highlightedClip =
     waveformSelection && waveformSelection.type === 'Clip'
-      ? waveformSelection.clip
+      ? waveformSelection.item
       : null
 
   const clipsLength = clipsIds.length
@@ -75,7 +75,7 @@ const FlashcardSection = ({
         />
       )}
 
-      {(!waveformSelection || waveformSelection.type == 'Preview') && (
+      {(!waveformSelection || waveformSelection.type === 'Preview') && (
         <Placeholder
           clipsIds={clipsIds}
           mediaFile={mediaFile}
@@ -109,7 +109,7 @@ const Placeholder = ({
   selection: {
     type: 'Preview'
     index: number
-    preview: SubtitlesCardBase
+    item: SubtitlesCardBase
   } | null
 }) => {
   const {
@@ -129,7 +129,7 @@ const Placeholder = ({
     fieldsToTracks &&
     subtitles &&
     selection &&
-    selection.preview ? (
+    selection.item ? (
     <section className={css.intro}>
       <Preview
         cardBases={subtitles}

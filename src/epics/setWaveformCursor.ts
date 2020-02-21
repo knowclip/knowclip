@@ -10,6 +10,7 @@ import {
 import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { combineEpics } from 'redux-observable'
+import { areSelectionsEqual } from '../utils/waveformSelection'
 
 let seeking = false
 
@@ -30,12 +31,13 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
         flatMap(() => {
           const state = state$.value
           const newlyUpdatedTime = effects.getCurrentTime()
-          const highlightedClip = r.getHighlightedClip(state)
-          const highlightedClipId = highlightedClip && highlightedClip.id
-          const newClipIdToHighlight = r.getClipIdAt(
+
+          const selection = r.getWaveformSelection(state)
+          const newSelection = r.getNewWaveformSelectionAt(
             state,
             r.getXAtMilliseconds(state, newlyUpdatedTime * 1000)
           )
+
           const wasSeeking = seeking
           seeking = false
 
@@ -43,19 +45,19 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
             !wasSeeking &&
             r.isLoopOn(state) &&
             effects.isMediaPlaying() &&
-            highlightedClip &&
-            newlyUpdatedTime >= r.getSecondsAtX(state, highlightedClip.end)
-          if (loopImminent && highlightedClip) {
-            const highlightedClipStart = r.getSecondsAtX(
+            selection &&
+            newlyUpdatedTime >= r.getSecondsAtX(state, selection.item.end)
+          if (loopImminent && selection && selection.item) {
+            const selectionStartTime = r.getSecondsAtX(
               state,
-              highlightedClip.start
+              selection.item.start
             )
-            effects.setCurrentTime(highlightedClipStart)
+            effects.setCurrentTime(selectionStartTime)
           }
 
-          if (wasSeeking && newClipIdToHighlight !== highlightedClipId) {
+          if (wasSeeking && !areSelectionsEqual(selection, newSelection)) {
             return from([
-              ...(!newClipIdToHighlight
+              ...(!newSelection
                 ? [
                     setCursorAndViewBox(
                       state,
@@ -64,20 +66,16 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
                     ),
                   ]
                 : []),
-              r.selectWaveformItem(
-                newClipIdToHighlight
-                  ? { type: 'Clip', id: newClipIdToHighlight }
-                  : null
-              ),
+              r.selectWaveformItem(newSelection),
             ])
           }
 
           if (
             !loopImminent &&
-            newClipIdToHighlight &&
-            newClipIdToHighlight !== highlightedClipId
+            newSelection &&
+            !areSelectionsEqual(selection, newSelection)
           )
-            return of(r.highlightClip(newClipIdToHighlight))
+            return of(r.selectWaveformItem(newSelection))
 
           return of(
             setCursorAndViewBox(

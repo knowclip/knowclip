@@ -1,27 +1,10 @@
 import { createSelector } from 'reselect'
-import { getCurrentMediaFile, getCurrentNoteType } from './currentMedia'
 import {
   getSubtitlesFlashcardFieldLinks,
-  getSubtitlesChunksWithinRange,
-  getSubtitlesChunksWithinRangeFromTracksState,
   overlapsSignificantly,
 } from './subtitles'
-import { getDefaultTags, getHighlightedClip } from './session'
-import { getWaveform } from './waveform'
-import { TransliterationFlashcardFields } from '../types/Project'
-import {
-  blankSimpleFields,
-  blankTransliterationFields,
-} from '../utils/newFlashcard'
 import { getClip } from './clips'
-const getCurrentCardPreviewIndex = (state: AppState) => {
-  const highlightedClip = getHighlightedClip(state)
-
-  if (highlightedClip) return null
-
-  const subtitlesBases = getSubtitlesCardBases(state)
-  if (!subtitlesBases.linkedTrackIds.length) return -1
-}
+import { getClipIdAt } from './currentMedia'
 
 export type SubtitlesCardBase = {
   // start and end from cues base?
@@ -40,13 +23,13 @@ const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
 export const getWaveformSelection = (
   state: AppState
 ):
-  | { type: 'Clip'; clip: Clip }
-  | { type: 'Preview'; index: number; preview: SubtitlesCardBase }
+  | { type: 'Clip'; id: ClipId; item: Clip }
+  | { type: 'Preview'; index: number; item: SubtitlesCardBase }
   | null => {
   const { waveformSelection } = state.session
   if (waveformSelection && waveformSelection.type === 'Clip') {
     const clip = getClip(state, waveformSelection.id)
-    return clip && { type: 'Clip', clip }
+    return clip && { type: 'Clip', id: clip.id, item: clip }
   }
 
   if (waveformSelection && waveformSelection.type === 'Preview') {
@@ -54,7 +37,7 @@ export const getWaveformSelection = (
       waveformSelection.index
     ]
     return preview
-      ? { type: 'Preview', index: waveformSelection.index, preview }
+      ? { type: 'Preview', index: waveformSelection.index, item: preview }
       : null
   }
 
@@ -79,26 +62,15 @@ export type SubtitlesCardBases = {
   ) => Dict<SubtitlesTrackId, string>
 }
 
-// export const getFieldsPreviewFromCardBase = (cardBase: SubtitlesCardBase) => Dict<string, string> => {
-//   const preview: Dict<string, string> = {}
-
-// }
-
 export const getSubtitlesCardBases = createSelector(
-  getHighlightedClip,
   (state: AppState) => state.waveform,
   (state: AppState) => state.subtitles,
   getSubtitlesFlashcardFieldLinks,
-  getDefaultTags,
-  getCurrentNoteType,
   getSubtitlesCardBaseFieldPriority,
   (
-    highlightedClip,
     waveform,
     subtitles,
     fieldsToTracks,
-    defaultTags,
-    noteType,
     fieldsCuePriority
   ): SubtitlesCardBases => {
     const [cueField] = fieldsCuePriority
@@ -111,7 +83,7 @@ export const getSubtitlesCardBases = createSelector(
         fieldNames: [],
         linkedTrackIds: [],
         excludedTracks: Object.values(subtitles),
-        getFieldsPreviewFromCardsBase: cardsBase => ({}),
+        getFieldsPreviewFromCardsBase: () => ({}),
       }
 
     const includedTracks = fieldsCuePriority.map(
@@ -120,53 +92,51 @@ export const getSubtitlesCardBases = createSelector(
 
     const halfSecond = (waveform.stepsPerSecond * waveform.stepLength) / 2
 
-    const lastIndexes = fieldsCuePriority.map(fieldName => 0)
-    const cards: SubtitlesCardBase[] = cueTrack.chunks.map(
-      (cueChunk, cueChunkIndex) => {
-        return {
-          start: cueChunk.start,
-          end: cueChunk.end,
-          fields: fieldsCuePriority.reduce(
-            (dict, fn, fieldPriority) => {
-              const overlappedIndexes: number[] = []
+    const lastIndexes = fieldsCuePriority.map(() => 0)
+    const cards: SubtitlesCardBase[] = cueTrack.chunks.map(cueChunk => {
+      return {
+        start: cueChunk.start,
+        end: cueChunk.end,
+        fields: fieldsCuePriority.reduce(
+          (dict, fn, fieldPriority) => {
+            const overlappedIndexes: number[] = []
 
-              const trackId = fieldsToTracks[fn]
-              const track = trackId && subtitles[trackId]
-              const chunks = track ? track.chunks : []
+            const trackId = fieldsToTracks[fn]
+            const track = trackId && subtitles[trackId]
+            const chunks = track ? track.chunks : []
 
-              for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
-                const chunk = chunks[i]
-                lastIndexes[fieldPriority] = i
+            for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
+              const chunk = chunks[i]
+              lastIndexes[fieldPriority] = i
 
-                if (!chunk) {
-                  console.log({ track, i })
-                  console.error(track)
-                  throw new Error('invalid chunk index')
-                }
-
-                if (chunk.start >= cueChunk.end) {
-                  break
-                }
-                if (
-                  overlapsSignificantly(
-                    cueChunk,
-                    chunk.start,
-                    chunk.end,
-                    halfSecond
-                  )
-                ) {
-                  overlappedIndexes.push(i)
-                }
+              if (!chunk) {
+                console.log({ track, i })
+                console.error(track)
+                throw new Error('invalid chunk index')
               }
 
-              if (trackId) dict[trackId] = overlappedIndexes
-              return dict
-            },
-            {} as Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
-          ),
-        }
+              if (chunk.start >= cueChunk.end) {
+                break
+              }
+              if (
+                overlapsSignificantly(
+                  cueChunk,
+                  chunk.start,
+                  chunk.end,
+                  halfSecond
+                )
+              ) {
+                overlappedIndexes.push(i)
+              }
+            }
+
+            if (trackId) dict[trackId] = overlappedIndexes
+            return dict
+          },
+          {} as Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
+        ),
       }
-    )
+    })
 
     return {
       totalTracksCount: Object.values(subtitles).length,
@@ -190,3 +160,22 @@ export const getSubtitlesCardBases = createSelector(
     }
   }
 )
+
+export const getNewWaveformSelectionAt = (state: AppState, x: number) => {
+  const clipId = getClipIdAt(state, x)
+  const clip = clipId && state.clips.byId[clipId]
+
+  if (clipId && clip) return { type: 'Clip' as const, id: clipId, item: clip }
+
+  const subtitles = getSubtitlesCardBases(state)
+
+  for (let i = 0; i < subtitles.cards.length; i++) {
+    const card = subtitles.cards[i]
+    if (card.start > x) return null
+
+    if (x >= card.start && x <= card.end)
+      return { type: 'Preview' as const, index: i, item: card }
+  }
+
+  return null
+}
