@@ -130,12 +130,12 @@ const SUBTITLES_CHUNK_HEIGHT = 14
 
 const SubtitlesChunk = ({
   chunk,
-  trackIndex,
+  trackOffsetY,
   chunkIndex,
   trackId,
 }: {
   chunk: SubtitlesChunk
-  trackIndex: number
+  trackOffsetY: number
   chunkIndex: number
   trackId: string
 }) => {
@@ -144,49 +144,109 @@ const SubtitlesChunk = ({
 
   const rect = {
     x: chunk.start,
-    y: WAVEFORM_HEIGHT + trackIndex * SUBTITLES_CHUNK_HEIGHT,
+    y: WAVEFORM_HEIGHT + trackOffsetY * SUBTITLES_CHUNK_HEIGHT,
     width: width,
     height: SUBTITLES_CHUNK_HEIGHT,
   }
+
+  const clickDataProps = {
+    'data-track-id': trackId,
+    'data-chunk-index': chunkIndex,
+  }
+
   return (
-    <g
-      className={css.subtitlesChunk}
-      data-chunk-index={chunkIndex}
-      data-track-id={trackId}
-    >
+    <g className={css.subtitlesChunk} {...clickDataProps}>
       <clipPath id={clipPathId}>
         <rect {...rect} width={width - 10} />
       </clipPath>
       <rect
         className={css.subtitlesChunkRectangle}
-        data-track-id={trackId}
-        data-chunk-index={chunkIndex}
+        {...clickDataProps}
         {...rect}
         rx={SUBTITLES_CHUNK_HEIGHT / 2}
       />
       <text
         clipPath={`url(#${clipPathId})`}
-        data-chunk-index={chunkIndex}
-        data-track-id={trackId}
+        {...clickDataProps}
         className={css.subtitlesText}
         x={chunk.start + 6}
-        y={(trackIndex + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
+        y={(trackOffsetY + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
       >
         {chunk.text}
       </text>
     </g>
   )
 }
+
+const LinkedSubtitlesChunk = ({
+  cardBase,
+  index,
+  fieldsPreview,
+  linkedFieldNames,
+  linkedTrackIds,
+}: {
+  cardBase: r.SubtitlesCardBase
+  index: number
+  fieldsPreview: Dict<string, string>
+  linkedFieldNames: TransliterationFlashcardFieldName[]
+  linkedTrackIds: SubtitlesTrackId[]
+}) => {
+  const clipPathId = `linkedSubtitles_${cardBase.start}`
+  const width = cardBase.end - cardBase.start
+
+  const rect = {
+    x: cardBase.start,
+    y: WAVEFORM_HEIGHT,
+    width: width,
+    height: SUBTITLES_CHUNK_HEIGHT * linkedFieldNames.length,
+  }
+
+  const clickDataProps = {
+    'data-track-id': linkedTrackIds[0],
+    'data-chunk-index': index,
+  }
+
+  return (
+    <g className={css.subtitlesChunk} {...clickDataProps}>
+      <clipPath id={clipPathId}>
+        <rect {...rect} width={width - 10} />
+      </clipPath>
+      <rect
+        className={css.subtitlesChunkRectangle}
+        {...clickDataProps}
+        {...rect}
+        rx={SUBTITLES_CHUNK_HEIGHT / 2}
+      />
+      {linkedTrackIds.map((id, i) => {
+        const i1 = 1 + i
+        return (
+          <text
+            key={id + i}
+            clipPath={`url(#${clipPathId})`}
+            className={css.subtitlesText}
+            x={cardBase.start + 6}
+            y={i1 * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
+            {...clickDataProps}
+          >
+            {fieldsPreview[id]}
+          </text>
+        )
+      })}
+    </g>
+  )
+}
+
 const SubtitlesTimelines = memo(
   ({
     subtitles,
     goToSubtitlesChunk,
   }: {
-    subtitles: SubtitlesTrack[]
+    subtitles: r.SubtitlesCardBases
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
   }) => {
     const handleClick = useCallback(
       e => {
+        console.log(e.target)
         e.stopPropagation()
         goToSubtitlesChunk(
           e.target.dataset.trackId,
@@ -201,19 +261,34 @@ const SubtitlesTimelines = memo(
         width="100%"
         onClick={handleClick}
       >
-        {subtitles.map(({ chunks, id }, trackIndex) => (
-          <g className={$.subtitlesTimelines} key={id}>
-            {chunks.map((chunk, index) => (
-              <SubtitlesChunk
-                key={`${chunk.start}_${chunk.text}`}
-                chunk={chunk}
-                trackIndex={trackIndex}
-                trackId={id}
-                chunkIndex={index}
-              />
-            ))}
-          </g>
-        ))}
+        {subtitles.cards.map((c, i) => {
+          return (
+            <LinkedSubtitlesChunk
+              cardBase={c}
+              index={i}
+              linkedFieldNames={subtitles.fieldNames}
+              linkedTrackIds={subtitles.linkedTrackIds}
+              fieldsPreview={subtitles.getFieldsPreviewFromCardsBase(c)}
+            />
+          )
+        })}
+        {subtitles.excludedTracks.map(({ chunks, id }, trackIndex) => {
+          const trackOffsetY =
+            Object.keys(subtitles.fieldNames).length + trackIndex
+          return (
+            <g className={$.subtitlesTimelines} key={id}>
+              {chunks.map((chunk, index) => (
+                <SubtitlesChunk
+                  key={`${chunk.start}_${chunk.text}`}
+                  chunk={chunk}
+                  trackOffsetY={trackOffsetY}
+                  trackId={id}
+                  chunkIndex={index}
+                />
+              ))}
+            </g>
+          )
+        })}
       </g>
     )
   }
@@ -235,7 +310,8 @@ const Waveform = ({ show }: { show: boolean }) => {
     pendingClip: r.getPendingClip(state),
     pendingStretch: r.getPendingStretch(state),
     highlightedClipId: r.getHighlightedClipId(state),
-    subtitles: r.getSubtitlesTracks(state),
+    // subtitles: r.getSubtitlesTracks(state),
+    subtitles: r.getSubtitlesCardBases(state),
   }))
 
   const dispatch = useDispatch()
@@ -247,7 +323,8 @@ const Waveform = ({ show }: { show: boolean }) => {
   )
 
   const { viewBox, cursor, stepsPerSecond } = waveform
-  const height = WAVEFORM_HEIGHT + subtitles.length * SUBTITLES_CHUNK_HEIGHT
+  const height =
+    WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
   const viewBoxString = getViewBoxString(viewBox.xMin, height)
   const svgRef = useRef(null)
   const onMouseDown = useCallback(
@@ -302,7 +379,7 @@ const Waveform = ({ show }: { show: boolean }) => {
         <image xlinkHref={`file://${path}`} style={{ pointerEvents: 'none' }} />
       )}
 
-      {Boolean(subtitles.length) && (
+      {Boolean(subtitles.cards.length || subtitles.excludedTracks.length) && (
         <SubtitlesTimelines
           subtitles={subtitles}
           goToSubtitlesChunk={goToSubtitlesChunk}
