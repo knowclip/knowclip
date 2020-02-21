@@ -246,7 +246,6 @@ const SubtitlesTimelines = memo(
   }) => {
     const handleClick = useCallback(
       e => {
-        console.log(e.target)
         e.stopPropagation()
         goToSubtitlesChunk(
           e.target.dataset.trackId,
@@ -310,7 +309,6 @@ const Waveform = ({ show }: { show: boolean }) => {
     pendingClip: r.getPendingClip(state),
     pendingStretch: r.getPendingStretch(state),
     highlightedClipId: r.getHighlightedClipId(state),
-    // subtitles: r.getSubtitlesTracks(state),
     subtitles: r.getSubtitlesCardBases(state),
   }))
 

@@ -13,7 +13,6 @@ import {
 } from '@material-ui/icons'
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
-import { CardPreview } from '../redux'
 import { TransliterationFlashcardFields } from '../types/Project'
 import FieldMenu, {
   useSubtitlesBySource,
@@ -21,19 +20,19 @@ import FieldMenu, {
 
 const FlashcardSectionPreview = ({
   clipsIds,
-  preview,
+  cardBases,
+  chunkIndex,
   mediaFile,
   fieldsToTracks,
 }: {
   clipsIds: string[]
-  preview: CardPreview | null
+  cardBases: r.SubtitlesCardBases
+  chunkIndex: number | null
   mediaFile: MediaFile
   fieldsToTracks: SubtitlesFlashcardFieldsLinks
 }) => {
   const { subtitles, id } = mediaFile
-  const fields = (preview
-    ? preview.fields
-    : {}) as TransliterationFlashcardFields
+  const fields = (cardBases ? {} : {}) as TransliterationFlashcardFields
   return (
     <section className={cn(css.preview)}>
       <section className={cn(css.previewFields)}>
@@ -46,7 +45,7 @@ const FlashcardSectionPreview = ({
           <p
             className={cn(css.previewFieldValue, css.previewFieldTranscription)}
           >
-            {preview && (
+            {chunkIndex != null && (
               <FieldValue
                 fieldName="transcription"
                 value={fields.transcription}
@@ -63,7 +62,7 @@ const FlashcardSectionPreview = ({
             mediaFileId={mediaFile.id}
           >
             <p className={cn(css.previewFieldValue)}>
-              {preview && (
+              {chunkIndex != null && (
                 <FieldValue
                   fieldName="pronunciation"
                   value={fields.pronunciation}
@@ -79,7 +78,7 @@ const FlashcardSectionPreview = ({
           mediaFileId={mediaFile.id}
         >
           <p className={cn(css.previewFieldValue)}>
-            {preview && (
+            {chunkIndex != null && (
               <FieldValue fieldName="meaning" value={fields.meaning} />
             )}
           </p>

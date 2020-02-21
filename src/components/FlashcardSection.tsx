@@ -94,21 +94,28 @@ const Placeholder = ({
   clipsIds: string[]
   mediaFile: MediaFile | null
 }) => {
-  const { fieldsToTracks, preview } = useSelector((state: AppState) =>
+  const {
+    fieldsToTracks,
+    subtitles,
+    // previewChunkIndex
+  } = useSelector((state: AppState) =>
     mediaFile && mediaFile.subtitles.length
       ? {
           fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-          preview: r.getCardPreview(state),
+          subtitles: r.getSubtitlesCardBases(state),
+          // previewChunkIndex: r.getCurrentCardPreviewIndex(state)
         }
       : {}
   )
   return mediaFile &&
     fieldsToTracks &&
-    preview &&
+    subtitles &&
+    // previewChunkIndex &&
     Object.keys(fieldsToTracks).length ? (
     <section className={css.intro}>
       <Preview
-        preview={preview}
+        cardBases={subtitles}
+        chunkIndex={0}
         clipsIds={clipsIds}
         mediaFile={mediaFile}
         fieldsToTracks={fieldsToTracks}
