@@ -42,7 +42,7 @@ declare type ClipAction =
   | AddClips
   | EditClip
   | MergeClips
-  | HighlightClip
+  | SelectWaveformItem
   | HighlightLeftClipRequest
   | HighlightRightClipRequest
 
@@ -82,7 +82,10 @@ declare type EditClip = {
   override: import('redux').DeepPartial<Clip>
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
-declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
+declare type SelectWaveformItem = {
+  type: 'SELECT_WAVEFORM_ITEM'
+  selection: WaveformSelection | null
+}
 declare type HighlightLeftClipRequest = { type: 'HIGHLIGHT_LEFT_CLIP_REQUEST' }
 declare type HighlightRightClipRequest = {
   type: 'HIGHLIGHT_RIGHT_CLIP_REQUEST'

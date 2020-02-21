@@ -1,4 +1,5 @@
 import { getClip } from './clips'
+import { getSubtitlesCardBases, SubtitlesCardBase } from './cardPreview'
 
 type ExpandedPendingStretch = {
   id: ClipId

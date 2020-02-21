@@ -61,8 +61,8 @@ const escEpic: AppEpic = (action$, state$, { window, isMediaPlaying }) =>
               ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
                 r.getHighlightedClipId(state$.value)
                 ? r.setLoop(false)
-                : r.highlightClip(null)
-              : r.highlightClip(null)
+                : r.clearWaveformSelection()
+              : r.clearWaveformSelection()
           )
     })
   )

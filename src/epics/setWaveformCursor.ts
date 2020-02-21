@@ -64,7 +64,11 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
                     ),
                   ]
                 : []),
-              r.highlightClip(newClipIdToHighlight),
+              r.selectWaveformItem(
+                newClipIdToHighlight
+                  ? { type: 'Clip', id: newClipIdToHighlight }
+                  : null
+              ),
             ])
           }
 

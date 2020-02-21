@@ -14,6 +14,7 @@ import {
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
 import Preview from './FlashcardSectionPreview'
+import { SubtitlesCardBase } from '../selectors'
 
 enum $ {
   container = 'flashcard-section-container',
@@ -28,10 +29,15 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { highlightedClip, clipsIds } = useSelector((state: AppState) => ({
-    highlightedClip: r.getHighlightedClip(state),
+  const { waveformSelection, clipsIds } = useSelector((state: AppState) => ({
+    waveformSelection: r.getWaveformSelection(state),
     clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
   }))
+
+  const highlightedClip =
+    waveformSelection && waveformSelection.type === 'Clip'
+      ? waveformSelection.clip
+      : null
 
   const clipsLength = clipsIds.length
   const clipIndex = useMemo(
@@ -61,14 +67,20 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClip && mediaFile ? (
+      {highlightedClip && mediaFile && (
         <FlashcardForm
           className={css.form}
           mediaFile={mediaFile}
           clipId={highlightedClip.id}
         />
-      ) : (
-        <Placeholder clipsIds={clipsIds} mediaFile={mediaFile} />
+      )}
+
+      {(!waveformSelection || waveformSelection.type == 'Preview') && (
+        <Placeholder
+          clipsIds={clipsIds}
+          mediaFile={mediaFile}
+          selection={waveformSelection}
+        />
       )}
 
       <Tooltip title="Next clip (Ctrl + period)">
@@ -90,9 +102,15 @@ const FlashcardSection = ({
 const Placeholder = ({
   clipsIds,
   mediaFile,
+  selection,
 }: {
   clipsIds: string[]
   mediaFile: MediaFile | null
+  selection: {
+    type: 'Preview'
+    index: number
+    preview: SubtitlesCardBase
+  } | null
 }) => {
   const {
     fieldsToTracks,
@@ -110,12 +128,12 @@ const Placeholder = ({
   return mediaFile &&
     fieldsToTracks &&
     subtitles &&
-    // previewChunkIndex &&
-    Object.keys(fieldsToTracks).length ? (
+    selection &&
+    selection.preview ? (
     <section className={css.intro}>
       <Preview
         cardBases={subtitles}
-        chunkIndex={0}
+        chunkIndex={selection.index}
         clipsIds={clipsIds}
         mediaFile={mediaFile}
         fieldsToTracks={fieldsToTracks}

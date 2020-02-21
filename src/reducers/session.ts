@@ -80,12 +80,13 @@ const session: Reducer<SessionState, Action> = (
         pendingClip: null,
       }
 
-    case A.HIGHLIGHT_CLIP:
-      return {
-        ...state,
-        waveformSelection:
-          action.id != null ? { type: 'Clip', id: action.id } : null,
-      }
+    case A.SELECT_WAVEFORM_ITEM:
+      return areSelectionsEqual(state.waveformSelection, action.selection)
+        ? state
+        : {
+            ...state,
+            waveformSelection: action.selection,
+          }
 
     case A.SET_PENDING_STRETCH:
       return {
@@ -202,6 +203,17 @@ const session: Reducer<SessionState, Action> = (
     default:
       return state
   }
+}
+
+const areSelectionsEqual = (
+  a: WaveformSelection | null,
+  b: WaveformSelection | null
+): boolean => {
+  if (a === b) return true
+  if (a && a.type === 'Preview' && b && b.type === 'Preview')
+    return a.index === b.index
+  if (a && a.type === 'Clip' && b && b.type === 'Clip') return a.id === b.id
+  return false
 }
 
 export default session

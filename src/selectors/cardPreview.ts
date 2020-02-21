@@ -13,6 +13,7 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
+import { getClip } from './clips'
 const getCurrentCardPreviewIndex = (state: AppState) => {
   const highlightedClip = getHighlightedClip(state)
 
@@ -36,24 +37,36 @@ const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
   'notes',
 ]
 
+export const getWaveformSelection = (
+  state: AppState
+):
+  | { type: 'Clip'; clip: Clip }
+  | { type: 'Preview'; index: number; preview: SubtitlesCardBase }
+  | null => {
+  const { waveformSelection } = state.session
+  if (waveformSelection && waveformSelection.type === 'Clip') {
+    const clip = getClip(state, waveformSelection.id)
+    return clip && { type: 'Clip', clip }
+  }
+
+  if (waveformSelection && waveformSelection.type === 'Preview') {
+    const preview: SubtitlesCardBase = getSubtitlesCardBases(state).cards[
+      waveformSelection.index
+    ]
+    return preview
+      ? { type: 'Preview', index: waveformSelection.index, preview }
+      : null
+  }
+
+  return null
+}
+
 const getSubtitlesCardBaseFieldPriority = createSelector(
   getSubtitlesFlashcardFieldLinks,
   links => {
-    return (
-      CUES_BASE_PRIORITY.filter(fieldName => Boolean(links[fieldName])) || null
-    )
+    return CUES_BASE_PRIORITY.filter(fieldName => Boolean(links[fieldName]))
   }
 )
-
-const findStartingAt = <T>(
-  arr: Array<T>,
-  index: number,
-  predicate: (item: T) => boolean
-) => {
-  for (let i = index; i < arr.length; i++) {
-    if (predicate(arr[i])) return arr[i]
-  }
-}
 
 export type SubtitlesCardBases = {
   totalTracksCount: number

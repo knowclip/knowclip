@@ -52,7 +52,11 @@ const highlightEpic: AppEpic = (action$, state$, effects) => {
 
       return clipIdAtX === highlightedClipId
         ? empty()
-        : of(r.highlightClip(clipIdAtX))
+        : of(
+            r.selectWaveformItem(
+              clipIdAtX ? { type: 'Clip', id: clipIdAtX } : null
+            )
+          )
     })
   )
 }
@@ -69,9 +73,16 @@ const playClipsOnHighlightEpic: AppEpic = (
   { setCurrentTime, getCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
-    filter(({ id }) => Boolean(id)),
-    tap(({ id: clipId }) => {
+    ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
+    filter(
+      (
+        a
+      ): a is {
+        type: 'SELECT_WAVEFORM_ITEM'
+        selection: { type: 'Clip'; id: ClipId }
+      } => Boolean(a.selection && a.selection.type === 'Clip')
+    ),
+    tap(({ selection: { id: clipId } }) => {
       const { start, end } = r.getClip(state$.value, clipId as ClipId) as Clip
 
       const { durationSeconds } = r.getCurrentMediaFile(
@@ -109,8 +120,12 @@ const centerSelectedClip: AppEpic = (
   { getWaveformSvgElement }
 ) =>
   action$.pipe(
-    ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
-    switchMap(({ id }) => {
+    ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
+    switchMap(action => {
+      const id =
+        action.selection &&
+        action.selection.type === 'Clip' &&
+        action.selection.id
       if (!id) return empty()
       const clip = r.getClip(state$.value, id)
       if (!clip) return empty()
@@ -150,7 +165,7 @@ const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
     filter(({ file }) => file.type === 'MediaFile'),
-    map(() => r.highlightClip(null))
+    map(() => r.clearWaveformSelection())
   )
 
 const highlightRightEpic: AppEpic = (action$, state$, { getCurrentTime }) =>
