@@ -14,9 +14,26 @@ export const addClips = (
   fileId,
 })
 
-export const highlightClip = (id: ClipId | null): HighlightClip => ({
-  type: A.HIGHLIGHT_CLIP,
-  id,
+export const selectWaveformItem = (
+  selection: WaveformSelection | null
+): SelectWaveformItem => ({
+  type: A.SELECT_WAVEFORM_ITEM,
+  selection,
+})
+
+export const clearWaveformSelection = (): SelectWaveformItem => ({
+  type: A.SELECT_WAVEFORM_ITEM,
+  selection: null,
+})
+
+export const highlightClip = (id: ClipId): SelectWaveformItem => ({
+  type: A.SELECT_WAVEFORM_ITEM,
+  selection: { type: 'Clip', id },
+})
+
+export const highlightSubtitles = (index: number): SelectWaveformItem => ({
+  type: A.SELECT_WAVEFORM_ITEM,
+  selection: { type: 'Preview', index },
 })
 
 export const highlightLeftClipRequest = (): HighlightLeftClipRequest => ({

@@ -90,19 +90,22 @@ declare type ExternalSubtitlesFile = {
   name: string
 }
 declare type VttConvertedSubtitlesFile =
-  | {
-      type: 'VttConvertedSubtitlesFile'
-      id: FileId
-      parentId: FileId // TODO: verify that this shouldn't be media file id
-      parentType: 'ExternalSubtitlesFile'
-    }
-  | {
-      type: 'VttConvertedSubtitlesFile'
-      id: FileId
-      parentId: MediaFileId
-      streamIndex: number
-      parentType: 'MediaFile'
-    }
+  | VttFromExternalSubtitles
+  | VttFromEmbeddedSubtitles
+declare type VttFromExternalSubtitles = {
+  type: 'VttConvertedSubtitlesFile'
+  id: FileId
+  parentId: FileId // TODO: verify that this shouldn't be media file id
+  parentType: 'ExternalSubtitlesFile'
+}
+declare type VttFromEmbeddedSubtitles = {
+  type: 'VttConvertedSubtitlesFile'
+  id: FileId
+  parentId: MediaFileId
+  streamIndex: number
+  parentType: 'MediaFile'
+}
+
 declare type WaveformPng = {
   type: 'WaveformPng'
   id: FileId

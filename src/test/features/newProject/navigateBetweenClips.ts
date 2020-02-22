@@ -16,6 +16,8 @@ export default async function navigateBetweenClips({ app, client }: TestSetup) {
 
   await client.clickElement_(previousClipButton)
 
+  await client.waitForText('body', '1 / 2')
+
   expect(await client.getText_(container)).toContain(
     'Relaxing while eating bamboo grass'
   )

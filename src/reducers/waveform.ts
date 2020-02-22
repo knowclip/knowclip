@@ -5,6 +5,7 @@ const initialState: WaveformState = {
   stepLength: 2,
   cursor: { x: 0, y: 0 },
   viewBox: { xMin: 0 },
+  length: 0,
 }
 
 const waveform: Reducer<WaveformState, Action> = (
@@ -28,6 +29,31 @@ const waveform: Reducer<WaveformState, Action> = (
         ...state,
         viewBox: action.viewBox,
       }
+
+    case A.OPEN_FILE_SUCCESS:
+      return action.validatedFile.type === 'MediaFile'
+        ? {
+            ...state,
+            length: ~~(
+              action.validatedFile.durationSeconds *
+              (state.stepsPerSecond * state.stepLength)
+            ),
+          }
+        : state
+
+    case A.DISMISS_MEDIA:
+      return {
+        ...state,
+        length: 0,
+      }
+
+    case A.OPEN_FILE_REQUEST:
+      return action.file.type === 'MediaFile'
+        ? {
+            ...state,
+            length: 0,
+          }
+        : state
 
     default:
       return state

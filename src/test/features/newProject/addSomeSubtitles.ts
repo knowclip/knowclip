@@ -3,6 +3,7 @@ import { waveform$ } from '../../../components/Waveform'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
+import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
 
 export default async function addSomeSubtitles(
   { client, app }: TestSetup,
@@ -16,6 +17,8 @@ export default async function addSomeSubtitles(
     ],
   })
   await client.clickElement_(subtitlesMenu$.addTrackButton)
+
+  await client.clickElement_(linkSubtitlesDialog$.skipButton)
 
   await client.elements_(waveform$.subtitlesTimelines, 2)
 }

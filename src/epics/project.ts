@@ -79,7 +79,10 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
         if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
         const { project } = normalizeProjectJson(state$.value, parse.value)
-        return of(r.openFileRequest(project, filePath))
+        return from([
+          r.abortFileDeletions(),
+          r.openFileRequest(project, filePath),
+        ])
       }
     ),
     mergeAll(),

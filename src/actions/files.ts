@@ -47,7 +47,7 @@ export const openFileSuccess = (
 export const openFileFailure = (
   file: FileMetadata,
   filePath: FilePath | null,
-  errorMessage: string
+  errorMessage: string | null
 ): OpenFileFailure => ({
   type: A.OPEN_FILE_FAILURE,
   file,
@@ -73,6 +73,10 @@ export const locateFileSuccess = (
 
 export const commitFileDeletions = (): CommitFileDeletions => ({
   type: A.COMMIT_FILE_DELETIONS,
+})
+
+export const abortFileDeletions = (): AbortFileDeletions => ({
+  type: A.ABORT_FILE_DELETIONS,
 })
 
 export const preloadVideoStills = (

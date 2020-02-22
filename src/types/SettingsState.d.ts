@@ -6,5 +6,8 @@ declare type SettingsState = {
   mediaFolderLocation: string | null
   assetsDirectories: string[]
   checkForUpdatesAutomatically: boolean
+  viewMode: ViewMode
   // TODO: save recent `ProjectFile`s here?
 }
+
+declare type ViewMode = 'HORIZONTAL' | 'VERTICAL'

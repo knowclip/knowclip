@@ -13,6 +13,8 @@ import {
 } from '@material-ui/icons'
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
+import Preview from './FlashcardSectionPreview'
+import { SubtitlesCardBase } from '../selectors'
 
 enum $ {
   container = 'flashcard-section-container',
@@ -27,10 +29,15 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { highlightedClip, clipsIds } = useSelector((state: AppState) => ({
-    highlightedClip: r.getHighlightedClip(state),
+  const { waveformSelection, clipsIds } = useSelector((state: AppState) => ({
+    waveformSelection: r.getWaveformSelection(state),
     clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
   }))
+
+  const highlightedClip =
+    waveformSelection && waveformSelection.type === 'Clip'
+      ? waveformSelection.item
+      : null
 
   const clipsLength = clipsIds.length
   const clipIndex = useMemo(
@@ -47,7 +54,7 @@ const FlashcardSection = ({
         </div>
       ) : null}
 
-      <Tooltip title="Previous clip (Ctrl + comma)">
+      <Tooltip title="Previous (Ctrl + comma)">
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
           disabled={clipsLength < 2}
@@ -60,17 +67,23 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClip && mediaFile ? (
+      {highlightedClip && mediaFile && (
         <FlashcardForm
           className={css.form}
           mediaFile={mediaFile}
           clipId={highlightedClip.id}
         />
-      ) : (
-        <Placeholder />
       )}
 
-      <Tooltip title="Next clip (Ctrl + period)">
+      {(!waveformSelection || waveformSelection.type === 'Preview') && (
+        <Placeholder
+          clipsIds={clipsIds}
+          mediaFile={mediaFile}
+          selection={waveformSelection}
+        />
+      )}
+
+      <Tooltip title="Next (Ctrl + period)">
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
           disabled={clipsLength < 2}
@@ -86,32 +99,78 @@ const FlashcardSection = ({
   )
 }
 
-const Placeholder = () => (
-  <section className={css.intro}>
-    <p className={css.introText}>
-      You can <strong>create clips</strong> in a few different ways:
-    </p>
-    <ul className={css.introList}>
-      <li>
-        Manually <strong>click and drag</strong> on the waveform
-      </li>
+const Placeholder = ({
+  clipsIds,
+  mediaFile,
+  selection,
+}: {
+  clipsIds: string[]
+  mediaFile: MediaFile | null
+  selection: {
+    type: 'Preview'
+    index: number
+    item: SubtitlesCardBase
+  } | null
+}) => {
+  const { fieldsToTracks, subtitles, viewMode } = useSelector(
+    (state: AppState) => {
+      const subtitlesMounted = mediaFile && mediaFile.subtitles.length
+      return {
+        fieldsToTracks: subtitlesMounted
+          ? r.getSubtitlesFlashcardFieldLinks(state)
+          : null,
+        subtitles: subtitlesMounted ? r.getSubtitlesCardBases(state) : null,
+        viewMode: state.settings.viewMode,
+      }
+    }
+  )
 
-      <li>
-        Use <Hearing className={css.icon} /> <strong>silence detection</strong>{' '}
-        to automatically make clips from audio containing little background
-        noise.
-      </li>
-      <li>
-        Use <Subtitles className={css.icon} /> <strong>subtitles</strong> to
-        automatically create both clips and flashcards.
-      </li>
-    </ul>
-    <p className={css.introText}>
-      When you're done, press the <Layers className={css.icon} />{' '}
-      <strong>export button</strong>.
-    </p>
-  </section>
-)
+  const className = cn(css.intro, {
+    [css.horizontalIntro]: viewMode === 'HORIZONTAL',
+  })
+
+  return mediaFile &&
+    fieldsToTracks &&
+    subtitles &&
+    selection &&
+    selection.item ? (
+    <section className={className}>
+      <Preview
+        cardBases={subtitles}
+        chunkIndex={selection.index}
+        clipsIds={clipsIds}
+        mediaFile={mediaFile}
+        fieldsToTracks={fieldsToTracks}
+        viewMode={viewMode}
+      />
+    </section>
+  ) : (
+    <section className={className}>
+      <p className={css.introText}>
+        You can <strong>create clips</strong> in a few different ways:
+      </p>
+      <ul className={css.introList}>
+        <li>
+          Manually <strong>click and drag</strong> on the waveform
+        </li>
+
+        <li>
+          Use <Hearing className={css.icon} />{' '}
+          <strong>silence detection</strong> to automatically make clips from
+          audio containing little background noise.
+        </li>
+        <li>
+          Use <Subtitles className={css.icon} /> <strong>subtitles</strong> to
+          automatically create both clips and flashcards.
+        </li>
+      </ul>
+      <p className={css.introText}>
+        When you're done, press the <Layers className={css.icon} />{' '}
+        <strong>export button</strong>.
+      </p>
+    </section>
+  )
+}
 
 export default FlashcardSection
 

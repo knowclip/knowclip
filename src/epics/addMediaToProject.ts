@@ -1,4 +1,4 @@
-import { flatMap, catchError, mergeAll } from 'rxjs/operators'
+import { catchError, mergeAll, flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
 import { readMediaFile, AsyncError } from '../utils/ffmpeg'

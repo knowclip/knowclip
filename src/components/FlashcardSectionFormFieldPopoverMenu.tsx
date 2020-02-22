@@ -1,9 +1,8 @@
-import React, { useCallback, SyntheticEvent } from 'react'
+import React, { useCallback, SyntheticEvent, useMemo } from 'react'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
-import css from './FlashcardSection.module.css'
 import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
 
@@ -18,12 +17,14 @@ const FlashcardSectionFormFieldPopoverMenu = ({
   linkedSubtitlesTrack,
   mediaFileId,
   fieldName,
+  className,
 }: {
   embeddedSubtitlesTracks: MediaFile['subtitles']
   externalSubtitlesTracks: MediaFile['subtitles']
   linkedSubtitlesTrack: string | null
   mediaFileId: MediaFileId
   fieldName: TransliterationFlashcardFieldName
+  className: string
 }) => {
   const subtitlesPopover = usePopover()
 
@@ -38,7 +39,7 @@ const FlashcardSectionFormFieldPopoverMenu = ({
       >
         <IconButton
           tabIndex={1}
-          className={cn(css.fieldMenuButton, $.openMenuButton)}
+          className={cn(className, $.openMenuButton)}
           buttonRef={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
         >
@@ -114,6 +115,48 @@ const FieldMenuItem = ({
     </MenuItem>
   )
 }
+
+export function useSubtitlesBySource(subtitles: MediaSubtitlesRelation[]) {
+  const embeddedSubtitlesTracks = useMemo(() => subtitles.filter(isEmbedded), [
+    subtitles,
+  ])
+  const externalSubtitlesTracks = useMemo(() => subtitles.filter(isExternal), [
+    subtitles,
+  ])
+  return { embeddedSubtitlesTracks, externalSubtitlesTracks }
+}
+
+const isEmbedded = (
+  t:
+    | {
+        type: 'EmbeddedSubtitlesTrack'
+        id: string
+        streamIndex: number
+      }
+    | {
+        type: 'ExternalSubtitlesTrack'
+        id: string
+      }
+): t is {
+  type: 'EmbeddedSubtitlesTrack'
+  id: string
+  streamIndex: number
+} => t.type === 'EmbeddedSubtitlesTrack'
+const isExternal = (
+  t:
+    | {
+        type: 'EmbeddedSubtitlesTrack'
+        id: string
+        streamIndex: number
+      }
+    | {
+        type: 'ExternalSubtitlesTrack'
+        id: string
+      }
+): t is {
+  type: 'ExternalSubtitlesTrack'
+  id: string
+} => t.type === 'ExternalSubtitlesTrack'
 
 export default FlashcardSectionFormFieldPopoverMenu
 

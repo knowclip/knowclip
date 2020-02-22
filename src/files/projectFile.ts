@@ -73,20 +73,18 @@ export default {
       }
 
       const addNewMediaFiles = media
-        .filter(
-          validatedFile => !r.getFile(state, 'MediaFile', validatedFile.id)
-        )
-        .map(validatedFile => {
+        .filter(mediaFile => !r.getFile(state, 'MediaFile', mediaFile.id))
+        .map(mediaFile => {
           return r.addFile(
-            validatedFile,
-            newlyAutoFoundMediaFilePaths[validatedFile.id]
+            mediaFile,
+            newlyAutoFoundMediaFilePaths[mediaFile.id]
           )
         })
       const addNewSubtitlesFiles = subtitles
         .filter(
-          validatedFile => !r.getSubtitlesSourceFile(state, validatedFile.id)
+          subtitlesFile => !r.getSubtitlesSourceFile(state, subtitlesFile.id)
         )
-        .map(validatedFile => r.addFile(validatedFile))
+        .map(subtitlesFile => r.addFile(subtitlesFile))
 
       const loadFirstMediaFile = media.length
         ? [r.openFileRequest(media[0])]
@@ -101,7 +99,7 @@ export default {
   ],
 
   openFailure: async ({ file, filePath, errorMessage }) => [
-    r.errorDialog('Problem opening project file:', errorMessage),
+    r.errorDialog('Problem opening project file:', errorMessage || ''),
   ],
 
   locateRequest: async ({ file }, availability, state, effects) => [

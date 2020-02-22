@@ -16,6 +16,7 @@ import keyboard from './keyboard'
 import project from './project'
 import highlightClip from './highlightClip'
 import subtitles from './subtitles'
+import subtitlesLinks from './subtitlesLinks'
 import files from './files'
 import defaultTags from './defaultTags'
 import loopMedia from './loopMedia'
@@ -69,6 +70,7 @@ const rootEpic: AppEpic = combineEpics(
   highlightClip,
   closeEpic,
   subtitles,
+  subtitlesLinks,
   files,
   preloadVideoStills,
   menu

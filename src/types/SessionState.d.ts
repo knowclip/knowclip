@@ -12,7 +12,7 @@ declare type PendingStretch = {
 declare type SessionState = {
   pendingClip: PendingClip | null
   pendingStretch: PendingStretch | null
-  highlightedClipId: ClipId | null
+  waveformSelection: WaveformSelection | null
   defaultTags: Array<string>
   defaultIncludeStill: boolean
   tagsToClipIds: {
@@ -31,3 +31,7 @@ declare type ProgressInfo = {
   message: string
   percentage: number
 }
+
+declare type WaveformSelection =
+  | { type: 'Clip'; id: ClipId }
+  | { type: 'Preview'; index: number }

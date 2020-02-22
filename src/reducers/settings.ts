@@ -4,6 +4,7 @@ export const initialState: SettingsState = {
   mediaFolderLocation: null,
   assetsDirectories: [],
   checkForUpdatesAutomatically: true,
+  viewMode: 'VERTICAL',
 }
 
 const settings: Reducer<SettingsState, Action> = (
@@ -44,6 +45,9 @@ const settings: Reducer<SettingsState, Action> = (
         ...state,
         ...action.settings,
       }
+
+    case A.SET_VIEW_MODE:
+      return { ...state, viewMode: action.viewMode }
 
     default:
       return state

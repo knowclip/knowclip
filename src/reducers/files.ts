@@ -104,7 +104,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         action.track.mediaFileId,
         (file = existingMediaFile): MediaFile => ({
           ...file,
-          subtitles: file.subtitles.some(s => s.id === action.track.id)
+          subtitles: file.subtitles.some(s => s.id === action.track.id) // should not happen... but just in case
             ? file.subtitles
             : [
                 ...file.subtitles,

@@ -12,6 +12,7 @@ declare type DialogData =
   | SubtitlesClipsDialogData
   | ErrorDialogData
   | SettingsDialogData
+  | LinkSubtitlesDialogData
 
 declare type ConfirmationDialogData = {
   type: 'Confirmation'
@@ -59,4 +60,10 @@ declare type ErrorDialogData = {
 
 declare type SettingsDialogData = {
   type: 'Settings'
+}
+
+declare type LinkSubtitlesDialogData = {
+  type: 'LinkSubtitles'
+  subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles
+  mediaFileId: MediaFileId
 }

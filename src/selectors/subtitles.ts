@@ -44,12 +44,16 @@ export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
 
 const getSubtitles = (state: AppState) => state.subtitles
 
+const getCurrentMediaFileSubtitles = (state: AppState) => {
+  const currentMediaFile = getCurrentMediaFile(state)
+  return currentMediaFile ? currentMediaFile.subtitles : []
+}
 export const getSubtitlesTracks = createSelector(
-  getCurrentMediaFile,
+  getCurrentMediaFileSubtitles,
   getSubtitles,
-  (currentFile, subtitles): Array<SubtitlesTrack> => {
-    if (!currentFile) return []
-    return currentFile.subtitles
+  (currentFileSubtitles, subtitles): Array<SubtitlesTrack> => {
+    if (!currentFileSubtitles.length) return []
+    return currentFileSubtitles
       .map(({ id }) => subtitles[id])
       .filter((track): track is SubtitlesTrack => Boolean(track))
   }
@@ -165,36 +169,74 @@ export const readVttChunk = (
   end: getXAtMilliseconds(state, end),
   text: (stripHtml(text) || '').trim(),
 })
-
+export const readParseSrtChunk = (
+  state: AppState,
+  {
+    start,
+    end,
+    text,
+  }: {
+    start: number
+    end: number
+    text: string
+  }
+): SubtitlesChunk => ({
+  start: getXAtMilliseconds(state, start * 1000),
+  end: getXAtMilliseconds(state, end * 1000),
+  text: (stripHtml(text) || '').trim(),
+})
 export const readSubsrtChunk = readVttChunk
 
-const overlap = (
-  chunk: SubtitlesChunk,
+export const overlapsSignificantly = (
+  chunk: { start: number; end: number },
   start: WaveformX,
   end: WaveformX,
   halfSecond: WaveformX
-): boolean =>
-  (start >= chunk.start && chunk.end - start >= halfSecond) ||
-  (end <= chunk.end && end - chunk.start >= halfSecond) ||
-  (chunk.start >= start && chunk.end <= end)
+): boolean => start <= chunk.end - halfSecond && end >= chunk.start + halfSecond
 
 export const getSubtitlesChunksWithinRange = (
   state: AppState,
   subtitlesTrackId: SubtitlesTrackId,
   start: WaveformX,
   end: WaveformX
-): Array<SubtitlesChunk> => {
-  const track = getSubtitlesTrack(state, subtitlesTrackId)
-  if (!track) return []
-
-  return track.chunks.filter(chunk =>
-    overlap(
-      chunk,
-      start,
-      end,
-      (state.waveform.stepsPerSecond * state.waveform.stepLength) / 2
-    )
+): Array<SubtitlesChunk> =>
+  getSubtitlesChunksWithinRangeFromTracksState(
+    state.subtitles,
+    state.waveform,
+    subtitlesTrackId,
+    start,
+    end
   )
+
+export const getSubtitlesChunksWithinRangeFromTracksState = (
+  // TODO: get rid of this!
+  state: AppState['subtitles'],
+  waveform: WaveformState,
+  subtitlesTrackId: SubtitlesTrackId,
+  start: WaveformX,
+  end: WaveformX
+): Array<SubtitlesChunk> => {
+  const track = state[subtitlesTrackId]
+  const chunks: SubtitlesChunk[] = []
+
+  if (!track) return chunks
+
+  for (let i = 0; i < track.chunks.length; i++) {
+    const chunk = track.chunks[i]
+    if (chunk.end < start) continue
+    if (chunk.start > end) break
+
+    if (
+      overlapsSignificantly(
+        chunk,
+        start,
+        end,
+        (waveform.stepsPerSecond * waveform.stepLength) / 2
+      )
+    )
+      chunks.push(chunk)
+  }
+  return chunks
 }
 
 export const getSubtitlesFlashcardFieldLinks = (

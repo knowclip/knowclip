@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import cn from 'classnames'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
@@ -38,6 +39,7 @@ const FlashcardSectionForm = memo(
       subtitlesFlashcardFieldLinks,
       clip,
       mediaIsPlaying,
+      viewMode,
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),
       selectedClipTime: r.getSelectedClipTime(state),
@@ -46,6 +48,7 @@ const FlashcardSectionForm = memo(
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
       clip: r.getHighlightedClip(state),
       mediaIsPlaying: r.isMediaPlaying(state),
+      viewMode: state.settings.viewMode,
     }))
 
     if (!selectedClipTime || !clip) throw new Error('Clip not found')
@@ -140,11 +143,17 @@ const FlashcardSectionForm = memo(
 
     return (
       <form
-        className={className}
+        className={cn(className, {
+          [css.horizontalForm]: viewMode === 'HORIZONTAL',
+        })}
         onSubmit={handleFlashcardSubmit}
         id={$.container}
       >
-        <section className={css.formTop}>
+        <section
+          className={cn(css.formTop, {
+            [css.horizontalFormTop]: viewMode === 'HORIZONTAL',
+          })}
+        >
           <div className={css.formTopLeft}>
             {mediaFile.isVideo && (
               <VideoStillDisplay
@@ -162,7 +171,7 @@ const FlashcardSectionForm = memo(
               {' - '}
               {formatTime(selectedClipTime.end)}
             </span>
-            <Tooltip title="Loop audio (Ctrl + L)">
+            <Tooltip title="Loop selection (Ctrl + L)">
               <IconButton
                 onClick={toggleLoop}
                 color={isLoopOn ? 'secondary' : 'default'}

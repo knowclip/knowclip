@@ -10,7 +10,7 @@ import {
   Divider,
   Popover,
 } from '@material-ui/core'
-import { PlayArrow, Pause } from '@material-ui/icons'
+import { PlayArrow, Pause, Loop } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import MediaFilesMenuItem from './MediaFilesMenuItem'
 import { showOpenDialog } from '../utils/electron'
@@ -52,11 +52,13 @@ const MediaFilesMenu = ({
   className,
   currentProjectId,
 }: MediaFilesMenuProps) => {
-  const { currentFile, projectMediaFiles } = useSelector((state: AppState) => ({
-    loop: r.isLoopOn(state),
-    currentFile: r.getCurrentMediaFile(state),
-    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-  }))
+  const { currentFile, projectMediaFiles, loopIsOn } = useSelector(
+    (state: AppState) => ({
+      loopIsOn: r.isLoopOn(state),
+      currentFile: r.getCurrentMediaFile(state),
+      projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+    })
+  )
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -72,6 +74,10 @@ const MediaFilesMenu = ({
   )
 
   const { playing, playOrPauseAudio } = usePlayButtonSync()
+
+  const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
+    dispatch,
+  ])
 
   return (
     <DarkTheme>
@@ -102,6 +108,17 @@ const MediaFilesMenu = ({
           >
             <IconButton onClick={playOrPauseAudio}>
               {playing ? <Pause /> : <PlayArrow />}
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {currentFile && (
+          <Tooltip title="Loop selection (Ctrl + L)">
+            <IconButton
+              onClick={toggleLoop}
+              color={loopIsOn ? 'secondary' : 'default'}
+            >
+              <Loop />
             </IconButton>
           </Tooltip>
         )}

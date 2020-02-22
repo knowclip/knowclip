@@ -46,12 +46,12 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
           const openMissingSubtitlesFailure = action$.pipe(
             ofType<Action, OpenFileFailure>('OPEN_FILE_FAILURE'),
             filter(({ file }) =>
-              missingTracks.some(([fn, t]) => t.id === file.id)
+              missingTracks.some(([, t]) => t.id === file.id)
             ),
             take(1)
           )
           return from(missingTracks).pipe(
-            concatMap(([fieldName, file]) =>
+            concatMap(([, file]) =>
               of(r.openFileRequest(file)).pipe(
                 concat(
                   action$.pipe(

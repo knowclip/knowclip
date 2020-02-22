@@ -2,7 +2,9 @@ import React, { useCallback, useMemo, memo, MutableRefObject } from 'react'
 import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
-import FieldMenu from './FlashcardSectionFormFieldPopoverMenu'
+import FieldMenu, {
+  useSubtitlesBySource,
+} from './FlashcardSectionFormFieldPopoverMenu'
 import { flashcardSectionForm$ } from './FlashcardSectionForm'
 
 type Props = {
@@ -38,14 +40,10 @@ const FlashcardSectionFormField = memo(
       e => setFlashcardText(name, e.target.value),
       [setFlashcardText, name]
     )
-    const embeddedSubtitlesTracks = useMemo(
-      () => subtitles.filter(isEmbedded),
-      [subtitles]
-    )
-    const externalSubtitlesTracks = useMemo(
-      () => subtitles.filter(isExternal),
-      [subtitles]
-    )
+    const {
+      embeddedSubtitlesTracks,
+      externalSubtitlesTracks,
+    } = useSubtitlesBySource(subtitles)
     const label = useMemo(
       () =>
         fieldLabel +
@@ -66,6 +64,7 @@ const FlashcardSectionFormField = memo(
       <section className={css.field}>
         {Boolean(subtitles.length) && (
           <FieldMenu
+            className={css.fieldMenuButton}
             embeddedSubtitlesTracks={embeddedSubtitlesTracks}
             externalSubtitlesTracks={externalSubtitlesTracks}
             linkedSubtitlesTrack={linkedSubtitlesTrack}
@@ -99,38 +98,6 @@ const FlashcardSectionFormField = memo(
     )
   }
 )
-
-const isEmbedded = (
-  t:
-    | {
-        type: 'EmbeddedSubtitlesTrack'
-        id: string
-        streamIndex: number
-      }
-    | {
-        type: 'ExternalSubtitlesTrack'
-        id: string
-      }
-): t is {
-  type: 'EmbeddedSubtitlesTrack'
-  id: string
-  streamIndex: number
-} => t.type === 'EmbeddedSubtitlesTrack'
-const isExternal = (
-  t:
-    | {
-        type: 'EmbeddedSubtitlesTrack'
-        id: string
-        streamIndex: number
-      }
-    | {
-        type: 'ExternalSubtitlesTrack'
-        id: string
-      }
-): t is {
-  type: 'ExternalSubtitlesTrack'
-  id: string
-} => t.type === 'ExternalSubtitlesTrack'
 
 const getLinkedTrackLabel = (
   embedded: MediaFile['subtitles'],

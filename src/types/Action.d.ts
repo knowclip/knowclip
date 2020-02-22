@@ -42,7 +42,7 @@ declare type ClipAction =
   | AddClips
   | EditClip
   | MergeClips
-  | HighlightClip
+  | SelectWaveformItem
   | HighlightLeftClipRequest
   | HighlightRightClipRequest
 
@@ -82,7 +82,10 @@ declare type EditClip = {
   override: import('redux').DeepPartial<Clip>
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
-declare type HighlightClip = { type: 'HIGHLIGHT_CLIP'; id: ClipId | null }
+declare type SelectWaveformItem = {
+  type: 'SELECT_WAVEFORM_ITEM'
+  selection: WaveformSelection | null
+}
 declare type HighlightLeftClipRequest = { type: 'HIGHLIGHT_LEFT_CLIP_REQUEST' }
 declare type HighlightRightClipRequest = {
   type: 'HIGHLIGHT_RIGHT_CLIP_REQUEST'
@@ -218,6 +221,7 @@ declare type MediaAction =
   | PlayMedia
   | PauseMedia
   | DismissMedia
+  | SetViewMode
 declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
@@ -233,6 +237,7 @@ declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
 declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
 declare type PlayMedia = { type: 'PLAY_MEDIA' }
 declare type PauseMedia = { type: 'PAUSE_MEDIA' }
+declare type SetViewMode = { type: 'SET_VIEW_MODE'; viewMode: ViewMode }
 
 declare type SettingsAction =
   | SetMediaFolderLocation
@@ -266,17 +271,23 @@ declare type DismissMedia = { type: 'DISMISS_MEDIA' }
 
 declare type SubtitlesAction =
   | AddSubtitlesTrack
+  | MountSubtitlesTrack
   | DeleteSubtitlesTrack
   | ShowSubtitles
   | HideSubtitles
   | MakeClipsFromSubtitles
   | ShowSubtitlesClipsDialogRequest
+  | LinkFlashcardFieldToSubtitlesTrackRequest
   | LinkFlashcardFieldToSubtitlesTrack
   | GoToSubtitlesChunk
 
 declare type LoadSubtitlesFailure = {
   type: 'LOAD_SUBTITLES_FAILURE'
   error: string
+}
+declare type MountSubtitlesTrack = {
+  type: 'MOUNT_SUBTITLES_TRACK'
+  track: SubtitlesTrack
 }
 declare type AddSubtitlesTrack = {
   type: 'ADD_SUBTITLES_TRACK'
@@ -317,6 +328,13 @@ declare type LinkFlashcardFieldToSubtitlesTrack = {
   flashcardFieldName: FlashcardFieldName
   subtitlesTrackId: SubtitlesTrackId | null
 }
+declare type LinkFlashcardFieldToSubtitlesTrackRequest = {
+  type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST'
+  mediaFileId: MediaFileId
+  flashcardFieldName: FlashcardFieldName
+  subtitlesTrackId: SubtitlesTrackId | null
+}
+
 declare type GoToSubtitlesChunk = {
   type: 'GO_TO_SUBTITLES_CHUNK'
   subtitlesTrackId: SubtitlesTrackId
@@ -333,6 +351,7 @@ declare type FileAction =
   | LocateFileRequest
   | LocateFileSuccess
   | CommitFileDeletions
+  | AbortFileDeletions
   | PreloadVideoStills
 declare type AddFile = {
   type: 'ADD_FILE'
@@ -352,6 +371,9 @@ declare type DeleteFileSuccess = {
 declare type CommitFileDeletions = {
   type: 'COMMIT_FILE_DELETIONS'
 }
+declare type AbortFileDeletions = {
+  type: 'ABORT_FILE_DELETIONS'
+}
 declare type OpenFileRequest = {
   type: 'OPEN_FILE_REQUEST'
   file: FileMetadata
@@ -367,7 +389,7 @@ declare type OpenFileFailure = {
   type: 'OPEN_FILE_FAILURE'
   file: FileMetadata
   filePath: FilePath | null
-  errorMessage: string
+  errorMessage: string | null
 }
 /** Should only be dispatched with a stored file */
 declare type LocateFileRequest = {
@@ -380,9 +402,6 @@ declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
   file: FileMetadata
   filePath: FilePath
-}
-declare type CommitFileDeletions = {
-  type: 'COMMIT_FILE_DELETIONS'
 }
 
 declare type PreloadVideoStills = {

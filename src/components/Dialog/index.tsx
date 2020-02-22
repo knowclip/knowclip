@@ -10,6 +10,7 @@ import FileSelection from './FileSelectionDialog'
 import ErrorDialog from './ErrorDialog'
 import SettingsDialog from './SettingsDialog'
 import { getCurrentDialog } from '../../selectors'
+import LinkSubtitlesDialog from './LinkSubtitlesDialog'
 
 const DialogView = () => {
   const currentDialog = useSelector((state: AppState) =>
@@ -32,11 +33,25 @@ const DialogView = () => {
     case 'SubtitlesClips':
       return <SubtitlesClips open={true} data={currentDialog} />
     case 'FileSelection':
-      return <FileSelection open={true} data={currentDialog} />
+      return (
+        <FileSelection
+          open={true}
+          data={currentDialog}
+          key={currentDialog.file.id}
+        />
+      )
     case 'Error':
       return <ErrorDialog open={true} data={currentDialog} />
     case 'Settings':
       return <SettingsDialog open={true} data={currentDialog} />
+    case 'LinkSubtitles':
+      return (
+        <LinkSubtitlesDialog
+          open={true}
+          data={currentDialog}
+          key={currentDialog.subtitles.id}
+        />
+      )
   }
 }
 

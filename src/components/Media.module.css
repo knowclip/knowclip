@@ -1,5 +1,5 @@
-.video::-webkit-media-controls-toggle-closed-captions-button {
-  display: none;
+.container {
+  position: relative;
 }
 
 .audio.mediaPlayer {
@@ -11,4 +11,23 @@
   box-sizing: border-box;
   max-width: 100%;
   max-height: 100%;
+}
+
+.viewModeButton {
+  position: absolute !important;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  opacity: 0;
+  transition: opacity .2s, background-color .2s;
+  background-color: white !important;
+}
+.viewModeButton:hover {
+  background-color: #eee !important;
+}
+
+.container:hover .viewModeButton,
+.container:focus-within .viewModeButton
+ {
+  opacity: 1;
 }

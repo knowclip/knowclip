@@ -1,6 +1,5 @@
-import { promisify } from 'util'
 import tempy from 'tempy'
-import fs from 'fs'
+import { promises } from 'fs'
 import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
 import * as r from '../redux'
 import { extname, basename, join } from 'path'
@@ -8,8 +7,7 @@ import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
 import { getMillisecondsAtX } from '../selectors'
 
-const readFile = promisify(fs.readFile)
-const writeFile = promisify(fs.writeFile)
+const { readFile, writeFile } = promises
 
 export const getSubtitlesFilePathFromMedia = async (
   file: SubtitlesFile,
@@ -71,8 +69,8 @@ export const getExternalSubtitlesVttPath = async (
       vttFilePath,
       stringifyVtt(
         chunks.map(chunk => ({
-          start: getMillisecondsAtX(state, chunk.start),
-          end: getMillisecondsAtX(state, chunk.end),
+          start: Math.round(getMillisecondsAtX(state, chunk.start)),
+          end: Math.round(getMillisecondsAtX(state, chunk.end)),
           text: chunk.text,
         }))
       ),
@@ -123,16 +121,43 @@ const parseSubtitles = (
   state: AppState,
   fileContents: string,
   extension: string
-) =>
-  extension === '.ass'
-    ? subsrt
-        .parse(fileContents)
-        .filter(({ type }) => type === 'caption')
-        .map(chunk => r.readSubsrtChunk(state, chunk))
-        .filter(({ text }) => text)
-    : parse(fileContents)
-        .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
-        .filter(({ text }) => text)
+) => {
+  switch (extension) {
+    case '.ass':
+      return sanitizeSubtitles(
+        subsrt
+          .parse(fileContents)
+          .filter(({ type }) => type === 'caption')
+          .map(chunk => r.readSubsrtChunk(state, chunk))
+      )
+    case '.vtt':
+    case '.srt':
+      return sanitizeSubtitles(
+        parse(fileContents).map(vttChunk =>
+          r.readVttChunk(state, vttChunk as SubtitlesChunk)
+        )
+      )
+    default:
+      throw new Error('Unknown subtitles format')
+  }
+}
+
+/** mutates */
+export const sanitizeSubtitles = (
+  chunks: SubtitlesChunk[]
+): SubtitlesChunk[] => {
+  const result = []
+  let lastChunk: SubtitlesChunk | undefined
+  for (const chunk of chunks) {
+    if (lastChunk && lastChunk.end === chunk.start) lastChunk.end -= 1
+
+    if (chunk.text.trim()) {
+      result.push(chunk)
+      lastChunk = chunk
+    }
+  }
+  return result
+}
 
 export const getSubtitlesFromFile = async (
   state: AppState,
@@ -152,7 +177,7 @@ export const newEmbeddedSubtitlesTrack = (
 ): EmbeddedSubtitlesTrack => ({
   type: 'EmbeddedSubtitlesTrack',
   id,
-  mode: 'showing',
+  mode: 'hidden',
   chunks,
   mediaFileId,
   streamIndex,
@@ -166,7 +191,7 @@ export const newExternalSubtitlesTrack = (
   filePath: string,
   vttFilePath: string
 ): ExternalSubtitlesTrack => ({
-  mode: 'showing',
+  mode: 'hidden',
   type: 'ExternalSubtitlesTrack',
   id,
   mediaFileId,

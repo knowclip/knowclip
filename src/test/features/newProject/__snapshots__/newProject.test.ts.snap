@@ -31,6 +31,9 @@ Object {
               "transcription": "またこの子は昼間からゴロゴロして",
             },
             "id": "a1eb3142-ce18-4595-a3c3-8c867e1058f4",
+            "image": Object {
+              "type": "VideoStill",
+            },
             "start": "00:15.12",
             "tags": Array [
               "pbc",

@@ -10,7 +10,10 @@ import externalSubtitles from '../files/externalSubtitlesFile'
 import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
 import videoStillImage from '../files/videoStillImageFile'
-import { FileEventHandlers } from '../files/eventHandlers'
+import {
+  FileEventHandlers,
+  OpenFileSuccessHandler,
+} from '../files/eventHandlers'
 import { getHumanFileName } from '../utils/files'
 
 const fileEventHandlers: Record<
@@ -68,13 +71,17 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 const openFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileSuccess>(A.OPEN_FILE_SUCCESS),
-    flatMap(action =>
-      from(
-        fileEventHandlers[action.validatedFile.type].openSuccess.map(handler =>
+    flatMap(action => {
+      const openSuccessHandlers: OpenFileSuccessHandler<
+        typeof action.validatedFile
+      >[] = fileEventHandlers[action.validatedFile.type].openSuccess
+
+      return from(
+        openSuccessHandlers.map(handler =>
           from(handler(action, state$.value, effects)).pipe(mergeAll())
         )
       )
-    ),
+    }),
     mergeAll()
   )
 
@@ -83,11 +90,19 @@ const openFileFailure: AppEpic = (action$, state$, effects) =>
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
     flatMap<OpenFileFailure, Observable<Action>>(action => {
       const openFailureHandler = fileEventHandlers[action.file.type].openFailure
+
+      console.error(action.errorMessage || 'Could not open file:')
+      console.log(action)
+
       return openFailureHandler
         ? from(openFailureHandler(action, state$.value, effects)).pipe(
             mergeAll()
           )
-        : of(r.simpleMessageSnackbar(action.errorMessage))
+        : from(
+            action.errorMessage
+              ? [r.simpleMessageSnackbar(action.errorMessage)]
+              : []
+          )
     })
   )
 

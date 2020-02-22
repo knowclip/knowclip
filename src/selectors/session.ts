@@ -23,12 +23,21 @@ export const getPendingStretch = (
 }
 
 export const getHighlightedClipId = (state: AppState): ClipId | null =>
-  state.session.highlightedClipId
+  state.session.waveformSelection &&
+  state.session.waveformSelection.type === 'Clip'
+    ? state.session.waveformSelection.id
+    : null
 
 export const getHighlightedClip = (state: AppState): Clip | null => {
   const highlightedClipId = getHighlightedClipId(state)
   return highlightedClipId ? getClip(state, highlightedClipId) : null
 }
+
+export const getHighlightedChunkIndex = (state: AppState): number | null =>
+  state.session.waveformSelection &&
+  state.session.waveformSelection.type === 'Preview'
+    ? state.session.waveformSelection.index
+    : null
 
 export const getPendingClip = (state: AppState): PendingClip | null =>
   state.session.pendingClip

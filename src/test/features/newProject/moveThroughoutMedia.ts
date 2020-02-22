@@ -19,10 +19,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
   })
 
   await waveformMouseDrag(app, client, 710, 1008)
-
-  await client.waitUntil(
-    async () => (await client.elements_(waveform$.waveformClip)).length === 3
-  )
+  await client.waitForText('body', '3 / 3')
 
   const clipsVisibility = async () =>
     await Promise.all(
@@ -31,6 +28,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
   expect(await clipsVisibility()).toMatchObject([false, false, true])
 
   await client.clickElement_(flashcardSection$.previousClipButton)
+  await client.waitForText('body', '2 / 3')
 
   expect(await clipsVisibility()).toMatchObject([false, true, false])
   expect(

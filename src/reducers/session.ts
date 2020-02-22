@@ -1,10 +1,11 @@
 import { Reducer } from 'redux'
 import deleteKey from '../utils/deleteKey'
+import { areSelectionsEqual } from '../utils/waveformSelection'
 
 const initialState: SessionState = {
   pendingClip: null,
   pendingStretch: null,
-  highlightedClipId: null,
+  waveformSelection: null,
   defaultTags: [],
   defaultIncludeStill: true,
   currentMediaFileId: null,
@@ -22,14 +23,17 @@ const session: Reducer<SessionState, Action> = (
 ) => {
   switch (action.type) {
     case A.DELETE_CARD:
-      return action.id === state.highlightedClipId
-        ? { ...state, highlightedClipId: null }
+      return state.waveformSelection &&
+        state.waveformSelection.type === 'Clip' &&
+        action.id === state.waveformSelection.id
+        ? { ...state, waveformSelection: null }
         : state
 
     case A.DELETE_CARDS:
-      return state.highlightedClipId &&
-        action.ids.includes(state.highlightedClipId)
-        ? { ...state, highlightedClipId: null }
+      return state.waveformSelection &&
+        state.waveformSelection.type === 'Clip' &&
+        action.ids.includes(state.waveformSelection.id)
+        ? { ...state, waveformSelection: null }
         : state
 
     case A.DELETE_MEDIA_FROM_PROJECT:
@@ -37,7 +41,7 @@ const session: Reducer<SessionState, Action> = (
         ? {
             ...state,
             currentMediaFileId: null,
-            highlightedClipId: null,
+            waveformSelection: null,
           }
         : state
 
@@ -77,11 +81,13 @@ const session: Reducer<SessionState, Action> = (
         pendingClip: null,
       }
 
-    case A.HIGHLIGHT_CLIP:
-      return {
-        ...state,
-        highlightedClipId: action.id,
-      }
+    case A.SELECT_WAVEFORM_ITEM:
+      return areSelectionsEqual(state.waveformSelection, action.selection)
+        ? state
+        : {
+            ...state,
+            waveformSelection: action.selection,
+          }
 
     case A.SET_PENDING_STRETCH:
       return {
@@ -193,7 +199,7 @@ const session: Reducer<SessionState, Action> = (
       }
 
     case A.DISMISS_MEDIA:
-      return { ...state, currentMediaFileId: null, highlightedClipId: null }
+      return { ...state, currentMediaFileId: null, waveformSelection: null }
 
     default:
       return state

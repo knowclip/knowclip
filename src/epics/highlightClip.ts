@@ -1,105 +1,33 @@
-import {
-  map,
-  flatMap,
-  ignoreElements,
-  filter,
-  tap,
-  sample,
-  switchMap,
-} from 'rxjs/operators'
+import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { fromEvent, empty, of } from 'rxjs'
+import { empty, of } from 'rxjs'
 import * as r from '../redux'
-import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
   return boundingClientRect.right - boundingClientRect.left
 }
 
-const highlightEpic: AppEpic = (action$, state$, effects) => {
-  const waveformMousedowns = fromEvent<WaveformMousedownEvent>(
-    effects.document,
-    'waveformMousedown'
-  )
-  return waveformMousedowns.pipe(
-    switchMap(waveformMousedown => {
-      if (r.getPendingStretch(state$.value)) return empty()
-
-      return of({
-        waveformMousedown,
-        clipIdAtX: r.getClipIdAt(
-          state$.value,
-          r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
-        ),
-      })
-    }),
-    sample(
-      waveformMousedowns.pipe(
-        switchMap(waveformMousedown =>
-          fromEvent(waveformMousedown.svg, 'mouseup')
-        )
-      )
-    ),
-    flatMap(({ waveformMousedown, clipIdAtX }) => {
-      const state = state$.value
-      const highlightedClipId = r.getHighlightedClipId(state)
-      const newTime =
-        clipIdAtX && clipIdAtX !== highlightedClipId
-          ? (r.getClip(state, clipIdAtX) as Clip).start
-          : waveformMousedown.seconds
-      effects.setCurrentTime(newTime)
-
-      return clipIdAtX === highlightedClipId
-        ? empty()
-        : of(r.highlightClip(clipIdAtX))
-    })
-  )
-}
-
-const highlightClipsOnAddEpic: AppEpic = (action$, state$) =>
+const highlightClipsOnAddEpic: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, AddClip>(A.ADD_CLIP),
     map(({ clip: { id } }) => r.highlightClip(id))
   )
 
-const playClipsOnHighlightEpic: AppEpic = (
-  action$,
-  state$,
-  { setCurrentTime, getCurrentTime }
-) =>
-  action$.pipe(
-    ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
-    filter(({ id }) => Boolean(id)),
-    tap(({ id: clipId }) => {
-      const { start, end } = r.getClip(state$.value, clipId as ClipId) as Clip
-
-      const { durationSeconds } = r.getCurrentMediaFile(
-        state$.value
-      ) as MediaFile
-      const newTime = Math.min(
-        durationSeconds,
-        r.getSecondsAtX(state$.value, start)
-      )
-      const currentTime = getCurrentTime()
-      if (
-        currentTime <= r.getSecondsAtX(state$.value, start) ||
-        currentTime >= r.getSecondsAtX(state$.value, end)
-      )
-        setCurrentTime(newTime)
-    }),
-    ignoreElements()
-  )
-
-const selectClipOnStretch: AppEpic = (action$, state$) =>
+const selectClipOnStretch: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, EditClip>(A.EDIT_CLIP),
-    filter(({ id, override }) => {
+    filter(({ override }) => {
       const isStretch =
         override.start !== undefined || override.end !== undefined
       return isStretch
     }),
-    map(({ id }) => r.highlightClip(id))
+    tap(({ id }) => {
+      const clip = r.getClip(state$.value, id)
+      if (clip)
+        effects.setCurrentTime(r.getSecondsAtX(state$.value, clip.start))
+    }),
+    ignoreElements()
   )
 
 const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
@@ -109,8 +37,12 @@ const centerSelectedClip: AppEpic = (
   { getWaveformSvgElement }
 ) =>
   action$.pipe(
-    ofType<Action, HighlightClip>(A.HIGHLIGHT_CLIP),
-    switchMap(({ id }) => {
+    ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
+    switchMap(action => {
+      const id =
+        action.selection &&
+        action.selection.type === 'Clip' &&
+        action.selection.id
       if (!id) return empty()
       const clip = r.getClip(state$.value, id)
       if (!clip) return empty()
@@ -146,39 +78,50 @@ const centerSelectedClip: AppEpic = (
     })
   )
 
-const deselectOnOpenMediaFile: AppEpic = (action$, state$) =>
+const deselectOnOpenMediaFile: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
     filter(({ file }) => file.type === 'MediaFile'),
-    map(() => r.highlightClip(null))
+    map(() => r.clearWaveformSelection())
   )
 
-const highlightRightEpic: AppEpic = (action$, state$, { getCurrentTime }) =>
+const highlightRightEpic: AppEpic = (
+  action$,
+  state$,
+  { getCurrentTime, setCurrentTime }
+) =>
   action$.pipe(
     ofType<Action, HighlightRightClipRequest>(A.HIGHLIGHT_RIGHT_CLIP_REQUEST),
-    flatMap(() => {
+    tap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
-
-      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
-
-      const highlightedClipId = r.getHighlightedClipId(state)
-      if (highlightedClipId) {
-        const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
-        const lastIndex = currentFileClipIds.length - 1
-        const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
-        if (nextId) return of(r.highlightClip(nextId))
+      const waveformItems = r.getWaveformItems(state)
+      const selection = r.getWaveformSelection(state)
+      const currentIndex = selection
+        ? waveformItems.indexOf(selection.item)
+        : -1
+      const nextIndex = currentIndex !== -1 ? currentIndex + 1 : -1
+      if (selection && nextIndex !== -1) {
+        const lastIndex = waveformItems.length - 1
+        const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
+        if (next)
+          return setCurrentTime(
+            r.getSecondsAtX(
+              state$.value,
+              Math.max(next.start, selection.item.end + 1)
+            )
+          )
       }
 
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
-      const nextClipId = currentFileClipIds.find(
-        clipId => (r.getClip(state, clipId) || { start: 0 }).start >= x
-      )
+      const next =
+        waveformItems.find(({ start }) => start >= x) || waveformItems[0]
 
-      return nextClipId ? of(r.highlightClip(nextClipId)) : empty()
-    })
+      if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.start))
+    }),
+    ignoreElements()
   )
 
 const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
@@ -192,44 +135,45 @@ const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
 const highlightLeftEpic: AppEpic = (
   action$,
   state$,
-  { window, getCurrentTime }
+  { getCurrentTime, setCurrentTime }
 ) =>
   action$.pipe(
     ofType<Action, HighlightLeftClipRequest>(A.HIGHLIGHT_LEFT_CLIP_REQUEST),
-    flatMap(() => {
+    tap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return empty()
+      if (!currentFileId) return
 
-      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
+      const waveformItems = r.getWaveformItems(state)
+      const selection = r.getWaveformSelection(state)
 
-      const highlightedClipId = r.getHighlightedClipId(state)
-      if (highlightedClipId) {
-        const highlightedIndex = currentFileClipIds.indexOf(highlightedClipId)
-        const nextId =
-          currentFileClipIds[
+      if (selection) {
+        const highlightedIndex = waveformItems.indexOf(selection.item)
+        const prev =
+          waveformItems[
             highlightedIndex === 0
-              ? currentFileClipIds.length - 1
+              ? waveformItems.length - 1
               : highlightedIndex - 1
           ]
-        return of(r.highlightClip(nextId))
+
+        if (prev)
+          return setCurrentTime(r.getSecondsAtX(state$.value, prev.start))
       }
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
-      const prevClipId =
-        findLast(
-          currentFileClipIds,
-          clipId => (r.getClip(state, clipId) || { end: Infinity }).end <= x
-        ) || currentFileClipIds[currentFileClipIds.length - 1]
+      const prev =
+        findLast(waveformItems, ({ end }) => end <= x) ||
+        waveformItems[waveformItems.length - 1]
 
-      return prevClipId ? of(r.highlightClip(prevClipId)) : empty()
-    })
+      if (prev) setCurrentTime(r.getSecondsAtX(state$.value, prev.start))
+    }),
+    ignoreElements()
   )
 
 export default combineEpics(
-  highlightEpic,
+  // highlightEpic,
   highlightClipsOnAddEpic,
-  playClipsOnHighlightEpic,
+  // playClipsOnHighlightEpic,
   selectClipOnStretch,
   centerSelectedClip,
   deselectOnOpenMediaFile,

@@ -30,9 +30,7 @@ export default {
         !parentFileAvailability ||
         parentFileAvailability.status !== 'CURRENTLY_LOADED'
       )
-        return [
-          r.openFileFailure(file, null, 'You must first locate this file.'),
-        ]
+        return [r.openFileFailure(file, null, null)]
 
       const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
       if (!cbr)

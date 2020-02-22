@@ -1,3 +1,4 @@
+
 .container {
   display: flex;
   height: 100%;
@@ -11,6 +12,10 @@
   flex: 1;
   align-items: center;
   overflow-y: auto;
+  align-items: stretch;
+}
+.horizontal {
+  flex-flow: column nowrap;
 }
 
 .flashcardSection {

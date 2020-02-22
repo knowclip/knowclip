@@ -33,7 +33,7 @@ const DownloadSection = () => {
     setOs(firstOs)
     setFirstOs(firstOs)
   }, [])
-  useLayoutEffect(() => {
+  useEffect(() => {
     const hash = window.location.hash || ""
     const focusedId = hash.replace("#", "")
     const focusedElement = focusedId && document.getElementById(focusedId)
