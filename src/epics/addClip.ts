@@ -89,7 +89,6 @@ const addClipEpic: AppEpic = (
               ? Math.max(pendingClip.start, pendingClip.end)
               : Math.min(pendingClip.start, pendingClip.end)
           )
-          console.log(pendingClip, { newTime })
           setCurrentTime(newTime)
 
           return tooSmall
