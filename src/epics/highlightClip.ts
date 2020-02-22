@@ -96,26 +96,24 @@ const highlightRightEpic: AppEpic = (
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
-
-      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
-
-      const highlightedClipId = r.getHighlightedClipId(state)
-      if (highlightedClipId) {
-        const nextIndex = currentFileClipIds.indexOf(highlightedClipId) + 1
-        const lastIndex = currentFileClipIds.length - 1
-        const nextId = currentFileClipIds[nextIndex > lastIndex ? 0 : nextIndex]
-        const next = r.getClip(state$.value, nextId)
-        if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.start))
-        return
+      const waveformItems = r.getWaveformItems(state)
+      const selection = r.getWaveformSelection(state)
+      const currentIndex = selection
+        ? waveformItems.indexOf(selection.item)
+        : -1
+      const nextIndex = currentIndex !== -1 ? currentIndex + 1 : -1
+      if (selection && nextIndex !== -1) {
+        const lastIndex = waveformItems.length - 1
+        const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
+        if (next)
+          return setCurrentTime(r.getSecondsAtX(state$.value, next.start))
       }
 
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
-      const nextClipId = currentFileClipIds.find(
-        clipId => (r.getClip(state, clipId) || { start: 0 }).start >= x
-      )
+      const next =
+        waveformItems.find(({ start }) => start >= x) || waveformItems[0]
 
-      const next = nextClipId && r.getClip(state$.value, nextClipId)
       if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.start))
     }),
     ignoreElements()
@@ -141,33 +139,28 @@ const highlightLeftEpic: AppEpic = (
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return
 
-      const currentFileClipIds = state.clips.idsByMediaFileId[currentFileId]
+      const waveformItems = r.getWaveformItems(state)
+      const selection = r.getWaveformSelection(state)
 
-      const highlightedClipId = r.getHighlightedClipId(state)
-      if (highlightedClipId) {
-        const highlightedIndex = currentFileClipIds.indexOf(highlightedClipId)
-        const nextId =
-          currentFileClipIds[
+      if (selection) {
+        const highlightedIndex = waveformItems.indexOf(selection.item)
+        const prev =
+          waveformItems[
             highlightedIndex === 0
-              ? currentFileClipIds.length - 1
+              ? waveformItems.length - 1
               : highlightedIndex - 1
           ]
 
-        const next = r.getClip(state$.value, nextId)
-        if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.start))
-        return
+        if (prev)
+          return setCurrentTime(r.getSecondsAtX(state$.value, prev.start))
       }
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
-      const prevClipId =
-        findLast(
-          currentFileClipIds,
-          clipId => (r.getClip(state, clipId) || { end: Infinity }).end <= x
-        ) || currentFileClipIds[currentFileClipIds.length - 1]
+      const prev =
+        findLast(waveformItems, ({ end }) => end <= x) ||
+        waveformItems[waveformItems.length - 1]
 
-      const previous = r.getClip(state$.value, prevClipId)
-      if (previous)
-        setCurrentTime(r.getSecondsAtX(state$.value, previous.start))
+      if (prev) setCurrentTime(r.getSecondsAtX(state$.value, prev.start))
     }),
     ignoreElements()
   )

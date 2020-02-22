@@ -188,7 +188,7 @@ export const readParseSrtChunk = (
 export const readSubsrtChunk = readVttChunk
 
 export const overlapsSignificantly = (
-  chunk: SubtitlesChunk,
+  chunk: { start: number; end: number },
   start: WaveformX,
   end: WaveformX,
   halfSecond: WaveformX
