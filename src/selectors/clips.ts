@@ -54,15 +54,6 @@ export const getClipTime = (state: AppState, id: ClipId): TimeSpan | null => {
   }
 }
 
-export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
-  const clip = getClip(state, id)
-  if (!clip) throw new Error('Maybe impossible')
-  return {
-    start: getSecondsAtX(state, clip.start),
-    end: getSecondsAtX(state, clip.end),
-  }
-}
-
 export const getFormattedClipTime = (
   state: AppState,
   id: ClipId

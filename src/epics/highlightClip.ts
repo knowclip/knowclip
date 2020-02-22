@@ -171,9 +171,7 @@ const highlightLeftEpic: AppEpic = (
   )
 
 export default combineEpics(
-  // highlightEpic,
   highlightClipsOnAddEpic,
-  // playClipsOnHighlightEpic,
   selectClipOnStretch,
   centerSelectedClip,
   deselectOnOpenMediaFile,

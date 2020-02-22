@@ -33,8 +33,6 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
         streamIndex,
         parentType: 'MediaFile',
       }
-      // if file is new, need to oopen link subtitles dialog.
-      // can we do this in subtitles file event handlers?
     )
   })
 

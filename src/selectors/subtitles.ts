@@ -209,7 +209,6 @@ export const getSubtitlesChunksWithinRange = (
   )
 
 export const getSubtitlesChunksWithinRangeFromTracksState = (
-  // TODO: get rid of this!
   state: AppState['subtitles'],
   waveform: WaveformState,
   subtitlesTrackId: SubtitlesTrackId,
