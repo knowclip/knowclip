@@ -83,11 +83,14 @@ const addClipEpic: AppEpic = (
           const tooSmall =
             pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
 
-          const [left, right] = [pendingClip.start, pendingClip.end].sort(
-            (a, b) => a - b
+          const newTime = r.getSecondsAtX(
+            state$.value,
+            tooSmall
+              ? Math.max(pendingClip.start, pendingClip.end)
+              : Math.min(pendingClip.start, pendingClip.end)
           )
-
-          setCurrentTime(r.getSecondsAtX(state$.value, tooSmall ? right : left))
+          console.log(pendingClip, { newTime })
+          setCurrentTime(newTime)
 
           return tooSmall
             ? // maybe later, do stretch + merge for overlaps.

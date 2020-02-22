@@ -124,19 +124,39 @@ const parseSubtitles = (
 ) => {
   switch (extension) {
     case '.ass':
-      return subsrt
-        .parse(fileContents)
-        .filter(({ type }) => type === 'caption')
-        .map(chunk => r.readSubsrtChunk(state, chunk))
-        .filter(({ text }) => text)
+      return sanitizeSubtitles(
+        subsrt
+          .parse(fileContents)
+          .filter(({ type }) => type === 'caption')
+          .map(chunk => r.readSubsrtChunk(state, chunk))
+      )
     case '.vtt':
     case '.srt':
-      return parse(fileContents)
-        .map(vttChunk => r.readVttChunk(state, vttChunk as SubtitlesChunk))
-        .filter(({ text }) => text)
+      return sanitizeSubtitles(
+        parse(fileContents).map(vttChunk =>
+          r.readVttChunk(state, vttChunk as SubtitlesChunk)
+        )
+      )
     default:
       throw new Error('Unknown subtitles format')
   }
+}
+
+/** mutates */
+export const sanitizeSubtitles = (
+  chunks: SubtitlesChunk[]
+): SubtitlesChunk[] => {
+  const result = []
+  let lastChunk: SubtitlesChunk | undefined
+  for (const chunk of chunks) {
+    if (lastChunk && lastChunk.end === chunk.start) lastChunk.end -= 1
+
+    if (chunk.text.trim()) {
+      result.push(chunk)
+      lastChunk = chunk
+    }
+  }
+  return result
 }
 
 export const getSubtitlesFromFile = async (

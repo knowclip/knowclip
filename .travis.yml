@@ -1,6 +1,6 @@
 jobs:
   include:
-  - stage: mac integration tests
+  - stage: mac build
     os: osx
     osx_image: xcode10.2
     language: node_js
@@ -21,7 +21,7 @@ jobs:
       file:
         - dist/Knowclip_*
       draft: true
-  - stage: linux + windows integration tests and all platforms build
+  - stage: linux + windows integration tests and builds
     os: linux
     language: node_js
     node_js: '12'

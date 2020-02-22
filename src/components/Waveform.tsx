@@ -1,4 +1,4 @@
-import React, { memo, useRef, useCallback } from 'react'
+import React, { memo, useRef, useCallback, useState } from 'react'
 import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import * as r from '../redux'
@@ -22,12 +22,14 @@ const WAVEFORM_HEIGHT = 70
 
 const Cursor = ({ x, height }: { x: number; height: number }) => (
   <line
+    className="cursor"
     stroke="white"
     x1={x}
     y1="-1"
     x2={x}
     y2={height}
     shapeRendering="crispEdges"
+    style={{ pointerEvents: 'none' }}
   />
 )
 
@@ -46,14 +48,22 @@ type ClipProps = {
   height: number
   index: number
 }
+type ClipClickDataProps = {
+  'data-clip-id': string
+  'data-clip-start': number
+  'data-clip-end': number
+  'data-clip-index': number
+  'data-clip-is-highlighted'?: number
+}
 const Clip = ({ id, start, end, isHighlighted, height, index }: ClipProps) => {
-  const clickDataProps = {
+  const clickDataProps: ClipClickDataProps = {
     'data-clip-id': id,
     'data-clip-start': start,
     'data-clip-end': end,
-    'data-clip-is-highlighted': isHighlighted,
     'data-clip-index': index,
   }
+  if (isHighlighted) clickDataProps['data-clip-is-highlighted'] = 1
+
   return (
     <g id={id} {...clickDataProps}>
       <rect
@@ -67,9 +77,7 @@ const Clip = ({ id, start, end, isHighlighted, height, index }: ClipProps) => {
       />
 
       <rect
-        className={cn(css.waveformClipBorder, {
-          [css.highlightedClipBorder]: isHighlighted,
-        })}
+        className={css.waveformClipBorder}
         x={start}
         y="0"
         width={SELECTION_BORDER_WIDTH}
@@ -128,10 +136,9 @@ const Clips = React.memo(
   }) => {
     const handleClick = useCallback(
       e => {
-        console.log(e, e.target.dataset, e.target)
         const { dataset } = e.target
         if (dataset && dataset.clipId) {
-          if (!dataset.isHighlighted) {
+          if (!dataset.clipIsHighlighted) {
             const player = document.getElementById(
               'mediaPlayer'
             ) as HTMLVideoElement
@@ -140,6 +147,7 @@ const Clips = React.memo(
                 waveform,
                 clips[dataset.clipIndex].start
               )
+            setCursorX(clips[dataset.clipIndex].start)
 
             e.stopPropagation()
           } else {
@@ -148,8 +156,27 @@ const Clips = React.memo(
       },
       [clips, waveform]
     )
+    const handleMouseUp = useCallback(e => {
+      const { dataset } = e.target
+      if (dataset && dataset.clipId) {
+        const currentSelected = document.querySelector(
+          '.' + css.highlightedClip
+        )
+        if (currentSelected)
+          currentSelected.classList.remove(css.highlightedClip)
+        const newSelected = document.querySelector(
+          `.${css.waveformClip}[data-clip-id="${dataset.clipId}"]`
+        )
+        if (newSelected) newSelected.classList.add(css.highlightedClip)
+      }
+    }, [])
+
     return (
-      <g className={$.waveformClipsContainer} onClick={handleClick}>
+      <g
+        className={$.waveformClipsContainer}
+        onClick={handleClick}
+        onMouseUp={handleMouseUp}
+      >
         {clips.map((clip, i) => (
           <Clip
             {...clip}
@@ -222,12 +249,14 @@ const LinkedSubtitlesChunk = ({
   fieldsPreview,
   linkedFieldNames,
   linkedTrackIds,
+  isSelected,
 }: {
   cardBase: r.SubtitlesCardBase
   index: number
   fieldsPreview: Dict<string, string>
   linkedFieldNames: TransliterationFlashcardFieldName[]
   linkedTrackIds: SubtitlesTrackId[]
+  isSelected: boolean
 }) => {
   const clipPathId = `linkedSubtitles_${cardBase.start}`
   const width = cardBase.end - cardBase.start
@@ -250,7 +279,9 @@ const LinkedSubtitlesChunk = ({
         <rect {...rect} width={width - 10} />
       </clipPath>
       <rect
-        className={css.subtitlesChunkRectangle}
+        className={cn(css.subtitlesChunkRectangle, {
+          [css.selectedSubtitlesChunk]: isSelected,
+        })}
         {...clickDataProps}
         {...rect}
         rx={SUBTITLES_CHUNK_HEIGHT / 2}
@@ -278,9 +309,11 @@ const SubtitlesTimelines = memo(
   ({
     subtitles,
     goToSubtitlesChunk,
+    highlightedChunkIndex,
   }: {
     subtitles: r.SubtitlesCardBases
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
+    highlightedChunkIndex: number | null
   }) => {
     const handleClick = useCallback(
       e => {
@@ -289,9 +322,19 @@ const SubtitlesTimelines = memo(
           e.target.dataset.trackId,
           e.target.dataset.chunkIndex
         )
+
+        if (e.target.classList.contains(css.subtitlesChunkRectangle)) {
+          const currentSelected = document.querySelector(
+            '.' + css.selectedSubtitlesChunk
+          )
+          if (currentSelected)
+            currentSelected.classList.remove(css.selectedSubtitlesChunk)
+          e.target.classList.add(css.selectedSubtitlesChunk)
+        }
       },
       [goToSubtitlesChunk]
     )
+
     return (
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
@@ -301,11 +344,13 @@ const SubtitlesTimelines = memo(
         {subtitles.cards.map((c, i) => {
           return (
             <LinkedSubtitlesChunk
+              key={'linked' + i}
               cardBase={c}
               index={i}
               linkedFieldNames={subtitles.fieldNames}
               linkedTrackIds={subtitles.linkedTrackIds}
               fieldsPreview={subtitles.getFieldsPreviewFromCardsBase(c)}
+              isSelected={highlightedChunkIndex === i}
             />
           )
         })}
@@ -340,6 +385,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     pendingStretch,
     highlightedClipId,
     subtitles,
+    highlightedChunkIndex,
   } = useSelector((state: AppState) => ({
     waveform: r.getWaveform(state),
     path: r.getWaveformPath(state),
@@ -348,6 +394,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     pendingStretch: r.getPendingStretch(state),
     highlightedClipId: r.getHighlightedClipId(state),
     subtitles: r.getSubtitlesCardBases(state),
+    highlightedChunkIndex: r.getHighlightedChunkIndex(state),
   }))
 
   const dispatch = useDispatch()
@@ -363,6 +410,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
   const viewBoxString = getViewBoxString(viewBox.xMin, height)
   const svgRef = useRef(null)
+
   const handleMouseDown = useCallback(
     e => {
       const coords = toWaveformCoordinates(
@@ -390,6 +438,8 @@ const Waveform = ({ show }: { show: boolean }) => {
         )
         const seconds = getSecondsAtXFromWaveform(waveform, coords.x)
         player.currentTime = seconds
+
+        setCursorX(coords.x)
       }
     },
     [waveform]
@@ -439,13 +489,23 @@ const Waveform = ({ show }: { show: boolean }) => {
         <SubtitlesTimelines
           subtitles={subtitles}
           goToSubtitlesChunk={goToSubtitlesChunk}
+          highlightedChunkIndex={highlightedChunkIndex}
         />
       )}
-      <Cursor {...cursor} height={height} />
+      <Cursor x={cursor.x} height={height} />
     </svg>
   ) : (
     <div className={css.waveformPlaceholder} />
   )
+}
+
+const setCursorX = (x: number) => {
+  const cursor: SVGLineElement | null = document.querySelector('.cursor')
+  if (cursor) {
+    const string = String(x)
+    cursor.setAttribute('x1', string)
+    cursor.setAttribute('x2', string)
+  }
 }
 
 export default Waveform

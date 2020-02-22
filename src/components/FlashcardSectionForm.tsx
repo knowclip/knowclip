@@ -171,7 +171,7 @@ const FlashcardSectionForm = memo(
               {' - '}
               {formatTime(selectedClipTime.end)}
             </span>
-            <Tooltip title="Loop audio (Ctrl + L)">
+            <Tooltip title="Loop selection (Ctrl + L)">
               <IconButton
                 onClick={toggleLoop}
                 color={isLoopOn ? 'secondary' : 'default'}
