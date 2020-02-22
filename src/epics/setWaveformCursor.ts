@@ -91,17 +91,16 @@ const setCursorAndViewBox = (
   const buffer = Math.round(svgWidth * 0.1)
 
   if (newX < viewBox.xMin) {
-    console.log('newX - svgWidth * 0.9', newX - svgWidth * 0.1, {
-      newX,
-      svgWidth,
-    })
     return setWaveformCursor(newX, {
       ...viewBox,
       xMin: Math.max(0, newX - buffer),
     })
   }
-  if (newX > svgWidth + viewBox.xMin) {
-    const xMin = newSelection ? newSelection.item.end + buffer : newX
+  if (newX >= svgWidth + viewBox.xMin) {
+    const xMin = Math.min(
+      newSelection ? newSelection.item.end + buffer : newX,
+      Math.max(state.waveform.length - svgWidth, 0)
+    )
     return setWaveformCursor(newX, { ...viewBox, xMin })
   }
   return setWaveformCursor(newX)
