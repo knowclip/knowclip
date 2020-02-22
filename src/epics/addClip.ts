@@ -91,22 +91,21 @@ const addClipEpic: AppEpic = (
           )
           setCurrentTime(newTime)
 
-          return tooSmall
-            ? // maybe later, do stretch + merge for overlaps.
-              r.clearPendingClip()
-            : r.addClip(
-                r.getNewClip(
-                  state$.value,
-                  pendingClip,
-                  currentFileId,
-                  uuid(),
-                  r.getNewFieldsFromLinkedSubtitles(
-                    state$.value,
-                    currentNoteType,
-                    pendingClip
-                  )
-                )
-              )
+          // maybe later, do stretch + merge for overlaps.
+          if (tooSmall) return r.clearPendingClip()
+
+          const { clip, flashcard } = r.getNewClipAndCard(
+            state$.value,
+            pendingClip,
+            currentFileId,
+            uuid(),
+            r.getNewFieldsFromLinkedSubtitles(
+              state$.value,
+              currentNoteType,
+              pendingClip
+            )
+          )
+          return r.addClip(clip, flashcard)
         })
       )
       return merge(pendingClips, pendingClipEnds)

@@ -2,7 +2,7 @@ import moment from 'moment'
 import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
 import { getSubtitlesSourceFile } from './subtitles'
-import { getClipIdsByMediaFileId, getClip } from './clips'
+import { getClipIdsByMediaFileId, getClip, getFlashcard } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
@@ -127,12 +127,10 @@ function getProjectClips<F extends FlashcardFields>(
   const clips = [] as ClipJson<F>[]
   for (const id of getClipIdsByMediaFileId(state, mediaFile.id)) {
     const clip = getClip(state, id)
-    if (clip) {
-      const {
-        start,
-        end,
-        flashcard: { fields, tags, image },
-      } = clip
+    const card = getFlashcard(state, id)
+    if (clip && card) {
+      const { start, end } = clip
+      const { fields, tags, image } = card
 
       const newClip: ClipJson<F> = {
         id,

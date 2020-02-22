@@ -30,11 +30,13 @@ export const openProjectById = (id: ProjectId): Action => ({
 export const openProject = (
   project: ProjectFile,
   clips: Clip[],
-  now: string
+  now: string,
+  flashcards: FlashcardsState
 ): OpenProject => ({
   type: A.OPEN_PROJECT,
   project,
   clips,
+  flashcards,
   now,
 })
 

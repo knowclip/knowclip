@@ -7,11 +7,11 @@ import css from './FlashcardSection.module.css'
 
 const VideoStillDisplay = ({
   videoFile,
-  clip,
+  flashcard,
   onFocus,
 }: {
   videoFile: VideoFile
-  clip: Clip
+  flashcard: Flashcard
   onFocus: (event: any) => void
 }) => {
   const { videoStill, mediaFileAvailability } = useSelector(
@@ -19,7 +19,7 @@ const VideoStillDisplay = ({
       videoStill: r.getFileWithAvailability<VideoStillImageFile>(
         state,
         'VideoStillImage',
-        clip.id
+        flashcard.id
       ),
       mediaFileAvailability: r.getFileAvailability(state, videoFile),
     })
@@ -29,24 +29,24 @@ const VideoStillDisplay = ({
 
   useEffect(
     () => {
-      dispatch(r.preloadVideoStills(videoFile, clip.id))
+      dispatch(r.preloadVideoStills(videoFile, flashcard.id))
     },
-    [clip.id, dispatch, videoFile]
+    [flashcard.id, dispatch, videoFile]
   )
   const { filePath } = videoStill.availability
 
   const handleClick = useCallback(
     () => {
       dispatch(
-        clip.flashcard.image
-          ? r.removeFlashcardImage(clip.id)
-          : r.addFlashcardImage(clip.id)
+        flashcard.image
+          ? r.removeFlashcardImage(flashcard.id)
+          : r.addFlashcardImage(flashcard.id)
       )
     },
-    [clip.flashcard.image, clip.id, dispatch]
+    [flashcard.image, flashcard.id, dispatch]
   )
 
-  const title = clip.flashcard.image
+  const title = flashcard.image
     ? 'Click to leave out image'
     : 'Click to include image'
 
@@ -54,7 +54,7 @@ const VideoStillDisplay = ({
     <Tooltip tabIndex={0} title={title}>
       <button
         className={cn(css.flashcardImageContainer, {
-          [css.flashcardImageUnused]: !clip.flashcard.image,
+          [css.flashcardImageUnused]: !flashcard.image,
         })}
         onClick={handleClick}
         name={title}

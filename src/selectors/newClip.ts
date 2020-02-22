@@ -11,22 +11,24 @@ interface ClipPoints {
 const sortClipPoints = ({ start, end }: ClipPoints) =>
   [start, end].sort(ascending)
 
-export const getNewClip = <F extends FlashcardFields>(
+export const getNewClipAndCard = <F extends FlashcardFields>(
   state: AppState,
   pendingClip: PendingClip,
   mediaFileId: string,
   id: ClipId,
   fields: F
-): Clip => {
+): { clip: Clip; flashcard: Flashcard } => {
   const tags = getDefaultTags(state)
   const includeStill = getDefaultIncludeStill(state)
 
   const [start, end] = sortClipPoints(pendingClip)
   return {
-    start: +start.toFixed(2),
-    end: +end.toFixed(2),
-    id,
-    fileId: mediaFileId,
+    clip: {
+      start: +start.toFixed(2),
+      end: +end.toFixed(2),
+      id,
+      fileId: mediaFileId,
+    },
     flashcard: newFlashcard(
       id,
       fields,

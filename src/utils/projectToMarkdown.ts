@@ -22,28 +22,26 @@ const projectToMarkdown = (
         return [
           `\n## ${metadata.name}`,
           ...r
-            .getClips(state, metadata.id)
-            .map(clip => {
-              const clipTime = r.getClipTime(state, clip.id)
+            .getFlashcards(state, metadata.id)
+            .map(flashcard => {
+              const clipTime = r.getClipTime(state, flashcard.id)
               return [
                 clipTime
                   ? `\n**${formatTime(clipTime.start)} - ${formatTime(
                       clipTime.end
-                    )}** ${clip.flashcard.tags
-                      .map(tag => `_#${tag}_`)
-                      .join(' ')}`
+                    )}** ${flashcard.tags.map(tag => `_#${tag}_`).join(' ')}`
                   : '',
-                ...(clip.flashcard.type === 'Simple'
+                ...(flashcard.type === 'Simple'
                   ? [
-                      `* ${clip.flashcard.fields.transcription}`,
-                      `* ${clip.flashcard.fields.meaning}`,
-                      `* ${clip.flashcard.fields.notes}`,
+                      `* ${flashcard.fields.transcription}`,
+                      `* ${flashcard.fields.meaning}`,
+                      `* ${flashcard.fields.notes}`,
                     ]
                   : [
-                      `* ${clip.flashcard.fields.transcription}`,
-                      `* ${clip.flashcard.fields.pronunciation}`,
-                      `* ${clip.flashcard.fields.meaning}`,
-                      `* ${clip.flashcard.fields.notes}`,
+                      `* ${flashcard.fields.transcription}`,
+                      `* ${flashcard.fields.pronunciation}`,
+                      `* ${flashcard.fields.meaning}`,
+                      `* ${flashcard.fields.notes}`,
                     ]
                 ).map(rawString => rawString.replace(/\n/g, '<br>')),
               ]

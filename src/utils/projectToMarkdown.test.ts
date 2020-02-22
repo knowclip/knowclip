@@ -18,11 +18,8 @@ describe('projectToMarkdown', () => {
       string
     ],
     tags: string[]
-  ): Clip => ({
-    start,
-    end,
-    fileId: mediaFileId,
-    id,
+  ): { clip: Clip; flashcard: Flashcard } => ({
+    clip: { start, end, fileId: mediaFileId, id },
     flashcard: {
       id,
       type: 'Transliteration',
@@ -46,6 +43,45 @@ describe('projectToMarkdown', () => {
     noteType: 'Transliteration',
     mediaFileIds: [mediaFileId],
   }
+
+  const clip1 = newClipWithCard(
+    'clip1',
+    10,
+    160,
+    [
+      '女の子は言葉を言いません。',
+      'Onnanóko-wa kotobá-o iimasén.',
+      "[The] girl doesn't say [a] word. (polite)",
+      `"iimasén" in plain form = "iwanai"
+
+"iimásu" in plain form = "iu".`,
+    ],
+    ['jgr1-1-1']
+  )
+  const clip2 = newClipWithCard(
+    'clip2',
+    200,
+    350,
+    [
+      '女の子は言葉を言いません。',
+      'Onnanóko-wa kotobá-o iimasén.',
+      "[The] girl doesn't say [a] word. (polite)",
+      '"iimasén" in plain form = "iwanai"\n"iimásu" in plain form = "iu".',
+    ],
+    ['jgr1-1-1']
+  )
+  const clip3 = newClipWithCard(
+    'clip3',
+    400,
+    550,
+    [
+      '女の子は言葉を言いません。',
+      'Onnanóko-wa kotobá-o iimasén.',
+      "[The] girl doesn't say [a] word. (polite)",
+      '"iimasén" in plain form = "iwanai"\n"iimásu" in plain form = "iu".',
+    ],
+    ['jgr1-1-1', 'taggytag']
+  )
 
   const state: AppState = {
     ...baseState,
@@ -72,44 +108,14 @@ describe('projectToMarkdown', () => {
     clips: {
       ...baseState.clips,
       byId: {
-        clip1: newClipWithCard(
-          'clip1',
-          10,
-          160,
-          [
-            '女の子は言葉を言いません。',
-            'Onnanóko-wa kotobá-o iimasén.',
-            "[The] girl doesn't say [a] word. (polite)",
-            `"iimasén" in plain form = "iwanai"
-
-"iimásu" in plain form = "iu".`,
-          ],
-          ['jgr1-1-1']
-        ),
-        clip2: newClipWithCard(
-          'clip2',
-          200,
-          350,
-          [
-            '女の子は言葉を言いません。',
-            'Onnanóko-wa kotobá-o iimasén.',
-            "[The] girl doesn't say [a] word. (polite)",
-            '"iimasén" in plain form = "iwanai"\n"iimásu" in plain form = "iu".',
-          ],
-          ['jgr1-1-1']
-        ),
-        clip3: newClipWithCard(
-          'clip3',
-          400,
-          550,
-          [
-            '女の子は言葉を言いません。',
-            'Onnanóko-wa kotobá-o iimasén.',
-            "[The] girl doesn't say [a] word. (polite)",
-            '"iimasén" in plain form = "iwanai"\n"iimásu" in plain form = "iu".',
-          ],
-          ['jgr1-1-1', 'taggytag']
-        ),
+        [clip1.clip.id]: clip1.clip,
+        [clip2.clip.id]: clip2.clip,
+        [clip3.clip.id]: clip3.clip,
+      },
+      flashcards: {
+        [clip1.flashcard.id]: clip1.flashcard,
+        [clip2.flashcard.id]: clip2.flashcard,
+        [clip3.flashcard.id]: clip3.flashcard,
       },
       idsByMediaFileId: { [mediaFileId]: ['clip1', 'clip2', 'clip3'] },
     },

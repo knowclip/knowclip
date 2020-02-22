@@ -33,6 +33,11 @@ export const getHighlightedClip = (state: AppState): Clip | null => {
   return highlightedClipId ? getClip(state, highlightedClipId) : null
 }
 
+export const getHighlightedFlashcard = (state: AppState): Flashcard | null => {
+  const highlightedClipId = getHighlightedClipId(state)
+  return highlightedClipId ? state.clips.flashcards[highlightedClipId] : null
+}
+
 export const getHighlightedChunkIndex = (state: AppState): number | null =>
   state.session.waveformSelection &&
   state.session.waveformSelection.type === 'Preview'

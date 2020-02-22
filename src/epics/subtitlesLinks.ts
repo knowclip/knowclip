@@ -94,10 +94,8 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
         if (!newValue.trim()) return empty()
 
         return of(
-          r.editClip(highlightedClip.id, {
-            flashcard: {
-              fields: { [action.flashcardFieldName]: newValue },
-            },
+          r.editClip(highlightedClip.id, null, {
+            fields: { [action.flashcardFieldName]: newValue },
           })
         )
       })

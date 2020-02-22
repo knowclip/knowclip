@@ -14,7 +14,7 @@ import { getClip, getCurrentMediaFile, getFile } from '../selectors'
 const remakeStill: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, EditClip>(A.EDIT_CLIP),
-    flatMap(({ override, id }) => {
+    flatMap(({ flashcardOverride, id }) => {
       const clip = getClip(state$.value, id) as Clip
       const mediaFile = getCurrentMediaFile(state$.value)
       if (!(clip && mediaFile && mediaFile.isVideo)) return empty()
@@ -24,7 +24,11 @@ const remakeStill: AppEpic = (action$, state$) =>
         'VideoStillImage',
         clip.id
       )
-      if (still && ('start' in override || 'end' in override))
+      if (
+        flashcardOverride &&
+        still &&
+        ('start' in flashcardOverride || 'end' in flashcardOverride)
+      )
         return of(actions.deleteFileRequest(still.type, still.id)).pipe(
           concat(
             action$.pipe(
@@ -48,11 +52,10 @@ const remakeStill: AppEpic = (action$, state$) =>
 const setDefaultClipSpecs: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, EditClip>(A.EDIT_CLIP),
-    flatMap(({ override }) => {
-      const { flashcard } = override
-      if (!flashcard) return empty()
+    flatMap(({ flashcardOverride }) => {
+      if (!flashcardOverride) return empty()
 
-      const { image } = flashcard
+      const { image } = flashcardOverride
       if (image === undefined) return empty()
 
       return of(

@@ -9,15 +9,15 @@ const defaultTagsEpic: AppEpic = (action$, state$) =>
       A.DELETE_FLASHCARD_TAG
     ),
     map(({ id }) => {
-      const clip = r.getClip(state$.value, id)
-      if (!clip) {
+      const flashcard = r.getFlashcard(state$.value, id)
+      if (!flashcard) {
         // should this happen or should we set empty default tags?
         console.error('No clip found')
         return r.simpleMessageSnackbar(
           'Could not set default tags: no clip found'
         )
       }
-      return r.setDefaultClipSpecs({ tags: clip.flashcard.tags })
+      return r.setDefaultClipSpecs({ tags: flashcard.tags })
     })
   )
 

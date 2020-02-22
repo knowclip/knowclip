@@ -10,6 +10,7 @@ type NormalizedProjectFileData = {
   project: ProjectFile
   media: MediaFile[]
   clips: Clip[]
+  cards: Flashcard[]
   subtitles: SubtitlesFile[]
 }
 
@@ -65,67 +66,77 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
     type: 'ProjectFile',
     error: null,
   }
-  const media: [MediaFile, () => Clip[], SubtitlesFile[]][] = mediaJson.map(
-    m => {
-      const subtitles = m.subtitles
-        ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
-        : []
-      const subtitlesFiles: SubtitlesFile[] = (m.subtitles || []).map(
-        (s): SubtitlesFile =>
-          s.type === 'Embedded'
-            ? {
-                type: 'VttConvertedSubtitlesFile',
-                id: s.id,
-                streamIndex: s.streamIndex,
-                parentId: m.id,
-                parentType: 'MediaFile',
-              }
-            : {
-                type: 'ExternalSubtitlesFile',
-                id: s.id,
-                name: s.name,
-                parentId: m.id,
-                parentType: 'MediaFile',
-              }
-      )
-      const base: AudioFile = {
-        name: m.name,
-        type: 'MediaFile',
-        id: m.id,
-        parentId: projectJson.id,
-        durationSeconds: parseFormattedDuration(m.duration).asSeconds(),
-        format: m.format,
-        subtitles,
-        flashcardFieldsToSubtitlesTracks:
-          m.flashcardFieldsToSubtitlesTracks || {},
-        subtitlesTracksStreamIndexes: subtitles
-          .filter(
-            (s): s is EmbeddedSubtitlesTrackRelation =>
-              s.type === 'EmbeddedSubtitlesTrack'
-          )
-          .map(s => s.streamIndex),
+  const media: [
+    MediaFile,
+    () => Clip[],
+    () => Flashcard[],
+    SubtitlesFile[]
+  ][] = mediaJson.map(m => {
+    const subtitles = m.subtitles
+      ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
+      : []
+    const subtitlesFiles: SubtitlesFile[] = (m.subtitles || []).map(
+      (s): SubtitlesFile =>
+        s.type === 'Embedded'
+          ? {
+              type: 'VttConvertedSubtitlesFile',
+              id: s.id,
+              streamIndex: s.streamIndex,
+              parentId: m.id,
+              parentType: 'MediaFile',
+            }
+          : {
+              type: 'ExternalSubtitlesFile',
+              id: s.id,
+              name: s.name,
+              parentId: m.id,
+              parentType: 'MediaFile',
+            }
+    )
+    const base: AudioFile = {
+      name: m.name,
+      type: 'MediaFile',
+      id: m.id,
+      parentId: projectJson.id,
+      durationSeconds: parseFormattedDuration(m.duration).asSeconds(),
+      format: m.format,
+      subtitles,
+      flashcardFieldsToSubtitlesTracks:
+        m.flashcardFieldsToSubtitlesTracks || {},
+      subtitlesTracksStreamIndexes: subtitles
+        .filter(
+          (s): s is EmbeddedSubtitlesTrackRelation =>
+            s.type === 'EmbeddedSubtitlesTrack'
+        )
+        .map(s => s.streamIndex),
 
-        isVideo: false,
-      }
-
-      if ('width' in m) {
-        return [
-          {
-            ...base,
-            isVideo: true,
-            width: m.width,
-            height: m.height,
-          },
-          getMediaClipsGetter<F>(state, project, m),
-          subtitlesFiles,
-        ]
-      }
-
-      return [base, getMediaClipsGetter<F>(state, project, m), subtitlesFiles]
+      isVideo: false,
     }
-  )
+
+    if ('width' in m) {
+      return [
+        {
+          ...base,
+          isVideo: true,
+          width: m.width,
+          height: m.height,
+        },
+        getMediaClipsGetter<F>(state, project, m),
+        getMediaCardsGetter<F>(state, project, m),
+        subtitlesFiles,
+      ]
+    }
+
+    return [
+      base,
+      getMediaClipsGetter<F>(state, project, m),
+      getMediaCardsGetter<F>(state, project, m),
+      subtitlesFiles,
+    ]
+  })
 
   let clips: Clip[]
+  let cards: Flashcard[]
 
   return {
     project,
@@ -134,7 +145,11 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
       clips = clips || media.flatMap(([, c]) => c())
       return clips
     },
-    subtitles: media.flatMap(([, , s]) => s),
+    get cards() {
+      cards = cards || media.flatMap(([, , c]) => c())
+      return cards
+    },
+    subtitles: media.flatMap(([, , , s]) => s),
   }
 }
 
@@ -143,6 +158,11 @@ const getMediaClipsGetter = <F extends FlashcardFields>(
   project: ProjectFile,
   media: MediaJson<F>
 ) => () => getMediaClips(state, project, media)
+const getMediaCardsGetter = <F extends FlashcardFields>(
+  state: AppState,
+  project: ProjectFile,
+  media: MediaJson<F>
+) => () => getMediaCards(state, project, media)
 
 function getMediaClips<F extends FlashcardFields>(
   state: AppState,
@@ -151,6 +171,28 @@ function getMediaClips<F extends FlashcardFields>(
 ): Clip[] {
   return (media.clips || []).map(
     (c): Clip => {
+      return {
+        id: c.id,
+        start: getXAtMilliseconds(
+          state,
+          parseFormattedDuration(c.start).asMilliseconds()
+        ),
+        end: getXAtMilliseconds(
+          state,
+          parseFormattedDuration(c.end).asMilliseconds()
+        ),
+        fileId: media.id,
+      }
+    }
+  )
+}
+function getMediaCards<F extends FlashcardFields>(
+  state: AppState,
+  project: ProjectFile,
+  media: MediaJson<F>
+): Flashcard[] {
+  return (media.clips || []).map(
+    (c): Flashcard => {
       const flashcardBase = {
         type: project.noteType,
         id: c.id,
@@ -163,30 +205,17 @@ function getMediaClips<F extends FlashcardFields>(
             : null),
         },
       }
-      return {
-        id: c.id,
-        start: getXAtMilliseconds(
-          state,
-          parseFormattedDuration(c.start).asMilliseconds()
-        ),
-        end: getXAtMilliseconds(
-          state,
-          parseFormattedDuration(c.end).asMilliseconds()
-        ),
-        fileId: media.id,
-        flashcard:
-          project.noteType === 'Simple'
-            ? {
-                ...flashcardBase,
-                type: 'Simple',
-                fields: { ...blankSimpleFields, ...c.fields },
-              }
-            : {
-                ...flashcardBase,
-                type: 'Transliteration',
-                fields: { ...blankTransliterationFields, ...c.fields },
-              },
-      }
+      return project.noteType === 'Simple'
+        ? {
+            ...flashcardBase,
+            type: 'Simple',
+            fields: { ...blankSimpleFields, ...c.fields },
+          }
+        : {
+            ...flashcardBase,
+            type: 'Transliteration',
+            fields: { ...blankTransliterationFields, ...c.fields },
+          }
     }
   )
 }

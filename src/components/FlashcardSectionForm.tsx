@@ -37,7 +37,7 @@ const FlashcardSectionForm = memo(
       currentNoteType,
       isLoopOn,
       subtitlesFlashcardFieldLinks,
-      clip,
+      flashcard,
       mediaIsPlaying,
       viewMode,
     } = useSelector((state: AppState) => ({
@@ -46,14 +46,14 @@ const FlashcardSectionForm = memo(
       currentNoteType: r.getCurrentNoteType(state),
       isLoopOn: r.isLoopOn(state),
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
-      clip: r.getHighlightedClip(state),
+      flashcard: r.getHighlightedFlashcard(state),
       mediaIsPlaying: r.isMediaPlaying(state),
       viewMode: state.settings.viewMode,
     }))
 
-    if (!selectedClipTime || !clip) throw new Error('Clip not found')
+    if (!selectedClipTime || !flashcard) throw new Error('Clip not found')
 
-    const { flashcard } = clip
+    const { id } = flashcard
 
     const [moreMenuAnchorEl, setMoreMenuAnchorEl] = useState(null)
 
@@ -78,7 +78,7 @@ const FlashcardSectionForm = memo(
       () => {
         setInitialFocusComplete(false)
       },
-      [clip.id]
+      [id]
     )
     useEffect(
       () => {
@@ -108,12 +108,12 @@ const FlashcardSectionForm = memo(
         dispatch(
           actions.confirmationDialog(
             'Are you sure you want to delete this clip and flashcard?',
-            actions.deleteCard(clip.id)
+            actions.deleteCard(id)
           )
         )
         loopOnInteract()
       },
-      [dispatch, clip.id, loopOnInteract]
+      [dispatch, id, loopOnInteract]
     )
 
     const handleFlashcardSubmit = useCallback(e => {
@@ -121,24 +121,23 @@ const FlashcardSectionForm = memo(
     }, [])
 
     const setFlashcardText = useCallback(
-      (key, text) => dispatch(actions.setFlashcardField(clip.id, key, text)),
-      [dispatch, clip.id]
+      (key, text) => dispatch(actions.setFlashcardField(id, key, text)),
+      [dispatch, id]
     )
     const deleteCard = useCallback(
       () => {
-        dispatch(actions.deleteCard(clip.id))
+        dispatch(actions.deleteCard(id))
       },
-      [dispatch, clip.id]
+      [dispatch, id]
     )
 
     const onAddChip = useCallback(
-      (text: string) => dispatch(actions.addFlashcardTag(clip.id, text)),
-      [dispatch, clip.id]
+      (text: string) => dispatch(actions.addFlashcardTag(id, text)),
+      [dispatch, id]
     )
     const onDeleteChip = useCallback(
-      (index, text) =>
-        dispatch(actions.deleteFlashcardTag(clip.id, index, text)),
-      [dispatch, clip.id]
+      (index, text) => dispatch(actions.deleteFlashcardTag(id, index, text)),
+      [dispatch, id]
     )
 
     return (
@@ -157,7 +156,7 @@ const FlashcardSectionForm = memo(
           <div className={css.formTopLeft}>
             {mediaFile.isVideo && (
               <VideoStillDisplay
-                clip={clip}
+                flashcard={flashcard}
                 videoFile={mediaFile}
                 onFocus={handleFocus}
               />

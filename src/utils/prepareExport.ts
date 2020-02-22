@@ -130,7 +130,9 @@ export const getApkgExportData = (
   const clips = clipIds.map(
     (id, i): ClipSpecs => {
       const clip = r.getClip(state, id)
+      const flashcard = r.getFlashcard(state, id)
       if (!clip) throw new Error('Could not find clip ' + id)
+      if (!flashcard) throw new Error('Could not find flashcard ' + id)
 
       const mediaFile = mediaFiles.find(media => media.id === clip.fileId)
       if (!mediaFile)
@@ -153,15 +155,15 @@ export const getApkgExportData = (
           )}`
         ) + '.mp3'
 
-      const fieldValues = Object.values(clip.flashcard.fields).map(roughEscape)
+      const fieldValues = Object.values(flashcard.fields).map(roughEscape)
 
-      const image = clip.flashcard.image
+      const image = flashcard.image
         ? `<img src="${basename(
             getVideoStillPngPath(
-              clip.flashcard.image.id,
+              flashcard.image.id,
               fileLoaded.filePath,
-              typeof clip.flashcard.image.seconds === 'number'
-                ? clip.flashcard.image.seconds
+              typeof flashcard.image.seconds === 'number'
+                ? flashcard.image.seconds
                 : +(getMidpoint(startTime, endTime) / 1000).toFixed(3)
             )
           )}" />`
@@ -174,8 +176,8 @@ export const getApkgExportData = (
         outputFilename,
         flashcardSpecs: {
           fields: [...fieldValues, `[sound:${outputFilename}]`, image, clip.id],
-          tags: clip.flashcard.tags || [],
-          image: clip.flashcard.image || null,
+          tags: flashcard.tags || [],
+          image: flashcard.image || null,
           due: i,
         },
       }

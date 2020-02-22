@@ -7,12 +7,14 @@ const newClip = (
   fileId: MediaFileId,
   id: ClipId,
   fields: TransliterationFlashcardFields
-): Clip => ({
-  start,
-  end,
-  fileId,
-  id,
-  flashcard: {
+): { clip: Clip; card: Flashcard } => ({
+  clip: {
+    start,
+    end,
+    fileId,
+    id,
+  },
+  card: {
     id,
     type: 'Transliteration',
     fields: fields,
@@ -28,12 +30,20 @@ describe('clips reducer', () => {
     transcription: 'asdf',
     notes: 'hey',
   }
+  const a = newClip({ start: 1, end: 1.5 }, fileId, 'a', transliterationFields)
+  const b = newClip({ start: 2, end: 2.5 }, fileId, 'b', transliterationFields)
+  const c = newClip({ start: 3, end: 3.5 }, fileId, 'c', transliterationFields)
   const oldState = clips(
     {
       byId: {
-        a: newClip({ start: 1, end: 1.5 }, fileId, 'a', transliterationFields),
-        b: newClip({ start: 2, end: 2.5 }, fileId, 'b', transliterationFields),
-        c: newClip({ start: 3, end: 3.5 }, fileId, 'c', transliterationFields),
+        a: a.clip,
+        b: b.clip,
+        c: c.clip,
+      },
+      flashcards: {
+        a: a.card,
+        b: b.card,
+        c: c.card,
       },
       idsByMediaFileId: {
         [fileId]: ['a', 'b', 'c'],
@@ -43,13 +53,13 @@ describe('clips reducer', () => {
   )
 
   it('adds to byId and idsByMediaFileId during ADD_CLIP', () => {
-    const clip = newClip(
+    const { clip, card } = newClip(
       { start: 2.75, end: 3 },
       fileId,
       'b-c',
       transliterationFields
     )
-    const action = r.addClip(clip)
+    const action = r.addClip(clip, card)
     const newState = clips(oldState, action)
     expect(newState.idsByMediaFileId[fileId]).toEqual(['a', 'b', 'b-c', 'c'])
     expect(newState.byId).toEqual({
@@ -59,13 +69,13 @@ describe('clips reducer', () => {
   })
 
   it('adds to byId and idsByMediaFileId during ADD_CLIP', () => {
-    const clip = newClip(
+    const { clip, card } = newClip(
       { start: 4, end: 4.5 },
       fileId,
       'd',
       transliterationFields
     )
-    const action = r.addClip(clip)
+    const action = r.addClip(clip, card)
     const newState = clips(oldState, action)
     expect(newState.idsByMediaFileId[fileId]).toEqual(['a', 'b', 'c', 'd'])
     expect(newState.byId).toEqual({
@@ -88,8 +98,9 @@ describe('clips reducer', () => {
       transliterationFields
     )
 
-    const newClips = [bC1, bC2]
-    const action = r.addClips(newClips, fileId)
+    const newClips = [bC1.clip, bC2.clip]
+    const newCards = [bC1.card, bC2.card]
+    const action = r.addClips(newClips, newCards, fileId)
     const newState = clips(oldState, action)
     expect(newState.idsByMediaFileId[fileId]).toEqual([
       'a',
@@ -112,27 +123,35 @@ describe('clips reducer', () => {
       transcription: 'asdf\nasdf',
       notes: 'hey\nhey',
     }
+    const a = newClip(
+      { start: 1, end: 1.5 },
+      fileId,
+      'a',
+      transliterationFields
+    )
+    const b = newClip(
+      { start: 2, end: 2.5 },
+      fileId,
+      'b',
+      transliterationFields
+    )
+    const c = newClip(
+      { start: 3, end: 3.5 },
+      fileId,
+      'c',
+      transliterationFields
+    )
     const state = clips(
       {
         byId: {
-          a: newClip(
-            { start: 1, end: 1.5 },
-            fileId,
-            'a',
-            transliterationFields
-          ),
-          b: newClip(
-            { start: 2, end: 2.5 },
-            fileId,
-            'b',
-            transliterationFields
-          ),
-          c: newClip(
-            { start: 3, end: 3.5 },
-            fileId,
-            'c',
-            transliterationFields
-          ),
+          a: a.clip,
+          b: b.clip,
+          c: c.clip,
+        },
+        flashcards: {
+          a: a.card,
+          b: b.card,
+          c: c.card,
         },
         idsByMediaFileId: {
           [fileId]: ['a', 'b', 'c'],
@@ -141,18 +160,19 @@ describe('clips reducer', () => {
       { type: '@@INIT' }
     )
     const mergeAction = r.mergeClips(['a', 'b'])
+
+    const expectedA = newClip({ start: 1, end: 2.5 }, fileId, 'a', mergedFields)
+    const expectedC = newClip(
+      { start: 3, end: 3.5 },
+      fileId,
+      'c',
+      transliterationFields
+    )
     expect(clips(state, mergeAction)).toEqual(
       clips(
         {
-          byId: {
-            a: newClip({ start: 1, end: 2.5 }, fileId, 'a', mergedFields),
-            c: newClip(
-              { start: 3, end: 3.5 },
-              fileId,
-              'c',
-              transliterationFields
-            ),
-          },
+          byId: { a: expectedA.clip, c: expectedC.clip },
+          flashcards: { a: expectedA.card, c: expectedA.card },
           idsByMediaFileId: {
             [fileId]: ['a', 'c'],
           },

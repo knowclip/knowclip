@@ -79,12 +79,17 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
             )
           )
 
-        const clips = getClipsAndCardsFromSubtitles(
+        const clips: Clip[] = []
+        const cards: Flashcard[] = []
+        getClipsAndCardsFromSubtitles(
           tracksValidation.transcriptionTrack,
           fieldNamesToTrackIds,
           state$.value,
           fileId
-        )
+        ).forEach(({ clip, flashcard }) => {
+          clips.push(clip)
+          cards.push(flashcard)
+        })
 
         return from([
           r.deleteCards(
@@ -100,7 +105,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
               trackId
             )
           }),
-          r.addClips(clips, fileId),
+          r.addClips(clips, cards, fileId),
           r.highlightClip(clips[0].id),
         ])
       }
@@ -239,7 +244,7 @@ function getClipsAndCardsFromSubtitles(
             .join(' ')
         : ''
     })
-    return r.getNewClip(
+    return r.getNewClipAndCard(
       state,
       {
         start: chunk.start,

@@ -70,16 +70,18 @@ declare type SetDefaultClipSpecs = {
   tags?: Array<string>
   includeStill?: boolean
 }
-declare type AddClip = { type: 'ADD_CLIP'; clip: Clip }
+declare type AddClip = { type: 'ADD_CLIP'; clip: Clip; flashcard: Flashcard }
 declare type AddClips = {
   type: 'ADD_CLIPS'
   clips: Array<Clip>
+  flashcards: Array<Flashcard>
   fileId: MediaFileId
 }
 declare type EditClip = {
   type: 'EDIT_CLIP'
   id: ClipId
-  override: import('redux').DeepPartial<Clip>
+  override: import('redux').DeepPartial<Clip> | null
+  flashcardOverride: import('redux').DeepPartial<Flashcard> | null
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type SelectWaveformItem = {
@@ -168,6 +170,7 @@ declare type OpenProject = {
   type: 'OPEN_PROJECT'
   project: ProjectFile
   clips: Clip[]
+  flashcards: FlashcardsState
   now: string
 }
 declare type SetProjectError = {

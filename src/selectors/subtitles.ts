@@ -274,7 +274,8 @@ const overlaps = (a: Coords, b: Coords) => a.end >= b.start && b.end >= a.start
 export const getNewFlashcardForStretchedClip = (
   state: AppState,
   noteType: NoteType,
-  { start, end, flashcard }: Clip,
+  { start, end }: Clip,
+  flashcard: Flashcard,
   { start: stretchStart, end: stretchEnd }: { start: number; end: number },
   direction: 'PREPEND' | 'APPEND'
 ): Flashcard => {

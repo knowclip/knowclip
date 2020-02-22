@@ -84,17 +84,25 @@ const stretchClipEpic: AppEpic = (
                 state$.value,
                 r.getCurrentNoteType(state$.value) as NoteType,
                 stretchedClip,
+                r.getFlashcard(state$.value, stretchedClip.id) as Flashcard,
                 { start, end: stretchedClip.end },
                 'PREPEND'
               )
               return from([
                 r.clearPendingStretch(),
-                r.editClip(id, {
-                  start,
-                  ...(newCard !== stretchedClip.flashcard
-                    ? { flashcard: newCard }
-                    : null),
-                }),
+                r.editClip(
+                  id,
+                  {
+                    start,
+                  },
+                  newCard !==
+                    (r.getFlashcard(
+                      state$.value,
+                      stretchedClip.id
+                    ) as Flashcard)
+                    ? newCard
+                    : null
+                ),
               ])
             }
 
@@ -107,18 +115,26 @@ const stretchClipEpic: AppEpic = (
                 state$.value,
                 r.getCurrentNoteType(state$.value) as NoteType,
                 stretchedClip,
+                r.getFlashcard(state$.value, stretchedClip.id) as Flashcard,
                 { end, start: stretchedClip.start },
                 'APPEND'
               )
 
               return from([
                 r.clearPendingStretch(),
-                r.editClip(id, {
-                  end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD),
-                  ...(newCard !== stretchedClip.flashcard
-                    ? { flashcard: newCard }
-                    : null),
-                }),
+                r.editClip(
+                  id,
+                  {
+                    end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD),
+                  },
+                  newCard !==
+                    (r.getFlashcard(
+                      state$.value,
+                      stretchedClip.id
+                    ) as Flashcard)
+                    ? newCard
+                    : null
+                ),
               ])
             }
 
