@@ -29,6 +29,15 @@ export const getWaveformItems = createSelector(
       if (clip.start <= chunk.start) {
         result.push(clip)
         clipIndex += 1
+
+        for (
+          let i = chunkIndex;
+          i < chunks.length &&
+          overlapsSignificantly(chunks[i], clip.start, clip.end, halfSecond);
+          i++
+        ) {
+          chunkIndex += 1
+        }
       } else {
         if (!overlapsSignificantly(chunk, clip.start, clip.end, halfSecond))
           result.push(chunk)
@@ -41,7 +50,6 @@ export const getWaveformItems = createSelector(
     for (let i = chunkIndex; i < chunks.length; i++) {
       result.push(chunks[i])
     }
-    console.log(result)
 
     return result
   }

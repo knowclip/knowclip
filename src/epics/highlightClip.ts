@@ -106,7 +106,12 @@ const highlightRightEpic: AppEpic = (
         const lastIndex = waveformItems.length - 1
         const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
         if (next)
-          return setCurrentTime(r.getSecondsAtX(state$.value, next.start))
+          return setCurrentTime(
+            r.getSecondsAtX(
+              state$.value,
+              Math.max(next.start, selection.item.end + 1)
+            )
+          )
       }
 
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
