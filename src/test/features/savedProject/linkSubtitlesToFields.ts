@@ -3,6 +3,7 @@ import { waveform$ } from '../../../components/Waveform'
 import { flashcardFormFieldMenu$ } from '../../../components/FlashcardSectionFormFieldPopoverMenu'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
+import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function linkSubtitlesToFields({
   app,
@@ -23,5 +24,8 @@ export default async function linkSubtitlesToFields({
   const [, external] = await client.elements_(flashcardFormFieldMenu$.menuItem)
   await external.click()
   await client.clickElement_(confirmationDialog$.okButton)
-  await client.waitForText('body', 'Transcription (External')
+  await client.waitForText_(
+    flashcardSection$.container,
+    '笹を食べながらのんびりするのは最高だなぁ'
+  )
 }
