@@ -81,8 +81,11 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         if (!fileId) throw new Error('Illegal: no media file loaded')
         if (!currentNoteType) throw new Error('Illegal: no note type found')
 
-        const newClips = chunks.map(({ start, end }) =>
-          r.getNewClip(
+        const newFlashcards: Flashcard[] = []
+        const newClips: Clip[] = []
+
+        chunks.forEach(({ start, end }) => {
+          const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
             {
               start: r.getXAtMilliseconds(state$.value, start),
@@ -103,11 +106,13 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
                   pronunciation: '',
                 }
           )
-        )
+          newClips.push(clip)
+          newFlashcards.push(flashcard)
+        })
 
         return [
           r.deleteCards(r.getClipIdsByMediaFileId(state$.value, fileId)),
-          r.addClips(newClips, fileId),
+          r.addClips(newClips, newFlashcards, fileId),
         ]
       })
     }),

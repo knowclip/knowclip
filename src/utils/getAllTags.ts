@@ -1,7 +1,7 @@
-const getAllTags = (clipsById: Record<ClipId, Clip>) => {
+const getAllTags = (flashcards: Record<ClipId, Flashcard>) => {
   const tags = new Set<string>()
-  for (const id in clipsById) {
-    clipsById[id].flashcard.tags.forEach(tag => tags.add(tag))
+  for (const id in flashcards) {
+    flashcards[id].tags.forEach(tag => tags.add(tag))
   }
   return tags
 }

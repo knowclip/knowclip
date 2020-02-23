@@ -1,16 +1,19 @@
 import { DeepPartial } from 'redux'
 
-export const addClip = (clip: Clip): ClipAction => ({
+export const addClip = (clip: Clip, flashcard: Flashcard): ClipAction => ({
   type: A.ADD_CLIP,
   clip,
+  flashcard,
 })
 
 export const addClips = (
   clips: Array<Clip>,
+  flashcards: Array<Flashcard>,
   fileId: MediaFileId
 ): ClipAction => ({
   type: A.ADD_CLIPS,
   clips,
+  flashcards,
   fileId,
 })
 
@@ -46,11 +49,13 @@ export const highlightRightClipRequest = (): HighlightRightClipRequest => ({
 
 export const editClip = (
   id: ClipId,
-  override: DeepPartial<Clip>
+  override: DeepPartial<Clip> | null,
+  flashcardOverride: DeepPartial<Flashcard> | null
 ): EditClip => ({
   type: A.EDIT_CLIP,
   id,
   override,
+  flashcardOverride,
 })
 
 export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
@@ -64,10 +69,9 @@ export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
   return {
     type: A.EDIT_CLIP,
     id,
-    override: {
-      flashcard: {
-        image,
-      },
+    override: null,
+    flashcardOverride: {
+      image,
     },
   }
 }
@@ -75,9 +79,8 @@ export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
 export const removeFlashcardImage = (id: ClipId): EditClip => ({
   type: A.EDIT_CLIP,
   id,
-  override: {
-    flashcard: { image: null },
-  },
+  flashcardOverride: { image: null },
+  override: null,
 })
 
 export const mergeClips = (ids: Array<ClipId>): ClipAction => ({

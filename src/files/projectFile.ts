@@ -5,6 +5,7 @@ import { join, basename } from 'path'
 import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
 import { AsyncError } from '../utils/ffmpeg'
+import { arrayToMapById } from '../utils/arrayToMapById'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -12,7 +13,7 @@ export default {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
-      const { project, clips } = normalizeProjectJson(state, parse.value)
+      const { project, clips, cards } = normalizeProjectJson(state, parse.value)
       if (!project)
         return [
           r.openFileFailure(
@@ -25,7 +26,12 @@ export default {
       effects.setAppMenuProjectSubmenuPermissions(true)
 
       return [
-        r.openProject(file, clips, effects.nowUtcTimestamp()),
+        r.openProject(
+          file,
+          clips,
+          effects.nowUtcTimestamp(),
+          arrayToMapById(cards)
+        ),
 
         r.openFileSuccess(project, filePath),
       ]

@@ -19,8 +19,8 @@ const selectClipOnStretch: AppEpic = (action$, state$, effects) =>
     ofType<Action, EditClip>(A.EDIT_CLIP),
     filter(({ override }) => {
       const isStretch =
-        override.start !== undefined || override.end !== undefined
-      return isStretch
+        override && (override.start !== undefined || override.end !== undefined)
+      return Boolean(isStretch)
     }),
     tap(({ id }) => {
       const clip = r.getClip(state$.value, id)
@@ -171,9 +171,7 @@ const highlightLeftEpic: AppEpic = (
   )
 
 export default combineEpics(
-  // highlightEpic,
   highlightClipsOnAddEpic,
-  // playClipsOnHighlightEpic,
   selectClipOnStretch,
   centerSelectedClip,
   deselectOnOpenMediaFile,

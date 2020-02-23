@@ -42,7 +42,17 @@ export default {
           ),
         ]
 
+      const flashcard = r.getFlashcard(state, file.id)
       const clip = r.getClip(state, file.id)
+      if (!flashcard)
+        return [
+          r.openFileFailure(
+            file,
+            null,
+            "Can't make a still for a flashcard that doesn't exist."
+          ),
+        ]
+
       if (!clip)
         return [
           r.openFileFailure(
@@ -53,8 +63,8 @@ export default {
         ]
 
       const seconds =
-        clip.flashcard.image && typeof clip.flashcard.image.seconds === 'number'
-          ? clip.flashcard.image.seconds
+        flashcard.image && typeof flashcard.image.seconds === 'number'
+          ? flashcard.image.seconds
           : r.getSecondsAtX(state, getMidpoint(clip.start, clip.end))
 
       const pngPath = await effects.getVideoStill(

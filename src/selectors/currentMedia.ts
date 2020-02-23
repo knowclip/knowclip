@@ -8,7 +8,7 @@ import {
 import {
   getFlashcard,
   getClipsObject,
-  getClipTimes,
+  getClipTime,
   getClipsByIds,
   getClip,
 } from './clips'
@@ -190,8 +190,6 @@ export const getCurrentFileClips: ((
   getClipsObject,
   getClipsByIds
 )
-export const getClipsTimes = (state: AppState): Array<TimeSpan> =>
-  getCurrentFileClipsOrder(state).map(id => getClipTimes(state, id))
 
 export const getFlashcardIdBeforeCurrent = (state: AppState): ClipId | null => {
   const flashcardId = getHighlightedClipId(state)

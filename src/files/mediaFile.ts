@@ -33,8 +33,6 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
         streamIndex,
         parentType: 'MediaFile',
       }
-      // if file is new, need to oopen link subtitles dialog.
-      // can we do this in subtitles file event handlers?
     )
   })
 
@@ -120,13 +118,13 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
     ]
 
   const commonTags = currentFileId
-    ? r.getClips(state, currentFileId).reduce(
-        (tags, clip, i) => {
-          if (i === 0) return clip.flashcard.tags
+    ? r.getFlashcards(state, currentFileId).reduce(
+        (tags, flashcard, i) => {
+          if (i === 0) return flashcard.tags
 
           const tagsToDelete = []
           for (const tag of tags) {
-            if (!clip.flashcard.tags.includes(tag)) tagsToDelete.push(tag)
+            if (!flashcard.tags.includes(tag)) tagsToDelete.push(tag)
           }
 
           for (const tagToDelete of tagsToDelete) {

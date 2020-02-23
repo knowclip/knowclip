@@ -28,7 +28,7 @@ export const getWaveformPng = async (
       constantBitrateFilePath,
       file
     )
-    // if (outputFilename && existsSync(outputFilename)) return outputFilename
+    if (outputFilename && existsSync(outputFilename)) return outputFilename
 
     return await new Promise((res, rej) => {
       ffmpeg(constantBitrateFilePath)

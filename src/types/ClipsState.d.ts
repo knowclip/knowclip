@@ -7,13 +7,13 @@ declare type Clip = {
   start: WaveformX
   end: WaveformX
   fileId: MediaFileId
-  flashcard: Flashcard
   linkedSubtitlesChunk?: number
 }
 
 declare type ClipsState = {
   byId: Record<ClipId, Clip>
   idsByMediaFileId: Record<MediaFileId, ClipId[]>
+  flashcards: FlashcardsState
 }
 
 declare interface FlashcardFields {

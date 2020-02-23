@@ -39,7 +39,7 @@ const Main = () => {
       currentMediaFile,
       clipsIdsForExport: currentMediaFile
         ? state.clips.idsByMediaFileId[currentMediaFile.id]
-        : [],
+        : EMPTY,
       subtitles: r.getSubtitlesTracks(state),
       viewMode: state.settings.viewMode,
     }
@@ -108,6 +108,8 @@ const Main = () => {
     </div>
   )
 }
+
+const EMPTY: string[] = []
 
 export default Main
 

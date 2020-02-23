@@ -26,6 +26,17 @@ export const getClips = (
   return clipsOrder ? getClipsByIds(clipsOrder, getClipsObject(state)) : []
 }
 
+export const getFlashcard = (state: AppState, id: ClipId): Flashcard | null =>
+  state.clips.flashcards[id] || null
+
+export const getFlashcards = (
+  state: AppState,
+  mediaFileId: MediaFileId
+): Array<Flashcard> => {
+  const clipsOrder = state.clips.idsByMediaFileId[mediaFileId]
+  return clipsOrder ? clipsOrder.map(id => state.clips.flashcards[id]) : []
+}
+
 export const getAllProjectClipsIds: ((
   state: AppState
 ) => Array<ClipId>) = createSelector(
@@ -43,15 +54,6 @@ export const getClipTime = (state: AppState, id: ClipId): TimeSpan | null => {
   }
 }
 
-export const getClipTimes = (state: AppState, id: ClipId): TimeSpan => {
-  const clip = getClip(state, id)
-  if (!clip) throw new Error('Maybe impossible')
-  return {
-    start: getSecondsAtX(state, clip.start),
-    end: getSecondsAtX(state, clip.end),
-  }
-}
-
 export const getFormattedClipTime = (
   state: AppState,
   id: ClipId
@@ -60,15 +62,6 @@ export const getFormattedClipTime = (
   if (!clipTime) return null
 
   return `${formatTime(clipTime.start)} - ${formatTime(clipTime.end)}`
-}
-
-export const getFlashcard = (state: AppState, id: ClipId): Flashcard | null => {
-  const clip = getClip(state, id)
-  if (!clip) return null
-  // if (!clip.flashcard) return null
-  const flashcard = clip.flashcard
-  if (!clip) throw new Error('Could not find clip')
-  return flashcard
 }
 
 export const getClipMilliseconds = (

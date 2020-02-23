@@ -33,10 +33,12 @@ const ReviewAndExportMediaTableRow = memo(
     const {
       flashcard: { fields, tags },
       formattedClipTime,
+      clipTime,
       isLoopOn,
       currentMediaFile,
     } = useSelector((state: AppState) => ({
       flashcard: r.getFlashcard(state, id) as Flashcard,
+      clipTime: r.getClipTime(state, id),
       formattedClipTime: r.getFormattedClipTime(state, id),
       isLoopOn: r.isLoopOn(state),
       currentMediaFile: r.getCurrentMediaFile(state),
@@ -54,10 +56,14 @@ const ReviewAndExportMediaTableRow = memo(
         })}
         onDoubleClick={useCallback(
           () => {
-            if (currentMediaFile && !isHighlighted)
-              dispatch(actions.highlightClip(id))
+            if (currentMediaFile && !isHighlighted && clipTime) {
+              const mediaPlayer = document.getElementById(
+                'mediaPlayer'
+              ) as HTMLVideoElement | null
+              if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
+            }
           },
-          [currentMediaFile, dispatch, id, isHighlighted]
+          [clipTime, currentMediaFile, isHighlighted]
         )}
         selected={isHighlighted}
       >
