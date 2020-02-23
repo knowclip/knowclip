@@ -5,13 +5,7 @@ import {
   getFileAvailability,
   getFileWithAvailability,
 } from './files'
-import {
-  getFlashcard,
-  getClipsObject,
-  getClipTime,
-  getClipsByIds,
-  getClip,
-} from './clips'
+import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_WIDTH } from './waveform'
