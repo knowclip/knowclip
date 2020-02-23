@@ -43,11 +43,16 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
   ).toMatchObject([true, true, true, true])
 
-  await client.doubleClickElement_(mediaTableRows$.container)
   await client.waitForText_(
-    mediaTableRows$.highlightedClipRow,
+    mediaTableRows$.container,
     '笹を食べながらのんびりするのは最高だなぁ'
   )
+  await client.doubleClickElement_(mediaTableRows$.container)
+  await client.waitUntil(async () => {
+    const row = await client.firstElement_(mediaTableRows$.container)
+    const classNames = await row.getAttribute('className')
+    return classNames.includes(mediaTableRows$.highlightedClipRow)
+  })
 
   const [, piggeldyHeader] = await client.elements_(mediaTables$.header)
   piggeldyHeader.click()
