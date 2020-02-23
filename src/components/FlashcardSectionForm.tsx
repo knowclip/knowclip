@@ -26,10 +26,12 @@ const FlashcardSectionForm = memo(
   ({
     className,
     mediaFile,
+    autofocusFieldName,
   }: {
     className?: string
     mediaFile: MediaFile
     clipId: ClipId
+    autofocusFieldName: FlashcardFieldName
   }) => {
     const {
       allTags,
@@ -51,7 +53,7 @@ const FlashcardSectionForm = memo(
       viewMode: state.settings.viewMode,
     }))
 
-    if (!selectedClipTime || !flashcard) throw new Error('Clip not found')
+    if (!selectedClipTime || !flashcard) throw new Error('Clip not found') // TODO: DELETE
 
     const { id } = flashcard
 
@@ -185,7 +187,9 @@ const FlashcardSectionForm = memo(
             getNoteTypeFields(currentNoteType).map((fieldName, i) => (
               <Field
                 key={`${fieldName}_${flashcard.id}`}
-                inputRef={i === 0 ? focusRef : undefined}
+                inputRef={
+                  fieldName === autofocusFieldName ? focusRef : undefined
+                }
                 name={fieldName}
                 currentFlashcard={flashcard}
                 label={capitalize(fieldName)}

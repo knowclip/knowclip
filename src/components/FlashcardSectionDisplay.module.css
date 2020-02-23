@@ -1,0 +1,55 @@
+
+.previewFieldMenuButton {
+  opacity: 0;
+
+  position: absolute !important;
+  left: 4rem;
+  top: .5rem;
+  opacity: 0;
+}
+.horizontalPreview .previewFieldMenuButton {
+  float: left;
+  position: static;
+}
+
+.previewField:focus .previewFieldMenuButton,
+.previewField:hover .previewFieldMenuButton,
+.previewFieldMenuButton:focus {
+  opacity: 1;
+}
+
+.preview {
+  margin-top: 2rem;
+  text-align: center;
+  color: #6b6b6b;
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+}
+.horizontalPreview {
+  margin-top: 0;
+}
+.previewFields {
+  flex-grow: 1;
+}
+.previewField {
+  position: relative;
+  width: 100%;
+  min-height: 3rem;
+}
+.previewFieldTranscription {
+  font-size: 1.2rem;
+}
+.previewFieldValue {
+  padding: 1rem 0.5rem;
+  margin: 0;
+}
+.emptyFieldPlaceholder {
+  font-size: 16px;
+  font-style: italic;
+  opacity: .5;
+}
+.previewTags {
+  padding: 1rem;
+  font-size: .8rem;
+}

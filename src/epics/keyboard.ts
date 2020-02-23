@@ -54,16 +54,23 @@ const escEpic: AppEpic = (action$, state$, { window, isMediaPlaying }) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     filter(({ ctrlKey, keyCode }) => keyCode === 27),
     flatMap(e => {
-      return r.getCurrentDialog(state$.value)
-        ? of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
-        : of(
-            isMediaPlaying()
-              ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
-                r.getHighlightedClipId(state$.value)
-                ? r.setLoop(false)
-                : r.clearWaveformSelection()
-              : r.clearWaveformSelection()
-          )
+      if (r.getCurrentDialog(state$.value))
+        of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
+
+      if (
+        r.getHighlightedClipId(state$.value) &&
+        state$.value.session.editingCards
+      )
+        return of(r.stopEditingCards())
+
+      return of(
+        isMediaPlaying()
+          ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
+            r.getHighlightedClipId(state$.value)
+            ? r.setLoop(false)
+            : r.clearWaveformSelection()
+          : r.clearWaveformSelection()
+      )
     })
   )
 

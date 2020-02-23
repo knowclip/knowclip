@@ -11,7 +11,10 @@ import {
   InputLabel,
 } from '@material-ui/core'
 import { DialogProps } from './DialogProps'
-import { closeDialog, linkFlashcardFieldToSubtitlesTrack } from '../../actions'
+import {
+  closeDialog,
+  linkFlashcardFieldToSubtitlesTrackRequest,
+} from '../../actions'
 import {
   getSubtitlesFlashcardFieldLinks,
   getCurrentNoteType,
@@ -65,7 +68,7 @@ const LinkSubtitlesDialog = ({
     e => {
       e.preventDefault()
       dispatch(
-        linkFlashcardFieldToSubtitlesTrack(
+        linkFlashcardFieldToSubtitlesTrackRequest(
           fieldSelection,
           mediaFileId,
           subtitles.id

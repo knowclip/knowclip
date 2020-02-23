@@ -99,7 +99,7 @@ const FieldMenuItem = ({
   const handleClick = useCallback(
     e => {
       dispatch(
-        actions.linkFlashcardFieldToSubtitlesTrack(
+        actions.linkFlashcardFieldToSubtitlesTrackRequest(
           fieldName,
           mediaFileId,
           selected ? null : trackId

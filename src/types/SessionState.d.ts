@@ -23,6 +23,7 @@ declare type SessionState = {
   workIsUnsaved: boolean
   loopMedia: boolean
   mediaIsPlaying: boolean
+  editingCards: boolean
 
   progress: ProgressInfo | null
 }

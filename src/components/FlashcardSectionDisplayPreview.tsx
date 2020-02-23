@@ -1,7 +1,7 @@
-import React, { ReactChild } from 'react'
+import React, { ReactChild, useCallback } from 'react'
 import cn from 'classnames'
 import * as r from '../redux'
-import css from './FlashcardSection.module.css'
+import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import FieldMenu, {
   useSubtitlesBySource,
@@ -38,7 +38,7 @@ const FlashcardSectionPreview = ({
       })}
     >
       <section className={cn(css.previewFields)}>
-        <Field
+        <FlashcardDisplayField
           fieldName="transcription"
           subtitles={mediaFile.subtitles}
           linkedTracks={fieldsToTracks}
@@ -48,16 +48,16 @@ const FlashcardSectionPreview = ({
             className={cn(css.previewFieldValue, css.previewFieldTranscription)}
           >
             {chunkIndex != null && (
-              <FieldValue
+              <FlashcardDisplayFieldValue
                 fieldName="transcription"
                 value={fields.transcription}
               />
             )}
           </p>
-        </Field>
+        </FlashcardDisplayField>
 
         {'pronunciation' in fields && fields.pronunciation && (
-          <Field
+          <FlashcardDisplayField
             fieldName="pronunciation"
             subtitles={mediaFile.subtitles}
             linkedTracks={fieldsToTracks}
@@ -65,15 +65,15 @@ const FlashcardSectionPreview = ({
           >
             <p className={cn(css.previewFieldValue)}>
               {chunkIndex != null && (
-                <FieldValue
+                <FlashcardDisplayFieldValue
                   fieldName="pronunciation"
                   value={fields.pronunciation}
                 />
               )}
             </p>
-          </Field>
+          </FlashcardDisplayField>
         )}
-        <Field
+        <FlashcardDisplayField
           fieldName="meaning"
           subtitles={mediaFile.subtitles}
           linkedTracks={fieldsToTracks}
@@ -81,25 +81,28 @@ const FlashcardSectionPreview = ({
         >
           <p className={cn(css.previewFieldValue)}>
             {chunkIndex != null && (
-              <FieldValue fieldName="meaning" value={fields.meaning} />
+              <FlashcardDisplayFieldValue
+                fieldName="meaning"
+                value={fields.meaning}
+              />
             )}
           </p>
-        </Field>
+        </FlashcardDisplayField>
         {fields.notes && (
-          <Field
+          <FlashcardDisplayField
             fieldName="notes"
             subtitles={mediaFile.subtitles}
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
           >
             <p className={cn(css.previewFieldValue)}>{fields.notes}</p>
-          </Field>
+          </FlashcardDisplayField>
         )}
       </section>
     </section>
   )
 }
-const FieldValue = ({
+export const FlashcardDisplayFieldValue = ({
   fieldName,
   value,
 }: {
@@ -112,26 +115,35 @@ const FieldValue = ({
     <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
   )
 
-const Field = ({
+export const FlashcardDisplayField = ({
   children,
   fieldName,
   subtitles,
   linkedTracks,
   mediaFileId,
+  onDoubleClick,
 }: {
   children: ReactChild
   fieldName: FlashcardFieldName
   subtitles: MediaSubtitlesRelation[]
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
+  onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
 }) => {
   const {
     embeddedSubtitlesTracks,
     externalSubtitlesTracks,
   } = useSubtitlesBySource(subtitles)
   const linkedSubtitlesTrack = linkedTracks[fieldName] || null
+  const handleDoubleClick = useCallback(
+    () => {
+      if (onDoubleClick) onDoubleClick(fieldName)
+      console.log('dbcl!')
+    },
+    [fieldName, onDoubleClick]
+  )
   return (
-    <div className={css.previewField}>
+    <div className={css.previewField} onDoubleClick={handleDoubleClick}>
       <FieldMenu
         className={css.previewFieldMenuButton}
         embeddedSubtitlesTracks={embeddedSubtitlesTracks}

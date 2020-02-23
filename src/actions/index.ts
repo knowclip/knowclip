@@ -91,3 +91,11 @@ export const setProgress = (progress: ProgressInfo | null): SetProgress => ({
   type: 'SET_PROGRESS',
   progress,
 })
+
+export const startEditingCards = (): StartEditingCards => ({
+  type: 'START_EDITING_CARDS',
+})
+
+export const stopEditingCards = (): StopEditingCards => ({
+  type: 'STOP_EDITING_CARDS',
+})

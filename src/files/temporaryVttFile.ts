@@ -29,11 +29,14 @@ export default {
         state,
         validatedFile.parentType,
         validatedFile.parentId
-      ) as CurrentlyLoadedFile
+      )
+      if (!(sourceFile && sourceFile.filePath)) return []
 
       const chunks = await effects.getSubtitlesFromFile(state, filePath)
 
       if (validatedFile.parentType === 'MediaFile') {
+        if (r.getCurrentFileId(state) !== sourceFile.id) return []
+
         const track = newEmbeddedSubtitlesTrack(
           validatedFile.id,
           validatedFile.parentId,
@@ -74,6 +77,7 @@ export default {
         'MediaFile',
         external.parentId
       )
+      if (!mediaFile || r.getCurrentFileId(state) !== mediaFile.id) return []
 
       return [
         ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)

@@ -91,12 +91,14 @@ export const linkFlashcardFieldToSubtitlesTrackRequest = (
 export const linkFlashcardFieldToSubtitlesTrack = (
   flashcardFieldName: FlashcardFieldName,
   mediaFileId: MediaFileId,
-  subtitlesTrackId: SubtitlesTrackId | null
+  subtitlesTrackId: SubtitlesTrackId | null,
+  fieldToClear?: FlashcardFieldName
 ): LinkFlashcardFieldToSubtitlesTrack => ({
   type: A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK,
   flashcardFieldName,
   mediaFileId,
   subtitlesTrackId,
+  fieldToClear: fieldToClear || null,
 })
 
 export const goToSubtitlesChunk = (

@@ -14,56 +14,47 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
         ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
           const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
           const previouslyLinkedTrack = previousLinks[flashcardFieldName]
-
-          if (
-            !previouslyLinkedTrack ||
-            !r.getClipIdsByMediaFileId(state$.value, mediaFileId).length
-          )
+          const previouslyLinkedField = (Object.keys(
+            previousLinks
+          ) as FlashcardFieldName[]).find(fn => {
+            const fieldName = fn as TransliterationFlashcardFieldName
+            return previousLinks[fieldName] === subtitlesTrackId
+          })
+          const cards = r.getFlashcards(state$.value, mediaFileId)
+          if (!cards.length)
             return r.linkFlashcardFieldToSubtitlesTrack(
               flashcardFieldName,
               mediaFileId,
               subtitlesTrackId
             )
 
-          if (previouslyLinkedTrack) {
-            const previouslyLinkedField = Object.keys(previousLinks).find(
-              fn => {
-                const fieldName = fn as TransliterationFlashcardFieldName
-                return previousLinks[fieldName] === subtitlesTrackId
-              }
-            )
-
-            const overwriteMessage = previouslyLinkedField
-              ? `This action will clear the ${previouslyLinkedField} field and overwrite the ${flashcardFieldName} field for all these existing cards.`
-              : `This action will overwrite the ${flashcardFieldName} field for all these existing cards.`
-            const message =
-              "It looks like you've already made some flashcards from this media file." +
-              '\n\n' +
-              overwriteMessage +
-              '\n\n' +
-              'Is that OK?'
-
-            return r.confirmationDialog(
-              message,
-              r.linkFlashcardFieldToSubtitlesTrack(
-                flashcardFieldName,
-                mediaFileId,
-                subtitlesTrackId
-              )
+          const actions: string[] = []
+          const unlinking = !subtitlesTrackId
+          if (previouslyLinkedField || unlinking) {
+            actions.push(
+              `clear the ${previouslyLinkedField || flashcardFieldName} field`
             )
           }
+          if (!unlinking) {
+            actions.push(`overwrite the ${flashcardFieldName} field`)
+          }
 
-          const message = `It looks like you've already made some flashcards from this media file.\n
-This action will ${
-            subtitlesTrackId ? 'overwrite' : 'clear'
-          } the ${flashcardFieldName} field for all these existing cards.\n
-Is that OK? `
+          const message =
+            "It looks like you've already made some flashcards from this media file." +
+            '\n\n' +
+            `This action will ${actions.join(
+              ' and '
+            )} for all these existing cards.` +
+            '\n\n' +
+            'Is that OK?'
+
           return r.confirmationDialog(
             message,
             r.linkFlashcardFieldToSubtitlesTrack(
               flashcardFieldName,
               mediaFileId,
-              subtitlesTrackId
+              subtitlesTrackId,
+              previouslyLinkedField
             )
           )
         }
@@ -77,27 +68,31 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
     )
     .pipe(
       flatMap(action => {
-        const highlightedClip = r.getHighlightedClip(state$.value)
-        if (!highlightedClip) return empty()
-
         const currentNoteType = r.getCurrentNoteType(state$.value)
         if (!currentNoteType) return empty()
 
-        const {
-          [action.flashcardFieldName]: newValue,
-        } = r.getNewFieldsFromLinkedSubtitles(
-          state$.value,
-          currentNoteType,
-          highlightedClip
-        ) as TransliterationFlashcardFields
+        const edits: EditClips['edits'] = []
 
-        if (!newValue.trim()) return empty()
+        for (const clip of r.getClips(state$.value, action.mediaFileId)) {
+          const {
+            [action.flashcardFieldName]: newValue,
+          } = r.getNewFieldsFromLinkedSubtitles(
+            state$.value,
+            currentNoteType,
+            clip
+          ) as TransliterationFlashcardFields
 
-        return of(
-          r.editClip(highlightedClip.id, null, {
-            fields: { [action.flashcardFieldName]: newValue },
+          const newFields = { [action.flashcardFieldName]: newValue.trim() }
+          if (action.fieldToClear) newFields[action.fieldToClear] = ''
+
+          edits.push({
+            id: clip.id,
+            flashcardOverride: { fields: newFields },
+            override: null,
           })
-        )
+        }
+
+        return of(r.editClips(edits))
       })
     )
 

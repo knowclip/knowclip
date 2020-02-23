@@ -255,14 +255,15 @@ export const getNewFieldsFromLinkedSubtitles = (
     noteType === 'Simple'
       ? { ...blankSimpleFields }
       : { ...blankTransliterationFields }
-  for (const fieldName in links) {
-    const coerced = fieldName as FlashcardFieldName
-    const trackId = links[coerced]
-    const chunks = trackId
+  for (const fn in links) {
+    const fieldName = fn as TransliterationFlashcardFieldName
+    const trackId = links[fieldName]
+    const chunks: Array<SubtitlesChunk> = trackId
       ? getSubtitlesChunksWithinRange(state, trackId, start, end)
       : []
-    // @ts-ignore
-    result[fieldName] = chunks.map(chunk => chunk.text).join('\n')
+    ;(result as TransliterationFlashcardFields)[fieldName] = chunks
+      .map(chunk => chunk.text)
+      .join('\n')
   }
   return result
 }

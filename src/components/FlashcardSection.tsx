@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
@@ -13,7 +13,8 @@ import {
 } from '@material-ui/icons'
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
-import Preview from './FlashcardSectionPreview'
+import FlashcardDisplay from './FlashcardSectionDisplayCard'
+import Preview from './FlashcardSectionDisplayPreview'
 import { SubtitlesCardBase } from '../selectors'
 
 enum $ {
@@ -29,10 +30,13 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { waveformSelection, clipsIds } = useSelector((state: AppState) => ({
-    waveformSelection: r.getWaveformSelection(state),
-    clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
-  }))
+  const { waveformSelection, clipsIds, editing } = useSelector(
+    (state: AppState) => ({
+      waveformSelection: r.getWaveformSelection(state),
+      clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
+      editing: state.session.editingCards,
+    })
+  )
 
   const highlightedClip =
     waveformSelection && waveformSelection.type === 'Clip'
@@ -45,6 +49,19 @@ const FlashcardSection = ({
     [clipsIds, highlightedClip]
   )
   const dispatch = useDispatch()
+
+  const [autofocusFieldName, setAutofocusFieldName] = useState<
+    TransliterationFlashcardFieldName
+  >('transcription')
+
+  const handleDoubleClickCardDisplayField = useCallback(
+    fieldName => {
+      setAutofocusFieldName(fieldName)
+      console.log('boop!', fieldName)
+      dispatch(actions.startEditingCards())
+    },
+    [setAutofocusFieldName, dispatch]
+  )
 
   return (
     <section className={cn(className, css.container, $.container, css.card)}>
@@ -67,13 +84,23 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClip && mediaFile && (
-        <FlashcardForm
-          className={css.form}
-          mediaFile={mediaFile}
-          clipId={highlightedClip.id}
-        />
-      )}
+      {highlightedClip &&
+        mediaFile &&
+        (editing ? (
+          <FlashcardForm
+            className={css.form}
+            mediaFile={mediaFile}
+            clipId={highlightedClip.id}
+            autofocusFieldName={autofocusFieldName}
+          />
+        ) : (
+          <FlashcardDisplay
+            className={css.display}
+            mediaFile={mediaFile}
+            clipId={highlightedClip.id}
+            onDoubleClickField={handleDoubleClickCardDisplayField}
+          />
+        ))}
 
       {(!waveformSelection || waveformSelection.type === 'Preview') && (
         <Placeholder

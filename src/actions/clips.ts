@@ -58,6 +58,17 @@ export const editClip = (
   flashcardOverride,
 })
 
+export const editClips = (
+  edits: {
+    id: ClipId
+    override: DeepPartial<Clip> | null
+    flashcardOverride: DeepPartial<Flashcard> | null
+  }[]
+): EditClips => ({
+  type: A.EDIT_CLIPS,
+  edits,
+})
+
 export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
   const image: FlashcardImage = seconds
     ? {

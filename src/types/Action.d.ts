@@ -15,6 +15,9 @@ declare type Action =
   | DeleteAllCurrentFileClipsRequest
   | SetAllTags
   | SetProgress
+  | StartEditingCards
+  | StopEditingCards
+
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
@@ -30,6 +33,12 @@ declare type SetProgress = {
   type: 'SET_PROGRESS'
   progress: ProgressInfo | null
 }
+declare type StartEditingCards = {
+  type: 'START_EDITING_CARDS'
+}
+declare type StopEditingCards = {
+  type: 'STOP_EDITING_CARDS'
+}
 
 declare type ClipAction =
   | DeleteCard
@@ -41,6 +50,7 @@ declare type ClipAction =
   | AddClip
   | AddClips
   | EditClip
+  | EditClips
   | MergeClips
   | SelectWaveformItem
   | HighlightLeftClipRequest
@@ -82,6 +92,14 @@ declare type EditClip = {
   id: ClipId
   override: import('redux').DeepPartial<Clip> | null
   flashcardOverride: import('redux').DeepPartial<Flashcard> | null
+}
+declare type EditClips = {
+  type: 'EDIT_CLIPS'
+  edits: {
+    id: ClipId
+    override: DeepPartial<Clip> | null
+    flashcardOverride: DeepPartial<Flashcard> | null
+  }[]
 }
 declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
 declare type SelectWaveformItem = {
@@ -330,6 +348,7 @@ declare type LinkFlashcardFieldToSubtitlesTrack = {
   mediaFileId: MediaFileId
   flashcardFieldName: FlashcardFieldName
   subtitlesTrackId: SubtitlesTrackId | null
+  fieldToClear: FlashcardFieldName | null
 }
 declare type LinkFlashcardFieldToSubtitlesTrackRequest = {
   type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST'
