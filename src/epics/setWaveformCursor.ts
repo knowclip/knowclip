@@ -1,4 +1,4 @@
-import { fromEvent, Observable, of, from, empty } from 'rxjs'
+import { fromEvent, Observable, of, from } from 'rxjs'
 import {
   startWith,
   filter,
@@ -7,10 +7,11 @@ import {
   ignoreElements,
   flatMap,
 } from 'rxjs/operators'
-import { setWaveformCursor, setWaveformViewBox } from '../actions'
+import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
+import { setCursorX } from '../utils/waveform'
 
 let seeking = false
 
@@ -53,7 +54,8 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
               selection.item.start
             )
             effects.setCurrentTime(selectionStartTime)
-            return empty()
+            setCursorX(selection.item.start)
+            return of(setWaveformCursor(selection.item.start))
           }
 
           const setViewboxAction = setViewBox(
@@ -89,8 +91,6 @@ const setViewBox = (
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean
 ) => {
-  console.log({ seeking })
-
   const viewBox = state.waveform.viewBox
 
   const newX = Math.round(newlySetTime * 50)

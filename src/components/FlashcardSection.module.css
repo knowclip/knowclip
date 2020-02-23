@@ -15,6 +15,9 @@
   padding: 1rem 3rem;
 }
 
+.intro {
+  max-width: 800px;
+}
 .introText {
   text-align: center;
   margin-top: 2rem;
@@ -65,6 +68,7 @@
 
 .form {
   width: 100%;
+  max-width: 1024px;
   height: 100%;
   display: flex;
   flex-flow: column nowrap;

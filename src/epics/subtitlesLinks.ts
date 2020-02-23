@@ -13,7 +13,6 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
       map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
         ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
           const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
-          const previouslyLinkedTrack = previousLinks[flashcardFieldName]
           const previouslyLinkedField = (Object.keys(
             previousLinks
           ) as FlashcardFieldName[]).find(fn => {

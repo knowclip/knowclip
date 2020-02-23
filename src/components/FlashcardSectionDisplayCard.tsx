@@ -1,25 +1,9 @@
-import React, {
-  useCallback,
-  useState,
-  useEffect,
-  memo,
-  useRef,
-  ReactNode,
-  ReactChild,
-  ReactElement,
-} from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
-import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import React, { useCallback, memo, ReactElement } from 'react'
+import { useSelector } from 'react-redux'
+import { Tooltip } from '@material-ui/core'
 import cn from 'classnames'
-import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
-import { getNoteTypeFields } from '../utils/noteType'
-import TagsInput from './TagsInput'
-import VideoStillDisplay from './FlashcardSectionFormVideoStill'
-import * as actions from '../actions'
-import Field from './FlashcardSectionFormField'
 import {
   FlashcardDisplayField,
   FlashcardDisplayFieldValue,
@@ -29,13 +13,8 @@ enum $ {
   container = 'flashcard-display-container',
 }
 
-const FIELD_INPUT_PROPS = {
-  style: { minHeight: '20px' },
-}
-
 const FlashcardSectionCardDisplay = memo(
   ({
-    className,
     mediaFile,
     onDoubleClickField,
   }: {
@@ -45,13 +24,9 @@ const FlashcardSectionCardDisplay = memo(
     onDoubleClickField?: (fieldName: FlashcardFieldName) => void
   }) => {
     const {
-      allTags,
       selectedClipTime,
-      currentNoteType,
-      isLoopOn,
       fieldsToTracks,
       flashcard,
-      mediaIsPlaying,
       viewMode,
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),

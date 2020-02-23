@@ -179,7 +179,7 @@ const Placeholder = ({
       />
     </section>
   ) : (
-    <section className={className}>
+    <section className={cn(className, css.intro)}>
       <p className={css.introText}>
         You can <strong>create clips</strong> in a few different ways:
       </p>

@@ -2,8 +2,6 @@
 .previewFieldMenuButton {
   opacity: 0;
 }
-.horizontalPreview .previewFieldMenuButton {
-}
 
 .previewField:focus .previewFieldMenuButton,
 .previewField:hover .previewFieldMenuButton,
@@ -34,7 +32,12 @@
   position: relative;
   width: 100%;
   min-height: 3rem;
+  margin: 2rem 0;
 }
+.horizontalPreview .previewField {
+  margin: 0;
+}
+
 .previewFieldTranscription {
   font-size: 1.2em;
 }

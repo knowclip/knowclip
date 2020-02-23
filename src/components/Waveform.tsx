@@ -135,7 +135,7 @@ const Clips = React.memo(
     height: number
     waveform: WaveformState
   }) => {
-    const handleClick = useCallback(
+    const handleMouseUp = useCallback(
       e => {
         const { dataset } = e.target
         if (dataset && dataset.clipId) {
@@ -149,35 +149,23 @@ const Clips = React.memo(
                 clips[dataset.clipIndex].start
               )
             setCursorX(clips[dataset.clipIndex].start)
-
-            e.stopPropagation()
-          } else {
           }
+          const currentSelected = document.querySelector(
+            '.' + css.highlightedClip
+          )
+          if (currentSelected)
+            currentSelected.classList.remove(css.highlightedClip)
+          const newSelected = document.querySelector(
+            `.${css.waveformClip}[data-clip-id="${dataset.clipId}"]`
+          )
+          if (newSelected) newSelected.classList.add(css.highlightedClip)
         }
       },
       [clips, waveform]
     )
-    const handleMouseUp = useCallback(e => {
-      const { dataset } = e.target
-      if (dataset && dataset.clipId) {
-        const currentSelected = document.querySelector(
-          '.' + css.highlightedClip
-        )
-        if (currentSelected)
-          currentSelected.classList.remove(css.highlightedClip)
-        const newSelected = document.querySelector(
-          `.${css.waveformClip}[data-clip-id="${dataset.clipId}"]`
-        )
-        if (newSelected) newSelected.classList.add(css.highlightedClip)
-      }
-    }, [])
 
     return (
-      <g
-        className={$.waveformClipsContainer}
-        onClick={handleClick}
-        onMouseUp={handleMouseUp}
-      >
+      <g className={$.waveformClipsContainer} onMouseUp={handleMouseUp}>
         {clips.map((clip, i) => (
           <Clip
             {...clip}
@@ -318,7 +306,7 @@ const SubtitlesTimelines = memo(
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
     highlightedChunkIndex: number | null
   }) => {
-    const handleClick = useCallback(
+    const handleMouseUp = useCallback(
       e => {
         e.stopPropagation()
 
@@ -344,7 +332,7 @@ const SubtitlesTimelines = memo(
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
         width="100%"
-        onClick={handleClick}
+        onMouseUp={handleMouseUp}
       >
         {subtitles.cards.map((c, i) => {
           return (
@@ -432,8 +420,9 @@ const Waveform = ({ show }: { show: boolean }) => {
     [waveform]
   )
 
-  const handleClick = useCallback(
+  const handleMouseUp = useCallback(
     e => {
+      if (e.target.dataset && e.target.dataset.clipId) return
       const player = document.getElementById('mediaPlayer') as HTMLVideoElement
       if (player) {
         const coords = toWaveformCoordinates(
@@ -459,7 +448,7 @@ const Waveform = ({ show }: { show: boolean }) => {
       className={cn(css.waveformSvg, $.container)}
       width="100%"
       onMouseDown={handleMouseDown}
-      onClick={handleClick}
+      onMouseUp={handleMouseUp}
       height={height}
     >
       <rect
