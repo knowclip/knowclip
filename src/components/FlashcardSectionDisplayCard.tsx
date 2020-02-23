@@ -110,6 +110,7 @@ const FlashcardSectionCardDisplay = memo(
               linkedTracks={fieldsToTracks}
               mediaFileId={mediaFile.id}
               onDoubleClick={handleDoubleClick}
+              className={cn(css.previewFieldNotes)}
             >
               {fields.notes}
             </FlashcardDisplayField>

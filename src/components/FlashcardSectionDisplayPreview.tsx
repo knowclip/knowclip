@@ -87,6 +87,7 @@ const FlashcardSectionPreview = ({
             subtitles={mediaFile.subtitles}
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
+            className={cn(css.previewFieldNotes)}
           >
             {fields.notes}
           </FlashcardDisplayField>
