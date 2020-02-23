@@ -43,6 +43,7 @@ const session: Reducer<SessionState, Action> = (
             ...state,
             currentMediaFileId: null,
             waveformSelection: null,
+            editingCards: false,
           }
         : state
 
@@ -88,6 +89,7 @@ const session: Reducer<SessionState, Action> = (
         : {
             ...state,
             waveformSelection: action.selection,
+            editingCards: false, // TODO: maybe get rid of this
           }
 
     case A.SET_PENDING_STRETCH:

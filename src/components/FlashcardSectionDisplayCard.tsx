@@ -1,6 +1,6 @@
 import React, { useCallback, memo, ReactElement } from 'react'
-import { useSelector } from 'react-redux'
-import { Tooltip } from '@material-ui/core'
+import { useSelector, useDispatch } from 'react-redux'
+import { Tooltip, IconButton } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
@@ -8,12 +8,14 @@ import {
   FlashcardDisplayField,
   FlashcardDisplayFieldValue,
 } from './FlashcardSectionDisplayPreview'
+import { Edit } from '@material-ui/icons'
 
 enum $ {
   container = 'flashcard-display-container',
+  editButton = 'flashcard-display-edit-button',
 }
 
-const FlashcardSectionCardDisplay = memo(
+const FlashcardSectionDisplayCard = memo(
   ({
     mediaFile,
     onDoubleClickField,
@@ -50,11 +52,20 @@ const FlashcardSectionCardDisplay = memo(
       [onDoubleClickField]
     )
 
+    const dispatch = useDispatch()
+    const startEditing = useCallback(
+      () => {
+        dispatch(r.startEditingCards())
+      },
+      [dispatch]
+    )
+
     return (
       <section
         className={cn(css.container, {
           [css.horizontalPreview]: viewMode === 'HORIZONTAL',
         })}
+        id={$.container}
       >
         <section className={cn(css.previewFields)}>
           <FlashcardDisplayField
@@ -116,6 +127,13 @@ const FlashcardSectionCardDisplay = memo(
             </FlashcardDisplayField>
           )}
         </section>
+        <IconButton
+          className={css.editCardButton}
+          onClick={startEditing}
+          id={$.editButton}
+        >
+          <Edit />
+        </IconButton>
       </section>
     )
   }
@@ -125,6 +143,6 @@ const EditTooltip = ({ children }: { children: ReactElement<any> }) => {
   return <Tooltip title="Double-click to edit">{children}</Tooltip>
 }
 
-export default FlashcardSectionCardDisplay
+export default FlashcardSectionDisplayCard
 
-export { $ as flashcardSectionForm$ }
+export { $ as flashcardSectionDisplayCard$ }

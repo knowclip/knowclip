@@ -39,7 +39,7 @@
 }
 
 .highlightedClip {
-  stroke: rgba(100, 255, 0, .5);
+  stroke: rgba(100, 255, 0, 0.8);
   fill: rgba(0, 255, 0, 0.26);
   fill: #8f9aad;
 }

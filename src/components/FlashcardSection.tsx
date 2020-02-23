@@ -85,6 +85,7 @@ const FlashcardSection = ({
 
       {highlightedClip && mediaFile && editing && (
         <FlashcardForm
+          key={highlightedClip.id}
           className={css.form}
           mediaFile={mediaFile}
           clipId={highlightedClip.id}

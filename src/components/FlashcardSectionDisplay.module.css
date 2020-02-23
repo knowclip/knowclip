@@ -35,6 +35,7 @@
   min-height: 3rem;
   margin: 2rem 0;
   line-height: 2;
+  white-space: pre-wrap;
 }
 .horizontalPreview .previewField {
   margin: 0;

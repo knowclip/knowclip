@@ -5,6 +5,8 @@ import { flashcardFormFieldMenu$ } from '../../../components/FlashcardSectionFor
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
+import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard'
+import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeFlashcardsWithSubtitles({
   app,
@@ -13,10 +15,7 @@ export default async function makeFlashcardsWithSubtitles({
   await client.elements_(waveform$.waveformClip, 3)
   await client.clickElement_(waveform$.waveformClip)
 
-  await client.waitForText_(
-    flashcardForm$.container,
-    'Transcription (External subtitles track 1)'
-  )
+  await client.firstElement_(flashcardSectionDisplayCard$.container)
 
   await setVideoTime(client, 39)
   await client.waitForHidden_(waveform$.waveformClip)
@@ -33,6 +32,7 @@ export default async function makeFlashcardsWithSubtitles({
     flashcardFormFieldMenu$.menuItem
   )
   await embeddedSubtitlesTrackButton.click()
+  await client.clickElement_(confirmationDialog$.okButton)
 
   await client.clickElement_(flashcardForm$.deleteButton)
   await client.clickElement_(confirmationDialog$.okButton)
@@ -43,7 +43,7 @@ export default async function makeFlashcardsWithSubtitles({
   await client.elements_(waveform$.waveformClip, 4)
 
   await client.waitForText_(
-    flashcardForm$.container,
+    flashcardSection$.container,
     `Don't try to suck me up!`
   )
 }

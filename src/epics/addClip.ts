@@ -108,10 +108,10 @@ const addClipEpic: AppEpic = (
             fields
           )
           return from([
+            r.addClip(clip, flashcard),
             ...(Object.values(fields).some(fieldValue => fieldValue.trim())
               ? []
               : [r.startEditingCards()]),
-            r.addClip(clip, flashcard),
           ])
         })
       )
