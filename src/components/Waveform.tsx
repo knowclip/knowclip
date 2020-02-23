@@ -218,6 +218,7 @@ const SubtitlesChunk = ({
   const clickDataProps = {
     'data-track-id': trackId,
     'data-chunk-index': chunkIndex,
+    'data-chunk-start': chunk.start,
   }
 
   return (
@@ -272,6 +273,7 @@ const LinkedSubtitlesChunk = ({
   const clickDataProps = {
     'data-track-id': linkedTrackIds[0],
     'data-chunk-index': index,
+    'data-chunk-start': cardBase.start,
   }
 
   return (
@@ -319,10 +321,12 @@ const SubtitlesTimelines = memo(
     const handleClick = useCallback(
       e => {
         e.stopPropagation()
-        goToSubtitlesChunk(
-          e.target.dataset.trackId,
-          e.target.dataset.chunkIndex
-        )
+
+        const { dataset } = e.target
+
+        setCursorX(dataset.chunkStart)
+
+        goToSubtitlesChunk(dataset.trackId, dataset.chunkIndex)
 
         if (e.target.classList.contains(css.subtitlesChunkRectangle)) {
           const currentSelected = document.querySelector(
