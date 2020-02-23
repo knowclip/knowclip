@@ -8,6 +8,7 @@ import {
   getSecondsAtXFromWaveform,
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
+import { setCursorX } from '../utils/waveform'
 
 enum $ {
   container = 'waveform-container',
@@ -497,15 +498,6 @@ const Waveform = ({ show }: { show: boolean }) => {
   ) : (
     <div className={css.waveformPlaceholder} />
   )
-}
-
-const setCursorX = (x: number) => {
-  const cursor: SVGLineElement | null = document.querySelector('.cursor')
-  if (cursor) {
-    const string = String(x)
-    cursor.setAttribute('x1', string)
-    cursor.setAttribute('x2', string)
-  }
 }
 
 export default Waveform
