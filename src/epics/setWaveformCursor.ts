@@ -7,7 +7,7 @@ import {
   ignoreElements,
   flatMap,
 } from 'rxjs/operators'
-import { setWaveformCursor } from '../actions'
+import { setWaveformCursor, setWaveformViewBox } from '../actions'
 import * as r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
@@ -56,34 +56,41 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
             return empty()
           }
 
-          const setCursorAction = setCursorAndViewBox(
+          const setViewboxAction = setViewBox(
             state,
             newlyUpdatedTime,
             effects.getWaveformSvgWidth(),
-            newSelection
+            newSelection,
+            wasSeeking
           )
 
           if (newSelection && !areSelectionsEqual(selection, newSelection)) {
-            return from([setCursorAction, r.selectWaveformItem(newSelection)])
+            return from([
+              ...setViewboxAction,
+              r.selectWaveformItem(newSelection),
+            ])
           }
 
           if (!newSelection && wasSeeking) {
-            return from([setCursorAction, r.clearWaveformSelection()])
+            return from([...setViewboxAction, r.clearWaveformSelection()])
           }
 
-          return from([setCursorAction])
+          return from(setViewboxAction)
         }),
         startWith(setWaveformCursor(0, { xMin: 0 }))
       )
     )
   )
 
-const setCursorAndViewBox = (
+const setViewBox = (
   state: AppState,
   newlySetTime: number,
   svgWidth: number,
-  newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>
+  newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
+  seeking: boolean
 ) => {
+  console.log({ seeking })
+
   const viewBox = state.waveform.viewBox
 
   const newX = Math.round(newlySetTime * 50)
@@ -91,19 +98,21 @@ const setCursorAndViewBox = (
   const buffer = Math.round(svgWidth * 0.1)
 
   if (newX < viewBox.xMin) {
-    return setWaveformCursor(newX, {
-      ...viewBox,
-      xMin: Math.max(0, newX - buffer),
-    })
+    return [
+      setWaveformCursor(newX, {
+        ...viewBox,
+        xMin: Math.max(0, newX - buffer),
+      }),
+    ]
   }
   if (newX >= svgWidth + viewBox.xMin) {
     const xMin = Math.min(
       newSelection ? newSelection.item.end + buffer : newX,
       Math.max(state.waveform.length - svgWidth, 0)
     )
-    return setWaveformCursor(newX, { ...viewBox, xMin })
+    return [setWaveformCursor(newX, { ...viewBox, xMin })]
   }
-  return setWaveformCursor(newX)
+  return seeking ? [setWaveformCursor(newX)] : []
 }
 
 type OpenMediaFileSuccess = {

@@ -19,6 +19,11 @@ import truncate from '../utils/truncate'
 import * as r from '../redux'
 import * as actions from '../actions'
 import css from './MainHeader.module.css'
+import {
+  startMovingCursor,
+  stopMovingCursor,
+  setCursorX,
+} from '../utils/waveform'
 
 enum $ {
   chooseFirstMediaFileButton = 'choose-media-file-button',
@@ -159,14 +164,27 @@ const MediaFilesMenu = ({
 function usePlayButtonSync() {
   const playing = useSelector(r.isMediaPlaying)
   const dispatch = useDispatch()
-  const playMedia = useCallback(() => dispatch(r.playMedia()), [dispatch])
-  const pauseMedia = useCallback(() => dispatch(r.pauseMedia()), [dispatch])
+  const playMedia = useCallback(
+    () => {
+      startMovingCursor()
+      dispatch(r.playMedia())
+    },
+    [dispatch]
+  )
+  const pauseMedia = useCallback(
+    () => {
+      stopMovingCursor()
+      dispatch(r.pauseMedia())
+    },
+    [dispatch]
+  )
 
   useEffect(
     () => {
       const startPlaying = () => playMedia()
 
       document.addEventListener('play', startPlaying, true)
+
       return () => document.removeEventListener('play', startPlaying, true)
     },
     [playMedia]
@@ -176,6 +194,7 @@ function usePlayButtonSync() {
       const stopPlaying = () => pauseMedia()
 
       document.addEventListener('pause', stopPlaying, true)
+
       return () => document.removeEventListener('pause', stopPlaying, true)
     },
     [pauseMedia]
@@ -192,7 +211,10 @@ function usePlayButtonSync() {
 
   useEffect(
     () => {
-      const resetPlayButton = () => pauseMedia()
+      const resetPlayButton = () => {
+        pauseMedia()
+        setCursorX(0)
+      }
       document.addEventListener('loadeddata', resetPlayButton, true)
       return () => document.removeEventListener('loadeddata', resetPlayButton)
     },
