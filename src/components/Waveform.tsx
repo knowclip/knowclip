@@ -308,8 +308,6 @@ const SubtitlesTimelines = memo(
   }) => {
     const handleMouseUp = useCallback(
       e => {
-        e.stopPropagation()
-
         const { dataset } = e.target
 
         setCursorX(dataset.chunkStart)
@@ -422,7 +420,11 @@ const Waveform = ({ show }: { show: boolean }) => {
 
   const handleMouseUp = useCallback(
     e => {
-      if (e.target.dataset && e.target.dataset.clipId) return
+      if (
+        e.target.dataset &&
+        (e.target.dataset.clipId || e.target.dataset.chunkIndex)
+      )
+        return
       const player = document.getElementById('mediaPlayer') as HTMLVideoElement
       if (player) {
         const coords = toWaveformCoordinates(
