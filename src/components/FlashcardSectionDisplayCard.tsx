@@ -1,4 +1,13 @@
-import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  memo,
+  useRef,
+  ReactNode,
+  ReactChild,
+  ReactElement,
+} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
@@ -61,7 +70,6 @@ const FlashcardSectionCardDisplay = memo(
 
     const handleDoubleClick = useCallback(
       fieldName => {
-        console.log({ fieldName })
         if (onDoubleClickField) onDoubleClickField(fieldName)
       },
       [onDoubleClickField]
@@ -69,7 +77,7 @@ const FlashcardSectionCardDisplay = memo(
 
     return (
       <section
-        className={cn(css.preview, {
+        className={cn(css.container, {
           [css.horizontalPreview]: viewMode === 'HORIZONTAL',
         })}
       >
@@ -80,18 +88,14 @@ const FlashcardSectionCardDisplay = memo(
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
             onDoubleClick={handleDoubleClick}
+            className={cn(css.previewFieldTranscription)}
           >
-            <p
-              className={cn(
-                css.previewFieldValue,
-                css.previewFieldTranscription
-              )}
-            >
+            <EditTooltip>
               <FlashcardDisplayFieldValue
                 fieldName="transcription"
                 value={fields.transcription}
               />
-            </p>
+            </EditTooltip>
           </FlashcardDisplayField>
 
           {'pronunciation' in fields && fields.pronunciation && (
@@ -102,12 +106,12 @@ const FlashcardSectionCardDisplay = memo(
               mediaFileId={mediaFile.id}
               onDoubleClick={handleDoubleClick}
             >
-              <p className={cn(css.previewFieldValue)}>
+              <EditTooltip>
                 <FlashcardDisplayFieldValue
                   fieldName="pronunciation"
                   value={fields.pronunciation}
                 />
-              </p>
+              </EditTooltip>
             </FlashcardDisplayField>
           )}
           <FlashcardDisplayField
@@ -117,12 +121,12 @@ const FlashcardSectionCardDisplay = memo(
             mediaFileId={mediaFile.id}
             onDoubleClick={handleDoubleClick}
           >
-            <p className={cn(css.previewFieldValue)}>
+            <EditTooltip>
               <FlashcardDisplayFieldValue
                 fieldName="meaning"
                 value={fields.meaning}
               />
-            </p>
+            </EditTooltip>
           </FlashcardDisplayField>
           {fields.notes && (
             <FlashcardDisplayField
@@ -132,20 +136,18 @@ const FlashcardSectionCardDisplay = memo(
               mediaFileId={mediaFile.id}
               onDoubleClick={handleDoubleClick}
             >
-              <p className={cn(css.previewFieldValue)}>{fields.notes}</p>
+              {fields.notes}
             </FlashcardDisplayField>
           )}
         </section>
       </section>
     )
-    // {formatTime(selectedClipTime.start)}
-    // {' - '}
-    // {formatTime(selectedClipTime.end)}
   }
 )
 
-const capitalize = (string: string) =>
-  string.substring(0, 1).toUpperCase() + string.slice(1)
+const EditTooltip = ({ children }: { children: ReactElement<any> }) => {
+  return <Tooltip title="Double-click to edit">{children}</Tooltip>
+}
 
 export default FlashcardSectionCardDisplay
 

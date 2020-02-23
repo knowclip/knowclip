@@ -57,7 +57,6 @@ const FlashcardSection = ({
   const handleDoubleClickCardDisplayField = useCallback(
     fieldName => {
       setAutofocusFieldName(fieldName)
-      console.log('boop!', fieldName)
       dispatch(actions.startEditingCards())
     },
     [setAutofocusFieldName, dispatch]
@@ -84,25 +83,33 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClip &&
-        mediaFile &&
-        (editing ? (
-          <FlashcardForm
-            className={css.form}
-            mediaFile={mediaFile}
-            clipId={highlightedClip.id}
-            autofocusFieldName={autofocusFieldName}
-          />
-        ) : (
+      {highlightedClip && mediaFile && editing && (
+        <FlashcardForm
+          className={css.form}
+          mediaFile={mediaFile}
+          clipId={highlightedClip.id}
+          autofocusFieldName={autofocusFieldName}
+        />
+      )}
+      {highlightedClip && mediaFile && !editing && (
+        <section className={css.display}>
           <FlashcardDisplay
-            className={css.display}
             mediaFile={mediaFile}
             clipId={highlightedClip.id}
             onDoubleClickField={handleDoubleClickCardDisplayField}
           />
-        ))}
+        </section>
+      )}
 
-      {(!waveformSelection || waveformSelection.type === 'Preview') && (
+      {!waveformSelection && (
+        <Placeholder
+          clipsIds={clipsIds}
+          mediaFile={mediaFile}
+          selection={waveformSelection}
+        />
+      )}
+
+      {waveformSelection && waveformSelection.type === 'Preview' && (
         <Placeholder
           clipsIds={clipsIds}
           mediaFile={mediaFile}
@@ -152,7 +159,7 @@ const Placeholder = ({
     }
   )
 
-  const className = cn(css.intro, {
+  const className = cn(css.display, {
     [css.horizontalIntro]: viewMode === 'HORIZONTAL',
   })
 
@@ -161,7 +168,7 @@ const Placeholder = ({
     subtitles &&
     selection &&
     selection.item ? (
-    <section className={className}>
+    <section className={cn(className, css.preview)}>
       <Preview
         cardBases={subtitles}
         chunkIndex={selection.index}

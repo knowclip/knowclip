@@ -33,7 +33,7 @@ const FlashcardSectionPreview = ({
 
   return (
     <section
-      className={cn(css.preview, {
+      className={cn(css.container, css.preview, {
         [css.horizontalPreview]: viewMode === 'HORIZONTAL',
       })}
     >
@@ -43,17 +43,14 @@ const FlashcardSectionPreview = ({
           subtitles={mediaFile.subtitles}
           linkedTracks={fieldsToTracks}
           mediaFileId={mediaFile.id}
+          className={cn(css.previewFieldTranscription)}
         >
-          <p
-            className={cn(css.previewFieldValue, css.previewFieldTranscription)}
-          >
-            {chunkIndex != null && (
-              <FlashcardDisplayFieldValue
-                fieldName="transcription"
-                value={fields.transcription}
-              />
-            )}
-          </p>
+          {chunkIndex != null ? (
+            <FlashcardDisplayFieldValue
+              fieldName="transcription"
+              value={fields.transcription}
+            />
+          ) : null}
         </FlashcardDisplayField>
 
         {'pronunciation' in fields && fields.pronunciation && (
@@ -63,14 +60,12 @@ const FlashcardSectionPreview = ({
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
           >
-            <p className={cn(css.previewFieldValue)}>
-              {chunkIndex != null && (
-                <FlashcardDisplayFieldValue
-                  fieldName="pronunciation"
-                  value={fields.pronunciation}
-                />
-              )}
-            </p>
+            {chunkIndex != null ? (
+              <FlashcardDisplayFieldValue
+                fieldName="pronunciation"
+                value={fields.pronunciation}
+              />
+            ) : null}
           </FlashcardDisplayField>
         )}
         <FlashcardDisplayField
@@ -79,14 +74,12 @@ const FlashcardSectionPreview = ({
           linkedTracks={fieldsToTracks}
           mediaFileId={mediaFile.id}
         >
-          <p className={cn(css.previewFieldValue)}>
-            {chunkIndex != null && (
-              <FlashcardDisplayFieldValue
-                fieldName="meaning"
-                value={fields.meaning}
-              />
-            )}
-          </p>
+          {chunkIndex != null ? (
+            <FlashcardDisplayFieldValue
+              fieldName="meaning"
+              value={fields.meaning}
+            />
+          ) : null}
         </FlashcardDisplayField>
         {fields.notes && (
           <FlashcardDisplayField
@@ -95,7 +88,7 @@ const FlashcardSectionPreview = ({
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
           >
-            <p className={cn(css.previewFieldValue)}>{fields.notes}</p>
+            {fields.notes}
           </FlashcardDisplayField>
         )}
       </section>
@@ -110,7 +103,7 @@ export const FlashcardDisplayFieldValue = ({
   value: string | null
 }) =>
   value ? (
-    <>{value}</>
+    <span>{value}</span>
   ) : (
     <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
   )
@@ -122,13 +115,15 @@ export const FlashcardDisplayField = ({
   linkedTracks,
   mediaFileId,
   onDoubleClick,
+  className,
 }: {
-  children: ReactChild
+  children: ReactChild | null
   fieldName: FlashcardFieldName
   subtitles: MediaSubtitlesRelation[]
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
   onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
+  className?: string
 }) => {
   const {
     embeddedSubtitlesTracks,
@@ -138,12 +133,14 @@ export const FlashcardDisplayField = ({
   const handleDoubleClick = useCallback(
     () => {
       if (onDoubleClick) onDoubleClick(fieldName)
-      console.log('dbcl!')
     },
     [fieldName, onDoubleClick]
   )
   return (
-    <div className={css.previewField} onDoubleClick={handleDoubleClick}>
+    <div
+      className={cn(css.previewField, className)}
+      onDoubleClick={handleDoubleClick}
+    >
       <FieldMenu
         className={css.previewFieldMenuButton}
         embeddedSubtitlesTracks={embeddedSubtitlesTracks}

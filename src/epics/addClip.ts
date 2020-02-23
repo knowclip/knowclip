@@ -5,8 +5,9 @@ import {
   takeLast,
   take,
   switchMap,
+  flatMap,
 } from 'rxjs/operators'
-import { fromEvent, merge } from 'rxjs'
+import { fromEvent, merge, from, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
@@ -66,7 +67,7 @@ const addClipEpic: AppEpic = (
 
       const pendingClipEnds = pendingClips.pipe(
         takeLast(1),
-        map(pendingClipAction => {
+        flatMap(pendingClipAction => {
           const { clip: pendingClip } = pendingClipAction
           const clipsOrder = r.getCurrentFileClipsOrder(state$.value)
           const pendingClipOverlaps = [
@@ -92,20 +93,26 @@ const addClipEpic: AppEpic = (
           setCurrentTime(newTime)
 
           // maybe later, do stretch + merge for overlaps.
-          if (tooSmall) return r.clearPendingClip()
+          if (tooSmall) return of(r.clearPendingClip())
 
+          const fields = r.getNewFieldsFromLinkedSubtitles(
+            state$.value,
+            currentNoteType,
+            pendingClip
+          )
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
             pendingClip,
             currentFileId,
             uuid(),
-            r.getNewFieldsFromLinkedSubtitles(
-              state$.value,
-              currentNoteType,
-              pendingClip
-            )
+            fields
           )
-          return r.addClip(clip, flashcard)
+          return from([
+            ...(Object.values(fields).some(fieldValue => fieldValue.trim())
+              ? []
+              : [r.startEditingCards()]),
+            r.addClip(clip, flashcard),
+          ])
         })
       )
       return merge(pendingClips, pendingClipEnds)

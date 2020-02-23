@@ -61,7 +61,10 @@ const escEpic: AppEpic = (action$, state$, { window, isMediaPlaying }) =>
         r.getHighlightedClipId(state$.value) &&
         state$.value.session.editingCards
       )
-        return of(r.stopEditingCards())
+        return from([
+          ...(r.isLoopOn(state$.value) ? [r.setLoop(false)] : []),
+          r.stopEditingCards(),
+        ])
 
       return of(
         isMediaPlaying()

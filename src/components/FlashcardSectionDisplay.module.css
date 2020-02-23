@@ -1,15 +1,8 @@
 
 .previewFieldMenuButton {
   opacity: 0;
-
-  position: absolute !important;
-  left: 4rem;
-  top: .5rem;
-  opacity: 0;
 }
 .horizontalPreview .previewFieldMenuButton {
-  float: left;
-  position: static;
 }
 
 .previewField:focus .previewFieldMenuButton,
@@ -18,16 +11,21 @@
   opacity: 1;
 }
 
-.preview {
+.container {
   margin-top: 2rem;
   text-align: center;
-  color: #6b6b6b;
   display: flex;
   flex-flow: column nowrap;
   height: 100%;
 }
+
+.preview {
+  color: #777;
+}
+
 .horizontalPreview {
   margin-top: 0;
+  font-size: 18px;
 }
 .previewFields {
   flex-grow: 1;
@@ -38,11 +36,7 @@
   min-height: 3rem;
 }
 .previewFieldTranscription {
-  font-size: 1.2rem;
-}
-.previewFieldValue {
-  padding: 1rem 0.5rem;
-  margin: 0;
+  font-size: 1.2em;
 }
 .emptyFieldPlaceholder {
   font-size: 16px;

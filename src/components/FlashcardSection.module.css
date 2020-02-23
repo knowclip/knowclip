@@ -6,12 +6,12 @@
   overflow: auto;
 }
 
-.intro {
+.display {
   width: 100%;
   height: 100%;
   padding: 2rem;
 }
-.horizontalIntro {
+.horizontalDisplay {
   padding: 1rem 3rem;
 }
 
@@ -163,4 +163,3 @@
 .fieldMenuButton:focus {
   opacity: 1;
 }
-
