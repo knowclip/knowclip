@@ -2,6 +2,7 @@ import { Reducer } from 'redux'
 import newFlashcard from '../utils/newFlashcard'
 import { getNoteTypeFields } from '../utils/noteType'
 import { arrayToMapById } from '../utils/arrayToMapById'
+import { TransliterationFlashcardFields } from '../types/Project'
 
 const initialState: ClipsState = {
   byId: {},
@@ -187,36 +188,43 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         id => !idsToBeDiscarded.includes(id)
       )
       const newClips: Record<ClipId, Clip> = {}
+      const newCards: Record<ClipId, Flashcard> = {}
       newClipsOrder.forEach(id => {
         const clip = state.byId[id]
         if (!clip) throw new Error('impossible')
         newClips[id] = clip
+
+        const card = state.flashcards[id]
+        if (!card) throw new Error('impossible')
+        newCards[id] = card
       })
       const sortedClipsToMerge = ids
         .sort(byStart(state.byId))
         .map(id => state.byId[id])
 
+      const { flashcards: cards } = state
       const flashcard = newFlashcard(
         finalId,
-        state.flashcards[finalId].fields,
+        cards[finalId].fields,
         [
           ...sortedClipsToMerge.reduce((all, { id }) => {
-            state.flashcards[id].tags.forEach((tag: string) => all.add(tag))
+            cards[id].tags.forEach((tag: string) => all.add(tag))
             return all
           }, new Set<string>()),
         ],
-        state.flashcards[finalId].image
+        cards[finalId].image
       )
       const fieldNames = getNoteTypeFields(flashcard.type)
 
       for (const fieldName of fieldNames) {
         const value = sortedClipsToMerge
-          // @ts-ignore
-          .map(({ flashcard: { fields } }) => fields[fieldName])
+          .map(
+            ({ id }) =>
+              cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
+          )
           .filter(x => x.trim())
           .join('\n')
-        // @ts-ignore
-        flashcard.fields[fieldName] = value
+        flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
       }
 
       newClips[finalId] = {
@@ -234,10 +242,10 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
           ),
         },
         flashcards: {
-          ...state.flashcards,
-          [fileId]: flashcard,
+          ...newCards,
+          [finalId]: flashcard,
         },
-      } as ClipsState
+      }
     }
 
     case A.DELETE_CARD: {
@@ -280,15 +288,16 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
     case A.SET_FLASHCARD_FIELD: {
       const { id, key, value } = action
-      // const clip = state.byId[id]
       const card: Flashcard = state.flashcards[id]
 
-      // @ts-ignore
       const flashcards: FlashcardsState = {
         ...state.flashcards,
         [id]: {
           ...card,
-          fields: { ...card.fields, [key]: value },
+          fields: {
+            ...(card.fields as TransliterationFlashcardFields),
+            [key as TransliterationFlashcardFieldName]: value,
+          },
         },
       }
       return {
@@ -362,23 +371,5 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return state
   }
 }
-
-// const areClipsEqual = (a: Clip, b: Clip): boolean => {
-//   return (
-//     a.id === b.id &&
-//     a.start === b.start &&
-//     a.end === b.end &&
-//     a.linkedSubtitlesChunk === b.linkedSubtitlesChunk
-//   )
-// }
-// const areFlashcardsEqual = (a: Flashcard, b: Flashcard): boolean => {
-//   const aFields = a.fields as TransliterationFlashcardFields
-//   const bFields = b.fields as TransliterationFlashcardFields
-//   return (
-//     a.id === b.id &&
-//     (Object.keys(aFields) as TransliterationFlashcardFieldName[]).every(k => aFields[k] === bFields[k])
-//     && a.image
-//   )
-// }
 
 export default clips

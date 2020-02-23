@@ -111,8 +111,13 @@ describe('clips reducer', () => {
     ])
     expect(newState.byId).toEqual({
       ...oldState.byId,
-      'b-c1': bC1,
-      'b-c2': bC2,
+      'b-c1': bC1.clip,
+      'b-c2': bC2.clip,
+    })
+    expect(newState.flashcards).toEqual({
+      ...oldState.flashcards,
+      'b-c1': bC1.card,
+      'b-c2': bC2.card,
     })
   })
 
@@ -172,7 +177,7 @@ describe('clips reducer', () => {
       clips(
         {
           byId: { a: expectedA.clip, c: expectedC.clip },
-          flashcards: { a: expectedA.card, c: expectedA.card },
+          flashcards: { a: expectedA.card, c: expectedC.card },
           idsByMediaFileId: {
             [fileId]: ['a', 'c'],
           },
