@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@material-ui/core'
 import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
@@ -36,8 +36,12 @@ const ProjectMenu = ({ className }: { className: string }) => {
     [dispatch]
   )
 
-  const [state, setState] = useState({ editing: false, text: '' })
+  const [state, setState] = useState({ editing: false, text: projectFile.name })
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [inputWidth, setInputWidth] = useState(
+    () => projectFile.name.length * 16
+  )
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   const startEditing = useCallback(
     () => {
@@ -45,9 +49,21 @@ const ProjectMenu = ({ className }: { className: string }) => {
         text: projectFile.name,
         editing: true,
       })
+    },
+    [setState, projectFile]
+  )
+  useEffect(
+    () => {
       inputRef.current && inputRef.current.focus()
     },
-    [inputRef, setState, projectFile]
+    [state.editing]
+  )
+  useEffect(
+    () => {
+      titleRef.current &&
+        setInputWidth(titleRef.current.getBoundingClientRect().width)
+    },
+    [state.text]
   )
 
   const handleChangeText = useCallback(
@@ -94,28 +110,31 @@ const ProjectMenu = ({ className }: { className: string }) => {
             <SaveIcon />
           </IconButton>
         </Tooltip>{' '}
-        {editing ? (
-          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+        {editing && (
+          <form onSubmit={handleSubmit} style={{ width: `${inputWidth}px` }}>
             <TextField
               inputRef={inputRef}
               classes={{ root: css.projectNameInput }}
               value={text}
               onChange={handleChangeText}
               onBlur={handleBlur}
+              fullWidth
               inputProps={{ id: $.projectTitleInput }}
             />
           </form>
-        ) : (
-          <Tooltip title="Double-click to edit">
-            <h1
-              className={css.projectName}
-              onDoubleClick={startEditing}
-              id={$.projectTitle}
-            >
-              {truncate(projectFile.name, 40)}
-            </h1>
-          </Tooltip>
         )}
+        <Tooltip title="Double-click to edit">
+          <h1
+            className={cn(css.projectName, {
+              [css.projectNameHidden]: editing,
+            })}
+            onDoubleClick={startEditing}
+            id={$.projectTitle}
+            ref={titleRef}
+          >
+            {truncate(state.text, 40)}
+          </h1>
+        </Tooltip>
       </section>
     </DarkTheme>
   )

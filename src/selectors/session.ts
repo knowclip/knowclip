@@ -57,5 +57,5 @@ export const getDefaultTags = (state: AppState): Array<string> =>
 export const getDefaultIncludeStill = (state: AppState): boolean =>
   state.session.defaultIncludeStill
 
-export const isUserEditingCard = (state: AppState): boolean =>
+export const isUserEditingCards = (state: AppState): boolean =>
   state.session.editingCards

@@ -62,10 +62,10 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
       // E key
       if (
         keyCode === 69 &&
-        !document.activeElement &&
+        !isTextFieldFocused() &&
         !(
           r.getHighlightedClipId(state$.value) &&
-          r.isUserEditingCard(state$.value)
+          r.isUserEditingCards(state$.value)
         )
       ) {
         event.preventDefault()

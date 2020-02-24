@@ -7,6 +7,7 @@
   margin: -.5em 0;
   flex-shrink: 0;
   flex-grow: 0;
+  height: 4rem;
 }
 
 .block {
@@ -17,8 +18,15 @@
   display: inline;
   padding: .5rem;
   font-size: 1.2em;
+  font-weight: normal;
+  white-space: pre-wrap;
 }
-
+.projectNameHidden {
+  position: absolute;
+  z-index: -9999; 
+  opacity: 0; 
+  pointer-events: none;
+}
 .leftMenu,
 .rightMenu {
   display: flex;
@@ -56,7 +64,8 @@
 }
 
 .projectNameInput input {
-  font-size: 1.2rem !important;
+  font-size: 17px !important;
+  padding: .4rem .5rem;
 }
 
 .subtitlesMenuListItemText,

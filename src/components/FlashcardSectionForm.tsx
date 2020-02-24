@@ -1,7 +1,14 @@
 import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
-import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import {
+  Delete as DeleteIcon,
+  Loop,
+  Edit,
+  ShortTextOutlined,
+  ShortTextSharp,
+  ShortTextTwoTone,
+} from '@material-ui/icons'
 import cn from 'classnames'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
@@ -117,6 +124,12 @@ const FlashcardSectionForm = memo(
       },
       [dispatch, id, loopOnInteract]
     )
+    const handleClickPreviewButton = useCallback(
+      () => {
+        dispatch(actions.stopEditingCards())
+      },
+      [dispatch]
+    )
 
     const handleFlashcardSubmit = useCallback(e => {
       e.preventDefault()
@@ -214,9 +227,16 @@ const FlashcardSectionForm = memo(
         </section>
 
         <section className={css.formBottom}>
-          <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Show card preview (Esc)">
+            <IconButton onClick={handleClickPreviewButton} id={$.deleteButton}>
+              <ShortTextTwoTone />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete clip and card">
+            <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
           <Menu
             anchorEl={moreMenuAnchorEl}
             open={Boolean(moreMenuAnchorEl)}

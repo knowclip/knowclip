@@ -423,7 +423,8 @@ const Waveform = ({ show }: { show: boolean }) => {
     e => {
       if (
         e.target.dataset &&
-        (e.target.dataset.clipId || e.target.dataset.chunkIndex)
+        ((e.target.dataset.clipId && !e.target.dataset.clipIsHighlighted) ||
+          e.target.dataset.chunkIndex)
       )
         return
       const player = document.getElementById('mediaPlayer') as HTMLVideoElement

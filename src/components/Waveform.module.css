@@ -31,11 +31,13 @@
 .waveformPendingClip {
   stroke: rgba(255, 255, 0, 0.2);
   fill: rgba(255, 255, 0, .2);
+  pointer-events: none;
 }
 
 .waveformPendingStretch {
   stroke: rgba(0, 255, 255, 0.4);
   fill: rgba(0, 255, 255, 0.4);
+  pointer-events: none;
 }
 
 .highlightedClip {

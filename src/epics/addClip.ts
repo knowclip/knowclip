@@ -90,7 +90,7 @@ const addClipEpic: AppEpic = (
               ? Math.max(pendingClip.start, pendingClip.end)
               : Math.min(pendingClip.start, pendingClip.end)
           )
-          setCurrentTime(newTime)
+          if (!tooSmall) setCurrentTime(newTime)
 
           // maybe later, do stretch + merge for overlaps.
           if (tooSmall) return of(r.clearPendingClip())

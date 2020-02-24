@@ -72,3 +72,9 @@
   padding: 1rem;
   font-size: .8rem;
 }
+
+.menu {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+}

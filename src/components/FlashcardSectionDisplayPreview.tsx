@@ -6,7 +6,9 @@ import { TransliterationFlashcardFields } from '../types/Project'
 import FieldMenu, {
   useSubtitlesBySource,
 } from './FlashcardSectionFormFieldPopoverMenu'
-import { Tooltip } from '@material-ui/core'
+import { Tooltip, IconButton } from '@material-ui/core'
+import { Add } from '@material-ui/icons'
+import { useDispatch } from 'react-redux'
 
 const FlashcardSectionPreview = ({
   cardBases,
@@ -31,6 +33,14 @@ const FlashcardSectionPreview = ({
     const text = trackId && tracksToFieldsText[trackId]
     fields[fieldName] = text || ''
   }
+
+  const dispatch = useDispatch()
+  const startEditing = useCallback(
+    () => {
+      dispatch(r.startEditingCards())
+    },
+    [dispatch]
+  )
 
   return (
     <section
@@ -78,6 +88,14 @@ const FlashcardSectionPreview = ({
             {fields.notes}
           </FlashcardDisplayField>
         )}
+      </section>
+
+      <section className={css.menu}>
+        <Tooltip title="Create flashcard from these subtitles (E key)">
+          <IconButton className={css.editCardButton} onClick={startEditing}>
+            <Add />
+          </IconButton>
+        </Tooltip>
       </section>
     </section>
   )

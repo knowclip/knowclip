@@ -1,6 +1,6 @@
 import React, { useCallback, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { IconButton } from '@material-ui/core'
+import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
@@ -114,13 +114,18 @@ const FlashcardSectionDisplayCard = memo(
             </FlashcardDisplayField>
           )}
         </section>
-        <IconButton
-          className={css.editCardButton}
-          onClick={startEditing}
-          id={$.editButton}
-        >
-          <Edit />
-        </IconButton>
+
+        <section className={css.menu}>
+          <Tooltip title="Edit card (E key)">
+            <IconButton
+              className={css.editCardButton}
+              onClick={startEditing}
+              id={$.editButton}
+            >
+              <Edit />
+            </IconButton>
+          </Tooltip>
+        </section>
       </section>
     )
   }
