@@ -60,6 +60,9 @@
   font-style: italic;
   opacity: .5;
 }
+.newlinePlaceholder {
+  white-space: normal;
+}
 .newlinePlaceholder::before {
   content: '⏎';
   width: 0;

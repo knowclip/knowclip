@@ -59,8 +59,10 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
       const { ctrlKey, altKey, keyCode } = event
+      // E key
       if (
         keyCode === 69 &&
+        !document.activeElement &&
         !(
           r.getHighlightedClipId(state$.value) &&
           r.isUserEditingCard(state$.value)

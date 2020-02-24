@@ -106,7 +106,7 @@ export const FlashcardDisplayFieldValue = ({
     if (i !== 0)
       withoutNewlines.push(
         <span className={css.newlinePlaceholder} key={String(i)}>
-          {' '}
+          {'\n'}
         </span>
       )
     withoutNewlines.push(line)
