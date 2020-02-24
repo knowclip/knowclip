@@ -89,6 +89,7 @@
 
 .horizontalFormTop {
   padding-right: 4em;
+  order: 2;
 }
 
 .formTopLeft {
@@ -100,7 +101,7 @@
   border-radius: 0 !important;
   transition: opacity .1s;
   opacity: 0.9;
-  box-shadow: rgba(0,0,0,0.2) 1px 1px 2px;
+  position: relative;
 
   /* background: none;
 	color: inherit; */
@@ -110,7 +111,7 @@
 	cursor: pointer;
 	outline: inherit;
 }
-.flashcardImage{
+.flashcardImage {
   height: 100%;
   width: auto !important;
   cursor: pointer;
@@ -118,6 +119,7 @@
   display: flex !important;
   justify-content: center;
   align-items: center;
+  box-shadow: rgba(0,0,0,0.2) 1px 1px 2px;
 }
 .flashcardImageContainer:hover,
 .flashcardImageContainer:focus {
@@ -126,11 +128,37 @@
 
 }
 .flashcardImageUnused {
-  opacity: 0.15;
+  position: relative;
 }
-.flashcardImageUnused:hover,
-  .flashcardImageUnused:focus {
+.flashcardImageUnused .flashcardImage {
+  opacity: 0.15;
+  box-shadow: none;
+}
+
+.flashcardImageContainer::after {
+  color: white;
+  opacity: 0;
+  transition: opacity .2s;
+  content: '✕';
+  font-size: 100px;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  text-align: center;
+}
+.flashcardImageUnused::after {
+  opacity: 1;
+}
+.flashcardImageUnused:hover .flashcardImage,
+  .flashcardImageUnused:focus .flashcardImage {
   opacity: 0.6;
+}
+.flashcardImageUnused:hover::after,
+  .flashcardImageUnused:focus::after {
+  opacity: 0.4;
 }
 
 .formBody {
@@ -139,6 +167,11 @@
 }
 
 .formBottom {
+}
+.horizontalForm .editButton {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
 }
 
 .suggestionsList {

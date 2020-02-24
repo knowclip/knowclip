@@ -228,7 +228,10 @@ const FlashcardSectionForm = memo(
 
         <section className={css.formBottom}>
           <Tooltip title="Show card preview (Esc)">
-            <IconButton onClick={handleClickPreviewButton} id={$.deleteButton}>
+            <IconButton
+              onClick={handleClickPreviewButton}
+              className={css.editButton}
+            >
               <ShortTextTwoTone />
             </IconButton>
           </Tooltip>
