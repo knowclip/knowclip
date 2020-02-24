@@ -41,6 +41,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           )
           const newSelection =
             selection &&
+            selection.type === 'Clip' &&
             possibleNewSelection &&
             possibleNewSelection.type === 'Preview'
               ? overlapsSignificantly(
