@@ -7,7 +7,7 @@ import {
 import { getCurrentFileClips } from './currentMedia'
 import { overlapsSignificantly } from './subtitles'
 
-const getHalfSecond = ({ waveform }: AppState) =>
+export const getHalfSecond = ({ waveform }: AppState) =>
   (waveform.stepsPerSecond * waveform.stepLength) / 2
 
 export const getWaveformItems = createSelector(

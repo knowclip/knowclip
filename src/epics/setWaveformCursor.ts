@@ -12,6 +12,7 @@ import * as r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
 import { setCursorX } from '../utils/waveform'
+import { overlapsSignificantly } from '../selectors'
 
 let seeking = false
 
@@ -34,10 +35,23 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           const newlyUpdatedTime = effects.getCurrentTime()
 
           const selection = r.getWaveformSelection(state)
-          const newSelection = r.getNewWaveformSelectionAt(
+          const possibleNewSelection = r.getNewWaveformSelectionAt(
             state,
             r.getXAtMilliseconds(state, newlyUpdatedTime * 1000)
           )
+          const newSelection =
+            selection &&
+            possibleNewSelection &&
+            possibleNewSelection.type === 'Preview'
+              ? overlapsSignificantly(
+                  possibleNewSelection.item,
+                  selection.item.start,
+                  selection.item.end,
+                  r.getHalfSecond(state$.value)
+                )
+                ? null
+                : possibleNewSelection
+              : possibleNewSelection
 
           const wasSeeking = seeking
           seeking = false
