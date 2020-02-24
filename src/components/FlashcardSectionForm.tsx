@@ -4,9 +4,6 @@ import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
 import {
   Delete as DeleteIcon,
   Loop,
-  Edit,
-  ShortTextOutlined,
-  ShortTextSharp,
   ShortTextTwoTone,
 } from '@material-ui/icons'
 import cn from 'classnames'
