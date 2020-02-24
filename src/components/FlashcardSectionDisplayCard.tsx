@@ -1,13 +1,10 @@
-import React, { useCallback, memo, ReactElement } from 'react'
+import React, { useCallback, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Tooltip, IconButton } from '@material-ui/core'
+import { IconButton } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
-import {
-  FlashcardDisplayField,
-  FlashcardDisplayFieldValue,
-} from './FlashcardSectionDisplayPreview'
+import { FlashcardDisplayField } from './FlashcardSectionDisplayPreview'
 import { Edit } from '@material-ui/icons'
 
 enum $ {
@@ -59,6 +56,7 @@ const FlashcardSectionDisplayCard = memo(
       },
       [dispatch]
     )
+    const title = 'Double-click to edit'
 
     return (
       <section
@@ -75,13 +73,9 @@ const FlashcardSectionDisplayCard = memo(
             mediaFileId={mediaFile.id}
             onDoubleClick={handleDoubleClick}
             className={cn(css.previewFieldTranscription)}
+            title={title}
           >
-            <EditTooltip>
-              <FlashcardDisplayFieldValue
-                fieldName="transcription"
-                value={fields.transcription}
-              />
-            </EditTooltip>
+            {fields.transcription}
           </FlashcardDisplayField>
 
           {'pronunciation' in fields && fields.pronunciation && (
@@ -91,13 +85,9 @@ const FlashcardSectionDisplayCard = memo(
               linkedTracks={fieldsToTracks}
               mediaFileId={mediaFile.id}
               onDoubleClick={handleDoubleClick}
+              title={title}
             >
-              <EditTooltip>
-                <FlashcardDisplayFieldValue
-                  fieldName="pronunciation"
-                  value={fields.pronunciation}
-                />
-              </EditTooltip>
+              {fields.pronunciation}
             </FlashcardDisplayField>
           )}
           <FlashcardDisplayField
@@ -106,13 +96,9 @@ const FlashcardSectionDisplayCard = memo(
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
             onDoubleClick={handleDoubleClick}
+            title={title}
           >
-            <EditTooltip>
-              <FlashcardDisplayFieldValue
-                fieldName="meaning"
-                value={fields.meaning}
-              />
-            </EditTooltip>
+            {fields.meaning}
           </FlashcardDisplayField>
           {fields.notes && (
             <FlashcardDisplayField
@@ -122,6 +108,7 @@ const FlashcardSectionDisplayCard = memo(
               mediaFileId={mediaFile.id}
               onDoubleClick={handleDoubleClick}
               className={cn(css.previewFieldNotes)}
+              title={title}
             >
               {fields.notes}
             </FlashcardDisplayField>
@@ -138,10 +125,6 @@ const FlashcardSectionDisplayCard = memo(
     )
   }
 )
-
-const EditTooltip = ({ children }: { children: ReactElement<any> }) => {
-  return <Tooltip title="Double-click to edit">{children}</Tooltip>
-}
 
 export default FlashcardSectionDisplayCard
 

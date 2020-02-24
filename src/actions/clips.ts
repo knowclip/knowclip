@@ -1,9 +1,14 @@
 import { DeepPartial } from 'redux'
 
-export const addClip = (clip: Clip, flashcard: Flashcard): ClipAction => ({
+export const addClip = (
+  clip: Clip,
+  flashcard: Flashcard,
+  startEditing: boolean = false
+): AddClip => ({
   type: A.ADD_CLIP,
   clip,
   flashcard,
+  startEditing,
 })
 
 export const addClips = (

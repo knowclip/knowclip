@@ -2,80 +2,22 @@ import {
   filter,
   map,
   flatMap,
-  tap,
-  ignoreElements,
   switchMap,
   takeUntil,
   take,
 } from 'rxjs/operators'
-import { fromEvent, from, of, merge, OperatorFunction } from 'rxjs'
+import { fromEvent, from, of, merge, OperatorFunction, empty } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 
-const ctrlSpaceEpic: AppEpic = (
-  action$,
-  state$,
-  { window, toggleMediaPaused }
-) =>
-  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 32 && ctrlKey),
-    tap(e => {
-      e.preventDefault()
-      const activeElement = window.document.activeElement
-      if (
-        !(activeElement && ['VIDEO', 'AUDIO'].includes(activeElement.tagName))
-      )
-        toggleMediaPaused()
-    }),
-    ignoreElements()
+const isTextFieldFocused = () => {
+  const { activeElement } = document
+  if (!activeElement) return false
+  return (
+    activeElement instanceof HTMLInputElement ||
+    activeElement instanceof HTMLTextAreaElement
   )
-
-const ctrlRightBracket: AppEpic = (
-  action$,
-  state$,
-  { window, getCurrentTime }
-) =>
-  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 190 && ctrlKey),
-    map(() => r.highlightRightClipRequest())
-  )
-
-const ctrlLeftBracket: AppEpic = (
-  action$,
-  state$,
-  { window, getCurrentTime }
-) =>
-  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 188 && ctrlKey),
-    map(() => r.highlightLeftClipRequest())
-  )
-
-const escEpic: AppEpic = (action$, state$, { window, isMediaPlaying }) =>
-  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 27),
-    flatMap(e => {
-      if (r.getCurrentDialog(state$.value))
-        of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
-
-      if (
-        r.getHighlightedClipId(state$.value) &&
-        state$.value.session.editingCards
-      )
-        return from([
-          ...(r.isLoopOn(state$.value) ? [r.setLoop(false)] : []),
-          r.stopEditingCards(),
-        ])
-
-      return of(
-        isMediaPlaying()
-          ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
-            r.getHighlightedClipId(state$.value)
-            ? r.setLoop(false)
-            : r.clearWaveformSelection()
-          : r.clearWaveformSelection()
-      )
-    })
-  )
+}
 
 const lEpic: AppEpic = (action$, state$, { window, getCurrentTime }) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
@@ -113,6 +55,69 @@ const lEpic: AppEpic = (action$, state$, { window, getCurrentTime }) =>
     })
   )
 
+const keydownEpic: AppEpic = (action$, state$, effects) =>
+  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
+    flatMap(event => {
+      const { ctrlKey, altKey, keyCode } = event
+      if (
+        keyCode === 69 &&
+        !(
+          r.getHighlightedClipId(state$.value) &&
+          r.isUserEditingCard(state$.value)
+        )
+      ) {
+        event.preventDefault()
+        return of(r.startEditingCards())
+      }
+
+      // space
+      if (keyCode === 32 && (ctrlKey || !document.activeElement)) {
+        event.preventDefault()
+        const activeElement = window.document.activeElement
+        if (
+          !(activeElement && ['VIDEO', 'AUDIO'].includes(activeElement.tagName))
+        )
+          effects.toggleMediaPaused()
+        return empty()
+      }
+      // right arrow
+      if (keyCode === 39 && (altKey || !isTextFieldFocused())) {
+        return of(r.highlightRightClipRequest())
+      }
+
+      // left arrow
+      if (keyCode === 37 && (altKey || !isTextFieldFocused())) {
+        return of(r.highlightLeftClipRequest())
+      }
+
+      // esc
+      if (keyCode === 27) {
+        if (r.getCurrentDialog(state$.value))
+          of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
+
+        if (
+          r.getHighlightedClipId(state$.value) &&
+          state$.value.session.editingCards
+        )
+          return from([
+            ...(r.isLoopOn(state$.value) ? [r.setLoop(false)] : []),
+            r.stopEditingCards(),
+          ])
+
+        return of(
+          effects.isMediaPlaying()
+            ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
+              r.getHighlightedClipId(state$.value)
+              ? r.setLoop(false)
+              : r.clearWaveformSelection()
+            : r.clearWaveformSelection()
+        )
+      }
+
+      return empty()
+    })
+  )
+
 const cmd: OperatorFunction<KeyboardEvent, KeyboardEvent> = filter(
   ({ keyCode }) => keyCode === 91
 )
@@ -145,11 +150,4 @@ const saveEpic: AppEpic = (action$, state$, { window }) =>
     )
   )
 
-export default combineEpics(
-  ctrlSpaceEpic,
-  escEpic,
-  lEpic,
-  ctrlRightBracket,
-  ctrlLeftBracket,
-  saveEpic
-)
+export default combineEpics(lEpic, keydownEpic, saveEpic)

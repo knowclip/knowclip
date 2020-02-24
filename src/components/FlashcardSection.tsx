@@ -70,7 +70,7 @@ const FlashcardSection = ({
         </div>
       ) : null}
 
-      <Tooltip title="Previous (Ctrl + comma)">
+      <Tooltip title="Previous (← key)">
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
           disabled={clipsLength < 2}
@@ -118,7 +118,7 @@ const FlashcardSection = ({
         />
       )}
 
-      <Tooltip title="Next (Ctrl + period)">
+      <Tooltip title="Next (→ key)">
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
           disabled={clipsLength < 2}

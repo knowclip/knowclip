@@ -60,6 +60,11 @@
   font-style: italic;
   opacity: .5;
 }
+.newlinePlaceholder::before {
+  content: '⏎';
+  width: 0;
+  color: #ccc;
+}
 .previewTags {
   padding: 1rem;
   font-size: .8rem;

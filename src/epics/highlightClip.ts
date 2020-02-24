@@ -39,14 +39,10 @@ const centerSelectedClip: AppEpic = (
   action$.pipe(
     ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
     switchMap(action => {
-      const id =
-        action.selection &&
-        action.selection.type === 'Clip' &&
-        action.selection.id
-      if (!id) return empty()
-      const clip = r.getClip(state$.value, id)
-      if (!clip) return empty()
+      const selection = r.getWaveformSelection(state$.value)
+      const clip = selection && selection.item
 
+      if (!clip) return empty()
       const svgElement = getWaveformSvgElement()
       if (!svgElement) return empty()
       const svgWidth = elementWidth(svgElement)
@@ -54,7 +50,8 @@ const centerSelectedClip: AppEpic = (
       const svgFits = clip.end - clip.start <= svgWidth
       if (!svgFits) return empty()
 
-      const { xMin } = state$.value.waveform.viewBox
+      const { waveform } = state$.value
+      const { xMin } = waveform.viewBox
 
       if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
         return of(
@@ -69,8 +66,10 @@ const centerSelectedClip: AppEpic = (
       if (xMin + svgWidth - clip.end < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
         return of(
           r.setWaveformViewBox({
-            xMin:
+            xMin: Math.min(
               clip.end + HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER - svgWidth,
+              waveform.length - svgWidth
+            ),
           })
         )
 

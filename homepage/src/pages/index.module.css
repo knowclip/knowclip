@@ -85,7 +85,6 @@ composes: content;
   justify-content: center;
 }
 .downloadText {
-  /* flex-basis: 33%; */
 }
 .latestVersion {
   text-align: center;
@@ -340,15 +339,14 @@ html:not(.noJs) .openInfo .infoHeading {
 }
 
 .infoHeading::before {
-  content: "⌄";
+  content: "˅";
   display: inline;
   position: absolute;
   right: 0;
-  top: -8px;
+  opacity: .5;
 }
 .openInfo .infoHeading::before {
-  content: "⌃";
-  top: 5px;
+  content: "˄";
 }
 
 .downloadLinkP {

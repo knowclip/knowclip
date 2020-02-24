@@ -1,4 +1,4 @@
-import React, { ReactChild, useCallback } from 'react'
+import React, { useCallback, ReactNodeArray } from 'react'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
@@ -6,6 +6,7 @@ import { TransliterationFlashcardFields } from '../types/Project'
 import FieldMenu, {
   useSubtitlesBySource,
 } from './FlashcardSectionFormFieldPopoverMenu'
+import { Tooltip } from '@material-ui/core'
 
 const FlashcardSectionPreview = ({
   cardBases,
@@ -45,12 +46,7 @@ const FlashcardSectionPreview = ({
           mediaFileId={mediaFile.id}
           className={cn(css.previewFieldTranscription)}
         >
-          {chunkIndex != null ? (
-            <FlashcardDisplayFieldValue
-              fieldName="transcription"
-              value={fields.transcription}
-            />
-          ) : null}
+          {fields.transcription || null}
         </FlashcardDisplayField>
 
         {'pronunciation' in fields && fields.pronunciation && (
@@ -60,12 +56,7 @@ const FlashcardSectionPreview = ({
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
           >
-            {chunkIndex != null ? (
-              <FlashcardDisplayFieldValue
-                fieldName="pronunciation"
-                value={fields.pronunciation}
-              />
-            ) : null}
+            {fields.pronunciation}
           </FlashcardDisplayField>
         )}
         <FlashcardDisplayField
@@ -74,12 +65,7 @@ const FlashcardSectionPreview = ({
           linkedTracks={fieldsToTracks}
           mediaFileId={mediaFile.id}
         >
-          {chunkIndex != null ? (
-            <FlashcardDisplayFieldValue
-              fieldName="meaning"
-              value={fields.meaning}
-            />
-          ) : null}
+          {fields.meaning || null}
         </FlashcardDisplayField>
         {fields.notes && (
           <FlashcardDisplayField
@@ -99,16 +85,40 @@ const FlashcardSectionPreview = ({
 export const FlashcardDisplayFieldValue = ({
   fieldName,
   value,
+  title,
 }: {
   fieldName: FlashcardFieldName
   value: string | null
-}) =>
-  value ? (
-    <span>{value}</span>
-  ) : (
-    <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
-  )
+  title: string | undefined
+}) => {
+  if (!value)
+    return title ? (
+      <Tooltip title={title}>
+        <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
+      </Tooltip>
+    ) : (
+      <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
+    )
 
+  const withoutNewlines: ReactNodeArray = []
+  const lines = value.split('\n')
+  lines.forEach((line, i) => {
+    if (i !== 0)
+      withoutNewlines.push(
+        <span className={css.newlinePlaceholder} key={String(i)}>
+          {' '}
+        </span>
+      )
+    withoutNewlines.push(line)
+  })
+  return title ? (
+    <Tooltip title={title}>
+      <span>{withoutNewlines}</span>
+    </Tooltip>
+  ) : (
+    <span>{withoutNewlines}</span>
+  )
+}
 export const FlashcardDisplayField = ({
   children,
   fieldName,
@@ -117,14 +127,16 @@ export const FlashcardDisplayField = ({
   mediaFileId,
   onDoubleClick,
   className,
+  title,
 }: {
-  children: ReactChild | null
+  children: string | null
   fieldName: FlashcardFieldName
   subtitles: MediaSubtitlesRelation[]
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
   onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
   className?: string
+  title?: string
 }) => {
   const {
     embeddedSubtitlesTracks,
@@ -150,7 +162,11 @@ export const FlashcardDisplayField = ({
         mediaFileId={mediaFileId}
         fieldName={fieldName as TransliterationFlashcardFieldName}
       />
-      {children}
+      <FlashcardDisplayFieldValue
+        fieldName={fieldName}
+        value={children}
+        title={title}
+      />
     </div>
   )
 }

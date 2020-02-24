@@ -1,8 +1,9 @@
 import { combineEpics } from 'redux-observable'
 import { flatMap, map } from 'rxjs/operators'
-import { of, empty } from 'rxjs'
+import { of, empty, from } from 'rxjs'
 import * as r from '../redux'
 import { TransliterationFlashcardFields } from '../types/Project'
+import { uuid } from '../utils/sideEffects'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$
@@ -95,4 +96,46 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       })
     )
 
-export default combineEpics(linkFieldToTrackRequest, linkFieldToTrack)
+export const newClipFromChunk: AppEpic = (
+  action$,
+  state$,
+  { setCurrentTime }
+) =>
+  action$.ofType<StartEditingCards>(A.START_EDITING_CARDS).pipe(
+    flatMap(() => {
+      const selection = r.getWaveformSelection(state$.value)
+      if (selection && selection.type === 'Preview') {
+        const mediaFileId = r.getCurrentFileId(state$.value)
+        if (!mediaFileId) return empty()
+        const cardBases = r.getSubtitlesCardBases(state$.value)
+        const fieldsToTracks = r.getSubtitlesFlashcardFieldLinks(state$.value)
+        const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
+          cardBases.cards[selection.index]
+        )
+        const fields = {} as TransliterationFlashcardFields
+        for (const fieldName of cardBases.fieldNames) {
+          const trackId = fieldsToTracks[fieldName]
+          const text = trackId && tracksToFieldsText[trackId]
+          fields[fieldName] = text || ''
+        }
+        const { clip, flashcard } = r.getNewClipAndCard(
+          state$.value,
+          { start: selection.item.start, end: selection.item.end },
+          mediaFileId,
+          uuid(),
+          fields
+        )
+
+        setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
+
+        return from([r.addClip(clip, flashcard, true)])
+      }
+      return empty()
+    })
+  )
+
+export default combineEpics(
+  linkFieldToTrackRequest,
+  linkFieldToTrack,
+  newClipFromChunk
+)

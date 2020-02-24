@@ -80,7 +80,12 @@ declare type SetDefaultClipSpecs = {
   tags?: Array<string>
   includeStill?: boolean
 }
-declare type AddClip = { type: 'ADD_CLIP'; clip: Clip; flashcard: Flashcard }
+declare type AddClip = {
+  type: 'ADD_CLIP'
+  clip: Clip
+  flashcard: Flashcard
+  startEditing: boolean
+}
 declare type AddClips = {
   type: 'ADD_CLIPS'
   clips: Array<Clip>

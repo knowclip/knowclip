@@ -69,6 +69,7 @@ const session: Reducer<SessionState, Action> = (
       return {
         ...state,
         pendingClip: null,
+        editingCards: action.startEditing || state.editingCards,
       }
 
     case A.SET_PENDING_CLIP:
@@ -89,7 +90,6 @@ const session: Reducer<SessionState, Action> = (
         : {
             ...state,
             waveformSelection: action.selection,
-            editingCards: false, // TODO: maybe get rid of this
           }
 
     case A.SET_PENDING_STRETCH:

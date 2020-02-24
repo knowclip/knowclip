@@ -409,9 +409,10 @@ const Waveform = ({ show }: { show: boolean }) => {
         e.currentTarget,
         waveform.viewBox.xMin
       )
+      const x = Math.min(waveform.length, coords.x)
       const waveformMousedown = new WaveformMousedownEvent(
         e.currentTarget,
-        getSecondsAtXFromWaveform(waveform, coords.x)
+        getSecondsAtXFromWaveform(waveform, x)
       )
       document.dispatchEvent(waveformMousedown)
     },
@@ -432,10 +433,11 @@ const Waveform = ({ show }: { show: boolean }) => {
           e.currentTarget,
           waveform.viewBox.xMin
         )
-        const seconds = getSecondsAtXFromWaveform(waveform, coords.x)
+        const x = Math.min(waveform.length, coords.x)
+        const seconds = getSecondsAtXFromWaveform(waveform, x)
         player.currentTime = seconds
 
-        setCursorX(coords.x)
+        setCursorX(x)
       }
     },
     [waveform]

@@ -7,7 +7,7 @@ import {
   switchMap,
   flatMap,
 } from 'rxjs/operators'
-import { fromEvent, merge, from, of } from 'rxjs'
+import { fromEvent, merge, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
@@ -107,12 +107,13 @@ const addClipEpic: AppEpic = (
             uuid(),
             fields
           )
-          return from([
-            r.addClip(clip, flashcard),
-            ...(Object.values(fields).some(fieldValue => fieldValue.trim())
-              ? []
-              : [r.startEditingCards()]),
-          ])
+          return of(
+            r.addClip(
+              clip,
+              flashcard,
+              !Object.values(fields).some(fieldValue => fieldValue.trim())
+            )
+          )
         })
       )
       return merge(pendingClips, pendingClipEnds)

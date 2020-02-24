@@ -13,9 +13,23 @@ const Shortcut = ({ keys, action }: { keys: string; action: string }) => (
 
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false)
-  const handleClick = useCallback(() => setOpen(open => !open), [setOpen])
+  const handleMouseDown = useCallback(
+    e => {
+      setOpen(open => !open)
+      if (!open) e.preventDefault()
+    },
+    [setOpen, open]
+  )
+  const handleFocus = useCallback(() => setOpen(true), [setOpen])
+  const handleBlur = useCallback(() => setOpen(false), [setOpen])
   return (
-    <section className={css.container} onClick={handleClick}>
+    <section
+      className={css.container}
+      onMouseDown={handleMouseDown}
+      tabIndex={0}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
       {open ? (
         <Card>
           <CardContent className={css.card}>
@@ -23,13 +37,22 @@ const KeyboardShortcuts = () => {
             <section className={css.group}>
               <Shortcut keys="Ctrl + space" action="Play/pause" />
               <Shortcut keys="Ctrl + L" action="Toggle loop" />
+              <Shortcut keys="Esc" action="Stop looping" />
             </section>
 
             <section className={css.group}>
-              <h3 className={css.heading}>Navigate between clips</h3>
-              <Shortcut keys="Ctrl + ," action="Select previous clip" />
-              <Shortcut keys="Ctrl + ." action="Select next clip" />
-              <Shortcut keys="Esc" action="Deselect current clip" />
+              <h3 className={css.heading}>Navigate between clips/subtitles</h3>
+              <Shortcut keys="←" action="Select previous" />
+              <Shortcut keys="→" action="Select next" />
+              <Shortcut keys="Esc" action="Deselect current" />
+            </section>
+
+            <section className={css.group}>
+              <h3 className={css.heading}>Editing flashcards</h3>
+              <Shortcut keys="E" action="Start editing fields" />
+              <Shortcut keys="Esc" action="Stop editing fields" />
+              <Shortcut keys="C" action="Start making cloze deletion" />
+              <Shortcut keys="Esc" action="Stop making cloze deletion" />
             </section>
 
             <section className={css.group}>
