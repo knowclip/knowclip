@@ -105,6 +105,22 @@ export const newClipFromChunk: AppEpic = (
     flatMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
+        const overlapped = r
+          .getCurrentFileClips(state$.value)
+          .find(clip =>
+            r.overlapsSignificantly(
+              selection.item,
+              clip.start,
+              clip.end,
+              r.getHalfSecond(state$.value)
+            )
+          )
+        if (overlapped) {
+          // TODO: show in UI that plus button will not create new card in this case
+          setCurrentTime(overlapped.start)
+          return from([r.startEditingCards(), r.highlightClip(overlapped.id)])
+        }
+
         const mediaFileId = r.getCurrentFileId(state$.value)
         if (!mediaFileId) return empty()
         const cardBases = r.getSubtitlesCardBases(state$.value)
