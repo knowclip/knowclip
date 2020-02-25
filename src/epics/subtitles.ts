@@ -106,6 +106,7 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
             )
           }),
           r.addClips(clips, cards, fileId),
+          r.highlightRightClipRequest(),
         ])
       }
     )
