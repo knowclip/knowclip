@@ -61,7 +61,8 @@
   opacity: .5;
 }
 .newlinePlaceholder {
-  white-space: normal;
+  white-space: pre;
+  display: inline-block
 }
 .newlinePlaceholder::before {
   content: '⏎';
