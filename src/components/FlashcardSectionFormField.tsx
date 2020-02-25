@@ -4,7 +4,7 @@ import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
 import FieldMenu, {
   useSubtitlesBySource,
-} from './FlashcardSectionFormFieldPopoverMenu'
+} from './FlashcardSectionFieldPopoverMenu'
 import { flashcardSectionForm$ } from './FlashcardSectionForm'
 
 type Props = {

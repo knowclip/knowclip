@@ -1,7 +1,7 @@
 import { TestSetup } from '../../spectronApp'
 import { waveform$ } from '../../../components/Waveform'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
-import { flashcardFormFieldMenu$ } from '../../../components/FlashcardSectionFormFieldPopoverMenu'
+import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
@@ -24,12 +24,13 @@ export default async function makeFlashcardsWithSubtitles({
   await client.elements_(waveform$.waveformClip, 4)
 
   const [, , meaningFieldButton] = await client.elements_(
-    flashcardFormFieldMenu$.openMenuButton
+    flashcardFieldMenu$.openMenuButton,
+    4
   )
   await meaningFieldButton.click()
 
   const [embeddedSubtitlesTrackButton] = await client.elements_(
-    flashcardFormFieldMenu$.menuItem
+    flashcardFieldMenu$.menuItem
   )
   await embeddedSubtitlesTrackButton.click()
   await client.clickElement_(confirmationDialog$.okButton)

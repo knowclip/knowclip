@@ -1,6 +1,6 @@
 import { TestSetup } from '../../spectronApp'
 import { waveform$ } from '../../../components/Waveform'
-import { flashcardFormFieldMenu$ } from '../../../components/FlashcardSectionFormFieldPopoverMenu'
+import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
@@ -20,8 +20,8 @@ export default async function linkSubtitlesToFields({
   )
   await client.clickElement_(waveform$.waveformClip)
 
-  await client.clickElement_(flashcardFormFieldMenu$.openMenuButton)
-  const [, external] = await client.elements_(flashcardFormFieldMenu$.menuItem)
+  await client.clickElement_(flashcardFieldMenu$.openMenuButton)
+  const [, external] = await client.elements_(flashcardFieldMenu$.menuItem)
   await external.click()
   await client.clickElement_(confirmationDialog$.okButton)
   await client.waitForText_(

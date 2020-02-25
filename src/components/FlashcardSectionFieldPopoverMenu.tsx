@@ -7,11 +7,11 @@ import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
 
 enum $ {
-  openMenuButton = 'flashcard-form-field-menu-open-button',
-  menuItem = 'flashcard-form-field-menu-item',
+  openMenuButton = 'flashcard-field-menu-open-button',
+  menuItem = 'flashcard-field-menu-item',
 }
 
-const FlashcardSectionFormFieldPopoverMenu = ({
+const FlashcardSectionFieldPopoverMenu = ({
   embeddedSubtitlesTracks,
   externalSubtitlesTracks,
   linkedSubtitlesTrack,
@@ -158,6 +158,6 @@ const isExternal = (
   id: string
 } => t.type === 'ExternalSubtitlesTrack'
 
-export default FlashcardSectionFormFieldPopoverMenu
+export default FlashcardSectionFieldPopoverMenu
 
-export { $ as flashcardFormFieldMenu$ }
+export { $ as flashcardFieldMenu$ }

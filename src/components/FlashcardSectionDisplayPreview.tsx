@@ -5,7 +5,7 @@ import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import FieldMenu, {
   useSubtitlesBySource,
-} from './FlashcardSectionFormFieldPopoverMenu'
+} from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip, IconButton } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
