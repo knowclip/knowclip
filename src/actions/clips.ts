@@ -34,16 +34,6 @@ export const clearWaveformSelection = (): SelectWaveformItem => ({
   selection: null,
 })
 
-export const highlightClip = (id: ClipId): SelectWaveformItem => ({
-  type: A.SELECT_WAVEFORM_ITEM,
-  selection: { type: 'Clip', id },
-})
-
-export const highlightSubtitles = (index: number): SelectWaveformItem => ({
-  type: A.SELECT_WAVEFORM_ITEM,
-  selection: { type: 'Preview', index },
-})
-
 export const highlightLeftClipRequest = (): HighlightLeftClipRequest => ({
   type: A.HIGHLIGHT_LEFT_CLIP_REQUEST,
 })

@@ -34,5 +34,5 @@ declare type ProgressInfo = {
 }
 
 declare type WaveformSelection =
-  | { type: 'Clip'; id: ClipId }
-  | { type: 'Preview'; index: number }
+  | { type: 'Clip'; index: number; id: ClipId }
+  | { type: 'Preview'; index: number; cardBaseIndex: number }

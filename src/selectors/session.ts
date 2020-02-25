@@ -41,7 +41,7 @@ export const getHighlightedFlashcard = (state: AppState): Flashcard | null => {
 export const getHighlightedChunkIndex = (state: AppState): number | null =>
   state.session.waveformSelection &&
   state.session.waveformSelection.type === 'Preview'
-    ? state.session.waveformSelection.index
+    ? state.session.waveformSelection.cardBaseIndex
     : null
 
 export const getPendingClip = (state: AppState): PendingClip | null =>

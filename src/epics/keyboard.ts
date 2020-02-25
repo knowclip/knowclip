@@ -19,46 +19,14 @@ const isTextFieldFocused = () => {
   )
 }
 
-const lEpic: AppEpic = (action$, state$, { window, getCurrentTime }) =>
-  fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    filter(({ ctrlKey, keyCode }) => keyCode === 76 && ctrlKey),
-    flatMap(e => {
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-
-      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
-      const clipIdAtX = r.getClipIdAt(state$.value, x)
-      const highlightedId = r.getHighlightedClipId(state$.value)
-
-      if (r.isLoopOn(state$.value) && clipIdAtX && !highlightedId)
-        return of(r.highlightClip(clipIdAtX))
-
-      if (clipIdAtX && highlightedId !== clipIdAtX)
-        return from([r.highlightClip(clipIdAtX), r.toggleLoop()])
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-
-      return of(r.toggleLoop())
-    })
-  )
-
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
       const { ctrlKey, altKey, keyCode } = event
+
+      // L key
+      if (keyCode === 76 && ctrlKey) return of(r.toggleLoop())
+
       // E key
       if (
         keyCode === 69 &&
@@ -152,4 +120,4 @@ const saveEpic: AppEpic = (action$, state$, { window }) =>
     )
   )
 
-export default combineEpics(lEpic, keydownEpic, saveEpic)
+export default combineEpics(keydownEpic, saveEpic)

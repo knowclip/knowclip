@@ -118,7 +118,7 @@ export const newClipFromChunk: AppEpic = (
         if (overlapped) {
           // TODO: show in UI that plus button will not create new card in this case
           setCurrentTime(overlapped.start)
-          return from([r.startEditingCards(), r.highlightClip(overlapped.id)])
+          return from([r.startEditingCards()])
         }
 
         const mediaFileId = r.getCurrentFileId(state$.value)
@@ -126,7 +126,7 @@ export const newClipFromChunk: AppEpic = (
         const cardBases = r.getSubtitlesCardBases(state$.value)
         const fieldsToTracks = r.getSubtitlesFlashcardFieldLinks(state$.value)
         const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
-          cardBases.cards[selection.index]
+          cardBases.cards[selection.item.index]
         )
         const fields = {} as TransliterationFlashcardFields
         for (const fieldName of cardBases.fieldNames) {

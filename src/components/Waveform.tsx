@@ -9,6 +9,7 @@ import {
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { setCursorX } from '../utils/waveform'
+import { dispatch } from 'rxjs/internal/observable/range'
 
 enum $ {
   container = 'waveform-container',
@@ -325,12 +326,26 @@ const SubtitlesTimelines = memo(
       },
       [goToSubtitlesChunk]
     )
+    const dispatch = useDispatch()
+    const handleDoubleClick = useCallback(
+      e => {
+        const { dataset } = e.target
+
+        if (dataset && dataset.chunkIndex) {
+          // this selects the wrong thing sometimes!
+          // dispatch(r.setWaveformCursor(dataset.chunkStart))
+          // dispatch(r.startEditingCards())
+        }
+      },
+      [dispatch]
+    )
 
     return (
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
         width="100%"
         onMouseUp={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
       >
         {subtitles.cards.map((c, i) => {
           return (
