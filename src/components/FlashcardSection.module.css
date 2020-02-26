@@ -200,3 +200,7 @@
 .fieldMenuButton:focus {
   opacity: 1;
 }
+
+.selectedMenuItem {
+  color: blue !important;
+}

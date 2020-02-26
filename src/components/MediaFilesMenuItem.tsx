@@ -138,11 +138,11 @@ const MediaFilesMenuItem = ({
           autoFocus
           onKeyDown={stopPropagation}
           onKeyPress={stopPropagation}
+          onClick={stopPropagation}
           open={submenu.isOpen}
           anchorEl={submenu.anchorEl}
           anchorOrigin={submenuAnchorOrigin}
           onClose={onCloseSubmenu}
-          onClick={stopPropagation}
         >
           <MenuItem dense onClick={loadAndClose}>
             <ListItemIcon>

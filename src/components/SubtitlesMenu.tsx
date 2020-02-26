@@ -21,6 +21,7 @@ import {
   ListItemIcon,
   Divider,
   MenuList,
+  Popover,
 } from '@material-ui/core'
 import { showOpenDialog } from '../utils/electron'
 import css from './MainHeader.module.css'
@@ -85,7 +86,7 @@ const SubtitlesMenu = () => {
           <SubtitlesIcon />
         </IconButton>
       </Tooltip>
-      <Menu anchorEl={anchorEl} open={isOpen} onClose={close}>
+      <Popover anchorEl={anchorEl} open={isOpen} onClose={close}>
         <MenuList>
           {!subtitles.total && (
             <MenuItem dense disabled>
@@ -130,7 +131,7 @@ const SubtitlesMenu = () => {
             <ListItemText primary="Make clips + cards from subtitles" />
           </MenuItem>
         </MenuList>
-      </Menu>
+      </Popover>
     </Fragment>
   )
 }
@@ -155,24 +156,70 @@ const EmbeddedTrackMenuItem = ({
   file: VttConvertedSubtitlesFile & { parentType: 'MediaFile' } | null
   track: EmbeddedSubtitlesTrack | null
   title: string
-}) => (
-  <MenuItem
-    dense
-    onClick={useToggleVisible(track, id)}
-    className={$.trackMenuItems}
-  >
-    <ListItemIcon>
-      {track ? (
-        <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
-      ) : (
-        <Tooltip title="Problem reading embedded subtitles">
-          <FolderSpecial />
-        </Tooltip>
-      )}
-    </ListItemIcon>
-    <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
-  </MenuItem>
-)
+}) => {
+  // const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+  // const dispatch = useDispatch()
+
+  // const locateFileRequest = useCallback(
+  //   e => {
+  //     if (file) {
+  //       dispatch(
+  //         actions.locateFileRequest(
+  //           file,
+  //           `Locate file in your filesystem to use these subtitles.`
+  //         )
+  //       )
+
+  //       close(e)
+  //     }
+  //   },
+  //   [dispatch, file, close]
+  // )
+
+  return (
+    <MenuItem
+      dense
+      onClick={useToggleVisible(track, id)}
+      className={$.trackMenuItems}
+      autoFocus
+    >
+      <ListItemIcon>
+        {track ? (
+          <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
+        ) : (
+          <Tooltip title="Problem reading embedded subtitles">
+            <FolderSpecial />
+          </Tooltip>
+        )}
+      </ListItemIcon>
+      <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
+      {/*<Tooltip title="More actions">
+        <ListItemSecondaryAction>
+          <IconButton
+            buttonRef={anchorCallbackRef}
+            onClick={open}
+            className={$.openTrackSubmenuButton}
+          >
+            <MoreVert />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </Tooltip>
+
+       {isOpen && (
+        <Menu autoFocus open={isOpen} onClose={close} anchorEl={anchorEl}>
+          <MenuItem
+            dense
+            onClick={locateFileRequest}
+            disabled={!file}
+            id={$.locateExternalFileButton}
+          >
+            <ListItemText primary="Refresh" />
+          </MenuItem>
+        </Menu>
+      )} */}
+    </MenuItem>
+  )
+}
 
 const ExternalTrackMenuItem = ({
   id,
@@ -214,31 +261,32 @@ const ExternalTrackMenuItem = ({
 
   const toggleVisible = useToggleVisible(track, id)
 
+  const stopPropagation = useCallback(e => {
+    e.stopPropagation()
+  }, [])
+
   return (
-    <>
-      <MenuItem
-        dense
-        onClick={toggleVisible}
-        disabled={!file}
-        className={$.trackMenuItems}
-      >
-        <ListItemIcon>
-          {track ? (
-            <VisibilityIcon
-              visible={Boolean(track && track.mode === 'showing')}
-            />
-          ) : (
-            <Tooltip title="Not found in filesystem">
-              <FolderSpecial />
-            </Tooltip>
-          )}
-        </ListItemIcon>
+    <MenuItem
+      dense
+      onClick={toggleVisible}
+      disabled={!file}
+      className={$.trackMenuItems}
+    >
+      <ListItemIcon>
+        {track ? (
+          <VisibilityIcon
+            visible={Boolean(track && track.mode === 'showing')}
+          />
+        ) : (
+          <Tooltip title="Not found in filesystem">
+            <FolderSpecial />
+          </Tooltip>
+        )}
+      </ListItemIcon>
 
-        <ListItemText
-          className={css.subtitlesMenuListItemText}
-          primary={title}
-        />
+      <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
 
+      <Tooltip title="More actions">
         <ListItemSecondaryAction>
           <IconButton
             buttonRef={anchorCallbackRef}
@@ -248,10 +296,17 @@ const ExternalTrackMenuItem = ({
             <MoreVert />
           </IconButton>
         </ListItemSecondaryAction>
-      </MenuItem>
-
+      </Tooltip>
       {isOpen && (
-        <Menu open={isOpen} onClose={close} anchorEl={anchorEl}>
+        <Menu
+          autoFocus
+          open={isOpen}
+          onClose={close}
+          anchorEl={anchorEl}
+          onKeyDown={stopPropagation}
+          onKeyPress={stopPropagation}
+          onClick={stopPropagation}
+        >
           <MenuItem
             dense
             onClick={locateFileRequest}
@@ -280,7 +335,7 @@ const ExternalTrackMenuItem = ({
           </MenuItem>
         </Menu>
       )}
-    </>
+    </MenuItem>
   )
 }
 
