@@ -35,6 +35,8 @@ type MediaFileMenuItemProps = {
   onClick?: any
 }
 
+const NAME_CUTOFF = 50
+
 const submenuAnchorOrigin = { vertical: 'top', horizontal: 'right' } as const
 const MediaFilesMenuItem = ({
   mediaFile,
@@ -116,60 +118,60 @@ const MediaFilesMenuItem = ({
     e.stopPropagation()
   }, [])
 
-  return (
-    <>
-      <MenuItem
-        dense
-        tabIndex={0}
-        key={mediaFile.id}
-        autoFocus={autoFocus}
-        onClick={loadAndClose}
-        className={className}
-      >
-        <ListItemText
-          title={mediaFile.name}
-          className={css.mediaFilesMenuListItemText}
+  const content = (
+    <MenuItem
+      dense
+      tabIndex={0}
+      key={mediaFile.id}
+      autoFocus={autoFocus}
+      onClick={loadAndClose}
+      className={className}
+    >
+      <ListItemText className={css.mediaFilesMenuListItemText}>
+        {truncate(mediaFile.name, NAME_CUTOFF)}
+      </ListItemText>
+      {needsFilePath ? (
+        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
+      ) : (
+        <Tooltip title="More actions">{actionsButton}</Tooltip>
+      )}
+      {submenu.isOpen && (
+        <Menu
+          autoFocus
+          onKeyDown={stopPropagation}
+          onKeyPress={stopPropagation}
+          open={submenu.isOpen}
+          anchorEl={submenu.anchorEl}
+          anchorOrigin={submenuAnchorOrigin}
+          onClose={onCloseSubmenu}
+          onClick={stopPropagation}
         >
-          {truncate(mediaFile.name, 40)}
-        </ListItemText>
-        {needsFilePath ? (
-          <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
-        ) : (
-          <Tooltip title="More actions">{actionsButton}</Tooltip>
-        )}
-        {submenu.isOpen && (
-          <Menu
-            autoFocus
-            onKeyDown={stopPropagation}
-            onKeyPress={stopPropagation}
-            open={submenu.isOpen}
-            anchorEl={submenu.anchorEl}
-            anchorOrigin={submenuAnchorOrigin}
-            onClose={onCloseSubmenu}
-            onClick={stopPropagation}
-          >
-            <MenuItem dense onClick={loadAndClose}>
-              <ListItemIcon>
-                <PlayArrow />
-              </ListItemIcon>
-              <ListItemText>Open</ListItemText>
-            </MenuItem>
-            <MenuItem dense onClick={deleteAndClose}>
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText>Delete</ListItemText>
-            </MenuItem>
-            <MenuItem dense onClick={locateAndClose}>
-              <ListItemIcon>
-                <FolderSpecial />
-              </ListItemIcon>
-              <ListItemText>Manually locate in file system</ListItemText>
-            </MenuItem>
-          </Menu>
-        )}
-      </MenuItem>
-    </>
+          <MenuItem dense onClick={loadAndClose}>
+            <ListItemIcon>
+              <PlayArrow />
+            </ListItemIcon>
+            <ListItemText>Open</ListItemText>
+          </MenuItem>
+          <MenuItem dense onClick={deleteAndClose}>
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText>Delete</ListItemText>
+          </MenuItem>
+          <MenuItem dense onClick={locateAndClose}>
+            <ListItemIcon>
+              <FolderSpecial />
+            </ListItemIcon>
+            <ListItemText>Manually locate in file system</ListItemText>
+          </MenuItem>
+        </Menu>
+      )}
+    </MenuItem>
+  )
+  return mediaFile.name.length > NAME_CUTOFF ? (
+    <Tooltip title={mediaFile.name}>{content}</Tooltip>
+  ) : (
+    content
   )
 }
 
