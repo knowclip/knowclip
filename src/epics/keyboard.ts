@@ -25,7 +25,8 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
       const { ctrlKey, altKey, keyCode } = event
 
       // L key
-      if (keyCode === 76 && ctrlKey) return of(r.toggleLoop())
+      if (keyCode === 76 && (ctrlKey || !isTextFieldFocused()))
+        return of(r.toggleLoop())
 
       // E key
       if (

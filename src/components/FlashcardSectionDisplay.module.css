@@ -44,6 +44,9 @@
 .previewFieldTranscription {
   font-size: 1.2em;
 }
+.previewFieldPronunciation {
+  font-style: italic;
+}
 .previewFieldNotes {
   min-width: 15em;
   background-color: #efefef;
@@ -51,8 +54,11 @@
   border-radius: .2em;
   text-align: justify;
   max-width: 40em;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  
+}
+.previewFieldWithPopover.previewFieldNotes{
   text-indent: -1em;
 }
 .emptyFieldPlaceholder {
@@ -69,6 +75,13 @@
   width: 0;
   color: #ccc;
 }
+.previewFieldNotes .newlinePlaceholder {
+  display: inline
+}
+.previewFieldNotes .newlinePlaceholder::before {
+  content: none;
+}
+
 .previewTags {
   padding: 1rem;
   font-size: .8rem;

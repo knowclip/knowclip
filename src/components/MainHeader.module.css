@@ -62,6 +62,16 @@
   align-items: center;
   height: 4em;
 }
+.projectNameForm {
+}
+.projectNameFormHidden {
+  display: hidden;
+  position: absolute;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
 
 .projectNameInput input {
   font-size: 17px !important;

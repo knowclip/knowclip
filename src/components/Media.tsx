@@ -21,6 +21,10 @@ type MediaProps = {
   className?: string
   viewMode: ViewMode
 }
+let clicked = false
+const setClicked = (c: boolean) => {
+  clicked = c
+}
 const Media = ({
   constantBitrateFilePath,
   loop,
@@ -31,10 +35,25 @@ const Media = ({
 }: MediaProps) => {
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
 
+  const setUpBlur = useCallback(e => {
+    setClicked(true)
+    if (mediaRef.current) mediaRef.current.blur()
+  }, [])
+  const blur = useCallback(e => {
+    if (mediaRef.current && clicked) {
+      mediaRef.current.blur()
+      // setClicked(false)
+    }
+  }, [])
+  const stopBlur = useCallback(e => {
+    if (mediaRef.current && clicked) {
+      setClicked(false)
+    }
+  }, [])
   const props:
     | AudioHTMLAttributes<HTMLAudioElement>
     | VideoHTMLAttributes<HTMLVideoElement> = {
-    loop: loop,
+    loop: false,
     controls: true,
     // disablePictureInPicture: true,
     id: 'mediaPlayer',
@@ -42,6 +61,14 @@ const Media = ({
     src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',
     // @ts-ignore
     playbackspeed: 1,
+
+    // prevent accidental scrub after play/pause with mouse
+    onMouseEnter: setUpBlur,
+    onMouseLeave: stopBlur,
+    onPlay: blur,
+    onPause: blur,
+    onClick: blur,
+    onVolumeChange: blur,
   }
 
   useEffect(

@@ -20,6 +20,7 @@ import {
   ListItemSecondaryAction,
   ListItemIcon,
   Divider,
+  MenuList,
 } from '@material-ui/core'
 import { showOpenDialog } from '../utils/electron'
 import css from './MainHeader.module.css'
@@ -85,48 +86,50 @@ const SubtitlesMenu = () => {
         </IconButton>
       </Tooltip>
       <Menu anchorEl={anchorEl} open={isOpen} onClose={close}>
-        {!subtitles.total && (
-          <MenuItem dense disabled>
-            No subtitles loaded.
+        <MenuList>
+          {!subtitles.total && (
+            <MenuItem dense disabled>
+              No subtitles loaded.
+            </MenuItem>
+          )}
+          {subtitles.embedded.map(({ relation, file, track }, i) => (
+            <EmbeddedTrackMenuItem
+              key={relation.id}
+              id={relation.id}
+              file={
+                file as
+                  | (VttConvertedSubtitlesFile & { parentType: 'MediaFile' })
+                  | null
+              }
+              track={track}
+              title={`Embedded track ${i + 1}`}
+            />
+          ))}
+          {subtitles.external.map(({ relation, file, track }, i) => (
+            <ExternalTrackMenuItem
+              key={relation.id}
+              id={relation.id}
+              track={track}
+              file={file}
+              title={`External track ${i + 1}`}
+            />
+          ))}
+          <Divider />
+          <MenuItem
+            dense
+            onClick={loadExternalTrack}
+            className={$.addTrackButton}
+          >
+            <ListItemText primary="Load external track" />
           </MenuItem>
-        )}
-        {subtitles.embedded.map(({ relation, file, track }, i) => (
-          <EmbeddedTrackMenuItem
-            key={relation.id}
-            id={relation.id}
-            file={
-              file as
-                | (VttConvertedSubtitlesFile & { parentType: 'MediaFile' })
-                | null
-            }
-            track={track}
-            title={`Embedded track ${i + 1}`}
-          />
-        ))}
-        {subtitles.external.map(({ relation, file, track }, i) => (
-          <ExternalTrackMenuItem
-            key={relation.id}
-            id={relation.id}
-            track={track}
-            file={file}
-            title={`External track ${i + 1}`}
-          />
-        ))}
-        <Divider />
-        <MenuItem
-          dense
-          onClick={loadExternalTrack}
-          className={$.addTrackButton}
-        >
-          <ListItemText primary="Load external track" />
-        </MenuItem>
-        <MenuItem
-          dense
-          onClick={subtitlesClipsDialogRequest}
-          id={$.makeClipsAndCardsButton}
-        >
-          <ListItemText primary="Make clips + cards from subtitles" />
-        </MenuItem>
+          <MenuItem
+            dense
+            onClick={subtitlesClipsDialogRequest}
+            id={$.makeClipsAndCardsButton}
+          >
+            <ListItemText primary="Make clips + cards from subtitles" />
+          </MenuItem>
+        </MenuList>
       </Menu>
     </Fragment>
   )

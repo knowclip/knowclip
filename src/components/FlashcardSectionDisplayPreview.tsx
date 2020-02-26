@@ -65,6 +65,7 @@ const FlashcardSectionPreview = ({
             subtitles={mediaFile.subtitles}
             linkedTracks={fieldsToTracks}
             mediaFileId={mediaFile.id}
+            className={css.previewFieldPronunciation}
           >
             {fields.pronunciation}
           </FlashcardDisplayField>
@@ -169,17 +170,21 @@ export const FlashcardDisplayField = ({
   )
   return (
     <div
-      className={cn(css.previewField, className)}
+      className={cn(css.previewField, className, {
+        [css.previewFieldWithPopover]: Boolean(subtitles.length),
+      })}
       onDoubleClick={handleDoubleClick}
     >
-      <FieldMenu
-        className={css.previewFieldMenuButton}
-        embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-        externalSubtitlesTracks={externalSubtitlesTracks}
-        linkedSubtitlesTrack={linkedSubtitlesTrack}
-        mediaFileId={mediaFileId}
-        fieldName={fieldName as TransliterationFlashcardFieldName}
-      />
+      {Boolean(subtitles.length) && (
+        <FieldMenu
+          className={css.previewFieldMenuButton}
+          embeddedSubtitlesTracks={embeddedSubtitlesTracks}
+          externalSubtitlesTracks={externalSubtitlesTracks}
+          linkedSubtitlesTrack={linkedSubtitlesTrack}
+          mediaFileId={mediaFileId}
+          fieldName={fieldName as TransliterationFlashcardFieldName}
+        />
+      )}
       <FlashcardDisplayFieldValue
         fieldName={fieldName}
         value={children}

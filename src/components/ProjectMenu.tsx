@@ -54,7 +54,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
   useEffect(
     () => {
-      inputRef.current && inputRef.current.focus()
+      if (state.editing && inputRef.current) inputRef.current.focus()
     },
     [state.editing]
   )
@@ -88,6 +88,13 @@ const ProjectMenu = ({ className }: { className: string }) => {
     [submit]
   )
 
+  const handleFocus = useCallback(
+    () => {
+      setState(state => ({ ...state, editing: true }))
+    },
+    [setState]
+  )
+
   const handleBlur = useCallback(
     () => {
       submit()
@@ -110,19 +117,26 @@ const ProjectMenu = ({ className }: { className: string }) => {
             <SaveIcon />
           </IconButton>
         </Tooltip>{' '}
-        {editing && (
-          <form onSubmit={handleSubmit} style={{ width: `${inputWidth}px` }}>
+        {
+          <form
+            onSubmit={handleSubmit}
+            style={{ width: `${inputWidth}px` }}
+            className={cn(css.projectNameForm, {
+              [css.projectNameFormHidden]: !editing,
+            })}
+          >
             <TextField
               inputRef={inputRef}
               classes={{ root: css.projectNameInput }}
               value={text}
               onChange={handleChangeText}
+              onFocus={handleFocus}
               onBlur={handleBlur}
               fullWidth
               inputProps={{ id: $.projectTitleInput }}
             />
           </form>
-        )}
+        }
         <Tooltip title="Double-click to edit">
           <h1
             className={cn(css.projectName, {

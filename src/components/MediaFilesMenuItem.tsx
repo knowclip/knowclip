@@ -9,6 +9,7 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   Menu,
+  ListItem,
 } from '@material-ui/core'
 import {
   Delete as DeleteIcon,
@@ -27,19 +28,21 @@ const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
 
 type MediaFileMenuItemProps = {
   mediaFile: MediaFile
-  selected: boolean
+  autoFocus: boolean
   currentProjectId: ProjectId
   closeMenu: (event: React.SyntheticEvent<Element, Event>) => void
   className?: string
+  onClick?: any
 }
 
 const submenuAnchorOrigin = { vertical: 'top', horizontal: 'right' } as const
 const MediaFilesMenuItem = ({
   mediaFile,
-  selected,
   currentProjectId,
   closeMenu: closeSupermenu,
   className,
+  autoFocus,
+  onClick,
 }: MediaFileMenuItemProps) => {
   const dispatch = useDispatch()
 
@@ -85,18 +88,13 @@ const MediaFilesMenuItem = ({
     fileAvailability: r.getFileAvailability(state, mediaFile),
   }))
   const needsFilePath = !fileAvailability.filePath
-  useEffect(
-    () => {
-      if (selected && submenu.anchorEl) submenu.anchorEl.scrollIntoView()
-    },
-    [submenu.anchorEl, selected]
-  )
 
   const actionsButton = (
     <ListItemSecondaryAction>
       <IconButton
         onClick={e => {
           e.stopPropagation()
+          onClick && onClick(e)
           submenu.toggle(e)
         }}
         buttonRef={submenu.anchorCallbackRef}
@@ -106,62 +104,72 @@ const MediaFilesMenuItem = ({
     </ListItemSecondaryAction>
   )
 
+  const onCloseSubmenu = useCallback(
+    e => {
+      e.stopPropagation()
+      closeSubmenu(e)
+    },
+    [closeSubmenu]
+  )
+
+  const stopPropagation = useCallback(e => {
+    e.stopPropagation()
+  }, [])
+
   return (
-    <MenuItem
-      dense
-      key={mediaFile.id}
-      selected={selected}
-      onClick={loadAndClose}
-      className={className}
-    >
-      <ListItemText
-        title={mediaFile.name}
-        className={css.mediaFilesMenuListItemText}
+    <>
+      <MenuItem
+        dense
+        tabIndex={0}
+        key={mediaFile.id}
+        autoFocus={autoFocus}
+        onClick={loadAndClose}
+        className={className}
       >
-        {truncate(mediaFile.name, 40)}
-      </ListItemText>
-      <Menu
-        open={submenu.isOpen}
-        anchorEl={submenu.anchorEl}
-        anchorOrigin={submenuAnchorOrigin}
-        onClose={useCallback(
-          e => {
-            e.stopPropagation()
-            closeSubmenu(e)
-          },
-          [closeSubmenu]
+        <ListItemText
+          title={mediaFile.name}
+          className={css.mediaFilesMenuListItemText}
+        >
+          {truncate(mediaFile.name, 40)}
+        </ListItemText>
+        {needsFilePath ? (
+          <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
+        ) : (
+          <Tooltip title="More actions">{actionsButton}</Tooltip>
         )}
-        onClick={useCallback(e => {
-          e.stopPropagation()
-        }, [])}
-      >
-        <MenuList>
-          <MenuItem dense onClick={loadAndClose}>
-            <ListItemIcon>
-              <PlayArrow />
-            </ListItemIcon>
-            <ListItemText>Open</ListItemText>
-          </MenuItem>
-          <MenuItem dense onClick={deleteAndClose}>
-            <ListItemIcon>
-              <DeleteIcon />
-            </ListItemIcon>
-            <ListItemText>Delete</ListItemText>
-          </MenuItem>
-          <MenuItem dense onClick={locateAndClose}>
-            <ListItemIcon>
-              <FolderSpecial />
-            </ListItemIcon>
-            <ListItemText>Manually locate in file system</ListItemText>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-      {needsFilePath ? (
-        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
-      ) : (
-        actionsButton
-      )}
-    </MenuItem>
+        {submenu.isOpen && (
+          <Menu
+            autoFocus
+            onKeyDown={stopPropagation}
+            onKeyPress={stopPropagation}
+            open={submenu.isOpen}
+            anchorEl={submenu.anchorEl}
+            anchorOrigin={submenuAnchorOrigin}
+            onClose={onCloseSubmenu}
+            onClick={stopPropagation}
+          >
+            <MenuItem dense onClick={loadAndClose}>
+              <ListItemIcon>
+                <PlayArrow />
+              </ListItemIcon>
+              <ListItemText>Open</ListItemText>
+            </MenuItem>
+            <MenuItem dense onClick={deleteAndClose}>
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText>Delete</ListItemText>
+            </MenuItem>
+            <MenuItem dense onClick={locateAndClose}>
+              <ListItemIcon>
+                <FolderSpecial />
+              </ListItemIcon>
+              <ListItemText>Manually locate in file system</ListItemText>
+            </MenuItem>
+          </Menu>
+        )}
+      </MenuItem>
+    </>
   )
 }
 

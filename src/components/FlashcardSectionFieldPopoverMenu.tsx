@@ -110,7 +110,12 @@ const FieldMenuItem = ({
     [dispatch, selected, trackId, fieldName, mediaFileId, closeMenu]
   )
   return (
-    <MenuItem onClick={handleClick} selected={selected} className={$.menuItem}>
+    <MenuItem
+      onClick={handleClick}
+      selected={selected}
+      className={$.menuItem}
+      tabIndex={0}
+    >
       {label}
     </MenuItem>
   )

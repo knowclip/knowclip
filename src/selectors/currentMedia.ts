@@ -132,9 +132,9 @@ export const getCurrentProjectMediaFiles = (
 ): Array<MediaFile> => {
   const projectMetadata = getCurrentProject(state)
   return projectMetadata
-    ? projectMetadata.mediaFileIds.map(
-        id => getFile<MediaFile>(state, 'MediaFile', id) as MediaFile
-      )
+    ? projectMetadata.mediaFileIds
+        .map(id => getFile<MediaFile>(state, 'MediaFile', id))
+        .filter((media): media is MediaFile => Boolean(media))
     : []
 }
 
