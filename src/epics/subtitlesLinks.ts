@@ -75,13 +75,11 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
 
         for (const clip of r.getClips(state$.value, action.mediaFileId)) {
           const {
-            [action.flashcardFieldName]: newValue,
+            [action.flashcardFieldName as TransliterationFlashcardFieldName]: newValue,
           } = r.getNewFieldsFromLinkedSubtitles(
             state$.value,
-            currentNoteType,
             clip
           ) as TransliterationFlashcardFields
-
           const newFields = { [action.flashcardFieldName]: newValue.trim() }
           if (action.fieldToClear) newFields[action.fieldToClear] = ''
 
@@ -96,7 +94,7 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       })
     )
 
-export const newClipFromChunk: AppEpic = (
+export const newClipFromChunkOnEdit: AppEpic = (
   action$,
   state$,
   { setCurrentTime }
@@ -105,53 +103,47 @@ export const newClipFromChunk: AppEpic = (
     flatMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
-        const overlapped = r
-          .getCurrentFileClips(state$.value)
-          .find(clip =>
-            r.overlapsSignificantly(
-              selection.item,
-              clip.start,
-              clip.end,
-              r.getHalfSecond(state$.value)
-            )
-          )
-        if (overlapped) {
-          // TODO: show in UI that plus button will not create new card in this case
-          setCurrentTime(overlapped.start)
-          return from([r.startEditingCards()])
-        }
-
-        const mediaFileId = r.getCurrentFileId(state$.value)
-        if (!mediaFileId) return empty()
-        const cardBases = r.getSubtitlesCardBases(state$.value)
-        const fieldsToTracks = r.getSubtitlesFlashcardFieldLinks(state$.value)
-        const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
-          cardBases.cards[selection.item.index]
-        )
-        const fields = {} as TransliterationFlashcardFields
-        for (const fieldName of cardBases.fieldNames) {
-          const trackId = fieldsToTracks[fieldName]
-          const text = trackId && tracksToFieldsText[trackId]
-          fields[fieldName] = text || ''
-        }
-        const { clip, flashcard } = r.getNewClipAndCard(
-          state$.value,
-          { start: selection.item.start, end: selection.item.end },
-          mediaFileId,
-          uuid(),
-          fields
-        )
-
-        setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
-
-        return from([r.addClip(clip, flashcard, true)])
+        return of(r.newClipFromSubtitlesChunk(selection))
       }
       return empty()
     })
   )
 
+export const newClipFromChunk: AppEpic = (
+  action$,
+  state$,
+  { setCurrentTime }
+) =>
+  action$
+    .ofType<NewCardFromSubtitlesRequest>(A.NEW_CARD_FROM_SUBTITLES_REQUEST)
+    .pipe(
+      flatMap(action => {
+        const selection = action.linkedSubtitlesChunkSelection
+
+        const mediaFileId = r.getCurrentFileId(state$.value)
+        if (!mediaFileId) return empty()
+        const cardBases = r.getSubtitlesCardBases(state$.value)
+
+        const { clip, flashcard } = r.getNewClipAndCard(
+          state$.value,
+          { start: selection.item.start, end: selection.item.end },
+          mediaFileId,
+          uuid(),
+          r.getNewFieldsFromLinkedSubtitles(
+            state$.value,
+            cardBases.cards[selection.item.index]
+          )
+        )
+
+        setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
+
+        return from([r.addClip(clip, flashcard, true)])
+      })
+    )
+
 export default combineEpics(
   linkFieldToTrackRequest,
   linkFieldToTrack,
-  newClipFromChunk
+  newClipFromChunk,
+  newClipFromChunkOnEdit
 )

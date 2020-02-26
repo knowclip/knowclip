@@ -9,7 +9,7 @@ import {
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { setCursorX } from '../utils/waveform'
-import { dispatch } from 'rxjs/internal/observable/range'
+import { WaveformSelectionExpanded } from '../selectors'
 
 enum $ {
   container = 'waveform-container',
@@ -183,127 +183,135 @@ const Clips = React.memo(
 
 const SUBTITLES_CHUNK_HEIGHT = 14
 
-const SubtitlesChunk = ({
-  chunk,
-  trackOffsetY,
-  chunkIndex,
-  trackId,
-}: {
-  chunk: SubtitlesChunk
-  trackOffsetY: number
-  chunkIndex: number
-  trackId: string
-}) => {
-  const clipPathId = `${trackId}__${chunkIndex}`
-  const width = chunk.end - chunk.start
+const SubtitlesChunk = React.memo(
+  ({
+    chunk,
+    trackOffsetY,
+    chunkIndex,
+    trackId,
+  }: {
+    chunk: SubtitlesChunk
+    trackOffsetY: number
+    chunkIndex: number
+    trackId: string
+  }) => {
+    const clipPathId = `${trackId}__${chunkIndex}`
+    const width = chunk.end - chunk.start
 
-  const rect = {
-    x: chunk.start,
-    y: WAVEFORM_HEIGHT + trackOffsetY * SUBTITLES_CHUNK_HEIGHT,
-    width: width,
-    height: SUBTITLES_CHUNK_HEIGHT,
+    const rect = {
+      x: chunk.start,
+      y: WAVEFORM_HEIGHT + trackOffsetY * SUBTITLES_CHUNK_HEIGHT,
+      width: width,
+      height: SUBTITLES_CHUNK_HEIGHT,
+    }
+
+    const clickDataProps = {
+      'data-track-id': trackId,
+      'data-chunk-index': chunkIndex,
+      'data-chunk-start': chunk.start,
+    }
+
+    return (
+      <g className={css.subtitlesChunk} {...clickDataProps}>
+        <clipPath id={clipPathId}>
+          <rect {...rect} width={width - 10} />
+        </clipPath>
+        <rect
+          className={css.subtitlesChunkRectangle}
+          {...clickDataProps}
+          {...rect}
+          rx={SUBTITLES_CHUNK_HEIGHT / 2}
+        />
+        <text
+          clipPath={`url(#${clipPathId})`}
+          {...clickDataProps}
+          className={css.subtitlesText}
+          x={chunk.start + 6}
+          y={(trackOffsetY + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
+        >
+          {chunk.text}
+        </text>
+      </g>
+    )
   }
+)
 
-  const clickDataProps = {
-    'data-track-id': trackId,
-    'data-chunk-index': chunkIndex,
-    'data-chunk-start': chunk.start,
-  }
+const LinkedSubtitlesChunk = React.memo(
+  ({
+    cardBase,
+    index,
+    getFieldsPreview,
+    linkedTrackIds,
+    isSelected,
+    tracksCount,
+  }: {
+    cardBase: r.SubtitlesCardBase
+    index: number
+    getFieldsPreview: (base: r.SubtitlesCardBase) => Dict<string, string>
+    linkedTrackIds: SubtitlesTrackId[]
+    isSelected: boolean
+    tracksCount: number
+  }) => {
+    const clipPathId = `linkedSubtitles_${cardBase.start}`
+    const width = cardBase.end - cardBase.start
 
-  return (
-    <g className={css.subtitlesChunk} {...clickDataProps}>
-      <clipPath id={clipPathId}>
-        <rect {...rect} width={width - 10} />
-      </clipPath>
-      <rect
-        className={css.subtitlesChunkRectangle}
-        {...clickDataProps}
-        {...rect}
-        rx={SUBTITLES_CHUNK_HEIGHT / 2}
-      />
-      <text
-        clipPath={`url(#${clipPathId})`}
-        {...clickDataProps}
-        className={css.subtitlesText}
-        x={chunk.start + 6}
-        y={(trackOffsetY + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
-      >
-        {chunk.text}
-      </text>
-    </g>
-  )
-}
+    const fieldsPreview = getFieldsPreview(cardBase)
 
-const LinkedSubtitlesChunk = ({
-  cardBase,
-  index,
-  fieldsPreview,
-  linkedFieldNames,
-  linkedTrackIds,
-  isSelected,
-}: {
-  cardBase: r.SubtitlesCardBase
-  index: number
-  fieldsPreview: Dict<string, string>
-  linkedFieldNames: TransliterationFlashcardFieldName[]
-  linkedTrackIds: SubtitlesTrackId[]
-  isSelected: boolean
-}) => {
-  const clipPathId = `linkedSubtitles_${cardBase.start}`
-  const width = cardBase.end - cardBase.start
+    const rect = {
+      x: cardBase.start,
+      y: WAVEFORM_HEIGHT,
+      width: width,
+      height: SUBTITLES_CHUNK_HEIGHT * tracksCount,
+    }
 
-  const rect = {
-    x: cardBase.start,
-    y: WAVEFORM_HEIGHT,
-    width: width,
-    height: SUBTITLES_CHUNK_HEIGHT * linkedFieldNames.length,
-  }
+    const clickDataProps = {
+      'data-track-id': linkedTrackIds[0],
+      'data-chunk-index': index,
+      'data-chunk-start': cardBase.start,
+    }
 
-  const clickDataProps = {
-    'data-track-id': linkedTrackIds[0],
-    'data-chunk-index': index,
-    'data-chunk-start': cardBase.start,
-  }
-
-  return (
-    <g className={css.subtitlesChunk} {...clickDataProps}>
-      <clipPath id={clipPathId}>
-        <rect {...rect} width={width - 10} />
-      </clipPath>
-      <rect
-        className={cn(css.subtitlesChunkRectangle, {
-          [css.selectedSubtitlesChunk]: isSelected,
+    return (
+      <g className={css.subtitlesChunk} {...clickDataProps}>
+        <clipPath id={clipPathId}>
+          <rect {...rect} width={width - 10} />
+        </clipPath>
+        <rect
+          className={cn(css.subtitlesChunkRectangle, {
+            [css.selectedSubtitlesChunk]: isSelected,
+          })}
+          {...clickDataProps}
+          {...rect}
+          rx={SUBTITLES_CHUNK_HEIGHT / 2}
+        />
+        {linkedTrackIds.map((id, i) => {
+          const i1 = 1 + i
+          return (
+            <text
+              key={id + i}
+              clipPath={`url(#${clipPathId})`}
+              className={css.subtitlesText}
+              x={cardBase.start + 6}
+              y={i1 * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
+              {...clickDataProps}
+            >
+              {fieldsPreview[id]}
+            </text>
+          )
         })}
-        {...clickDataProps}
-        {...rect}
-        rx={SUBTITLES_CHUNK_HEIGHT / 2}
-      />
-      {linkedTrackIds.map((id, i) => {
-        const i1 = 1 + i
-        return (
-          <text
-            key={id + i}
-            clipPath={`url(#${clipPathId})`}
-            className={css.subtitlesText}
-            x={cardBase.start + 6}
-            y={i1 * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
-            {...clickDataProps}
-          >
-            {fieldsPreview[id]}
-          </text>
-        )
-      })}
-    </g>
-  )
-}
+      </g>
+    )
+  }
+)
 
 const SubtitlesTimelines = memo(
   ({
     subtitles,
+    waveformItems,
     goToSubtitlesChunk,
     highlightedChunkIndex,
   }: {
     subtitles: r.SubtitlesCardBases
+    waveformItems: WaveformSelectionExpanded[]
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
     highlightedChunkIndex: number | null
   }) => {
@@ -330,16 +338,21 @@ const SubtitlesTimelines = memo(
     const handleDoubleClick = useCallback(
       e => {
         const { dataset } = e.target
-
         if (dataset && dataset.chunkIndex) {
-          // this selects the wrong thing sometimes!
-          // dispatch(r.setWaveformCursor(dataset.chunkStart))
-          // dispatch(r.startEditingCards())
+          const item = waveformItems.find(
+            i => i.type === 'Preview' && i.cardBaseIndex === +dataset.chunkIndex
+          )
+          if (item) dispatch(r.newClipFromSubtitlesChunk(item))
         }
       },
-      [dispatch]
+      [dispatch, waveformItems]
     )
-
+    console.log({
+      subtitles,
+      waveformItems,
+      goToSubtitlesChunk,
+      highlightedChunkIndex,
+    })
     return (
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
@@ -353,9 +366,9 @@ const SubtitlesTimelines = memo(
               key={'linked' + i}
               cardBase={c}
               index={i}
-              linkedFieldNames={subtitles.fieldNames}
+              tracksCount={subtitles.fieldNames.length}
               linkedTrackIds={subtitles.linkedTrackIds}
-              fieldsPreview={subtitles.getFieldsPreviewFromCardsBase(c)}
+              getFieldsPreview={subtitles.getFieldsPreviewFromCardsBase}
               isSelected={highlightedChunkIndex === i}
             />
           )
@@ -392,6 +405,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     highlightedClipId,
     subtitles,
     highlightedChunkIndex,
+    waveformItems,
   } = useSelector((state: AppState) => ({
     waveform: r.getWaveform(state),
     path: r.getWaveformPath(state),
@@ -401,6 +415,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     highlightedClipId: r.getHighlightedClipId(state),
     subtitles: r.getSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
+    waveformItems: r.getWaveformItems(state),
   }))
 
   const dispatch = useDispatch()
@@ -504,6 +519,7 @@ const Waveform = ({ show }: { show: boolean }) => {
           subtitles={subtitles}
           goToSubtitlesChunk={goToSubtitlesChunk}
           highlightedChunkIndex={highlightedChunkIndex}
+          waveformItems={waveformItems}
         />
       )}
       <Cursor x={cursor.x} height={height} />

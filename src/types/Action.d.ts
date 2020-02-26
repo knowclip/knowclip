@@ -17,6 +17,7 @@ declare type Action =
   | SetProgress
   | StartEditingCards
   | StopEditingCards
+  | NewCardFromSubtitlesRequest
 
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
 
@@ -38,6 +39,11 @@ declare type StartEditingCards = {
 }
 declare type StopEditingCards = {
   type: 'STOP_EDITING_CARDS'
+}
+
+declare type NewCardFromSubtitlesRequest = {
+  type: 'NEW_CARD_FROM_SUBTITLES_REQUEST'
+  linkedSubtitlesChunkSelection: WaveformSelectionExpanded
 }
 
 declare type ClipAction =

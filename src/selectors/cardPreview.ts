@@ -3,6 +3,7 @@ import {
   getSubtitlesFlashcardFieldLinks,
   overlapsSignificantly,
 } from './subtitles'
+import { getCurrentMediaFile } from './currentMedia'
 
 export type SubtitlesCardBase = {
   fields: Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
@@ -30,8 +31,12 @@ export type WaveformSelectionExpanded =
 
 const getSubtitlesCardBaseFieldPriority = createSelector(
   getSubtitlesFlashcardFieldLinks,
-  links => {
-    return CUES_BASE_PRIORITY.filter(fieldName => Boolean(links[fieldName]))
+  (state: AppState) => state.subtitles,
+  (links, subtitles) => {
+    return CUES_BASE_PRIORITY.filter(fieldName => {
+      const trackId = links[fieldName]
+      return Boolean(trackId && subtitles[trackId])
+    })
   }
 )
 
@@ -49,22 +54,25 @@ export type SubtitlesCardBases = {
 export const getSubtitlesCardBases = createSelector(
   (state: AppState) => state.waveform,
   (state: AppState) => state.subtitles,
+  getCurrentMediaFile,
   getSubtitlesFlashcardFieldLinks,
   getSubtitlesCardBaseFieldPriority,
   (
     waveform,
     subtitles,
+    currentFile,
     fieldsToTracks,
     fieldsCuePriority
   ): SubtitlesCardBases => {
     const [cueField] = fieldsCuePriority
     const cueTrackId = cueField && fieldsToTracks[cueField]
     const cueTrack = cueTrackId && subtitles[cueTrackId]
+    const totalTracksCount = currentFile ? currentFile.subtitles.length : 0
     if (!cueTrack)
       return {
-        totalTracksCount: Object.values(subtitles).length,
+        totalTracksCount,
         cards: [],
-        fieldNames: [],
+        fieldNames: fieldsCuePriority,
         linkedTrackIds: [],
         excludedTracks: Object.values(subtitles),
         getFieldsPreviewFromCardsBase: () => ({}),
@@ -126,7 +134,7 @@ export const getSubtitlesCardBases = createSelector(
     )
 
     return {
-      totalTracksCount: Object.values(subtitles).length,
+      totalTracksCount,
       cards,
       fieldNames: fieldsCuePriority,
       linkedTrackIds: fieldsCuePriority

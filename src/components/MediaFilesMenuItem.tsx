@@ -1,15 +1,13 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   IconButton,
   Tooltip,
   MenuItem,
-  MenuList,
   ListItemText,
   ListItemIcon,
   ListItemSecondaryAction,
   Menu,
-  ListItem,
 } from '@material-ui/core'
 import {
   Delete as DeleteIcon,

@@ -28,13 +28,15 @@ const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
 const centerSelectedClip: AppEpic = (
   action$,
   state$,
-  { getWaveformSvgElement }
+  { getWaveformSvgElement, getCurrentTime }
 ) =>
   action$.pipe(
     ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
     switchMap(action => {
       const selection = r.getWaveformSelection(state$.value)
       const clip = selection && selection.item
+
+      if (!(window as any).seeking) return empty()
 
       if (!clip) return empty()
       const svgElement = getWaveformSvgElement()

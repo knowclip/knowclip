@@ -1,7 +1,15 @@
 import { createSelector } from 'reselect'
 import { getSubtitlesCardBases, WaveformSelectionExpanded } from './cardPreview'
-import { getCurrentFileClips } from './currentMedia'
-import { overlapsSignificantly } from './subtitles'
+import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
+import {
+  overlapsSignificantly,
+  getSubtitlesFlashcardFieldLinks,
+} from './subtitles'
+import { TransliterationFlashcardFields } from '../types/Project'
+import {
+  blankSimpleFields,
+  blankTransliterationFields,
+} from '../utils/newFlashcard'
 
 export const getHalfSecond = ({ waveform }: AppState) =>
   (waveform.stepsPerSecond * waveform.stepLength) / 2
@@ -108,4 +116,31 @@ export const getNewWaveformSelectionAt = (
       ({ item }) => x >= item.start && x <= item.end
     ) || null
   )
+}
+
+export const getBlankFields = (state: AppState) =>
+  getCurrentNoteType(state) === 'Simple'
+    ? blankSimpleFields
+    : blankTransliterationFields
+
+export const getNewFieldsFromLinkedSubtitles = (
+  state: AppState,
+  { start, end }: PendingClip
+): FlashcardFields => {
+  const subs = getSubtitlesCardBases(state)
+
+  const cardBase = subs.cards.find(c =>
+    overlapsSignificantly(c, start, end, getHalfSecond(state))
+  )
+  const fieldsToTracks = getSubtitlesFlashcardFieldLinks(state)
+  const tracksToFieldsText = cardBase
+    ? subs.getFieldsPreviewFromCardsBase(cardBase)
+    : null
+  const fields = { ...getBlankFields(state) } as TransliterationFlashcardFields
+  for (const fieldName of subs.fieldNames) {
+    const trackId = fieldsToTracks[fieldName]
+    const text = trackId && tracksToFieldsText && tracksToFieldsText[trackId]
+    fields[fieldName] = text || ''
+  }
+  return fields
 }

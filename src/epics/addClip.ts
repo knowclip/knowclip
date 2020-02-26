@@ -74,10 +74,7 @@ const addClipEpic: AppEpic = (
             r.getClipIdAt(state$.value, pendingClip.start),
             r.getClipIdAt(state$.value, pendingClip.end),
           ].some(id => id && clipsOrder.includes(id))
-          const currentNoteType = r.getCurrentNoteType(state$.value)
           const currentFileId = r.getCurrentFileId(state$.value)
-          if (!currentNoteType)
-            throw new Error('Could not find current file id') // necessary?
           if (!currentFileId)
             throw new Error('Could not find current note type')
 
@@ -97,7 +94,6 @@ const addClipEpic: AppEpic = (
 
           const fields = r.getNewFieldsFromLinkedSubtitles(
             state$.value,
-            currentNoteType,
             pendingClip
           )
           const { clip, flashcard } = r.getNewClipAndCard(

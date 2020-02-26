@@ -35,6 +35,13 @@ const Media = ({
 }: MediaProps) => {
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
 
+  const seekOn = useCallback(e => {
+    ;(window as any).seeking = true
+  }, [])
+  const seekOff = useCallback(e => {
+    ;(window as any).seeking = false
+  }, [])
+
   const setUpBlur = useCallback(e => {
     setClicked(true)
     if (mediaRef.current) mediaRef.current.blur()
@@ -61,6 +68,9 @@ const Media = ({
     src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',
     // @ts-ignore
     playbackspeed: 1,
+
+    onSeeking: seekOn,
+    onSeeked: seekOff,
 
     // prevent accidental scrub after play/pause with mouse
     onMouseEnter: setUpBlur,

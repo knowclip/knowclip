@@ -21,7 +21,7 @@ export default async function makeFlashcardsWithSubtitles({
   await client.waitForHidden_(waveform$.waveformClip)
 
   await waveformMouseDrag(app, client, 589, 824)
-  await client.elements_(waveform$.waveformClip, 4)
+  await client.waitForText_(flashcardSection$.container, '3 / 4')
 
   const [, , meaningFieldButton] = await client.elements_(
     flashcardFieldMenu$.openMenuButton,

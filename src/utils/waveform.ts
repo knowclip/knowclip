@@ -20,6 +20,7 @@ export const moveCursorRight = (increment: number) => {
 
 let animationFrame: number
 let lastTime: number | null = null
+;(window as any).seeking = false
 
 export const moveCursorRightTime = (time: number) => {
   if (lastTime == null) lastTime = time
@@ -27,7 +28,7 @@ export const moveCursorRightTime = (time: number) => {
 
   lastTime = time
 
-  moveCursorRight(incrementPerMs * elapsed)
+  if (!(window as any).seeking) moveCursorRight(incrementPerMs * elapsed)
 
   animationFrame = requestAnimationFrame(moveCursorRightTime)
 }
