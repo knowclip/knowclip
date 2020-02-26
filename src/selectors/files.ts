@@ -61,7 +61,9 @@ export const getWaveformPath = (state: AppState): string | null => {
     'WaveformPng',
     currentMediaFile.id
   )
-  return waveformFile ? waveformFile.filePath : null
+  return waveformFile && waveformFile.status === 'CURRENTLY_LOADED'
+    ? waveformFile.filePath
+    : null
 }
 
 export const getFileDescendants = (

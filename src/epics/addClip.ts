@@ -5,8 +5,9 @@ import {
   takeLast,
   take,
   switchMap,
+  flatMap,
 } from 'rxjs/operators'
-import { fromEvent, merge } from 'rxjs'
+import { fromEvent, merge, of } from 'rxjs'
 import * as r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
@@ -66,17 +67,14 @@ const addClipEpic: AppEpic = (
 
       const pendingClipEnds = pendingClips.pipe(
         takeLast(1),
-        map(pendingClipAction => {
+        flatMap(pendingClipAction => {
           const { clip: pendingClip } = pendingClipAction
           const clipsOrder = r.getCurrentFileClipsOrder(state$.value)
           const pendingClipOverlaps = [
             r.getClipIdAt(state$.value, pendingClip.start),
             r.getClipIdAt(state$.value, pendingClip.end),
           ].some(id => id && clipsOrder.includes(id))
-          const currentNoteType = r.getCurrentNoteType(state$.value)
           const currentFileId = r.getCurrentFileId(state$.value)
-          if (!currentNoteType)
-            throw new Error('Could not find current file id') // necessary?
           if (!currentFileId)
             throw new Error('Could not find current note type')
 
@@ -89,23 +87,29 @@ const addClipEpic: AppEpic = (
               ? Math.max(pendingClip.start, pendingClip.end)
               : Math.min(pendingClip.start, pendingClip.end)
           )
-          setCurrentTime(newTime)
+          if (!tooSmall) setCurrentTime(newTime)
 
           // maybe later, do stretch + merge for overlaps.
-          if (tooSmall) return r.clearPendingClip()
+          if (tooSmall) return of(r.clearPendingClip())
 
+          const fields = r.getNewFieldsFromLinkedSubtitles(
+            state$.value,
+            pendingClip
+          )
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
             pendingClip,
             currentFileId,
             uuid(),
-            r.getNewFieldsFromLinkedSubtitles(
-              state$.value,
-              currentNoteType,
-              pendingClip
+            fields
+          )
+          return of(
+            r.addClip(
+              clip,
+              flashcard,
+              !Object.values(fields).some(fieldValue => fieldValue.trim())
             )
           )
-          return r.addClip(clip, flashcard)
         })
       )
       return merge(pendingClips, pendingClipEnds)

@@ -1,9 +1,14 @@
 import { DeepPartial } from 'redux'
 
-export const addClip = (clip: Clip, flashcard: Flashcard): ClipAction => ({
+export const addClip = (
+  clip: Clip,
+  flashcard: Flashcard,
+  startEditing: boolean = false
+): AddClip => ({
   type: A.ADD_CLIP,
   clip,
   flashcard,
+  startEditing,
 })
 
 export const addClips = (
@@ -29,16 +34,6 @@ export const clearWaveformSelection = (): SelectWaveformItem => ({
   selection: null,
 })
 
-export const highlightClip = (id: ClipId): SelectWaveformItem => ({
-  type: A.SELECT_WAVEFORM_ITEM,
-  selection: { type: 'Clip', id },
-})
-
-export const highlightSubtitles = (index: number): SelectWaveformItem => ({
-  type: A.SELECT_WAVEFORM_ITEM,
-  selection: { type: 'Preview', index },
-})
-
 export const highlightLeftClipRequest = (): HighlightLeftClipRequest => ({
   type: A.HIGHLIGHT_LEFT_CLIP_REQUEST,
 })
@@ -56,6 +51,17 @@ export const editClip = (
   id,
   override,
   flashcardOverride,
+})
+
+export const editClips = (
+  edits: {
+    id: ClipId
+    override: DeepPartial<Clip> | null
+    flashcardOverride: DeepPartial<Flashcard> | null
+  }[]
+): EditClips => ({
+  type: A.EDIT_CLIPS,
+  edits,
 })
 
 export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {

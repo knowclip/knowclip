@@ -8,12 +8,6 @@ const elementWidth = (element: Element) => {
   return boundingClientRect.right - boundingClientRect.left
 }
 
-const highlightClipsOnAddEpic: AppEpic = action$ =>
-  action$.pipe(
-    ofType<Action, AddClip>(A.ADD_CLIP),
-    map(({ clip: { id } }) => r.highlightClip(id))
-  )
-
 const selectClipOnStretch: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, EditClip>(A.EDIT_CLIP),
@@ -34,19 +28,17 @@ const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
 const centerSelectedClip: AppEpic = (
   action$,
   state$,
-  { getWaveformSvgElement }
+  { getWaveformSvgElement, getCurrentTime }
 ) =>
   action$.pipe(
     ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
     switchMap(action => {
-      const id =
-        action.selection &&
-        action.selection.type === 'Clip' &&
-        action.selection.id
-      if (!id) return empty()
-      const clip = r.getClip(state$.value, id)
-      if (!clip) return empty()
+      const selection = r.getWaveformSelection(state$.value)
+      const clip = selection && selection.item
 
+      if (!(window as any).seeking) return empty()
+
+      if (!clip) return empty()
       const svgElement = getWaveformSvgElement()
       if (!svgElement) return empty()
       const svgWidth = elementWidth(svgElement)
@@ -54,7 +46,8 @@ const centerSelectedClip: AppEpic = (
       const svgFits = clip.end - clip.start <= svgWidth
       if (!svgFits) return empty()
 
-      const { xMin } = state$.value.waveform.viewBox
+      const { waveform } = state$.value
+      const { xMin } = waveform.viewBox
 
       if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
         return of(
@@ -69,8 +62,10 @@ const centerSelectedClip: AppEpic = (
       if (xMin + svgWidth - clip.end < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
         return of(
           r.setWaveformViewBox({
-            xMin:
+            xMin: Math.min(
               clip.end + HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER - svgWidth,
+              waveform.length - svgWidth
+            ),
           })
         )
 
@@ -98,9 +93,7 @@ const highlightRightEpic: AppEpic = (
       if (!currentFileId) return empty()
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
-      const currentIndex = selection
-        ? waveformItems.indexOf(selection.item)
-        : -1
+      const currentIndex = selection ? selection.index : -1
       const nextIndex = currentIndex !== -1 ? currentIndex + 1 : -1
       if (selection && nextIndex !== -1) {
         const lastIndex = waveformItems.length - 1
@@ -109,7 +102,7 @@ const highlightRightEpic: AppEpic = (
           return setCurrentTime(
             r.getSecondsAtX(
               state$.value,
-              Math.max(next.start, selection.item.end + 1)
+              Math.max(next.item.start, selection.item.end + 1)
             )
           )
       }
@@ -117,9 +110,9 @@ const highlightRightEpic: AppEpic = (
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
       const next =
-        waveformItems.find(({ start }) => start >= x) || waveformItems[0]
+        waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
 
-      if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.start))
+      if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
     }),
     ignoreElements()
   )
@@ -148,7 +141,7 @@ const highlightLeftEpic: AppEpic = (
       const selection = r.getWaveformSelection(state)
 
       if (selection) {
-        const highlightedIndex = waveformItems.indexOf(selection.item)
+        const highlightedIndex = selection.index
         const prev =
           waveformItems[
             highlightedIndex === 0
@@ -157,21 +150,20 @@ const highlightLeftEpic: AppEpic = (
           ]
 
         if (prev)
-          return setCurrentTime(r.getSecondsAtX(state$.value, prev.start))
+          return setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
       }
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
       const prev =
-        findLast(waveformItems, ({ end }) => end <= x) ||
+        findLast(waveformItems, ({ item }) => item.end <= x) ||
         waveformItems[waveformItems.length - 1]
 
-      if (prev) setCurrentTime(r.getSecondsAtX(state$.value, prev.start))
+      if (prev) setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
     }),
     ignoreElements()
   )
 
 export default combineEpics(
-  highlightClipsOnAddEpic,
   selectClipOnStretch,
   centerSelectedClip,
   deselectOnOpenMediaFile,

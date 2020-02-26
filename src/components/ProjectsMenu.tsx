@@ -45,10 +45,16 @@ const ProjectMenuItem = ({
     () => dispatch(actions.openProjectById(availability.id)),
     [dispatch, availability.id]
   )
+
+  const stopPropagation = useCallback(e => {
+    e.stopPropagation()
+  }, [])
+
   return (
     <Fragment>
       {isOpen && (
         <Menu
+          onKeyDown={stopPropagation}
           open={isOpen}
           onClose={close}
           anchorEl={anchorEl}
@@ -57,7 +63,11 @@ const ProjectMenuItem = ({
           <MenuItem onClick={removeFromRecents}>Remove from recents</MenuItem>
         </Menu>
       )}
-      <MenuItem onClick={openProjectById} className={$.recentProjectsListItem}>
+      <MenuItem
+        tabIndex={0}
+        onClick={openProjectById}
+        className={$.recentProjectsListItem}
+      >
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText
             primary={availability.name}

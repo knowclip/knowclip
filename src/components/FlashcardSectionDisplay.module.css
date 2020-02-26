@@ -1,0 +1,94 @@
+
+.previewFieldMenuButton {
+  opacity: 0;
+  padding: 0 0.2em !important;
+}
+
+.previewField:focus .previewFieldMenuButton,
+.previewField:hover .previewFieldMenuButton,
+.previewFieldMenuButton:focus {
+  opacity: 1;
+}
+
+.container {
+  margin-top: 2rem;
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+}
+
+.preview {
+  color: #777;
+}
+
+.horizontalPreview {
+  margin-top: 0;
+  font-size: 18px;
+}
+.previewFields {
+  flex-grow: 1;
+}
+.previewField {
+  position: relative;
+  width: 100%;
+  min-height: 3rem;
+  margin: 2rem 0;
+  line-height: 2;
+  white-space: pre-wrap;
+}
+.horizontalPreview .previewField {
+  margin: 0;
+}
+
+.previewFieldTranscription {
+  font-size: 1.2em;
+}
+.previewFieldPronunciation {
+  font-style: italic;
+}
+.previewFieldNotes {
+  min-width: 15em;
+  background-color: #efefef;
+  padding: .8em;
+  border-radius: .2em;
+  text-align: justify;
+  max-width: 40em;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  
+}
+.previewFieldWithPopover.previewFieldNotes{
+  text-indent: -1em;
+}
+.emptyFieldPlaceholder {
+  font-size: 16px;
+  font-style: italic;
+  opacity: .5;
+}
+.newlinePlaceholder {
+  white-space: pre;
+  display: inline-block
+}
+.newlinePlaceholder::before {
+  content: '⏎';
+  width: 0;
+  color: #ccc;
+}
+.previewFieldNotes .newlinePlaceholder {
+  display: inline
+}
+.previewFieldNotes .newlinePlaceholder::before {
+  content: none;
+}
+
+.previewTags {
+  padding: 1rem;
+  font-size: .8rem;
+}
+
+.menu {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+}

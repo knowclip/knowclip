@@ -1,4 +1,4 @@
-import { fromEvent, Observable, of, from, empty } from 'rxjs'
+import { fromEvent, Observable, of, from } from 'rxjs'
 import {
   startWith,
   filter,
@@ -7,10 +7,12 @@ import {
   ignoreElements,
   flatMap,
 } from 'rxjs/operators'
-import { setWaveformCursor, setWaveformViewBox } from '../actions'
+import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
+import { setCursorX } from '../utils/waveform'
+import { overlapsSignificantly } from '../selectors'
 
 let seeking = false
 
@@ -33,10 +35,24 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           const newlyUpdatedTime = effects.getCurrentTime()
 
           const selection = r.getWaveformSelection(state)
-          const newSelection = r.getNewWaveformSelectionAt(
+          const possibleNewSelection = r.getNewWaveformSelectionAt(
             state,
             r.getXAtMilliseconds(state, newlyUpdatedTime * 1000)
           )
+          const newSelection =
+            selection &&
+            selection.type === 'Clip' &&
+            possibleNewSelection &&
+            possibleNewSelection.type === 'Preview'
+              ? overlapsSignificantly(
+                  possibleNewSelection.item,
+                  selection.item.start,
+                  selection.item.end,
+                  r.getHalfSecond(state$.value)
+                )
+                ? null
+                : possibleNewSelection
+              : possibleNewSelection
 
           const wasSeeking = seeking
           seeking = false
@@ -53,7 +69,8 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
               selection.item.start
             )
             effects.setCurrentTime(selectionStartTime)
-            return empty()
+            setCursorX(selection.item.start)
+            return of(setWaveformCursor(selection.item.start))
           }
 
           const setViewboxAction = setViewBox(
@@ -89,8 +106,6 @@ const setViewBox = (
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean
 ) => {
-  console.log({ seeking })
-
   const viewBox = state.waveform.viewBox
 
   const newX = Math.round(newlySetTime * 50)

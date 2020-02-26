@@ -33,7 +33,9 @@ const ConfirmationDialog = ({
 
   return (
     <Dialog open={open}>
-      <DialogContent>{message}</DialogContent>
+      <DialogContent style={{ whiteSpace: 'pre-line' }}>
+        {message}
+      </DialogContent>
       <DialogActions>
         <Button onClick={cancel} id={$.cancelButton} color="primary">
           Cancel

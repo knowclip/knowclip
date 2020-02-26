@@ -5,13 +5,7 @@ import {
   getFileAvailability,
   getFileWithAvailability,
 } from './files'
-import {
-  getFlashcard,
-  getClipsObject,
-  getClipTime,
-  getClipsByIds,
-  getClip,
-} from './clips'
+import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_WIDTH } from './waveform'
@@ -138,9 +132,9 @@ export const getCurrentProjectMediaFiles = (
 ): Array<MediaFile> => {
   const projectMetadata = getCurrentProject(state)
   return projectMetadata
-    ? projectMetadata.mediaFileIds.map(
-        id => getFile<MediaFile>(state, 'MediaFile', id) as MediaFile
-      )
+    ? projectMetadata.mediaFileIds
+        .map(id => getFile<MediaFile>(state, 'MediaFile', id))
+        .filter((media): media is MediaFile => Boolean(media))
     : []
 }
 

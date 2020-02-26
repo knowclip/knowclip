@@ -28,9 +28,12 @@ Object {
               "meaning": "This kid, lazing about again so early",
               "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
               "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
-              "transcription": "またこの子は昼間からゴロゴロして",
+              "transcription": "ちょっと  またこの子は昼間からゴロゴロして",
             },
             "id": "a272b282-4d89-4af0-9d17-baa807793f1f",
+            "image": Object {
+              "type": "VideoStill",
+            },
             "start": "00:15.12",
             "tags": Array [
               "pbc",
@@ -38,6 +41,9 @@ Object {
           },
           Object {
             "end": "01:21.16",
+            "fields": Object {
+              "transcription": "えーと  働かないでお金がもらえる仕事が載っているのはどれですか",
+            },
             "id": "6fce08e8-9312-4930-9601-c14b470e57ab",
             "image": Object {
               "type": "VideoStill",

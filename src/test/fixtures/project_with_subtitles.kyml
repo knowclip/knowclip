@@ -33,14 +33,18 @@ clips:
     start: 00:15.12
     end: 00:17.76
     fields:
-      transcription: またこの子は昼間からゴロゴロして
+      transcription: ちょっと  またこの子は昼間からゴロゴロして
       pronunciation: mata kono ko-wa hirumá-kara góro-goro shite
       meaning: This kid, lazing about again so early
       notes: '"Goro-goro" is the sound of something big rolling around.'
     tags: *a1
+    image:
+      type: VideoStill
   - id: a3a0c3eb-3841-4d2f-851a-5af95cd14855
     start: 01:15.2
     end: 01:21.16
+    fields:
+      transcription: えーと  働かないでお金がもらえる仕事が載っているのはどれですか
     tags: *a1
     image:
       type: VideoStill

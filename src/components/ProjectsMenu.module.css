@@ -1,5 +1,12 @@
 .header {
-  composes: container from './MainHeader.module.css';
+  background-color: #222;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -.5em 0;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 .mainHeading {

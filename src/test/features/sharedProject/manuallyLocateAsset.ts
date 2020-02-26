@@ -3,8 +3,8 @@ import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { waveformMouseDrag } from '../../driver/waveform'
+import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function manuallyLocateAsset({ app, client }: TestSetup) {
   await client.clickElement_(subtitlesMenu$.openMenuButton)
@@ -24,5 +24,5 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
 
   await waveformMouseDrag(app, client, 591, 572)
 
-  await client.waitForText_(flashcardForm$.container, 'ああー  吸わないで')
+  await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
 }

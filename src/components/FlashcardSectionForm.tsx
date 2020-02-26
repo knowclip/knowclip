@@ -1,7 +1,11 @@
 import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
-import { Delete as DeleteIcon, Loop } from '@material-ui/icons'
+import {
+  Delete as DeleteIcon,
+  Loop,
+  ShortTextTwoTone,
+} from '@material-ui/icons'
 import cn from 'classnames'
 import formatTime from '../utils/formatTime'
 import * as r from '../redux'
@@ -16,7 +20,18 @@ enum $ {
   container = 'flashcard-form-container',
   flashcardFields = 'flashcard-field',
   deleteButton = 'delete-clip-button',
+  transcriptionField = 'flashcard-form-transcription',
+  pronunciationField = 'flashcard-form-pronunciation',
+  meaningField = 'flashcard-form-meaning',
+  notesField = 'flashcard-form-notes',
 }
+
+const fieldLabels = {
+  transcription: $.transcriptionField,
+  pronunciation: $.pronunciationField,
+  meaning: $.meaningField,
+  notes: $.notesField,
+} as const
 
 const FIELD_INPUT_PROPS = {
   style: { minHeight: '20px' },
@@ -26,10 +41,12 @@ const FlashcardSectionForm = memo(
   ({
     className,
     mediaFile,
+    autofocusFieldName,
   }: {
     className?: string
     mediaFile: MediaFile
     clipId: ClipId
+    autofocusFieldName: FlashcardFieldName
   }) => {
     const {
       allTags,
@@ -51,7 +68,7 @@ const FlashcardSectionForm = memo(
       viewMode: state.settings.viewMode,
     }))
 
-    if (!selectedClipTime || !flashcard) throw new Error('Clip not found')
+    if (!selectedClipTime || !flashcard) throw new Error('Clip not found') // TODO: DELETE
 
     const { id } = flashcard
 
@@ -87,7 +104,7 @@ const FlashcardSectionForm = memo(
           if (mediaIsPlaying) setInitialFocusComplete(true)
         }
       },
-      [mediaIsPlaying, initialFocus]
+      [mediaIsPlaying, initialFocus, focusRef.current] // eslint-disable-line react-hooks/exhaustive-deps
     )
     const handleFocus = useCallback(
       () => {
@@ -115,6 +132,12 @@ const FlashcardSectionForm = memo(
       },
       [dispatch, id, loopOnInteract]
     )
+    const handleClickPreviewButton = useCallback(
+      () => {
+        dispatch(actions.stopEditingCards())
+      },
+      [dispatch]
+    )
 
     const handleFlashcardSubmit = useCallback(e => {
       e.preventDefault()
@@ -139,6 +162,15 @@ const FlashcardSectionForm = memo(
       (index, text) => dispatch(actions.deleteFlashcardTag(id, index, text)),
       [dispatch, id]
     )
+
+    const fieldProps = {
+      currentFlashcard: flashcard,
+      setFlashcardText: setFlashcardText,
+      subtitles: mediaFile.subtitles,
+      mediaFileId: mediaFile.id,
+      inputProps: FIELD_INPUT_PROPS,
+      onKeyPress: loopOnInteract,
+    }
 
     return (
       <form
@@ -185,19 +217,17 @@ const FlashcardSectionForm = memo(
             getNoteTypeFields(currentNoteType).map((fieldName, i) => (
               <Field
                 key={`${fieldName}_${flashcard.id}`}
-                inputRef={i === 0 ? focusRef : undefined}
+                inputRef={
+                  fieldName === autofocusFieldName ? focusRef : undefined
+                }
                 name={fieldName}
-                currentFlashcard={flashcard}
                 label={capitalize(fieldName)}
-                setFlashcardText={setFlashcardText}
-                subtitles={mediaFile.subtitles}
                 linkedSubtitlesTrack={
                   subtitlesFlashcardFieldLinks[fieldName] || null
                 }
-                mediaFileId={mediaFile.id}
-                inputProps={FIELD_INPUT_PROPS}
-                onKeyPress={loopOnInteract}
                 onFocus={!initialFocus && i === 0 ? () => {} : handleFocus}
+                className={fieldLabels[fieldName]}
+                {...fieldProps}
               />
             ))}
           <TagsInput
@@ -210,9 +240,19 @@ const FlashcardSectionForm = memo(
         </section>
 
         <section className={css.formBottom}>
-          <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Show card preview (Esc)">
+            <IconButton
+              onClick={handleClickPreviewButton}
+              className={css.editButton}
+            >
+              <ShortTextTwoTone />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete clip and card">
+            <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
           <Menu
             anchorEl={moreMenuAnchorEl}
             open={Boolean(moreMenuAnchorEl)}

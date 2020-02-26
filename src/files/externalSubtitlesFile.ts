@@ -26,6 +26,8 @@ export default {
           'MediaFile',
           validatedFile.parentId
         )
+        if (r.getCurrentFileId(state) !== validatedFile.parentId) return []
+
         return [
           ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
             ? [
@@ -38,6 +40,7 @@ export default {
           r.mountSubtitlesTrack(track), // maybe should only do this after linkSubtitlesDialog in case this is first time mounting,
         ]
       } else {
+        if (validatedFile.parentId !== r.getCurrentFileId(state)) return []
         const vttFile = r.getFile(
           state,
           'VttConvertedSubtitlesFile',

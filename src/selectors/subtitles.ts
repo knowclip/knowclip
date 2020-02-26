@@ -1,9 +1,5 @@
 import stripHtml from '../utils/stripHtml'
 import { getXAtMilliseconds } from './waveformTime'
-import {
-  blankSimpleFields,
-  blankTransliterationFields,
-} from '../utils/newFlashcard'
 import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
@@ -243,28 +239,6 @@ export const getSubtitlesFlashcardFieldLinks = (
 ): SubtitlesFlashcardFieldsLinks => {
   const media = getCurrentMediaFile(state)
   return media ? media.flashcardFieldsToSubtitlesTracks : {}
-}
-
-export const getNewFieldsFromLinkedSubtitles = (
-  state: AppState,
-  noteType: NoteType,
-  { start, end }: PendingClip
-): FlashcardFields => {
-  const links = getSubtitlesFlashcardFieldLinks(state)
-  const result =
-    noteType === 'Simple'
-      ? { ...blankSimpleFields }
-      : { ...blankTransliterationFields }
-  for (const fieldName in links) {
-    const coerced = fieldName as FlashcardFieldName
-    const trackId = links[coerced]
-    const chunks = trackId
-      ? getSubtitlesChunksWithinRange(state, trackId, start, end)
-      : []
-    // @ts-ignore
-    result[fieldName] = chunks.map(chunk => chunk.text).join('\n')
-  }
-  return result
 }
 
 type Coords = { start: number; end: number }

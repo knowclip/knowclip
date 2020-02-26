@@ -15,6 +15,7 @@ const initialState: SessionState = {
   loopMedia: false,
   mediaIsPlaying: false,
   progress: null,
+  editingCards: false,
 }
 
 const session: Reducer<SessionState, Action> = (
@@ -42,6 +43,7 @@ const session: Reducer<SessionState, Action> = (
             ...state,
             currentMediaFileId: null,
             waveformSelection: null,
+            editingCards: false,
           }
         : state
 
@@ -67,6 +69,7 @@ const session: Reducer<SessionState, Action> = (
       return {
         ...state,
         pendingClip: null,
+        editingCards: action.startEditing || state.editingCards,
       }
 
     case A.SET_PENDING_CLIP:
@@ -149,25 +152,6 @@ const session: Reducer<SessionState, Action> = (
         tagsToClipIds: newTagsToClipIds,
       }
     }
-    // const prevTags: any = Object.keys(prevTagsToClipIds)
-    // const deletedTags: Array<string> = prevTags.filter(
-    //   tag => !value.includes(tag)
-    // )
-    // const tagsToClipIds = { ...prevTagsToClipIds }
-    // value.forEach(tag => {
-    //   tagsToClipIds[tag] = (tagsToClipIds[tag] || []).concat(id)
-    // })
-    // deletedTags.forEach(tag => {
-    //   tagsToClipIds[tag] = (tagsToClipIds[tag] || []).filter(
-    //     clipId => clipId !== id
-    //   )
-    //   if (!tagsToClipIds[tag].length) delete tagsToClipIds[tag]
-    // })
-
-    // return {
-    //   ...state,
-    //   tagsToClipIds,
-    // }
 
     case A.SET_WORK_IS_UNSAVED:
       return {
@@ -200,6 +184,12 @@ const session: Reducer<SessionState, Action> = (
 
     case A.DISMISS_MEDIA:
       return { ...state, currentMediaFileId: null, waveformSelection: null }
+
+    case A.START_EDITING_CARDS:
+      return { ...state, editingCards: true }
+
+    case A.STOP_EDITING_CARDS:
+      return { ...state, editingCards: false }
 
     default:
       return state

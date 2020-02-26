@@ -2,12 +2,12 @@ import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { flashcardSectionForm$ } from '../../../components/FlashcardSectionForm'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
 import { waveform$ } from '../../../components/Waveform'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeCardsFromSubtitles({
   app,
@@ -48,11 +48,11 @@ export default async function makeCardsFromSubtitles({
   await client.clickElement_(subtitleClipsDialog$.okButton)
 
   await client.waitForText_(
-    flashcardSectionForm$.container,
+    flashcardSection$.container,
     '笹を食べながらのんびりするのは最高だなぁ'
   )
   await client.waitForText_(
-    flashcardSectionForm$.container,
+    flashcardSection$.container,
     'Chilling and eating bamboo \ngrass is the best thing ever.'
   )
 }

@@ -1,4 +1,4 @@
-import { Reducer } from 'redux'
+import { Reducer, DeepPartial } from 'redux'
 import newFlashcard from '../utils/newFlashcard'
 import { getNoteTypeFields } from '../utils/noteType'
 import { arrayToMapById } from '../utils/arrayToMapById'
@@ -132,49 +132,16 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
     case A.EDIT_CLIP: {
       const { id, override, flashcardOverride } = action
-      const clip = state.byId[id]
-      const flashcard = state.flashcards[id]
-      const newClip: Clip = override
-        ? {
-            // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
-            id,
-            fileId: clip.fileId,
-            start: override.start || clip.start,
-            end: override.end || clip.end,
-          }
-        : clip
-      const newFlashcard: Flashcard = override
-        ? ({
-            id,
-            type: flashcard.type,
-            image:
-              flashcardOverride && 'image' in flashcardOverride
-                ? flashcardOverride.image
-                : flashcard.image,
-            fields: {
-              ...flashcard.fields,
-              ...(flashcardOverride ? flashcardOverride.fields : null),
-            },
-            tags:
-              flashcardOverride && flashcardOverride.tags
-                ? flashcardOverride.tags.filter((t): t is string => Boolean(t))
-                : flashcard.tags,
-          } as Flashcard)
-        : state.flashcards[id]
-      return {
-        ...state,
-        byId:
-          newClip === clip
-            ? state.byId
-            : {
-                ...state.byId,
-                [id]: newClip,
-              },
-        flashcards:
-          newFlashcard === flashcard
-            ? state.flashcards
-            : { ...state.flashcards, [id]: newFlashcard },
+      return editClip(state, id, override, flashcardOverride)
+    }
+
+    case A.EDIT_CLIPS: {
+      let newState = state
+      for (const { id, override, flashcardOverride } of action.edits) {
+        const updated = editClip(newState, id, override, flashcardOverride)
+        newState = updated
       }
+      return newState
     }
 
     case A.MERGE_CLIPS: {
@@ -369,6 +336,56 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     }
     default:
       return state
+  }
+}
+
+function editClip(
+  state: ClipsState,
+  id: string,
+  override: DeepPartial<Clip> | null,
+  flashcardOverride: DeepPartial<Flashcard> | null
+) {
+  const clip = state.byId[id]
+  const flashcard = state.flashcards[id]
+  const newClip: Clip = override
+    ? {
+        // START AND END SHOULD ALWAYS BE SORTED! where is the right place to do this?
+        id,
+        fileId: clip.fileId,
+        start: override.start || clip.start,
+        end: override.end || clip.end,
+      }
+    : clip
+  const newFlashcard: Flashcard = flashcardOverride
+    ? ({
+        id,
+        type: flashcard.type,
+        image:
+          'image' in flashcardOverride
+            ? flashcardOverride.image
+            : flashcard.image,
+        fields: {
+          ...flashcard.fields,
+          ...(flashcardOverride ? flashcardOverride.fields : null),
+        },
+        tags: flashcardOverride.tags
+          ? flashcardOverride.tags.filter((t): t is string => Boolean(t))
+          : flashcard.tags,
+      } as Flashcard)
+    : state.flashcards[id]
+  return {
+    ...state,
+    byId:
+      newClip === clip
+        ? state.byId
+        : {
+            ...state.byId,
+            [id]: newClip,
+          },
+    flashcards:
+      newFlashcard === flashcard
+        ? state.flashcards
+        : { ...state.flashcards, [id]: newFlashcard },
   }
 }
 

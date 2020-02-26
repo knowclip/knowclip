@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@material-ui/core'
 import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
@@ -36,8 +36,12 @@ const ProjectMenu = ({ className }: { className: string }) => {
     [dispatch]
   )
 
-  const [state, setState] = useState({ editing: false, text: '' })
+  const [state, setState] = useState({ editing: false, text: projectFile.name })
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [inputWidth, setInputWidth] = useState(
+    () => projectFile.name.length * 16
+  )
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   const startEditing = useCallback(
     () => {
@@ -45,9 +49,21 @@ const ProjectMenu = ({ className }: { className: string }) => {
         text: projectFile.name,
         editing: true,
       })
-      inputRef.current && inputRef.current.focus()
     },
-    [inputRef, setState, projectFile]
+    [setState, projectFile]
+  )
+  useEffect(
+    () => {
+      if (state.editing && inputRef.current) inputRef.current.focus()
+    },
+    [state.editing]
+  )
+  useEffect(
+    () => {
+      titleRef.current &&
+        setInputWidth(titleRef.current.getBoundingClientRect().width)
+    },
+    [state.text]
   )
 
   const handleChangeText = useCallback(
@@ -72,6 +88,13 @@ const ProjectMenu = ({ className }: { className: string }) => {
     [submit]
   )
 
+  const handleFocus = useCallback(
+    () => {
+      setState(state => ({ ...state, editing: true }))
+    },
+    [setState]
+  )
+
   const handleBlur = useCallback(
     () => {
       submit()
@@ -94,28 +117,38 @@ const ProjectMenu = ({ className }: { className: string }) => {
             <SaveIcon />
           </IconButton>
         </Tooltip>{' '}
-        {editing ? (
-          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+        {
+          <form
+            onSubmit={handleSubmit}
+            style={{ width: `${inputWidth}px` }}
+            className={cn(css.projectNameForm, {
+              [css.projectNameFormHidden]: !editing,
+            })}
+          >
             <TextField
               inputRef={inputRef}
               classes={{ root: css.projectNameInput }}
               value={text}
               onChange={handleChangeText}
+              onFocus={handleFocus}
               onBlur={handleBlur}
+              fullWidth
               inputProps={{ id: $.projectTitleInput }}
             />
           </form>
-        ) : (
-          <Tooltip title="Double-click to edit">
-            <h1
-              className={css.projectName}
-              onDoubleClick={startEditing}
-              id={$.projectTitle}
-            >
-              {truncate(projectFile.name, 40)}
-            </h1>
-          </Tooltip>
-        )}
+        }
+        <Tooltip title="Double-click to edit">
+          <h1
+            className={cn(css.projectName, {
+              [css.projectNameHidden]: editing,
+            })}
+            onDoubleClick={startEditing}
+            id={$.projectTitle}
+            ref={titleRef}
+          >
+            {truncate(state.text, 40)}
+          </h1>
+        </Tooltip>
       </section>
     </DarkTheme>
   )

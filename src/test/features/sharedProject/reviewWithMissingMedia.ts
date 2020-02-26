@@ -6,15 +6,12 @@ import {
   reviewAndExportMediaTableRow$ as mediaTableRows$,
   reviewAndExportMediaTableRow$,
 } from '../../../components/ReviewAndExportMediaTableRow'
-import { flashcardSectionForm$ } from '../../../components/FlashcardSectionForm'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
+import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function reviewWithMissingMedia({ client }: TestSetup) {
   // maybe the first part for the loaded media should go in a different integration test
-  await client.waitForText_(
-    flashcardSectionForm$.container,
-    'ああー  吸わないで'
-  )
+  await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
   await client.clickElement_(main$.exportButton)
 
   await client.clickElement_(dialog$.continueButton)

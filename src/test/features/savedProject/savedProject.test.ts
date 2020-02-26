@@ -113,7 +113,7 @@ const persistedState: Partial<AppState> = {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(ASSETS_DIRECTORY, '/piggeldy_cat.mp4'),
-        lastOpened: '2020-02-01T13:21:19Z',
+        lastOpened: '2020-02-01T13:21:08Z',
       },
     },
     ExternalSubtitlesFile: {
@@ -125,7 +125,7 @@ const persistedState: Partial<AppState> = {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(ASSETS_DIRECTORY, '/pbc_jp.ass'),
-        lastOpened: '2020-02-01T13:21:21Z',
+        lastOpened: '2020-02-01T13:21:20Z',
       },
     },
     VttConvertedSubtitlesFile: {
@@ -181,7 +181,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/piggeldy_cat.mp4_bb2bd7fe-4ead-48aa-bad5-88df7a1b5e77.png'
         ),
-        lastOpened: '2020-02-01T13:21:20Z',
+        lastOpened: '2020-02-01T13:21:19Z',
       },
     },
     ConstantBitrateMp3: {},
@@ -210,7 +210,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe_16-760_a272b282-4d89-4af0-9d17-baa807793f1f.png'
         ),
-        lastOpened: '2020-02-01T13:21:08Z',
+        lastOpened: '2020-02-01T13:21:00Z',
       },
       '6fce08e8-9312-4930-9601-c14b470e57ab': {
         type: 'VideoStillImage',

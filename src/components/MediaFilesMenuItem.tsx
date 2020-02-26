@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   IconButton,
   Tooltip,
   MenuItem,
-  MenuList,
   ListItemText,
   ListItemIcon,
   ListItemSecondaryAction,
@@ -27,19 +26,23 @@ const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =
 
 type MediaFileMenuItemProps = {
   mediaFile: MediaFile
-  selected: boolean
+  autoFocus: boolean
   currentProjectId: ProjectId
   closeMenu: (event: React.SyntheticEvent<Element, Event>) => void
   className?: string
+  onClick?: any
 }
+
+const NAME_CUTOFF = 50
 
 const submenuAnchorOrigin = { vertical: 'top', horizontal: 'right' } as const
 const MediaFilesMenuItem = ({
   mediaFile,
-  selected,
   currentProjectId,
   closeMenu: closeSupermenu,
   className,
+  autoFocus,
+  onClick,
 }: MediaFileMenuItemProps) => {
   const dispatch = useDispatch()
 
@@ -85,18 +88,13 @@ const MediaFilesMenuItem = ({
     fileAvailability: r.getFileAvailability(state, mediaFile),
   }))
   const needsFilePath = !fileAvailability.filePath
-  useEffect(
-    () => {
-      if (selected && submenu.anchorEl) submenu.anchorEl.scrollIntoView()
-    },
-    [submenu.anchorEl, selected]
-  )
 
   const actionsButton = (
     <ListItemSecondaryAction>
       <IconButton
         onClick={e => {
           e.stopPropagation()
+          onClick && onClick(e)
           submenu.toggle(e)
         }}
         buttonRef={submenu.anchorCallbackRef}
@@ -106,36 +104,46 @@ const MediaFilesMenuItem = ({
     </ListItemSecondaryAction>
   )
 
-  return (
+  const onCloseSubmenu = useCallback(
+    e => {
+      e.stopPropagation()
+      closeSubmenu(e)
+    },
+    [closeSubmenu]
+  )
+
+  const stopPropagation = useCallback(e => {
+    e.stopPropagation()
+  }, [])
+
+  const content = (
     <MenuItem
       dense
+      tabIndex={0}
       key={mediaFile.id}
-      selected={selected}
+      autoFocus={autoFocus}
       onClick={loadAndClose}
       className={className}
     >
-      <ListItemText
-        title={mediaFile.name}
-        className={css.mediaFilesMenuListItemText}
-      >
-        {truncate(mediaFile.name, 40)}
+      <ListItemText className={css.mediaFilesMenuListItemText}>
+        {truncate(mediaFile.name, NAME_CUTOFF)}
       </ListItemText>
-      <Menu
-        open={submenu.isOpen}
-        anchorEl={submenu.anchorEl}
-        anchorOrigin={submenuAnchorOrigin}
-        onClose={useCallback(
-          e => {
-            e.stopPropagation()
-            closeSubmenu(e)
-          },
-          [closeSubmenu]
-        )}
-        onClick={useCallback(e => {
-          e.stopPropagation()
-        }, [])}
-      >
-        <MenuList>
+      {needsFilePath ? (
+        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
+      ) : (
+        <Tooltip title="More actions">{actionsButton}</Tooltip>
+      )}
+      {submenu.isOpen && (
+        <Menu
+          autoFocus
+          onKeyDown={stopPropagation}
+          onKeyPress={stopPropagation}
+          open={submenu.isOpen}
+          anchorEl={submenu.anchorEl}
+          anchorOrigin={submenuAnchorOrigin}
+          onClose={onCloseSubmenu}
+          onClick={stopPropagation}
+        >
           <MenuItem dense onClick={loadAndClose}>
             <ListItemIcon>
               <PlayArrow />
@@ -154,14 +162,14 @@ const MediaFilesMenuItem = ({
             </ListItemIcon>
             <ListItemText>Manually locate in file system</ListItemText>
           </MenuItem>
-        </MenuList>
-      </Menu>
-      {needsFilePath ? (
-        <Tooltip title="Not found in file system">{actionsButton}</Tooltip>
-      ) : (
-        actionsButton
+        </Menu>
       )}
     </MenuItem>
+  )
+  return mediaFile.name.length > NAME_CUTOFF ? (
+    <Tooltip title={mediaFile.name}>{content}</Tooltip>
+  ) : (
+    content
   )
 }
 

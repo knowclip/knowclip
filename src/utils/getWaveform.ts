@@ -30,7 +30,7 @@ export const getWaveformPng = async (
     )
     if (outputFilename && existsSync(outputFilename)) return outputFilename
 
-    return await new Promise((res, rej) => {
+    const newFileName: string = await new Promise((res, rej) => {
       ffmpeg(constantBitrateFilePath)
         .complexFilter(
           [
@@ -53,6 +53,11 @@ export const getWaveformPng = async (
         })
         .run()
     })
+
+    if (!newFileName || !existsSync(newFileName))
+      throw new Error('Problem creating waveform image')
+
+    return newFileName
   } catch (err) {
     return new AsyncError(err)
   }

@@ -3,8 +3,8 @@
   bottom: 0;
   left: 0;
   padding: .4rem;
+  z-index: 5;
   cursor: pointer;
-  font-size: .8rem;
 }
 
 .card {
@@ -15,13 +15,13 @@
 .closed {
   opacity: .88;
   font-size: .8rem;
-  background: rgba(200,200,200,.5);
+  background: rgba(200,200,200,.9);
   padding: .2em .3em;
   border-radius: .2em;
 }
 
-.closed:hover {
-  background: rgb(200,200,200);
+.container:hover .closed {
+  background: #eee;
     color: #000000;
 }
 

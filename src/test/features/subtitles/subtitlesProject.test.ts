@@ -121,7 +121,7 @@ const persistedState: Partial<AppState> = {
         status: 'CURRENTLY_LOADED',
         isLoading: false,
         filePath: join(ASSETS_DIRECTORY, '/pbc_jp.ass'),
-        lastOpened: '2020-02-01T16:11:19Z',
+        lastOpened: '2020-02-01T16:11:18Z',
       },
     },
     VttConvertedSubtitlesFile: {
@@ -149,7 +149,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/pbc_jp.ass_a8b64692-dba0-4ef4-b5e7-8c887956a69a.vtt'
         ),
-        lastOpened: '2020-02-01T16:11:28Z',
+        lastOpened: '2020-02-01T16:11:24Z',
       },
     },
     WaveformPng: {
@@ -164,7 +164,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe.mp4_bd8aca85-de21-4666-bbab-a33fd21d03f1.png'
         ),
-        lastOpened: '2020-02-01T16:11:24Z',
+        lastOpened: '2020-02-01T16:11:19Z',
       },
       'f5053503-8e5f-45c3-9afc-26f5e6eab8a8': {
         type: 'WaveformPng',
@@ -193,7 +193,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe_10-280_6b02575a-0a4f-402a-8ea3-31f457cb5d8c.png'
         ),
-        lastOpened: '2020-02-01T16:11:28Z',
+        lastOpened: '2020-02-01T16:10:42Z',
       },
       'ff54865f-ef52-4f16-9f20-2ae257eceb40': {
         type: 'VideoStillImage',
@@ -206,7 +206,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe_16-760_ff54865f-ef52-4f16-9f20-2ae257eceb40.png'
         ),
-        lastOpened: '2020-02-01T16:11:28Z',
+        lastOpened: '2020-02-01T16:10:44Z',
       },
       'a3a0c3eb-3841-4d2f-851a-5af95cd14855': {
         type: 'VideoStillImage',
@@ -219,7 +219,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/polar_bear_cafe_78-180_a3a0c3eb-3841-4d2f-851a-5af95cd14855.png'
         ),
-        lastOpened: '2020-02-01T16:11:28Z',
+        lastOpened: '2020-02-01T16:10:54Z',
       },
       '152077c6-336b-47d6-88e6-1ba4410db553': {
         type: 'VideoStillImage',
@@ -245,7 +245,7 @@ const persistedState: Partial<AppState> = {
           GENERATED_ASSETS_DIRECTORY,
           '/piggeldy_cat_19-220_864d822f-d482-438e-9620-684b2730a688.png'
         ),
-        lastOpened: '2020-02-01T16:11:18Z',
+        lastOpened: '2020-02-01T16:11:17Z',
       },
       'c9723266-41d2-4676-884f-a811ec89c786': {
         type: 'VideoStillImage',
@@ -256,7 +256,7 @@ const persistedState: Partial<AppState> = {
         isLoading: false,
         filePath: join(
           GENERATED_ASSETS_DIRECTORY,
-          '/piggeldy_cat_43-320_c9723266-41d2-4676-884f-a811ec89c786.png'
+          '/piggeldy_cat_43-020_c9723266-41d2-4676-884f-a811ec89c786.png'
         ),
         lastOpened: '2020-02-01T16:11:18Z',
       },

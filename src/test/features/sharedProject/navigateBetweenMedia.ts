@@ -5,7 +5,7 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { snackbar$ } from '../../../components/Snackbar'
 
-export default async function openSharedProject({ app, client }: TestSetup) {
+export default async function navigateBetweenMedia({ app, client }: TestSetup) {
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
   const [, secondMediaFile] = await client.elements_(
     mediaFilesMenu$.mediaFileMenuItem,

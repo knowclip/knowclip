@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
@@ -13,7 +13,8 @@ import {
 } from '@material-ui/icons'
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
-import Preview from './FlashcardSectionPreview'
+import FlashcardDisplay from './FlashcardSectionDisplayCard'
+import Preview from './FlashcardSectionDisplayPreview'
 import { SubtitlesCardBase } from '../selectors'
 
 enum $ {
@@ -29,10 +30,13 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { waveformSelection, clipsIds } = useSelector((state: AppState) => ({
-    waveformSelection: r.getWaveformSelection(state),
-    clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
-  }))
+  const { waveformSelection, clipsIds, editing } = useSelector(
+    (state: AppState) => ({
+      waveformSelection: r.getWaveformSelection(state),
+      clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
+      editing: state.session.editingCards,
+    })
+  )
 
   const highlightedClip =
     waveformSelection && waveformSelection.type === 'Clip'
@@ -46,6 +50,18 @@ const FlashcardSection = ({
   )
   const dispatch = useDispatch()
 
+  const [autofocusFieldName, setAutofocusFieldName] = useState<
+    TransliterationFlashcardFieldName
+  >('transcription')
+
+  const handleDoubleClickCardDisplayField = useCallback(
+    fieldName => {
+      setAutofocusFieldName(fieldName)
+      dispatch(actions.startEditingCards())
+    },
+    [setAutofocusFieldName, dispatch]
+  )
+
   return (
     <section className={cn(className, css.container, $.container, css.card)}>
       {highlightedClip ? (
@@ -54,7 +70,7 @@ const FlashcardSection = ({
         </div>
       ) : null}
 
-      <Tooltip title="Previous (Ctrl + comma)">
+      <Tooltip title="Previous (← key)">
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
           disabled={clipsLength < 2}
@@ -67,15 +83,26 @@ const FlashcardSection = ({
         </IconButton>
       </Tooltip>
 
-      {highlightedClip && mediaFile && (
+      {highlightedClip && mediaFile && editing && (
         <FlashcardForm
+          key={highlightedClip.id}
           className={css.form}
           mediaFile={mediaFile}
           clipId={highlightedClip.id}
+          autofocusFieldName={autofocusFieldName}
         />
       )}
+      {highlightedClip && mediaFile && !editing && (
+        <section className={css.display}>
+          <FlashcardDisplay
+            mediaFile={mediaFile}
+            clipId={highlightedClip.id}
+            onDoubleClickField={handleDoubleClickCardDisplayField}
+          />
+        </section>
+      )}
 
-      {(!waveformSelection || waveformSelection.type === 'Preview') && (
+      {!waveformSelection && (
         <Placeholder
           clipsIds={clipsIds}
           mediaFile={mediaFile}
@@ -83,7 +110,15 @@ const FlashcardSection = ({
         />
       )}
 
-      <Tooltip title="Next (Ctrl + period)">
+      {waveformSelection && waveformSelection.type === 'Preview' && (
+        <Placeholder
+          clipsIds={clipsIds}
+          mediaFile={mediaFile}
+          selection={waveformSelection}
+        />
+      )}
+
+      <Tooltip title="Next (→ key)">
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
           disabled={clipsLength < 2}
@@ -125,7 +160,7 @@ const Placeholder = ({
     }
   )
 
-  const className = cn(css.intro, {
+  const className = cn(css.display, {
     [css.horizontalIntro]: viewMode === 'HORIZONTAL',
   })
 
@@ -134,7 +169,7 @@ const Placeholder = ({
     subtitles &&
     selection &&
     selection.item ? (
-    <section className={className}>
+    <section className={cn(className, css.preview)}>
       <Preview
         cardBases={subtitles}
         chunkIndex={selection.index}
@@ -145,7 +180,7 @@ const Placeholder = ({
       />
     </section>
   ) : (
-    <section className={className}>
+    <section className={cn(className, css.intro)}>
       <p className={css.introText}>
         You can <strong>create clips</strong> in a few different ways:
       </p>

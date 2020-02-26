@@ -92,7 +92,7 @@
     "hooks": {
       "pre-commit": "yarn tidy",
       "post-commit": "git diff",
-      "post-push": "echo '############ BUILDING JSON SCHEMAS JUST IN CASE! ############### && yarn build-schemas"
+      "post-push": "echo '############ BUILDING JSON SCHEMAS JUST IN CASE! ###############' && yarn build-schemas"
     }
   },
   "browserslist": [

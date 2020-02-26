@@ -7,11 +7,11 @@ import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
 
 enum $ {
-  openMenuButton = 'flashcard-form-field-menu-open-button',
-  menuItem = 'flashcard-form-field-menu-item',
+  openMenuButton = 'flashcard-field-menu-open-button',
+  menuItem = 'flashcard-field-menu-item',
 }
 
-const FlashcardSectionFormFieldPopoverMenu = ({
+const FlashcardSectionFieldPopoverMenu = ({
   embeddedSubtitlesTracks,
   externalSubtitlesTracks,
   linkedSubtitlesTrack,
@@ -99,7 +99,7 @@ const FieldMenuItem = ({
   const handleClick = useCallback(
     e => {
       dispatch(
-        actions.linkFlashcardFieldToSubtitlesTrack(
+        actions.linkFlashcardFieldToSubtitlesTrackRequest(
           fieldName,
           mediaFileId,
           selected ? null : trackId
@@ -110,7 +110,12 @@ const FieldMenuItem = ({
     [dispatch, selected, trackId, fieldName, mediaFileId, closeMenu]
   )
   return (
-    <MenuItem onClick={handleClick} selected={selected} className={$.menuItem}>
+    <MenuItem
+      onClick={handleClick}
+      selected={selected}
+      className={$.menuItem}
+      tabIndex={0}
+    >
       {label}
     </MenuItem>
   )
@@ -158,6 +163,6 @@ const isExternal = (
   id: string
 } => t.type === 'ExternalSubtitlesTrack'
 
-export default FlashcardSectionFormFieldPopoverMenu
+export default FlashcardSectionFieldPopoverMenu
 
-export { $ as flashcardFormFieldMenu$ }
+export { $ as flashcardFieldMenu$ }

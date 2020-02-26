@@ -9,6 +9,7 @@ import {
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { setCursorX } from '../utils/waveform'
+import { WaveformSelectionExpanded } from '../selectors'
 
 enum $ {
   container = 'waveform-container',
@@ -135,7 +136,7 @@ const Clips = React.memo(
     height: number
     waveform: WaveformState
   }) => {
-    const handleClick = useCallback(
+    const handleMouseUp = useCallback(
       e => {
         const { dataset } = e.target
         if (dataset && dataset.clipId) {
@@ -149,35 +150,23 @@ const Clips = React.memo(
                 clips[dataset.clipIndex].start
               )
             setCursorX(clips[dataset.clipIndex].start)
-
-            e.stopPropagation()
-          } else {
           }
+          const currentSelected = document.querySelector(
+            '.' + css.highlightedClip
+          )
+          if (currentSelected)
+            currentSelected.classList.remove(css.highlightedClip)
+          const newSelected = document.querySelector(
+            `.${css.waveformClip}[data-clip-id="${dataset.clipId}"]`
+          )
+          if (newSelected) newSelected.classList.add(css.highlightedClip)
         }
       },
       [clips, waveform]
     )
-    const handleMouseUp = useCallback(e => {
-      const { dataset } = e.target
-      if (dataset && dataset.clipId) {
-        const currentSelected = document.querySelector(
-          '.' + css.highlightedClip
-        )
-        if (currentSelected)
-          currentSelected.classList.remove(css.highlightedClip)
-        const newSelected = document.querySelector(
-          `.${css.waveformClip}[data-clip-id="${dataset.clipId}"]`
-        )
-        if (newSelected) newSelected.classList.add(css.highlightedClip)
-      }
-    }, [])
 
     return (
-      <g
-        className={$.waveformClipsContainer}
-        onClick={handleClick}
-        onMouseUp={handleMouseUp}
-      >
+      <g className={$.waveformClipsContainer} onMouseUp={handleMouseUp}>
         {clips.map((clip, i) => (
           <Clip
             {...clip}
@@ -194,134 +183,140 @@ const Clips = React.memo(
 
 const SUBTITLES_CHUNK_HEIGHT = 14
 
-const SubtitlesChunk = ({
-  chunk,
-  trackOffsetY,
-  chunkIndex,
-  trackId,
-}: {
-  chunk: SubtitlesChunk
-  trackOffsetY: number
-  chunkIndex: number
-  trackId: string
-}) => {
-  const clipPathId = `${trackId}__${chunkIndex}`
-  const width = chunk.end - chunk.start
+const SubtitlesChunk = React.memo(
+  ({
+    chunk,
+    trackOffsetY,
+    chunkIndex,
+    trackId,
+  }: {
+    chunk: SubtitlesChunk
+    trackOffsetY: number
+    chunkIndex: number
+    trackId: string
+  }) => {
+    const clipPathId = `${trackId}__${chunkIndex}`
+    const width = chunk.end - chunk.start
 
-  const rect = {
-    x: chunk.start,
-    y: WAVEFORM_HEIGHT + trackOffsetY * SUBTITLES_CHUNK_HEIGHT,
-    width: width,
-    height: SUBTITLES_CHUNK_HEIGHT,
+    const rect = {
+      x: chunk.start,
+      y: WAVEFORM_HEIGHT + trackOffsetY * SUBTITLES_CHUNK_HEIGHT,
+      width: width,
+      height: SUBTITLES_CHUNK_HEIGHT,
+    }
+
+    const clickDataProps = {
+      'data-track-id': trackId,
+      'data-chunk-index': chunkIndex,
+      'data-chunk-start': chunk.start,
+    }
+
+    return (
+      <g className={css.subtitlesChunk} {...clickDataProps}>
+        <clipPath id={clipPathId}>
+          <rect {...rect} width={width - 10} />
+        </clipPath>
+        <rect
+          className={css.subtitlesChunkRectangle}
+          {...clickDataProps}
+          {...rect}
+          rx={SUBTITLES_CHUNK_HEIGHT / 2}
+        />
+        <text
+          clipPath={`url(#${clipPathId})`}
+          {...clickDataProps}
+          className={css.subtitlesText}
+          x={chunk.start + 6}
+          y={(trackOffsetY + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
+        >
+          {chunk.text}
+        </text>
+      </g>
+    )
   }
+)
 
-  const clickDataProps = {
-    'data-track-id': trackId,
-    'data-chunk-index': chunkIndex,
-    'data-chunk-start': chunk.start,
-  }
+const LinkedSubtitlesChunk = React.memo(
+  ({
+    cardBase,
+    index,
+    getFieldsPreview,
+    linkedTrackIds,
+    isSelected,
+    tracksCount,
+  }: {
+    cardBase: r.SubtitlesCardBase
+    index: number
+    getFieldsPreview: (base: r.SubtitlesCardBase) => Dict<string, string>
+    linkedTrackIds: SubtitlesTrackId[]
+    isSelected: boolean
+    tracksCount: number
+  }) => {
+    const clipPathId = `linkedSubtitles_${cardBase.start}`
+    const width = cardBase.end - cardBase.start
 
-  return (
-    <g className={css.subtitlesChunk} {...clickDataProps}>
-      <clipPath id={clipPathId}>
-        <rect {...rect} width={width - 10} />
-      </clipPath>
-      <rect
-        className={css.subtitlesChunkRectangle}
-        {...clickDataProps}
-        {...rect}
-        rx={SUBTITLES_CHUNK_HEIGHT / 2}
-      />
-      <text
-        clipPath={`url(#${clipPathId})`}
-        {...clickDataProps}
-        className={css.subtitlesText}
-        x={chunk.start + 6}
-        y={(trackOffsetY + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
-      >
-        {chunk.text}
-      </text>
-    </g>
-  )
-}
+    const fieldsPreview = getFieldsPreview(cardBase)
 
-const LinkedSubtitlesChunk = ({
-  cardBase,
-  index,
-  fieldsPreview,
-  linkedFieldNames,
-  linkedTrackIds,
-  isSelected,
-}: {
-  cardBase: r.SubtitlesCardBase
-  index: number
-  fieldsPreview: Dict<string, string>
-  linkedFieldNames: TransliterationFlashcardFieldName[]
-  linkedTrackIds: SubtitlesTrackId[]
-  isSelected: boolean
-}) => {
-  const clipPathId = `linkedSubtitles_${cardBase.start}`
-  const width = cardBase.end - cardBase.start
+    const rect = {
+      x: cardBase.start,
+      y: WAVEFORM_HEIGHT,
+      width: width,
+      height: SUBTITLES_CHUNK_HEIGHT * tracksCount,
+    }
 
-  const rect = {
-    x: cardBase.start,
-    y: WAVEFORM_HEIGHT,
-    width: width,
-    height: SUBTITLES_CHUNK_HEIGHT * linkedFieldNames.length,
-  }
+    const clickDataProps = {
+      'data-track-id': linkedTrackIds[0],
+      'data-chunk-index': index,
+      'data-chunk-start': cardBase.start,
+    }
 
-  const clickDataProps = {
-    'data-track-id': linkedTrackIds[0],
-    'data-chunk-index': index,
-    'data-chunk-start': cardBase.start,
-  }
-
-  return (
-    <g className={css.subtitlesChunk} {...clickDataProps}>
-      <clipPath id={clipPathId}>
-        <rect {...rect} width={width - 10} />
-      </clipPath>
-      <rect
-        className={cn(css.subtitlesChunkRectangle, {
-          [css.selectedSubtitlesChunk]: isSelected,
+    return (
+      <g className={css.subtitlesChunk} {...clickDataProps}>
+        <clipPath id={clipPathId}>
+          <rect {...rect} width={width - 10} />
+        </clipPath>
+        <rect
+          className={cn(css.subtitlesChunkRectangle, {
+            [css.selectedSubtitlesChunk]: isSelected,
+          })}
+          {...clickDataProps}
+          {...rect}
+          rx={SUBTITLES_CHUNK_HEIGHT / 2}
+        />
+        {linkedTrackIds.map((id, i) => {
+          const i1 = 1 + i
+          return (
+            <text
+              key={id + i}
+              clipPath={`url(#${clipPathId})`}
+              className={css.subtitlesText}
+              x={cardBase.start + 6}
+              y={i1 * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
+              {...clickDataProps}
+            >
+              {fieldsPreview[id]}
+            </text>
+          )
         })}
-        {...clickDataProps}
-        {...rect}
-        rx={SUBTITLES_CHUNK_HEIGHT / 2}
-      />
-      {linkedTrackIds.map((id, i) => {
-        const i1 = 1 + i
-        return (
-          <text
-            key={id + i}
-            clipPath={`url(#${clipPathId})`}
-            className={css.subtitlesText}
-            x={cardBase.start + 6}
-            y={i1 * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
-            {...clickDataProps}
-          >
-            {fieldsPreview[id]}
-          </text>
-        )
-      })}
-    </g>
-  )
-}
+      </g>
+    )
+  }
+)
 
 const SubtitlesTimelines = memo(
   ({
     subtitles,
+    waveformItems,
     goToSubtitlesChunk,
     highlightedChunkIndex,
   }: {
     subtitles: r.SubtitlesCardBases
+    waveformItems: WaveformSelectionExpanded[]
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
     highlightedChunkIndex: number | null
   }) => {
-    const handleClick = useCallback(
+    const handleMouseUp = useCallback(
       e => {
-        e.stopPropagation()
-
         const { dataset } = e.target
 
         setCursorX(dataset.chunkStart)
@@ -339,12 +334,31 @@ const SubtitlesTimelines = memo(
       },
       [goToSubtitlesChunk]
     )
-
+    const dispatch = useDispatch()
+    const handleDoubleClick = useCallback(
+      e => {
+        const { dataset } = e.target
+        if (dataset && dataset.chunkIndex) {
+          const item = waveformItems.find(
+            i => i.type === 'Preview' && i.cardBaseIndex === +dataset.chunkIndex
+          )
+          if (item) dispatch(r.newClipFromSubtitlesChunk(item))
+        }
+      },
+      [dispatch, waveformItems]
+    )
+    console.log({
+      subtitles,
+      waveformItems,
+      goToSubtitlesChunk,
+      highlightedChunkIndex,
+    })
     return (
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
         width="100%"
-        onClick={handleClick}
+        onMouseUp={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
       >
         {subtitles.cards.map((c, i) => {
           return (
@@ -352,9 +366,9 @@ const SubtitlesTimelines = memo(
               key={'linked' + i}
               cardBase={c}
               index={i}
-              linkedFieldNames={subtitles.fieldNames}
+              tracksCount={subtitles.fieldNames.length}
               linkedTrackIds={subtitles.linkedTrackIds}
-              fieldsPreview={subtitles.getFieldsPreviewFromCardsBase(c)}
+              getFieldsPreview={subtitles.getFieldsPreviewFromCardsBase}
               isSelected={highlightedChunkIndex === i}
             />
           )
@@ -391,6 +405,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     highlightedClipId,
     subtitles,
     highlightedChunkIndex,
+    waveformItems,
   } = useSelector((state: AppState) => ({
     waveform: r.getWaveform(state),
     path: r.getWaveformPath(state),
@@ -400,6 +415,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     highlightedClipId: r.getHighlightedClipId(state),
     subtitles: r.getSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
+    waveformItems: r.getWaveformItems(state),
   }))
 
   const dispatch = useDispatch()
@@ -423,17 +439,24 @@ const Waveform = ({ show }: { show: boolean }) => {
         e.currentTarget,
         waveform.viewBox.xMin
       )
+      const x = Math.min(waveform.length, coords.x)
       const waveformMousedown = new WaveformMousedownEvent(
         e.currentTarget,
-        getSecondsAtXFromWaveform(waveform, coords.x)
+        getSecondsAtXFromWaveform(waveform, x)
       )
       document.dispatchEvent(waveformMousedown)
     },
     [waveform]
   )
 
-  const handleClick = useCallback(
+  const handleMouseUp = useCallback(
     e => {
+      if (
+        e.target.dataset &&
+        ((e.target.dataset.clipId && !e.target.dataset.clipIsHighlighted) ||
+          e.target.dataset.chunkIndex)
+      )
+        return
       const player = document.getElementById('mediaPlayer') as HTMLVideoElement
       if (player) {
         const coords = toWaveformCoordinates(
@@ -441,10 +464,11 @@ const Waveform = ({ show }: { show: boolean }) => {
           e.currentTarget,
           waveform.viewBox.xMin
         )
-        const seconds = getSecondsAtXFromWaveform(waveform, coords.x)
+        const x = Math.min(waveform.length, coords.x)
+        const seconds = getSecondsAtXFromWaveform(waveform, x)
         player.currentTime = seconds
 
-        setCursorX(coords.x)
+        setCursorX(x)
       }
     },
     [waveform]
@@ -459,7 +483,7 @@ const Waveform = ({ show }: { show: boolean }) => {
       className={cn(css.waveformSvg, $.container)}
       width="100%"
       onMouseDown={handleMouseDown}
-      onClick={handleClick}
+      onMouseUp={handleMouseUp}
       height={height}
     >
       <rect
@@ -495,6 +519,7 @@ const Waveform = ({ show }: { show: boolean }) => {
           subtitles={subtitles}
           goToSubtitlesChunk={goToSubtitlesChunk}
           highlightedChunkIndex={highlightedChunkIndex}
+          waveformItems={waveformItems}
         />
       )}
       <Cursor x={cursor.x} height={height} />

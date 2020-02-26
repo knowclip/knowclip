@@ -133,27 +133,31 @@ const MediaFilesMenu = ({
             open={popover.isOpen}
             onClose={popover.close}
           >
-            <MenuList style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
-              {projectMediaFiles.map(media => (
-                <MediaFilesMenuItem
-                  key={media.id}
-                  closeMenu={popover.close}
-                  mediaFile={media}
-                  selected={Boolean(currentFile && currentFile.id === media.id)}
-                  currentProjectId={currentProjectId}
-                  className={$.mediaFileMenuItem}
-                />
-              ))}
-            </MenuList>
-            <Divider />
-            <MenuItem dense>
-              <ListItemText
+            <MenuList>
+              <div style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
+                {projectMediaFiles.map(media => (
+                  <MediaFilesMenuItem
+                    key={media.id}
+                    closeMenu={popover.close}
+                    mediaFile={media}
+                    autoFocus={Boolean(
+                      currentFile && currentFile.id === media.id
+                    )}
+                    currentProjectId={currentProjectId}
+                    className={$.mediaFileMenuItem}
+                  />
+                ))}
+              </div>
+              <Divider />
+              <MenuItem
+                dense
+                tabIndex={0}
                 onClick={chooseMediaFiles}
                 id={$.addNewAdditionalMediaButton}
               >
-                Add new media
-              </ListItemText>
-            </MenuItem>
+                <ListItemText>Add new media</ListItemText>
+              </MenuItem>
+            </MenuList>
           </Popover>
         )}
       </section>
