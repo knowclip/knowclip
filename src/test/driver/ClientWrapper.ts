@@ -35,6 +35,8 @@ export class ClientWrapper {
   }
 
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
+    if (typeof count === 'number' && count <= 0)
+      throw new Error('Count must be at least 1')
     let elementsSoFar: RawResult<Element>[] | undefined
     try {
       if (count)

@@ -17,12 +17,15 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await client.clickElement_(tagsInput$.tagChip)
   await client.elements_(tagsInput$.tagChip)
   await client.pressKeys(['Backspace'])
+  await client.waitUntilGone_(tagsInput$.tagChip)
 
   await client.setFieldValue_(tagsInput$.inputField, 'pbc')
   await client.pressKeys(['Enter'])
   await client.elements_(tagsInput$.tagChip, 1)
   await client.waitForText_(tagsInput$.tagChip, 'pbc')
+
   await waveformMouseDrag(app, client, 756, 920)
+
   await waveformMouseDrag(app, client, 917, 888)
 
   await client.elements_(tagsInput$.tagChip, 1)

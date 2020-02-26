@@ -20,7 +20,18 @@ enum $ {
   container = 'flashcard-form-container',
   flashcardFields = 'flashcard-field',
   deleteButton = 'delete-clip-button',
+  transcriptionField = 'flashcard-form-transcription',
+  pronunciationField = 'flashcard-form-pronunciation',
+  meaningField = 'flashcard-form-meaning',
+  notesField = 'flashcard-form-notes',
 }
+
+const fieldLabels = {
+  transcription: $.transcriptionField,
+  pronunciation: $.pronunciationField,
+  meaning: $.meaningField,
+  notes: $.notesField,
+} as const
 
 const FIELD_INPUT_PROPS = {
   style: { minHeight: '20px' },
@@ -152,6 +163,15 @@ const FlashcardSectionForm = memo(
       [dispatch, id]
     )
 
+    const fieldProps = {
+      currentFlashcard: flashcard,
+      setFlashcardText: setFlashcardText,
+      subtitles: mediaFile.subtitles,
+      mediaFileId: mediaFile.id,
+      inputProps: FIELD_INPUT_PROPS,
+      onKeyPress: loopOnInteract,
+    }
+
     return (
       <form
         className={cn(className, {
@@ -201,17 +221,13 @@ const FlashcardSectionForm = memo(
                   fieldName === autofocusFieldName ? focusRef : undefined
                 }
                 name={fieldName}
-                currentFlashcard={flashcard}
                 label={capitalize(fieldName)}
-                setFlashcardText={setFlashcardText}
-                subtitles={mediaFile.subtitles}
                 linkedSubtitlesTrack={
                   subtitlesFlashcardFieldLinks[fieldName] || null
                 }
-                mediaFileId={mediaFile.id}
-                inputProps={FIELD_INPUT_PROPS}
-                onKeyPress={loopOnInteract}
                 onFocus={!initialFocus && i === 0 ? () => {} : handleFocus}
+                className={fieldLabels[fieldName]}
+                {...fieldProps}
               />
             ))}
           <TagsInput

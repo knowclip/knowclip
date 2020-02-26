@@ -6,19 +6,27 @@ export async function fillInTransliterationCardFields(
   client: ClientWrapper,
   newValues: Partial<TransliterationFlashcardFields>
 ) {
-  const [
-    transcriptionEl,
-    pronunciationEl,
-    meaningEl,
-    notesEl,
-  ] = await client.elements_(
-    `${flashcardSectionForm$.flashcardFields} textarea:not([aria-hidden])`,
-    4
-  )
+  await client.firstElement_(flashcardSectionForm$.container)
   const { transcription, pronunciation, meaning, notes } = newValues
 
-  if (transcription) await transcriptionEl.setFieldValue(transcription)
-  if (pronunciation) await pronunciationEl.setFieldValue(pronunciation)
-  if (meaning) await meaningEl.setFieldValue(meaning)
-  if (notes) await notesEl.setFieldValue(notes)
+  if (transcription)
+    await client.setFieldValue_(
+      flashcardSectionForm$.transcriptionField + ' textarea:not([aria-hidden])',
+      transcription
+    )
+  if (pronunciation)
+    await client.setFieldValue_(
+      flashcardSectionForm$.pronunciationField + ' textarea:not([aria-hidden])',
+      pronunciation
+    )
+  if (meaning)
+    await client.setFieldValue_(
+      flashcardSectionForm$.meaningField + ' textarea:not([aria-hidden])',
+      meaning
+    )
+  if (notes)
+    await client.setFieldValue_(
+      flashcardSectionForm$.notesField + ' textarea:not([aria-hidden])',
+      notes
+    )
 }

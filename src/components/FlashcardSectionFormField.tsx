@@ -6,6 +6,7 @@ import FieldMenu, {
   useSubtitlesBySource,
 } from './FlashcardSectionFieldPopoverMenu'
 import { flashcardSectionForm$ } from './FlashcardSectionForm'
+import cn from 'classnames'
 
 type Props = {
   name: FlashcardFieldName
@@ -20,6 +21,7 @@ type Props = {
   onFocus: (event: any) => void
   autoFocus?: boolean
   inputRef?: MutableRefObject<HTMLInputElement | undefined>
+  className?: string
 }
 const FlashcardSectionFormField = memo(
   ({
@@ -35,6 +37,7 @@ const FlashcardSectionFormField = memo(
     autoFocus = false,
     onFocus,
     inputRef,
+    className,
   }: Props) => {
     const handleChange = useCallback(
       e => setFlashcardText(name, e.target.value),
@@ -74,7 +77,7 @@ const FlashcardSectionFormField = memo(
         )}
         <TextField
           autoFocus={autoFocus}
-          className={flashcardSectionForm$.flashcardFields}
+          className={cn(className, flashcardSectionForm$.flashcardFields)}
           inputProps={inputProps}
           onChange={handleChange}
           onKeyPress={onKeyPress}
