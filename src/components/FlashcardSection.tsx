@@ -172,7 +172,7 @@ const Placeholder = ({
     <section className={cn(className, css.preview)}>
       <Preview
         cardBases={subtitles}
-        chunkIndex={selection.index}
+        chunkIndex={selection.item.index}
         clipsIds={clipsIds}
         mediaFile={mediaFile}
         fieldsToTracks={fieldsToTracks}

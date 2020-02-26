@@ -35,7 +35,7 @@
   min-height: 3rem;
   margin: 2rem 0;
   line-height: 2;
-  white-space: pre-wrap;
+  white-space: pre;
 }
 .horizontalPreview .previewField {
   margin: 0;
@@ -67,12 +67,17 @@
   opacity: .5;
 }
 .newlinePlaceholder {
+  display: inline;
+}
+.newline {
   white-space: pre;
-  display: inline-block
+  pointer-events: none;
+  position:absolute;
+  opacity: 0; 
 }
 .newlinePlaceholder::before {
   content: '⏎';
-  width: 0;
+  display: inline;
   color: #ccc;
 }
 .previewFieldNotes .newlinePlaceholder {
@@ -91,4 +96,23 @@
   position: absolute;
   bottom: 1rem;
   left: 1rem;
+}
+
+.clozeButton {
+  min-width: 0 !important;
+  padding: 0.3em .5em;
+}
+
+.clozeField {
+  overflow: hidden;
+  resize: none;
+  position: absolute;
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+  font-size: inherit;
+  border: 0;
+  line-height: inherit;
+  padding: inherit;
+  letter-spacing: inherit;
 }

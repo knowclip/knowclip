@@ -1,5 +1,9 @@
 import { createSelector } from 'reselect'
-import { getSubtitlesCardBases, WaveformSelectionExpanded } from './cardPreview'
+import {
+  getSubtitlesCardBases,
+  WaveformSelectionExpanded,
+  SubtitlesCardBase,
+} from './cardPreview'
 import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
 import {
   overlapsSignificantly,
@@ -28,6 +32,15 @@ export const getWaveformItems = createSelector(
 
     while (clipIndex < clips.length && chunkIndex < chunks.length) {
       const clip = clips[clipIndex]
+
+      let i = chunkIndex
+      while (
+        overlapsSignificantly(chunks[i], clip.start, clip.end, halfSecond) &&
+        i < chunks.length
+      ) {
+        chunkIndex++
+        i++
+      }
       const chunk = chunks[chunkIndex]
 
       if (clip.start <= chunk.start) {
@@ -38,23 +51,13 @@ export const getWaveformItems = createSelector(
           item: clip,
         })
         clipIndex += 1
-
-        for (
-          let i = chunkIndex;
-          i < chunks.length &&
-          overlapsSignificantly(chunks[i], clip.start, clip.end, halfSecond);
-          i++
-        ) {
-          chunkIndex += 1
-        }
       } else {
-        if (!overlapsSignificantly(chunk, clip.start, clip.end, halfSecond))
-          result.push({
-            type: 'Preview',
-            index: result.length,
-            item: chunk,
-            cardBaseIndex: chunk.index,
-          })
+        result.push({
+          type: 'Preview',
+          index: result.length,
+          item: chunk,
+          cardBaseIndex: chunk.index,
+        })
         chunkIndex += 1
       }
     }
@@ -128,19 +131,27 @@ export const getNewFieldsFromLinkedSubtitles = (
   { start, end }: PendingClip
 ): FlashcardFields => {
   const subs = getSubtitlesCardBases(state)
-
-  const cardBase = subs.cards.find(c =>
-    overlapsSignificantly(c, start, end, getHalfSecond(state))
-  )
   const fieldsToTracks = getSubtitlesFlashcardFieldLinks(state)
-  const tracksToFieldsText = cardBase
-    ? subs.getFieldsPreviewFromCardsBase(cardBase)
-    : null
   const fields = { ...getBlankFields(state) } as TransliterationFlashcardFields
-  for (const fieldName of subs.fieldNames) {
-    const trackId = fieldsToTracks[fieldName]
-    const text = trackId && tracksToFieldsText && tracksToFieldsText[trackId]
-    fields[fieldName] = text || ''
+
+  for (const cardBase of subs.cards) {
+    if (overlapsSignificantly(cardBase, start, end, getHalfSecond(state))) {
+      const tracksToFieldsText = cardBase
+        ? subs.getFieldsPreviewFromCardsBase(cardBase)
+        : null
+      for (const fieldName of subs.fieldNames) {
+        const trackId = fieldsToTracks[fieldName]
+        const newText =
+          (trackId && tracksToFieldsText && tracksToFieldsText[trackId]) || ''
+
+        const text = fields[fieldName]
+
+        fields[fieldName] = [text.trim(), newText.trim()]
+          .filter(s => s)
+          .join('\n')
+      }
+    } else if (cardBase.start >= end) break
   }
+
   return fields
 }

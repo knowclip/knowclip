@@ -1,4 +1,11 @@
-import React, { useCallback, ReactNodeArray } from 'react'
+import React, {
+  useCallback,
+  ReactNodeArray,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
@@ -6,7 +13,7 @@ import { TransliterationFlashcardFields } from '../types/Project'
 import FieldMenu, {
   useSubtitlesBySource,
 } from './FlashcardSectionFieldPopoverMenu'
-import { Tooltip, IconButton } from '@material-ui/core'
+import { Tooltip, IconButton, Button } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
 
@@ -92,6 +99,17 @@ const FlashcardSectionPreview = ({
       </section>
 
       <section className={css.menu}>
+        <Tooltip title="Create cloze deletion (C key)">
+          <Button
+            className={css.clozeButton}
+            onClick={startEditing}
+            color="primary"
+            variant="contained"
+          >
+            C1
+          </Button>
+        </Tooltip>
+
         <Tooltip title="Create flashcard from these subtitles (E key)">
           <IconButton className={css.editCardButton} onClick={startEditing}>
             <Add />
@@ -110,6 +128,22 @@ export const FlashcardDisplayFieldValue = ({
   value: string | null
   title: string | undefined
 }) => {
+  const spanRef = useRef<HTMLSpanElement | null>(null)
+
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
+
+  useLayoutEffect(
+    () => {
+      if (spanRef.current) {
+        const rect = spanRef.current.getBoundingClientRect()
+        setWidth(rect.width + 16)
+        setHeight(rect.height + 7)
+      }
+    },
+    [value]
+  )
+
   if (!value)
     return title ? (
       <Tooltip title={title}>
@@ -125,17 +159,32 @@ export const FlashcardDisplayFieldValue = ({
     if (i !== 0)
       withoutNewlines.push(
         <span className={css.newlinePlaceholder} key={String(i)}>
-          {'\n'}
+          <span className={css.newline}>{'\n'}</span>
         </span>
       )
     withoutNewlines.push(line)
   })
-  return title ? (
-    <Tooltip title={title}>
-      <span>{withoutNewlines}</span>
-    </Tooltip>
-  ) : (
-    <span>{withoutNewlines}</span>
+
+  const contenta = (
+    <span ref={spanRef} onSelect={e => console.log(e)}>
+      {withoutNewlines}
+    </span>
+  )
+  const content = (
+    <textarea
+      style={{ width: width + 'px', height: height + 'px' }}
+      className={css.clozeField}
+      onSelect={e => console.log(e)}
+      value={value.replace(/\n/g, '⏎')}
+      onKeyPress={e => e.preventDefault()}
+    />
+  )
+
+  return (
+    <>
+      {title ? <Tooltip title={title}>{content}</Tooltip> : content}
+      {contenta}
+    </>
   )
 }
 export const FlashcardDisplayField = ({
