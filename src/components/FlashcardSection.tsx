@@ -30,13 +30,21 @@ const FlashcardSection = ({
   mediaFile: MediaFile | null
   className?: string
 }) => {
-  const { waveformSelection, clipsIds, editing } = useSelector(
-    (state: AppState) => ({
-      waveformSelection: r.getWaveformSelection(state),
-      clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
-      editing: state.session.editingCards,
-    })
-  )
+  const {
+    waveformSelection,
+    clipsIds,
+    editing,
+    fieldsToTracks,
+    subtitles,
+    viewMode,
+  } = useSelector((state: AppState) => ({
+    waveformSelection: r.getWaveformSelection(state),
+    clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
+    editing: state.session.editingCards,
+    fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
+    subtitles: r.getSubtitlesCardBases(state),
+    viewMode: state.settings.viewMode,
+  }))
 
   const highlightedClip =
     waveformSelection && waveformSelection.type === 'Clip'
@@ -101,23 +109,23 @@ const FlashcardSection = ({
           />
         </section>
       )}
-
-      {!waveformSelection && (
-        <Placeholder
-          clipsIds={clipsIds}
-          mediaFile={mediaFile}
-          selection={waveformSelection}
-        />
+      {mediaFile && waveformSelection && waveformSelection.type === 'Preview' && (
+        <section
+          className={cn(css.preview, css.display, {
+            [css.horizontalIntro]: viewMode === 'HORIZONTAL',
+          })}
+        >
+          <Preview
+            cardBases={subtitles}
+            chunkIndex={waveformSelection.item.index}
+            clipsIds={clipsIds}
+            mediaFile={mediaFile}
+            fieldsToTracks={fieldsToTracks}
+            viewMode={viewMode}
+          />
+        </section>
       )}
-
-      {waveformSelection && waveformSelection.type === 'Preview' && (
-        <Placeholder
-          clipsIds={clipsIds}
-          mediaFile={mediaFile}
-          selection={waveformSelection}
-        />
-      )}
-
+      {!waveformSelection && <Placeholder viewMode={viewMode} />}
       <Tooltip title="Next (→ key)">
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
@@ -134,53 +142,13 @@ const FlashcardSection = ({
   )
 }
 
-const Placeholder = ({
-  clipsIds,
-  mediaFile,
-  selection,
-}: {
-  clipsIds: string[]
-  mediaFile: MediaFile | null
-  selection: {
-    type: 'Preview'
-    index: number
-    item: SubtitlesCardBase
-  } | null
-}) => {
-  const { fieldsToTracks, subtitles, viewMode } = useSelector(
-    (state: AppState) => {
-      const subtitlesMounted = mediaFile && mediaFile.subtitles.length
-      return {
-        fieldsToTracks: subtitlesMounted
-          ? r.getSubtitlesFlashcardFieldLinks(state)
-          : null,
-        subtitles: subtitlesMounted ? r.getSubtitlesCardBases(state) : null,
-        viewMode: state.settings.viewMode,
-      }
-    }
-  )
-
-  const className = cn(css.display, {
-    [css.horizontalIntro]: viewMode === 'HORIZONTAL',
-  })
-
-  return mediaFile &&
-    fieldsToTracks &&
-    subtitles &&
-    selection &&
-    selection.item ? (
-    <section className={cn(className, css.preview)}>
-      <Preview
-        cardBases={subtitles}
-        chunkIndex={selection.item.index}
-        clipsIds={clipsIds}
-        mediaFile={mediaFile}
-        fieldsToTracks={fieldsToTracks}
-        viewMode={viewMode}
-      />
-    </section>
-  ) : (
-    <section className={cn(className, css.intro)}>
+const Placeholder = ({ viewMode }: { viewMode: ViewMode }) => {
+  return (
+    <section
+      className={cn(css.intro, css.display, {
+        [css.horizontalIntro]: viewMode === 'HORIZONTAL',
+      })}
+    >
       <p className={css.introText}>
         You can <strong>create clips</strong> in a few different ways:
       </p>

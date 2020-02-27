@@ -6,6 +6,8 @@ import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
 import FlashcardDisplayField from './FlashcardSectionDisplayField'
 import { Edit } from '@material-ui/icons'
+import FlashcardSectionDisplay from './FlashcardSectionDisplay'
+import { TransliterationFlashcardFields } from '../types/Project'
 
 enum $ {
   container = 'flashcard-display-container',
@@ -40,7 +42,8 @@ const FlashcardSectionDisplayCard = memo(
 
     if (!selectedClipTime || !flashcard) throw new Error('Clip not found')
 
-    const { fields } = flashcard
+    const { fields: f } = flashcard
+    const fields = f as TransliterationFlashcardFields
 
     const handleDoubleClick = useCallback(
       fieldName => {
@@ -59,74 +62,28 @@ const FlashcardSectionDisplayCard = memo(
     const title = 'Double-click to edit'
 
     return (
-      <section
-        className={cn(css.container, {
-          [css.horizontalPreview]: viewMode === 'HORIZONTAL',
-        })}
-        id={$.container}
-      >
-        <section className={cn(css.previewFields)}>
-          <FlashcardDisplayField
-            fieldName="transcription"
-            subtitles={mediaFile.subtitles}
-            linkedTracks={fieldsToTracks}
-            mediaFileId={mediaFile.id}
-            onDoubleClick={handleDoubleClick}
-            className={cn(css.previewFieldTranscription)}
-            title={title}
-          >
-            {fields.transcription}
-          </FlashcardDisplayField>
-
-          {'pronunciation' in fields && fields.pronunciation && (
-            <FlashcardDisplayField
-              fieldName="pronunciation"
-              subtitles={mediaFile.subtitles}
-              linkedTracks={fieldsToTracks}
-              mediaFileId={mediaFile.id}
-              onDoubleClick={handleDoubleClick}
-              title={title}
-            >
-              {fields.pronunciation}
-            </FlashcardDisplayField>
-          )}
-          <FlashcardDisplayField
-            fieldName="meaning"
-            subtitles={mediaFile.subtitles}
-            linkedTracks={fieldsToTracks}
-            mediaFileId={mediaFile.id}
-            onDoubleClick={handleDoubleClick}
-            title={title}
-          >
-            {fields.meaning}
-          </FlashcardDisplayField>
-          {fields.notes && (
-            <FlashcardDisplayField
-              fieldName="notes"
-              subtitles={mediaFile.subtitles}
-              linkedTracks={fieldsToTracks}
-              mediaFileId={mediaFile.id}
-              onDoubleClick={handleDoubleClick}
-              className={cn(css.previewFieldNotes)}
-              title={title}
-            >
-              {fields.notes}
-            </FlashcardDisplayField>
-          )}
-        </section>
-
-        <section className={css.menu}>
-          <Tooltip title="Edit card (E key)">
-            <IconButton
-              className={css.editCardButton}
-              onClick={startEditing}
-              id={$.editButton}
-            >
-              <Edit />
-            </IconButton>
-          </Tooltip>
-        </section>
-      </section>
+      <FlashcardSectionDisplay
+        className={css.preview}
+        mediaFile={mediaFile}
+        fieldsToTracks={fieldsToTracks}
+        fields={fields}
+        viewMode={viewMode}
+        onDoubleClickField={handleDoubleClick}
+        fieldHoverText={title}
+        menuItems={
+          <>
+            <Tooltip title="Edit card (E key)">
+              <IconButton
+                className={css.editCardButton}
+                onClick={startEditing}
+                id={$.editButton}
+              >
+                <Edit />
+              </IconButton>
+            </Tooltip>
+          </>
+        }
+      />
     )
   }
 )

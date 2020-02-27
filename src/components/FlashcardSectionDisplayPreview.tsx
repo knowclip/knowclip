@@ -17,6 +17,7 @@ import { Tooltip, IconButton, Button } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import FlashcardDisplayField from './FlashcardSectionDisplayField'
 import { useDispatch } from 'react-redux'
+import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 
 const FlashcardSectionPreview = ({
   cardBases,
@@ -51,73 +52,33 @@ const FlashcardSectionPreview = ({
   )
 
   return (
-    <section
-      className={cn(css.container, css.preview, {
-        [css.horizontalPreview]: viewMode === 'HORIZONTAL',
-      })}
-    >
-      <section className={cn(css.previewFields)}>
-        <FlashcardDisplayField
-          fieldName="transcription"
-          subtitles={mediaFile.subtitles}
-          linkedTracks={fieldsToTracks}
-          mediaFileId={mediaFile.id}
-          className={cn(css.previewFieldTranscription)}
-        >
-          {fields.transcription || null}
-        </FlashcardDisplayField>
+    <FlashcardSectionDisplay
+      className={css.preview}
+      mediaFile={mediaFile}
+      fieldsToTracks={fieldsToTracks}
+      fields={fields}
+      viewMode={viewMode}
+      menuItems={
+        <>
+          <Tooltip title="Create cloze deletion (C key)">
+            <Button
+              className={css.clozeButton}
+              onClick={startEditing}
+              color="primary"
+              variant="contained"
+            >
+              C1
+            </Button>
+          </Tooltip>
 
-        {'pronunciation' in fields && fields.pronunciation && (
-          <FlashcardDisplayField
-            fieldName="pronunciation"
-            subtitles={mediaFile.subtitles}
-            linkedTracks={fieldsToTracks}
-            mediaFileId={mediaFile.id}
-            className={css.previewFieldPronunciation}
-          >
-            {fields.pronunciation}
-          </FlashcardDisplayField>
-        )}
-        <FlashcardDisplayField
-          fieldName="meaning"
-          subtitles={mediaFile.subtitles}
-          linkedTracks={fieldsToTracks}
-          mediaFileId={mediaFile.id}
-        >
-          {fields.meaning || null}
-        </FlashcardDisplayField>
-        {fields.notes && (
-          <FlashcardDisplayField
-            fieldName="notes"
-            subtitles={mediaFile.subtitles}
-            linkedTracks={fieldsToTracks}
-            mediaFileId={mediaFile.id}
-            className={cn(css.previewFieldNotes)}
-          >
-            {fields.notes}
-          </FlashcardDisplayField>
-        )}
-      </section>
-
-      <section className={css.menu}>
-        <Tooltip title="Create cloze deletion (C key)">
-          <Button
-            className={css.clozeButton}
-            onClick={startEditing}
-            color="primary"
-            variant="contained"
-          >
-            C1
-          </Button>
-        </Tooltip>
-
-        <Tooltip title="Create flashcard from these subtitles (E key)">
-          <IconButton className={css.editCardButton} onClick={startEditing}>
-            <Add />
-          </IconButton>
-        </Tooltip>
-      </section>
-    </section>
+          <Tooltip title="Create flashcard from these subtitles (E key)">
+            <IconButton className={css.editCardButton} onClick={startEditing}>
+              <Add />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    />
   )
 }
 
