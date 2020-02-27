@@ -1,7 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@material-ui/core'
-import { Close as CloseIcon, Save as SaveIcon } from '@material-ui/icons'
+import {
+  Close as CloseIcon,
+  Save as SaveIcon,
+  Publish,
+} from '@material-ui/icons'
 import * as r from '../redux'
 import * as actions from '../actions'
 import DarkTheme from './DarkTheme'
@@ -14,6 +18,7 @@ enum $ {
   projectTitleInput = 'project-title-input',
   saveButton = 'save-button',
   closeButton = 'close-button',
+  exportButton = 'export-button',
 }
 
 const ProjectMenu = ({ className }: { className: string }) => {
@@ -21,6 +26,27 @@ const ProjectMenu = ({ className }: { className: string }) => {
     r.getCurrentProject(state)
   )
   if (!projectFile) throw new Error('Could not find project file')
+
+  const { currentMediaFile, clipsIdsForExport, workIsUnsaved } = useSelector(
+    (state: AppState) => {
+      const currentMediaFile = r.getCurrentMediaFile(state)
+      return {
+        loop: r.isLoopOn(state),
+        audioIsLoading: r.isAudioLoading(state),
+        currentProjectId: r.getCurrentProjectId(state),
+        constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(
+          state
+        ),
+        currentMediaFile,
+        clipsIdsForExport: currentMediaFile
+          ? state.clips.idsByMediaFileId[currentMediaFile.id]
+          : EMPTY,
+        subtitles: r.getSubtitlesTracks(state),
+        viewMode: state.settings.viewMode,
+        workIsUnsaved: r.isWorkUnsaved(state),
+      }
+    }
+  )
 
   const dispatch = useDispatch()
   const closeProjectRequest = useCallback(
@@ -102,6 +128,14 @@ const ProjectMenu = ({ className }: { className: string }) => {
     [submit]
   )
 
+  const reviewAndExportDialog = useCallback(
+    () =>
+      dispatch(
+        actions.reviewAndExportDialog(currentMediaFile, clipsIdsForExport)
+      ),
+    [dispatch, currentMediaFile, clipsIdsForExport]
+  )
+
   const { editing, text } = state
 
   return (
@@ -113,10 +147,23 @@ const ProjectMenu = ({ className }: { className: string }) => {
           </IconButton>
         </Tooltip>
         <Tooltip title="Save project">
-          <IconButton onClick={saveProjectRequest} id={$.saveButton}>
+          <IconButton
+            onClick={saveProjectRequest}
+            id={$.saveButton}
+            color={workIsUnsaved ? 'secondary' : 'default'}
+          >
             <SaveIcon />
           </IconButton>
-        </Tooltip>{' '}
+        </Tooltip>
+        <Tooltip title="Review and export flashcards">
+          <IconButton
+            id={$.exportButton}
+            className={css.floatingActionButton}
+            onClick={reviewAndExportDialog}
+          >
+            <Publish />
+          </IconButton>
+        </Tooltip>
         {
           <form
             onSubmit={handleSubmit}
@@ -137,6 +184,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
             />
           </form>
         }
+
         <Tooltip title="Double-click to edit">
           <h1
             className={cn(css.projectName, {
@@ -157,3 +205,5 @@ const ProjectMenu = ({ className }: { className: string }) => {
 export default ProjectMenu
 
 export { $ as projectMenu$ }
+
+const EMPTY: string[] = []

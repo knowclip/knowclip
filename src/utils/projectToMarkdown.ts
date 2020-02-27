@@ -43,7 +43,7 @@ const projectToMarkdown = (
                       `* ${flashcard.fields.meaning}`,
                       `* ${flashcard.fields.notes}`,
                     ]
-                ).map(rawString => rawString.replace(/\n/g, '<br>')),
+                ).map(rawString => rawString.replace(/[\n\r]/g, '<br>')),
               ]
             })
             .reduce((a, b) => a.concat(b), []),

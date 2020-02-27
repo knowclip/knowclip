@@ -8,7 +8,7 @@ import { existsSync } from 'fs'
 import { getVideoStillPngPath, getMidpoint } from './getVideoStill'
 import { sanitizeFileName } from './sanitizeFilename'
 
-const roughEscape = (text: string) => text.replace(/\n/g, '<br />')
+const roughEscape = (text: string) => text.replace(/[\n\r]/g, '<br />')
 
 const FRONT_SIDE = '{{FrontSide}}'
 const HR = '<hr id="answer" />'

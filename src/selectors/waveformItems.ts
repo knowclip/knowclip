@@ -33,17 +33,20 @@ export const getWaveformItems = createSelector(
     while (clipIndex < clips.length && chunkIndex < chunks.length) {
       const clip = clips[clipIndex]
 
-      let i = chunkIndex
       while (
-        overlapsSignificantly(chunks[i], clip.start, clip.end, halfSecond) &&
-        i < chunks.length
+        chunkIndex < chunks.length &&
+        overlapsSignificantly(
+          chunks[chunkIndex],
+          clip.start,
+          clip.end,
+          halfSecond
+        )
       ) {
         chunkIndex++
-        i++
       }
       const chunk = chunks[chunkIndex]
 
-      if (clip.start <= chunk.start) {
+      if (!chunk || clip.start <= chunk.start) {
         result.push({
           type: 'Clip',
           id: clip.id,

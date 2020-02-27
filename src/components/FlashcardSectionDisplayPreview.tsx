@@ -15,6 +15,7 @@ import FieldMenu, {
 } from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip, IconButton, Button } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
+import FlashcardDisplayField from './FlashcardSectionDisplayField'
 import { useDispatch } from 'react-redux'
 
 const FlashcardSectionPreview = ({
@@ -117,129 +118,6 @@ const FlashcardSectionPreview = ({
         </Tooltip>
       </section>
     </section>
-  )
-}
-export const FlashcardDisplayFieldValue = ({
-  fieldName,
-  value,
-  title,
-}: {
-  fieldName: FlashcardFieldName
-  value: string | null
-  title: string | undefined
-}) => {
-  const spanRef = useRef<HTMLSpanElement | null>(null)
-
-  const [width, setWidth] = useState(0)
-  const [height, setHeight] = useState(0)
-
-  useLayoutEffect(
-    () => {
-      if (spanRef.current) {
-        const rect = spanRef.current.getBoundingClientRect()
-        setWidth(rect.width + 16)
-        setHeight(rect.height + 7)
-      }
-    },
-    [value]
-  )
-
-  if (!value)
-    return title ? (
-      <Tooltip title={title}>
-        <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
-      </Tooltip>
-    ) : (
-      <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
-    )
-
-  const withoutNewlines: ReactNodeArray = []
-  const lines = value.split('\n')
-  lines.forEach((line, i) => {
-    if (i !== 0)
-      withoutNewlines.push(
-        <span className={css.newlinePlaceholder} key={String(i)}>
-          <span className={css.newline}>{'\n'}</span>
-        </span>
-      )
-    withoutNewlines.push(line)
-  })
-
-  const contenta = (
-    <span ref={spanRef} onSelect={e => console.log(e)}>
-      {withoutNewlines}
-    </span>
-  )
-  const content = (
-    <textarea
-      style={{ width: width + 'px', height: height + 'px' }}
-      className={css.clozeField}
-      onSelect={e => console.log(e)}
-      value={value.replace(/\n/g, '⏎')}
-      onKeyPress={e => e.preventDefault()}
-    />
-  )
-
-  return (
-    <>
-      {title ? <Tooltip title={title}>{content}</Tooltip> : content}
-      {contenta}
-    </>
-  )
-}
-export const FlashcardDisplayField = ({
-  children,
-  fieldName,
-  subtitles,
-  linkedTracks,
-  mediaFileId,
-  onDoubleClick,
-  className,
-  title,
-}: {
-  children: string | null
-  fieldName: FlashcardFieldName
-  subtitles: MediaSubtitlesRelation[]
-  linkedTracks: SubtitlesFlashcardFieldsLinks
-  mediaFileId: MediaFileId
-  onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
-  className?: string
-  title?: string
-}) => {
-  const {
-    embeddedSubtitlesTracks,
-    externalSubtitlesTracks,
-  } = useSubtitlesBySource(subtitles)
-  const linkedSubtitlesTrack = linkedTracks[fieldName] || null
-  const handleDoubleClick = useCallback(
-    () => {
-      if (onDoubleClick) onDoubleClick(fieldName)
-    },
-    [fieldName, onDoubleClick]
-  )
-  return (
-    <div
-      className={cn(css.previewField, className, {
-        [css.previewFieldWithPopover]: Boolean(subtitles.length),
-      })}
-      onDoubleClick={handleDoubleClick}
-    >
-      {Boolean(subtitles.length) && (
-        <FieldMenu
-          className={css.previewFieldMenuButton}
-          embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-          externalSubtitlesTracks={externalSubtitlesTracks}
-          linkedSubtitlesTrack={linkedSubtitlesTrack}
-          mediaFileId={mediaFileId}
-          fieldName={fieldName as TransliterationFlashcardFieldName}
-        />
-      )}
-      <FlashcardDisplayFieldValue
-        fieldName={fieldName}
-        value={children}
-        title={title}
-      />
-    </div>
   )
 }
 

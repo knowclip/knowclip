@@ -1,7 +1,6 @@
-import React, { useCallback } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { CircularProgress, Tooltip, Fab } from '@material-ui/core'
-import { Layers } from '@material-ui/icons'
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { CircularProgress } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
 import cn from 'classnames'
 import Media from '../components/Media'
@@ -11,12 +10,10 @@ import Header from '../components/MainHeader'
 import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import DarkTheme from '../components/DarkTheme'
 import css from '../components/Main.module.css'
-import * as actions from '../actions'
 import * as r from '../selectors'
 
 enum $ {
   container = 'main-screen-container',
-  exportButton = 'export-button',
 }
 
 const Main = () => {
@@ -26,7 +23,6 @@ const Main = () => {
     currentProjectId,
     constantBitrateFilePath,
     currentMediaFile,
-    clipsIdsForExport,
     subtitles,
     viewMode,
   } = useSelector((state: AppState) => {
@@ -44,15 +40,6 @@ const Main = () => {
       viewMode: state.settings.viewMode,
     }
   })
-  const dispatch = useDispatch()
-
-  const reviewAndExportDialog = useCallback(
-    () =>
-      dispatch(
-        actions.reviewAndExportDialog(currentMediaFile, clipsIdsForExport)
-      ),
-    [dispatch, currentMediaFile, clipsIdsForExport]
-  )
 
   if (!currentProjectId) return <Redirect to="/projects" />
 
@@ -94,16 +81,6 @@ const Main = () => {
 
       <Waveform show={Boolean(currentMediaFile && !audioIsLoading)} />
 
-      <Tooltip title="Review and export flashcards">
-        <Fab
-          id={$.exportButton}
-          className={css.floatingActionButton}
-          onClick={reviewAndExportDialog}
-          color="primary"
-        >
-          <Layers />
-        </Fab>
-      </Tooltip>
       <KeyboardShortcuts />
     </div>
   )

@@ -4,7 +4,7 @@ import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
-import { FlashcardDisplayField } from './FlashcardSectionDisplayPreview'
+import FlashcardDisplayField from './FlashcardSectionDisplayField'
 import { Edit } from '@material-ui/icons'
 
 enum $ {
