@@ -81,21 +81,19 @@ const addClipEpic: AppEpic = (
           const tooSmall =
             pendingClipOverlaps || !pendingClipIsBigEnough(state$.value)
 
-          const newTime = r.getSecondsAtX(
-            state$.value,
-            tooSmall
-              ? Math.max(pendingClip.start, pendingClip.end)
-              : Math.min(pendingClip.start, pendingClip.end)
-          )
+          const left = Math.min(pendingClip.start, pendingClip.end)
+          const right = Math.max(pendingClip.start, pendingClip.end)
+
+          const newTime = r.getSecondsAtX(state$.value, tooSmall ? right : left)
           if (!tooSmall) setCurrentTime(newTime)
 
           // maybe later, do stretch + merge for overlaps.
           if (tooSmall) return of(r.clearPendingClip())
 
-          const fields = r.getNewFieldsFromLinkedSubtitles(
-            state$.value,
-            pendingClip
-          )
+          const fields = r.getNewFieldsFromLinkedSubtitles(state$.value, {
+            start: left,
+            end: right,
+          })
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
             pendingClip,

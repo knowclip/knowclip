@@ -30,6 +30,8 @@ const FlashcardSectionDisplay = ({
   className,
   onDoubleClickField,
   fieldHoverText,
+  clozeIndex = -1,
+  clozeDeletions,
 }: {
   fields: TransliterationFlashcardFields
   viewMode: ViewMode
@@ -42,7 +44,8 @@ const FlashcardSectionDisplay = ({
   className?: string
   onDoubleClickField?: (fn: TransliterationFlashcardFieldName) => void
   fieldHoverText?: string
-
+  clozeIndex?: number
+  clozeDeletions?: ClozeDeletion[]
   // viewMode: ViewMode
 }) => {
   // const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
@@ -55,13 +58,13 @@ const FlashcardSectionDisplay = ({
   //   fields[fieldName] = text || ''
   // }
 
-  const dispatch = useDispatch()
-  const startEditing = useCallback(
-    () => {
-      dispatch(r.startEditingCards())
-    },
-    [dispatch]
-  )
+  // const dispatch = useDispatch()
+  // const startEditing = useCallback(
+  //   () => {
+  //     dispatch(r.startEditingCards())
+  //   },
+  //   [dispatch]
+  // )
 
   return (
     <section
@@ -78,6 +81,8 @@ const FlashcardSectionDisplay = ({
           onDoubleClick={onDoubleClickField}
           title={fieldHoverText}
           className={cn(css.previewFieldTranscription)}
+          clozeIndex={clozeIndex}
+          clozeDeletions={clozeDeletions}
         >
           {fields.transcription || null}
         </FlashcardDisplayField>

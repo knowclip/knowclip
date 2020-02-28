@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react'
+import React, { useCallback, memo, useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
@@ -60,6 +60,18 @@ const FlashcardSectionDisplayCard = memo(
       [dispatch]
     )
     const title = 'Double-click to edit'
+
+    // const [clozeModeOn, setClozeMode] = useState(false)
+    // useEffect(() => {
+    //   const cKey = (e: KeyboardEvent) => {
+    //     if (e.keyCode === 67) {
+    //       setClozeMode(true)
+    //     }
+    //   }
+    //   document.addEventListener('keyup', cKey)
+
+    //   return () => document.removeEventListener('keyup', cKey)
+    // })
 
     return (
       <FlashcardSectionDisplay

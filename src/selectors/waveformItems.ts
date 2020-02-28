@@ -131,7 +131,7 @@ export const getBlankFields = (state: AppState) =>
 
 export const getNewFieldsFromLinkedSubtitles = (
   state: AppState,
-  { start, end }: PendingClip
+  { start, end }: { start: number; end: number }
 ): FlashcardFields => {
   const subs = getSubtitlesCardBases(state)
   const fieldsToTracks = getSubtitlesFlashcardFieldLinks(state)

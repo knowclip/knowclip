@@ -14,8 +14,12 @@ import FieldMenu, {
   useSubtitlesBySource,
 } from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip, IconButton, Button } from '@material-ui/core'
-import { Add } from '@material-ui/icons'
-import FlashcardDisplayField from './FlashcardSectionDisplayField'
+import { Add, LibraryAdd } from '@material-ui/icons'
+import FlashcardDisplayField, {
+  ClozeId,
+  ClozeIds,
+  ClozeColors,
+} from './FlashcardSectionDisplayField'
 import { useDispatch } from 'react-redux'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 
@@ -51,6 +55,37 @@ const FlashcardSectionPreview = ({
     [dispatch]
   )
 
+  const deletions = [
+    { clozeId: 'c1' as const, ranges: [{ start: 0, end: 7 }] },
+    {
+      clozeId: 'c2' as const,
+      ranges: [{ start: 5, end: 10 }, { start: 12, end: 15 }],
+    },
+  ]
+
+  const [clozeIndex, setClozeIndex] = useState<number>(-1)
+  // const [previewClozeIndex, setPreviewClozeIndex] = useState(-1)
+  // const
+  // useEffect(
+  //   () => {
+  //     if (clozeIndex > deletions.length) setClozeIndex(deletions.length)
+  //   },
+  //   [clozeIndex, deletions.length]
+  // )
+  useEffect(() => {
+    const cKey = (e: KeyboardEvent) => {
+      if (e.keyCode === 67) {
+        const potentialNewIndex = clozeIndex + 1
+        setClozeIndex(
+          potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+        )
+      }
+    }
+    document.addEventListener('keyup', cKey)
+
+    return () => document.removeEventListener('keyup', cKey)
+  })
+
   return (
     <FlashcardSectionDisplay
       className={css.preview}
@@ -58,27 +93,97 @@ const FlashcardSectionPreview = ({
       fieldsToTracks={fieldsToTracks}
       fields={fields}
       viewMode={viewMode}
+      clozeIndex={clozeIndex}
+      clozeDeletions={deletions}
       menuItems={
         <>
-          <Tooltip title="Create cloze deletion (C key)">
-            <Button
-              className={css.clozeButton}
-              onClick={startEditing}
-              color="primary"
-              variant="contained"
-            >
-              C1
-            </Button>
-          </Tooltip>
-
           <Tooltip title="Create flashcard from these subtitles (E key)">
             <IconButton className={css.editCardButton} onClick={startEditing}>
-              <Add />
+              <LibraryAdd />
             </IconButton>
           </Tooltip>
+          <ClozeButtons
+            deletions={deletions}
+            currentClozeIndex={clozeIndex}
+            setClozeIndex={setClozeIndex}
+          />
         </>
       }
     />
+  )
+}
+
+const ClozeButtons = ({
+  deletions,
+  currentClozeIndex,
+  setClozeIndex,
+}: {
+  deletions: ClozeDeletion[]
+  currentClozeIndex?: number
+  setClozeIndex: React.Dispatch<React.SetStateAction<number>>
+}) => {
+  const handleClick = useCallback(() => {}, [])
+  const nextId = ClozeIds[deletions.length]
+  const buttons = deletions.map(({ clozeId }, index) => {
+    return (
+      <ClozeButton
+        key={clozeId}
+        index={index}
+        hoverText={
+          currentClozeIndex === index
+            ? `Finish editing cloze deletion card (Enter)`
+            : `Edit cloze deletion card #${index + 1} (C key)`
+        }
+        id={clozeId}
+        setClozeIndex={setClozeIndex}
+        isActive={currentClozeIndex === index}
+      />
+    )
+  })
+
+  if (nextId)
+    buttons.push(
+      <ClozeButton
+        hoverText="Make a new cloze deletion card (C key)"
+        index={deletions.length}
+        id={nextId}
+        isActive={currentClozeIndex === deletions.length}
+        setClozeIndex={setClozeIndex}
+      />
+    )
+  return <>{buttons}</>
+}
+
+const ClozeButton = ({
+  hoverText,
+  id,
+  isActive,
+  index,
+  setClozeIndex,
+}: {
+  hoverText: string
+  id: ClozeId
+  isActive: boolean
+  index: number
+  setClozeIndex: React.Dispatch<React.SetStateAction<number>>
+}) => {
+  const handleClick = useCallback(
+    () => {
+      if (isActive) setClozeIndex(-1)
+      else setClozeIndex(index)
+    },
+    [index, isActive, setClozeIndex]
+  )
+  return (
+    <Tooltip title={hoverText}>
+      <Button
+        className={css.clozeButton}
+        onClick={handleClick}
+        style={isActive ? { backgroundColor: ClozeColors[id] } : undefined}
+      >
+        {id.toUpperCase()}
+      </Button>
+    </Tooltip>
   )
 }
 

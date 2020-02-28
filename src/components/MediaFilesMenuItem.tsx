@@ -15,6 +15,7 @@ import {
   PlayArrow,
   FolderSpecial,
 } from '@material-ui/icons'
+import cn from 'classnames'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import * as r from '../redux'
@@ -125,7 +126,11 @@ const MediaFilesMenuItem = ({
       onClick={loadAndClose}
       className={className}
     >
-      <ListItemText className={css.mediaFilesMenuListItemText}>
+      <ListItemText
+        className={cn(css.mediaFilesMenuListItemText, {
+          [css.activeMediaFilesMenuListItemText]: autoFocus,
+        })}
+      >
         {truncate(mediaFile.name, NAME_CUTOFF)}
       </ListItemText>
       {needsFilePath ? (

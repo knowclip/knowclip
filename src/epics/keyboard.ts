@@ -15,7 +15,9 @@ const isTextFieldFocused = () => {
   if (!activeElement) return false
   return (
     activeElement instanceof HTMLInputElement ||
-    activeElement instanceof HTMLTextAreaElement
+    activeElement instanceof HTMLTextAreaElement ||
+    activeElement instanceof HTMLDivElement ||
+    activeElement instanceof HTMLSpanElement
   )
 }
 
