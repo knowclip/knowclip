@@ -172,6 +172,7 @@
   composes: fieldValue;
   /* display:block; */
   color: black;
+  z-index: 4;
 
   position: relative;
   /* color: blue; */
@@ -183,7 +184,7 @@
   -webkit-line-break: after-white-space !important;
 } */
 .clozeFieldValueOverlay {
-  z-index: 1;
+  /* z-index: 1; */
  /* position: relative; */
 }
 .clozeFieldValue:focus {
@@ -237,26 +238,33 @@
   text-indent: 1.6rem;
   text-indent: 24px;
   pointer-events: none; 
+  z-index: 1;
+}
+.currentClozeUnderlay {
+  z-index: 0;
 }
 
 .clozeUnderlayDeletion {
-  opacity: .1;
-  border-bottom: solid 2px black;
+  opacity: .5;
+  border-bottom: dotted 2px rgba(0,0,0,0.5);
   /* opacity: 0; */
   background-color: #00000000;
   letter-spacing: inherit;
   padding: 0;
   margin: 0;
-  z-index: 3 !important;
+  /* z-index: 3; */
 }
 .currentClozeUnderlayDeletion {
-  opacity: 0.8;
-  z-index: 2 ;
+  opacity: 1;
+  border-bottom-color:black; 
 }
 .previewBlank {
-  z-index: 5 !important;
+  z-index: 15 !important;
+  opacity: 1 !important;
+}
+.previewBlank .clozeUnderlayDeletion {
   background-color: white !important;
-  opacity: 1;
+  opacity: 1 !important;
 }
 /* .clozeUnderlayDeletion::after {
   content: "";
@@ -269,21 +277,21 @@
 } */
 
 :global(.c1) .clozeUnderlayDeletion {
-  background-color: hsl(240, 40%, 80%);
+  background-color: hsla(240, 60%, 80%, 75%);
 }
 
 :global(.c2) .clozeUnderlayDeletion {
-  background-color: hsl(120, 40%, 80%);
+  background-color: hsla(120, 60%, 80%, 75%);
 }
 
 :global(.c3) .clozeUnderlayDeletion {
-  background-color: hsl(60, 40%, 80%);
+  background-color: hsla(60, 60%, 80%, 75%);
 }
 
 :global(.c4) .clozeUnderlayDeletion {
-  background-color: hsl(180, 40%, 80%);
+  background-color: hsla(180, 60%, 80%, 75%);
 }
 
 :global(.c5) .clozeUnderlayDeletion {
-  background-color: hsl(300, 40%, 80%);
+  background-color: hsla(300, 60%, 80%, 75%);
 }

@@ -63,28 +63,12 @@ const FlashcardSectionPreview = ({
     },
   ]
 
-  const [clozeIndex, setClozeIndex] = useState<number>(-1)
-  // const [previewClozeIndex, setPreviewClozeIndex] = useState(-1)
-  // const
-  // useEffect(
-  //   () => {
-  //     if (clozeIndex > deletions.length) setClozeIndex(deletions.length)
-  //   },
-  //   [clozeIndex, deletions.length]
-  // )
-  useEffect(() => {
-    const cKey = (e: KeyboardEvent) => {
-      if (e.keyCode === 67) {
-        const potentialNewIndex = clozeIndex + 1
-        setClozeIndex(
-          potentialNewIndex > deletions.length ? -1 : potentialNewIndex
-        )
-      }
-    }
-    document.addEventListener('keyup', cKey)
-
-    return () => document.removeEventListener('keyup', cKey)
-  })
+  const {
+    clozeIndex,
+    setClozeIndex,
+    previewClozeIndex,
+    setPreviewClozeIndex,
+  } = useClozeUi(deletions)
 
   return (
     <FlashcardSectionDisplay
@@ -94,6 +78,7 @@ const FlashcardSectionPreview = ({
       fields={fields}
       viewMode={viewMode}
       clozeIndex={clozeIndex}
+      previewClozeIndex={previewClozeIndex}
       clozeDeletions={deletions}
       menuItems={
         <>
@@ -106,6 +91,7 @@ const FlashcardSectionPreview = ({
             deletions={deletions}
             currentClozeIndex={clozeIndex}
             setClozeIndex={setClozeIndex}
+            setPreviewClozeIndex={setPreviewClozeIndex}
           />
         </>
       }
@@ -116,13 +102,16 @@ const FlashcardSectionPreview = ({
 const ClozeButtons = ({
   deletions,
   currentClozeIndex,
+  setPreviewClozeIndex,
   setClozeIndex,
 }: {
   deletions: ClozeDeletion[]
   currentClozeIndex?: number
+  setPreviewClozeIndex: React.Dispatch<React.SetStateAction<number>>
   setClozeIndex: React.Dispatch<React.SetStateAction<number>>
 }) => {
   const handleClick = useCallback(() => {}, [])
+
   const nextId = ClozeIds[deletions.length]
   const buttons = deletions.map(({ clozeId }, index) => {
     return (
@@ -136,6 +125,7 @@ const ClozeButtons = ({
         }
         id={clozeId}
         setClozeIndex={setClozeIndex}
+        setPreviewClozeIndex={setPreviewClozeIndex}
         isActive={currentClozeIndex === index}
       />
     )
@@ -149,6 +139,7 @@ const ClozeButtons = ({
         id={nextId}
         isActive={currentClozeIndex === deletions.length}
         setClozeIndex={setClozeIndex}
+        setPreviewClozeIndex={setPreviewClozeIndex}
       />
     )
   return <>{buttons}</>
@@ -160,12 +151,14 @@ const ClozeButton = ({
   isActive,
   index,
   setClozeIndex,
+  setPreviewClozeIndex,
 }: {
   hoverText: string
   id: ClozeId
   isActive: boolean
   index: number
   setClozeIndex: React.Dispatch<React.SetStateAction<number>>
+  setPreviewClozeIndex: React.Dispatch<React.SetStateAction<number>>
 }) => {
   const handleClick = useCallback(
     () => {
@@ -174,9 +167,25 @@ const ClozeButton = ({
     },
     [index, isActive, setClozeIndex]
   )
+  const handleMouseEnter = useCallback(
+    () => {
+      setPreviewClozeIndex(index)
+    },
+    [setPreviewClozeIndex, index]
+  )
+  const handleMouseLeave = useCallback(
+    () => {
+      setPreviewClozeIndex(-1)
+    },
+    [setPreviewClozeIndex]
+  )
   return (
     <Tooltip title={hoverText}>
       <Button
+        onMouseEnter={handleMouseEnter}
+        onFocus={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onBlur={handleMouseLeave}
         className={css.clozeButton}
         onClick={handleClick}
         style={isActive ? { backgroundColor: ClozeColors[id] } : undefined}
@@ -185,6 +194,36 @@ const ClozeButton = ({
       </Button>
     </Tooltip>
   )
+}
+
+function useClozeUi(deletions: ClozeDeletion[]) {
+  const [clozeIndex, setClozeIndex] = useState<number>(-1)
+  const [previewClozeIndex, setPreviewClozeIndex] = useState(-1)
+  useEffect(
+    () => {
+      if (clozeIndex > deletions.length) setClozeIndex(deletions.length)
+    },
+    [clozeIndex, deletions.length]
+  )
+  useEffect(() => {
+    const cKey = (e: KeyboardEvent) => {
+      if (e.keyCode === 67) {
+        const potentialNewIndex = clozeIndex + 1
+        setClozeIndex(
+          potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+        )
+      }
+    }
+    document.addEventListener('keyup', cKey)
+
+    return () => document.removeEventListener('keyup', cKey)
+  })
+  return {
+    clozeIndex,
+    setClozeIndex,
+    previewClozeIndex,
+    setPreviewClozeIndex,
+  }
 }
 
 export default FlashcardSectionPreview

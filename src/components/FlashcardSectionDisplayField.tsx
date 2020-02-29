@@ -187,10 +187,13 @@ const ClozeField = ({
 }) => {
   const ref = useRef<HTMLSpanElement>(null)
 
-  useEffect(() => {
-    console.log({ ref })
-    if (ref.current) ref.current.focus()
-  }, [])
+  useEffect(
+    () => {
+      console.log({ ref })
+      if (ref.current) ref.current.focus()
+    },
+    [clozeIndex]
+  )
 
   const clearNewlines = (value: string, className?: string) => {
     const withoutNewlines: ReactNodeArray = []
@@ -233,14 +236,31 @@ const ClozeField = ({
     console.log({ e })
     e.preventDefault()
   }, [])
+  const clozeHint = (
+    <>
+      Select the text you wish to blank out.
+      <br />
+      <br />
+      Hit Backspace to trim selection.
+      <br />
+      <br />
+      Hit Enter when finished.
+    </>
+  )
 
-  const content = (
+  return (
     <>
       {deletions
         // .filter(d => d.clozeId === clozeId)
         .map(({ ranges, clozeId: id }, clozeIndex) => {
           return (
-            <span className={cn(css.clozeUnderlay, id)} contentEditable>
+            <span
+              className={cn(css.clozeUnderlay, id, {
+                [css.currentClozeUnderlay]: id === clozeId,
+                [css.previewBlank]: clozeIndex === previewClozeIndex,
+              })}
+              contentEditable
+            >
               {ranges.reduce(
                 (elements, { start, end }, i) => {
                   // const lastEnd  ranges[i - 1].end
@@ -251,7 +271,6 @@ const ClozeField = ({
                     <span
                       className={cn(css.clozeUnderlayDeletion, {
                         [css.currentClozeUnderlayDeletion]: id === clozeId,
-                        [css.previewBlank]: clozeIndex === previewClozeIndex,
                       })}
                     >
                       {clearNewlines(value.slice(start, end))}
@@ -293,32 +312,32 @@ const ClozeField = ({
       </span> */}
       {/* {horizontal ? value.replace(/[\n\r]/g, '⏎') : value} */}
       {subtitlesMenu}
-      <span
-        className={cn(css.clozeFieldValue, clozeId)}
-        contentEditable
-        onPaste={preventDefault}
-        onCut={preventDefault}
-        onKeyDown={onKeyDown}
-        onDragEnd={preventDefault}
-        onDragExit={preventDefault}
-        onDragOver={preventDefault}
-        onSelect={e => {
-          console.log('select', e)
-        }}
-        // style={{ caretColor: ClozeColors[ClozeIds[clozeIndex]] }}
-        onCopy={onCopy}
-        ref={ref}
-      >
-        <span className={cn(css.clozeFieldValueOverlay, clozeId)}>
-          {withoutNewlines}
+      <Tooltip title={clozeHint}>
+        <span
+          className={cn(css.clozeFieldValue, clozeId)}
+          contentEditable
+          onPaste={preventDefault}
+          onCut={preventDefault}
+          onKeyDown={onKeyDown}
+          onDragEnd={preventDefault}
+          onDragExit={preventDefault}
+          onDragOver={preventDefault}
+          onSelect={e => {
+            console.log('select', e)
+          }}
+          // style={{ caretColor: ClozeColors[ClozeIds[clozeIndex]] }}
+          onCopy={onCopy}
+          ref={ref}
+        >
+          <span className={cn(css.clozeFieldValueOverlay, clozeId)}>
+            {withoutNewlines}
+          </span>
         </span>
-      </span>
+      </Tooltip>
     </>
   )
   //  const withTooltip = title ? <Tooltip title={title}>{content}</Tooltip> : content
-  const clozeHint =
-    'Select the text you wish to blank out.\nTrim selection with Backspace, complete with Enter.'
-  return <Tooltip title={clozeHint}>{content}</Tooltip>
+  // return <Tooltip title={clozeHint}>{content}</Tooltip>
 }
 
 const ENABLED_KEYS = [

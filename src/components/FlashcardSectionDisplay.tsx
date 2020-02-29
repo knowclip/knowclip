@@ -31,6 +31,7 @@ const FlashcardSectionDisplay = ({
   onDoubleClickField,
   fieldHoverText,
   clozeIndex = -1,
+  previewClozeIndex = -1,
   clozeDeletions,
 }: {
   fields: TransliterationFlashcardFields
@@ -45,6 +46,7 @@ const FlashcardSectionDisplay = ({
   onDoubleClickField?: (fn: TransliterationFlashcardFieldName) => void
   fieldHoverText?: string
   clozeIndex?: number
+  previewClozeIndex?: number
   clozeDeletions?: ClozeDeletion[]
   // viewMode: ViewMode
 }) => {
@@ -82,6 +84,7 @@ const FlashcardSectionDisplay = ({
           title={fieldHoverText}
           className={cn(css.previewFieldTranscription)}
           clozeIndex={clozeIndex}
+          previewClozeIndex={previewClozeIndex}
           clozeDeletions={clozeDeletions}
         >
           {fields.transcription || null}
