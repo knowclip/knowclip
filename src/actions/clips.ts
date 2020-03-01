@@ -97,12 +97,14 @@ export const mergeClips = (ids: Array<ClipId>): ClipAction => ({
 export const setFlashcardField = (
   id: ClipId,
   key: FlashcardFieldName,
-  value: string
+  value: string,
+  caretLocation: number
 ): SetFlashcardField => ({
   type: A.SET_FLASHCARD_FIELD,
   id,
   key,
   value,
+  caretLocation,
 })
 
 export const addFlashcardTag = (id: ClipId, text: string): Action => ({
@@ -131,3 +133,38 @@ export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
   type: A.DELETE_CARDS,
   ids,
 })
+
+export const addClozeDeletion = (
+  id: ClipId,
+  currentCloze: ClozeDeletion[],
+  deletion: ClozeDeletion
+): EditClip =>
+  editClip(id, null, {
+    cloze: [...currentCloze, deletion],
+  })
+
+export const editClozeDeletion = (
+  id: ClipId,
+  currentCloze: ClozeDeletion[],
+  clozeIndex: number,
+  ranges: ClozeDeletion['ranges']
+): EditClip =>
+  editClip(id, null, {
+    cloze: currentCloze.map((c, i) =>
+      i === clozeIndex
+        ? {
+            ...c,
+            ranges,
+          }
+        : c
+    ),
+  })
+
+export const removeClozeDeletion = (
+  id: ClipId,
+  currentCloze: ClozeDeletion[],
+  clozeIndex: number
+): EditClip =>
+  editClip(id, null, {
+    cloze: currentCloze.filter((c, i) => i !== clozeIndex),
+  })

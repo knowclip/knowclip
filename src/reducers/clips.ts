@@ -371,6 +371,7 @@ function editClip(
         tags: flashcardOverride.tags
           ? flashcardOverride.tags.filter((t): t is string => Boolean(t))
           : flashcard.tags,
+        cloze: flashcardOverride.cloze,
       } as Flashcard)
     : state.flashcards[id]
   return {

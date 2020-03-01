@@ -39,6 +39,7 @@ const newFlashcard = (
         },
   tags,
   image,
+  cloze: [],
 })
 
 export default newFlashcard

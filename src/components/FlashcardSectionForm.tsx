@@ -144,7 +144,8 @@ const FlashcardSectionForm = memo(
     }, [])
 
     const setFlashcardText = useCallback(
-      (key, text) => dispatch(actions.setFlashcardField(id, key, text)),
+      (key, text, caretLocation) =>
+        dispatch(actions.setFlashcardField(id, key, text, caretLocation)),
       [dispatch, id]
     )
     const deleteCard = useCallback(

@@ -1,6 +1,5 @@
 declare type FlashcardsState = Record<ClipId, Flashcard>
 
-
 declare interface FlashcardFields {
   transcription: string
   meaning: string
@@ -30,7 +29,7 @@ declare type SimpleFlashcard = {
   fields: import('./Project').SimpleFlashcardFields
   tags: Array<string>
   image?: FlashcardImage | null
-  cloze?: ClozeDeletion | null
+  cloze: ClozeDeletion[]
 }
 declare type TransliterationFlashcard = {
   id: ClipId
@@ -38,7 +37,7 @@ declare type TransliterationFlashcard = {
   fields: import('./Project').TransliterationFlashcardFields
   tags: Array<string>
   image?: FlashcardImage | null
-  cloze?: ClozeDeletion | null
+  cloze: ClozeDeletion[]
 }
 
 declare type FlashcardImage = {
@@ -49,6 +48,7 @@ declare type FlashcardImage = {
 }
 
 declare type ClozeDeletion = {
-  clozeId: ClozeId
-  ranges: { start: number; end: number }[]
+  ranges: ClozeRange[]
 }
+
+declare type ClozeRange = { start: number; end: number }

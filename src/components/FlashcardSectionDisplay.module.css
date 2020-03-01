@@ -35,6 +35,9 @@
 .preview {
   color: #777;
 }
+.card {
+  color: inherit;
+}
 
 .horizontalPreview {
   margin-top: 0;
@@ -183,10 +186,7 @@
   overflow-wrap: initial !important;
   -webkit-line-break: after-white-space !important;
 } */
-.clozeFieldValueOverlay {
-  /* z-index: 1; */
- /* position: relative; */
-}
+
 .clozeFieldValue:focus {
   outline: 0 !important;
   /* z-index: -1; */
@@ -227,7 +227,6 @@
 }
 
 .clozeUnderlay {
-  composes: clozeFieldValueOverlay;
   color: #00000000; 
   position: absolute;
   left: 0;

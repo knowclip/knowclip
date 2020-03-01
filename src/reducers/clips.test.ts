@@ -19,6 +19,7 @@ const newClip = (
     type: 'Transliteration',
     fields: fields,
     tags: [],
+    cloze: [],
   },
 })
 

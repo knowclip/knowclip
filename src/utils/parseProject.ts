@@ -210,11 +210,13 @@ function getMediaCards<F extends FlashcardFields>(
             ...flashcardBase,
             type: 'Simple',
             fields: { ...blankSimpleFields, ...c.fields },
+            cloze: [],
           }
         : {
             ...flashcardBase,
             type: 'Transliteration',
             fields: { ...blankTransliterationFields, ...c.fields },
+            cloze: [],
           }
     }
   )

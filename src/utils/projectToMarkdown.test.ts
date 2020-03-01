@@ -30,6 +30,7 @@ describe('projectToMarkdown', () => {
         notes,
       },
       tags,
+      cloze: [],
     },
   })
 

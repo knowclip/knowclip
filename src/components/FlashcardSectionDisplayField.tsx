@@ -2,8 +2,6 @@ import React, {
   useCallback,
   ReactNodeArray,
   useRef,
-  useLayoutEffect,
-  useState,
   useEffect,
   ReactNode,
 } from 'react'
@@ -14,6 +12,7 @@ import FieldMenu, {
 } from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
 import { useSelector } from 'react-redux'
+import { getSelectionWithin, ClozeTextInputActions } from '../utils/useClozeUi'
 
 const FlashcardDisplayField = ({
   children,
@@ -27,6 +26,8 @@ const FlashcardDisplayField = ({
   clozeIndex = -1,
   clozeDeletions,
   previewClozeIndex,
+  fieldValueRef,
+  clozeTextInputActions,
 }: {
   children: string | null
   fieldName: FlashcardFieldName
@@ -39,6 +40,9 @@ const FlashcardDisplayField = ({
   clozeIndex?: number
   clozeDeletions?: ClozeDeletion[]
   previewClozeIndex?: number
+  fieldValueRef?: React.RefObject<HTMLSpanElement>
+  clozeTextInputActions?: ClozeTextInputActions
+  // confirmSelection?: (e: any) => void
 }) => {
   const {
     embeddedSubtitlesTracks,
@@ -73,25 +77,47 @@ const FlashcardDisplayField = ({
       {typeof clozeIndex === 'number' &&
       clozeIndex !== -1 &&
       fieldName === 'transcription' &&
-      children ? (
+      children &&
+      fieldValueRef ? (
         <div className={css.clozeField}>
-          <ClozeField
-            fieldName={fieldName}
-            value={children}
-            title={title}
-            clozeIndex={clozeIndex}
-            deletions={clozeDeletions || []}
-            subtitlesMenu={subtitlesMenu}
-            previewClozeIndex={previewClozeIndex}
-          />
+          {clozeDeletions && (
+            <ClozeUnderlay
+              deletions={clozeDeletions}
+              clozeId={ClozeIds[clozeIndex]}
+              previewClozeIndex={previewClozeIndex}
+              value={children}
+            />
+          )}
+          {clozeTextInputActions && (
+            <ClozeField
+              fieldName={fieldName}
+              value={children}
+              title={title}
+              clozeIndex={clozeIndex}
+              deletions={clozeDeletions || []}
+              subtitlesMenu={subtitlesMenu}
+              previewClozeIndex={previewClozeIndex}
+              fieldValueRef={fieldValueRef}
+              clozeTextInputActions={clozeTextInputActions}
+            />
+          )}
         </div>
       ) : (
         <>
           {subtitlesMenu}
+          {clozeDeletions && children && (
+            <ClozeUnderlay
+              deletions={clozeDeletions}
+              clozeId={ClozeIds[clozeIndex]}
+              previewClozeIndex={previewClozeIndex}
+              value={children}
+            />
+          )}
           <FlashcardDisplayFieldValue
             fieldName={fieldName}
             value={children}
             title={title}
+            fieldValueRef={fieldValueRef}
           />
         </>
       )}
@@ -104,22 +130,15 @@ const FlashcardDisplayFieldValue = ({
   value,
   title,
   clozeIndex,
+  fieldValueRef,
 }: {
   fieldName: FlashcardFieldName
   value: string | null
   title: string | undefined
   clozeIndex?: number
+  fieldValueRef?: React.RefObject<HTMLSpanElement>
 }) => {
-  const divRef = useRef<HTMLDivElement | null>(null)
-
-  // const preventDefault = useCallback(e => {
-  //   console.log({ e })
-  //   e.preventDefault()
-  // }, [])
-
-  // const blur = useCallback(e => {
-  //   e.target.blur()
-  // }, []) //
+  // const divRef = useRef<HTMLDivElement | null>(null)
 
   if (!value)
     return title ? (
@@ -143,8 +162,8 @@ const FlashcardDisplayFieldValue = ({
   })
 
   return (
-    <div
-      ref={divRef}
+    <span
+      ref={fieldValueRef}
       // contentEditable
       // tabIndex={-1}
       // onFocus={blur}
@@ -152,7 +171,7 @@ const FlashcardDisplayFieldValue = ({
       className={css.fieldValue}
     >
       {withoutNewlines}
-    </div>
+    </span>
   )
 }
 
@@ -166,6 +185,25 @@ export const ClozeColors = {
   c5: '#ff00ff',
 } as const
 
+const clearNewlines = (value: string, className?: string) => {
+  const withoutNewlines: ReactNodeArray = []
+  const lines = value.split(/[\n\r]/)
+  lines.forEach((line, i) => {
+    if (i !== 0)
+      withoutNewlines.push(
+        <span
+          className={cn(css.clozeNewlinePlaceholder, className)}
+          key={String(i)}
+        >
+          ⏎
+        </span>
+      )
+    withoutNewlines.push(<span className={className}>{line}</span>)
+  })
+  return withoutNewlines
+}
+
+let shiftKeyHeld = false
 const ClozeField = ({
   fieldName,
   value,
@@ -174,7 +212,10 @@ const ClozeField = ({
   previewClozeIndex,
   deletions,
   subtitlesMenu,
-}: // textAreaRef,
+  fieldValueRef: ref,
+  clozeTextInputActions: { onSelect, onBackspace, onPressDelete, onEnter },
+}: // confirmSelection,
+// textAreaRef,
 {
   fieldName: FlashcardFieldName
   value: string
@@ -183,39 +224,24 @@ const ClozeField = ({
   previewClozeIndex?: number
   deletions: ClozeDeletion[]
   subtitlesMenu: ReactNode
-  // textAreaRef: React.RefObject<HTMLTextAreaElement>
+  fieldValueRef: React.RefObject<HTMLSpanElement>
+  clozeTextInputActions: ClozeTextInputActions
 }) => {
-  const ref = useRef<HTMLSpanElement>(null)
-
   useEffect(
     () => {
-      console.log({ ref })
-      if (ref.current) ref.current.focus()
+      if (ref.current) {
+        const selection = window.getSelection()
+        if (selection) selection.empty()
+        ref.current.focus()
+      }
     },
-    [clozeIndex]
+    [clozeIndex, ref.current]
   )
 
-  const clearNewlines = (value: string, className?: string) => {
-    const withoutNewlines: ReactNodeArray = []
-    const lines = value.split(/[\n\r]/)
-    lines.forEach((line, i) => {
-      if (i !== 0)
-        withoutNewlines.push(
-          <span
-            className={cn(css.clozeNewlinePlaceholder, className)}
-            key={String(i)}
-          >
-            ⏎
-          </span>
-        )
-      withoutNewlines.push(<span className={className}>{line}</span>)
-    })
-    return withoutNewlines
-  }
   const clozeId = ClozeIds[clozeIndex]
   const withoutNewlines = clearNewlines(value, clozeId)
-  const horizontal =
-    useSelector((state: AppState) => state.settings.viewMode) === 'HORIZONTAL'
+  // const horizontal =
+  //   useSelector((state: AppState) => state.settings.viewMode) === 'HORIZONTAL'
 
   const onCopy = useCallback(e => {
     const selection = window.getSelection()
@@ -225,17 +251,73 @@ const ClozeField = ({
     e.preventDefault()
   }, [])
 
-  const onKeyDown = useCallback(e => {
-    console.log({ e })
-    console.log(e.target.innerText)
-    if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
-
-    // e.target.innerText = horizontal ? value.replace(/[\n\r]/g, '⏎') : value
-  }, [])
+  const onKeyDown = useCallback(
+    e => {
+      if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
+      switch (e.keyCode) {
+        // enter
+        case 13: {
+          e.preventDefault()
+          onEnter()
+          break
+        }
+        // delete
+        case 46: {
+          if (ref.current) {
+            const selection = getSelectionWithin(ref.current)
+            // if/ (selection.start !== selection.end || select
+            onPressDelete(selection)
+          }
+          break
+        }
+        // backspace
+        case 8: {
+          if (ref.current) {
+            const selection = getSelectionWithin(ref.current)
+            onBackspace(selection)
+          }
+          break
+        }
+        // shift
+        case 16:
+          return (shiftKeyHeld = true)
+        default:
+      }
+    },
+    // [confirmSelection]
+    [onBackspace, ref]
+  )
   const preventDefault = useCallback(e => {
-    console.log({ e })
     e.preventDefault()
   }, [])
+  const handleSelect = useCallback(
+    e => {
+      if (!shiftKeyHeld) {
+        console.log(e.target)
+        const selection = getSelectionWithin(e.target)
+        if (selection.start === selection.end) return
+        onSelect(selection)
+      }
+    },
+    [onSelect]
+  )
+  const handleKeyUp = useCallback(
+    e => {
+      // shift key
+      if (e.keyCode === 16) {
+        shiftKeyHeld = false
+        const selection = getSelectionWithin(e.target)
+        if (selection.start === selection.end) return
+        onSelect(selection)
+      }
+    },
+    [onSelect]
+  )
+
+  const handleMouseUp = useCallback(e => {
+    console.log({ MOUSEUP: e })
+  }, [])
+
   const clozeHint = (
     <>
       Select the text you wish to blank out.
@@ -250,94 +332,30 @@ const ClozeField = ({
 
   return (
     <>
-      {deletions
-        // .filter(d => d.clozeId === clozeId)
-        .map(({ ranges, clozeId: id }, clozeIndex) => {
-          return (
-            <span
-              className={cn(css.clozeUnderlay, id, {
-                [css.currentClozeUnderlay]: id === clozeId,
-                [css.previewBlank]: clozeIndex === previewClozeIndex,
-              })}
-              contentEditable
-            >
-              {ranges.reduce(
-                (elements, { start, end }, i) => {
-                  // const lastEnd  ranges[i - 1].end
-                  if (i === 0 && start > 0)
-                    elements.push(clearNewlines(value.slice(0, start))) // + 1?
-
-                  elements.push(
-                    <span
-                      className={cn(css.clozeUnderlayDeletion, {
-                        [css.currentClozeUnderlayDeletion]: id === clozeId,
-                      })}
-                    >
-                      {clearNewlines(value.slice(start, end))}
-                    </span>
-                  )
-                  const nextStart = ranges[i + 1]
-                    ? ranges[i + 1].start
-                    : value.length // + 1?
-                  if (nextStart - end > 0)
-                    elements.push(clearNewlines(value.slice(end, nextStart))) // + 1?
-
-                  return elements
-                },
-                [] as ReactNode[]
-              )}
-            </span>
-          )
-        })}
-      {/* <textarea
-        ref={textArea}
-        onCopy={onCopy}
-        onCut={onCopy}
-        className={css.clozeField}
-        onSelect={e => console.log(e)}
-        onKeyPress={e => e.preventDefault()}
-        value={horizontal ? value.replace(/[\n\r]/g, '⏎') : value}
-      /> */}
-      {/* <span
-        onPaste={preventDefault}
-        onCut={preventDefault}
-        onKeyDown={onKeyDown}
-        style={{ position: 'absolute', color: 'blue' }}
-        onSelect={e => {
-          console.log('select', e)
-        }}
-        onCopy={onCopy}
-      >
-        {withoutNewlines}
-      </span> */}
-      {/* {horizontal ? value.replace(/[\n\r]/g, '⏎') : value} */}
       {subtitlesMenu}
       <Tooltip title={clozeHint}>
         <span
-          className={cn(css.clozeFieldValue, clozeId)}
           contentEditable
+          suppressContentEditableWarning
+          className={cn(css.clozeFieldValue, clozeId)}
+          onKeyDown={onKeyDown}
           onPaste={preventDefault}
           onCut={preventDefault}
-          onKeyDown={onKeyDown}
           onDragEnd={preventDefault}
           onDragExit={preventDefault}
           onDragOver={preventDefault}
-          onSelect={e => {
-            console.log('select', e)
-          }}
+          onSelect={handleSelect}
+          onKeyUp={handleKeyUp}
+          onMouseUp={handleMouseUp}
           // style={{ caretColor: ClozeColors[ClozeIds[clozeIndex]] }}
           onCopy={onCopy}
           ref={ref}
         >
-          <span className={cn(css.clozeFieldValueOverlay, clozeId)}>
-            {withoutNewlines}
-          </span>
+          {withoutNewlines}
         </span>
       </Tooltip>
     </>
   )
-  //  const withTooltip = title ? <Tooltip title={title}>{content}</Tooltip> : content
-  // return <Tooltip title={clozeHint}>{content}</Tooltip>
 }
 
 const ENABLED_KEYS = [
@@ -355,3 +373,65 @@ const isEnabledKey = (keyCode: number, ctrlKey: boolean) =>
   ctrlKey ? ENABLED_CTRL_KEYS.includes(keyCode) : ENABLED_KEYS.includes(keyCode)
 
 export default FlashcardDisplayField
+
+function ClozeUnderlay({
+  deletions,
+  clozeId,
+  previewClozeIndex,
+  value,
+}: {
+  deletions: ClozeDeletion[]
+  clozeId: string
+  previewClozeIndex: number | undefined
+  value: string
+}) {
+  return (
+    <>
+      {deletions
+        // .filter(d => d.clozeId === clozeId)
+        .map(({ ranges }, clozeIndex) => {
+          const id = ClozeIds[clozeIndex]
+          if (
+            typeof previewClozeIndex === 'number' &&
+            previewClozeIndex !== -1 &&
+            clozeIndex !== previewClozeIndex
+          )
+            return null
+          return (
+            <span
+              className={cn(css.clozeUnderlay, id, {
+                [css.currentClozeUnderlay]: id === clozeId,
+                [css.previewBlank]: clozeIndex === previewClozeIndex,
+              })}
+              contentEditable
+              suppressContentEditableWarning
+            >
+              {ranges.reduce(
+                (elements, { start, end }, i) => {
+                  // const lastEnd  ranges[i - 1].end
+                  if (i === 0 && start > 0)
+                    elements.push(clearNewlines(value.slice(0, start))) // + 1?
+                  elements.push(
+                    <span
+                      className={cn(css.clozeUnderlayDeletion, {
+                        [css.currentClozeUnderlayDeletion]: id === clozeId,
+                      })}
+                    >
+                      {clearNewlines(value.slice(start, end))}
+                    </span>
+                  )
+                  const nextStart = ranges[i + 1]
+                    ? ranges[i + 1].start
+                    : value.length // + 1?
+                  if (nextStart - end > 0)
+                    elements.push(clearNewlines(value.slice(end, nextStart))) // + 1?
+                  return elements
+                },
+                [] as ReactNode[]
+              )}
+            </span>
+          )
+        })}
+    </>
+  )
+}

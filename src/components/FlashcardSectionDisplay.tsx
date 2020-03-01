@@ -1,23 +1,11 @@
-import React, {
-  useCallback,
-  ReactNodeArray,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-  useState,
-  ReactChild,
-} from 'react'
+import React, { ReactChild } from 'react'
 import cn from 'classnames'
-import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
-import FieldMenu, {
-  useSubtitlesBySource,
-} from './FlashcardSectionFieldPopoverMenu'
-import { Tooltip, IconButton, Button } from '@material-ui/core'
-import { Add } from '@material-ui/icons'
 import FlashcardDisplayField from './FlashcardSectionDisplayField'
-import { useDispatch } from 'react-redux'
+import { ClozeTextInputActions } from '../utils/useClozeUi'
+
+const empty: ClozeDeletion[] = []
 
 const FlashcardSectionDisplay = ({
   // cardBases,
@@ -32,7 +20,9 @@ const FlashcardSectionDisplay = ({
   fieldHoverText,
   clozeIndex = -1,
   previewClozeIndex = -1,
-  clozeDeletions,
+  clozeDeletions = empty,
+  fieldValueRef,
+  clozeTextInputActions,
 }: {
   fields: TransliterationFlashcardFields
   viewMode: ViewMode
@@ -48,26 +38,11 @@ const FlashcardSectionDisplay = ({
   clozeIndex?: number
   previewClozeIndex?: number
   clozeDeletions?: ClozeDeletion[]
+  confirmSelection?: (e: any) => void
+  fieldValueRef: React.RefObject<HTMLSpanElement>
+  clozeTextInputActions?: ClozeTextInputActions
   // viewMode: ViewMode
 }) => {
-  // const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
-  //   cardBases.cards[chunkIndex]
-  // )
-  // const fields = {} as TransliterationFlashcardFields
-  // for (const fieldName of cardBases.fieldNames) {
-  //   const trackId = fieldsToTracks[fieldName]
-  //   const text = trackId && tracksToFieldsText[trackId]
-  //   fields[fieldName] = text || ''
-  // }
-
-  // const dispatch = useDispatch()
-  // const startEditing = useCallback(
-  //   () => {
-  //     dispatch(r.startEditingCards())
-  //   },
-  //   [dispatch]
-  // )
-
   return (
     <section
       className={cn(css.container, className, {
@@ -86,6 +61,8 @@ const FlashcardSectionDisplay = ({
           clozeIndex={clozeIndex}
           previewClozeIndex={previewClozeIndex}
           clozeDeletions={clozeDeletions}
+          fieldValueRef={fieldValueRef}
+          clozeTextInputActions={clozeTextInputActions}
         >
           {fields.transcription || null}
         </FlashcardDisplayField>

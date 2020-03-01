@@ -135,9 +135,13 @@ export const newClipFromChunk: AppEpic = (
           )
         )
 
+        if (action.clozeDeletion) {
+          flashcard.cloze = [action.clozeDeletion]
+        }
+
         setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
 
-        return from([r.addClip(clip, flashcard, true)])
+        return from([r.addClip(clip, flashcard, !action.clozeDeletion)])
       })
     )
 

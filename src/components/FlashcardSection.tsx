@@ -117,7 +117,7 @@ const FlashcardSection = ({
         >
           <Preview
             cardBases={subtitles}
-            chunkIndex={waveformSelection.item.index}
+            cardPreviewSelection={waveformSelection}
             clipsIds={clipsIds}
             mediaFile={mediaFile}
             fieldsToTracks={fieldsToTracks}
