@@ -58,7 +58,6 @@ const FlashcardSectionPreview = ({
   } = useClozeUi({
     onNewClozeCard: useCallback(
       deletion => {
-        console.log('making new clip from chunk!')
         dispatch(r.newClipFromSubtitlesChunk(cardPreviewSelection, deletion))
       },
       [cardPreviewSelection, dispatch]

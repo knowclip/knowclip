@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  ReactNodeArray,
-  useRef,
-  useEffect,
-  ReactNode,
-} from 'react'
+import React, { useCallback, ReactNodeArray, useEffect, ReactNode } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu, {
@@ -42,7 +36,6 @@ const FlashcardDisplayField = ({
   previewClozeIndex?: number
   fieldValueRef?: React.RefObject<HTMLSpanElement>
   clozeTextInputActions?: ClozeTextInputActions
-  // confirmSelection?: (e: any) => void
 }) => {
   const {
     embeddedSubtitlesTracks,
@@ -55,6 +48,7 @@ const FlashcardDisplayField = ({
     },
     [fieldName, onDoubleClick]
   )
+  const viewMode = useSelector((state: AppState) => state.settings.viewMode)
 
   const subtitlesMenu = Boolean(subtitles.length) && (
     <FieldMenu
@@ -74,11 +68,7 @@ const FlashcardDisplayField = ({
       })}
       onDoubleClick={handleDoubleClick}
     >
-      {typeof clozeIndex === 'number' &&
-      clozeIndex !== -1 &&
-      fieldName === 'transcription' &&
-      children &&
-      fieldValueRef ? (
+      {clozeDeletions && children && fieldValueRef ? (
         <div className={css.clozeField}>
           {clozeDeletions && (
             <ClozeUnderlay
@@ -86,6 +76,8 @@ const FlashcardDisplayField = ({
               clozeId={ClozeIds[clozeIndex]}
               previewClozeIndex={previewClozeIndex}
               value={children}
+              viewMode={viewMode}
+              editing={clozeIndex !== -1}
             />
           )}
           {clozeTextInputActions && (
@@ -105,14 +97,6 @@ const FlashcardDisplayField = ({
       ) : (
         <>
           {subtitlesMenu}
-          {clozeDeletions && children && (
-            <ClozeUnderlay
-              deletions={clozeDeletions}
-              clozeId={ClozeIds[clozeIndex]}
-              previewClozeIndex={previewClozeIndex}
-              value={children}
-            />
-          )}
           <FlashcardDisplayFieldValue
             fieldName={fieldName}
             value={children}
@@ -138,8 +122,6 @@ const FlashcardDisplayFieldValue = ({
   clozeIndex?: number
   fieldValueRef?: React.RefObject<HTMLSpanElement>
 }) => {
-  // const divRef = useRef<HTMLDivElement | null>(null)
-
   if (!value)
     return title ? (
       <Tooltip title={title}>
@@ -162,14 +144,7 @@ const FlashcardDisplayFieldValue = ({
   })
 
   return (
-    <span
-      ref={fieldValueRef}
-      // contentEditable
-      // tabIndex={-1}
-      // onFocus={blur}
-      // onKeyDown={preventDefault}
-      className={css.fieldValue}
-    >
+    <span ref={fieldValueRef} className={css.fieldValue}>
       {withoutNewlines}
     </span>
   )
@@ -185,7 +160,12 @@ export const ClozeColors = {
   c5: '#ff00ff',
 } as const
 
-const clearNewlines = (value: string, className?: string) => {
+const clearNewlines = (
+  value: string,
+  viewMode: ViewMode,
+  className?: string
+) => {
+  const char = viewMode === 'VERTICAL' ? '\n' : '⏎'
   const withoutNewlines: ReactNodeArray = []
   const lines = value.split(/[\n\r]/)
   lines.forEach((line, i) => {
@@ -195,7 +175,7 @@ const clearNewlines = (value: string, className?: string) => {
           className={cn(css.clozeNewlinePlaceholder, className)}
           key={String(i)}
         >
-          ⏎
+          {char}
         </span>
       )
     withoutNewlines.push(<span className={className}>{line}</span>)
@@ -213,7 +193,13 @@ const ClozeField = ({
   deletions,
   subtitlesMenu,
   fieldValueRef: ref,
-  clozeTextInputActions: { onSelect, onBackspace, onPressDelete, onEnter },
+  clozeTextInputActions: {
+    onSelect,
+    onBackspace,
+    onPressDelete,
+    onEnter,
+    onEscape,
+  },
 }: // confirmSelection,
 // textAreaRef,
 {
@@ -235,13 +221,13 @@ const ClozeField = ({
         ref.current.focus()
       }
     },
-    [clozeIndex, ref.current]
+    [clozeIndex, ref]
   )
 
   const clozeId = ClozeIds[clozeIndex]
-  const withoutNewlines = clearNewlines(value, clozeId)
-  // const horizontal =
-  //   useSelector((state: AppState) => state.settings.viewMode) === 'HORIZONTAL'
+  const viewMode = useSelector((state: AppState) => state.settings.viewMode)
+
+  const withoutNewlines = clearNewlines(value, viewMode, clozeId)
 
   const onCopy = useCallback(e => {
     const selection = window.getSelection()
@@ -250,6 +236,8 @@ const ClozeField = ({
     e.clipboardData.setData('text/plain', text)
     e.preventDefault()
   }, [])
+
+  const editing = clozeIndex !== -1
 
   const onKeyDown = useCallback(
     e => {
@@ -281,11 +269,17 @@ const ClozeField = ({
         // shift
         case 16:
           return (shiftKeyHeld = true)
+
+        // escape
+        case 27:
+          onEscape()
+          return e.stopPropagation()
+
         default:
       }
     },
     // [confirmSelection]
-    [onBackspace, ref]
+    [onBackspace, onEnter, onEscape, onPressDelete, ref]
   )
   const preventDefault = useCallback(e => {
     e.preventDefault()
@@ -314,10 +308,6 @@ const ClozeField = ({
     [onSelect]
   )
 
-  const handleMouseUp = useCallback(e => {
-    console.log({ MOUSEUP: e })
-  }, [])
-
   const clozeHint = (
     <>
       Select the text you wish to blank out.
@@ -330,30 +320,30 @@ const ClozeField = ({
     </>
   )
 
+  const content = (
+    <span
+      className={cn(css.clozeFieldValue, clozeId)}
+      contentEditable={editing}
+      suppressContentEditableWarning
+      onKeyDown={onKeyDown}
+      onPaste={preventDefault}
+      onCut={preventDefault}
+      onDragEnd={preventDefault}
+      onDragExit={preventDefault}
+      onDragOver={preventDefault}
+      onSelect={handleSelect}
+      onKeyUp={handleKeyUp}
+      onCopy={onCopy}
+      ref={ref}
+    >
+      {withoutNewlines}
+    </span>
+  )
+
   return (
     <>
       {subtitlesMenu}
-      <Tooltip title={clozeHint}>
-        <span
-          contentEditable
-          suppressContentEditableWarning
-          className={cn(css.clozeFieldValue, clozeId)}
-          onKeyDown={onKeyDown}
-          onPaste={preventDefault}
-          onCut={preventDefault}
-          onDragEnd={preventDefault}
-          onDragExit={preventDefault}
-          onDragOver={preventDefault}
-          onSelect={handleSelect}
-          onKeyUp={handleKeyUp}
-          onMouseUp={handleMouseUp}
-          // style={{ caretColor: ClozeColors[ClozeIds[clozeIndex]] }}
-          onCopy={onCopy}
-          ref={ref}
-        >
-          {withoutNewlines}
-        </span>
-      </Tooltip>
+      {editing ? <Tooltip title={clozeHint}>{content}</Tooltip> : content}
     </>
   )
 }
@@ -363,6 +353,7 @@ const ENABLED_KEYS = [
   16, // shift
   37, // left
   39, // right
+  27, // escape
 ]
 const ENABLED_CTRL_KEYS = [
   ...ENABLED_KEYS,
@@ -379,11 +370,15 @@ function ClozeUnderlay({
   clozeId,
   previewClozeIndex,
   value,
+  viewMode,
+  editing,
 }: {
   deletions: ClozeDeletion[]
   clozeId: string
   previewClozeIndex: number | undefined
   value: string
+  viewMode: ViewMode
+  editing: boolean
 }) {
   return (
     <>
@@ -403,28 +398,33 @@ function ClozeUnderlay({
                 [css.currentClozeUnderlay]: id === clozeId,
                 [css.previewBlank]: clozeIndex === previewClozeIndex,
               })}
-              contentEditable
+              contentEditable={editing}
               suppressContentEditableWarning
+              tabIndex={-1}
             >
               {ranges.reduce(
                 (elements, { start, end }, i) => {
                   // const lastEnd  ranges[i - 1].end
                   if (i === 0 && start > 0)
-                    elements.push(clearNewlines(value.slice(0, start))) // + 1?
+                    elements.push(
+                      clearNewlines(value.slice(0, start), viewMode)
+                    ) // + 1?
                   elements.push(
                     <span
                       className={cn(css.clozeUnderlayDeletion, {
                         [css.currentClozeUnderlayDeletion]: id === clozeId,
                       })}
                     >
-                      {clearNewlines(value.slice(start, end))}
+                      {clearNewlines(value.slice(start, end), viewMode)}
                     </span>
                   )
                   const nextStart = ranges[i + 1]
                     ? ranges[i + 1].start
                     : value.length // + 1?
                   if (nextStart - end > 0)
-                    elements.push(clearNewlines(value.slice(end, nextStart))) // + 1?
+                    elements.push(
+                      clearNewlines(value.slice(end, nextStart), viewMode)
+                    ) // + 1?
                   return elements
                 },
                 [] as ReactNode[]

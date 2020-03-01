@@ -86,9 +86,11 @@ const ClozeButton = ({
   )
   const handleClick = useCallback(
     e => {
-      if (selection.current) confirmSelection(selection.current)
+      const textSelected =
+        selection.current && selection.current.start !== selection.current.end
+      if (selection.current && textSelected) confirmSelection(selection.current)
       if (isActive) {
-        if (!selection) setClozeIndex(-1)
+        if (!textSelected) setClozeIndex(-1)
       } else {
         setClozeIndex(index)
       }

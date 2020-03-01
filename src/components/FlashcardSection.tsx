@@ -15,7 +15,6 @@ import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
 import FlashcardDisplay from './FlashcardSectionDisplayCard'
 import Preview from './FlashcardSectionDisplayPreview'
-import { SubtitlesCardBase } from '../selectors'
 
 enum $ {
   container = 'flashcard-section-container',
@@ -102,11 +101,7 @@ const FlashcardSection = ({
       )}
       {highlightedClip && mediaFile && !editing && (
         <section className={css.display}>
-          <FlashcardDisplay
-            mediaFile={mediaFile}
-            clipId={highlightedClip.id}
-            onDoubleClickField={handleDoubleClickCardDisplayField}
-          />
+          <FlashcardDisplay mediaFile={mediaFile} clipId={highlightedClip.id} />
         </section>
       )}
       {mediaFile && waveformSelection && waveformSelection.type === 'Preview' && (
@@ -116,6 +111,7 @@ const FlashcardSection = ({
           })}
         >
           <Preview
+            key={waveformSelection.cardBaseIndex}
             cardBases={subtitles}
             cardPreviewSelection={waveformSelection}
             clipsIds={clipsIds}

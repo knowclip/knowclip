@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ClozeIds } from '../components/FlashcardSectionDisplayField'
+import * as r from '../redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 const empty: ClozeDeletion[] = []
 
@@ -23,6 +25,7 @@ export type ClozeTextInputActions = {
     }
   ) => void
   onEnter: () => void
+  onEscape: () => void
 }
 
 export default function useClozeUi({
@@ -40,6 +43,9 @@ export default function useClozeUi({
   ) => void
   onDeleteClozeCard?: (clozeIndex: number) => void
 }) {
+  const playing = useSelector((state: AppState) => r.isMediaPlaying(state))
+  const dispatch = useDispatch()
+
   const [clozeIndex, _setClozeIndex] = useState<number>(-1)
   const [previewClozeIndex, setPreviewClozeIndex] = useState(-1)
   const setClozeIndex = useCallback(
@@ -56,9 +62,9 @@ export default function useClozeUi({
       } else {
         _setClozeIndex(newIndex)
       }
-      // delete cloze deletions with no/empty ranges
+      if (playing) dispatch(r.setLoop(newIndex !== -1))
     },
-    [clozeIndex, deletions, onDeleteClozeCard]
+    [clozeIndex, deletions, dispatch, onDeleteClozeCard, playing]
   )
 
   const inputRef = useRef<HTMLSpanElement>(null)
@@ -91,10 +97,10 @@ export default function useClozeUi({
             ranges: [selection],
           }
           onNewClozeCard(clozeDeletion)
+          // if (playing) dispatch(r.setLoop(false))
         }
 
         if (editingCard && onEditClozeCard && selection) {
-          const deletion = deletions[clozeIndex]
           onEditClozeCard(clozeIndex, [selection])
         }
       }
@@ -102,7 +108,6 @@ export default function useClozeUi({
     },
     [
       clozeIndex,
-      deletions,
       editingCard,
       getSelection,
       makingNewCard,
@@ -238,6 +243,9 @@ export default function useClozeUi({
       if (clozeIndex !== -1) {
         setClozeIndex(-1)
       }
+    },
+    onEscape: () => {
+      setClozeIndex(-1)
     },
   }
 

@@ -91,22 +91,21 @@
   display: inline;
 }
 .horizontalPreview .newlinePlaceholder {
-  padding-right: 1em;
+  /* padding-right: 1em; */
 }
 .newline {
-  /* white-space: pre; */
-  white-space: nowrap;
+  white-space: pre;
 }
 .horizontalPreview .newline {
-  /* pointer-events: none;
+  pointer-events: none;
   position:absolute;
-  opacity: 0;  */
+  opacity: 0; 
 }
-.newlinePlaceholder::before {
+.horizontalPreview .newlinePlaceholder::before {
   content: '⏎';
   display: inline;
-  position: absolute;
-  color: #ccc;
+  padding-right: .45em;
+  color: rgba(0,0,0,0.5);
 }
 .previewFieldNotes .newlinePlaceholder {
   display: inline
@@ -116,7 +115,6 @@
 }
 
 .clozeNewlinePlaceholder {
-  color: #ccc;
   padding-right: .45em;
 }
 
@@ -166,6 +164,8 @@
     -webkit-line-break: after-white-space;
     -webkit-appearance:textfield; */
     display: inline;
+    position: relative;
+    z-index: 1;
 }
 .fieldValue:not([contenteditable]) {
     letter-spacing: 0.0035em;
@@ -235,9 +235,12 @@
   right: 0;
   text-indent: 3rem;
   text-indent: 1.6rem;
-  text-indent: 24px;
+  text-indent: 30px;
   pointer-events: none; 
   z-index: 1;
+}
+.horizontalPreview .clozeUnderlay {
+  text-indent: 24px;
 }
 .currentClozeUnderlay {
   z-index: 0;
