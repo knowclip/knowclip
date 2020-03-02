@@ -130,7 +130,7 @@ function getProjectClips<F extends FlashcardFields>(
     const card = getFlashcard(state, id)
     if (clip && card) {
       const { start, end } = clip
-      const { fields, tags, image } = card
+      const { fields, tags, image, cloze } = card
 
       const newClip: ClipJson<F> = {
         id,
@@ -150,7 +150,12 @@ function getProjectClips<F extends FlashcardFields>(
       Object.keys(fieldsTemplate).reduce(
         (all, fn) => {
           const fieldName: keyof typeof fields = fn as any
-          if (fields[fieldName].trim()) all[fieldName] = fields[fieldName]
+          if (fields[fieldName].trim()) {
+            all[fieldName] =
+              fieldName === 'transcription' && cloze.length
+                ? encodeClozeDeletions(fields[fieldName], cloze)
+                : fields[fieldName]
+          }
 
           return all
         },
@@ -173,6 +178,29 @@ function getProjectClips<F extends FlashcardFields>(
   }
 
   return clips
+}
+
+const escapeClozeChars = (text: string) =>
+  text.replace(/(<\/?c(10|[1-9])>)/g, `\\$1`)
+const encodeClozeDeletions = (text: string, cloze: ClozeDeletion[]) => {
+  const ranges = cloze.flatMap(c => c.ranges).sort((a, b) => a.start - b.start)
+  if (!ranges.length) return escapeClozeChars(text)
+  const firstRange = ranges[0]
+  let result = firstRange.start > 0 ? text.slice(0, firstRange.start) : ''
+  let i = 0
+  for (const range of ranges) {
+    const nextRange = ranges[i + 1]
+    const subsequentGapEnd = nextRange ? nextRange.start : text.length
+
+    result +=
+      `<c${i + 1}>${escapeClozeChars(
+        text.slice(range.start, range.end)
+      )}</c${i + 1}>` +
+      escapeClozeChars(text.slice(range.end, subsequentGapEnd))
+
+    i++
+  }
+  return result
 }
 
 const getFieldsTemplate = (file: ProjectFile) =>

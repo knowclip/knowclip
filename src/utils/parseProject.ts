@@ -5,6 +5,7 @@ import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
 import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'
 import validateProject from './validateProject'
+import { unescapeClozeFields } from './clozeField'
 
 type NormalizedProjectFileData = {
   project: ProjectFile
@@ -205,18 +206,21 @@ function getMediaCards<F extends FlashcardFields>(
             : null),
         },
       }
+
+      const { fields, cloze } = unescapeClozeFields(c.fields)
+
       return project.noteType === 'Simple'
         ? {
             ...flashcardBase,
             type: 'Simple',
-            fields: { ...blankSimpleFields, ...c.fields },
-            cloze: [],
+            fields: { ...blankSimpleFields, ...fields },
+            cloze,
           }
         : {
             ...flashcardBase,
             type: 'Transliteration',
-            fields: { ...blankTransliterationFields, ...c.fields },
-            cloze: [],
+            fields: { ...blankTransliterationFields, ...fields },
+            cloze,
           }
     }
   )

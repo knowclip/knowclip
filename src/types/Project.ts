@@ -44,8 +44,13 @@ export type ClipJson<F extends FlashcardFields> = {
   image?: { type: 'VideoStill'; time?: string }
   fields?: Partial<F>
   tags?: Array<string>
+  cloze?: ClozeJson
 
   id: string
+}
+
+export type ClozeJson = {
+  transcription: Array<[number, number]>
 }
 
 export type SubtitlesJson =

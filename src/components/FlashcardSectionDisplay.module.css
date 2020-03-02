@@ -229,7 +229,7 @@
 }
 
 .clozePreviewFieldValue .blank:not(.previewBlank) {
-  border: 0;
+  border: 0 !important;
   background: transparent;
 }
 
