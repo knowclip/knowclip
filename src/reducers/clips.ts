@@ -254,8 +254,54 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     }
 
     case A.SET_FLASHCARD_FIELD: {
-      const { id, key, value } = action
+      const { id, key, value, caretLocation } = action
       const card: Flashcard = state.flashcards[id]
+      const editDifference = value.length - card.fields.transcription.length
+      const caretStart = caretLocation - editDifference
+      console.log(
+        { caretStart, caretLocation, editDifference },
+        card.cloze.length && card.cloze[0].ranges[0]
+      )
+      const cloze =
+        key === 'transcription' && card.cloze.length
+          ? card.cloze
+              .map(c => ({
+                ...c,
+                ranges: c.ranges
+                  .map(r => {
+                    // if (caretStart <= r.end) {
+                    //   return {
+                    //     start:
+                    //       caretStart > r.start
+                    //         ? r.start
+                    //         : r.start + editDifference,
+                    //     end:
+                    //       r.end -
+                    //       (caretStart -
+                    //         editDifference -
+                    //         r.end -
+                    //         caretStart -
+                    //         editDifference),
+                    //   }
+                    // }
+                    return {
+                      start:
+                        caretStart > r.start
+                          ? r.start
+                          : r.start + editDifference,
+                      end: caretStart <= r.end ? r.end + editDifference : r.end,
+                    }
+                  })
+                  .filter(
+                    r =>
+                      r.start !== r.end &&
+                      r.end > r.start &&
+                      r.end > 0 &&
+                      r.start >= 0
+                  ),
+              }))
+              .filter(c => c.ranges.length)
+          : card.cloze
 
       const flashcards: FlashcardsState = {
         ...state.flashcards,
@@ -265,6 +311,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
             ...(card.fields as TransliterationFlashcardFields),
             [key as TransliterationFlashcardFieldName]: value,
           },
+          cloze,
         },
       }
       return {
