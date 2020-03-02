@@ -115,7 +115,8 @@
 }
 
 .clozeNewlinePlaceholder {
-  padding-right: .45em;
+  /* padding-right: .45em; */
+  color: rgba(0,0,0,0.3);
 }
 
 .previewTags {
@@ -182,6 +183,9 @@
   /* letter-spacing: .01071em;
   letter-spacing: .000em; */
 }
+.clozeFieldValue::selection {
+  background-color: rgba(0,0,0,0.3)
+}
 /* .clozeFieldValue span {
   overflow-wrap: initial !important;
   -webkit-line-break: after-white-space !important;
@@ -191,110 +195,88 @@
   outline: 0 !important;
   /* z-index: -1; */
 }
-.clozeFieldValue::selection {
-  background-color: pink;
-}
 
-:global(.c1)::selection{
+/* 
+:global(.c1) .clozeValueChar::selection{
   background-color: hsl(240, 100%, 75%);
 }
 
-:global(.c2)::selection{
+:global(.c2) .clozeValueChar::selection{
   background-color: #00ff00;
 }
 
-:global(.c3)::selection{
+:global(.c3) .clozeValueChar::selection{
   background-color: #ffff00;
 }
 
-:global(.c4)::selection{
+:global(.c4) .clozeValueChar::selection{
   background-color: #00ffff;
 }
 
-:global  .c5::selection{
+:global(.c5) .clozeValueChar::selection{
   background-color: #ff00ff;
-}
-/* .clozeFieldValue::after {
-  display: inline;
-  content: " ";
-  white-space: pre;
 } */
 
-.clozeTranscriptionText {
-
-  /* opacity: 0; */
-  /* padding-right: 0.5em; */
-}
-
-.clozeUnderlay {
-  color: #00000000; 
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  text-indent: 3rem;
-  text-indent: 1.6rem;
-  text-indent: 30px;
-  text-indent: 24px;
-  pointer-events: none; 
-  z-index: 1;
-}
-.horizontalPreview .clozeUnderlay {
-  text-indent: 24px;
-}
-.currentClozeUnderlay {
-  z-index: 0;
-}
-
-.clozeUnderlayDeletion {
-  opacity: .5;
-  border-bottom: dotted 2px rgba(0,0,0,0.5);
-  /* opacity: 0; */
-  background-color: #00000000;
-  letter-spacing: inherit;
-  padding: 0;
-  margin: 0;
-  /* z-index: 3; */
-}
-.currentClozeUnderlayDeletion {
-  opacity: 1;
-  border-bottom-color:black; 
-}
 .previewBlank {
-  z-index: 15 !important;
-  opacity: 1 !important;
-}
-.previewBlank .clozeUnderlayDeletion {
+  color: #ffffff00;
   background-color: white !important;
-  opacity: 1 !important;
+  border-bottom: solid 1px #000 !important;
 }
-/* .clozeUnderlayDeletion::after {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  opacity: .1;
-  background-color: inherit;
-} */
 
-:global(.c1) .clozeUnderlayDeletion {
+.blank {
+  border-bottom: solid 1px rgba(0,0,0,0.2);
+  background-color: hsla(var(--cloze-background-hue), 60%, 80%, 30%);
+}
+
+.clozePreviewFieldValue .blank:not(.previewBlank) {
+  border: 0;
+  background: transparent;
+}
+
+.blankEditing {
+  border-bottom: solid 1px #000 !important;
+  background-color: hsla(var(--cloze-background-hue), 90%, 85%, 65%);
+}
+.blank::selection {
+  background-color: hsla(var(--cloze-background-hue), 100%, 80%, 80%);
+}
+.clozeValueChar {
+  /* --cloze-selection-hue: 194; */
+}
+.clozeValueChar::selection {
+  background-color: hsla(var(--cloze-selection-hue), 100%, 90%, 75%);
+  /* color: hsl(calc(var(--cloze-selection-hue) + 180), 100%, 10%) */
+  color: hsl(calc(var(--cloze-selection-hue) + 150), 20%, 50%);
+  color: hsl(calc(var(--cloze-selection-hue) + 150), 100%, 30%);
+}
+/* 
+:global(.c1Blank) {
   background-color: hsla(240, 60%, 80%, 75%);
 }
-
-:global(.c2) .clozeUnderlayDeletion {
-  background-color: hsla(120, 60%, 80%, 75%);
+:global(.c2Blank) {
+  background-color: hsla(130, 60%, 80%, 0.75);
 }
-
-:global(.c3) .clozeUnderlayDeletion {
+:global(.c3Blank) {
   background-color: hsla(60, 60%, 80%, 75%);
 }
-
-:global(.c4) .clozeUnderlayDeletion {
+:global(.c4Blank) {
   background-color: hsla(180, 60%, 80%, 75%);
 }
-
-:global(.c5) .clozeUnderlayDeletion {
+:global(.c5Blank) {
   background-color: hsla(300, 60%, 80%, 75%);
 }
+:global(.c6Blank) {
+  background-color: hsla(41, 60%, 80%, 0.75);
+}
+:global(.c7Blank) {
+  background-color: hsla(78, 60%, 80%, 0.75);
+}
+:global(.c8Blank) {
+  background-color: hsla(0, 60%, 80%, 0.75);
+}
+:global(.c9Blank) {
+  background-color: hsla(202, 60%, 80%, 0.75);
+}
+:global(.c10Blank) {
+  background-color: hsla(271, 60%, 80%, 0.75);
+} */

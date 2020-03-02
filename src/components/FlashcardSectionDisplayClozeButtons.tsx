@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react'
 import css from './FlashcardSectionDisplay.module.css'
 import { Tooltip, Button } from '@material-ui/core'
-import { ClozeId, ClozeIds, ClozeColors } from './FlashcardSectionDisplayField'
+import { ClozeId, ClozeIds, ClozeHues } from './FlashcardSectionDisplayField'
 
 const empty: ClozeDeletion[] = []
 
@@ -50,7 +50,6 @@ const ClozeButtons = ({
         id={nextId}
         isActive={currentClozeIndex === deletions.length}
         setClozeIndex={setClozeIndex}
-        setPreviewClozeIndex={setPreviewClozeIndex}
         getSelection={getSelection}
         confirmSelection={confirmSelection}
       />
@@ -73,7 +72,7 @@ const ClozeButton = ({
   isActive: boolean
   index: number
   setClozeIndex: (index: number) => void
-  setPreviewClozeIndex: (index: number) => void
+  setPreviewClozeIndex?: (index: number) => void
   confirmSelection: (selection: ClozeRange) => void
   getSelection: () => ClozeRange | null
 }) => {
@@ -100,13 +99,13 @@ const ClozeButton = ({
   )
   const handleMouseEnter = useCallback(
     () => {
-      setPreviewClozeIndex(index)
+      if (setPreviewClozeIndex) setPreviewClozeIndex(index)
     },
     [setPreviewClozeIndex, index]
   )
   const handleMouseLeave = useCallback(
     () => {
-      setPreviewClozeIndex(-1)
+      if (setPreviewClozeIndex) setPreviewClozeIndex(-1)
     },
     [setPreviewClozeIndex]
   )
@@ -120,7 +119,11 @@ const ClozeButton = ({
         className={css.clozeButton}
         onMouseDown={handleMouseDown}
         onClick={handleClick}
-        style={isActive ? { backgroundColor: ClozeColors[id] } : undefined}
+        style={
+          isActive
+            ? { backgroundColor: `hsla(${ClozeHues[id]}, 60%, 80%, 75%)` }
+            : undefined
+        }
       >
         {id.toUpperCase()}
       </Button>

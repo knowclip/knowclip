@@ -2,7 +2,9 @@ import React, { ReactChild } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
-import FlashcardDisplayField from './FlashcardSectionDisplayField'
+import FlashcardDisplayField, {
+  ClozeHues,
+} from './FlashcardSectionDisplayField'
 import { ClozeTextInputActions } from '../utils/useClozeUi'
 
 const empty: ClozeDeletion[] = []

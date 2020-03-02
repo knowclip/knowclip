@@ -140,7 +140,11 @@ export const addClozeDeletion = (
   deletion: ClozeDeletion
 ): EditClip =>
   editClip(id, null, {
-    cloze: trimClozeRangeOverlaps(currentCloze, deletion, currentCloze.length),
+    cloze: trimClozeRangeOverlaps(
+      currentCloze,
+      deletion,
+      currentCloze.length
+    ).filter(({ ranges }) => ranges.length),
   })
 
 const overlaps = (a: ClozeRange, b: ClozeRange): boolean =>

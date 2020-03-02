@@ -1,4 +1,10 @@
-import React, { useCallback, ReactNodeArray, useEffect, ReactNode } from 'react'
+import React, {
+  useCallback,
+  ReactNodeArray,
+  useEffect,
+  ReactNode,
+  useMemo,
+} from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu, {
@@ -19,7 +25,7 @@ const FlashcardDisplayField = ({
   title,
   clozeIndex = -1,
   clozeDeletions,
-  previewClozeIndex,
+  previewClozeIndex = -1,
   fieldValueRef,
   clozeTextInputActions,
 }: {
@@ -61,25 +67,28 @@ const FlashcardDisplayField = ({
     />
   )
 
+  const currentClozeId = ClozeIds[clozeIndex]
+  const selectionHue =
+    ClozeHues[
+      currentClozeId || ClozeIds[clozeDeletions ? clozeDeletions.length : -1]
+    ]
+
   return (
     <div
       className={cn(css.previewField, className, {
         [css.previewFieldWithPopover]: Boolean(subtitles.length),
       })}
       onDoubleClick={handleDoubleClick}
+      style={{
+        ['--cloze-selection-hue' as any]: selectionHue,
+      }}
     >
       {clozeDeletions && children && fieldValueRef ? (
-        <div className={css.clozeField}>
-          {clozeDeletions && (
-            <ClozeUnderlay
-              deletions={clozeDeletions}
-              clozeId={ClozeIds[clozeIndex]}
-              previewClozeIndex={previewClozeIndex}
-              value={children}
-              viewMode={viewMode}
-              editing={clozeIndex !== -1}
-            />
-          )}
+        <div
+          className={cn(css.clozeField, {
+            [css.clozeFieldEditing]: clozeIndex !== -1,
+          })}
+        >
           {clozeTextInputActions && (
             <ClozeField
               fieldName={fieldName}
@@ -150,15 +159,63 @@ const FlashcardDisplayFieldValue = ({
   )
 }
 
-export type ClozeId = 'c1' | 'c2' | 'c3' | 'c4' | 'c5'
-export const ClozeIds = ['c1', 'c2', 'c3', 'c4', 'c5'] as const
-export const ClozeColors = {
-  c1: '#8080ff',
-  c2: '#00ff00',
-  c3: '#ffff00',
-  c4: '#00ffff',
-  c5: '#ff00ff',
-} as const
+export type ClozeId =
+  | 'c1'
+  | 'c2'
+  | 'c3'
+  | 'c4'
+  | 'c5'
+  | 'c6'
+  | 'c7'
+  | 'c8'
+  | 'c9'
+  | 'c10'
+export const ClozeIds = [
+  'c1',
+  'c2',
+  'c3',
+  'c4',
+  'c5',
+  'c6',
+  'c7',
+  'c8',
+  'c9',
+  'c10',
+] as const
+
+export const ClozeHues = {
+  c1: 240,
+  c2: 130,
+  c3: 60,
+  c4: 180,
+  c5: 300,
+  c6: 41,
+  c7: 78,
+  c8: 0,
+  c9: 202,
+  c10: 271,
+}
+
+const charSpan = (
+  char: string,
+  index: number,
+  className: string,
+  clozeIndex: number,
+  newlineChar: string
+) => {
+  const isNewline = char === '\n' || char === '\r'
+  return (
+    <span
+      className={cn(className, { [css.clozeNewlinePlaceholder]: isNewline })}
+      key={String(index)}
+      style={{
+        ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
+      }}
+    >
+      {isNewline ? newlineChar : char}
+    </span>
+  )
+}
 
 const clearNewlines = (
   value: string,
@@ -188,7 +245,7 @@ const ClozeField = ({
   fieldName,
   value,
   title,
-  clozeIndex,
+  clozeIndex: currentClozeIndex,
   previewClozeIndex,
   deletions,
   subtitlesMenu,
@@ -207,7 +264,7 @@ const ClozeField = ({
   value: string
   title: string | undefined
   clozeIndex: number
-  previewClozeIndex?: number
+  previewClozeIndex: number
   deletions: ClozeDeletion[]
   subtitlesMenu: ReactNode
   fieldValueRef: React.RefObject<HTMLSpanElement>
@@ -218,17 +275,87 @@ const ClozeField = ({
       if (ref.current) {
         const selection = window.getSelection()
         if (selection) selection.empty()
+        console.log('focusing!', { selection })
+        ref.current.blur()
         ref.current.focus()
       }
     },
-    [clozeIndex, ref]
+    [currentClozeIndex, ref]
   )
-
-  const clozeId = ClozeIds[clozeIndex]
+  const clozeId = ClozeIds[currentClozeIndex]
   const viewMode = useSelector((state: AppState) => state.settings.viewMode)
 
-  const withoutNewlines = clearNewlines(value, viewMode, clozeId)
+  const rangesWithClozeIndexes = deletions
+    .flatMap(({ ranges }, clozeIndex) => {
+      return ranges.map(range => ({ range, clozeIndex }))
+    })
+    .sort((a, b) => a.range.start - b.range.start)
+  const segments: ReactNode[] = useMemo(
+    () => {
+      const newlineChar = viewMode === 'HORIZONTAL' ? '⏎' : '\n'
+      const segments = rangesWithClozeIndexes.length
+        ? []
+        : clearNewlines(value, viewMode)
+      rangesWithClozeIndexes.forEach(
+        ({ range: { start, end }, clozeIndex }, i) => {
+          if (i === 0 && start > 0) {
+            segments.push(
+              ...[...value.slice(0, start)].map((c, i) =>
+                charSpan(c, i, css.clozeValueChar, clozeIndex, newlineChar)
+              )
+            )
+          }
+          segments.push(
+            ...[...value.slice(start, end)].map((c, i) =>
+              charSpan(
+                c,
+                start + i,
+                cn(css.blank, {
+                  [css.previewBlank]:
+                    previewClozeIndex !== -1 &&
+                    previewClozeIndex === clozeIndex,
+                  [css.blankEditing]: clozeIndex === currentClozeIndex,
+                }),
+                clozeIndex,
+                newlineChar
+              )
+            )
+          )
 
+          const nextRange: {
+            range: ClozeRange
+            clozeIndex: number
+          } | null = rangesWithClozeIndexes[i + 1] || null
+          const subsequentGapEnd = nextRange
+            ? nextRange.range.start
+            : value.length
+
+          if (subsequentGapEnd - end > 0) {
+            // segments.push(clearNewlines(value.slice(end, subsequentGapEnd), viewMode))
+            segments.push(
+              ...[...value.slice(end, subsequentGapEnd)].map((c, i) =>
+                charSpan(
+                  c,
+                  end + i,
+                  css.clozeValueChar,
+                  clozeIndex,
+                  newlineChar
+                )
+              )
+            )
+          }
+        }
+      )
+      return segments
+    },
+    [
+      currentClozeIndex,
+      previewClozeIndex,
+      rangesWithClozeIndexes,
+      value,
+      viewMode,
+    ]
+  )
   const onCopy = useCallback(e => {
     const selection = window.getSelection()
     if (!selection) return
@@ -237,7 +364,7 @@ const ClozeField = ({
     e.preventDefault()
   }, [])
 
-  const editing = clozeIndex !== -1
+  const editing = currentClozeIndex !== -1
 
   const onKeyDown = useCallback(
     e => {
@@ -322,7 +449,9 @@ const ClozeField = ({
 
   const content = (
     <span
-      className={cn(css.clozeFieldValue, clozeId)}
+      className={cn(css.clozeFieldValue, clozeId, {
+        [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
+      })}
       contentEditable={editing}
       suppressContentEditableWarning
       onKeyDown={onKeyDown}
@@ -336,7 +465,7 @@ const ClozeField = ({
       onCopy={onCopy}
       ref={ref}
     >
-      {withoutNewlines}
+      {segments}
     </span>
   )
 
@@ -364,74 +493,3 @@ const isEnabledKey = (keyCode: number, ctrlKey: boolean) =>
   ctrlKey ? ENABLED_CTRL_KEYS.includes(keyCode) : ENABLED_KEYS.includes(keyCode)
 
 export default FlashcardDisplayField
-
-function ClozeUnderlay({
-  deletions,
-  clozeId,
-  previewClozeIndex,
-  value,
-  viewMode,
-  editing,
-}: {
-  deletions: ClozeDeletion[]
-  clozeId: string
-  previewClozeIndex: number | undefined
-  value: string
-  viewMode: ViewMode
-  editing: boolean
-}) {
-  return (
-    <>
-      {deletions
-        // .filter(d => d.clozeId === clozeId)
-        .map(({ ranges }, clozeIndex) => {
-          const id = ClozeIds[clozeIndex]
-          if (
-            typeof previewClozeIndex === 'number' &&
-            previewClozeIndex !== -1 &&
-            clozeIndex !== previewClozeIndex
-          )
-            return null
-          return (
-            <span
-              className={cn(css.clozeUnderlay, id, {
-                [css.currentClozeUnderlay]: id === clozeId,
-                [css.previewBlank]: clozeIndex === previewClozeIndex,
-              })}
-              contentEditable={editing}
-              suppressContentEditableWarning
-              tabIndex={-1}
-            >
-              {ranges.reduce(
-                (elements, { start, end }, i) => {
-                  // const lastEnd  ranges[i - 1].end
-                  if (i === 0 && start > 0)
-                    elements.push(
-                      clearNewlines(value.slice(0, start), viewMode)
-                    ) // + 1?
-                  elements.push(
-                    <span
-                      className={cn(css.clozeUnderlayDeletion, {
-                        [css.currentClozeUnderlayDeletion]: id === clozeId,
-                      })}
-                    >
-                      {clearNewlines(value.slice(start, end), viewMode)}
-                    </span>
-                  )
-                  const nextStart = ranges[i + 1]
-                    ? ranges[i + 1].start
-                    : value.length // + 1?
-                  if (nextStart - end > 0)
-                    elements.push(
-                      clearNewlines(value.slice(end, nextStart), viewMode)
-                    ) // + 1?
-                  return elements
-                },
-                [] as ReactNode[]
-              )}
-            </span>
-          )
-        })}
-    </>
-  )
-}
