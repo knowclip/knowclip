@@ -140,8 +140,59 @@ export const addClozeDeletion = (
   deletion: ClozeDeletion
 ): EditClip =>
   editClip(id, null, {
-    cloze: [...currentCloze, deletion],
+    cloze: trimClozeRangeOverlaps(currentCloze, deletion, currentCloze.length),
   })
+
+const overlaps = (a: ClozeRange, b: ClozeRange): boolean =>
+  a.start < b.end && a.end > b.start
+
+function trimClozeRangeOverlaps(
+  oldDeletions: ClozeDeletion[],
+  newDeletion: ClozeDeletion,
+  newIndex: number
+): ClozeDeletion[] {
+  const newDeletions = [...oldDeletions]
+  const rangesWithoutOverlaps = oldDeletions.reduce(
+    (rangesWithoutOverlapsSoFar, oldDeletion, i) => {
+      if (newIndex === i) {
+        return rangesWithoutOverlapsSoFar
+      }
+      return rangesWithoutOverlapsSoFar.flatMap(newRange => {
+        const overlappingOldRanges = oldDeletion.ranges.filter(existingRange =>
+          overlaps(existingRange, newRange)
+        )
+        if (!overlappingOldRanges.length) return [newRange]
+
+        return overlappingOldRanges.reduce(
+          (newPotentiallySplitRange, existingRange) => {
+            return newPotentiallySplitRange.flatMap(newRangeSegment => {
+              const withoutOverlaps: ClozeRange[] = []
+              if (newRangeSegment.start < existingRange.start)
+                withoutOverlaps.push({
+                  start: newRangeSegment.start,
+                  end: existingRange.start,
+                })
+
+              if (newRangeSegment.end > existingRange.end)
+                withoutOverlaps.push({
+                  start: existingRange.end,
+                  end: newRangeSegment.end,
+                })
+
+              return withoutOverlaps
+            })
+          },
+          [newRange]
+        )
+      })
+    },
+    newDeletion.ranges
+  )
+
+  newDeletions[newIndex] = { ranges: rangesWithoutOverlaps }
+
+  return newDeletions
+}
 
 export const editClozeDeletion = (
   id: ClipId,
@@ -150,14 +201,7 @@ export const editClozeDeletion = (
   ranges: ClozeDeletion['ranges']
 ): EditClip =>
   editClip(id, null, {
-    cloze: currentCloze.map((c, i) =>
-      i === clozeIndex
-        ? {
-            ...c,
-            ranges,
-          }
-        : c
-    ),
+    cloze: trimClozeRangeOverlaps(currentCloze, { ranges }, clozeIndex),
   })
 
 export const removeClozeDeletion = (

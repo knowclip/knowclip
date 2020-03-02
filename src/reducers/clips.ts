@@ -264,50 +264,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
       const cloze =
         key === 'transcription' && card.cloze.length
-          ? card.cloze
-              .map(c => ({
-                ...c,
-                ranges: c.ranges
-                  .map(r => {
-                    if (editDifference < 0) {
-                      const deletion = {
-                        start: editStart,
-                        end: editEnd,
-                      }
-                      const overlap =
-                        deletion.start <= r.end && deletion.end > r.start
-                      if (
-                        overlap &&
-                        (deletion.start < r.start || deletion.end > r.end)
-                      ) {
-                        return deletion.start < r.start
-                          ? {
-                              start: deletion.start,
-                              end: deletion.start + 1 + (r.end - deletion.end),
-                            }
-                          : {
-                              start: r.start,
-                              end: deletion.start,
-                            }
-                      }
-                    }
-                    return {
-                      start:
-                        editStart >= r.start
-                          ? r.start
-                          : r.start + editDifference,
-                      end: editStart <= r.end ? r.end + editDifference : r.end,
-                    }
-                  })
-                  .filter(
-                    r =>
-                      r.start !== r.end &&
-                      r.end > r.start &&
-                      r.end > 0 &&
-                      r.start >= 0
-                  ),
-              }))
-              .filter(c => c.ranges.length)
+          ? adjustClozeRanges(card, editDifference, editStart, editEnd)
           : card.cloze
 
       const flashcards: FlashcardsState = {
@@ -391,6 +348,47 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     default:
       return state
   }
+}
+
+function adjustClozeRanges(
+  card: Flashcard,
+  editDifference: number,
+  editStart: number,
+  editEnd: number
+) {
+  return card.cloze
+    .map(c => ({
+      ...c,
+      ranges: c.ranges
+        .map(r => {
+          if (editDifference < 0) {
+            const deletion = {
+              start: editStart,
+              end: editEnd,
+            }
+            const overlap = deletion.start <= r.end && deletion.end > r.start
+            if (overlap && (deletion.start < r.start || deletion.end > r.end)) {
+              return deletion.start < r.start
+                ? {
+                    start: deletion.start,
+                    end: deletion.start + 1 + (r.end - deletion.end),
+                  }
+                : {
+                    start: r.start,
+                    end: deletion.start,
+                  }
+            }
+          }
+          return {
+            start: editStart >= r.start ? r.start : r.start + editDifference,
+            end: editStart <= r.end ? r.end + editDifference : r.end,
+          }
+        })
+        .filter(
+          r => r.start !== r.end && r.end > r.start && r.end > 0 && r.start >= 0
+        ),
+    }))
+    .filter(c => c.ranges.length)
 }
 
 function editClip(
