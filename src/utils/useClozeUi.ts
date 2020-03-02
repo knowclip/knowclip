@@ -277,7 +277,13 @@ export function getSelectionWithin(element: HTMLElement) {
     end = preCaretRange.toString().length
   }
 
-  return { start: start, end: end }
+  const innerText = element.innerText
+  const length = innerText.length
+
+  return {
+    start: Math.max(0, Math.min(start, length)),
+    end: Math.max(0, Math.min(end, length)),
+  }
 }
 
 const joinRanges = (base: ClozeRange[], newRange: ClozeRange) => {

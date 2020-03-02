@@ -258,10 +258,10 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const card: Flashcard = state.flashcards[id]
       const editDifference = value.length - card.fields.transcription.length
       const caretStart = caretLocation - editDifference
-      console.log(
-        { caretStart, caretLocation, editDifference },
-        card.cloze.length && card.cloze[0].ranges[0]
-      )
+
+      const editStart = Math.min(caretStart, caretLocation)
+      const editEnd = Math.max(caretStart, caretLocation)
+
       const cloze =
         key === 'transcription' && card.cloze.length
           ? card.cloze
@@ -269,27 +269,34 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
                 ...c,
                 ranges: c.ranges
                   .map(r => {
-                    // if (caretStart <= r.end) {
-                    //   return {
-                    //     start:
-                    //       caretStart > r.start
-                    //         ? r.start
-                    //         : r.start + editDifference,
-                    //     end:
-                    //       r.end -
-                    //       (caretStart -
-                    //         editDifference -
-                    //         r.end -
-                    //         caretStart -
-                    //         editDifference),
-                    //   }
-                    // }
+                    if (editDifference < 0) {
+                      const deletion = {
+                        start: editStart,
+                        end: editEnd,
+                      }
+                      const overlap =
+                        deletion.start <= r.end && deletion.end > r.start
+                      if (
+                        overlap &&
+                        (deletion.start < r.start || deletion.end > r.end)
+                      ) {
+                        return deletion.start < r.start
+                          ? {
+                              start: deletion.start,
+                              end: deletion.start + 1 + (r.end - deletion.end),
+                            }
+                          : {
+                              start: r.start,
+                              end: deletion.start,
+                            }
+                      }
+                    }
                     return {
                       start:
-                        caretStart > r.start
+                        editStart >= r.start
                           ? r.start
                           : r.start + editDifference,
-                      end: caretStart <= r.end ? r.end + editDifference : r.end,
+                      end: editStart <= r.end ? r.end + editDifference : r.end,
                     }
                   })
                   .filter(
