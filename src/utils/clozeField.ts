@@ -1,4 +1,5 @@
 type RawClozeRange = {
+  clozeIndex: number
   startIndex: number
   fullMatchText: string
   tagContents: string
@@ -26,63 +27,59 @@ export const unescapeClozeFields = <F extends FlashcardFields>(
   return { fields, cloze }
 }
 
-const clozeTagsRegex = new RegExp(`<c(10|[1-9])>(.*?)</c>`, 'g')
+const clozeTagsRegex = new RegExp(
+  `(?<!\\\\)\\{\\{c(10|[1-9])::(.*?)(?<!\\\\)\\}\\}`,
+  'g'
+)
 
-export function unescapeClozeField(text: string) {
-  const matches = [...text.matchAll(clozeTagsRegex)]
+export function unescapeClozeField(jsonText: string) {
+  const matches = jsonText.matchAll(clozeTagsRegex)
 
-  let result = ''
-  const rawRangeGroups = matches
-    .reduce(
-      (deletions, match) => {
-        const [fullMatchText, clozeNumberRaw, tagContents] = match
-        const index = typeof match.index === 'number' ? match.index : -1
-        const clozeNumber = +clozeNumberRaw
+  const rawRanges: RawClozeRange[] = []
+  for (const match of matches) {
+    const [fullMatchText, clozeNumberRaw, tagContents] = match
+    const index = typeof match.index === 'number' ? match.index : -1
+    const clozeNumber = +clozeNumberRaw
 
-        deletions[clozeNumber - 1] = deletions[clozeNumber - 1] || []
-        deletions[clozeNumber - 1].push({
-          startIndex: index,
-          fullMatchText,
-          tagContents,
-        })
-        return deletions
-      },
-      [] as RawClozeRange[][]
+    rawRanges.push({
+      startIndex: index,
+      clozeIndex: clozeNumber - 1,
+      fullMatchText,
+      tagContents,
+    })
+  }
+
+  if (!rawRanges.length) return { text: jsonText, clozeDeletions: [] }
+
+  let text = ''
+  const sparseDeletions: ClozeDeletion[] = []
+  const firstRange = rawRanges[0]
+  if (firstRange.startIndex > 0) {
+    text += jsonText.slice(0, firstRange.startIndex)
+  }
+
+  let i = 0
+  for (const rawRange of rawRanges) {
+    const { ranges } = (sparseDeletions[rawRange.clozeIndex] = sparseDeletions[
+      rawRange.clozeIndex
+    ] || { ranges: [] })
+    ranges.push({
+      start: text.length,
+      end: text.length + rawRange.tagContents.length,
+    })
+    text += rawRange.tagContents
+
+    const nextRange = rawRanges[i + 1]
+    const subsequentGapEnd = nextRange ? nextRange.startIndex : jsonText.length
+    text += jsonText.slice(
+      rawRange.startIndex + rawRange.fullMatchText.length,
+      subsequentGapEnd
     )
-    .filter(r => r && r.length)
 
-  if (!rawRangeGroups.length) return { text, clozeDeletions: [] }
+    i++
+  }
 
-  const deletions: ClozeDeletion[] = rawRangeGroups.map(
-    (rawRanges, rangeGroupIndex) => {
-      const ranges: ClozeRange[] = []
-
-      const firstRange = rawRanges[0]
-      if (rangeGroupIndex === 0 && firstRange.startIndex > 0) {
-        result += text.slice(0, firstRange.startIndex)
-      }
-
-      let i = 0
-      for (const rawRange of rawRanges) {
-        ranges.push({
-          start: result.length,
-          end: result.length + rawRange.tagContents.length,
-        })
-        result += rawRange.tagContents
-
-        const nextRange = rawRanges[i + 1]
-        const subsequentGapEnd = nextRange ? nextRange.startIndex : text.length
-        result += text.slice(
-          rawRange.startIndex + rawRange.fullMatchText.length,
-          subsequentGapEnd
-        )
-
-        i++
-      }
-
-      return { ranges }
-    }
-  )
-
-  return { text: result, clozeDeletions: deletions }
+  const deletions: ClozeDeletion[] = []
+  sparseDeletions.forEach(d => deletions.push(d))
+  return { text: text, clozeDeletions: deletions }
 }

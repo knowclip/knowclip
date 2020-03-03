@@ -183,20 +183,21 @@ function getProjectClips<F extends FlashcardFields>(
 const escapeClozeChars = (text: string) =>
   text.replace(/(<\/?c(10|[1-9])>)/g, `\\$1`)
 const encodeClozeDeletions = (text: string, cloze: ClozeDeletion[]) => {
-  const ranges = cloze.flatMap(c => c.ranges).sort((a, b) => a.start - b.start)
+  const ranges = cloze
+    .flatMap((c, clozeIndex) => c.ranges.map(range => ({ range, clozeIndex })))
+    .sort((a, b) => a.range.start - b.range.start)
   if (!ranges.length) return escapeClozeChars(text)
-  const firstRange = ranges[0]
+  const firstRange = ranges[0].range
   let result = firstRange.start > 0 ? text.slice(0, firstRange.start) : ''
   let i = 0
-  for (const range of ranges) {
+  for (const { range, clozeIndex } of ranges) {
     const nextRange = ranges[i + 1]
-    const subsequentGapEnd = nextRange ? nextRange.start : text.length
+    const subsequentGapEnd = nextRange ? nextRange.range.start : text.length
 
     result +=
-      `<c${i + 1}>${escapeClozeChars(
+      `{{c${clozeIndex + 1}::${escapeClozeChars(
         text.slice(range.start, range.end)
-      )}</c${i + 1}>` +
-      escapeClozeChars(text.slice(range.end, subsequentGapEnd))
+      )}}}` + escapeClozeChars(text.slice(range.end, subsequentGapEnd))
 
     i++
   }
