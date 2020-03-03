@@ -187,4 +187,89 @@ describe('clips reducer', () => {
       )
     )
   })
+
+  it('merges clips with cloze fields', () => {
+    const a = newClip({ start: 1, end: 1.5 }, fileId, 'a', {
+      transcription: 'The quick brown fox',
+      pronunciation: '',
+      meaning: '',
+      notes: '',
+    })
+    const b = newClip({ start: 2, end: 2.5 }, fileId, 'b', {
+      transcription: 'jumps over the lazy dog',
+      pronunciation: '',
+      meaning: '',
+      notes: '',
+    })
+    const getWordRange = (text: string, word: string) => {
+      const start = text.indexOf(word)
+      return {
+        start,
+        end: start + word.length,
+      }
+    }
+    a.card.cloze = [
+      { ranges: [getWordRange(a.card.fields.transcription, 'quick')] },
+    ]
+    b.card.cloze = [
+      {
+        ranges: [
+          getWordRange(b.card.fields.transcription, 'jumps'),
+          getWordRange(b.card.fields.transcription, 'over'),
+        ],
+      },
+      { ranges: [getWordRange(b.card.fields.transcription, 'dog')] },
+    ]
+
+    const state = clips(
+      {
+        byId: {
+          a: a.clip,
+          b: b.clip,
+        },
+        flashcards: {
+          a: a.card,
+          b: b.card,
+        },
+        idsByMediaFileId: {
+          [fileId]: ['a', 'b'],
+        },
+      },
+      { type: '@@INIT' }
+    )
+    const mergeAction = r.mergeClips(['a', 'b'])
+
+    const expectedMergeResult = newClip({ start: 1, end: 2.5 }, fileId, 'a', {
+      transcription: 'The quick brown fox\njumps over the lazy dog',
+      pronunciation: '',
+      meaning: '',
+      notes: '',
+    })
+    const { fields } = expectedMergeResult.card
+    expectedMergeResult.card.cloze = [
+      { ranges: [getWordRange(fields.transcription, 'quick')] },
+      {
+        ranges: [
+          getWordRange(fields.transcription, 'jumps'),
+          getWordRange(fields.transcription, 'over'),
+        ],
+      },
+      {
+        ranges: [getWordRange(fields.transcription, 'dog')],
+      },
+    ]
+
+    expect(clips(state, mergeAction)).toEqual(
+      clips(
+        {
+          byId: { a: expectedMergeResult.clip },
+          flashcards: { a: expectedMergeResult.card },
+          idsByMediaFileId: {
+            [fileId]: ['a'],
+          },
+        },
+        { type: '@@INIT' }
+      )
+    )
+  })
 })

@@ -184,15 +184,43 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const fieldNames = getNoteTypeFields(flashcard.type)
 
       for (const fieldName of fieldNames) {
-        const value = sortedClipsToMerge
-          .map(
-            ({ id }) =>
-              cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
-          )
-          .filter(x => x.trim())
-          .join('\n')
-        flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
+        const values = sortedClipsToMerge.map(
+          ({ id }) =>
+            cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
+        )
+
+        if (fieldName === 'transcription') {
+          let mergingCardIndex = 0
+          let mergedValueSoFar = ''
+          for (const transcriptionText of values) {
+            const trimmed = transcriptionText.trim()
+            if (mergingCardIndex > 0 && trimmed) mergedValueSoFar += '\n'
+            const mergingCardId = sortedClipsToMerge[mergingCardIndex].id
+
+            flashcard.cloze.push(
+              /* eslint-disable no-loop-func */
+              ...cards[mergingCardId].cloze.map(c => ({
+                /* eslint-enable no-loop-func */
+                ...c,
+                ranges: c.ranges.map(r => ({
+                  start: r.start + mergedValueSoFar.length,
+                  end: r.end + mergedValueSoFar.length,
+                })),
+              }))
+            )
+            mergedValueSoFar += trimmed
+            mergingCardIndex++
+          }
+          flashcard.fields[
+            fieldName as SimpleFlashcardFieldName
+          ] = mergedValueSoFar
+        } else {
+          const value = values.filter(x => x.trim()).join('\n')
+          flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
+        }
       }
+
+      if (flashcard.cloze.length > 10) console.error(flashcard.cloze.splice(10))
 
       newClips[finalId] = {
         ...state.byId[finalId],

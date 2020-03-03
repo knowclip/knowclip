@@ -241,9 +241,6 @@ export const getSubtitlesFlashcardFieldLinks = (
   return media ? media.flashcardFieldsToSubtitlesTracks : {}
 }
 
-type Coords = { start: number; end: number }
-const overlaps = (a: Coords, b: Coords) => a.end >= b.start && b.end >= a.start
-
 export const getNewFlashcardForStretchedClip = (
   state: AppState,
   noteType: NoteType,
@@ -263,7 +260,8 @@ export const getNewFlashcardForStretchedClip = (
     const trackId = links[fieldName]
     const originalText = originalFields[fieldName]
     const newlyOverlapped = (chunk: SubtitlesChunk) =>
-      !originalText.trim() || !overlaps({ start, end }, chunk)
+      !originalText.trim() ||
+      !overlapsSignificantly(chunk, start, end, getHalfSecond(state))
     const chunks = trackId
       ? getSubtitlesChunksWithinRange(
           state,
@@ -294,3 +292,5 @@ export const getNewFlashcardForStretchedClip = (
 
   return { ...flashcard, fields: newFields }
 }
+const getHalfSecond = ({ waveform }: AppState) =>
+  (waveform.stepsPerSecond * waveform.stepLength) / 2
