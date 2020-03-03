@@ -6,7 +6,7 @@ import css from './FlashcardSectionDisplay.module.css'
 import { Edit } from '@material-ui/icons'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import { TransliterationFlashcardFields } from '../types/Project'
-import useClozeUi from '../utils/useClozeUi'
+import useClozeControls from '../utils/useClozeUi'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 
 enum $ {
@@ -60,16 +60,7 @@ const FlashcardSectionDisplayCard = memo(
       [dispatch]
     )
 
-    const {
-      clozeIndex,
-      setClozeIndex,
-      previewClozeIndex,
-      setPreviewClozeIndex,
-      inputRef,
-      confirmSelection,
-      clozeTextInputActions,
-      getSelection,
-    } = useClozeUi({
+    const clozeControls = useClozeControls({
       deletions: flashcard.cloze,
       onNewClozeCard: useCallback(
         deletion => {
@@ -110,12 +101,7 @@ const FlashcardSectionDisplayCard = memo(
         fields={fields}
         viewMode={viewMode}
         onDoubleClickField={handleDoubleClick}
-        clozeIndex={clozeIndex}
-        previewClozeIndex={previewClozeIndex}
-        clozeDeletions={flashcard.cloze}
-        confirmSelection={confirmSelection}
-        clozeTextInputActions={clozeTextInputActions}
-        fieldValueRef={inputRef}
+        clozeControls={clozeControls}
         menuItems={
           <>
             <Tooltip title="Edit card (E key)">
@@ -128,14 +114,7 @@ const FlashcardSectionDisplayCard = memo(
               </IconButton>
             </Tooltip>
             {fields.transcription.trim() && (
-              <ClozeButtons
-                deletions={flashcard.cloze}
-                currentClozeIndex={clozeIndex}
-                setClozeIndex={setClozeIndex}
-                setPreviewClozeIndex={setPreviewClozeIndex}
-                confirmSelection={confirmSelection}
-                getSelection={getSelection}
-              />
+              <ClozeButtons controls={clozeControls} />
             )}
           </>
         }

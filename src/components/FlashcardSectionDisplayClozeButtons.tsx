@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, MutableRefObject } from 'react'
 import css from './FlashcardSectionDisplay.module.css'
 import { Tooltip, Button } from '@material-ui/core'
 import {
@@ -6,23 +6,22 @@ import {
   ClozeIds,
   ClozeHues,
 } from './FlashcardSectionDisplayClozeField'
+import { ClozeControls } from '../utils/useClozeUi'
 
 const empty: ClozeDeletion[] = []
 
 const ClozeButtons = ({
-  deletions = empty,
-  currentClozeIndex,
-  setPreviewClozeIndex,
-  setClozeIndex,
-  confirmSelection,
-  getSelection,
+  controls: {
+    deletions = empty,
+    clozeIndex: currentClozeIndex,
+    setPreviewClozeIndex,
+    setClozeIndex,
+    confirmSelection,
+    getSelection,
+    selection,
+  },
 }: {
-  deletions?: ClozeDeletion[]
-  currentClozeIndex?: number
-  setPreviewClozeIndex: (index: number) => void
-  setClozeIndex: (index: number) => void
-  confirmSelection: ((event: any) => ClozeRange | undefined)
-  getSelection: () => ClozeRange | null
+  controls: ClozeControls
 }) => {
   const nextId = ClozeIds[deletions.length]
   const buttons = deletions.map((cloze, index) => {
@@ -42,6 +41,7 @@ const ClozeButtons = ({
         getSelection={getSelection}
         isActive={currentClozeIndex === index}
         confirmSelection={confirmSelection}
+        selection={selection}
       />
     )
   })
@@ -56,6 +56,7 @@ const ClozeButtons = ({
         setClozeIndex={setClozeIndex}
         getSelection={getSelection}
         confirmSelection={confirmSelection}
+        selection={selection}
       />
     )
   return <>{buttons}</>
@@ -70,6 +71,7 @@ const ClozeButton = ({
   setPreviewClozeIndex,
   confirmSelection,
   getSelection,
+  selection,
 }: {
   hoverText: string
   id: ClozeId
@@ -77,29 +79,34 @@ const ClozeButton = ({
   index: number
   setClozeIndex: (index: number) => void
   setPreviewClozeIndex?: (index: number) => void
-  confirmSelection: (selection: ClozeRange) => void
+  confirmSelection: ((clozeIndex: number, selection: ClozeRange) => void)
   getSelection: () => ClozeRange | null
+  selection: MutableRefObject<ClozeRange | null>
 }) => {
-  const selection = useRef<ClozeRange | null>(null)
-  const handleMouseDown = useCallback(
-    e => {
+  const registerSelection = useCallback(
+    () => {
       selection.current = getSelection() || null
     },
-    [getSelection]
+    [getSelection, selection]
   )
   const handleClick = useCallback(
-    e => {
+    () => {
       const textSelected =
         selection.current && selection.current.start !== selection.current.end
-      if (selection.current && textSelected) confirmSelection(selection.current)
-      if (isActive) {
+      if (selection.current && textSelected) {
+        // TODO: make this add to existing cloze card
+        // for this cloze button's clozeIndex
+        // in case current clozeIndex is -1
+        confirmSelection(index, selection.current)
+        console.log('confirmSelction!', { index, selection: selection.current })
+      } else if (isActive) {
         if (!textSelected) setClozeIndex(-1)
       } else {
         setClozeIndex(index)
       }
       selection.current = null
     },
-    [confirmSelection, index, isActive, setClozeIndex]
+    [confirmSelection, index, isActive, selection, setClozeIndex]
   )
   const handleMouseEnter = useCallback(
     () => {
@@ -121,7 +128,7 @@ const ClozeButton = ({
         onMouseLeave={handleMouseLeave}
         onBlur={handleMouseLeave}
         className={css.clozeButton}
-        onMouseDown={handleMouseDown}
+        onMouseDown={registerSelection}
         onClick={handleClick}
         style={
           isActive

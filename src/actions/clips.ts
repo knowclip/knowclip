@@ -195,7 +195,12 @@ export function trimClozeRangeOverlaps(
     newDeletion.ranges
   )
 
-  if (!rangesWithoutOverlaps.length) return oldDeletions
+  const oldRangesAtIndex = oldDeletions[newIndex]
+    ? oldDeletions[newIndex].ranges
+    : []
+  const nothingAdded =
+    rangesWithoutOverlaps.length === 0 && oldRangesAtIndex.length === 0
+  if (nothingAdded) return oldDeletions
 
   newDeletions[newIndex] = { ranges: rangesWithoutOverlaps }
 

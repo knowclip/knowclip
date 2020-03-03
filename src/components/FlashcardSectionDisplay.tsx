@@ -3,7 +3,7 @@ import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import FlashcardDisplayField from './FlashcardSectionDisplayField'
-import { ClozeTextInputActions } from '../utils/useClozeUi'
+import { ClozeControls } from '../utils/useClozeUi'
 import ClozeField from './FlashcardSectionDisplayClozeField'
 
 const empty: ClozeDeletion[] = []
@@ -17,11 +17,7 @@ const FlashcardSectionDisplay = ({
   className,
   onDoubleClickField,
   fieldHoverText,
-  clozeIndex = -1,
-  previewClozeIndex = -1,
-  clozeDeletions = empty,
-  fieldValueRef,
-  clozeTextInputActions,
+  clozeControls,
 }: {
   fields: TransliterationFlashcardFields
   viewMode: ViewMode
@@ -32,13 +28,14 @@ const FlashcardSectionDisplay = ({
   className?: string
   onDoubleClickField?: (fn: TransliterationFlashcardFieldName) => void
   fieldHoverText?: string
-  clozeIndex?: number
-  previewClozeIndex?: number
-  clozeDeletions?: ClozeDeletion[]
-  confirmSelection?: (e: any) => void
-  fieldValueRef: React.RefObject<HTMLSpanElement>
-  clozeTextInputActions?: ClozeTextInputActions
+  clozeControls?: ClozeControls
 }) => {
+  const {
+    clozeIndex = -1,
+    deletions: clozeDeletions = empty,
+    inputRef: fieldValueRef,
+  } = clozeControls || {}
+
   return (
     <section
       className={cn(css.container, className, {
@@ -46,13 +43,15 @@ const FlashcardSectionDisplay = ({
       })}
     >
       <section className={cn(css.previewFields)}>
-        {clozeDeletions && fieldValueRef && fields.transcription.trim() ? (
+        {clozeDeletions &&
+        fieldValueRef &&
+        (fields.transcription || '').trim() ? (
           <div
             className={cn(css.clozeField, {
               [css.clozeFieldEditing]: clozeIndex !== -1,
             })}
           >
-            {clozeTextInputActions && (
+            {clozeControls && (
               <ClozeField
                 className={css.previewFieldTranscription}
                 fieldName={'transcription'}
@@ -60,11 +59,7 @@ const FlashcardSectionDisplay = ({
                 linkedTracks={fieldsToTracks}
                 mediaFileId={mediaFile.id}
                 value={fields.transcription}
-                clozeIndex={clozeIndex}
-                deletions={clozeDeletions || []}
-                previewClozeIndex={previewClozeIndex}
-                fieldValueRef={fieldValueRef}
-                clozeTextInputActions={clozeTextInputActions}
+                clozeControls={clozeControls}
               />
             )}
           </div>

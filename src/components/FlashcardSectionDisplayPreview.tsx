@@ -6,7 +6,7 @@ import { Tooltip, IconButton } from '@material-ui/core'
 import { LibraryAdd } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
-import useClozeUi from '../utils/useClozeUi'
+import useClozeControls from '../utils/useClozeUi'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 
 const FlashcardSectionPreview = ({
@@ -46,16 +46,7 @@ const FlashcardSectionPreview = ({
     [dispatch]
   )
 
-  const {
-    clozeIndex,
-    setClozeIndex,
-    previewClozeIndex,
-    setPreviewClozeIndex,
-    inputRef,
-    confirmSelection,
-    clozeTextInputActions,
-    getSelection,
-  } = useClozeUi({
+  const clozeControls = useClozeControls({
     onNewClozeCard: useCallback(
       deletion => {
         dispatch(r.newClipFromSubtitlesChunk(cardPreviewSelection, deletion))
@@ -71,11 +62,7 @@ const FlashcardSectionPreview = ({
       fieldsToTracks={fieldsToTracks}
       fields={fields}
       viewMode={viewMode}
-      clozeIndex={clozeIndex}
-      previewClozeIndex={previewClozeIndex}
-      confirmSelection={confirmSelection}
-      fieldValueRef={inputRef}
-      clozeTextInputActions={clozeTextInputActions}
+      clozeControls={clozeControls}
       menuItems={
         <>
           <Tooltip title="Create flashcard from these subtitles (E key)">
@@ -83,14 +70,8 @@ const FlashcardSectionPreview = ({
               <LibraryAdd />
             </IconButton>
           </Tooltip>
-          {fields.transcription.trim() && (
-            <ClozeButtons
-              currentClozeIndex={clozeIndex}
-              setClozeIndex={setClozeIndex}
-              setPreviewClozeIndex={setPreviewClozeIndex}
-              confirmSelection={confirmSelection}
-              getSelection={getSelection}
-            />
+          {(fields.transcription || '').trim() && (
+            <ClozeButtons controls={clozeControls} />
           )}
         </>
       }

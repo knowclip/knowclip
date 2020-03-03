@@ -12,7 +12,7 @@ import FieldMenu, {
 } from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
 import { useSelector } from 'react-redux'
-import { getSelectionWithin, ClozeTextInputActions } from '../utils/useClozeUi'
+import { getSelectionWithin, ClozeControls } from '../utils/useClozeUi'
 
 let shiftKeyHeld = false
 const ClozeField = ({
@@ -22,18 +22,20 @@ const ClozeField = ({
   linkedTracks,
   mediaFileId,
   value,
-  clozeIndex: currentClozeIndex = -1,
-  previewClozeIndex = -1,
-  deletions,
-  fieldValueRef: ref,
-  clozeTextInputActions: {
-    onSelect,
-    onBackspace,
-    onPressDelete,
-    onEnter,
-    onEscape,
-  },
   onDoubleClick,
+  clozeControls: {
+    clozeIndex: currentClozeIndex = -1,
+    previewClozeIndex = -1,
+    deletions,
+    inputRef: ref,
+    clozeTextInputActions: {
+      onSelect,
+      onBackspace,
+      onPressDelete,
+      onEnter,
+      onEscape,
+    },
+  },
 }: {
   className?: string
   fieldName: FlashcardFieldName
@@ -41,12 +43,8 @@ const ClozeField = ({
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
   value: string
-  clozeIndex?: number
-  previewClozeIndex?: number
-  deletions: ClozeDeletion[]
-  fieldValueRef: React.RefObject<HTMLSpanElement>
-  clozeTextInputActions: ClozeTextInputActions
   onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
+  clozeControls: ClozeControls
 }) => {
   const {
     embeddedSubtitlesTracks,
@@ -275,7 +273,10 @@ const ClozeField = ({
       {editing ? (
         <Tooltip title={clozeHint}>{content}</Tooltip>
       ) : (
-        <Tooltip title="Select text and press C key to create new cloze deletion card.">
+        <Tooltip
+          title="Select text and press C key to create new cloze deletion card."
+          placement="top"
+        >
           {content}
         </Tooltip>
       )}

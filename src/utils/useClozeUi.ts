@@ -29,7 +29,9 @@ export type ClozeTextInputActions = {
   onEscape: () => void
 }
 
-export default function useClozeUi({
+export type ClozeControls = ReturnType<typeof useClozeControls>
+
+export default function useClozeControls({
   deletions = empty,
   onNewClozeCard,
   onEditClozeCard,
@@ -46,6 +48,8 @@ export default function useClozeUi({
 }) {
   const playing = useSelector((state: AppState) => r.isMediaPlaying(state))
   const dispatch = useDispatch()
+
+  const selection = useRef<ClozeRange | null>(null)
 
   const [clozeIndex, _setClozeIndex] = useState<number>(-1)
   const [previewClozeIndex, setPreviewClozeIndex] = useState(-1)
@@ -69,8 +73,6 @@ export default function useClozeUi({
   )
 
   const inputRef = useRef<HTMLSpanElement>(null)
-
-  const nextId = ClozeIds[deletions.length]
 
   const getSelection = useCallback(() => {
     const el = inputRef.current
@@ -97,14 +99,12 @@ export default function useClozeUi({
     [clozeIndex, deletions]
   )
 
-  const editingCard =
-    clozeIndex < deletions.length &&
-    clozeIndex !== -1 &&
-    typeof clozeIndex === 'number'
+  const currentClozeIndex = clozeIndex
+  const editingCard = clozeIndex < deletions.length && clozeIndex !== -1
   const confirmSelection = useCallback(
-    e => {
-      const selection = getSelection()
-      if (nextId && selection) {
+    (clozeIndex: number, selection: ClozeRange) => {
+      // if (nextId && selection) {
+      if (clozeIndex === -1 || clozeIndex === deletions.length) {
         if (selectionGivesNewCard(selection)) {
           const clozeDeletion: ClozeDeletion = {
             ranges: [selection],
@@ -112,29 +112,30 @@ export default function useClozeUi({
           onNewClozeCard(clozeDeletion)
           // if (playing) dispatch(r.setLoop(false))
         }
-
-        if (editingCard && onEditClozeCard && selection) {
-          const baseRanges = deletions[clozeIndex]
-            ? deletions[clozeIndex].ranges
-            : []
-          const ranges = joinRanges(baseRanges, selection)
-          if (ranges !== baseRanges) onEditClozeCard(clozeIndex, ranges)
-        }
-
-        if (inputRef.current)
-          setSelectionRange(inputRef.current, selection.end, selection.end)
       }
+
+      const editingCard = clozeIndex < deletions.length && clozeIndex !== -1
+      if (editingCard && onEditClozeCard) {
+        const baseRanges = deletions[clozeIndex]
+          ? deletions[clozeIndex].ranges
+          : []
+        const ranges = joinRanges(baseRanges, selection)
+        if (ranges !== baseRanges) onEditClozeCard(clozeIndex, ranges)
+        if (currentClozeIndex !== clozeIndex) setClozeIndex(clozeIndex)
+      }
+
+      if (inputRef.current)
+        setSelectionRange(inputRef.current, selection.end, selection.end)
+
       return selection || undefined
     },
     [
-      clozeIndex,
       deletions,
-      editingCard,
-      getSelection,
-      nextId,
       onEditClozeCard,
-      onNewClozeCard,
       selectionGivesNewCard,
+      onNewClozeCard,
+      currentClozeIndex,
+      setClozeIndex,
     ]
   )
 
@@ -146,36 +147,43 @@ export default function useClozeUi({
   )
   useEffect(
     () => {
-      const cKey = (e: KeyboardEvent) => {
-        // C key
-        if (e.keyCode === 67) {
-          const selection = getSelection()
-          if (selection && selection.start !== selection.end) {
-            confirmSelection(e)
-          } else {
-            const potentialNewIndex = clozeIndex + 1
-            setClozeIndex(
-              potentialNewIndex > deletions.length ? -1 : potentialNewIndex
-            )
-          }
-        }
+      const keyup = (e: KeyboardEvent) => {
+        const potentialNewIndex = clozeIndex + 1
+        const newIndex =
+          potentialNewIndex > deletions.length ? -1 : potentialNewIndex
 
-        // enter key
-        if (e.keyCode === 13) {
-          if (
-            document.activeElement === inputRef.current ||
-            !document.activeElement
-          ) {
-            const selection = getSelection()
-            if (selection) {
-              confirmSelection(e)
+        switch (e.keyCode) {
+          // C key
+          case 67: {
+            if (
+              selection.current &&
+              selection.current.start !== selection.current.end
+            ) {
+              confirmSelection(newIndex, selection.current)
+            } else {
+              setClozeIndex(newIndex)
             }
+            break
+          }
+          // enter key
+          case 13: {
+            if (
+              document.activeElement === inputRef.current ||
+              !document.activeElement
+            ) {
+              if (selection.current) {
+                confirmSelection(newIndex, selection.current)
+              }
+            }
+            break
           }
         }
-      }
-      document.addEventListener('keyup', cKey)
 
-      return () => document.removeEventListener('keyup', cKey)
+        selection.current = null
+      }
+      document.addEventListener('keyup', keyup)
+
+      return () => document.removeEventListener('keyup', keyup)
     },
     [
       clozeIndex,
@@ -185,6 +193,26 @@ export default function useClozeUi({
       setClozeIndex,
     ]
   )
+
+  const registerSelection = useCallback(
+    e => {
+      selection.current = getSelection() || null
+    },
+    [getSelection, selection]
+  )
+
+  useEffect(() => {
+    const keydown = (e: KeyboardEvent) => {
+      switch (e.keyCode) {
+        case 67: //c
+        case 13: //enter
+          registerSelection(e)
+      }
+    }
+    document.addEventListener('keydown', keydown)
+
+    return () => document.removeEventListener('keydown', keydown)
+  })
 
   const clozeTextInputActions: ClozeTextInputActions = {
     onSelect: useCallback(
@@ -215,13 +243,11 @@ export default function useClozeUi({
           if (selection.start === selection.end && selection.start !== 0) {
             const newCursor = selection.start - 1
             setSelectionRange(inputRef.current, newCursor, newCursor)
-            onEditClozeCard(
-              clozeIndex,
-              removeRange(deletions[clozeIndex].ranges, {
-                start: newCursor,
-                end: selection.start,
-              })
-            )
+            const newRanges = removeRange(deletions[clozeIndex].ranges, {
+              start: newCursor,
+              end: selection.start,
+            })
+            onEditClozeCard(clozeIndex, newRanges)
           } else {
             const newCursor = Math.min(selection.start, selection.end)
             setSelectionRange(inputRef.current, newCursor, newCursor)
@@ -230,6 +256,9 @@ export default function useClozeUi({
               removeRange(deletions[clozeIndex].ranges, selection)
             )
           }
+        } else if (inputRef.current) {
+          const newCursor = selection.end - 1
+          setSelectionRange(inputRef.current, newCursor, newCursor)
         }
       },
       [clozeIndex, deletions, editingCard, onEditClozeCard]
@@ -270,6 +299,8 @@ export default function useClozeUi({
   }
 
   return {
+    deletions,
+    selection,
     clozeIndex,
     setClozeIndex,
     previewClozeIndex,
@@ -333,12 +364,13 @@ const joinRanges = (base: ClozeRange[], newRange: ClozeRange) => {
     : base
 }
 
+const overlaps = (a: ClozeRange, b: ClozeRange): boolean =>
+  a.start < b.end && a.end > b.start
 const removeRange = (base: ClozeRange[], toDelete: ClozeRange) => {
   const ranges: ClozeRange[] = []
 
   for (const range of base) {
-    // + 1?
-    if (toDelete.start <= range.end && toDelete.end >= range.start) {
+    if (overlaps(toDelete, range)) {
       if (toDelete.start > range.start)
         ranges.push({
           start: range.start,
