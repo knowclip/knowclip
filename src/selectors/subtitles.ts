@@ -279,6 +279,17 @@ export const getNewFlashcardForStretchedClip = (
     )
       .filter(t => t.trim())
       .join('\n')
+
+    if (fieldName === 'transcription' && direction === 'PREPEND') {
+      const difference = newFields[fieldName].length - originalText.length
+      flashcard.cloze = flashcard.cloze.map(c => ({
+        ...c,
+        ranges: c.ranges.map(({ start, end }) => ({
+          start: start + difference,
+          end: end + difference,
+        })),
+      }))
+    }
   }
 
   if (
