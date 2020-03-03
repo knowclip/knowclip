@@ -347,12 +347,6 @@ const SubtitlesTimelines = memo(
       },
       [dispatch, waveformItems]
     )
-    console.log({
-      subtitles,
-      waveformItems,
-      goToSubtitlesChunk,
-      highlightedChunkIndex,
-    })
     return (
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}

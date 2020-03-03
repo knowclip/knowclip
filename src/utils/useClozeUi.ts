@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { ClozeIds } from '../components/FlashcardSectionDisplayClozeField'
 import * as r from '../redux'
 import { useSelector, useDispatch } from 'react-redux'
 import { trimClozeRangeOverlaps } from '../redux'
@@ -195,7 +194,7 @@ export default function useClozeControls({
   )
 
   const registerSelection = useCallback(
-    e => {
+    () => {
       selection.current = getSelection() || null
     },
     [getSelection, selection]

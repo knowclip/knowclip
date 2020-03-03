@@ -1,9 +1,5 @@
 import { createSelector } from 'reselect'
-import {
-  getSubtitlesCardBases,
-  WaveformSelectionExpanded,
-  SubtitlesCardBase,
-} from './cardPreview'
+import { getSubtitlesCardBases, WaveformSelectionExpanded } from './cardPreview'
 import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
 import {
   overlapsSignificantly,
@@ -32,7 +28,6 @@ export const getWaveformItems = createSelector(
 
     while (clipIndex < clips.length && chunkIndex < chunks.length) {
       const clip = clips[clipIndex]
-
       while (
         chunkIndex < chunks.length &&
         overlapsSignificantly(
@@ -90,12 +85,7 @@ export const getWaveformSelection = createSelector(
   getSubtitlesCardBases,
   (state: AppState) => state.clips.byId,
   getWaveformItems,
-  (
-    selection,
-    cardsBases,
-    clipsById,
-    items
-  ): WaveformSelectionExpanded | null => {
+  (selection, cardsBases, clipsById): WaveformSelectionExpanded | null => {
     if (!selection) return null
 
     switch (selection.type) {
@@ -115,13 +105,24 @@ export const getWaveformSelection = createSelector(
 
 export const getNewWaveformSelectionAt = (
   state: AppState,
-  x: number
+  newX: number
 ): WaveformSelectionExpanded | null => {
-  return (
-    getWaveformItems(state).find(
-      ({ item }) => x >= item.start && x <= item.end
-    ) || null
-  )
+  const selection = getWaveformSelection(state)
+  if (selection && newX >= selection.item.start && newX <= selection.item.end)
+    return selection
+
+  const overlapping: WaveformSelectionExpanded[] = []
+
+  for (const clipOrPreview of getWaveformItems(state)) {
+    const { item } = clipOrPreview
+    if (item.start > newX) break
+
+    if (newX >= item.start && newX <= item.end) overlapping.push(clipOrPreview)
+  }
+
+  if (overlapping.length <= 1) return overlapping[0] || null
+
+  return overlapping.find(({ type }) => type === 'Clip') || null
 }
 
 export const getBlankFields = (state: AppState) =>
