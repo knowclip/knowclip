@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { ClozeIds } from '../components/FlashcardSectionDisplayField'
+import { ClozeIds } from '../components/FlashcardSectionDisplayClozeField'
 import * as r from '../redux'
 import { useSelector, useDispatch } from 'react-redux'
+import { trimClozeRangeOverlaps } from '../redux'
 
 const empty: ClozeDeletion[] = []
 
@@ -80,10 +81,22 @@ export default function useClozeUi({
     return null
   }, [])
 
-  const makingNewCard =
-    clozeIndex === deletions.length ||
-    clozeIndex === -1 ||
-    typeof clozeIndex !== 'number'
+  const selectionGivesNewCard = useCallback(
+    (selection: ClozeRange) => {
+      if (clozeIndex !== deletions.length && clozeIndex !== -1) return false
+
+      const newDeletions = trimClozeRangeOverlaps(
+        deletions,
+        {
+          ranges: [selection],
+        },
+        deletions.length
+      )
+      return newDeletions !== deletions
+    },
+    [clozeIndex, deletions]
+  )
+
   const editingCard =
     clozeIndex < deletions.length &&
     clozeIndex !== -1 &&
@@ -92,7 +105,7 @@ export default function useClozeUi({
     e => {
       const selection = getSelection()
       if (nextId && selection) {
-        if (makingNewCard) {
+        if (selectionGivesNewCard(selection)) {
           const clozeDeletion: ClozeDeletion = {
             ranges: [selection],
           }
@@ -101,19 +114,27 @@ export default function useClozeUi({
         }
 
         if (editingCard && onEditClozeCard && selection) {
-          onEditClozeCard(clozeIndex, [selection])
+          const baseRanges = deletions[clozeIndex]
+            ? deletions[clozeIndex].ranges
+            : []
+          const ranges = joinRanges(baseRanges, selection)
+          if (ranges !== baseRanges) onEditClozeCard(clozeIndex, ranges)
         }
+
+        if (inputRef.current)
+          setSelectionRange(inputRef.current, selection.end, selection.end)
       }
       return selection || undefined
     },
     [
       clozeIndex,
+      deletions,
       editingCard,
       getSelection,
-      makingNewCard,
       nextId,
       onEditClozeCard,
       onNewClozeCard,
+      selectionGivesNewCard,
     ]
   )
 
@@ -168,25 +189,24 @@ export default function useClozeUi({
   const clozeTextInputActions: ClozeTextInputActions = {
     onSelect: useCallback(
       selection => {
-        if (makingNewCard) {
+        if (selectionGivesNewCard(selection)) {
           onNewClozeCard({
             ranges: [selection],
           })
         }
         if (editingCard && onEditClozeCard) {
-          onEditClozeCard(
-            clozeIndex,
-            joinRanges(deletions[clozeIndex].ranges, selection)
-          )
+          const ranges = joinRanges(deletions[clozeIndex].ranges, selection)
+          if (ranges !== deletions[clozeIndex].ranges)
+            onEditClozeCard(clozeIndex, ranges)
         }
       },
       [
         clozeIndex,
         deletions,
         editingCard,
-        makingNewCard,
         onEditClozeCard,
         onNewClozeCard,
+        selectionGivesNewCard,
       ]
     ),
     onBackspace: useCallback(
@@ -307,7 +327,10 @@ const joinRanges = (base: ClozeRange[], newRange: ClozeRange) => {
   ranges.push(newMergedRange)
   ranges.sort((a, b) => a.start - b.start)
 
-  return ranges
+  return ranges.length !== base.length ||
+    ranges.some((r, i) => r.start !== base[i].start || r.end !== base[i].end)
+    ? ranges
+    : base
 }
 
 const removeRange = (base: ClozeRange[], toDelete: ClozeRange) => {

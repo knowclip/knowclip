@@ -59,7 +59,6 @@ const FlashcardSectionDisplayCard = memo(
       },
       [dispatch]
     )
-    const title = 'Double-click to edit'
 
     const {
       clozeIndex,
@@ -77,8 +76,6 @@ const FlashcardSectionDisplayCard = memo(
           dispatch(
             r.addClozeDeletion(flashcard.id, flashcard.cloze || [], deletion)
           )
-          // dispatch(r.newClipFromSubtitlesChunk(cardPreviewSelection, deletion))
-          console.log({ deletion })
         },
         [dispatch, flashcard.cloze, flashcard.id]
       ),
@@ -113,7 +110,6 @@ const FlashcardSectionDisplayCard = memo(
         fields={fields}
         viewMode={viewMode}
         onDoubleClickField={handleDoubleClick}
-        fieldHoverText={title}
         clozeIndex={clozeIndex}
         previewClozeIndex={previewClozeIndex}
         clozeDeletions={flashcard.cloze}
@@ -131,14 +127,16 @@ const FlashcardSectionDisplayCard = memo(
                 <Edit />
               </IconButton>
             </Tooltip>
-            <ClozeButtons
-              deletions={flashcard.cloze}
-              currentClozeIndex={clozeIndex}
-              setClozeIndex={setClozeIndex}
-              setPreviewClozeIndex={setPreviewClozeIndex}
-              confirmSelection={confirmSelection}
-              getSelection={getSelection}
-            />
+            {fields.transcription.trim() && (
+              <ClozeButtons
+                deletions={flashcard.cloze}
+                currentClozeIndex={clozeIndex}
+                setClozeIndex={setClozeIndex}
+                setPreviewClozeIndex={setPreviewClozeIndex}
+                confirmSelection={confirmSelection}
+                getSelection={getSelection}
+              />
+            )}
           </>
         }
       />

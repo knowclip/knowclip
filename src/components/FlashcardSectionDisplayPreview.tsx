@@ -83,13 +83,15 @@ const FlashcardSectionPreview = ({
               <LibraryAdd />
             </IconButton>
           </Tooltip>
-          <ClozeButtons
-            currentClozeIndex={clozeIndex}
-            setClozeIndex={setClozeIndex}
-            setPreviewClozeIndex={setPreviewClozeIndex}
-            confirmSelection={confirmSelection}
-            getSelection={getSelection}
-          />
+          {fields.transcription.trim() && (
+            <ClozeButtons
+              currentClozeIndex={clozeIndex}
+              setClozeIndex={setClozeIndex}
+              setPreviewClozeIndex={setPreviewClozeIndex}
+              confirmSelection={confirmSelection}
+              getSelection={getSelection}
+            />
+          )}
         </>
       }
     />

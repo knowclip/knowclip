@@ -150,7 +150,7 @@ export const addClozeDeletion = (
 const overlaps = (a: ClozeRange, b: ClozeRange): boolean =>
   a.start < b.end && a.end > b.start
 
-function trimClozeRangeOverlaps(
+export function trimClozeRangeOverlaps(
   oldDeletions: ClozeDeletion[],
   newDeletion: ClozeDeletion,
   newIndex: number
@@ -165,24 +165,26 @@ function trimClozeRangeOverlaps(
         const overlappingOldRanges = oldDeletion.ranges.filter(existingRange =>
           overlaps(existingRange, newRange)
         )
-        if (!overlappingOldRanges.length) return [newRange]
+        if (!overlappingOldRanges.length) {
+          return [newRange]
+        }
 
         return overlappingOldRanges.reduce(
           (newPotentiallySplitRange, existingRange) => {
             return newPotentiallySplitRange.flatMap(newRangeSegment => {
               const withoutOverlaps: ClozeRange[] = []
-              if (newRangeSegment.start < existingRange.start)
+              if (newRangeSegment.start < existingRange.start) {
                 withoutOverlaps.push({
                   start: newRangeSegment.start,
                   end: existingRange.start,
                 })
-
-              if (newRangeSegment.end > existingRange.end)
+              }
+              if (newRangeSegment.end > existingRange.end) {
                 withoutOverlaps.push({
                   start: existingRange.end,
                   end: newRangeSegment.end,
                 })
-
+              }
               return withoutOverlaps
             })
           },
@@ -192,6 +194,8 @@ function trimClozeRangeOverlaps(
     },
     newDeletion.ranges
   )
+
+  if (!rangesWithoutOverlaps.length) return oldDeletions
 
   newDeletions[newIndex] = { ranges: rangesWithoutOverlaps }
 

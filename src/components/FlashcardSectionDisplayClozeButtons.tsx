@@ -1,7 +1,11 @@
 import React, { useCallback, useRef } from 'react'
 import css from './FlashcardSectionDisplay.module.css'
 import { Tooltip, Button } from '@material-ui/core'
-import { ClozeId, ClozeIds, ClozeHues } from './FlashcardSectionDisplayField'
+import {
+  ClozeId,
+  ClozeIds,
+  ClozeHues,
+} from './FlashcardSectionDisplayClozeField'
 
 const empty: ClozeDeletion[] = []
 

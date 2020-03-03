@@ -2,16 +2,13 @@ import React, { ReactChild } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
-import FlashcardDisplayField, {
-  ClozeHues,
-} from './FlashcardSectionDisplayField'
+import FlashcardDisplayField from './FlashcardSectionDisplayField'
 import { ClozeTextInputActions } from '../utils/useClozeUi'
+import ClozeField from './FlashcardSectionDisplayClozeField'
 
 const empty: ClozeDeletion[] = []
 
 const FlashcardSectionDisplay = ({
-  // cardBases,
-  // chunkIndex,
   mediaFile,
   fieldsToTracks,
   fields,
@@ -28,9 +25,7 @@ const FlashcardSectionDisplay = ({
 }: {
   fields: TransliterationFlashcardFields
   viewMode: ViewMode
-  // clipsIds: string[]
-  // cardBases: r.SubtitlesCardBases
-  // chunkIndex: number
+
   mediaFile: MediaFile
   fieldsToTracks: SubtitlesFlashcardFieldsLinks
   menuItems: ReactChild
@@ -43,7 +38,6 @@ const FlashcardSectionDisplay = ({
   confirmSelection?: (e: any) => void
   fieldValueRef: React.RefObject<HTMLSpanElement>
   clozeTextInputActions?: ClozeTextInputActions
-  // viewMode: ViewMode
 }) => {
   return (
     <section
@@ -52,23 +46,42 @@ const FlashcardSectionDisplay = ({
       })}
     >
       <section className={cn(css.previewFields)}>
-        <FlashcardDisplayField
-          fieldName="transcription"
-          subtitles={mediaFile.subtitles}
-          linkedTracks={fieldsToTracks}
-          mediaFileId={mediaFile.id}
-          onDoubleClick={onDoubleClickField}
-          title={fieldHoverText}
-          className={cn(css.previewFieldTranscription)}
-          clozeIndex={clozeIndex}
-          previewClozeIndex={previewClozeIndex}
-          clozeDeletions={clozeDeletions}
-          fieldValueRef={fieldValueRef}
-          clozeTextInputActions={clozeTextInputActions}
-        >
-          {fields.transcription || null}
-        </FlashcardDisplayField>
-
+        {clozeDeletions && fieldValueRef && fields.transcription.trim() ? (
+          <div
+            className={cn(css.clozeField, {
+              [css.clozeFieldEditing]: clozeIndex !== -1,
+            })}
+          >
+            {clozeTextInputActions && (
+              <ClozeField
+                className={css.previewFieldTranscription}
+                fieldName={'transcription'}
+                subtitles={mediaFile.subtitles}
+                linkedTracks={fieldsToTracks}
+                mediaFileId={mediaFile.id}
+                value={fields.transcription}
+                clozeIndex={clozeIndex}
+                deletions={clozeDeletions || []}
+                previewClozeIndex={previewClozeIndex}
+                fieldValueRef={fieldValueRef}
+                clozeTextInputActions={clozeTextInputActions}
+              />
+            )}
+          </div>
+        ) : (
+          <FlashcardDisplayField
+            fieldName="transcription"
+            subtitles={mediaFile.subtitles}
+            linkedTracks={fieldsToTracks}
+            mediaFileId={mediaFile.id}
+            onDoubleClick={onDoubleClickField}
+            title={fieldHoverText}
+            className={cn(css.previewFieldTranscription)}
+            fieldValueRef={fieldValueRef}
+          >
+            {fields.transcription || null}
+          </FlashcardDisplayField>
+        )}
         {'pronunciation' in fields && fields.pronunciation && (
           <FlashcardDisplayField
             fieldName="pronunciation"
