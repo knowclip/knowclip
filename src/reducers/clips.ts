@@ -184,37 +184,20 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const fieldNames = getNoteTypeFields(flashcard.type)
 
       for (const fieldName of fieldNames) {
-        const values = sortedClipsToMerge.map(
-          ({ id }) =>
-            cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
-        )
-
         if (fieldName === 'transcription') {
-          let mergingCardIndex = 0
-          let mergedValueSoFar = ''
-          for (const transcriptionText of values) {
-            const trimmed = transcriptionText.trim()
-            if (mergingCardIndex > 0 && trimmed) mergedValueSoFar += '\n'
-            const mergingCardId = sortedClipsToMerge[mergingCardIndex].id
-
-            flashcard.cloze.push(
-              /* eslint-disable no-loop-func */
-              ...cards[mergingCardId].cloze.map(c => ({
-                /* eslint-enable no-loop-func */
-                ...c,
-                ranges: c.ranges.map(r => ({
-                  start: r.start + mergedValueSoFar.length,
-                  end: r.end + mergedValueSoFar.length,
-                })),
-              }))
-            )
-            mergedValueSoFar += trimmed
-            mergingCardIndex++
-          }
-          flashcard.fields[
-            fieldName as SimpleFlashcardFieldName
-          ] = mergedValueSoFar
+          const mergingCards = sortedClipsToMerge.map(({ id }) => cards[id])
+          const { clozeDeletions, text } = mergeClozeFields(
+            mergingCards,
+            fieldName
+          )
+          flashcard.fields[fieldName as SimpleFlashcardFieldName] = text
+          flashcard.cloze = clozeDeletions
         } else {
+          const values = sortedClipsToMerge.map(
+            ({ id }) =>
+              cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
+          )
+
           const value = values.filter(x => x.trim()).join('\n')
           flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
         }
@@ -376,6 +359,34 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     default:
       return state
   }
+}
+
+export function mergeClozeFields(mergingCards: Flashcard[], fieldName: string) {
+  const clozeDeletions: ClozeDeletion[] = []
+  let mergedValueSoFar = ''
+
+  let mergingCardIndex = 0
+  for (const card of mergingCards) {
+    const transcriptionText =
+      card.fields[fieldName as SimpleFlashcardFieldName] || ''
+    const trimmed = transcriptionText.trim()
+    if (mergingCardIndex > 0 && trimmed) mergedValueSoFar += '\n'
+    const mergingCard = mergingCards[mergingCardIndex]
+    clozeDeletions.push(
+      /* eslint-disable no-loop-func */
+      ...mergingCard.cloze.map(c => ({
+        /* eslint-enable no-loop-func */
+        ...c,
+        ranges: c.ranges.map(r => ({
+          start: r.start + mergedValueSoFar.length,
+          end: r.end + mergedValueSoFar.length,
+        })),
+      }))
+    )
+    mergedValueSoFar += trimmed
+    mergingCardIndex++
+  }
+  return { clozeDeletions, text: mergedValueSoFar }
 }
 
 function adjustClozeRanges(
