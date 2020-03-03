@@ -61,13 +61,13 @@ const FlashcardSection = ({
     TransliterationFlashcardFieldName
   >('transcription')
 
-  const handleDoubleClickCardDisplayField = useCallback(
-    fieldName => {
-      setAutofocusFieldName(fieldName)
-      dispatch(actions.startEditingCards())
-    },
-    [setAutofocusFieldName, dispatch]
-  )
+  // const handleDoubleClickCardDisplayField = useCallback(
+  //   fieldName => {
+  //     setAutofocusFieldName(fieldName)
+  //     dispatch(actions.startEditingCards())
+  //   },
+  //   [setAutofocusFieldName, dispatch]
+  // )
 
   return (
     <section className={cn(className, css.container, $.container, css.card)}>

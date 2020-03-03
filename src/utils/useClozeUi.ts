@@ -205,7 +205,7 @@ export default function useClozeControls({
       switch (e.keyCode) {
         case 67: //c
         case 13: //enter
-          registerSelection(e)
+          registerSelection()
       }
     }
     document.addEventListener('keydown', keydown)
