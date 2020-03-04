@@ -1,4 +1,5 @@
 import { DeepPartial } from 'redux'
+import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 
 export const addClip = (
   clip: Clip,
@@ -146,66 +147,6 @@ export const addClozeDeletion = (
       currentCloze.length
     ).filter(({ ranges }) => ranges.length),
   })
-
-const overlaps = (a: ClozeRange, b: ClozeRange): boolean =>
-  a.start < b.end && a.end > b.start
-
-export function trimClozeRangeOverlaps(
-  oldDeletions: ClozeDeletion[],
-  newDeletion: ClozeDeletion,
-  newIndex: number
-): ClozeDeletion[] {
-  const newDeletions = [...oldDeletions]
-  const rangesWithoutOverlaps = oldDeletions.reduce(
-    (rangesWithoutOverlapsSoFar, oldDeletion, i) => {
-      if (newIndex === i) {
-        return rangesWithoutOverlapsSoFar
-      }
-      return rangesWithoutOverlapsSoFar.flatMap(newRange => {
-        const overlappingOldRanges = oldDeletion.ranges.filter(existingRange =>
-          overlaps(existingRange, newRange)
-        )
-        if (!overlappingOldRanges.length) {
-          return [newRange]
-        }
-
-        return overlappingOldRanges.reduce(
-          (newPotentiallySplitRange, existingRange) => {
-            return newPotentiallySplitRange.flatMap(newRangeSegment => {
-              const withoutOverlaps: ClozeRange[] = []
-              if (newRangeSegment.start < existingRange.start) {
-                withoutOverlaps.push({
-                  start: newRangeSegment.start,
-                  end: existingRange.start,
-                })
-              }
-              if (newRangeSegment.end > existingRange.end) {
-                withoutOverlaps.push({
-                  start: existingRange.end,
-                  end: newRangeSegment.end,
-                })
-              }
-              return withoutOverlaps
-            })
-          },
-          [newRange]
-        )
-      })
-    },
-    newDeletion.ranges
-  )
-
-  const oldRangesAtIndex = oldDeletions[newIndex]
-    ? oldDeletions[newIndex].ranges
-    : []
-  const nothingAdded =
-    rangesWithoutOverlaps.length === 0 && oldRangesAtIndex.length === 0
-  if (nothingAdded) return oldDeletions
-
-  newDeletions[newIndex] = { ranges: rangesWithoutOverlaps }
-
-  return newDeletions
-}
 
 export const editClozeDeletion = (
   id: ClipId,

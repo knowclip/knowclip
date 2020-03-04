@@ -24,6 +24,7 @@ const isTextFieldFocused = () => {
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
+      console.log({ cloze: (window as any).cloze })
       const { ctrlKey, altKey, keyCode } = event
 
       // L key
@@ -65,8 +66,8 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
 
       // esc
       if (keyCode === 27) {
-        if (r.getCurrentDialog(state$.value))
-          of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
+        if (r.getCurrentDialog(state$.value) || (window as any).cloze)
+          return of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
 
         if (
           r.getHighlightedClipId(state$.value) &&

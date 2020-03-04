@@ -134,7 +134,9 @@
   min-width: 0 !important;
   padding: 0.3em .5em;
 }
-
+.clozeButton:hover {
+  background-color: hsla(var(--cloze-hue), 100%, 80%, 80%);
+}
 /* .clozeField {
   overflow: hidden;
   position: absolute;

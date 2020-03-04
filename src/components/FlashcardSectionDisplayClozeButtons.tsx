@@ -54,6 +54,7 @@ const ClozeButtons = ({
         id={nextId}
         isActive={currentClozeIndex === deletions.length}
         setClozeIndex={setClozeIndex}
+        setPreviewClozeIndex={setPreviewClozeIndex}
         getSelection={getSelection}
         confirmSelection={confirmSelection}
         selection={selection}
@@ -130,11 +131,12 @@ const ClozeButton = ({
         className={css.clozeButton}
         onMouseDown={registerSelection}
         onClick={handleClick}
-        style={
-          isActive
-            ? { backgroundColor: `hsla(${ClozeHues[id]}, 60%, 80%, 75%)` }
-            : undefined
-        }
+        style={{
+          backgroundColor: isActive
+            ? `hsla(${ClozeHues[id]}, 60%, 80%, 75%)`
+            : undefined,
+          ['--cloze-hue' as any]: ClozeHues[id],
+        }}
       >
         {id.toUpperCase()}
       </Button>

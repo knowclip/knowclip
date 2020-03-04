@@ -1,32 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import * as r from '../redux'
 import { useSelector, useDispatch } from 'react-redux'
-import { trimClozeRangeOverlaps } from '../redux'
+import { ClozeIds } from '../components/FlashcardSectionDisplayClozeField'
+import {
+  collapseRanges,
+  removeRange,
+  trimClozeRangeOverlaps,
+} from './clozeRanges'
 
 const empty: ClozeDeletion[] = []
-
-export type ClozeTextInputActions = {
-  onSelect: (
-    selection: {
-      start: number
-      end: number
-    }
-  ) => void
-  onBackspace: (
-    selection: {
-      start: number
-      end: number
-    }
-  ) => void
-  onPressDelete: (
-    selection: {
-      start: number
-      end: number
-    }
-  ) => void
-  onEnter: () => void
-  onEscape: () => void
-}
 
 export type ClozeControls = ReturnType<typeof useClozeControls>
 
@@ -69,6 +51,15 @@ export default function useClozeControls({
       if (playing) dispatch(r.setLoop(newIndex !== -1))
     },
     [clozeIndex, deletions, dispatch, onDeleteClozeCard, playing]
+  )
+  useEffect(
+    () => {
+      ;(window as any).cloze = clozeIndex !== -1
+      return () => {
+        ;(window as any).cloze = false
+      }
+    },
+    [clozeIndex]
   )
 
   const inputRef = useRef<HTMLSpanElement>(null)
@@ -118,7 +109,7 @@ export default function useClozeControls({
         const baseRanges = deletions[clozeIndex]
           ? deletions[clozeIndex].ranges
           : []
-        const ranges = joinRanges(baseRanges, selection)
+        const ranges = collapseRanges(baseRanges, selection)
         if (ranges !== baseRanges) onEditClozeCard(clozeIndex, ranges)
         if (currentClozeIndex !== clozeIndex) setClozeIndex(clozeIndex)
       }
@@ -147,38 +138,46 @@ export default function useClozeControls({
   useEffect(
     () => {
       const keyup = (e: KeyboardEvent) => {
-        const potentialNewIndex = clozeIndex + 1
-        const newIndex =
-          potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+        const currentSelection = selection.current
+        selection.current = null
 
         switch (e.keyCode) {
           // C key
-          case 67: {
-            if (
-              selection.current &&
-              selection.current.start !== selection.current.end
-            ) {
-              confirmSelection(newIndex, selection.current)
-            } else {
-              setClozeIndex(newIndex)
-            }
-            break
-          }
           // enter key
+          case 67:
           case 13: {
             if (
-              document.activeElement === inputRef.current ||
-              !document.activeElement
+              currentSelection &&
+              currentSelection.start !== currentSelection.end
             ) {
-              if (selection.current) {
-                confirmSelection(newIndex, selection.current)
+              if (clozeIndex === -1) {
+                const newIndex = deletions.length
+                if (newIndex < ClozeIds.length)
+                  return confirmSelection(newIndex, currentSelection)
+                else
+                  return dispatch(
+                    r.simpleMessageSnackbar(
+                      `You've already reached the maximum of ${
+                        ClozeIds.length
+                      } cloze deletions per card.`
+                    )
+                  )
               }
+              return confirmSelection(clozeIndex, currentSelection)
+            } else if (e.keyCode === 67) {
+              const potentialNewIndex = clozeIndex + 1
+              const newIndex =
+                potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+              return setClozeIndex(newIndex)
             }
             break
           }
-        }
 
-        selection.current = null
+          // esc
+          case 27: {
+            if (clozeIndex !== -1) setClozeIndex(-1)
+          }
+        }
       }
       document.addEventListener('keyup', keyup)
 
@@ -188,6 +187,7 @@ export default function useClozeControls({
       clozeIndex,
       confirmSelection,
       deletions.length,
+      dispatch,
       getSelection,
       setClozeIndex,
     ]
@@ -213,7 +213,7 @@ export default function useClozeControls({
     return () => document.removeEventListener('keydown', keydown)
   })
 
-  const clozeTextInputActions: ClozeTextInputActions = {
+  const clozeTextInputActions = {
     onSelect: useCallback(
       selection => {
         if (selectionGivesNewCard(selection)) {
@@ -222,7 +222,7 @@ export default function useClozeControls({
           })
         }
         if (editingCard && onEditClozeCard) {
-          const ranges = joinRanges(deletions[clozeIndex].ranges, selection)
+          const ranges = collapseRanges(deletions[clozeIndex].ranges, selection)
           if (ranges !== deletions[clozeIndex].ranges)
             onEditClozeCard(clozeIndex, ranges)
         }
@@ -287,14 +287,6 @@ export default function useClozeControls({
       },
       [clozeIndex, deletions, editingCard, onEditClozeCard]
     ),
-    onEnter: () => {
-      if (clozeIndex !== -1) {
-        setClozeIndex(-1)
-      }
-    },
-    onEscape: () => {
-      setClozeIndex(-1)
-    },
   }
 
   return {
@@ -334,59 +326,6 @@ export function getSelectionWithin(element: HTMLElement) {
     start: Math.max(0, Math.min(start, length)),
     end: Math.max(0, Math.min(end, length)),
   }
-}
-
-const joinRanges = (base: ClozeRange[], newRange: ClozeRange) => {
-  const ranges: ClozeRange[] = []
-
-  let newMergedRange = newRange
-  for (const range of base) {
-    const overlapping =
-      newRange.start <= range.end && newRange.end >= range.start
-    const adjacent =
-      range.end === newRange.start || newRange.end === range.start
-    if (overlapping || adjacent) {
-      newMergedRange = {
-        start: Math.min(newMergedRange.start, range.start),
-        end: Math.max(newMergedRange.end, range.end),
-      }
-    } else {
-      ranges.push(range)
-    }
-  }
-  ranges.push(newMergedRange)
-  ranges.sort((a, b) => a.start - b.start)
-
-  return ranges.length !== base.length ||
-    ranges.some((r, i) => r.start !== base[i].start || r.end !== base[i].end)
-    ? ranges
-    : base
-}
-
-const overlaps = (a: ClozeRange, b: ClozeRange): boolean =>
-  a.start < b.end && a.end > b.start
-const removeRange = (base: ClozeRange[], toDelete: ClozeRange) => {
-  const ranges: ClozeRange[] = []
-
-  for (const range of base) {
-    if (overlaps(toDelete, range)) {
-      if (toDelete.start > range.start)
-        ranges.push({
-          start: range.start,
-          end: toDelete.start,
-        })
-
-      if (toDelete.end < range.end)
-        ranges.push({
-          start: toDelete.end,
-          end: range.end,
-        })
-    } else {
-      ranges.push(range)
-    }
-  }
-
-  return ranges
 }
 
 function getTextNodesIn(node: Node) {

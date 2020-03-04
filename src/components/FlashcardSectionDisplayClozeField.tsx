@@ -28,13 +28,7 @@ const ClozeField = ({
     previewClozeIndex = -1,
     deletions,
     inputRef: ref,
-    clozeTextInputActions: {
-      onSelect,
-      onBackspace,
-      onPressDelete,
-      onEnter,
-      onEscape,
-    },
+    clozeTextInputActions: { onSelect, onBackspace, onPressDelete },
   },
 }: {
   className?: string
@@ -170,12 +164,6 @@ const ClozeField = ({
     e => {
       if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
       switch (e.keyCode) {
-        // enter
-        case 13: {
-          e.preventDefault()
-          onEnter()
-          break
-        }
         // delete
         case 46: {
           if (ref.current) {
@@ -197,16 +185,11 @@ const ClozeField = ({
         case 16:
           return (shiftKeyHeld = true)
 
-        // escape
-        case 27:
-          onEscape()
-          return e.stopPropagation()
-
         default:
       }
     },
     // [confirmSelection]
-    [onBackspace, onEnter, onEscape, onPressDelete, ref]
+    [onBackspace, onPressDelete, ref]
   )
   const preventDefault = useCallback(e => {
     e.preventDefault()
@@ -317,7 +300,7 @@ export const ClozeHues = {
   c6: 41,
   c7: 78,
   c8: 0,
-  c9: 202,
+  c9: 215,
   c10: 271,
 }
 
