@@ -362,7 +362,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 }
 
 export function mergeClozeFields(
-  mergingCards: { fields: Flashcard['fields']; cloze?: Flashcard['cloze'] }[],
+  mergingCards: { fields: Flashcard['fields']; cloze: Flashcard['cloze'] }[],
   fieldName: string
 ) {
   const clozeDeletions: ClozeDeletion[] = []
@@ -375,18 +375,18 @@ export function mergeClozeFields(
     const trimmed = transcriptionText.trim()
     if (mergingCardIndex > 0 && trimmed) mergedValueSoFar += '\n'
     const mergingCard = mergingCards[mergingCardIndex]
-    if (mergingCard.cloze)
-      clozeDeletions.push(
-        /* eslint-disable no-loop-func */
-        ...mergingCard.cloze.map(c => ({
-          /* eslint-enable no-loop-func */
-          ...c,
-          ranges: c.ranges.map(r => ({
-            start: r.start + mergedValueSoFar.length,
-            end: r.end + mergedValueSoFar.length,
-          })),
-        }))
-      )
+
+    clozeDeletions.push(
+      /* eslint-disable no-loop-func */
+      ...mergingCard.cloze.map(c => ({
+        /* eslint-enable no-loop-func */
+        ...c,
+        ranges: c.ranges.map(r => ({
+          start: r.start + mergedValueSoFar.length,
+          end: r.end + mergedValueSoFar.length,
+        })),
+      }))
+    )
     mergedValueSoFar += trimmed
     mergingCardIndex++
   }
@@ -451,23 +451,25 @@ function editClip(
         end: override.end || clip.end,
       }
     : clip
+
+  const fields = {
+    ...flashcard.fields,
+    ...(flashcardOverride ? flashcardOverride.fields : null),
+  } as TransliterationFlashcardFields
   const newFlashcard: Flashcard = flashcardOverride
-    ? ({
+    ? {
         id,
         type: flashcard.type,
         image:
           'image' in flashcardOverride
             ? flashcardOverride.image
             : flashcard.image,
-        fields: {
-          ...flashcard.fields,
-          ...(flashcardOverride ? flashcardOverride.fields : null),
-        },
+        fields,
         tags: flashcardOverride.tags
           ? flashcardOverride.tags.filter((t): t is string => Boolean(t))
           : flashcard.tags,
-        cloze: flashcardOverride.cloze,
-      } as Flashcard)
+        cloze: (flashcardOverride.cloze as ClozeDeletion[]) || flashcard.cloze,
+      }
     : state.flashcards[id]
   return {
     ...state,

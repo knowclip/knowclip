@@ -5,7 +5,6 @@ import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPo
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
-import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeFlashcardsWithSubtitles({
@@ -14,8 +13,7 @@ export default async function makeFlashcardsWithSubtitles({
 }: TestSetup) {
   await client.elements_(waveform$.waveformClip, 3)
   await client.clickElement_(waveform$.waveformClip)
-
-  await client.firstElement_(flashcardSectionDisplayCard$.container)
+  await client.waitForText_(flashcardSection$.container, '1 / 3')
 
   await setVideoTime(client, 39)
   await client.waitForHidden_(waveform$.waveformClip)
