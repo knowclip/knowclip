@@ -6,7 +6,7 @@ import {
   switchMap,
   catchError,
 } from 'rxjs/operators'
-import { of, from, Observable, empty } from 'rxjs'
+import { of, from, empty } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
