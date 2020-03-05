@@ -3,8 +3,7 @@ import {
   getSubtitlesFlashcardFieldLinks,
   overlapsSignificantly,
 } from './subtitles'
-import { getCurrentMediaFile, getCurrentNoteType } from './currentMedia'
-import { getNoteTypeFields } from '../utils/noteType'
+import { getCurrentMediaFile } from './currentMedia'
 
 export type SubtitlesCardBase = {
   fields: Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
