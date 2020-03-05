@@ -16,6 +16,7 @@ describe('validateProject', () => {
     const validProjectJson: ProjectMetadataJson = {
       id: 'abcde-fghij-klmno',
       name: 'my cool project',
+      createdAt: '2020-01-27T12:35:20Z',
       timestamp: '2020-01-28T12:35:20Z',
       noteType: 'Simple',
     }
@@ -28,6 +29,7 @@ describe('validateProject', () => {
     const validProjectJson: ProjectMetadataJson = {
       id: 'abcde-fghij-klmno',
       name: 'my cool project',
+      createdAt: '2020-01-27T12:35:20Z',
       timestamp: '2020-01-28T12:35:20Z',
       noteType: 'Simple',
     }

@@ -39,6 +39,7 @@ describe('projectToMarkdown', () => {
     type: 'ProjectFile',
     id: 'xxx',
     name: 'Basic Japanese',
+    createdAt: '2015-11-15T09:44:45Z',
     lastSaved: '2015-11-16T09:44:45Z',
 
     noteType: 'Transliteration',

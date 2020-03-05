@@ -53,6 +53,7 @@ const openProjectById: AppEpic = (action$, state$) =>
           id: id,
           type: 'ProjectFile',
           lastSaved: 'PLACEHOLDER',
+          createdAt: 'PLACEHOLDER',
           noteType: 'Simple',
           mediaFileIds: [],
           error: null,

@@ -66,6 +66,7 @@ export const getProjectJson = <F extends FlashcardFields>(
     project: {
       name: file.name,
       noteType: file.noteType,
+      createdAt: file.createdAt,
       timestamp: nowUtcTimestamp(),
       id: file.id,
     },

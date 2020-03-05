@@ -60,6 +60,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
 ): NormalizedProjectFileData => {
   const project: ProjectFile = {
     id: projectJson.id,
+    createdAt: projectJson.createdAt,
     lastSaved: projectJson.timestamp,
     noteType: projectJson.noteType,
     name: projectJson.name,
