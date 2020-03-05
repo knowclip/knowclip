@@ -87,7 +87,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
       const fields = exportData.template.fields.map(fn => ({ name: fn }))
       const noteModel = new anki.Model({
         name: `Audio note (${exportData.deckName})`,
-        id: '1542998993963',
+        id: exportData.projectId,
         flds: fields,
         req: exportData.template.cards.map((t, i) => [
           i,
@@ -102,8 +102,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
         })),
       })
       const clozeNoteModel = new anki.ClozeModel({
-        // DO THESE HVE TO BE NUMBERS OR CAN I USE UUID???
-        id: '1542906796012',
+        id: exportData.projectId,
         name: `Cloze (${exportData.deckName})`,
         flds: fields,
         css: TEMPLATE_CSS,

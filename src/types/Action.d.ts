@@ -198,7 +198,7 @@ declare type OpenProjectRequestById = {
 }
 declare type OpenProjectRequestByFilePath = {
   type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH'
-  filePath: ProjectFilePath
+  filePath: string
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'
