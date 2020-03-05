@@ -159,25 +159,6 @@ const EmbeddedTrackMenuItem = ({
   track: EmbeddedSubtitlesTrack | null
   title: string
 }) => {
-  // const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
-  // const dispatch = useDispatch()
-
-  // const locateFileRequest = useCallback(
-  //   e => {
-  //     if (file) {
-  //       dispatch(
-  //         actions.locateFileRequest(
-  //           file,
-  //           `Locate file in your filesystem to use these subtitles.`
-  //         )
-  //       )
-
-  //       close(e)
-  //     }
-  //   },
-  //   [dispatch, file, close]
-  // )
-
   return (
     <MenuItem
       dense
@@ -195,30 +176,6 @@ const EmbeddedTrackMenuItem = ({
         )}
       </ListItemIcon>
       <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
-      {/*<Tooltip title="More actions">
-        <ListItemSecondaryAction>
-          <IconButton
-            buttonRef={anchorCallbackRef}
-            onClick={open}
-            className={$.openTrackSubmenuButton}
-          >
-            <MoreVert />
-          </IconButton>
-        </ListItemSecondaryAction>
-      </Tooltip>
-
-       {isOpen && (
-        <Menu autoFocus open={isOpen} onClose={close} anchorEl={anchorEl}>
-          <MenuItem
-            dense
-            onClick={locateFileRequest}
-            disabled={!file}
-            id={$.locateExternalFileButton}
-          >
-            <ListItemText primary="Refresh" />
-          </MenuItem>
-        </Menu>
-      )} */}
     </MenuItem>
   )
 }

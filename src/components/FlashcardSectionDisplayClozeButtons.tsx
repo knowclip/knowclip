@@ -95,11 +95,7 @@ const ClozeButton = ({
       const textSelected =
         selection.current && selection.current.start !== selection.current.end
       if (selection.current && textSelected) {
-        // TODO: make this add to existing cloze card
-        // for this cloze button's clozeIndex
-        // in case current clozeIndex is -1
         confirmSelection(index, selection.current)
-        console.log('confirmSelction!', { index, selection: selection.current })
       } else if (isActive) {
         if (!textSelected) setClozeIndex(-1)
       } else {

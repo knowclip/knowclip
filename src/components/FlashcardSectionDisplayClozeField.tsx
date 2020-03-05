@@ -125,7 +125,6 @@ const ClozeField = ({
             : value.length
 
           if (subsequentGapEnd - end > 0) {
-            // segments.push(clearNewlines(value.slice(end, subsequentGapEnd), viewMode))
             segments.push(
               ...[...value.slice(end, subsequentGapEnd)].map((c, i) =>
                 charSpan(
@@ -168,7 +167,6 @@ const ClozeField = ({
         case 46: {
           if (ref.current) {
             const selection = getSelectionWithin(ref.current)
-            // if/ (selection.start !== selection.end || select
             onPressDelete(selection)
           }
           break

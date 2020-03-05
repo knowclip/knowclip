@@ -93,14 +93,12 @@ export default function useClozeControls({
   const editingCard = clozeIndex < deletions.length && clozeIndex !== -1
   const confirmSelection = useCallback(
     (clozeIndex: number, selection: ClozeRange) => {
-      // if (nextId && selection) {
       if (clozeIndex === -1 || clozeIndex === deletions.length) {
         if (selectionGivesNewCard(selection)) {
           const clozeDeletion: ClozeDeletion = {
             ranges: [selection],
           }
           onNewClozeCard(clozeDeletion)
-          // if (playing) dispatch(r.setLoop(false))
         }
       }
 

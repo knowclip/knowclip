@@ -6,11 +6,6 @@ declare interface FlashcardFields {
   notes: string
 }
 
-// declare interface SimpleFlashcardFields extends FlashcardFields {}
-// declare interface TransliterationFlashcardFields extends FlashcardFields {
-//   pronunciation: string
-// }
-
 declare type FlashcardFieldName =
   | SimpleFlashcardFieldName
   | TransliterationFlashcardFieldName
