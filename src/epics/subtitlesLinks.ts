@@ -124,20 +124,25 @@ export const newClipFromChunk: AppEpic = (
         if (!mediaFileId) return empty()
         const cardBases = r.getSubtitlesCardBases(state$.value)
 
+        const fields = r.getNewFieldsFromLinkedSubtitles(
+          state$.value,
+          cardBases.cards[selection.item.index]
+        )
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,
           { start: selection.item.start, end: selection.item.end },
           mediaFileId,
           uuid(),
-          r.getNewFieldsFromLinkedSubtitles(
-            state$.value,
-            cardBases.cards[selection.item.index]
-          )
+          fields
         )
+
+        if (action.clozeDeletion) {
+          flashcard.cloze = [action.clozeDeletion]
+        }
 
         setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
 
-        return from([r.addClip(clip, flashcard, true)])
+        return from([r.addClip(clip, flashcard, !action.clozeDeletion)])
       })
     )
 

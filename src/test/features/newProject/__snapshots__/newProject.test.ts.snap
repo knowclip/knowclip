@@ -76,6 +76,7 @@ Object {
       },
     ],
     "project": Object {
+      "createdAt": "2020-01-28T12:35:20Z",
       "id": "6f58206b-9384-411c-8432-e7ff8d6c958b",
       "name": "My cool new project",
       "noteType": "Transliteration",

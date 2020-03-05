@@ -8,9 +8,10 @@
 type NoteType = 'Simple' | 'Transliteration' // TODO: remove this duplication
 export type ProjectMetadataJson = {
   name: string
+  id: string
+  createdAt: string
   noteType: NoteType
   timestamp: string
-  id: string
 }
 
 export type MediaJson<F extends FlashcardFields> =
@@ -65,6 +66,7 @@ export type ProjectJson<F extends FlashcardFields> = {
     name: string
     noteType: NoteType
     timestamp: string
+    createdAt: string
     id: string
   }
   media: MediaJson<F>[]

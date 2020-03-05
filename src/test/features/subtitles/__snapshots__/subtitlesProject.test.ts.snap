@@ -297,6 +297,7 @@ so I'll do it later.",
       },
     ],
     "project": Object {
+      "createdAt": "2020-02-01T16:10:37Z",
       "id": "ef3a2602-37a0-4158-89d6-47b75edb5bea",
       "name": "Project with subtitles",
       "noteType": "Transliteration",

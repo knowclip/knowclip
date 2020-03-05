@@ -13,6 +13,7 @@ export const createProject = (
     noteType,
     mediaFileIds: [],
     error: null,
+    createdAt: now,
     lastSaved: now,
   },
   filePath,

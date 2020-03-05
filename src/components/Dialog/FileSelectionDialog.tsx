@@ -10,7 +10,7 @@ import {
   Checkbox,
   Button,
 } from '@material-ui/core'
-import { getExtensions, getHumanFileName } from '../../utils/files'
+import { getHumanFileName, getFileFilters } from '../../utils/files'
 import * as actions from '../../actions'
 import { DialogProps } from './DialogProps'
 import css from './FileSelectionForm.module.css'
@@ -51,7 +51,7 @@ const FileSelectionDialog = ({
     handleSubmit,
     checkFolderAutomatically,
     toggleCheckFolderAutomatically,
-  } = useLocationForm(getExtensions(file), onSubmit)
+  } = useLocationForm(getFileFilters(file.type), onSubmit)
 
   const cancel = useCallback(
     () => {
@@ -126,7 +126,7 @@ const FileSelectionDialog = ({
 }
 
 const useLocationForm = (
-  extensions: string[],
+  filters: Electron.FileFilter[],
   onSubmit: (string: string) => void
 ) => {
   const dispatch = useDispatch()
@@ -158,16 +158,14 @@ const useLocationForm = (
   }, [])
   const onLocationTextFocus = useCallback(
     async e => {
-      const filePaths = await showOpenDialog([
-        { name: 'Subtitles file', extensions: ['srt', 'ass', 'vtt'] },
-      ])
+      const filePaths = await showOpenDialog(filters)
 
       if (!filePaths) return
 
       const [directory] = filePaths
       fillInLocation(directory)
     },
-    [fillInLocation]
+    [fillInLocation, filters]
   )
   const handleSubmit = useCallback(
     e => {

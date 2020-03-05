@@ -144,7 +144,8 @@ const FlashcardSectionForm = memo(
     }, [])
 
     const setFlashcardText = useCallback(
-      (key, text) => dispatch(actions.setFlashcardField(id, key, text)),
+      (key, text, caretLocation) =>
+        dispatch(actions.setFlashcardField(id, key, text, caretLocation)),
       [dispatch, id]
     )
     const deleteCard = useCallback(
@@ -266,7 +267,7 @@ const FlashcardSectionForm = memo(
   }
 )
 
-const capitalize = (string: string) =>
+export const capitalize = (string: string) =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
 
 export default FlashcardSectionForm

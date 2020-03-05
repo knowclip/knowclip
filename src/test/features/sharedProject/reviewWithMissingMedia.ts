@@ -1,5 +1,4 @@
 import { TestSetup } from '../../spectronApp'
-import { main$ } from '../../../components/Main'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
 import {
@@ -8,11 +7,12 @@ import {
 } from '../../../components/ReviewAndExportMediaTableRow'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { projectMenu$ } from '../../../components/ProjectMenu'
 
 export default async function reviewWithMissingMedia({ client }: TestSetup) {
   // maybe the first part for the loaded media should go in a different integration test
   await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
-  await client.clickElement_(main$.exportButton)
+  await client.clickElement_(projectMenu$.exportButton)
 
   await client.clickElement_(dialog$.continueButton)
   await client.elements_(mediaTables$.container, 2)

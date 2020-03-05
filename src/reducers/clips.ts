@@ -184,15 +184,26 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const fieldNames = getNoteTypeFields(flashcard.type)
 
       for (const fieldName of fieldNames) {
-        const value = sortedClipsToMerge
-          .map(
+        if (fieldName === 'transcription') {
+          const mergingCards = sortedClipsToMerge.map(({ id }) => cards[id])
+          const { clozeDeletions, text } = mergeClozeFields(
+            mergingCards,
+            fieldName
+          )
+          flashcard.fields[fieldName as SimpleFlashcardFieldName] = text
+          flashcard.cloze = clozeDeletions
+        } else {
+          const values = sortedClipsToMerge.map(
             ({ id }) =>
               cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
           )
-          .filter(x => x.trim())
-          .join('\n')
-        flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
+
+          const value = values.filter(x => x.trim()).join('\n')
+          flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
+        }
       }
+
+      if (flashcard.cloze.length > 10) console.error(flashcard.cloze.splice(10))
 
       newClips[finalId] = {
         ...state.byId[finalId],
@@ -254,8 +265,18 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     }
 
     case A.SET_FLASHCARD_FIELD: {
-      const { id, key, value } = action
+      const { id, key, value, caretLocation } = action
       const card: Flashcard = state.flashcards[id]
+      const editDifference = value.length - card.fields.transcription.length
+      const caretStart = caretLocation - editDifference
+
+      const editStart = Math.min(caretStart, caretLocation)
+      const editEnd = Math.max(caretStart, caretLocation)
+
+      const cloze =
+        key === 'transcription' && card.cloze.length
+          ? adjustClozeRanges(card, editDifference, editStart, editEnd)
+          : card.cloze
 
       const flashcards: FlashcardsState = {
         ...state.flashcards,
@@ -265,6 +286,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
             ...(card.fields as TransliterationFlashcardFields),
             [key as TransliterationFlashcardFieldName]: value,
           },
+          cloze,
         },
       }
       return {
@@ -339,6 +361,79 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
   }
 }
 
+export function mergeClozeFields(
+  mergingCards: { fields: Flashcard['fields']; cloze: Flashcard['cloze'] }[],
+  fieldName: string
+) {
+  const clozeDeletions: ClozeDeletion[] = []
+  let mergedValueSoFar = ''
+
+  let mergingCardIndex = 0
+  for (const card of mergingCards) {
+    const transcriptionText =
+      card.fields[fieldName as SimpleFlashcardFieldName] || ''
+    const trimmed = transcriptionText.trim()
+    if (mergingCardIndex > 0 && trimmed) mergedValueSoFar += '\n'
+    const mergingCard = mergingCards[mergingCardIndex]
+
+    clozeDeletions.push(
+      /* eslint-disable no-loop-func */
+      ...mergingCard.cloze.map(c => ({
+        /* eslint-enable no-loop-func */
+        ...c,
+        ranges: c.ranges.map(r => ({
+          start: r.start + mergedValueSoFar.length,
+          end: r.end + mergedValueSoFar.length,
+        })),
+      }))
+    )
+    mergedValueSoFar += trimmed
+    mergingCardIndex++
+  }
+  return { clozeDeletions, text: mergedValueSoFar }
+}
+
+function adjustClozeRanges(
+  card: Flashcard,
+  editDifference: number,
+  editStart: number,
+  editEnd: number
+) {
+  return card.cloze
+    .map(c => ({
+      ...c,
+      ranges: c.ranges
+        .map(r => {
+          if (editDifference < 0) {
+            const deletion = {
+              start: editStart,
+              end: editEnd,
+            }
+            const overlap = deletion.start <= r.end && deletion.end > r.start
+            if (overlap && (deletion.start < r.start || deletion.end > r.end)) {
+              return deletion.start < r.start
+                ? {
+                    start: deletion.start,
+                    end: deletion.start + 1 + (r.end - deletion.end),
+                  }
+                : {
+                    start: r.start,
+                    end: deletion.start,
+                  }
+            }
+          }
+          return {
+            start: editStart >= r.start ? r.start : r.start + editDifference,
+            end: editStart <= r.end ? r.end + editDifference : r.end,
+          }
+        })
+        .filter(
+          r => r.start !== r.end && r.end > r.start && r.end > 0 && r.start >= 0
+        ),
+    }))
+    .filter(c => c.ranges.length)
+}
+
 function editClip(
   state: ClipsState,
   id: string,
@@ -356,22 +451,25 @@ function editClip(
         end: override.end || clip.end,
       }
     : clip
+
+  const fields = {
+    ...flashcard.fields,
+    ...(flashcardOverride ? flashcardOverride.fields : null),
+  } as TransliterationFlashcardFields
   const newFlashcard: Flashcard = flashcardOverride
-    ? ({
+    ? {
         id,
         type: flashcard.type,
         image:
           'image' in flashcardOverride
             ? flashcardOverride.image
             : flashcard.image,
-        fields: {
-          ...flashcard.fields,
-          ...(flashcardOverride ? flashcardOverride.fields : null),
-        },
+        fields,
         tags: flashcardOverride.tags
           ? flashcardOverride.tags.filter((t): t is string => Boolean(t))
           : flashcard.tags,
-      } as Flashcard)
+        cloze: (flashcardOverride.cloze as ClozeDeletion[]) || flashcard.cloze,
+      }
     : state.flashcards[id]
   return {
     ...state,

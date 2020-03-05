@@ -1,13 +1,13 @@
 import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
-import { main$ } from '../../../components/Main'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTableRow$ as dialogTableRow$ } from '../../../components/ReviewAndExportMediaTableRow'
 import { snackbar$ } from '../../../components/Snackbar'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { projectMenu$ } from '../../../components/ProjectMenu'
 
 export default async function reviewAndExportApkg({ client, app }: TestSetup) {
-  await client.clickElement_(main$.exportButton)
+  await client.clickElement_(projectMenu$.exportButton)
 
   await client.clickElement_(dialog$.continueButton)
 

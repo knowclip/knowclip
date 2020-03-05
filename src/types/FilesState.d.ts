@@ -32,6 +32,7 @@ declare type ProjectFile = {
   mediaFileIds: Array<MediaFileId>
   error: string | null
   lastSaved: string
+  createdAt: string
 }
 declare type MediaFile = VideoFile | AudioFile
 

@@ -1,5 +1,9 @@
 import { createSelector } from 'reselect'
-import { getSubtitlesCardBases, WaveformSelectionExpanded } from './cardPreview'
+import {
+  getSubtitlesCardBases,
+  WaveformSelectionExpanded,
+  SubtitlesCardBase,
+} from './cardPreview'
 import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
 import {
   overlapsSignificantly,
@@ -28,9 +32,20 @@ export const getWaveformItems = createSelector(
 
     while (clipIndex < clips.length && chunkIndex < chunks.length) {
       const clip = clips[clipIndex]
+      while (
+        chunkIndex < chunks.length &&
+        overlapsSignificantly(
+          chunks[chunkIndex],
+          clip.start,
+          clip.end,
+          halfSecond
+        )
+      ) {
+        chunkIndex++
+      }
       const chunk = chunks[chunkIndex]
 
-      if (clip.start <= chunk.start) {
+      if (!chunk || clip.start <= chunk.start) {
         result.push({
           type: 'Clip',
           id: clip.id,
@@ -38,23 +53,13 @@ export const getWaveformItems = createSelector(
           item: clip,
         })
         clipIndex += 1
-
-        for (
-          let i = chunkIndex;
-          i < chunks.length &&
-          overlapsSignificantly(chunks[i], clip.start, clip.end, halfSecond);
-          i++
-        ) {
-          chunkIndex += 1
-        }
       } else {
-        if (!overlapsSignificantly(chunk, clip.start, clip.end, halfSecond))
-          result.push({
-            type: 'Preview',
-            index: result.length,
-            item: chunk,
-            cardBaseIndex: chunk.index,
-          })
+        result.push({
+          type: 'Preview',
+          index: result.length,
+          item: chunk,
+          cardBaseIndex: chunk.index,
+        })
         chunkIndex += 1
       }
     }
@@ -84,12 +89,7 @@ export const getWaveformSelection = createSelector(
   getSubtitlesCardBases,
   (state: AppState) => state.clips.byId,
   getWaveformItems,
-  (
-    selection,
-    cardsBases,
-    clipsById,
-    items
-  ): WaveformSelectionExpanded | null => {
+  (selection, cardsBases, clipsById): WaveformSelectionExpanded | null => {
     if (!selection) return null
 
     switch (selection.type) {
@@ -109,13 +109,47 @@ export const getWaveformSelection = createSelector(
 
 export const getNewWaveformSelectionAt = (
   state: AppState,
-  x: number
+  newX: number
 ): WaveformSelectionExpanded | null => {
-  return (
-    getWaveformItems(state).find(
-      ({ item }) => x >= item.start && x <= item.end
-    ) || null
+  const selection = getWaveformSelection(state)
+  const waveformItems = getWaveformItems(state)
+  const updatedSelection =
+    selection &&
+    getUpdatedSameSelection(selection, waveformItems[selection.index] || null)
+  if (
+    updatedSelection &&
+    newX >= updatedSelection.item.start &&
+    newX <= updatedSelection.item.end
   )
+    return updatedSelection
+
+  const overlapping: WaveformSelectionExpanded[] = []
+
+  for (const clipOrPreview of waveformItems) {
+    const { item } = clipOrPreview
+    if (item.start > newX) break
+
+    if (newX >= item.start && newX <= item.end) overlapping.push(clipOrPreview)
+  }
+
+  if (overlapping.length <= 1) return overlapping[0] || null
+
+  return overlapping.find(({ type }) => type === 'Clip') || null
+}
+const getUpdatedSameSelection = (
+  prev: WaveformSelectionExpanded,
+  next: WaveformSelectionExpanded | null
+): WaveformSelectionExpanded | null => {
+  if (!next || prev.type !== next.type) return null
+  if (prev.type === 'Clip' && prev.item.id === (next.item as Clip).id)
+    return next
+  if (
+    prev.type === 'Preview' &&
+    prev.item.index === (next.item as SubtitlesCardBase).index
+  )
+    return next
+
+  return null
 }
 
 export const getBlankFields = (state: AppState) =>
@@ -125,22 +159,30 @@ export const getBlankFields = (state: AppState) =>
 
 export const getNewFieldsFromLinkedSubtitles = (
   state: AppState,
-  { start, end }: PendingClip
+  { start, end }: { start: number; end: number }
 ): FlashcardFields => {
   const subs = getSubtitlesCardBases(state)
-
-  const cardBase = subs.cards.find(c =>
-    overlapsSignificantly(c, start, end, getHalfSecond(state))
-  )
   const fieldsToTracks = getSubtitlesFlashcardFieldLinks(state)
-  const tracksToFieldsText = cardBase
-    ? subs.getFieldsPreviewFromCardsBase(cardBase)
-    : null
   const fields = { ...getBlankFields(state) } as TransliterationFlashcardFields
-  for (const fieldName of subs.fieldNames) {
-    const trackId = fieldsToTracks[fieldName]
-    const text = trackId && tracksToFieldsText && tracksToFieldsText[trackId]
-    fields[fieldName] = text || ''
+
+  for (const cardBase of subs.cards) {
+    if (overlapsSignificantly(cardBase, start, end, getHalfSecond(state))) {
+      const tracksToFieldsText = cardBase
+        ? subs.getFieldsPreviewFromCardsBase(cardBase)
+        : null
+      for (const fieldName of subs.fieldNames) {
+        const trackId = fieldsToTracks[fieldName]
+        const newText =
+          (trackId && tracksToFieldsText && tracksToFieldsText[trackId]) || ''
+
+        const text = fields[fieldName]
+
+        fields[fieldName] = [text.trim(), newText.trim()]
+          .filter(s => s)
+          .join('\n')
+      }
+    } else if (cardBase.start >= end) break
   }
+
   return fields
 }

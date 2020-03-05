@@ -27,14 +27,14 @@ const session: Reducer<SessionState, Action> = (
       return state.waveformSelection &&
         state.waveformSelection.type === 'Clip' &&
         action.id === state.waveformSelection.id
-        ? { ...state, waveformSelection: null }
+        ? { ...state, waveformSelection: null, loopMedia: false }
         : state
 
     case A.DELETE_CARDS:
       return state.waveformSelection &&
         state.waveformSelection.type === 'Clip' &&
         action.ids.includes(state.waveformSelection.id)
-        ? { ...state, waveformSelection: null }
+        ? { ...state, waveformSelection: null, loopMedia: false }
         : state
 
     case A.DELETE_MEDIA_FROM_PROJECT:

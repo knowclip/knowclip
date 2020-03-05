@@ -25,6 +25,7 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../../utils/newFlashcard'
+import { capitalize } from '../FlashcardSectionForm'
 
 enum $ {
   container = 'link-subtitles-dialog-container',
@@ -139,7 +140,7 @@ const LinkSubtitlesDialog = ({
                   ]
                 return (
                   <MenuItem value={fieldName} key={fieldName}>
-                    {fieldName} {label && `(Replace ${label})`}
+                    {capitalize(fieldName)} {label && `(Replace ${label})`}
                   </MenuItem>
                 )
               })}

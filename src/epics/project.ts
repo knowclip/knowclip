@@ -6,7 +6,7 @@ import {
   switchMap,
   catchError,
 } from 'rxjs/operators'
-import { of, from, Observable, empty } from 'rxjs'
+import { of, from, empty } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import { promisify } from 'util'
@@ -53,6 +53,7 @@ const openProjectById: AppEpic = (action$, state$) =>
           id: id,
           type: 'ProjectFile',
           lastSaved: 'PLACEHOLDER',
+          createdAt: 'PLACEHOLDER',
           noteType: 'Simple',
           mediaFileIds: [],
           error: null,
@@ -73,21 +74,21 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     ofType<Action, OpenProjectRequestByFilePath>(
       A.OPEN_PROJECT_REQUEST_BY_FILE_PATH
     ),
-    flatMap<OpenProjectRequestByFilePath, Promise<Observable<Action>>>(
-      async ({ filePath }) => {
-        const parse = await parseProjectJson(filePath)
-        if (parse.errors) throw new Error(parse.errors.join('\n\n'))
+    switchMap(({ filePath }) =>
+      from(parseProjectJson(filePath)).pipe(
+        flatMap(parse => {
+          if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
-        const { project } = normalizeProjectJson(state$.value, parse.value)
-        return from([
-          r.abortFileDeletions(),
-          r.openFileRequest(project, filePath),
-        ])
-      }
-    ),
-    mergeAll(),
-    catchError(err =>
-      of(r.errorDialog('Problem opening project file:', err.message))
+          const { project } = normalizeProjectJson(state$.value, parse.value)
+          return from([
+            r.abortFileDeletions(),
+            r.openFileRequest(project, filePath),
+          ])
+        }),
+        catchError(err =>
+          of(r.errorDialog('Problem opening project file:', err.message))
+        )
+      )
     )
   )
 

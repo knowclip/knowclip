@@ -5,6 +5,9 @@
     "ProjectMetadataJson": {
       "additionalProperties": false,
       "properties": {
+        "createdAt": {
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
@@ -24,9 +27,10 @@
       },
       "required": [
         "name",
+        "id",
+        "createdAt",
         "noteType",
-        "timestamp",
-        "id"
+        "timestamp"
       ],
       "type": "object"
     }

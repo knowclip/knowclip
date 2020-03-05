@@ -13,7 +13,7 @@ type Props = {
   mediaFileId: MediaFileId
   currentFlashcard: Flashcard
   label: string
-  setFlashcardText: (id: string, text: string) => void
+  setFlashcardText: (id: string, text: string, caretLocation: number) => void
   subtitles: MediaFile['subtitles']
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
@@ -40,7 +40,7 @@ const FlashcardSectionFormField = memo(
     className,
   }: Props) => {
     const handleChange = useCallback(
-      e => setFlashcardText(name, e.target.value),
+      e => setFlashcardText(name, e.target.value, e.target.selectionEnd),
       [setFlashcardText, name]
     )
     const {

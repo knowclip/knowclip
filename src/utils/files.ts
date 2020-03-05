@@ -1,20 +1,44 @@
-export const getExtensions = (file: FileMetadata) => {
-  switch (file.type) {
-    case 'ConstantBitrateMp3':
-      return ['mp3']
-    case 'ExternalSubtitlesFile':
-      return ['vtt', 'srt', 'ass']
-    case 'MediaFile':
-      return []
-    case 'ProjectFile':
-      return ['kyml']
-    case 'VttConvertedSubtitlesFile':
-      return ['vtt']
-    case 'VideoStillImage':
-      return ['png']
-    case 'WaveformPng':
-      return ['png']
-  }
+const fileFilters = {
+  ConstantBitrateMp3: [{ name: 'Constant bitrate mp3', extensions: ['mp3'] }],
+  ExternalSubtitlesFile: [
+    { name: 'Subtitles file', extensions: ['vtt', 'srt', 'ass'] },
+  ],
+  MediaFile: [
+    {
+      name: 'Audio or video files',
+      extensions: [
+        'mp3',
+        'mp4',
+        'wav',
+        'ogg',
+        'm4a',
+        'mkv',
+        'flac',
+        'avi',
+        'mov',
+        'aac',
+        'webm',
+      ],
+    },
+  ],
+  ProjectFile: [{ name: 'Knowclip project file', extensions: ['kyml'] }],
+  VttConvertedSubtitlesFile: [
+    { name: 'Temporary file from subtitles', extensions: ['vtt'] },
+  ],
+  VideoStillImage: [{ name: 'Still image from video', extensions: ['png'] }],
+  WaveformPng: [
+    { name: 'Waveform image from audio track', extensions: ['png'] },
+  ],
+}
+
+export const getExtensions = (fileType: FileMetadata['type']) => {
+  return fileFilters[fileType][0].extensions
+}
+
+export const getFileFilters = (
+  fileType: FileMetadata['type']
+): Electron.FileFilter[] => {
+  return fileFilters[fileType]
 }
 
 const getHumanFileTypeName = (file: { type: string; name?: string }) => {

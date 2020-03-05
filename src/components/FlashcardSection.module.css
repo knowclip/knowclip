@@ -50,6 +50,16 @@
   composes: navButton;
   right: 1rem;
 }
+/* .horizontalForm .navButton {
+  top: 0;
+}
+.horizontalForm .prevButton {
+  left: 0;
+}
+.horizontalForm .nextButton {
+  right: 0;
+} */
+
 
 .card {
   background:white;
@@ -200,3 +210,9 @@
 .fieldMenuButton:focus {
   opacity: 1;
 }
+
+.selectedMenuItem,
+.selectedMenuItem span {
+  font-weight: bold !important;
+}
+

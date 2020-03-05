@@ -24,6 +24,7 @@ import {
   stopMovingCursor,
   setCursorX,
 } from '../utils/waveform'
+import { getFileFilters } from '../utils/files'
 
 enum $ {
   chooseFirstMediaFileButton = 'choose-media-file-button',
@@ -31,25 +32,6 @@ enum $ {
   mediaFileMenuItem = 'media-file-menu-item',
   addNewAdditionalMediaButton = 'add-new-additional-media-button',
 }
-
-const MEDIA_FILTERS = [
-  {
-    name: 'Audio or video files',
-    extensions: [
-      'mp3',
-      'mp4',
-      'wav',
-      'ogg',
-      'm4a',
-      'mkv',
-      'flac',
-      'avi',
-      'mov',
-      'aac',
-      'webm',
-    ],
-  },
-]
 
 type MediaFilesMenuProps = { className: string; currentProjectId: ProjectId }
 
@@ -69,7 +51,7 @@ const MediaFilesMenu = ({
   const dispatch = useDispatch()
   const chooseMediaFiles = useCallback(
     async e => {
-      const filePaths = await showOpenDialog(MEDIA_FILTERS, true)
+      const filePaths = await showOpenDialog(getFileFilters('MediaFile'), true)
       if (filePaths) {
         dispatch(actions.addMediaToProjectRequest(currentProjectId, filePaths))
         popover.close(e)

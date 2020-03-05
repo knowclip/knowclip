@@ -82,6 +82,9 @@
 .mediaFilesMenuListItemText {
   padding-right: 3rem !important;
 }
+.activeMediaFilesMenuListItemText span {
+  font-weight: bold;
+}
 
 .mediaFileName {
   font-size: large;

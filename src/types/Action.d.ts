@@ -44,6 +44,7 @@ declare type StopEditingCards = {
 declare type NewCardFromSubtitlesRequest = {
   type: 'NEW_CARD_FROM_SUBTITLES_REQUEST'
   linkedSubtitlesChunkSelection: WaveformSelectionExpanded
+  clozeDeletion?: ClozeDeletion
 }
 
 declare type ClipAction =
@@ -69,6 +70,7 @@ declare type SetFlashcardField = {
   id: ClipId
   key: FlashcardFieldName
   value: string
+  caretLocation: number
 }
 declare type AddFlashcardTag = {
   type: 'ADD_FLASHCARD_TAG'
@@ -81,6 +83,9 @@ declare type DeleteFlashcardTag = {
   index: number
   tag: string
 }
+// declare type AddClozeDeletion = {
+//   type: 'ADD_CLOZE_DELETION'
+// }
 declare type SetDefaultClipSpecs = {
   type: 'SET_DEFAULT_CLIP_SPECS'
   tags?: Array<string>
@@ -193,7 +198,7 @@ declare type OpenProjectRequestById = {
 }
 declare type OpenProjectRequestByFilePath = {
   type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH'
-  filePath: ProjectFilePath
+  filePath: string
 }
 declare type OpenProject = {
   type: 'OPEN_PROJECT'

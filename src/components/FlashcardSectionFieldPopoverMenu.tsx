@@ -1,10 +1,17 @@
 import React, { useCallback, SyntheticEvent, useMemo } from 'react'
-import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
+import {
+  IconButton,
+  MenuItem,
+  Tooltip,
+  MenuList,
+  Popover,
+} from '@material-ui/core'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
 import usePopover from '../utils/usePopover'
 import * as actions from '../actions'
+import css from './FlashcardSection.module.css'
 
 enum $ {
   openMenuButton = 'flashcard-field-menu-open-button',
@@ -47,34 +54,36 @@ const FlashcardSectionFieldPopoverMenu = ({
         </IconButton>
       </Tooltip>
       {subtitlesPopover.isOpen && (
-        <Menu
+        <Popover
           anchorEl={subtitlesPopover.anchorEl}
           open={subtitlesPopover.isOpen}
           onClose={subtitlesPopover.close}
         >
-          {embeddedSubtitlesTracks.map((track, i) => (
-            <FieldMenuItem
-              key={track.id}
-              trackId={track.id}
-              label={`Embedded subtitles track ${i + 1}`}
-              selected={linkedSubtitlesTrack === track.id}
-              mediaFileId={mediaFileId}
-              fieldName={fieldName}
-              closeMenu={subtitlesPopover.close}
-            />
-          ))}
-          {externalSubtitlesTracks.map((track, i) => (
-            <FieldMenuItem
-              key={track.id}
-              trackId={track.id}
-              label={`External subtitles track ${i + 1}`}
-              selected={linkedSubtitlesTrack === track.id}
-              mediaFileId={mediaFileId}
-              fieldName={fieldName}
-              closeMenu={subtitlesPopover.close}
-            />
-          ))}
-        </Menu>
+          <MenuList>
+            {embeddedSubtitlesTracks.map((track, i) => (
+              <FieldMenuItem
+                key={track.id}
+                trackId={track.id}
+                label={`Embedded subtitles track ${i + 1}`}
+                selected={linkedSubtitlesTrack === track.id}
+                mediaFileId={mediaFileId}
+                fieldName={fieldName}
+                closeMenu={subtitlesPopover.close}
+              />
+            ))}
+            {externalSubtitlesTracks.map((track, i) => (
+              <FieldMenuItem
+                key={track.id}
+                trackId={track.id}
+                label={`External subtitles track ${i + 1}`}
+                selected={linkedSubtitlesTrack === track.id}
+                mediaFileId={mediaFileId}
+                fieldName={fieldName}
+                closeMenu={subtitlesPopover.close}
+              />
+            ))}
+          </MenuList>
+        </Popover>
       )}
     </React.Fragment>
   )
@@ -112,9 +121,9 @@ const FieldMenuItem = ({
   return (
     <MenuItem
       onClick={handleClick}
-      selected={selected}
-      className={$.menuItem}
+      autoFocus={selected}
       tabIndex={0}
+      className={cn($.menuItem, { [css.selectedMenuItem]: selected })}
     >
       {label}
     </MenuItem>

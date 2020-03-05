@@ -15,7 +15,9 @@ const isTextFieldFocused = () => {
   if (!activeElement) return false
   return (
     activeElement instanceof HTMLInputElement ||
-    activeElement instanceof HTMLTextAreaElement
+    activeElement instanceof HTMLTextAreaElement ||
+    activeElement instanceof HTMLDivElement ||
+    activeElement instanceof HTMLSpanElement
   )
 }
 
@@ -63,8 +65,8 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
 
       // esc
       if (keyCode === 27) {
-        if (r.getCurrentDialog(state$.value))
-          of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
+        if (r.getCurrentDialog(state$.value) || (window as any).cloze)
+          return of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
 
         if (
           r.getHighlightedClipId(state$.value) &&
