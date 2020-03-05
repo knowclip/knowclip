@@ -25,22 +25,30 @@ const newFlashcard = (
   tags: string[],
   image: Flashcard['image'],
   cloze: ClozeDeletion[] = []
-): Flashcard => ({
-  id,
-  type: isTransliterationCard(fields) ? 'Transliteration' : 'Simple',
-  fields:
-    'pronunciation' in fields
-      ? {
-          ...blankSimpleFields,
-          ...fields,
-        }
-      : {
+): Flashcard => {
+  return isTransliterationCard(fields)
+    ? {
+        id,
+        type: 'Transliteration',
+        fields: {
           ...blankTransliterationFields,
           ...fields,
         },
-  tags,
-  image,
-  cloze,
-})
+        tags,
+        image,
+        cloze,
+      }
+    : {
+        id,
+        type: 'Simple',
+        fields: {
+          ...blankSimpleFields,
+          ...fields,
+        },
+        tags,
+        image,
+        cloze,
+      }
+}
 
 export default newFlashcard

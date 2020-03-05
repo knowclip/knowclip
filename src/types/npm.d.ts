@@ -18,3 +18,8 @@ declare module 'anki-apkg-export-multi-field/dist/exporter' {
     }): Promise<Buffer>
   }
 }
+
+declare module '@silvestre/mkanki' {
+  const mkanki: any
+  export = mkanki
+}

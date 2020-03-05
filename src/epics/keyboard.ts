@@ -24,7 +24,6 @@ const isTextFieldFocused = () => {
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
-      console.log({ cloze: (window as any).cloze })
       const { ctrlKey, altKey, keyCode } = event
 
       // L key

@@ -25,6 +25,10 @@ export const getVideoStill = async (
           res(outputFilePath)
         })
         .on('error', (err: any) => {
+          console.error(
+            `Could not make still from ${videoFilePath} at ${seconds} seconds`
+          )
+          console.error(err)
           rej(err)
         })
         .run()

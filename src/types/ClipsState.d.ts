@@ -37,14 +37,17 @@ declare type ClipSpecs = {
   flashcardSpecs: FlashcardSpecs
 }
 declare type FlashcardSpecs = {
+  id: string
   fields: Array<string>
-  tags: Array<string>
+  tags: string
   due: number
   image: FlashcardImage | null
+  clozeDeletions?: string
 }
 
 declare type ApkgExportData = {
   deckName: string
+  projectId: string
   template: ApkgExportTemplate
   clips: Array<ClipSpecs>
 }

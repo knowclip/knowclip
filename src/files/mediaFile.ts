@@ -112,7 +112,7 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
   if (currentFileName && !clipsCount)
     return [
       r.setDefaultClipSpecs({
-        tags: [basename(currentFileName)],
+        tags: [basename(currentFileName).replace(/\s/g, '_')],
         includeStill: action.validatedFile.isVideo,
       }),
     ]

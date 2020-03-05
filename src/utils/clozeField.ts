@@ -8,7 +8,6 @@ type RawClozeRange = {
 export const unescapeClozeFields = <F extends FlashcardFields>(
   fieldsFromJson?: Partial<F>
 ): { fields: Partial<F>; cloze: ClozeDeletion[] } => {
-  console.log('UNESCAPING!!')
   const fields = {} as F
   if (!fieldsFromJson) return { fields, cloze: [] }
   const cloze: ClozeDeletion[] = []

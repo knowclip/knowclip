@@ -77,7 +77,10 @@ const ReviewAndExportMediaTable = memo(
           onClick={toggleOpen}
         >
           <Checkbox
-            checked={clipsIds.every(id => selectedIds.includes(id))}
+            checked={
+              Boolean(clipsIds.length) &&
+              clipsIds.every(id => selectedIds.includes(id))
+            }
             onChange={selectAll}
             onClick={stopPropagation}
             className={cn(css.selectAllClipsCheckbox, $.checkbox)}

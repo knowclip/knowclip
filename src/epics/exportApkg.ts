@@ -19,16 +19,20 @@ import { of, empty, defer, from } from 'rxjs'
 import * as r from '../redux'
 import { join, basename } from 'path'
 import { promises } from 'fs'
-import Exporter from 'anki-apkg-export-multi-field/dist/exporter'
-import createTemplate from 'anki-apkg-export-multi-field/dist/template'
 import tempy from 'tempy'
-import { getApkgExportData } from '../utils/prepareExport'
+import * as anki from '@silvestre/mkanki'
+import {
+  getApkgExportData,
+  TEMPLATE_CSS,
+  CLOZE_QUESTION_FORMAT,
+  CLOZE_ANSWER_FORMAT,
+} from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
 import { getVideoStill, getMidpoint } from '../utils/getVideoStill'
 
-const { writeFile, readFile, unlink: deleteFile } = promises
+const { readFile } = promises
 
 const exportApkgFailure: AppEpic = action$ =>
   action$.pipe(
@@ -80,11 +84,40 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
     filter((path): path is string => Boolean(path)),
     flatMap(outputFilePath => {
       document.body.style.cursor = 'progress'
-      const apkg = new Exporter(exportData.deckName, {
-        // @ts-ignore
-        sql: window.SQL,
-        template: createTemplate(exportData.template),
+      const fields = exportData.template.fields.map(fn => ({ name: fn }))
+      const noteModel = new anki.Model({
+        name: `Audio note (${exportData.deckName})`,
+        id: '1542998993963',
+        flds: fields,
+        req: exportData.template.cards.map((t, i) => [
+          i,
+          'all',
+          [exportData.template.fields.indexOf('sound')],
+        ]),
+        css: TEMPLATE_CSS,
+        tmpls: exportData.template.cards.map(template => ({
+          name: template.name,
+          qfmt: template.questionFormat,
+          afmt: template.answerFormat,
+        })),
       })
+      const clozeNoteModel = new anki.ClozeModel({
+        // DO THESE HVE TO BE NUMBERS OR CAN I USE UUID???
+        id: '1542906796012',
+        name: `Cloze (${exportData.deckName})`,
+        flds: fields,
+        css: TEMPLATE_CSS,
+        tmpl: {
+          name: 'Cloze',
+          qfmt: CLOZE_QUESTION_FORMAT,
+          afmt: CLOZE_ANSWER_FORMAT,
+        },
+      })
+
+      const deck = new anki.Deck(Date.now(), exportData.deckName)
+
+      const pkg = new anki.Package()
+
       let count = 0
       const processClipsObservables = exportData.clips.map(
         (clipSpecs: ClipSpecs) =>
@@ -96,18 +129,40 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
               endTime,
               flashcardSpecs,
             } = clipSpecs
-            const { fields, ...restSpecs } = flashcardSpecs
-            apkg.addCard(fields, restSpecs)
+            const { fields } = flashcardSpecs
+            deck.addNote(noteModel.note(fields, null, flashcardSpecs.tags))
+            if (flashcardSpecs.clozeDeletions)
+              deck.addNote(
+                clozeNoteModel.note(
+                  [flashcardSpecs.clozeDeletions, ...fields.slice(1)],
+                  null,
+                  flashcardSpecs.tags
+                )
+              )
             const clipOutputFilePath = join(directory, outputFilename)
-            await clipAudio(
-              sourceFilePath,
-              startTime,
-              endTime,
-              clipOutputFilePath
-            )
-            apkg.addMedia(outputFilename, await readFile(clipOutputFilePath))
+            try {
+              await clipAudio(
+                sourceFilePath,
+                startTime,
+                endTime,
+                clipOutputFilePath
+              )
+              await pkg.addMedia(
+                await readFile(clipOutputFilePath),
+                outputFilename
+              )
+            } catch (err) {
+              console.error(err)
+              console.log({
+                sourceFilePath,
+                startTime,
+                endTime,
+                clipOutputFilePath,
+              })
+              throw new Error(`Could not make cliip from ${sourceFilePath}`)
+            }
             if (clipSpecs.flashcardSpecs.image) {
-              const clipId = fields[fields.length - 1]
+              const clipId = clipSpecs.flashcardSpecs.id
               const { image } = clipSpecs.flashcardSpecs
               const imagePath = await getVideoStill(
                 clipId,
@@ -117,12 +172,9 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
                   : +(getMidpoint(startTime, endTime) / 1000).toFixed(3)
               )
               if (imagePath instanceof Error) throw imagePath
-              await apkg.addMedia(
-                basename(imagePath),
-                await readFile(imagePath)
-              )
+
+              await pkg.addMedia(await readFile(imagePath), basename(imagePath))
             }
-            await deleteFile(clipOutputFilePath)
             count += 1
 
             return r.setProgress({
@@ -144,27 +196,18 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           of(
             r.setProgress({
               percentage: 100,
-              message: 'Saving .apkg file...',
+              message: 'Almost done! Saving .apkg file...',
             })
           ).pipe(
-            concatMap(() =>
-              from(
-                apkg.save({
-                  type: 'nodebuffer',
-                  base64: false,
-                  compression: 'DEFLATE',
-                })
-              ).pipe(
-                flatMap(async (zip: Buffer) => {
-                  await writeFile(outputFilePath, zip, 'binary')
-                  console.log(`Package has been generated: ${outputFilePath}`)
-                  return r.exportApkgSuccess(
-                    'Flashcards made in ' + outputFilePath
-                  )
-                }),
+            concatMap(() => {
+              pkg.addDeck(deck)
+              return defer(() => pkg.writeToFile(outputFilePath)).pipe(
+                map(() =>
+                  r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
+                ),
                 endWith(r.setProgress(null))
               )
-            )
+            })
           )
         )
       )
