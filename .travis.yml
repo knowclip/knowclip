@@ -50,12 +50,7 @@ before_cache:
 - rm -rf node_modules/.cache/terser-webpack-plugin
 - rm -rf node_modules/.cache/babel-loader
 - rm -rf node_modules/.cache/eslint-loader
-before_install:
-- |
-  git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '^homepage/' || {
-    echo "Only homepage was updated, stopping build process."
-    exit
-  }
+
 branches:
   only:
   - /v\d+\.\d+.\d+(-.+)?/
