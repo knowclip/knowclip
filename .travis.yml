@@ -58,7 +58,6 @@ before_install:
   }
 branches:
   only:
-  - master
   - /v\d+\.\d+.\d+(-.+)?/
 
 addons:
