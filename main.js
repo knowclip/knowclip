@@ -9,9 +9,10 @@ const setUpMenu = require('./electron/appMenu')
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
 const installDevtools = require('./electron/devtools')
-const useDevtools = Boolean(
-  process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : !isPackaged
-)
+// const useDevtools = Boolean(
+//   process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : !isPackaged
+// )
+const useDevtools = true
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

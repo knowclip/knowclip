@@ -31,7 +31,6 @@ jobs:
     services: docker
     deploy:
       <<: *deploy_base
-      draft: false
 cache:
   directories:
   - node_modules
