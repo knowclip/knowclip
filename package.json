@@ -1,7 +1,7 @@
 {
   "name": "knowclip",
   "productName": "Knowclip",
-  "version": "0.7.1-alpha",
+  "version": "0.7.2-alpha",
   "private": true,
   "engines": {
     "node": "^12.4.0"
@@ -85,8 +85,10 @@
     "build-schema:media": "yarn build-schema --out ./src/utils/validateProjectMedia.json --type \\$MediaJson",
     "build-schema": "ts-json-schema-generator --path ./src/types/Project.ts --tsconfig ./tsconfig.json",
     "tidy": "yarn format --list-different && yarn lint && yarn tsc",
-    "electron-builder": "electron-builder -p never",
-    "dist": "yarn build:ci && yarn electron-builder"
+    "electron-builder": "electron-builder",
+    "electron-builder:skip-publish": "electron-builder -p never",
+    "dist": "yarn build:ci && yarn electron-builder:skip-publish",
+    "dist:appveyor": "yarn build:ci && yarn electron-builder"
   },
   "husky": {
     "hooks": {
