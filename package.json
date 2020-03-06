@@ -1,7 +1,7 @@
 {
   "name": "knowclip",
   "productName": "Knowclip",
-  "version": "0.7.2-alpha",
+  "version": "0.7.3-alpha",
   "private": true,
   "engines": {
     "node": "^12.4.0"
@@ -66,6 +66,7 @@
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
+    "postinstall": "electron-builder install-app-deps",
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
     "build": "yarn build-schemas && REACT_APP_TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",
     "build:ci": "CI=false yarn build",
