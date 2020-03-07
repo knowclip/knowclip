@@ -201,8 +201,12 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           ).pipe(
             concatMap(() => {
               pkg.addDeck(deck)
+              const tmpFilename = tempy.file()
               return defer(() =>
-                pkg.writeToFile(outputFilePath, sql(tempy.file()))
+                pkg.writeToFile(outputFilePath, {
+                  db: sql(tmpFilename),
+                  tmpFilename,
+                })
               ).pipe(
                 map(() =>
                   r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
