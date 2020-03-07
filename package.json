@@ -68,6 +68,7 @@
     "build:appveyor": "react-scripts build",
     "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test --setupTestFrameworkScriptFile=./src/utils/initializeActionTypeGlobals.ts",
     "integration": "REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
+    "integration:appveyor": "yarn build:appveyor && react-scripts test ./src/test/ --watchAll=false  --runInBand",
     "integration:skip-build": "REACT_APP_SPECTRON=true react-scripts test ./src/test/ --watchAll=false --runInBand",
     "integration:debug": "INTEGRATION_DEV=true yarn integration:skip-build --verbose",
     "integration:build-fixtures": "INTEGRATION_DEV=true REACT_APP_SPECTRON=true react-scripts test ./src/test/ --testMatch=**/*.fixture.{js,jsx,ts,tsx} --watchAll=false --runInBand",

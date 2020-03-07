@@ -16,7 +16,10 @@ install:
   - yarn
 
 build_script:
-  - set REACT_APP_BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER
+  - set REACT_APP_BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
   - yarn dist:appveyor
 
-test: off
+test_script:
+  - set REACT_APP_SPECTRON=True
+  - yarn integration:appveyor
+  - set REACT_APP_SPECTRON=False
