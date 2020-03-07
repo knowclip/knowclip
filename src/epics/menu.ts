@@ -23,7 +23,7 @@ const showSettingsDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
 
 const aboutMessage = [
   `Version ${electron.remote.app.getVersion()}`,
-  `Build #${process.env.REACT_APP_TRAVIS_BUILD_NUMBER || '[DEV BUILD]'}`,
+  `Build #${process.env.REACT_APP_BUILD_NUMBER || '[DEV BUILD]'}`,
   'Distributed under GNU Affero General Public License 3.0.',
   '© 2020 Justin Silvestre',
 ].join('\n\n')
