@@ -26,3 +26,10 @@ test_script:
   # relying on it won't work here
   - yarn integration:appveyor -t "shared project"
   - cmd: set REACT_APP_SPECTRON=False
+
+skip_commits:
+  files:
+    - homepage/*
+    - docker/*
+    - travis.yml
+    - '*.md'
