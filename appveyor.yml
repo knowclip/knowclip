@@ -17,12 +17,9 @@ install:
 
 build_script:
   - cmd: set REACT_APP_BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
-  - cmd: set REACT_APP_BUILD_NUMBER
-  - cmd: set APPVEYOR_BUILD_NUMBER
   - yarn dist:appveyor
 
 test_script:
   - cmd: set REACT_APP_SPECTRON=True
-  - cmd set REACT_APP_SPECTRON
   - yarn integration:appveyor -t "shared project"
   - cmd: set REACT_APP_SPECTRON=False
