@@ -21,5 +21,8 @@ build_script:
 
 test_script:
   - cmd: set REACT_APP_SPECTRON=True
+  # only testing this one for now to save time and
+  # copyFixtures is broken on Windows, so tests
+  # relying on it won't work here
   - yarn integration:appveyor -t "shared project"
   - cmd: set REACT_APP_SPECTRON=False
