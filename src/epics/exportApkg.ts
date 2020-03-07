@@ -21,6 +21,7 @@ import { join, basename } from 'path'
 import { promises } from 'fs'
 import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
+import sql from 'better-sqlite3'
 import {
   getApkgExportData,
   TEMPLATE_CSS,
@@ -200,7 +201,9 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           ).pipe(
             concatMap(() => {
               pkg.addDeck(deck)
-              return defer(() => pkg.writeToFile(outputFilePath)).pipe(
+              return defer(() =>
+                pkg.writeToFile(outputFilePath, sql(tempy.file()))
+              ).pipe(
                 map(() =>
                   r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
                 ),
