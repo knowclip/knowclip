@@ -1944,10 +1944,10 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
-"@silvestre/mkanki@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@silvestre/mkanki/-/mkanki-2.0.0.tgz#ae1ba70f1bc00bbc3f06f66a04d015480cce9bc8"
-  integrity sha512-E9bEDL0Vz1qCyXGopnnJH6T3JGPPvPVC+NuC5gV8ICB5xJNMpUWSfCqaDUN1l8gH7leYiuBkzeC2TpRvpwohEw==
+"@silvestre/mkanki@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@silvestre/mkanki/-/mkanki-2.1.0.tgz#cb3d8741fe19244cd20a21611b20eb195b34d625"
+  integrity sha512-bw8c0aiYrU76y1/bc44v5Om0q0/VmgHl2WF17eOaV4aeQKNXsDMrDoLKWlw2/UIS/RIZdT1BH0qBcKbfmma6aQ==
   dependencies:
     archiver "^3.0.0"
     better-sqlite3 "^5.0.1"

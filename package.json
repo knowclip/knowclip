@@ -1,7 +1,7 @@
 {
   "name": "knowclip",
   "productName": "Knowclip",
-  "version": "0.7.8-alpha",
+  "version": "0.7.9-alpha",
   "private": true,
   "engines": {
     "node": "^12.4.0"
@@ -18,7 +18,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@silvestre/mkanki": "^2.0.0",
+    "@silvestre/mkanki": "^2.1.0",
     "ajv": "^6.11.0",
     "asar": "0.14.3",
     "better-ajv-errors": "^0.6.7",
