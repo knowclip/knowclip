@@ -159,7 +159,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
                 endTime,
                 clipOutputFilePath,
               })
-              throw new Error(`Could not make cliip from ${sourceFilePath}`)
+              throw new Error(`Could not make clip from ${sourceFilePath}.`)
             }
             if (clipSpecs.flashcardSpecs.image) {
               const clipId = clipSpecs.flashcardSpecs.id
