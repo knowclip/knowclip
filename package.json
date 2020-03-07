@@ -146,7 +146,7 @@
         "portable"
       ],
       "icon": "./icons/icon.ico",
-      "artifactName": "${productName}_${version}_${os}.${ext}"
+      "artifactName": "${productName}_${version}_${os}_${arch}.${ext}"
     },
     "linux": {
       "target": [

@@ -16,13 +16,15 @@ const getOs = ({ userAgent }) => {
   return WINDOWS
 }
 
-const getFileName = (osCode, ext) =>
-  `Knowclip_${packageJson.version}_${osCode}.${ext}`
+const getFileName = (osCode, ext, arch) =>
+  `Knowclip_${[packageJson.version, osCode, arch]
+    .filter(s => s)
+    .join("_")}.${ext}`
 
-const getDownloadUrl = (osCode, ext) =>
+const getDownloadUrl = (osCode, ext, arch) =>
   `https://github.com/knowclip/knowclip/releases/download/v${
     packageJson.version
-  }/${getFileName(osCode, ext)}`
+  }/${getFileName(osCode, ext, arch)}`
 
 const DownloadSection = () => {
   const [os, setOs] = useState()
@@ -63,7 +65,7 @@ const DownloadSection = () => {
             <ol>
               <li>
                 <a
-                  href={getDownloadUrl(os, "exe")}
+                  href={getDownloadUrl(os, "exe", "x64")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
                   {...TARGET_BLANK}
@@ -78,10 +80,19 @@ const DownloadSection = () => {
                 the app.
               </li>
             </ol>
+            <h5 className={css.subheading}>32-bit windows</h5>
             <p>
-              Note that the app is currently only available on 64-bit machines.
-              (You probably don't have to worry about this unless you have a
-              really old computer{" "}
+              If you have a really old computer and the above file didn't work,
+              you might have a 32-bit machine. You can try downloading the
+              <a
+                href={getDownloadUrl(os, "exe", "x64")}
+                className={css.link}
+                onClick={showPostDownloadMessage}
+                {...TARGET_BLANK}
+              >
+                32-bit version
+              </a>{" "}
+              in that case. (Note that this version hasn't been tested{" "}
               <span role="img" aria-label="smile">
                 🙂️
               </span>
@@ -249,7 +260,11 @@ const DownloadOsSection = ({
         <section className={css.downloadButtonSection}>
           <a
             className={css.downloadButton}
-            href={getDownloadUrl(os, defaultExt)}
+            href={getDownloadUrl(
+              os,
+              defaultExt,
+              os === WINDOWS ? "x64" : undefined
+            )}
             onClick={showPostDownloadMessage}
           >
             <div className={css.callToAction}>Download latest</div>
