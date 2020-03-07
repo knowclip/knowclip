@@ -41,7 +41,7 @@ async function createWindow() {
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,
-      devTools: useDevtools,
+      devTools: true,
     },
   })
 
@@ -112,7 +112,7 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
-  setUpMenu(electron, context, useDevtools)
+  setUpMenu(electron, context, true)
 })
 
 app.on('will-quit', () => {
