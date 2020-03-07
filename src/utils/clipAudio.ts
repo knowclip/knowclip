@@ -48,7 +48,6 @@ const clipAudio = async (
         res(outputFilename)
       })
       .on('error', err => {
-        console.log('whoooooops')
         console.error(err)
         rej(err)
       })

@@ -88,7 +88,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
       const fields = exportData.template.fields.map(fn => ({ name: fn }))
       const noteModel = new anki.Model({
         name: `Audio note (${exportData.deckName})`,
-        id: exportData.projectId,
+        id: exportData.noteModelId,
         flds: fields,
         req: exportData.template.cards.map((t, i) => [
           i,
@@ -103,7 +103,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
         })),
       })
       const clozeNoteModel = new anki.ClozeModel({
-        id: exportData.projectId,
+        id: exportData.clozeModelId,
         name: `Cloze (${exportData.deckName})`,
         flds: fields,
         css: TEMPLATE_CSS,

@@ -48,6 +48,8 @@ declare type FlashcardSpecs = {
 declare type ApkgExportData = {
   deckName: string
   projectId: number
+  noteModelId: number
+  clozeModelId: number
   template: ApkgExportTemplate
   clips: Array<ClipSpecs>
 }
