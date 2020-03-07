@@ -161,9 +161,11 @@ export const getApkgExportData = (
 
       const startTime = r.getMillisecondsAtX(state, clip.start)
       const endTime = r.getMillisecondsAtX(state, clip.end)
-      const outputFilename = `${sanitizeFileName(filenameWithoutExtension)}__${
-        mediaFile.id
-      }__${toTimestamp(startTime)}_${toTimestamp(endTime)}.mp3`
+      const outputFilename = sanitizeFileName(
+        `${filenameWithoutExtension.slice(0, 40)}__${
+          mediaFile.id
+        }__${toTimestamp(startTime)}_${toTimestamp(endTime)}.mp3`
+      )
 
       const fieldValues = Object.values(flashcard.fields).map(roughEscape)
 

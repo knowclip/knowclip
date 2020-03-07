@@ -54,9 +54,10 @@ export const getVideoStillPngPath = (
 ) =>
   join(
     tempy.root,
-    `${sanitizeFileName(basename(videoFilePath))}_${seconds
-      .toFixed(3)
-      .replace('.', '-')}_${id}.png`
+    `${sanitizeFileName(basename(videoFilePath)).slice(
+      0,
+      40
+    )}_${seconds.toFixed(3).replace('.', '-')}_${id}.png`
   )
 
 export const getMidpoint = (start: number, end: number) =>
