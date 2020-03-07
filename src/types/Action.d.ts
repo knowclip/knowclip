@@ -223,7 +223,7 @@ declare type SaveProjectAsRequest = { type: 'SAVE_PROJECT_AS_REQUEST' }
 declare type ExportMp3 = { type: 'EXPORT_MP3'; exportData: ApkgExportData }
 declare type ExportApkgRequest = {
   type: 'EXPORT_APKG_REQUEST'
-  clipIds: Array<ClipId>
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   mediaOpenPrior: MediaFile | null
 }
 declare type ExportApkgFailure = {

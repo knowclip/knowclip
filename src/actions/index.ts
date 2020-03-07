@@ -20,11 +20,11 @@ export const setCurrentFile = (index: number): Action => ({
 })
 
 export const exportApkgRequest = (
-  clipIds: Array<ClipId>,
+  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaIdsToClipsIds'],
   mediaOpenPrior: MediaFile | null
 ): ExportApkgRequest => ({
   type: A.EXPORT_APKG_REQUEST,
-  clipIds,
+  mediaFileIdsToClipIds,
   mediaOpenPrior,
 })
 

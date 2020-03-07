@@ -21,14 +21,10 @@ const exportCsv: AppEpic = (action$, state$) =>
           if (!currentProject)
             return of(r.simpleMessageSnackbar('Could not find project'))
 
-          const exportData = getApkgExportData(
-            state$.value,
-            currentProject,
-            clipIds
-          )
-          if (exportData instanceof Set) {
+          const exportData = getApkgExportData(state$.value, currentProject, {})
+          if ('missingMediaFiles' in exportData) {
             return from(
-              [...exportData].map(file =>
+              [...exportData.missingMediaFiles].map(file =>
                 r.locateFileRequest(
                   file,
                   `You can't make clips from this file until you've located it in the filesystem:\n${

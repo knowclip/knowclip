@@ -103,113 +103,99 @@ export const TEMPLATE_CSS = `.card {
 export const getApkgExportData = (
   state: AppState,
   project: ProjectFile,
-  clipIds: Array<ClipId>
-): ApkgExportData | Set<MediaFile> => {
+  clipIds: ReviewAndExportDialogData['mediaIdsToClipsIds']
+) => {
   const fieldNames = getNoteTypeFields(project.noteType)
   const mediaFiles = r.getProjectMediaFiles(state, project.id)
 
-  const missingMediaFiles: Set<MediaFile> = new Set()
+  const missingMediaFiles = mediaFiles.filter(mediaFile => {
+    if (!clipIds[mediaFile.id].length) return false
 
-  // sort and validate
-  clipIds.sort((id, id2) => {
-    const clip = r.getClip(state, id)
-    if (!clip) throw new Error('Could not find clip ' + id)
-
-    const clip2 = r.getClip(state, id2)
-    if (!clip2) throw new Error('Could not find clip ' + id2)
-
-    const file = mediaFiles.find(media => media.id === clip.fileId)
-    if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
-    const fileLoaded = getFileAvailability(state, file)
-    if (!fileLoaded || !fileLoaded.filePath || !existsSync(fileLoaded.filePath))
-      missingMediaFiles.add(file)
-
-    const file2 = mediaFiles.find(media => media.id === clip.fileId)
-    if (!file2) throw new Error(`Couldn't find media metadata for clip ${id}`)
-
-    const fileIndex1 = mediaFiles.indexOf(file)
-    const fileIndex2 = mediaFiles.findIndex(media => media.id === clip2.fileId)
-
-    if (fileIndex1 < fileIndex2) return -1
-    if (fileIndex1 > fileIndex2) return 1
-
-    if (clip.start < clip2.start) return -1
-    if (clip.start > clip2.start) return 1
-    return 0
+    const fileLoaded = getFileAvailability(state, mediaFile)
+    return (
+      !fileLoaded || !fileLoaded.filePath || !existsSync(fileLoaded.filePath)
+    )
   })
+  if (missingMediaFiles.length > 0) return { missingMediaFiles }
 
-  if (missingMediaFiles.size > 0) return missingMediaFiles
+  const clips = Object.entries(clipIds).flatMap(
+    ([mediaFileId, clipIds], i): ClipSpecs[] => {
+      const media = r.getFile<MediaFile>(
+        state,
+        'MediaFile',
+        mediaFileId
+      ) as MediaFile
+      const clipSpecs: ClipSpecs[] = []
+      for (const id of clipIds) {
+        if (!id) continue
 
-  const clips = clipIds.map(
-    (id, i): ClipSpecs => {
-      const clip = r.getClip(state, id)
-      const flashcard = r.getFlashcard(state, id)
-      if (!clip) throw new Error('Could not find clip ' + id)
-      if (!flashcard) throw new Error('Could not find flashcard ' + id)
+        const clip = r.getClip(state, id)
+        const flashcard = r.getFlashcard(state, id)
+        if (!clip) throw new Error('Could not find clip ' + id)
+        if (!flashcard) throw new Error('Could not find flashcard ' + id)
 
-      const mediaFile = mediaFiles.find(media => media.id === clip.fileId)
-      if (!mediaFile)
-        throw new Error(`Couldn't find media metadata for clip ${id}`)
-      const file = mediaFiles.find(media => media.id === clip.fileId)
-      if (!file) throw new Error(`Couldn't find media metadata for clip ${id}`)
-      const fileLoaded = getFileAvailability(state, file)
-      if (!fileLoaded.filePath)
-        // verified existent via missingMediaFiles above
-        throw new Error(`Please open ${file.name} and try again.`)
-      const extension = extname(fileLoaded.filePath)
-      const filenameWithoutExtension = basename(fileLoaded.filePath, extension)
+        const fileLoaded = getFileAvailability(state, media)
+        if (!fileLoaded.filePath)
+          // verified existent via missingMediaFiles above
+          throw new Error(`Please open ${media.name} and try again.`)
+        const extension = extname(fileLoaded.filePath)
+        const filenameWithoutExtension = basename(
+          fileLoaded.filePath,
+          extension
+        )
 
-      const startTime = r.getMillisecondsAtX(state, clip.start)
-      const endTime = r.getMillisecondsAtX(state, clip.end)
-      const outputFilename =
-        sanitizeFileName(
-          `${filenameWithoutExtension.slice(0, 20)}__${mediaFile.id}`
-        ) +
-        `__${toTimestamp(startTime, '!', '!')}_${toTimestamp(
-          endTime,
-          '!',
-          '!'
-        )}.mp3`
+        const startTime = r.getMillisecondsAtX(state, clip.start)
+        const endTime = r.getMillisecondsAtX(state, clip.end)
+        const outputFilename =
+          sanitizeFileName(
+            `${filenameWithoutExtension.slice(0, 20)}__${media.id}`
+          ) +
+          `__${toTimestamp(startTime, '!', '!')}_${toTimestamp(
+            endTime,
+            '!',
+            '!'
+          )}.mp3`
 
-      const fieldValues = Object.values(flashcard.fields).map(roughEscape)
+        const fieldValues = Object.values(flashcard.fields).map(roughEscape)
 
-      const image = flashcard.image
-        ? `<img src="${basename(
-            getVideoStillPngPath(
-              flashcard.image.id,
-              fileLoaded.filePath,
-              typeof flashcard.image.seconds === 'number'
-                ? flashcard.image.seconds
-                : +(getMidpoint(startTime, endTime) / 1000).toFixed(3)
-            )
-          )}" />`
-        : ''
-
-      return {
-        sourceFilePath: fileLoaded.filePath,
-        startTime,
-        endTime,
-        outputFilename,
-        flashcardSpecs: {
-          id: clip.id,
-          fields: [...fieldValues, `[sound:${outputFilename}]`, image],
-          tags: flashcard.tags.map(t => t.replace(/\s+/g, '_')).join(' '),
-          image: flashcard.image || null,
-          due: i,
-          clozeDeletions: flashcard.cloze.length
-            ? encodeClozeDeletions(
-                flashcard.fields.transcription,
-                flashcard.cloze
+        const image = flashcard.image
+          ? `<img src="${basename(
+              getVideoStillPngPath(
+                flashcard.image.id,
+                fileLoaded.filePath,
+                typeof flashcard.image.seconds === 'number'
+                  ? flashcard.image.seconds
+                  : +(getMidpoint(startTime, endTime) / 1000).toFixed(3)
               )
-            : undefined,
-        },
+            )}" />`
+          : ''
+
+        clipSpecs.push({
+          sourceFilePath: fileLoaded.filePath,
+          startTime,
+          endTime,
+          outputFilename,
+          flashcardSpecs: {
+            id: clip.id,
+            fields: [...fieldValues, `[sound:${outputFilename}]`, image],
+            tags: flashcard.tags.map(t => t.replace(/\s+/g, '_')).join(' '),
+            image: flashcard.image || null,
+            clozeDeletions: flashcard.cloze.length
+              ? encodeClozeDeletions(
+                  flashcard.fields.transcription,
+                  flashcard.cloze
+                )
+              : undefined,
+          },
+        })
       }
+      return clipSpecs
     }
   )
 
   const projectId = moment(project.createdAt).valueOf()
 
-  return {
+  const exportData: ApkgExportData = {
     projectId,
     noteModelId: projectId + 1,
     clozeModelId: projectId + 2,
@@ -223,6 +209,7 @@ export const getApkgExportData = (
     },
     clips,
   }
+  return exportData
 }
 
 export const getCsvText = (exportData: ApkgExportData) => {

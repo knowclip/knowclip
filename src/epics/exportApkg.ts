@@ -60,7 +60,7 @@ const exportApkg: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportApkgRequest>(A.EXPORT_APKG_REQUEST),
     switchMap(exportApkgRequest => {
-      const { clipIds } = exportApkgRequest
+      const { mediaFileIdsToClipIds } = exportApkgRequest
       const directory = tempy.directory()
 
       const currentProject = r.getCurrentProject(state$.value)
@@ -70,11 +70,15 @@ const exportApkg: AppEpic = (action$, state$) =>
       const exportData = getApkgExportData(
         state$.value,
         currentProject,
-        clipIds
+        mediaFileIdsToClipIds
       )
 
-      if (exportData instanceof Set) {
-        return getMissingMedia(exportData, action$, exportApkgRequest)
+      if ('missingMediaFiles' in exportData) {
+        return getMissingMedia(
+          exportData.missingMediaFiles,
+          action$,
+          exportApkgRequest
+        )
       }
 
       return makeApkg(exportData, directory)
@@ -230,11 +234,11 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
 }
 
 function getMissingMedia(
-  exportData: Set<MediaFile>,
+  missingMediaFiles: Array<MediaFile>,
   action$: ActionsObservable<Action>,
   exportApkgRequest: ExportApkgRequest
 ) {
-  const missingMediaFileIds = [...exportData].map(file => file.id)
+  const missingMediaFileIds = missingMediaFiles.map(file => file.id)
   const openMissingMediaFailure = action$.pipe(
     ofType<Action, OpenFileFailure>('OPEN_FILE_FAILURE'),
     filter(
@@ -243,7 +247,7 @@ function getMissingMedia(
     ),
     take(1)
   )
-  return from(exportData).pipe(
+  return from(missingMediaFiles).pipe(
     concatMap(file =>
       of(r.openFileRequest(file)).pipe(
         concat(
@@ -261,7 +265,7 @@ function getMissingMedia(
     endWith(
       r.reviewAndExportDialog(
         exportApkgRequest.mediaOpenPrior,
-        exportApkgRequest.clipIds
+        exportApkgRequest.mediaFileIdsToClipIds
       )
     )
   )

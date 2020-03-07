@@ -26,9 +26,9 @@ enum $ {
 type MediaTableProps = {
   media: MediaFile
   open: boolean
-  selectedIds: string[]
-  onSelect: (id: string) => void
-  onSelectAll: (ids: string[]) => void
+  selectedIds: Array<string | undefined>
+  onSelect: (mediaFileId: string, id: string) => void
+  onSelectAll: (mediaFileId: string) => void
   onClick: (index: number) => void
   mediaIndex: number
 }
@@ -65,9 +65,9 @@ const ReviewAndExportMediaTable = memo(
       [onClick, open, mediaIndex, dispatch, fileRemembered, media]
     )
     const stopPropagation = useCallback(e => e.stopPropagation(), [])
-    const selectAll = useCallback(() => onSelectAll(clipsIds), [
+    const selectAll = useCallback(() => onSelectAll(media.id), [
       onSelectAll,
-      clipsIds,
+      media.id,
     ])
 
     return (
@@ -79,7 +79,7 @@ const ReviewAndExportMediaTable = memo(
           <Checkbox
             checked={
               Boolean(clipsIds.length) &&
-              clipsIds.every(id => selectedIds.includes(id))
+              clipsIds.every((id, i) => selectedIds[i] === id)
             }
             onChange={selectAll}
             onClick={stopPropagation}
@@ -87,8 +87,8 @@ const ReviewAndExportMediaTable = memo(
           />
 
           <div className={css.selectedClipsCount}>
-            {clipsIds.filter(id => selectedIds.includes(id)).length || '--'} of{' '}
-            {clipsIds.length}
+            {clipsIds.filter((id, i) => selectedIds[i] === id).length || '--'}{' '}
+            of {clipsIds.length}
           </div>
 
           <h2 className={css.mediaFileName}>
@@ -125,6 +125,7 @@ const ReviewAndExportMediaTable = memo(
           </colgroup>
           {open && (
             <MediaTableBody
+              mediaFileId={media.id}
               {...{ clipsIds, onSelect, highlightedClipId, selectedIds }}
             />
           )}
@@ -137,17 +138,22 @@ const ReviewAndExportMediaTable = memo(
 const MediaTableBody = React.memo(
   ({
     clipsIds,
+    mediaFileId,
     onSelect,
     selectedIds,
     highlightedClipId,
   }: MediaTableBodyProps) => {
+    const handleSelect = useCallback(
+      (id: string) => onSelect(mediaFileId, id),
+      [mediaFileId, onSelect]
+    )
     return (
       <TableBody className={css.tableBody}>
         {clipsIds.map(id => (
           <FlashcardRow
             key={id}
             id={id}
-            onSelect={onSelect}
+            onSelect={handleSelect}
             isSelected={selectedIds.includes(id)}
             isHighlighted={highlightedClipId === id}
           />
@@ -163,9 +169,10 @@ const MediaTableBody = React.memo(
 )
 type MediaTableBodyProps = {
   clipsIds: string[]
-  onSelect: (id: string) => void
+  mediaFileId: MediaFileId
+  onSelect: (mediaFileId: string, id: string) => void
   highlightedClipId: string | null
-  selectedIds: string[]
+  selectedIds: Array<string | undefined>
 }
 
 export default ReviewAndExportMediaTable

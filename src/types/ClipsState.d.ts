@@ -40,7 +40,6 @@ declare type FlashcardSpecs = {
   id: string
   fields: Array<string>
   tags: string
-  due: number
   image: FlashcardImage | null
   clozeDeletions?: string
 }

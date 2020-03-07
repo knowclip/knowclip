@@ -46,12 +46,12 @@ export const mediaFolderLocationFormDialog = (
 
 export const reviewAndExportDialog = (
   mediaOpenPrior: MediaFile | null,
-  clipIds: string[]
+  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaIdsToClipsIds']
 ) =>
   enqueueDialog({
     type: 'ReviewAndExport',
     mediaOpenPrior,
-    clipIds,
+    mediaIdsToClipsIds: mediaFileIdsToClipIds,
   })
 
 export const newProjectFormDialog = () =>

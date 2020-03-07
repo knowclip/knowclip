@@ -25,20 +25,25 @@ enum $ {
 const Export = React.memo(
   ({
     open,
-    data: { mediaOpenPrior, clipIds },
+    data: { mediaOpenPrior, mediaIdsToClipsIds: initialSelectedClips },
   }: DialogProps<ReviewAndExportDialogData>) => {
     const dispatch = useDispatch()
-    const { currentMedia, currentFileId, projectMedia, progress } = useSelector(
-      (state: AppState) => {
-        const currentMedia = r.getCurrentMediaFile(state)
-        return {
-          currentMedia,
-          currentFileId: r.getCurrentFileId(state),
-          projectMedia: r.getCurrentProjectMediaFiles(state),
-          progress: state.session.progress,
-        }
+    const {
+      currentMedia,
+      currentFileId,
+      projectMedia,
+      progress,
+      clipIdsByMediaFileId,
+    } = useSelector((state: AppState) => {
+      const currentMedia = r.getCurrentMediaFile(state)
+      return {
+        currentMedia,
+        currentFileId: r.getCurrentFileId(state),
+        projectMedia: r.getCurrentProjectMediaFiles(state),
+        progress: state.session.progress,
+        clipIdsByMediaFileId: state.clips.idsByMediaFileId,
       }
-    )
+    })
 
     const closeDialog = useCallback(
       () => {
@@ -66,42 +71,60 @@ const Export = React.memo(
     const startSelection = useCallback(() => setSelectionHasStarted(true), [
       setSelectionHasStarted,
     ])
-
-    const [selectedIds, setSelectedIds] = useState(clipIds)
+    console.log({ initialSelectedClips })
+    const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
     const exportApkg = useCallback(
-      () => dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior)),
+      () => {
+        dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
+      },
       [dispatch, selectedIds, mediaOpenPrior]
     )
     const csvAndMp3ExportDialog = useCallback(
-      () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
-      [dispatch, selectedIds]
+      () => dispatch(actions.csvAndMp3ExportDialog([])),
+      [dispatch]
     )
     const exportMarkdown = useCallback(
-      () => dispatch(actions.exportMarkdown(selectedIds)),
-      [dispatch, selectedIds]
+      () => dispatch(actions.exportMarkdown([])),
+      [dispatch]
     )
 
     const onSelect = useCallback(
-      (id: string) =>
-        setSelectedIds(selectedIds => {
-          const index = selectedIds.indexOf(id)
-          if (index === -1) return selectedIds.concat(id)
+      (mediaFileId: string, id: string) =>
+        setSelectedIds(mediaToClips => {
+          const selectedIds = mediaToClips[mediaFileId]
+          const newSelectedIds = [...selectedIds]
+          const index = clipIdsByMediaFileId[mediaFileId].indexOf(id)
+          newSelectedIds[index] = selectedIds.includes(id) ? undefined : id
 
-          return [
-            ...selectedIds.slice(0, index),
-            ...selectedIds.slice(index + 1),
-          ]
+          return {
+            ...mediaToClips,
+            [mediaFileId]: newSelectedIds,
+          }
         }),
-      []
+      [clipIdsByMediaFileId]
     )
     const onSelectAll = useCallback(
-      (ids: string[]) =>
-        setSelectedIds(selectedIds =>
-          ids.every(id => selectedIds.includes(id))
-            ? selectedIds.filter(id => !ids.includes(id))
-            : [...new Set([...selectedIds, ...ids])]
-        ),
-      [setSelectedIds]
+      (mediaFileId: string) => {
+        setSelectedIds(mediaToClips => {
+          console.log(
+            { mediaToClips, mediaFileId },
+            clipIdsByMediaFileId[mediaFileId]
+          )
+
+          const selectedIds = mediaToClips[mediaFileId]
+          const wasSelected = clipIdsByMediaFileId[mediaFileId].every(
+            (id, i) => selectedIds[i] === id
+          )
+
+          return {
+            ...mediaToClips,
+            [mediaFileId]: wasSelected
+              ? []
+              : [...clipIdsByMediaFileId[mediaFileId]],
+          }
+        })
+      },
+      [clipIdsByMediaFileId]
     )
     const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
       projectMedia.findIndex(metadata => metadata.id === currentFileId)
@@ -147,7 +170,7 @@ const Export = React.memo(
                     mediaIndex={i}
                     onClick={onClickTable}
                     media={metadata}
-                    selectedIds={selectedIds}
+                    selectedIds={selectedIds[metadata.id]}
                     onSelect={onSelect}
                     onSelectAll={onSelectAll}
                   />

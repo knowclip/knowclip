@@ -20,7 +20,9 @@ export default async function addFirstMediaToProject(
 
   await client.waitForText('body', videoFilePath)
 
-  expect(await client.getAttribute('video', 'src')).toContain(japaneseVideoPath)
+  expect(await client.getAttribute('video', 'src')).toContain(
+    japaneseVideoPath.replace(/\\/g, '/')
+  )
 
   await client.clickElement_(linkSubtitlesDialog$.skipButton)
 

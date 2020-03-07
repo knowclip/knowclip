@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@material-ui/core'
 import {
@@ -27,25 +27,40 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
   if (!projectFile) throw new Error('Could not find project file')
 
-  const { currentMediaFile, clipsIdsForExport, workIsUnsaved } = useSelector(
-    (state: AppState) => {
-      const currentMediaFile = r.getCurrentMediaFile(state)
-      return {
-        loop: r.isLoopOn(state),
-        audioIsLoading: r.isAudioLoading(state),
-        currentProjectId: r.getCurrentProjectId(state),
-        constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(
-          state
-        ),
-        currentMediaFile,
-        clipsIdsForExport: currentMediaFile
-          ? state.clips.idsByMediaFileId[currentMediaFile.id]
-          : EMPTY,
-        subtitles: r.getSubtitlesTracks(state),
-        viewMode: state.settings.viewMode,
-        workIsUnsaved: r.isWorkUnsaved(state),
-      }
+  const {
+    currentMediaFile,
+    mediaFileIds,
+    currentFileClipsIds,
+    workIsUnsaved,
+  } = useSelector((state: AppState) => {
+    const currentMediaFile = r.getCurrentMediaFile(state)
+    const currentProject = r.getCurrentProject(state)
+    return {
+      loop: r.isLoopOn(state),
+      audioIsLoading: r.isAudioLoading(state),
+      currentProjectId: r.getCurrentProjectId(state),
+      constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
+      currentMediaFile,
+      mediaFileIds: currentProject ? currentProject.mediaFileIds : EMPTY,
+      currentFileClipsIds: currentMediaFile
+        ? state.clips.idsByMediaFileId[currentMediaFile.id]
+        : EMPTY,
+      subtitles: r.getSubtitlesTracks(state),
+      viewMode: state.settings.viewMode,
+      workIsUnsaved: r.isWorkUnsaved(state),
     }
+  })
+
+  const clipsIdsForExport = useMemo(
+    () => {
+      const result: ReviewAndExportDialogData['mediaIdsToClipsIds'] = {}
+      for (const mediaFileId of mediaFileIds) result[mediaFileId] = []
+      if (currentMediaFile)
+        result[currentMediaFile.id] = [...currentFileClipsIds]
+
+      return result
+    },
+    [mediaFileIds, currentMediaFile, currentFileClipsIds]
   )
 
   const dispatch = useDispatch()
