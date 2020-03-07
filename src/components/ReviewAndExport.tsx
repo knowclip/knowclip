@@ -49,7 +49,6 @@ const Export = React.memo(
       () => {
         const currentMediaId = currentMedia && currentMedia.id
         const initialMediaId = mediaOpenPrior && mediaOpenPrior.id
-        console.log({ currentMediaId, initialMediaId })
         if (currentMediaId !== initialMediaId)
           dispatch(
             mediaOpenPrior
@@ -71,7 +70,6 @@ const Export = React.memo(
     const startSelection = useCallback(() => setSelectionHasStarted(true), [
       setSelectionHasStarted,
     ])
-    console.log({ initialSelectedClips })
     const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
     const exportApkg = useCallback(
       () => {
@@ -106,11 +104,6 @@ const Export = React.memo(
     const onSelectAll = useCallback(
       (mediaFileId: string) => {
         setSelectedIds(mediaToClips => {
-          console.log(
-            { mediaToClips, mediaFileId },
-            clipIdsByMediaFileId[mediaFileId]
-          )
-
           const selectedIds = mediaToClips[mediaFileId]
           const wasSelected = clipIdsByMediaFileId[mediaFileId].every(
             (id, i) => selectedIds[i] === id

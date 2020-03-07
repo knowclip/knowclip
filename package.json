@@ -86,7 +86,7 @@
     "electron-builder": "electron-builder",
     "electron-builder:skip-publish": "electron-builder -p never",
     "dist": "yarn build:ci && yarn electron-builder:skip-publish",
-    "dist:appveyor": "yarn build:appveyor && yarn electron-builder"
+    "dist:appveyor": "yarn build:appveyor && yarn electron-builder -p onTag"
   },
   "husky": {
     "hooks": {
