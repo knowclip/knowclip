@@ -78,9 +78,12 @@ const SubtitlesClipsDialog = ({
     [currentFileId, dispatch]
   )
 
-  const [fields, setFields] = useState(fieldsToTracks)
+  const [state, setState] = useState(() => ({
+    fields: fieldsToTracks,
+    errorText: '',
+  }))
+
   const { tags, onAddChip, onDeleteChip } = useTagsInput(defaultTags)
-  const [errorText, setErrorText] = useState('')
 
   const [useStills, setUseStills] = useState(defaultIncludeStill)
   const toggleUseStills = useCallback(
@@ -95,17 +98,21 @@ const SubtitlesClipsDialog = ({
     e => {
       if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
 
-      const transcriptionTrackId = fields.transcription
-
-      if (!transcriptionTrackId)
-        return setErrorText(
-          'This field is necessary to automatically make clips.'
-        )
+      const { fields } = state
+      console.log(
+        { fields },
+        !Object.values(fields).find(v => v && v.trim()),
+        '!Object.values(fields).find(v => v && v.trim())'
+      )
+      if (!Object.values(fields).find(v => v && v.trim()))
+        return setState(state => ({
+          ...state,
+          errorText: 'Please choose at least one subtitles track.',
+        }))
 
       const fieldsWithoutBlankValues: Partial<
         TransliterationFlashcardFields
-      > & { transcription: string } = { transcription: transcriptionTrackId }
-
+      > = {}
       for (const fn in fields) {
         const fieldName = fn as TransliterationFlashcardFieldName
         const value = fields[fieldName]
@@ -122,17 +129,20 @@ const SubtitlesClipsDialog = ({
         )
       )
     },
-    [dispatch, fields, currentFileId, tags, useStills]
+    [currentFileId, dispatch, state, tags, useStills]
   )
   const setField = useCallback(
     (key: TransliterationFlashcardFieldName, value: SubtitlesTrackId) => {
-      setFields(fields => ({
-        ...fields,
-        [key]: value,
+      setState(state => ({
+        ...state,
+        fields: {
+          ...state.fields,
+          [key]: value,
+        },
+        errorText: key === 'transcription' && value ? '' : state.errorText,
       }))
-      if (key === 'transcription' && value) setErrorText('')
     },
-    [setFields]
+    [setState]
   )
 
   const onClickLoadExternal = useCallback(
@@ -172,6 +182,8 @@ const SubtitlesClipsDialog = ({
     },
     [setField]
   )
+
+  const { fields, errorText } = state
 
   return (
     <Dialog open={open}>
@@ -222,7 +234,6 @@ const SubtitlesClipsDialog = ({
                 onChange={onChangePronunciation}
                 id={$.pronunciationField}
               >
-                <MenuItem value="">None</MenuItem>
                 {subtitlesTrackOptions(subtitles)}
               </Select>
             </FormControl>
@@ -234,7 +245,6 @@ const SubtitlesClipsDialog = ({
               onChange={onChangeMeaning}
               id={$.meaningField}
             >
-              <MenuItem value="">None</MenuItem>
               {subtitlesTrackOptions(subtitles)}
             </Select>
           </FormControl>
@@ -245,7 +255,6 @@ const SubtitlesClipsDialog = ({
               onChange={onChangeNotes}
               id={$.notesField}
             >
-              <MenuItem value="">None</MenuItem>
               {subtitlesTrackOptions(subtitles)}
             </Select>
           </FormControl>
@@ -287,6 +296,7 @@ const SubtitlesClipsDialog = ({
 }
 
 const subtitlesTrackOptions = ({ external, embedded }: MediaSubtitles) => [
+  <MenuItem value="">None</MenuItem>,
   ...embedded.map(trackMenuItem),
   ...external.map(trackMenuItem),
 ]

@@ -350,9 +350,7 @@ declare type MakeClipsFromSubtitles = {
   fileId: MediaFileId
   fieldNamesToTrackIds: Partial<
     import('./Project').TransliterationFlashcardFields
-  > & {
-    transcription: string
-  }
+  >
   tags: Array<string>
   includeStill: boolean
 }

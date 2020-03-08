@@ -18,16 +18,30 @@ import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
 
-const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
+const makeClipsFromSubtitles: AppEpic = (
+  action$,
+  state$,
+  { pauseMedia, setCurrentTime }
+) =>
   action$.pipe(
     ofType<Action, MakeClipsFromSubtitles>(A.MAKE_CLIPS_FROM_SUBTITLES),
     flatMap<MakeClipsFromSubtitles, Observable<Action>>(
-      ({ fileId, fieldNamesToTrackIds, tags }) => {
-        const includeStill = false
+      ({ fileId, fieldNamesToTrackIds, tags, includeStill }) => {
         const tracksValidation = validateTracks(
           state$.value,
           fieldNamesToTrackIds
         )
+
+        pauseMedia()
+        setCurrentTime(0)
+
+        if (tracksValidation.status === 'NO_LINKS_GIVEN')
+          return of(
+            r.simpleMessageSnackbar(
+              'Please choose a subtitles track to make cards from before proceeding.'
+            ),
+            r.subtitlesClipsDialogRequest()
+          )
 
         if (tracksValidation.status === 'MISSING_FILE_RECORDS')
           return from([
@@ -79,18 +93,6 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
             )
           )
 
-        const clips: Clip[] = []
-        const cards: Flashcard[] = []
-        getClipsAndCardsFromSubtitles(
-          tracksValidation.transcriptionTrack,
-          fieldNamesToTrackIds,
-          state$.value,
-          fileId
-        ).forEach(({ clip, flashcard }) => {
-          clips.push(clip)
-          cards.push(flashcard)
-        })
-
         return from([
           r.deleteCards(
             r.getClipIdsByMediaFileId(state$.value, currentFile.id)
@@ -105,9 +107,26 @@ const makeClipsFromSubtitles: AppEpic = (action$, state$) =>
               trackId
             )
           }),
-          r.addClips(clips, cards, fileId),
-          r.highlightRightClipRequest(),
-        ])
+        ]).pipe(
+          concatMap(() => {
+            const clips: Clip[] = []
+            const cards: Flashcard[] = []
+            getClipsAndCardsFromSubtitles(
+              tracksValidation.cueTrackFieldName,
+              fieldNamesToTrackIds,
+              state$.value,
+              fileId
+            ).forEach(({ clip, flashcard }) => {
+              clips.push(clip)
+              cards.push(flashcard)
+            })
+
+            return from([
+              r.addClips(clips, cards, fileId),
+              r.highlightRightClipRequest(),
+            ])
+          })
+        )
       }
     )
   )
@@ -153,16 +172,11 @@ const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
     ignoreElements()
   )
 
-type SubtitlesGenerationFieldMapping = Partial<
-  Record<TransliterationFlashcardFieldName, SubtitlesTrackId>
-> & {
-  transcription: SubtitlesTrackId
-}
-
 function validateTracks(
   state: AppState,
-  fieldNamesToTrackIds: SubtitlesGenerationFieldMapping
+  fieldNamesToTrackIds: SubtitlesFlashcardFieldsLinks
 ):
+  | { status: 'NO_LINKS_GIVEN' }
   | { status: 'MISSING_FILE_RECORDS'; result: r.SubtitlesFileWithTrack[] }
   | {
       status: 'MISSING_TRACKS'
@@ -170,7 +184,17 @@ function validateTracks(
         [K in TransliterationFlashcardFieldName]?: SubtitlesFile
       }
     }
-  | { status: 'SUCCESS'; transcriptionTrack: SubtitlesTrack } {
+  | {
+      status: 'SUCCESS'
+      cueTrackFieldName: TransliterationFlashcardFieldName
+    } {
+  if (
+    !Object.values(fieldNamesToTrackIds).find(
+      trackId => trackId && trackId.trim()
+    )
+  )
+    return { status: 'NO_LINKS_GIVEN' }
+
   const allMediaSubtitles = r.getSubtitlesFilesWithTracks(state)
   const missingFileRecords = allMediaSubtitles.all.filter(({ file }) => !file)
   if (missingFileRecords.length)
@@ -194,26 +218,32 @@ function validateTracks(
     return { status: 'MISSING_TRACKS', fieldNamesToFiles }
   }
 
+  const cueTrackFieldName = r.CUES_BASE_PRIORITY.find(
+    fieldName => fieldNamesToTrackIds[fieldName]
+  ) as TransliterationFlashcardFieldName
+
   return {
     status: 'SUCCESS',
-    transcriptionTrack: r.getSubtitlesTrack(
-      state,
-      fieldNamesToTrackIds.transcription
-    ) as SubtitlesTrack,
+    cueTrackFieldName,
   }
 }
 
 function getClipsAndCardsFromSubtitles(
-  transcriptionTrack: SubtitlesTrack,
-  fieldNamesToTrackIds: SubtitlesGenerationFieldMapping,
+  cueTrackFieldName: TransliterationFlashcardFieldName,
+  fieldNamesToTrackIds: SubtitlesFlashcardFieldsLinks,
   state: AppState,
   fileId: string
 ) {
+  const trackId = fieldNamesToTrackIds[cueTrackFieldName]
+  const cueTrack = trackId && r.getSubtitlesTrack(state, trackId)
+  if (!cueTrack)
+    throw new Error('Could not load subtitles file for generating clips')
+
   const currentNoteType = r.getCurrentNoteType(state)
   if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
 
   // careful, pretty sure this mutates
-  const sortedChunks = transcriptionTrack.chunks.sort(
+  const sortedChunks = cueTrack.chunks.sort(
     ({ start: a }, { start: b }) => a - b
   )
   return sortedChunks.map((chunk, chunkIndex) => {
