@@ -2,7 +2,6 @@ image: Visual Studio 2017
 
 platform:
   - x64
-  - x86
 
 cache:
   - node_modules
@@ -17,7 +16,7 @@ install:
 
 build_script:
   - cmd: set REACT_APP_BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
-  - yarn dist:appveyor --win --ia32 --x64
+  - yarn dist:appveyor -p always --win --ia32 --x64
 
 test_script:
   - cmd: set REACT_APP_SPECTRON=True
