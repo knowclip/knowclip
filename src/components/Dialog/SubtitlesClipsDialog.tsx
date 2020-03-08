@@ -99,11 +99,6 @@ const SubtitlesClipsDialog = ({
       if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
 
       const { fields } = state
-      console.log(
-        { fields },
-        !Object.values(fields).find(v => v && v.trim()),
-        '!Object.values(fields).find(v => v && v.trim())'
-      )
       if (!Object.values(fields).find(v => v && v.trim()))
         return setState(state => ({
           ...state,
