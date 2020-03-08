@@ -93,33 +93,38 @@ const FlashcardSection = ({
       {highlightedClip && mediaFile && editing && (
         <FlashcardForm
           key={highlightedClip.id}
-          className={css.form}
+          className={cn(css.form, css.flashcardSectionContents)}
           mediaFile={mediaFile}
           clipId={highlightedClip.id}
           autofocusFieldName={autofocusFieldName}
         />
       )}
       {highlightedClip && mediaFile && !editing && (
-        <section className={css.display}>
-          <FlashcardDisplay mediaFile={mediaFile} clipId={highlightedClip.id} />
-        </section>
+        // <section className={css.display}>
+        <FlashcardDisplay
+          mediaFile={mediaFile}
+          clipId={highlightedClip.id}
+          className={css.flashcardSectionContents}
+        />
+        // </section>
       )}
       {mediaFile && waveformSelection && waveformSelection.type === 'Preview' && (
-        <section
-          className={cn(css.preview, css.display, {
-            [css.horizontalIntro]: viewMode === 'HORIZONTAL',
-          })}
-        >
-          <Preview
-            key={waveformSelection.cardBaseIndex}
-            cardBases={subtitles}
-            cardPreviewSelection={waveformSelection}
-            clipsIds={clipsIds}
-            mediaFile={mediaFile}
-            fieldsToTracks={fieldsToTracks}
-            viewMode={viewMode}
-          />
-        </section>
+        // <section
+        //   className={cn(css.preview, css.display, {
+        //     [css.horizontalIntro]: viewMode === 'HORIZONTAL',
+        //   })}
+        // >
+        <Preview
+          key={waveformSelection.cardBaseIndex}
+          cardBases={subtitles}
+          cardPreviewSelection={waveformSelection}
+          clipsIds={clipsIds}
+          mediaFile={mediaFile}
+          fieldsToTracks={fieldsToTracks}
+          viewMode={viewMode}
+          className={css.flashcardSectionContents}
+        />
+        // </section>
       )}
       {!waveformSelection && <Placeholder viewMode={viewMode} />}
       <Tooltip title="Next (→ key)">

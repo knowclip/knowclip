@@ -1,9 +1,10 @@
 import React, { useCallback, memo } from 'react'
+import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
-import { Edit } from '@material-ui/icons'
+import { Edit, Photo, Delete } from '@material-ui/icons'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import { TransliterationFlashcardFields } from '../types/Project'
 import useClozeControls from '../utils/useClozeUi'
@@ -18,6 +19,7 @@ const FlashcardSectionDisplayCard = memo(
   ({
     mediaFile,
     onDoubleClickField,
+    className,
   }: {
     className?: string
     mediaFile: MediaFile
@@ -60,6 +62,31 @@ const FlashcardSectionDisplayCard = memo(
       [dispatch]
     )
 
+    const toggleIncludeStill = useCallback(
+      () => {
+        dispatch(
+          r.editClip(flashcard.id, null, {
+            image: flashcard.image
+              ? null
+              : { type: 'VideoStillImage', id: flashcard.id },
+          })
+        )
+      },
+      [dispatch, flashcard.id, flashcard.image]
+    )
+
+    const deleteClipAndCard = useCallback(
+      () => {
+        dispatch(
+          r.confirmationDialog(
+            'Are you sure you want to delete this clip and flashcard?',
+            r.deleteCard(flashcard.id)
+          )
+        )
+      },
+      [dispatch, flashcard.id]
+    )
+
     const clozeControls = useClozeControls({
       deletions: flashcard.cloze,
       onNewClozeCard: useCallback(
@@ -95,7 +122,7 @@ const FlashcardSectionDisplayCard = memo(
 
     return (
       <FlashcardSectionDisplay
-        className={css.card}
+        className={cn(className, css.card)}
         mediaFile={mediaFile}
         fieldsToTracks={fieldsToTracks}
         fields={fields}
@@ -115,6 +142,34 @@ const FlashcardSectionDisplayCard = memo(
             </Tooltip>
             {fields.transcription.trim() && (
               <ClozeButtons controls={clozeControls} />
+            )}
+          </>
+        }
+        secondaryMenuItems={
+          <>
+            <Tooltip title="Delete clip and flashcard">
+              <IconButton onClick={deleteClipAndCard}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+            {mediaFile.isVideo && (
+              <Tooltip
+                title={
+                  flashcard.image
+                    ? 'Click to leave out image'
+                    : 'Click to include image'
+                }
+              >
+                <IconButton
+                  className={css.editCardButton}
+                  onClick={toggleIncludeStill}
+                  style={{
+                    color: flashcard.image ? 'rgba(0, 0, 0, 0.54)' : '#ddd',
+                  }}
+                >
+                  <Photo />
+                </IconButton>
+              </Tooltip>
             )}
           </>
         }

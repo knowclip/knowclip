@@ -11,10 +11,11 @@
 }
 
 .container {
-  margin-top: 2rem;
+  /* margin-top: 2rem; */
   text-align: center;
   display: flex;
   flex-flow: column nowrap;
+  width: 100%;
   height: 100%;
 }
 
@@ -28,7 +29,7 @@
 .horizontalPreview {
   margin-top: 0;
   font-size: 18px;
-  padding: 0 2em;
+  /* padding: 0 2em; */
 }
 .previewFields {
   flex-grow: 1;
@@ -107,12 +108,51 @@
 .menu {
   position: absolute;
   bottom: 1rem;
+  right: 1rem;
+  /* width: 3em; */
+  text-align: left;
+}
+.secondaryMenu {
+  position: absolute;
+  bottom: 1rem;
   left: 1rem;
+  /* width: 3em; */
+  text-align: left;
+}
+
+.clozeButtons {
+  display: inline-block;
+
+  --initial-width: auto;
 }
 
 .clozeButton {
   min-width: 0 !important;
   padding: 0.3em .5em;
+
+  --initial-width: 3em;
+  
+  
+  width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+
+  transition: padding .2s, width .2s;
+}
+.clozeButton span {
+  width: 0 !important;
+  padding: 0 !important;
+  transition: all .2s;
+}
+.clozeButton:last-child,
+.clozeButton:last-child span,
+.openClozeButtons .clozeButton,
+.openClozeButtons .clozeButton span,
+.clozeButtons:focus-within .clozeButton,
+.clozeButtons:focus-within .clozeButton span 
+{
+  width: var(--initial-width) !important;
+  padding: 0.3em .5em !important;
 }
 .clozeButton:hover {
   background-color: hsla(var(--cloze-hue), 100%, 80%, 80%);

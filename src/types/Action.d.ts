@@ -45,6 +45,7 @@ declare type NewCardFromSubtitlesRequest = {
   type: 'NEW_CARD_FROM_SUBTITLES_REQUEST'
   linkedSubtitlesChunkSelection: WaveformSelectionExpanded
   clozeDeletion?: ClozeDeletion
+  startEditing: boolean
 }
 
 declare type ClipAction =

@@ -69,7 +69,8 @@ const session: Reducer<SessionState, Action> = (
       return {
         ...state,
         pendingClip: null,
-        editingCards: action.startEditing || state.editingCards,
+        editingCards: action.startEditing,
+        // editingCards: action.startEditing || state.editingCards,
       }
 
     case A.SET_PENDING_CLIP:
