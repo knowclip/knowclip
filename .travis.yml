@@ -38,9 +38,9 @@ cache:
 script:
 - |	
   if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    yarn && yarn integration && yarn dist --linux
+    yarn && yarn integration && yarn dist --linux && ls -lsa dist
   else	
-    yarn && yarn dist --mac
+    yarn && yarn dist --mac && ls -lsa dist
   fi
 before_cache:
 - rm -rf $HOME/.cache/electron-builder/wine
