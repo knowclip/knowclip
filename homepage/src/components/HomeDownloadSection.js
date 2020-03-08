@@ -16,13 +16,15 @@ const getOs = ({ userAgent }) => {
   return WINDOWS
 }
 
-const getFileName = (osCode, ext) =>
-  `Knowclip_${packageJson.version}_${osCode}.${ext}`
+const getFileName = (osCode, ext, arch) =>
+  `Knowclip_${[packageJson.version, osCode, arch]
+    .filter(s => s)
+    .join("_")}.${ext}`
 
-const getDownloadUrl = (osCode, ext) =>
+const getDownloadUrl = (osCode, ext, arch) =>
   `https://github.com/knowclip/knowclip/releases/download/v${
     packageJson.version
-  }/${getFileName(osCode, ext)}`
+  }/${getFileName(osCode, ext, arch)}`
 
 const DownloadSection = () => {
   const [os, setOs] = useState()

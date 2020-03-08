@@ -63,7 +63,7 @@
     "start": "react-scripts start",
     "postinstall": "electron-builder install-app-deps",
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
-    "build": "yarn build-schemas && REACT_APP_TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",
+    "build": "yarn build-schemas && REACT_APP_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",
     "build:ci": "CI=false yarn build",
     "build:appveyor": "react-scripts build",
     "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test --setupTestFrameworkScriptFile=./src/utils/initializeActionTypeGlobals.ts",
@@ -146,7 +146,7 @@
         "portable"
       ],
       "icon": "./icons/icon.ico",
-      "artifactName": "${productName}_${version}_${os}.${ext}"
+      "artifactName": "${productName}_${version}_${os}_${arch}.${ext}"
     },
     "linux": {
       "target": [
