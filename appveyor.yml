@@ -16,7 +16,7 @@ install:
 
 build_script:
   - cmd: set REACT_APP_BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
-  - yarn dist:appveyor -p always --win --ia32 --x64
+  - yarn dist:appveyor -p onTag --win
 
 test_script:
   - cmd: set REACT_APP_SPECTRON=True
