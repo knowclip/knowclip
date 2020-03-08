@@ -13,7 +13,7 @@ export type SubtitlesCardBase = {
 }
 type SubtitlesChunkIndex = number
 
-const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
+export const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
   'transcription',
   'pronunciation',
   'meaning',

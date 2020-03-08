@@ -60,9 +60,7 @@ export const deleteSubtitlesTrackFromMedia = (
 
 export const makeClipsFromSubtitles = (
   fileId: MediaFileId,
-  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields> & {
-    transcription: string
-  },
+  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields>,
   tags: Array<string>,
   includeStill: boolean
 ): MakeClipsFromSubtitles => ({

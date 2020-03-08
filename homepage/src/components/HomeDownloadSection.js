@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useLayoutEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import css from "../pages/index.module.css"
 import Icon from "../components/icon"
 import cn from "classnames"

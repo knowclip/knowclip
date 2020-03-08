@@ -129,7 +129,7 @@ const SubtitlesMenu = () => {
               onClick={subtitlesClipsDialogRequest}
               id={$.makeClipsAndCardsButton}
             >
-              <ListItemText primary="Make clips + cards from subtitles" />
+              <ListItemText primary="Generate clips + cards from subtitles" />
             </MenuItem>
           </MenuList>
         </Popover>
