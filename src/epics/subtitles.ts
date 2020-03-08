@@ -12,7 +12,7 @@ import {
   concat,
   tap,
 } from 'rxjs/operators'
-import { of, Observable } from 'rxjs'
+import { of, Observable, defer } from 'rxjs'
 import * as r from '../redux'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
@@ -108,24 +108,26 @@ const makeClipsFromSubtitles: AppEpic = (
             )
           }),
         ]).pipe(
-          concatMap(() => {
-            const clips: Clip[] = []
-            const cards: Flashcard[] = []
-            getClipsAndCardsFromSubtitles(
-              tracksValidation.cueTrackFieldName,
-              fieldNamesToTrackIds,
-              state$.value,
-              fileId
-            ).forEach(({ clip, flashcard }) => {
-              clips.push(clip)
-              cards.push(flashcard)
-            })
+          concat(
+            defer(() => {
+              const clips: Clip[] = []
+              const cards: Flashcard[] = []
+              getClipsAndCardsFromSubtitles(
+                tracksValidation.cueTrackFieldName,
+                fieldNamesToTrackIds,
+                state$.value,
+                fileId
+              ).forEach(({ clip, flashcard }) => {
+                clips.push(clip)
+                cards.push(flashcard)
+              })
 
-            return from([
-              r.addClips(clips, cards, fileId),
-              r.highlightRightClipRequest(),
-            ])
-          })
+              return from([
+                r.addClips(clips, cards, fileId),
+                r.highlightRightClipRequest(),
+              ])
+            })
+          )
         )
       }
     )
