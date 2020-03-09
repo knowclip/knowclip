@@ -1,13 +1,12 @@
 import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core'
+import { IconButton, Tooltip } from '@material-ui/core'
 import {
   Delete as DeleteIcon,
   Loop,
   ShortTextTwoTone,
 } from '@material-ui/icons'
 import cn from 'classnames'
-import formatTime from '../utils/formatTime'
 import * as r from '../redux'
 import css from './FlashcardSection.module.css'
 import { getNoteTypeFields } from '../utils/noteType'
@@ -72,8 +71,6 @@ const FlashcardSectionForm = memo(
 
     const { id } = flashcard
 
-    const [moreMenuAnchorEl, setMoreMenuAnchorEl] = useState(null)
-
     const dispatch = useDispatch()
 
     const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
@@ -114,12 +111,6 @@ const FlashcardSectionForm = memo(
       [initialFocus, loopOnInteract]
     )
 
-    const handleCloseMoreMenu = useCallback(
-      () => {
-        setMoreMenuAnchorEl(null)
-      },
-      [setMoreMenuAnchorEl]
-    )
     const handleClickDeleteButton = useCallback(
       () => {
         dispatch(
@@ -146,12 +137,6 @@ const FlashcardSectionForm = memo(
     const setFlashcardText = useCallback(
       (key, text, caretLocation) =>
         dispatch(actions.setFlashcardField(id, key, text, caretLocation)),
-      [dispatch, id]
-    )
-    const deleteCard = useCallback(
-      () => {
-        dispatch(actions.deleteCard(id))
-      },
       [dispatch, id]
     )
 
@@ -224,10 +209,7 @@ const FlashcardSectionForm = memo(
 
         <section className={css.menu}>
           <Tooltip title="Show card preview (Esc)">
-            <IconButton
-              onClick={handleClickPreviewButton}
-              className={css.editButton}
-            >
+            <IconButton onClick={handleClickPreviewButton}>
               <ShortTextTwoTone />
             </IconButton>
           </Tooltip>

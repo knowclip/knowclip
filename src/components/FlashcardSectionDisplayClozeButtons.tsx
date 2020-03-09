@@ -121,7 +121,7 @@ const ClozeButton = ({
 
       e.target.focus()
     },
-    [confirmSelection, id, index, isActive, selection, setClozeIndex]
+    [confirmSelection, index, isActive, selection, setClozeIndex]
   )
   const handleMouseEnter = useCallback(
     () => {

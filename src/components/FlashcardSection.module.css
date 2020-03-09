@@ -103,9 +103,6 @@
   padding-right: 1rem;
 }
 
-.formTopLeft {
-
-}
 .flashcardImageContainer{
   height: 84px;
   border-radius: 0 !important;
@@ -166,14 +163,6 @@
 .flashcardImageUnused::after {
   opacity: 1;
 }
-.flashcardImageUnused:hover .flashcardImage,
-  .flashcardImageUnused:focus .flashcardImage {
-  /* opacity: 0.6; */
-}
-.flashcardImageUnused:hover::after,
-  .flashcardImageUnused:focus::after {
-  /* opacity: 0.4; */
-}
 
 .formBody {
   flex-grow: 1;
@@ -186,11 +175,6 @@
 }
 .secondaryMenu {
   composes: secondaryMenu from './FlashcardSectionDisplay.module.css';
-}
-.horizontalForm .editButton {
-  /* position: absolute;
-  bottom: 1rem;
-  left: 1rem; */
 }
 
 .suggestionsList {
