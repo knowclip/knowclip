@@ -9,10 +9,14 @@ const VideoStillDisplay = ({
   videoFile,
   flashcard,
   onFocus,
+  height = 85,
+  preloadAdjacent = true,
 }: {
   videoFile: VideoFile
   flashcard: Flashcard
   onFocus: (event: any) => void
+  height?: number
+  preloadAdjacent?: boolean
 }) => {
   const { videoStill, mediaFileAvailability } = useSelector(
     (state: AppState) => ({
@@ -29,9 +33,10 @@ const VideoStillDisplay = ({
 
   useEffect(
     () => {
-      dispatch(r.preloadVideoStills(videoFile, flashcard.id))
+      if (preloadAdjacent)
+        dispatch(r.preloadVideoStills(videoFile, flashcard.id))
     },
-    [flashcard.id, dispatch, videoFile]
+    [flashcard.id, dispatch, videoFile, preloadAdjacent]
   )
   const { filePath } = videoStill.availability
 
@@ -59,8 +64,9 @@ const VideoStillDisplay = ({
         onClick={handleClick}
         name={title}
         style={{
-          width: Math.round((videoFile.width / videoFile.height) * 85) + 'px',
-          height: 85 + 'px',
+          width:
+            Math.round((videoFile.width / videoFile.height) * height) + 'px',
+          height: height + 'px',
         }}
         onFocus={onFocus}
       >

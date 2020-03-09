@@ -1,22 +1,29 @@
 .container {
   display: flex;
+  position: relative;
   flex-flow: row nowrap;
   justify-content: center;
   align-items: flex-start;
   overflow: auto;
 }
 
-.display {
-  width: 100%;
+.flashcardSectionContents {
+  /* flex-grow: 1; */
   height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   padding: 2rem;
+
 }
-.horizontalDisplay {
-  padding: 1rem 3rem;
-}
+
 
 .intro {
   max-width: 800px;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  padding: 1rem;
 }
 .introText {
   text-align: center;
@@ -68,36 +75,32 @@
 
 .form {
   width: 100%;
-  max-width: 1024px;
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+  justify-content: center;
   align-items: stretch;
   padding: 4rem 1rem 1rem;
 }
 
 .horizontalForm {
   padding: 2rem 4rem;
-  /* margin-bottom: 1rem; */
+  flex-flow: row nowrap;
 }
 
 .formTop {
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
+  padding: 0 1rem 1rem;
 }
 
 .horizontalFormTop {
-  padding-right: 4em;
-  order: 2;
+  padding-right: 1rem;
 }
 
-.formTopLeft {
-
-}
 .flashcardImageContainer{
   height: 84px;
-  margin: 1rem;
   border-radius: 0 !important;
   transition: opacity .1s;
   opacity: 0.9;
@@ -111,6 +114,9 @@
 	cursor: pointer;
 	outline: inherit;
 }
+.horizontalForm .flashcardImageContainer {
+  height: 150px;
+}
 .flashcardImage {
   height: 100%;
   width: auto !important;
@@ -123,15 +129,14 @@
 }
 .flashcardImageContainer:hover,
 .flashcardImageContainer:focus {
-  opacity: 1;
   box-shadow: rgba(0,0,0,0.2) 3px 3px 5px;
 
 }
 .flashcardImageUnused {
   position: relative;
+  opacity: 0.6;
 }
 .flashcardImageUnused .flashcardImage {
-  opacity: 0.15;
   box-shadow: none;
 }
 
@@ -152,26 +157,18 @@
 .flashcardImageUnused::after {
   opacity: 1;
 }
-.flashcardImageUnused:hover .flashcardImage,
-  .flashcardImageUnused:focus .flashcardImage {
-  opacity: 0.6;
-}
-.flashcardImageUnused:hover::after,
-  .flashcardImageUnused:focus::after {
-  opacity: 0.4;
-}
 
 .formBody {
   flex-grow: 1;
   padding: 0 1rem;
+  max-width: 500px;
 }
 
-.formBottom {
+.menu {
+  composes: menu from './FlashcardSectionDisplay.module.css';
 }
-.horizontalForm .editButton {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
+.secondaryMenu {
+  composes: secondaryMenu from './FlashcardSectionDisplay.module.css';
 }
 
 .suggestionsList {

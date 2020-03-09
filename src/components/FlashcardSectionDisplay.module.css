@@ -11,10 +11,10 @@
 }
 
 .container {
-  margin-top: 2rem;
   text-align: center;
   display: flex;
   flex-flow: column nowrap;
+  width: 100%;
   height: 100%;
 }
 
@@ -28,7 +28,8 @@
 .horizontalPreview {
   margin-top: 0;
   font-size: 18px;
-  padding: 0 2em;
+  padding-left: 3em;
+  padding-right: 3em;
 }
 .previewFields {
   flex-grow: 1;
@@ -95,7 +96,6 @@
 }
 
 .clozeNewlinePlaceholder {
-  /* padding-right: .45em; */
   color: rgba(0,0,0,0.3);
 }
 
@@ -107,12 +107,53 @@
 .menu {
   position: absolute;
   bottom: 1rem;
+  right: 1rem;
+  text-align: right;
+  background-color: rgba(255,255,255,0.8);
+  z-index: 5;
+}
+.secondaryMenu {
+  position: absolute;
+  bottom: 1rem;
   left: 1rem;
+  text-align: left;
+  background-color: rgba(255,255,255,0.8);
+  z-index: 5;
+}
+
+.clozeButtons {
+  display: inline-block;
+
+  --initial-width: auto;
 }
 
 .clozeButton {
   min-width: 0 !important;
   padding: 0.3em .5em;
+
+  --initial-width: 3em;
+  
+  
+  width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+
+  transition: padding .2s, width .2s;
+}
+.clozeButton span {
+  width: 0 !important;
+  padding: 0 !important;
+  transition: all .2s;
+}
+.clozeButton:last-child,
+.clozeButton:last-child span,
+.openClozeButtons .clozeButton,
+.openClozeButtons .clozeButton span,
+.clozeButtons:focus-within .clozeButton,
+.clozeButtons:focus-within .clozeButton span 
+{
+  width: var(--initial-width) !important;
+  padding: 0.3em .5em !important;
 }
 .clozeButton:hover {
   background-color: hsla(var(--cloze-hue), 100%, 80%, 80%);
@@ -168,12 +209,7 @@
 .blank::selection {
   background-color: hsla(var(--cloze-background-hue), 100%, 80%, 80%);
 }
-.clozeValueChar {
-  /* --cloze-selection-hue: 194; */
-}
 .clozeValueChar::selection {
   background-color: hsla(var(--cloze-selection-hue), 100%, 90%, 75%);
-  /* color: hsl(calc(var(--cloze-selection-hue) + 180), 100%, 10%) */
-  color: hsl(calc(var(--cloze-selection-hue) + 150), 20%, 50%);
   color: hsl(calc(var(--cloze-selection-hue) + 150), 100%, 30%);
 }

@@ -1,4 +1,5 @@
 import React, { useCallback, MutableRefObject } from 'react'
+import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import { Tooltip, Button } from '@material-ui/core'
 import {
@@ -49,7 +50,12 @@ const ClozeButtons = ({
   if (nextId)
     buttons.push(
       <ClozeButton
-        hoverText="Make a new cloze deletion card (C key)"
+        key={nextId}
+        hoverText={
+          currentClozeIndex === -1
+            ? 'Edit cloze deletions (C key)'
+            : 'Make a new cloze deletion card (C key)'
+        }
         index={deletions.length}
         id={nextId}
         isActive={currentClozeIndex === deletions.length}
@@ -60,7 +66,15 @@ const ClozeButtons = ({
         selection={selection}
       />
     )
-  return <>{buttons}</>
+  return (
+    <section
+      className={cn(css.clozeButtons, {
+        [css.openClozeButtons]: currentClozeIndex !== -1,
+      })}
+    >
+      {buttons}
+    </section>
+  )
 }
 
 const ClozeButton = ({
@@ -84,14 +98,16 @@ const ClozeButton = ({
   getSelection: () => ClozeRange | null
   selection: MutableRefObject<ClozeRange | null>
 }) => {
-  const registerSelection = useCallback(
-    () => {
+  const handleMouseDown = useCallback(
+    e => {
       selection.current = getSelection() || null
+      // don't focus yet so buttons won't expand and prevent click from firing
+      e.preventDefault()
     },
     [getSelection, selection]
   )
   const handleClick = useCallback(
-    () => {
+    e => {
       const textSelected =
         selection.current && selection.current.start !== selection.current.end
       if (selection.current && textSelected) {
@@ -102,6 +118,8 @@ const ClozeButton = ({
         setClozeIndex(index)
       }
       selection.current = null
+
+      e.target.focus()
     },
     [confirmSelection, index, isActive, selection, setClozeIndex]
   )
@@ -125,7 +143,7 @@ const ClozeButton = ({
         onMouseLeave={handleMouseLeave}
         onBlur={handleMouseLeave}
         className={css.clozeButton}
-        onMouseDown={registerSelection}
+        onMouseDown={handleMouseDown}
         onClick={handleClick}
         style={{
           backgroundColor: isActive

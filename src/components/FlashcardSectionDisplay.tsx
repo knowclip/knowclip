@@ -13,22 +13,23 @@ const FlashcardSectionDisplay = ({
   fieldsToTracks,
   fields,
   viewMode,
-  menuItems,
   className,
   onDoubleClickField,
   fieldHoverText,
   clozeControls,
+  menuItems,
+  secondaryMenuItems,
 }: {
   fields: TransliterationFlashcardFields
   viewMode: ViewMode
-
   mediaFile: MediaFile
   fieldsToTracks: SubtitlesFlashcardFieldsLinks
-  menuItems: ReactChild
   className?: string
   onDoubleClickField?: (fn: TransliterationFlashcardFieldName) => void
   fieldHoverText?: string
   clozeControls?: ClozeControls
+  menuItems: ReactChild
+  secondaryMenuItems?: ReactChild
 }) => {
   const {
     clozeIndex = -1,
@@ -116,6 +117,7 @@ const FlashcardSectionDisplay = ({
       </section>
 
       <section className={css.menu}>{menuItems}</section>
+      <section className={css.secondaryMenu}>{secondaryMenuItems}</section>
     </section>
   )
 }

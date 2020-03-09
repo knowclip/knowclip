@@ -103,7 +103,7 @@ export const newClipFromChunkOnEdit: AppEpic = (
     flatMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
-        return of(r.newClipFromSubtitlesChunk(selection))
+        return of(r.newClipFromSubtitlesChunk(selection, undefined, true))
       }
       return empty()
     })
@@ -142,7 +142,7 @@ export const newClipFromChunk: AppEpic = (
 
         setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
 
-        return from([r.addClip(clip, flashcard, !action.clozeDeletion)])
+        return from([r.addClip(clip, flashcard, action.startEditing || false)])
       })
     )
 

@@ -104,9 +104,11 @@ export const stopEditingCards = (): StopEditingCards => ({
 
 export const newClipFromSubtitlesChunk = (
   linkedSubtitlesChunkSelection: WaveformSelectionExpanded,
-  clozeDeletion?: ClozeDeletion
+  clozeDeletion?: ClozeDeletion,
+  startEditing: boolean = false
 ): NewCardFromSubtitlesRequest => ({
   type: 'NEW_CARD_FROM_SUBTITLES_REQUEST',
   linkedSubtitlesChunkSelection,
   clozeDeletion,
+  startEditing,
 })
