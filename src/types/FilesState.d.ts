@@ -75,7 +75,6 @@ declare type MediaSubtitlesRelation =
 declare type EmbeddedSubtitlesTrackRelation = {
   type: 'EmbeddedSubtitlesTrack'
   id: string
-  streamIndex: number
 }
 declare type ExternalSubtitlesTrackRelation = {
   type: 'ExternalSubtitlesTrack'

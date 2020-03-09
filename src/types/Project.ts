@@ -49,17 +49,17 @@ export type ClipJson<F extends FlashcardFields> = {
   id: string
 }
 
-export type SubtitlesJson =
-  | {
-      type: 'Embedded'
-      streamIndex: number
-      id: string
-    }
-  | {
-      type: 'External'
-      name: string
-      id: string
-    }
+export type SubtitlesJson = EmbeddedSubtitlesJson | ExternalSubtitlesJson
+export type EmbeddedSubtitlesJson = {
+  type: 'Embedded'
+  streamIndex: number
+  id: string
+}
+export type ExternalSubtitlesJson = {
+  type: 'External'
+  name: string
+  id: string
+}
 
 export type ProjectJson<F extends FlashcardFields> = {
   project: {

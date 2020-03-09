@@ -1,7 +1,8 @@
 import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { empty, of } from 'rxjs'
+import { empty, of, from } from 'rxjs'
 import * as r from '../redux'
+import { isMediaFileLoaded } from '../selectors'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -87,10 +88,12 @@ const highlightRightEpic: AppEpic = (
 ) =>
   action$.pipe(
     ofType<Action, HighlightRightClipRequest>(A.HIGHLIGHT_RIGHT_CLIP_REQUEST),
-    tap(() => {
+    switchMap(() => {
       const state = state$.value
+      console.log('isMediaFileLoaded', r.isMediaFileLoaded(state))
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
+      console.log({ currentFileId })
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
       const currentIndex = selection ? selection.index : -1
@@ -98,23 +101,34 @@ const highlightRightEpic: AppEpic = (
       if (selection && nextIndex !== -1) {
         const lastIndex = waveformItems.length - 1
         const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
-        if (next)
-          return setCurrentTime(
+        debugger
+        if (next) {
+          setCurrentTime(
             r.getSecondsAtX(
               state$.value,
               Math.max(next.item.start, selection.item.end + 1)
             )
           )
+          return r.isMediaFileLoaded(state)
+            ? empty()
+            : of(r.selectWaveformItem(next))
+        }
       }
 
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
       const next =
         waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
+      debugger
+      if (next) {
+        setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
+        return r.isMediaFileLoaded(state)
+          ? empty()
+          : of(r.selectWaveformItem(next))
+      }
 
-      if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
-    }),
-    ignoreElements()
+      return empty()
+    })
   )
 
 const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {

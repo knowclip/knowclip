@@ -135,6 +135,52 @@
       ],
       "type": "object"
     },
+    "EmbeddedSubtitlesJson": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "streamIndex": {
+          "type": "number"
+        },
+        "type": {
+          "enum": [
+            "Embedded"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "streamIndex",
+        "id"
+      ],
+      "type": "object"
+    },
+    "ExternalSubtitlesJson": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "External"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "id"
+      ],
+      "type": "object"
+    },
     "MediaJson<SimpleFlashcardFields>": {
       "anyOf": [
         {
@@ -336,50 +382,10 @@
     "SubtitlesJson": {
       "anyOf": [
         {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "streamIndex": {
-              "type": "number"
-            },
-            "type": {
-              "enum": [
-                "Embedded"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "streamIndex",
-            "id"
-          ],
-          "type": "object"
+          "$ref": "#/definitions/EmbeddedSubtitlesJson"
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "External"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "name",
-            "id"
-          ],
-          "type": "object"
+          "$ref": "#/definitions/ExternalSubtitlesJson"
         }
       ]
     }

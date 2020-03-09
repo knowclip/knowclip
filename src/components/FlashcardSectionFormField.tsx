@@ -2,19 +2,17 @@ import React, { useCallback, useMemo, memo, MutableRefObject } from 'react'
 import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
-import FieldMenu, {
-  useSubtitlesBySource,
-} from './FlashcardSectionFieldPopoverMenu'
-import { flashcardSectionForm$ } from './FlashcardSectionForm'
+import FieldMenu from './FlashcardSectionFieldPopoverMenu'
+import { flashcardSectionForm$, capitalize } from './FlashcardSectionForm'
 import cn from 'classnames'
+import * as r from '../redux'
 
 type Props = {
   name: FlashcardFieldName
   mediaFileId: MediaFileId
   currentFlashcard: Flashcard
-  label: string
   setFlashcardText: (id: string, text: string, caretLocation: number) => void
-  subtitles: MediaFile['subtitles']
+  subtitles: r.MediaSubtitles
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
   onKeyPress: () => void
@@ -28,7 +26,6 @@ const FlashcardSectionFormField = memo(
     name,
     mediaFileId,
     currentFlashcard,
-    label: fieldLabel,
     setFlashcardText,
     subtitles,
     linkedSubtitlesTrack,
@@ -43,33 +40,21 @@ const FlashcardSectionFormField = memo(
       e => setFlashcardText(name, e.target.value, e.target.selectionEnd),
       [setFlashcardText, name]
     )
-    const {
-      embeddedSubtitlesTracks,
-      externalSubtitlesTracks,
-    } = useSubtitlesBySource(subtitles)
+
     const label = useMemo(
-      () =>
-        fieldLabel +
-        getLinkedTrackLabel(
-          embeddedSubtitlesTracks,
-          externalSubtitlesTracks,
-          linkedSubtitlesTrack
-        ),
-      [
-        fieldLabel,
-        embeddedSubtitlesTracks,
-        externalSubtitlesTracks,
-        linkedSubtitlesTrack,
-      ]
+      () => {
+        const track = subtitles.all.find(s => s.id === linkedSubtitlesTrack)
+
+        return track ? `${capitalize(name)} (${track.label})` : capitalize(name)
+      },
+      [subtitles.all, name, linkedSubtitlesTrack]
     )
 
     return (
       <section className={css.field}>
-        {Boolean(subtitles.length) && (
+        {Boolean(subtitles.all.length) && (
           <FieldMenu
             className={css.fieldMenuButton}
-            embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-            externalSubtitlesTracks={externalSubtitlesTracks}
             linkedSubtitlesTrack={linkedSubtitlesTrack}
             mediaFileId={mediaFileId}
             fieldName={name as TransliterationFlashcardFieldName}
@@ -101,23 +86,5 @@ const FlashcardSectionFormField = memo(
     )
   }
 )
-
-const getLinkedTrackLabel = (
-  embedded: MediaFile['subtitles'],
-  external: MediaFile['subtitles'],
-  linkedTrackId: string | null
-) => {
-  if (!linkedTrackId) return ''
-
-  const embeddedIndex = embedded.findIndex(t => t.id === linkedTrackId)
-  if (embeddedIndex !== -1)
-    return ` (Embedded subtitles track ${embeddedIndex + 1})`
-
-  const externalIndex = external.findIndex(t => t.id === linkedTrackId)
-  if (externalIndex !== -1)
-    return ` (External subtitles track ${externalIndex + 1})`
-
-  return ''
-}
 
 export default FlashcardSectionFormField

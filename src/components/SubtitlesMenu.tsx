@@ -94,25 +94,29 @@ const SubtitlesMenu = () => {
                 No subtitles loaded.
               </MenuItem>
             )}
-            {subtitles.embedded.map(({ relation, file, track }, i) => (
-              <EmbeddedTrackMenuItem
-                key={relation.id}
-                id={relation.id}
-                file={
-                  file as
-                    | (VttConvertedSubtitlesFile & { parentType: 'MediaFile' })
-                    | null
-                }
-                track={track}
-                title={`Embedded track ${i + 1}`}
-              />
-            ))}
-            {subtitles.external.map(({ relation, file, track }, i) => (
+            {subtitles.embedded.map(
+              ({ relation, sourceFile: file, track }, i) => (
+                <EmbeddedTrackMenuItem
+                  key={relation.id}
+                  id={relation.id}
+                  file={
+                    file as
+                      | (VttConvertedSubtitlesFile & {
+                          parentType: 'MediaFile'
+                        })
+                      | null
+                  }
+                  track={track}
+                  title={`Embedded track ${i + 1}`}
+                />
+              )
+            )}
+            {subtitles.external.map(({ relation, sourceFile, track }, i) => (
               <ExternalTrackMenuItem
                 key={relation.id}
                 id={relation.id}
                 track={track}
-                file={file}
+                file={sourceFile}
                 title={`External track ${i + 1}`}
               />
             ))}
@@ -305,8 +309,8 @@ function useToggleVisible(track: SubtitlesTrack | null, id: string) {
       if (track)
         dispatch(
           track.mode === 'showing'
-            ? actions.hideSubtitles(id, track.mediaFileId)
-            : actions.showSubtitles(id, track.mediaFileId)
+            ? actions.hideSubtitles(id)
+            : actions.showSubtitles(id)
         )
     },
     [dispatch, id, track]

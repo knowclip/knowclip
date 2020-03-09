@@ -14,13 +14,7 @@ export default {
     async ({ validatedFile, filePath }, state, effects) => {
       if (isVtt(filePath)) {
         const chunks = await effects.getSubtitlesFromFile(state, filePath)
-        const track = newExternalSubtitlesTrack(
-          validatedFile.id,
-          validatedFile.parentId,
-          chunks,
-          filePath,
-          filePath
-        )
+        const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
         const mediaFile = r.getFile<MediaFile>(
           state,
           'MediaFile',
@@ -31,7 +25,7 @@ export default {
         return [
           ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
             ? [
-                r.addSubtitlesTrack(track),
+                r.addSubtitlesTrack(track, mediaFile.id),
                 ...(state.dialog.queue.some(d => d.type === 'SubtitlesClips')
                   ? []
                   : [r.linkSubtitlesDialog(validatedFile, mediaFile.id)]),

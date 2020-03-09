@@ -37,13 +37,7 @@ export default {
       if (validatedFile.parentType === 'MediaFile') {
         if (r.getCurrentFileId(state) !== sourceFile.id) return []
 
-        const track = newEmbeddedSubtitlesTrack(
-          validatedFile.id,
-          validatedFile.parentId,
-          chunks,
-          validatedFile.streamIndex,
-          filePath
-        )
+        const track = newEmbeddedSubtitlesTrack(validatedFile.id, chunks)
         const mediaFile = r.getFile<MediaFile>(
           state,
           'MediaFile',
@@ -52,7 +46,7 @@ export default {
         return [
           ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
             ? [
-                r.addSubtitlesTrack(track),
+                r.addSubtitlesTrack(track, mediaFile.id),
                 r.linkSubtitlesDialog(validatedFile, mediaFile.id),
               ]
             : []),
@@ -65,13 +59,7 @@ export default {
         'ExternalSubtitlesFile',
         validatedFile.parentId
       ) as ExternalSubtitlesFile
-      const track = newExternalSubtitlesTrack(
-        validatedFile.id,
-        external.parentId,
-        chunks,
-        sourceFile.filePath,
-        filePath
-      )
+      const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
       const mediaFile = r.getFile<MediaFile>(
         state,
         'MediaFile',
@@ -82,7 +70,7 @@ export default {
       return [
         ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
           ? [
-              r.addSubtitlesTrack(track),
+              r.addSubtitlesTrack(track, mediaFile.id),
               ...(state.dialog.queue.some(d => d.type === 'SubtitlesClips')
                 ? []
                 : [r.linkSubtitlesDialog(external, mediaFile.id)]), // TODO: extract and share between here and externalSubtitlesFile.ts

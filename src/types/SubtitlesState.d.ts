@@ -10,9 +10,6 @@ declare type EmbeddedSubtitlesTrack = {
   id: SubtitlesTrackId
   mode: TextTrackMode
   chunks: Array<SubtitlesChunk>
-  mediaFileId: MediaFileId
-  streamIndex: number
-  tmpFilePath: string
 }
 
 declare type ExternalSubtitlesTrack = {
@@ -20,9 +17,6 @@ declare type ExternalSubtitlesTrack = {
   id: SubtitlesTrackId
   mode: TextTrackMode
   chunks: Array<SubtitlesChunk>
-  mediaFileId: MediaFileId
-  filePath: SubtitlesFilePath
-  vttFilePath: string
 }
 
 declare type SubtitlesChunk = {

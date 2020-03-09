@@ -15,9 +15,17 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
 ) =>
   // TODO: clean up orphans?
   subtitlesTracksStreamIndexes.map(streamIndex => {
-    const existing = subtitles.find(
-      s => s.type === 'EmbeddedSubtitlesTrack' && s.streamIndex === streamIndex
-    )
+    const existing = subtitles.find(s => {
+      if (s.type !== 'EmbeddedSubtitlesTrack') return false
+
+      const file = r.getSubtitlesSourceFile(state, s.id)
+      return (
+        file &&
+        file.type === 'VttConvertedSubtitlesFile' &&
+        file.parentType === 'MediaFile' &&
+        file.streamIndex === streamIndex
+      )
+    })
     const file = existing
       ? r.getFile(state, 'VttConvertedSubtitlesFile', existing.id)
       : null

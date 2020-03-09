@@ -14,6 +14,8 @@ import YAML from 'yaml'
 import {
   MediaJson,
   SubtitlesJson,
+  ExternalSubtitlesJson,
+  EmbeddedSubtitlesJson,
   ClipJson,
   ProjectJson,
 } from '../types/Project'
@@ -75,26 +77,47 @@ export const getProjectJson = <F extends FlashcardFields>(
       (mediaFile): MediaJson<F> => {
         const { name, format, durationSeconds, id } = mediaFile
 
-        const subtitles: SubtitlesJson[] = mediaFile.subtitles.map(s =>
-          s.type === 'EmbeddedSubtitlesTrack'
-            ? {
-                id: s.id,
-                streamIndex: s.streamIndex,
-                type: 'Embedded',
+        const externalSubtitles: ExternalSubtitlesJson[] = mediaFile.subtitles
+          .filter(
+            (s): s is ExternalSubtitlesTrack =>
+              s.type === 'ExternalSubtitlesTrack'
+          )
+          .map(s => ({
+            id: s.id,
+            type: 'External',
+            name: (
+              (getSubtitlesSourceFile(
+                state,
+                s.id
+              ) as ExternalSubtitlesFile | null) || {
+                name: 'External subtitles file',
               }
-            : {
-                id: s.id,
-                type: 'External',
-                name: (
-                  (getSubtitlesSourceFile(
-                    state,
-                    s.id
-                  ) as ExternalSubtitlesFile | null) || {
-                    name: 'External subtitles file',
-                  }
-                ).name,
-              }
-        )
+            ).name,
+          }))
+        const embeddedSubtitles = mediaFile.subtitlesTracksStreamIndexes
+          .map(streamIndex => {
+            for (const s of mediaFile.subtitles) {
+              if (s.type !== 'EmbeddedSubtitlesTrack') continue
+
+              const file = getSubtitlesSourceFile(state, s.id)
+              if (
+                file &&
+                file.type === 'VttConvertedSubtitlesFile' &&
+                file.parentType === 'MediaFile' &&
+                file.streamIndex === streamIndex
+              )
+                return {
+                  id: file.id,
+                  streamIndex: streamIndex,
+                  type: 'Embedded',
+                }
+            }
+          })
+          .filter((s): s is EmbeddedSubtitlesJson => Boolean(s))
+        const subtitles: SubtitlesJson[] = [
+          ...embeddedSubtitles,
+          ...externalSubtitles,
+        ]
 
         const clips = getProjectClips(state, mediaFile, fieldsTemplate)
 

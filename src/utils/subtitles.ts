@@ -170,32 +170,20 @@ export const getSubtitlesFromFile = async (
 
 export const newEmbeddedSubtitlesTrack = (
   id: string,
-  mediaFileId: MediaFileId,
-  chunks: Array<SubtitlesChunk>,
-  streamIndex: number,
-  tmpFilePath: string
+  chunks: Array<SubtitlesChunk>
 ): EmbeddedSubtitlesTrack => ({
   type: 'EmbeddedSubtitlesTrack',
   id,
   mode: 'hidden',
   chunks,
-  mediaFileId,
-  streamIndex,
-  tmpFilePath,
 })
 
 export const newExternalSubtitlesTrack = (
   id: string,
-  mediaFileId: MediaFileId,
-  chunks: Array<SubtitlesChunk>,
-  filePath: string,
-  vttFilePath: string
+  chunks: Array<SubtitlesChunk>
 ): ExternalSubtitlesTrack => ({
   mode: 'hidden',
   type: 'ExternalSubtitlesTrack',
   id,
-  mediaFileId,
   chunks,
-  filePath,
-  vttFilePath,
 })
