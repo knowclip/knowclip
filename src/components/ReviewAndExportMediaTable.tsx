@@ -1,9 +1,7 @@
 import React, { useCallback, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  Table,
   Toolbar,
-  TableBody,
   Paper,
   Checkbox,
   IconButton,
@@ -16,6 +14,13 @@ import cn from 'classnames'
 import moment from 'moment'
 import FlashcardRow from './ReviewAndExportMediaTableRow'
 import { formatDuration } from '../utils/formatTime'
+import {
+  AutoSizer,
+  CellMeasurerCache,
+  List,
+  ListRowRenderer,
+  CellMeasurer,
+} from 'react-virtualized'
 
 enum $ {
   container = 'review-and-export-media-table-container',
@@ -32,6 +37,12 @@ type MediaTableProps = {
   onClick: (index: number) => void
   mediaIndex: number
 }
+
+const cache = new CellMeasurerCache({
+  fixedWidth: true,
+  minHeight: 25,
+  defaultHeight: 65, //currently, this is the height the cell sizes to after calling 'toggleHeight'
+})
 
 const ReviewAndExportMediaTable = memo(
   ({
@@ -69,6 +80,49 @@ const ReviewAndExportMediaTable = memo(
       onSelectAll,
       media.id,
     ])
+
+    const handleSelect = useCallback((id: string) => onSelect(media.id, id), [
+      media.id,
+      onSelect,
+    ])
+
+    const rowRenderer: ListRowRenderer = useCallback(
+      ({ index, key, parent, style }) => {
+        const id = clipsIds[index]
+
+        return (
+          <CellMeasurer
+            cache={cache}
+            columnIndex={0}
+            key={key}
+            parent={parent}
+            rowIndex={index}
+          >
+            {({ measure, registerChild }) => (
+              <FlashcardRow
+                key={key}
+                id={id}
+                onSelect={handleSelect}
+                isSelected={selectedIds.includes(id)}
+                isHighlighted={highlightedClipId === id}
+                style={style}
+                measure={measure}
+                registerChild={registerChild}
+              />
+            )}
+          </CellMeasurer>
+        )
+
+        //   <div
+        //   ref={registerChild as (instance: HTMLDivElement | null) => void}
+        //   style={style}
+        //   onLoad={measure}
+        // >
+        //   hihi{' '}{id}
+        // </div>
+      },
+      [clipsIds, handleSelect, highlightedClipId, selectedIds]
+    )
 
     return (
       <Paper className={$.container}>
@@ -115,65 +169,34 @@ const ReviewAndExportMediaTable = memo(
           <IconButton>{open ? <ExpandLess /> : <ExpandMore />}</IconButton>
         </Toolbar>
 
-        <Table className={css.table}>
-          <colgroup>
-            <col width="1%" />
-            <col width="15%" />
-            <col width="70%" />
-            <col width="10%" />
-            <col width="10%" />
-          </colgroup>
+        <div>
           {open && (
-            <MediaTableBody
-              mediaFileId={media.id}
-              {...{ clipsIds, onSelect, highlightedClipId, selectedIds }}
-            />
+            <AutoSizer disableHeight>
+              {({ width }) => (
+                <List
+                  className={css.table}
+                  height={clipsIds.length ? 400 : 80}
+                  width={width}
+                  padding={10}
+                  rowHeight={cache.rowHeight}
+                  rowCount={clipsIds.length}
+                  rowRenderer={rowRenderer}
+                  noRowsRenderer={noRowsRenderer}
+                />
+              )}
+            </AutoSizer>
           )}
-        </Table>
+        </div>
       </Paper>
     )
   }
 )
 
-const MediaTableBody = React.memo(
-  ({
-    clipsIds,
-    mediaFileId,
-    onSelect,
-    selectedIds,
-    highlightedClipId,
-  }: MediaTableBodyProps) => {
-    const handleSelect = useCallback(
-      (id: string) => onSelect(mediaFileId, id),
-      [mediaFileId, onSelect]
-    )
-    return (
-      <TableBody className={css.tableBody}>
-        {clipsIds.map(id => (
-          <FlashcardRow
-            key={id}
-            id={id}
-            onSelect={handleSelect}
-            isSelected={selectedIds.includes(id)}
-            isHighlighted={highlightedClipId === id}
-          />
-        ))}
-        {!clipsIds.length && (
-          <p style={{ padding: '0 2em', textAlign: 'center' }}>
-            No clips have been made for this media file.
-          </p>
-        )}
-      </TableBody>
-    )
-  }
+const noRowsRenderer = () => (
+  <p style={{ padding: '0 2em', textAlign: 'center' }}>
+    No clips have been made for this media file.
+  </p>
 )
-type MediaTableBodyProps = {
-  clipsIds: string[]
-  mediaFileId: MediaFileId
-  onSelect: (mediaFileId: string, id: string) => void
-  highlightedClipId: string | null
-  selectedIds: Array<string | undefined>
-}
 
 export default ReviewAndExportMediaTable
 

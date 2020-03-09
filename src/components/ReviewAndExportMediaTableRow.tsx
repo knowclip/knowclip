@@ -1,19 +1,14 @@
-import React, { useCallback, memo } from 'react'
+import React, { useCallback, memo, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  TableRow,
-  TableCell,
-  Checkbox,
-  Chip,
-  IconButton,
-  Tooltip,
-} from '@material-ui/core'
+import { Checkbox, Chip, IconButton, Tooltip } from '@material-ui/core'
 import { Loop } from '@material-ui/icons'
 import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
 import * as actions from '../actions'
+import { ListRowProps } from 'react-virtualized'
+import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer'
 
 enum $ {
   container = 'review-and-export-table-row-container',
@@ -26,10 +21,21 @@ type FlashcardRowProps = {
   onSelect: (id: string) => void
   isSelected: boolean
   isHighlighted: boolean
+  style: ListRowProps['style']
+  measure: CellMeasurerChildProps['measure']
+  registerChild: CellMeasurerChildProps['registerChild']
 }
 
 const ReviewAndExportMediaTableRow = memo(
-  ({ id, isSelected, onSelect, isHighlighted }: FlashcardRowProps) => {
+  ({
+    id,
+    isSelected,
+    onSelect,
+    isHighlighted,
+    style,
+    measure,
+    registerChild,
+  }: FlashcardRowProps) => {
     const {
       flashcard: { fields, tags },
       formattedClipTime,
@@ -49,10 +55,15 @@ const ReviewAndExportMediaTableRow = memo(
       dispatch,
     ])
 
+    useEffect(() => measure(), [measure])
+
     return (
-      <TableRow
+      <section
+        ref={registerChild as any}
+        style={style}
         className={cn(css.tableRow, $.container, {
           [$.highlightedClipRow]: isHighlighted,
+          [css.highlightedClipRow]: isHighlighted,
         })}
         onDoubleClick={useCallback(
           () => {
@@ -65,18 +76,17 @@ const ReviewAndExportMediaTableRow = memo(
           },
           [clipTime, currentMediaFile, isHighlighted]
         )}
-        selected={isHighlighted}
       >
-        <TableCell padding="checkbox">
+        <section className={css.checkbox}>
           <Checkbox
             checked={isSelected}
             onClick={useCallback(e => e.stopPropagation(), [])}
             onChange={useCallback(() => onSelect(id), [onSelect, id])}
             className={$.clipCheckboxes}
           />
-        </TableCell>
-        <TableCell padding="default">
-          <span className={css.clipTime}>{formattedClipTime}</span>
+        </section>
+        <section className={css.clipTime}>
+          <span className={css.clipTimeText}>{formattedClipTime}</span>
           {isHighlighted && (
             <IconButton
               onClick={toggleLoop}
@@ -85,8 +95,8 @@ const ReviewAndExportMediaTableRow = memo(
               <Loop />
             </IconButton>
           )}
-        </TableCell>
-        <TableCell className={css.flashcardContents}>
+        </section>
+        <section className={css.flashcardContents}>
           <p
             className={cn(css.transcription, {
               [css.blank]: !fields.transcription.trim(),
@@ -102,16 +112,16 @@ const ReviewAndExportMediaTableRow = memo(
           >
             {fields.meaning.trim() || '[no meaning given]'}
           </p>
-        </TableCell>
-        <TableCell>
-          <p className={css.field}>{fields.notes}</p>
-        </TableCell>
-        <TableCell>
+          {fields.notes.trim() && (
+            <p className={cn(css.field, css.notes)}>{fields.notes}</p>
+          )}
+        </section>
+        <section className={css.tags}>
           {tags.map(t => (
             <ShortTag key={t} title={t} />
           ))}
-        </TableCell>
-      </TableRow>
+        </section>
+      </section>
     )
   }
 )

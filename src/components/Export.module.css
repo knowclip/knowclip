@@ -50,11 +50,17 @@
   margin-top: 1em;
 }
 .tableRow {
-  vertical-align: top !important;
+  display: flex;
+  padding: 1rem;
 }
+.highlightedClipRow {
+  background-color: rgb(255, 254, 240);
+}
+
 .flashcardContents {
   padding-top: .8rem !important;
   padding-bottom: .8rem !important;
+  flex-grow: 1;
 }
 
 .field {
@@ -80,9 +86,31 @@
   margin-bottom: 0;
 }
 
+.notes {
+  background: #eee;
+  padding: .8em;
+  border-radius: .5em;
+}
+
+.clipTime,
+.flashcardContents,
+.tags {
+  padding-left: .5rem;
+  padding-right: .5rem;
+}
 .clipTime {
+  width: 8em;
+  text-align: center;
+}
+.clipTimeText {
   padding-top: .8rem;
   display: block;
+}
+
+.tags {
+  padding-top: .8rem !important;
+  padding-bottom: .8rem !important;
+  max-width: 20em;
 }
 
 .blank {
