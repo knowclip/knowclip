@@ -108,7 +108,7 @@
   position: absolute;
   bottom: 1rem;
   right: 1rem;
-  text-align: left;
+  text-align: right;
   background-color: rgba(255,255,255,0.8);
   z-index: 5;
 }
@@ -117,6 +117,8 @@
   bottom: 1rem;
   left: 1rem;
   text-align: left;
+  background-color: rgba(255,255,255,0.8);
+  z-index: 5;
 }
 
 .clozeButtons {

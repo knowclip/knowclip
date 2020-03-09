@@ -140,7 +140,7 @@ const FlashcardSection = ({
 const Placeholder = ({ viewMode }: { viewMode: ViewMode }) => {
   return (
     <section
-      className={cn(css.intro, css.display, {
+      className={cn(css.intro, {
         [css.horizontalIntro]: viewMode === 'HORIZONTAL',
       })}
     >
