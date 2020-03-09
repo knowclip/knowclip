@@ -79,10 +79,10 @@
 
 .form {
   width: 100%;
-  max-width: 1024px;
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+  justify-content: center;
   align-items: stretch;
   padding: 4rem 1rem 1rem;
 }
@@ -96,10 +96,11 @@
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
+  padding: 0 1rem 1rem;
 }
 
 .horizontalFormTop {
-  padding-right: 4em;
+  padding-right: 1rem;
 }
 
 .formTopLeft {
@@ -107,7 +108,6 @@
 }
 .flashcardImageContainer{
   height: 84px;
-  margin: 1rem;
   border-radius: 0 !important;
   transition: opacity .1s;
   opacity: 0.9;
@@ -121,6 +121,9 @@
 	cursor: pointer;
 	outline: inherit;
 }
+.horizontalForm .flashcardImageContainer {
+  height: 150px;
+}
 .flashcardImage {
   height: 100%;
   width: auto !important;
@@ -133,15 +136,16 @@
 }
 .flashcardImageContainer:hover,
 .flashcardImageContainer:focus {
-  opacity: 1;
+  /* opacity: 1; */
   box-shadow: rgba(0,0,0,0.2) 3px 3px 5px;
 
 }
 .flashcardImageUnused {
   position: relative;
+  opacity: 0.6;
 }
 .flashcardImageUnused .flashcardImage {
-  opacity: 0.15;
+  /* opacity: 0.15; */
   box-shadow: none;
 }
 
@@ -164,19 +168,24 @@
 }
 .flashcardImageUnused:hover .flashcardImage,
   .flashcardImageUnused:focus .flashcardImage {
-  opacity: 0.6;
+  /* opacity: 0.6; */
 }
 .flashcardImageUnused:hover::after,
   .flashcardImageUnused:focus::after {
-  opacity: 0.4;
+  /* opacity: 0.4; */
 }
 
 .formBody {
   flex-grow: 1;
   padding: 0 1rem;
+  max-width: 500px;
 }
 
-.formBottom {
+.menu {
+  composes: menu from './FlashcardSectionDisplay.module.css';
+}
+.secondaryMenu {
+  composes: secondaryMenu from './FlashcardSectionDisplay.module.css';
 }
 .horizontalForm .editButton {
   /* position: absolute;

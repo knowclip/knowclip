@@ -186,32 +186,14 @@ const FlashcardSectionForm = memo(
             [css.horizontalFormTop]: viewMode === 'HORIZONTAL',
           })}
         >
-          <div className={css.formTopLeft}>
-            {mediaFile.isVideo && (
-              <VideoStillDisplay
-                flashcard={flashcard}
-                videoFile={mediaFile}
-                onFocus={handleFocus}
-              />
-            )}
-          </div>
-
-          <div className={css.formTopRight}>
-            {' '}
-            <span className={css.timeStamp}>
-              {formatTime(selectedClipTime.start)}
-              {' - '}
-              {formatTime(selectedClipTime.end)}
-            </span>
-            <Tooltip title="Loop selection (Ctrl + L)">
-              <IconButton
-                onClick={toggleLoop}
-                color={isLoopOn ? 'secondary' : 'default'}
-              >
-                <Loop />
-              </IconButton>
-            </Tooltip>
-          </div>
+          {mediaFile.isVideo && (
+            <VideoStillDisplay
+              flashcard={flashcard}
+              videoFile={mediaFile}
+              onFocus={handleFocus}
+              height={viewMode === 'HORIZONTAL' ? 120 : 85}
+            />
+          )}
         </section>
         <section className={css.formBody}>
           {currentNoteType &&
@@ -240,7 +222,7 @@ const FlashcardSectionForm = memo(
           />
         </section>
 
-        <section className={css.formBottom}>
+        <section className={css.menu}>
           <Tooltip title="Show card preview (Esc)">
             <IconButton
               onClick={handleClickPreviewButton}
@@ -249,18 +231,22 @@ const FlashcardSectionForm = memo(
               <ShortTextTwoTone />
             </IconButton>
           </Tooltip>
+        </section>
+
+        <section className={css.secondaryMenu}>
+          <Tooltip title="Loop selection (Ctrl + L)">
+            <IconButton
+              onClick={toggleLoop}
+              color={isLoopOn ? 'secondary' : 'default'}
+            >
+              <Loop />
+            </IconButton>
+          </Tooltip>{' '}
           <Tooltip title="Delete clip and card">
             <IconButton onClick={handleClickDeleteButton} id={$.deleteButton}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
-          <Menu
-            anchorEl={moreMenuAnchorEl}
-            open={Boolean(moreMenuAnchorEl)}
-            onClose={handleCloseMoreMenu}
-          >
-            <MenuItem onClick={deleteCard}>Delete card</MenuItem>
-          </Menu>
         </section>
       </form>
     )

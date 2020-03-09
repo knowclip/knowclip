@@ -4,7 +4,7 @@ import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { Tooltip, IconButton } from '@material-ui/core'
-import { LibraryAdd, Photo } from '@material-ui/icons'
+import { LibraryAdd, Photo, Loop } from '@material-ui/icons'
 import { useDispatch, useSelector } from 'react-redux'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import useClozeControls from '../utils/useClozeUi'
@@ -58,8 +58,9 @@ const FlashcardSectionPreview = ({
     ),
   })
 
-  const { defaultIncludeStill } = useSelector((state: AppState) => ({
+  const { defaultIncludeStill, isLoopOn } = useSelector((state: AppState) => ({
     defaultIncludeStill: r.getDefaultIncludeStill(state),
+    isLoopOn: r.isLoopOn(state),
   }))
 
   const toggleIncludeStill = useCallback(
@@ -68,7 +69,7 @@ const FlashcardSectionPreview = ({
     },
     [defaultIncludeStill, dispatch]
   )
-
+  const toggleLoop = useCallback(() => dispatch(r.toggleLoop()), [dispatch])
   return (
     <FlashcardSectionDisplay
       className={cn(className, css.preview)}
@@ -79,17 +80,32 @@ const FlashcardSectionPreview = ({
       clozeControls={clozeControls}
       menuItems={
         <>
-          <Tooltip title="Create flashcard from these subtitles (E key)">
+          {(fields.transcription || '').trim() && (
+            <ClozeButtons controls={clozeControls} />
+          )}
+          <Tooltip title="Create flashcard and start editing (E key)">
             <IconButton className={css.editCardButton} onClick={startEditing}>
               <LibraryAdd />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+      secondaryMenuItems={
+        <>
+          <Tooltip title="Loop selection (Ctrl + L)">
+            <IconButton
+              onClick={toggleLoop}
+              color={isLoopOn ? 'secondary' : 'default'}
+            >
+              <Loop />
             </IconButton>
           </Tooltip>
           {mediaFile.isVideo && (
             <Tooltip
               title={
                 defaultIncludeStill
-                  ? 'Click to leave out image'
-                  : 'Click to include image'
+                  ? 'Click to leave out image by default when creating a card'
+                  : 'Click to include image by default when creating a card'
               }
             >
               <IconButton
@@ -102,9 +118,6 @@ const FlashcardSectionPreview = ({
                 <Photo />
               </IconButton>
             </Tooltip>
-          )}
-          {(fields.transcription || '').trim() && (
-            <ClozeButtons controls={clozeControls} />
           )}
         </>
       }

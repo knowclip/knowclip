@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import * as r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
-import { Edit, Photo, Delete } from '@material-ui/icons'
+import { Edit, Photo, Delete, Loop } from '@material-ui/icons'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import { TransliterationFlashcardFields } from '../types/Project'
 import useClozeControls from '../utils/useClozeUi'
@@ -31,6 +31,7 @@ const FlashcardSectionDisplayCard = memo(
       fieldsToTracks,
       flashcard,
       viewMode,
+      isLoopOn,
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),
       selectedClipTime: r.getSelectedClipTime(state),
@@ -119,6 +120,7 @@ const FlashcardSectionDisplayCard = memo(
         [dispatch, flashcard.cloze, flashcard.id]
       ),
     })
+    const toggleLoop = useCallback(() => dispatch(r.toggleLoop()), [dispatch])
 
     return (
       <FlashcardSectionDisplay
@@ -131,6 +133,9 @@ const FlashcardSectionDisplayCard = memo(
         clozeControls={clozeControls}
         menuItems={
           <>
+            {fields.transcription.trim() && (
+              <ClozeButtons controls={clozeControls} />
+            )}
             <Tooltip title="Edit card (E key)">
               <IconButton
                 className={css.editCardButton}
@@ -140,16 +145,16 @@ const FlashcardSectionDisplayCard = memo(
                 <Edit />
               </IconButton>
             </Tooltip>
-            {fields.transcription.trim() && (
-              <ClozeButtons controls={clozeControls} />
-            )}
           </>
         }
         secondaryMenuItems={
           <>
-            <Tooltip title="Delete clip and flashcard">
-              <IconButton onClick={deleteClipAndCard}>
-                <Delete />
+            <Tooltip title="Loop selection (Ctrl + L)">
+              <IconButton
+                onClick={toggleLoop}
+                color={isLoopOn ? 'secondary' : 'default'}
+              >
+                <Loop />
               </IconButton>
             </Tooltip>
             {mediaFile.isVideo && (
@@ -171,6 +176,11 @@ const FlashcardSectionDisplayCard = memo(
                 </IconButton>
               </Tooltip>
             )}
+            <Tooltip title="Delete clip and flashcard">
+              <IconButton onClick={deleteClipAndCard}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
           </>
         }
       />

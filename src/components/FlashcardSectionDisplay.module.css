@@ -11,7 +11,6 @@
 }
 
 .container {
-  /* margin-top: 2rem; */
   text-align: center;
   display: flex;
   flex-flow: column nowrap;
@@ -29,7 +28,8 @@
 .horizontalPreview {
   margin-top: 0;
   font-size: 18px;
-  /* padding: 0 2em; */
+  padding-left: 3em;
+  padding-right: 3em;
 }
 .previewFields {
   flex-grow: 1;
@@ -96,7 +96,6 @@
 }
 
 .clozeNewlinePlaceholder {
-  /* padding-right: .45em; */
   color: rgba(0,0,0,0.3);
 }
 
@@ -109,14 +108,14 @@
   position: absolute;
   bottom: 1rem;
   right: 1rem;
-  /* width: 3em; */
   text-align: left;
+  background-color: rgba(255,255,255,0.8);
+  z-index: 5;
 }
 .secondaryMenu {
   position: absolute;
   bottom: 1rem;
   left: 1rem;
-  /* width: 3em; */
   text-align: left;
 }
 
@@ -208,12 +207,7 @@
 .blank::selection {
   background-color: hsla(var(--cloze-background-hue), 100%, 80%, 80%);
 }
-.clozeValueChar {
-  /* --cloze-selection-hue: 194; */
-}
 .clozeValueChar::selection {
   background-color: hsla(var(--cloze-selection-hue), 100%, 90%, 75%);
-  /* color: hsl(calc(var(--cloze-selection-hue) + 180), 100%, 10%) */
-  color: hsl(calc(var(--cloze-selection-hue) + 150), 20%, 50%);
   color: hsl(calc(var(--cloze-selection-hue) + 150), 100%, 30%);
 }

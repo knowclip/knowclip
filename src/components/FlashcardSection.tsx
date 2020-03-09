@@ -9,7 +9,7 @@ import {
   ChevronRight,
   Subtitles,
   Hearing,
-  Layers,
+  Publish,
 } from '@material-ui/icons'
 import * as actions from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
@@ -100,32 +100,26 @@ const FlashcardSection = ({
         />
       )}
       {highlightedClip && mediaFile && !editing && (
-        // <section className={css.display}>
         <FlashcardDisplay
           mediaFile={mediaFile}
           clipId={highlightedClip.id}
           className={css.flashcardSectionContents}
         />
-        // </section>
       )}
-      {mediaFile && waveformSelection && waveformSelection.type === 'Preview' && (
-        // <section
-        //   className={cn(css.preview, css.display, {
-        //     [css.horizontalIntro]: viewMode === 'HORIZONTAL',
-        //   })}
-        // >
-        <Preview
-          key={waveformSelection.cardBaseIndex}
-          cardBases={subtitles}
-          cardPreviewSelection={waveformSelection}
-          clipsIds={clipsIds}
-          mediaFile={mediaFile}
-          fieldsToTracks={fieldsToTracks}
-          viewMode={viewMode}
-          className={css.flashcardSectionContents}
-        />
-        // </section>
-      )}
+      {mediaFile &&
+        waveformSelection &&
+        waveformSelection.type === 'Preview' && (
+          <Preview
+            key={waveformSelection.cardBaseIndex}
+            cardBases={subtitles}
+            cardPreviewSelection={waveformSelection}
+            clipsIds={clipsIds}
+            mediaFile={mediaFile}
+            fieldsToTracks={fieldsToTracks}
+            viewMode={viewMode}
+            className={css.flashcardSectionContents}
+          />
+        )}
       {!waveformSelection && <Placeholder viewMode={viewMode} />}
       <Tooltip title="Next (→ key)">
         <IconButton
@@ -169,7 +163,7 @@ const Placeholder = ({ viewMode }: { viewMode: ViewMode }) => {
         </li>
       </ul>
       <p className={css.introText}>
-        When you're done, press the <Layers className={css.icon} />{' '}
+        When you're done, press the <Publish className={css.icon} />{' '}
         <strong>export button</strong>.
       </p>
     </section>
