@@ -11,19 +11,24 @@ export default async function reviewAndExportApkg({ client, app }: TestSetup) {
 
   await client.clickElement_(dialog$.continueButton)
 
-  const [first, , third] = await client.elements_(
-    dialogTableRow$.clipCheckboxes
-  )
+  const [first] = await client.elements_(`${dialogTableRow$.clipCheckboxes}`, 3)
 
   await first.click()
   await first.click()
+  const [, , third] = await client.elements_(
+    `${dialogTableRow$.clipCheckboxes}`,
+    3
+  )
   await third.click()
 
-  const checkboxInputs = await client.elements_(
-    `${dialogTableRow$.clipCheckboxes} input`
-  )
-  const checkboxesChecked = async () =>
-    await Promise.all(checkboxInputs.map(cbi => cbi.isSelected()))
+  const checkboxesChecked = async () => {
+    const checkboxInputs = await client.elements_(
+      `${dialogTableRow$.clipCheckboxes} input`,
+      3
+    )
+
+    return await Promise.all(checkboxInputs.map(cbi => cbi.isSelected()))
+  }
 
   expect(await checkboxesChecked()).toMatchObject([true, true, false])
 

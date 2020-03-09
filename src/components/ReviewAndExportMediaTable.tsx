@@ -112,14 +112,6 @@ const ReviewAndExportMediaTable = memo(
             )}
           </CellMeasurer>
         )
-
-        //   <div
-        //   ref={registerChild as (instance: HTMLDivElement | null) => void}
-        //   style={style}
-        //   onLoad={measure}
-        // >
-        //   hihi{' '}{id}
-        // </div>
       },
       [clipsIds, handleSelect, highlightedClipId, selectedIds]
     )
@@ -175,7 +167,7 @@ const ReviewAndExportMediaTable = memo(
               {({ width }) => (
                 <List
                   className={css.table}
-                  height={clipsIds.length ? 400 : 80}
+                  height={clipsIds.length ? 430 : 80}
                   width={width}
                   padding={10}
                   rowHeight={cache.rowHeight}
