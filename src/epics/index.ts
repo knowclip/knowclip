@@ -1,4 +1,4 @@
-import { ignoreElements, mergeAll } from 'rxjs/operators'
+import { ignoreElements, mergeAll, tap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, of } from 'rxjs'
 import * as r from '../redux'
@@ -51,6 +51,12 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 
 const initialize: AppEpic = () => of(r.initializeApp())
 
+const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
+  action$.ofType<SetProgress>(A.SET_PROGRESS).pipe(
+    tap(() => pauseMedia()),
+    ignoreElements()
+  )
+
 const rootEpic: AppEpic = combineEpics(
   initialize,
   addMediaToProject,
@@ -73,7 +79,8 @@ const rootEpic: AppEpic = combineEpics(
   subtitlesLinks,
   files,
   preloadVideoStills,
-  menu
+  menu,
+  pauseOnBusy
 )
 
 export default rootEpic
