@@ -40,6 +40,7 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
         id: existing ? existing.id : uuid(),
         streamIndex,
         parentType: 'MediaFile',
+        chunksCount: null,
       }
     )
   })
@@ -64,6 +65,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
           type: 'ExternalSubtitlesFile',
           name: availability.name,
           parentId: mediaFileId,
+          chunksCount: null,
         }
       )
     }),

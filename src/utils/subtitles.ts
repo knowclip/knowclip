@@ -163,9 +163,36 @@ export const getSubtitlesFromFile = async (
   state: AppState,
   sourceFilePath: string
 ) => {
-  const extension = extname(sourceFilePath).toLowerCase()
-  const fileContents = await readFile(sourceFilePath, 'utf8')
-  return parseSubtitles(state, fileContents, extension)
+  try {
+    const extension = extname(sourceFilePath).toLowerCase()
+    const fileContents = await readFile(sourceFilePath, 'utf8')
+    return parseSubtitles(state, fileContents, extension)
+  } catch (error) {
+    return { error }
+  }
+}
+
+export const validateSubtitlesFromFile = async (
+  state: AppState,
+  sourceFilePath: string,
+  existingFile: ExternalSubtitlesFile
+) => {
+  try {
+    const differences: { attribute: string; name: string }[] = []
+
+    const extension = extname(sourceFilePath).toLowerCase()
+    const fileContents = await readFile(sourceFilePath, 'utf8')
+    const parsed = parseSubtitles(state, fileContents, extension)
+
+    if (
+      typeof existingFile.chunksCount === 'number' &&
+      parsed.length !== existingFile.chunksCount
+    )
+      differences.push({ attribute: 'chunksCount', name: 'number of cues' })
+    return differences.length ? { differences } : { success: true }
+  } catch (error) {
+    return { error }
+  }
 }
 
 export const newEmbeddedSubtitlesTrack = (

@@ -1,19 +1,37 @@
 import * as r from '../redux'
-import { newExternalSubtitlesTrack } from '../utils/subtitles'
+import {
+  newExternalSubtitlesTrack,
+  getSubtitlesFromFile,
+} from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
 import { extname } from 'path'
+import { readFile } from 'fs-extra'
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => [
-    r.openFileSuccess(file, filePath),
-  ],
-
+  openRequest: async ({ file }, filePath, state, effects) => {
+    try {
+      const fileContents = await readFile(filePath, 'utf8')
+      const parsed = getSubtitlesFromFile(state, filePath)
+    } catch (err) {}
+    return [r.openFileSuccess(file, filePath)]
+  },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
       if (isVtt(filePath)) {
         const chunks = await effects.getSubtitlesFromFile(state, filePath)
+
+        if ('error' in chunks) {
+          return [
+            r.simpleMessageSnackbar(
+              `There was a problem reading subtitles from ${
+                validatedFile.name
+              }: ${chunks.error}`
+            ),
+          ]
+        }
+
         const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
         const mediaFile = r.getFile<MediaFile>(
           state,
@@ -47,6 +65,7 @@ export default {
               id: validatedFile.id,
               parentId: validatedFile.id, // not needed?
               parentType: 'ExternalSubtitlesFile',
+              chunksCount: null,
             }
           ),
         ]

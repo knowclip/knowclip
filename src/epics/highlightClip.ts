@@ -1,8 +1,7 @@
 import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { empty, of, from } from 'rxjs'
+import { empty, of } from 'rxjs'
 import * as r from '../redux'
-import { isMediaFileLoaded } from '../selectors'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -90,10 +89,8 @@ const highlightRightEpic: AppEpic = (
     ofType<Action, HighlightRightClipRequest>(A.HIGHLIGHT_RIGHT_CLIP_REQUEST),
     switchMap(() => {
       const state = state$.value
-      console.log('isMediaFileLoaded', r.isMediaFileLoaded(state))
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
-      console.log({ currentFileId })
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
       const currentIndex = selection ? selection.index : -1
@@ -101,7 +98,7 @@ const highlightRightEpic: AppEpic = (
       if (selection && nextIndex !== -1) {
         const lastIndex = waveformItems.length - 1
         const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
-        debugger
+
         if (next) {
           setCurrentTime(
             r.getSecondsAtX(
@@ -119,7 +116,6 @@ const highlightRightEpic: AppEpic = (
 
       const next =
         waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
-      debugger
       if (next) {
         setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
         return r.isMediaFileLoaded(state)
@@ -146,10 +142,10 @@ const highlightLeftEpic: AppEpic = (
 ) =>
   action$.pipe(
     ofType<Action, HighlightLeftClipRequest>(A.HIGHLIGHT_LEFT_CLIP_REQUEST),
-    tap(() => {
+    switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return
+      if (!currentFileId) return empty()
 
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
@@ -163,8 +159,12 @@ const highlightLeftEpic: AppEpic = (
               : highlightedIndex - 1
           ]
 
-        if (prev)
-          return setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+        if (prev) {
+          setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+          return r.isMediaFileLoaded(state)
+            ? empty()
+            : of(r.selectWaveformItem(prev))
+        }
       }
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
@@ -172,9 +172,15 @@ const highlightLeftEpic: AppEpic = (
         findLast(waveformItems, ({ item }) => item.end <= x) ||
         waveformItems[waveformItems.length - 1]
 
-      if (prev) setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
-    }),
-    ignoreElements()
+      if (prev) {
+        setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+        return r.isMediaFileLoaded(state)
+          ? empty()
+          : of(r.selectWaveformItem(prev))
+      }
+
+      return empty()
+    })
   )
 
 export default combineEpics(

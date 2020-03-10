@@ -54,7 +54,7 @@ const FlashcardSectionFieldPopoverMenu = ({
           <MoreVert />
         </IconButton>
       </Tooltip>
-      {subtitlesPopover.isOpen && (
+      {subtitlesPopover.isOpen && subtitlesPopover.anchorEl && (
         <Popover
           anchorEl={subtitlesPopover.anchorEl}
           open={subtitlesPopover.isOpen}

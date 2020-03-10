@@ -37,12 +37,24 @@ export default {
       if (validatedFile.parentType === 'MediaFile') {
         if (r.getCurrentFileId(state) !== sourceFile.id) return []
 
-        const track = newEmbeddedSubtitlesTrack(validatedFile.id, chunks)
         const mediaFile = r.getFile<MediaFile>(
           state,
           'MediaFile',
           validatedFile.parentId
         )
+
+        if ('error' in chunks) {
+          return [
+            r.simpleMessageSnackbar(
+              `There was a problem reading subtitles from ${
+                mediaFile ? mediaFile.name : 'media file'
+              }: ${chunks.error}`
+            ),
+          ]
+        }
+
+        const track = newEmbeddedSubtitlesTrack(validatedFile.id, chunks)
+
         return [
           ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
             ? [
@@ -59,6 +71,15 @@ export default {
         'ExternalSubtitlesFile',
         validatedFile.parentId
       ) as ExternalSubtitlesFile
+      if ('error' in chunks) {
+        return [
+          r.simpleMessageSnackbar(
+            `There was a problem reading subtitles from ${
+              external ? external.name : 'media file'
+            }: ${chunks.error}`
+          ),
+        ]
+      }
       const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
       const mediaFile = r.getFile<MediaFile>(
         state,

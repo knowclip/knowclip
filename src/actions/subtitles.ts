@@ -39,6 +39,7 @@ export const loadNewSubtitlesFile = (
       parentId: mediaFileId,
       id: uuid(),
       name: basename(filePath),
+      chunksCount: null,
     },
     filePath
   )

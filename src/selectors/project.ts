@@ -1,7 +1,10 @@
 import moment from 'moment'
 import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
-import { getSubtitlesSourceFile } from './subtitles'
+import {
+  getSubtitlesSourceFile,
+  getSubtitlesFilesWithTracks,
+} from './subtitles'
 import { getClipIdsByMediaFileId, getClip, getFlashcard } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
@@ -64,6 +67,7 @@ export const getProjectJson = <F extends FlashcardFields>(
   fieldsTemplate: F
 ): ProjectJson<F> => {
   const mediaFiles = getProjectMediaFiles(state, file.id)
+
   return {
     project: {
       name: file.name,
@@ -77,23 +81,25 @@ export const getProjectJson = <F extends FlashcardFields>(
       (mediaFile): MediaJson<F> => {
         const { name, format, durationSeconds, id } = mediaFile
 
-        const externalSubtitles: ExternalSubtitlesJson[] = mediaFile.subtitles
+        const externalSubtitles = mediaFile.subtitles
           .filter(
             (s): s is ExternalSubtitlesTrack =>
               s.type === 'ExternalSubtitlesTrack'
           )
-          .map(s => ({
-            id: s.id,
-            type: 'External',
-            name: (
-              (getSubtitlesSourceFile(
+          .map(
+            (s): ExternalSubtitlesJson => {
+              const sourceFile = getSubtitlesSourceFile(
                 state,
                 s.id
-              ) as ExternalSubtitlesFile | null) || {
-                name: 'External subtitles file',
+              ) as ExternalSubtitlesFile | null
+              return {
+                id: s.id,
+                type: 'External',
+                chunksCount: sourceFile ? sourceFile.chunksCount : null,
+                name: sourceFile ? sourceFile.name : 'External subtitles file',
               }
-            ).name,
-          }))
+            }
+          )
         const embeddedSubtitles = mediaFile.subtitlesTracksStreamIndexes
           .map(streamIndex => {
             for (const s of mediaFile.subtitles) {
@@ -105,12 +111,19 @@ export const getProjectJson = <F extends FlashcardFields>(
                 file.type === 'VttConvertedSubtitlesFile' &&
                 file.parentType === 'MediaFile' &&
                 file.streamIndex === streamIndex
-              )
-                return {
+              ) {
+                const sourceFile = getSubtitlesSourceFile(
+                  state,
+                  s.id
+                ) as VttFromEmbeddedSubtitles | null
+                const subtitles: EmbeddedSubtitlesJson = {
                   id: file.id,
                   streamIndex: streamIndex,
                   type: 'Embedded',
+                  chunksCount: sourceFile ? sourceFile.chunksCount : null,
                 }
+                return subtitles
+              }
             }
           })
           .filter((s): s is EmbeddedSubtitlesJson => Boolean(s))

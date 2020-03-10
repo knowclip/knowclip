@@ -22,6 +22,7 @@ import { loadNewSubtitlesFile, makeClipsFromSubtitles } from '../../actions'
 import { SubtitlesFileWithTrack } from '../../redux'
 import { MediaSubtitles } from '../../selectors'
 import { TransliterationFlashcardFields } from '../../types/Project'
+import { getFileFilters } from '../../utils/files'
 
 enum $ {
   loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
@@ -143,9 +144,9 @@ const SubtitlesClipsDialog = ({
   const onClickLoadExternal = useCallback(
     async () => {
       if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
-      const filePaths = await showOpenDialog([
-        { name: 'Subtitles', extensions: ['srt', 'ass', 'vtt'] },
-      ])
+      const filePaths = await showOpenDialog(
+        getFileFilters('ExternalSubtitlesFile')
+      )
       if (!filePaths) return
 
       dispatch(loadNewSubtitlesFile(filePaths[0], currentFileId))

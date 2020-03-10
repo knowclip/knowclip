@@ -91,6 +91,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
               streamIndex: s.streamIndex,
               parentId: m.id,
               parentType: 'MediaFile',
+              chunksCount: s.chunksCount,
             }
           : {
               type: 'ExternalSubtitlesFile',
@@ -98,6 +99,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
               name: s.name,
               parentId: m.id,
               parentType: 'MediaFile',
+              chunksCount: s.chunksCount,
             }
     )
     const base: AudioFile = {
