@@ -26,17 +26,19 @@ export default {
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      const sourceFile = r.getFileAvailabilityById(
+      const source = r.getFileAvailabilityById(
         state,
         validatedFile.parentType,
         validatedFile.parentId
       )
-      if (!(sourceFile && sourceFile.filePath)) return []
+      const sourceFile = r.getSubtitlesSourceFile(state, validatedFile.id)
+
+      if (!(source && source.filePath && sourceFile)) return []
 
       const chunks = await effects.getSubtitlesFromFile(state, filePath)
 
       if (validatedFile.parentType === 'MediaFile') {
-        if (r.getCurrentFileId(state) !== sourceFile.id) return []
+        if (r.getCurrentFileId(state) !== source.id) return []
 
         const mediaFile = r.getFile<MediaFile>(
           state,
@@ -64,6 +66,10 @@ export default {
               ]
             : []),
           r.mountSubtitlesTrack(track),
+          // r.addFile({
+          //   ...sourceFile,
+          //   chunksMetadata: validatedFile.chunksMetadata,
+          // }),
         ]
       }
 
@@ -99,6 +105,10 @@ export default {
             ]
           : []),
         r.mountSubtitlesTrack(track),
+        // r.addFile({
+        //   ...sourceFile,
+        //   chunksMetadata: validatedFile.chunksMetadata,
+        // }),
       ]
     },
   ],

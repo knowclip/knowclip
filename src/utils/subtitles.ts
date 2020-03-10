@@ -172,31 +172,36 @@ export const getSubtitlesFromFile = async (
   }
 }
 
-export const validateBeforeOpenFileAction = async (
+export const validateBeforeOpenFileAction = async <S extends SubtitlesFile>(
   state: AppState,
   sourceFilePath: string,
-  existingFile: SubtitlesFile
+  existingFile: S
 ) => {
   const validation = await validateSubtitlesFromFilePath(
     state,
     sourceFilePath,
     existingFile
   )
-  if (validation.valid) return [r.openFileSuccess(existingFile, sourceFilePath)]
+
+  const newChunksMetadata = validation.newChunksMetadata
+    ? { chunksMetadata: validation.newChunksMetadata }
+    : null
+  const file: S = newChunksMetadata
+    ? {
+        ...existingFile,
+        ...newChunksMetadata,
+      }
+    : existingFile
+  if (validation.valid) {
+    return [r.openFileSuccess(file, sourceFilePath)]
+  }
 
   if (validation.differences)
+    // better "changes?"
     return [
       r.confirmationDialog(
         validation.message,
-        r.openFileSuccess(
-          {
-            ...existingFile,
-            ...(validation.newChunksMetadata
-              ? { newChunksMetadata: validation.newChunksMetadata }
-              : null),
-          },
-          sourceFilePath
-        ),
+        r.openFileSuccess(file, sourceFilePath),
         r.openFileFailure(
           existingFile,
           sourceFilePath,
@@ -223,30 +228,37 @@ export const validateSubtitlesFromFilePath = async (
 
     const { chunksMetadata } = existingFile
 
+    const endChunk = parsed[parsed.length - 1]
+    const endCue = endChunk ? endChunk.end : null
+    const newChunksMetadata =
+      parsed.length && typeof endCue === 'number'
+        ? {
+            count: parsed.length,
+            endCue: endCue,
+          }
+        : null
+
     if (chunksMetadata) {
-      if (parsed.length !== chunksMetadata.count)
+      if (chunksMetadata.count !== parsed.length)
         differences.push({ attribute: 'count', name: 'number of cues' })
 
-      const endChunk = parsed[parsed.length - 1]
-      const endCue = endChunk ? endChunk.end : null
-      if (chunksMetadata.count !== endCue)
+      if (chunksMetadata.endCue !== endCue)
         differences.push({ attribute: 'endCue', name: 'timing' })
 
       if (differences.length)
         return {
           differences,
-          newChunksMetadata: parsed.length
-            ? {
-                count: parsed.length,
-                endCue: endCue || null,
-              }
-            : null,
-          message: `This media file differs from the one on record by:\n\n ${differences
+          newChunksMetadata,
+          message: `This ${
+            'name' in existingFile
+              ? `subtitles file "${existingFile.name}"`
+              : `embedded subtitles track`
+          } differs from the one on record by:\n\n ${differences
             .map(({ name }) => name)
             .join('\n')}. \n\nAre you sure this is the file you want to open?`,
         }
     }
-    return { valid: true }
+    return { valid: true, newChunksMetadata }
   } catch (error) {
     return { error }
   }

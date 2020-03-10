@@ -61,7 +61,9 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
       for (const clip of action.clips) {
         byId[clip.id] = clip
-        idsByMediaFileId[clip.fileId].push(clip.id)
+        idsByMediaFileId[clip.fileId].push(clip.id) // ToDO:
+        // crash here `TypeError: Cannot read property 'push' of undefined`
+        // after locating missing project file
       }
       for (const fileId in idsByMediaFileId) {
         idsByMediaFileId[fileId].sort(byStart(byId))

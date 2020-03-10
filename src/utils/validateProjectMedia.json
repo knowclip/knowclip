@@ -138,6 +138,29 @@
     "EmbeddedSubtitlesJson": {
       "additionalProperties": false,
       "properties": {
+        "chunksMetadata": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "endCue": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count",
+                "endCue"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "id": {
           "type": "string"
         },
@@ -154,13 +177,37 @@
       "required": [
         "type",
         "streamIndex",
-        "id"
+        "id",
+        "chunksMetadata"
       ],
       "type": "object"
     },
     "ExternalSubtitlesJson": {
       "additionalProperties": false,
       "properties": {
+        "chunksMetadata": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "endCue": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count",
+                "endCue"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "id": {
           "type": "string"
         },
@@ -177,7 +224,8 @@
       "required": [
         "type",
         "name",
-        "id"
+        "id",
+        "chunksMetadata"
       ],
       "type": "object"
     },

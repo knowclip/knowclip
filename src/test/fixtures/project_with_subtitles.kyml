@@ -14,8 +14,14 @@ subtitles:
   - id: 5f581055-dbf5-4f3b-bcee-a3215e405ffc
     streamIndex: 2
     type: Embedded
+    chunksMetadata:
+      count: 26
+      endCue: 4321.5
   - id: a8b64692-dba0-4ef4-b5e7-8c887956a69a
     type: External
+    chunksMetadata:
+      count: 15
+      endCue: 4336.5
     name: pbc_jp.ass
 clips:
   - id: 6b02575a-0a4f-402a-8ea3-31f457cb5d8c

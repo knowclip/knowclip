@@ -89,6 +89,7 @@ export const getProjectJson = <F extends FlashcardFields>(
                 state,
                 s.id
               ) as ExternalSubtitlesFile | null
+              console.log({ s, sourceFile })
               return {
                 id: s.id,
                 type: 'External',
@@ -113,6 +114,7 @@ export const getProjectJson = <F extends FlashcardFields>(
                   state,
                   s.id
                 ) as VttFromEmbeddedSubtitles | null
+                console.log({ s, sourceFile })
                 const subtitles: EmbeddedSubtitlesJson = {
                   id: file.id,
                   streamIndex: streamIndex,
@@ -143,7 +145,7 @@ export const getProjectJson = <F extends FlashcardFields>(
           ),
           id,
         }
-
+        console.log({ subtitles })
         if (subtitles.length) newMediaFile.subtitles = subtitles
         if (clips.length) newMediaFile.clips = clips
         if (Object.keys(mediaFile.flashcardFieldsToSubtitlesTracks).length)
@@ -252,6 +254,7 @@ export const getProjectFileContents = (
     projectFile,
     getFieldsTemplate(projectFile)
   )
+  console.log({ media })
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
     [project, ...media].map(o => YAML.stringify(o)).join('---\n')
