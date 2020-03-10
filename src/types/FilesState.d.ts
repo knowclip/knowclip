@@ -88,7 +88,7 @@ declare type ExternalSubtitlesFile = {
   id: FileId
   parentId: MediaFileId
   name: string
-  chunksCount: number | null
+  chunksMetadata: SubtitlesChunksMetadata | null
 }
 declare type VttConvertedSubtitlesFile =
   | VttFromExternalSubtitles
@@ -98,7 +98,7 @@ declare type VttFromExternalSubtitles = {
   id: FileId
   parentId: FileId // TODO: verify that this shouldn't be media file id
   parentType: 'ExternalSubtitlesFile'
-  chunksCount: number | null
+  chunksMetadata: SubtitlesChunksMetadata | null
 }
 declare type VttFromEmbeddedSubtitles = {
   type: 'VttConvertedSubtitlesFile'
@@ -106,7 +106,11 @@ declare type VttFromEmbeddedSubtitles = {
   parentId: MediaFileId
   streamIndex: number
   parentType: 'MediaFile'
-  chunksCount: number | null
+  chunksMetadata: SubtitlesChunksMetadata | null
+}
+declare type SubtitlesChunksMetadata = {
+  count: number
+  endCue: number
 }
 
 declare type WaveformPng = {

@@ -95,7 +95,7 @@ export const getProjectJson = <F extends FlashcardFields>(
               return {
                 id: s.id,
                 type: 'External',
-                chunksCount: sourceFile ? sourceFile.chunksCount : null,
+                chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
                 name: sourceFile ? sourceFile.name : 'External subtitles file',
               }
             }
@@ -120,7 +120,7 @@ export const getProjectJson = <F extends FlashcardFields>(
                   id: file.id,
                   streamIndex: streamIndex,
                   type: 'Embedded',
-                  chunksCount: sourceFile ? sourceFile.chunksCount : null,
+                  chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
                 }
                 return subtitles
               }

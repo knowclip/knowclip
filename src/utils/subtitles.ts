@@ -172,10 +172,47 @@ export const getSubtitlesFromFile = async (
   }
 }
 
-export const validateSubtitlesFromFile = async (
+export const validateBeforeOpenFileAction = async (
   state: AppState,
   sourceFilePath: string,
-  existingFile: ExternalSubtitlesFile
+  existingFile: SubtitlesFile
+) => {
+  const validation = await validateSubtitlesFromFilePath(
+    state,
+    sourceFilePath,
+    existingFile
+  )
+  if (validation.valid) return [r.openFileSuccess(existingFile, sourceFilePath)]
+
+  if (validation.differences)
+    return [
+      r.confirmationDialog(
+        validation.message,
+        r.openFileSuccess(
+          {
+            ...existingFile,
+            ...(validation.newChunksMetadata
+              ? { newChunksMetadata: validation.newChunksMetadata }
+              : null),
+          },
+          sourceFilePath
+        ),
+        r.openFileFailure(
+          existingFile,
+          sourceFilePath,
+          `Some features may be unavailable until your file is located.`
+        ),
+        true
+      ),
+    ]
+
+  return [r.openFileFailure(existingFile, sourceFilePath, validation.error)]
+}
+
+export const validateSubtitlesFromFilePath = async (
+  state: AppState,
+  sourceFilePath: string,
+  existingFile: SubtitlesFile
 ) => {
   try {
     const differences: { attribute: string; name: string }[] = []
@@ -184,12 +221,32 @@ export const validateSubtitlesFromFile = async (
     const fileContents = await readFile(sourceFilePath, 'utf8')
     const parsed = parseSubtitles(state, fileContents, extension)
 
-    if (
-      typeof existingFile.chunksCount === 'number' &&
-      parsed.length !== existingFile.chunksCount
-    )
-      differences.push({ attribute: 'chunksCount', name: 'number of cues' })
-    return differences.length ? { differences } : { success: true }
+    const { chunksMetadata } = existingFile
+
+    if (chunksMetadata) {
+      if (parsed.length !== chunksMetadata.count)
+        differences.push({ attribute: 'count', name: 'number of cues' })
+
+      const endChunk = parsed[parsed.length - 1]
+      const endCue = endChunk ? endChunk.end : null
+      if (chunksMetadata.count !== endCue)
+        differences.push({ attribute: 'endCue', name: 'timing' })
+
+      if (differences.length)
+        return {
+          differences,
+          newChunksMetadata: parsed.length
+            ? {
+                count: parsed.length,
+                endCue: endCue || null,
+              }
+            : null,
+          message: `This media file differs from the one on record by:\n\n ${differences
+            .map(({ name }) => name)
+            .join('\n')}. \n\nAre you sure this is the file you want to open?`,
+        }
+    }
+    return { valid: true }
   } catch (error) {
     return { error }
   }

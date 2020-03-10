@@ -1,21 +1,16 @@
 import * as r from '../redux'
 import {
   newExternalSubtitlesTrack,
-  getSubtitlesFromFile,
+  validateBeforeOpenFileAction,
 } from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
 import { extname } from 'path'
-import { readFile } from 'fs-extra'
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
-    try {
-      const fileContents = await readFile(filePath, 'utf8')
-      const parsed = getSubtitlesFromFile(state, filePath)
-    } catch (err) {}
-    return [r.openFileSuccess(file, filePath)]
+    return await validateBeforeOpenFileAction(state, filePath, file)
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
@@ -65,7 +60,7 @@ export default {
               id: validatedFile.id,
               parentId: validatedFile.id, // not needed?
               parentType: 'ExternalSubtitlesFile',
-              chunksCount: null,
+              chunksMetadata: null,
             }
           ),
         ]

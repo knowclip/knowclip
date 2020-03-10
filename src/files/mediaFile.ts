@@ -8,6 +8,127 @@ import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 import { existsSync } from 'fs-extra'
 
+const handlers = (): FileEventHandlers<MediaFile> => ({
+  openRequest: async ({ file }, filePath, state, effects) => {
+    effects.pauseMedia()
+    // mediaPlayer.src = ''
+
+    const validationResult = await validateMediaFile(file, filePath)
+    if (validationResult instanceof AsyncError)
+      return [
+        r.openFileFailure(
+          file,
+          filePath,
+          `Problem opening ${getHumanFileName(
+            file
+          )}: ${validationResult.message || 'problem reading file.'}`
+        ),
+      ]
+    const [errorMessage, validatedFile] = validationResult
+    if (errorMessage)
+      return [
+        r.confirmationDialog(
+          errorMessage + '\n\nAre you sure this is the file you want to open?',
+          r.openFileSuccess(validatedFile, filePath),
+          r.openFileFailure(
+            file,
+            filePath,
+            `Some features may be unavailable until your file is located.`
+          ),
+          true
+        ),
+      ]
+
+    return [r.openFileSuccess(validatedFile, filePath)]
+  },
+
+  openSuccess: [
+    addEmbeddedSubtitles,
+    loadExternalSubtitles,
+    getCbr,
+    getWaveform,
+    setDefaultClipSpecs,
+  ],
+  locateRequest: async (action, availability, state, effects) => {
+    const autoSearchDirectories = r.getAssetsDirectories(state)
+
+    // works while fileavailability names can't be changed...
+    for (const directory of autoSearchDirectories) {
+      const nameMatch = join(directory, basename(availability.name))
+      const matchingFile =
+        existsSync(nameMatch) &&
+        (await validateMediaFile(action.file, nameMatch))
+
+      if (matchingFile && !(matchingFile instanceof AsyncError))
+        return [r.locateFileSuccess(action.file, nameMatch)]
+    }
+
+    return [r.fileSelectionDialog(action.message, action.file)]
+  },
+  locateSuccess: null,
+  deleteRequest: [
+    async (file, availability, descendants, state) => [
+      r.deleteFileSuccess(availability, descendants),
+    ],
+  ],
+  deleteSuccess: [],
+})
+
+export const validateMediaFile = async (
+  existingFile: MediaFile,
+  filePath: string
+): Promise<[string | null, MediaFile] | AsyncError> => {
+  const newFile = await readMediaFile(
+    filePath,
+    existingFile.id,
+    existingFile.parentId,
+    existingFile.subtitles,
+    existingFile.flashcardFieldsToSubtitlesTracks
+  )
+
+  if (newFile instanceof AsyncError) return newFile
+
+  const differences: { [attribute: string]: [string, string] } = {}
+
+  if (existingFile.name !== newFile.name)
+    differences.name = [existingFile.name, newFile.name]
+  if (existingFile.durationSeconds !== newFile.durationSeconds)
+    differences.duration = [
+      formatDurationWithMilliseconds(
+        moment.duration({ seconds: existingFile.durationSeconds })
+      ),
+      formatDurationWithMilliseconds(
+        moment.duration({ seconds: newFile.durationSeconds })
+      ),
+    ]
+  if (existingFile.format !== newFile.format)
+    differences.format = [existingFile.format, newFile.format]
+  if (
+    existingFile.subtitlesTracksStreamIndexes.sort().toString() !==
+    newFile.subtitlesTracksStreamIndexes.sort().toString()
+  )
+    differences['subtitles streams'] = [
+      existingFile.subtitlesTracksStreamIndexes.join(', '),
+      newFile.subtitlesTracksStreamIndexes.join(', '),
+    ]
+
+  if (Object.keys(differences).length) {
+    return [
+      `This media file differs from the one on record by:\n\n ${Object.entries(
+        differences
+      )
+        .map(
+          ([attr, [old, current]]) =>
+            `${attr}: "${current}" for this file instead of "${old}"`
+        )
+        .join('\n')}.`,
+      newFile,
+    ]
+  }
+
+  return [null, newFile]
+}
+
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
   state,
@@ -40,7 +161,7 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
         id: existing ? existing.id : uuid(),
         streamIndex,
         parentType: 'MediaFile',
-        chunksCount: null,
+        chunksMetadata: null,
       }
     )
   })
@@ -65,7 +186,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
           type: 'ExternalSubtitlesFile',
           name: availability.name,
           parentId: mediaFileId,
-          chunksCount: null,
+          chunksMetadata: null,
         }
       )
     }),
@@ -151,123 +272,4 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
   return [r.setDefaultClipSpecs({ tags: [] })]
 }
 
-export default {
-  openRequest: async ({ file }, filePath, state, effects) => {
-    effects.pauseMedia()
-    // mediaPlayer.src = ''
-
-    const validationResult = await validateMediaFile(file, filePath)
-    if (validationResult instanceof AsyncError)
-      return [
-        r.openFileFailure(
-          file,
-          filePath,
-          `Problem opening ${getHumanFileName(
-            file
-          )}: ${validationResult.message || 'problem reading file.'}`
-        ),
-      ]
-    const [errorMessage, validatedFile] = validationResult
-    if (errorMessage)
-      return [
-        r.confirmationDialog(
-          errorMessage + '\n\nAre you sure this is the file you want to open?',
-          r.openFileSuccess(validatedFile, filePath),
-          r.openFileFailure(
-            file,
-            filePath,
-            `Some features may be unavailable until your file is located.`
-          ),
-          true
-        ),
-      ]
-
-    return [r.openFileSuccess(validatedFile, filePath)]
-  },
-
-  openSuccess: [
-    addEmbeddedSubtitles,
-    loadExternalSubtitles,
-    getCbr,
-    getWaveform,
-    setDefaultClipSpecs,
-  ],
-  locateRequest: async (action, availability, state, effects) => {
-    const autoSearchDirectories = r.getAssetsDirectories(state)
-
-    // works while fileavailability names can't be changed...
-    for (const directory of autoSearchDirectories) {
-      const nameMatch = join(directory, basename(availability.name))
-      const matchingFile =
-        existsSync(nameMatch) &&
-        (await validateMediaFile(action.file, nameMatch))
-
-      if (matchingFile && !(matchingFile instanceof AsyncError))
-        return [r.locateFileSuccess(action.file, nameMatch)]
-    }
-
-    return [r.fileSelectionDialog(action.message, action.file)]
-  },
-  locateSuccess: null,
-  deleteRequest: [
-    async (file, availability, descendants, state) => [
-      r.deleteFileSuccess(availability, descendants),
-    ],
-  ],
-  deleteSuccess: [],
-} as FileEventHandlers<MediaFile>
-
-export const validateMediaFile = async (
-  existingFile: MediaFile,
-  filePath: string
-): Promise<[string | null, MediaFile] | AsyncError> => {
-  const newFile = await readMediaFile(
-    filePath,
-    existingFile.id,
-    existingFile.parentId,
-    existingFile.subtitles,
-    existingFile.flashcardFieldsToSubtitlesTracks
-  )
-
-  if (newFile instanceof AsyncError) return newFile
-
-  const differences: { [attribute: string]: [string, string] } = {}
-
-  if (existingFile.name !== newFile.name)
-    differences.name = [existingFile.name, newFile.name]
-  if (existingFile.durationSeconds !== newFile.durationSeconds)
-    differences.duration = [
-      formatDurationWithMilliseconds(
-        moment.duration({ seconds: existingFile.durationSeconds })
-      ),
-      formatDurationWithMilliseconds(
-        moment.duration({ seconds: newFile.durationSeconds })
-      ),
-    ]
-  if (existingFile.format !== newFile.format)
-    differences.format = [existingFile.format, newFile.format]
-  if (
-    existingFile.subtitlesTracksStreamIndexes.sort().toString() !==
-    newFile.subtitlesTracksStreamIndexes.sort().toString()
-  )
-    differences['subtitles streams'] = [
-      existingFile.subtitlesTracksStreamIndexes.join(', '),
-      newFile.subtitlesTracksStreamIndexes.join(', '),
-    ]
-
-  if (Object.keys(differences).length) {
-    return [
-      `This media file differs from the one on record by:\n\n ${Object.entries(
-        differences
-      )
-        .map(
-          ([attr, [old, current]]) =>
-            `${attr}: "${current}" for this file instead of "${old}"`
-        )
-        .join('\n')}.`,
-      newFile,
-    ]
-  }
-
-  return [null, newFile]
-}
+export default handlers()

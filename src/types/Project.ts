@@ -54,13 +54,13 @@ export type EmbeddedSubtitlesJson = {
   type: 'Embedded'
   streamIndex: number
   id: string
-  chunksCount: number | null
+  chunksMetadata: SubtitlesChunksMetadata | null
 }
 export type ExternalSubtitlesJson = {
   type: 'External'
   name: string
   id: string
-  chunksCount: number | null
+  chunksMetadata: SubtitlesChunksMetadata | null
 }
 
 export type ProjectJson<F extends FlashcardFields> = {

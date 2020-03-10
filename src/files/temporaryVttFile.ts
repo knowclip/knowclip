@@ -2,6 +2,7 @@ import * as r from '../redux'
 import {
   newExternalSubtitlesTrack,
   newEmbeddedSubtitlesTrack,
+  validateBeforeOpenFileAction,
 } from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
 
@@ -21,7 +22,7 @@ export default {
       file
     )
 
-    return [r.openFileSuccess(file, vttFilePath)]
+    return await validateBeforeOpenFileAction(state, vttFilePath, file)
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
@@ -126,7 +127,7 @@ export default {
               source.filePath,
               file
             )
-            return [r.locateFileSuccess(file, tmpFilePath)]
+            return await validateBeforeOpenFileAction(state, tmpFilePath, file)
           }
           case 'ExternalSubtitlesFile':
             const tmpFilePath = await effects.getSubtitlesFilePath(
@@ -134,7 +135,7 @@ export default {
               source.filePath,
               file
             )
-            return [r.locateFileSuccess(file, tmpFilePath)]
+            return await validateBeforeOpenFileAction(state, tmpFilePath, file)
         }
       }
     } catch (err) {
