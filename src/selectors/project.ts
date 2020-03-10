@@ -1,10 +1,7 @@
 import moment from 'moment'
 import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
-import {
-  getSubtitlesSourceFile,
-  getSubtitlesFilesWithTracks,
-} from './subtitles'
+import { getSubtitlesSourceFile } from './subtitles'
 import { getClipIdsByMediaFileId, getClip, getFlashcard } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import { getSecondsAtX } from './waveformTime'
@@ -125,6 +122,8 @@ export const getProjectJson = <F extends FlashcardFields>(
                 return subtitles
               }
             }
+
+            return undefined
           })
           .filter((s): s is EmbeddedSubtitlesJson => Boolean(s))
         const subtitles: SubtitlesJson[] = [
