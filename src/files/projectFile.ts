@@ -6,8 +6,9 @@ import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
 import { AsyncError } from '../utils/ffmpeg'
 import { arrayToMapById } from '../utils/arrayToMapById'
+import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 
-export default {
+const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openRequest: async ({ file }, filePath, state, effects) => {
     try {
       const parse = await parseProjectJson(filePath)
@@ -78,6 +79,36 @@ export default {
         }
       }
 
+      const newlyAutoFoundSubtitlesPaths: {
+        [id: string]:
+          | { singleMatch: string }
+          | { multipleMatches: true; singleMatch: undefined }
+          | undefined
+      } = {}
+      for (const subtitlesFile of subtitles.filter(
+        s => !(r.getFileAvailability(state, s) || { filePath: null }).filePath
+      )) {
+        if (subtitlesFile.type !== 'ExternalSubtitlesFile') continue
+        // works while subtitles files names can't be changed...
+        for (const directory of r.getAssetsDirectories(state)) {
+          const nameMatch = join(directory, basename(subtitlesFile.name))
+          const matchingFile = existsSync(nameMatch)
+            ? await validateSubtitlesFromFilePath(
+                state,
+                nameMatch,
+                subtitlesFile
+              )
+            : null
+
+          if (matchingFile && matchingFile.valid)
+            newlyAutoFoundSubtitlesPaths[
+              subtitlesFile.id
+            ] = newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
+              ? { multipleMatches: true, singleMatch: undefined }
+              : { singleMatch: nameMatch }
+        }
+      }
+
       const addNewMediaFiles = media
         .filter(mediaFile => !r.getFile(state, 'MediaFile', mediaFile.id))
         .map(mediaFile => {
@@ -90,7 +121,13 @@ export default {
         .filter(
           subtitlesFile => !r.getSubtitlesSourceFile(state, subtitlesFile.id)
         )
-        .map(subtitlesFile => r.addFile(subtitlesFile))
+        .map(subtitlesFile => {
+          const existingPath = newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
+          return r.addFile(
+            subtitlesFile,
+            existingPath ? existingPath.singleMatch : undefined
+          )
+        })
 
       const loadFirstMediaFile = media.length
         ? [r.openFileRequest(media[0])]
@@ -122,4 +159,6 @@ export default {
     ],
   ],
   deleteSuccess: [async (action, state) => [r.commitFileDeletions()]],
-} as FileEventHandlers<ProjectFile>
+}
+
+export default projectFileEventHandlers

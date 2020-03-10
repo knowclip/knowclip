@@ -86,7 +86,7 @@ const SubtitlesMenu = () => {
           <SubtitlesIcon />
         </IconButton>
       </Tooltip>
-      {isOpen && (
+      {isOpen && anchorEl && (
         <Popover anchorEl={anchorEl} open={isOpen} onClose={close}>
           <MenuList>
             {!subtitles.total && (

@@ -244,7 +244,9 @@ const ClozeField = ({
     >
       {subtitlesMenu}
       {editing ? (
-        <Tooltip title={clozeHint}>{content}</Tooltip>
+        <Tooltip title={clozeHint} key={value}>
+          {content}
+        </Tooltip>
       ) : (
         <Tooltip
           title="Select text and press C key to create new cloze deletion card."
@@ -305,7 +307,7 @@ const charSpan = (
   return (
     <span
       className={cn(className, { [css.clozeNewlinePlaceholder]: isNewline })}
-      key={String(index)}
+      key={String(index + char)}
       style={{
         ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
       }}
