@@ -57,11 +57,19 @@ Object {
         "name": "polar_bear_cafe.mp4",
         "subtitles": Array [
           Object {
+            "chunksMetadata": Object {
+              "count": 26,
+              "endCue": 4321.5,
+            },
             "id": "7077af99-722b-4737-854e-d2d1a3a3a60f",
             "streamIndex": 2,
             "type": "Embedded",
           },
           Object {
+            "chunksMetadata": Object {
+              "count": 15,
+              "endCue": 4336.5,
+            },
             "id": "a517b52e-e10b-4e9e-90e1-bfecc865b428",
             "name": "pbc_jp.ass",
             "type": "External",

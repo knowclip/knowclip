@@ -3,7 +3,12 @@ import { readFile } from 'fs-extra'
 import { getXAtMilliseconds } from '../selectors'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
-import { ProjectJson, MediaJson, SubtitlesJson } from '../types/Project'
+import {
+  ProjectJson,
+  MediaJson,
+  SubtitlesJson,
+  EmbeddedSubtitlesJson,
+} from '../types/Project'
 import validateProject from './validateProject'
 import { unescapeClozeFields } from './clozeField'
 
@@ -86,6 +91,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
               streamIndex: s.streamIndex,
               parentId: m.id,
               parentType: 'MediaFile',
+              chunksMetadata: s.chunksMetadata,
             }
           : {
               type: 'ExternalSubtitlesFile',
@@ -93,6 +99,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
               name: s.name,
               parentId: m.id,
               parentType: 'MediaFile',
+              chunksMetadata: s.chunksMetadata,
             }
     )
     const base: AudioFile = {
@@ -105,11 +112,8 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
       subtitles,
       flashcardFieldsToSubtitlesTracks:
         m.flashcardFieldsToSubtitlesTracks || {},
-      subtitlesTracksStreamIndexes: subtitles
-        .filter(
-          (s): s is EmbeddedSubtitlesTrackRelation =>
-            s.type === 'EmbeddedSubtitlesTrack'
-        )
+      subtitlesTracksStreamIndexes: (m.subtitles || [])
+        .filter((s): s is EmbeddedSubtitlesJson => s.type === 'Embedded')
         .map(s => s.streamIndex),
 
       isVideo: false,
@@ -233,7 +237,6 @@ function toMediaSubtitlesRelation(s: SubtitlesJson): MediaSubtitlesRelation {
       return {
         type: 'EmbeddedSubtitlesTrack',
         id: s.id,
-        streamIndex: s.streamIndex,
       }
 
     case 'External':

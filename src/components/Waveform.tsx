@@ -400,6 +400,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     subtitles,
     highlightedChunkIndex,
     waveformItems,
+    mediaIsLoaded,
   } = useSelector((state: AppState) => ({
     waveform: r.getWaveform(state),
     path: r.getWaveformPath(state),
@@ -410,6 +411,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     subtitles: r.getSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
     waveformItems: r.getWaveformItems(state),
+    mediaIsLoaded: r.isMediaFileLoaded(state),
   }))
 
   const dispatch = useDispatch()
@@ -445,20 +447,23 @@ const Waveform = ({ show }: { show: boolean }) => {
 
   const handleMouseUp = useCallback(
     e => {
-      if (
-        e.target.dataset &&
-        ((e.target.dataset.clipId && !e.target.dataset.clipIsHighlighted) ||
-          e.target.dataset.chunkIndex)
+      const coords = toWaveformCoordinates(
+        e,
+        e.currentTarget,
+        waveform.viewBox.xMin
       )
+      const x = Math.min(waveform.length, coords.x)
+      const { dataset } = e.target
+
+      if (
+        dataset &&
+        ((dataset.clipId && !dataset.clipIsHighlighted) || dataset.chunkIndex)
+      ) {
         return
+      }
+
       const player = document.getElementById('mediaPlayer') as HTMLVideoElement
       if (player) {
-        const coords = toWaveformCoordinates(
-          e,
-          e.currentTarget,
-          waveform.viewBox.xMin
-        )
-        const x = Math.min(waveform.length, coords.x)
         const seconds = getSecondsAtXFromWaveform(waveform, x)
         player.currentTime = seconds
 
@@ -479,6 +484,7 @@ const Waveform = ({ show }: { show: boolean }) => {
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       height={height}
+      style={mediaIsLoaded ? undefined : { pointerEvents: 'none' }}
     >
       <rect
         fill="#222222"

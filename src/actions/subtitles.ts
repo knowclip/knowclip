@@ -3,22 +3,14 @@ import { openFileRequest } from './files'
 import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
 
-export const showSubtitles = (
-  id: SubtitlesTrackId,
-  mediaFileId: MediaFileId
-): ShowSubtitles => ({
+export const showSubtitles = (id: SubtitlesTrackId): ShowSubtitles => ({
   type: A.SHOW_SUBTITLES,
   id,
-  mediaFileId,
 })
 
-export const hideSubtitles = (
-  id: SubtitlesTrackId,
-  mediaFileId: MediaFileId
-): HideSubtitles => ({
+export const hideSubtitles = (id: SubtitlesTrackId): HideSubtitles => ({
   type: A.HIDE_SUBTITLES,
   id,
-  mediaFileId,
 })
 
 export const mountSubtitlesTrack = (
@@ -29,10 +21,12 @@ export const mountSubtitlesTrack = (
 })
 
 export const addSubtitlesTrack = (
-  track: SubtitlesTrack
+  track: SubtitlesTrack,
+  mediaFileId: MediaFileId
 ): AddSubtitlesTrack => ({
   type: A.ADD_SUBTITLES_TRACK,
   track,
+  mediaFileId,
 })
 
 export const loadNewSubtitlesFile = (
@@ -45,6 +39,7 @@ export const loadNewSubtitlesFile = (
       parentId: mediaFileId,
       id: uuid(),
       name: basename(filePath),
+      chunksMetadata: null,
     },
     filePath
   )

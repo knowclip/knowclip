@@ -135,6 +135,100 @@
       ],
       "type": "object"
     },
+    "EmbeddedSubtitlesJson": {
+      "additionalProperties": false,
+      "properties": {
+        "chunksMetadata": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "endCue": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count",
+                "endCue"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "streamIndex": {
+          "type": "number"
+        },
+        "type": {
+          "enum": [
+            "Embedded"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "streamIndex",
+        "id",
+        "chunksMetadata"
+      ],
+      "type": "object"
+    },
+    "ExternalSubtitlesJson": {
+      "additionalProperties": false,
+      "properties": {
+        "chunksMetadata": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "endCue": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count",
+                "endCue"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "External"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "id",
+        "chunksMetadata"
+      ],
+      "type": "object"
+    },
     "MediaJson<SimpleFlashcardFields>": {
       "anyOf": [
         {
@@ -336,50 +430,10 @@
     "SubtitlesJson": {
       "anyOf": [
         {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "streamIndex": {
-              "type": "number"
-            },
-            "type": {
-              "enum": [
-                "Embedded"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "streamIndex",
-            "id"
-          ],
-          "type": "object"
+          "$ref": "#/definitions/EmbeddedSubtitlesJson"
         },
         {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "External"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "name",
-            "id"
-          ],
-          "type": "object"
+          "$ref": "#/definitions/ExternalSubtitlesJson"
         }
       ]
     }

@@ -6,18 +6,19 @@ import React, {
   VideoHTMLAttributes,
   useCallback,
 } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import cn from 'classnames'
 import * as r from '../redux'
 import css from './Media.module.css'
 import { Tooltip, IconButton } from '@material-ui/core'
 import { VerticalSplitSharp, HorizontalSplitSharp } from '@material-ui/icons'
+import { SubtitlesFileWithTrack, MediaSubtitles } from '../redux'
 
 type MediaProps = {
   constantBitrateFilePath: string | null
   loop: boolean
   metadata: MediaFile | null
-  subtitles: SubtitlesTrack[]
+  subtitles: MediaSubtitles
   className?: string
   viewMode: ViewMode
 }
@@ -96,7 +97,7 @@ const Media = ({
     [props.src]
   )
 
-  useSyncSubtitlesVisibility(subtitles, mediaRef)
+  useSyncSubtitlesVisibility(subtitles.all, mediaRef)
 
   const dispatch = useDispatch()
   const toggleViewMode = useCallback(
@@ -143,14 +144,18 @@ const Media = ({
           ref={mediaRef as MutableRefObject<HTMLVideoElement>}
           className={cn(css.video, css.mediaPlayer)}
         >
-          {subtitles.map((track, index) => (
-            <Subtitles
-              index={index}
-              track={track}
-              key={track.id}
-              isDefault={index === 0}
-            />
-          ))}
+          {subtitles.all.map((track, index) => {
+            const displayFile = track.displayFile
+            return (
+              <Subtitles
+                track={track.track}
+                index={index}
+                displayFile={displayFile}
+                key={track.id}
+                isDefault={index === 0}
+              />
+            )
+          })}
         </video>
       ) : (
         <audio
@@ -164,7 +169,7 @@ const Media = ({
 }
 
 function useSyncSubtitlesVisibility(
-  subtitles: SubtitlesTrack[],
+  subtitles: SubtitlesFileWithTrack[],
   mediaRef: React.MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
 ) {
   const dispatch = useDispatch()
@@ -173,14 +178,12 @@ function useSyncSubtitlesVisibility(
     () => {
       function syncReduxTracksToDom(event: Event) {
         Array.from(event.target as TextTrackList).forEach((domTrack, i) => {
-          const track: SubtitlesTrack | undefined = subtitles.find(
-            track => track.id === domTrack.id
-          )
-          if (track && track.mode !== domTrack.mode)
+          const track = subtitles.find(track => track.id === domTrack.id)
+          if (track && track.track && track.track.mode !== domTrack.mode)
             dispatch(
               domTrack.mode === 'showing'
-                ? r.showSubtitles(track.id, track.mediaFileId)
-                : r.hideSubtitles(track.id, track.mediaFileId)
+                ? r.showSubtitles(track.id)
+                : r.hideSubtitles(track.id)
             )
         })
       }
@@ -207,7 +210,8 @@ function useSyncSubtitlesVisibility(
         const domTrack = [...mediaRef.current.textTracks].find(
           domTrack => domTrack.id === track.id
         )
-        if (domTrack && domTrack.mode !== track.mode) domTrack.mode = track.mode
+        if (domTrack && track.track && domTrack.mode !== track.track.mode)
+          domTrack.mode = track.track.mode
       }
     },
     [subtitles, mediaRef]
@@ -227,17 +231,28 @@ declare global {
 
 const Subtitles = ({
   track,
+  displayFile,
   isDefault,
 }: {
-  track: SubtitlesTrack
+  track: SubtitlesTrack | null
+  displayFile: SubtitlesFile | null
   index: number
   isDefault: boolean
-}) =>
-  track.type === 'EmbeddedSubtitlesTrack' ? (
+}) => {
+  const { availability } = useSelector((state: AppState) => ({
+    availability: displayFile
+      ? r.getFileAvailability(state, displayFile)
+      : null,
+  }))
+
+  if (!track || !availability || availability.status !== 'CURRENTLY_LOADED')
+    return null
+
+  return track.type === 'EmbeddedSubtitlesTrack' ? (
     <track
       id={track.id}
       kind="subtitles"
-      src={`file://${track.tmpFilePath}`}
+      src={`file://${availability.filePath}`}
       mode={track.mode}
       default={isDefault}
     />
@@ -245,10 +260,10 @@ const Subtitles = ({
     <track
       id={track.id}
       kind="subtitles"
-      src={`file://${track.vttFilePath}`}
+      src={`file://${availability.filePath}`}
       mode={track.mode}
       default={isDefault}
     />
   )
-
+}
 export default Media

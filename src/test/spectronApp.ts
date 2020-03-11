@@ -69,7 +69,7 @@ export async function stopApp(context: {
   testId: string
 }): Promise<null> {
   const { app } = context
-  if (process.env.INTEGRATION_DEV) {
+  if (process.env.INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
     return null
   }
 

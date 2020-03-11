@@ -12,16 +12,19 @@ export const getSubtitlesDisplayFile = (
   state: AppState,
   id: string
 ): VttConvertedSubtitlesFile | ExternalSubtitlesFile | null =>
-  state.files.VttConvertedSubtitlesFile[id] ||
-  state.files.ExternalSubtitlesFile[id] ||
-  null
+  getSubtitlesDisplayFileFromFilesSubset(
+    state.files.ExternalSubtitlesFile,
+    state.files.VttConvertedSubtitlesFile,
+    id
+  )
 
-const getSubtitlesSourceFileFromFilesSubset = (
+const getSubtitlesDisplayFileFromFilesSubset = (
   external: FilesState['ExternalSubtitlesFile'],
   generated: FilesState['VttConvertedSubtitlesFile'],
   id: string
 ): ExternalSubtitlesFile | VttConvertedSubtitlesFile | null =>
-  external[id] || generated[id] || null
+  generated[id] || external[id] || null
+
 export const getSubtitlesSourceFile = (
   state: AppState,
   id: string
@@ -31,6 +34,12 @@ export const getSubtitlesSourceFile = (
     state.files.VttConvertedSubtitlesFile,
     id
   )
+const getSubtitlesSourceFileFromFilesSubset = (
+  external: FilesState['ExternalSubtitlesFile'],
+  generated: FilesState['VttConvertedSubtitlesFile'],
+  id: string
+): ExternalSubtitlesFile | VttConvertedSubtitlesFile | null =>
+  external[id] || generated[id] || null
 
 export const getSubtitlesFileAvailability = (state: AppState, id: string) => {
   const record = getSubtitlesDisplayFile(state, id)
@@ -59,17 +68,21 @@ export type SubtitlesFileWithTrack =
   | EmbeddedSubtitlesFileWithTrack
   | ExternalSubtitlesFileWithTrack
 export type EmbeddedSubtitlesFileWithTrack = {
+  id: SubtitlesTrackId
   relation: EmbeddedSubtitlesTrackRelation
   label: string
   embeddedIndex: number
-  file: VttConvertedSubtitlesFile | null // can be null while loading?
+  sourceFile: VttConvertedSubtitlesFile | null // can be null while loading?
+  displayFile: VttConvertedSubtitlesFile | null
   track: EmbeddedSubtitlesTrack | null
 }
 export type ExternalSubtitlesFileWithTrack = {
+  id: SubtitlesTrackId
   relation: ExternalSubtitlesTrackRelation
   label: string
   externalIndex: number
-  file: ExternalSubtitlesFile | null // should never really be null
+  sourceFile: ExternalSubtitlesFile | null // should never really be null
+  displayFile: ExternalSubtitlesFile | null
   track: ExternalSubtitlesTrack | null
 }
 
@@ -97,27 +110,39 @@ export const getSubtitlesFilesWithTracks = createSelector(
       ? /* eslint-disable array-callback-return */
         currentFile.subtitles.map((t, i) => {
           switch (t.type) {
-            case 'EmbeddedSubtitlesTrack':
+            case 'EmbeddedSubtitlesTrack': {
               const embeddedIndex = ++embeddedCount
               return {
+                id: t.id,
                 relation: t,
                 embeddedIndex,
                 label: `Embedded subtitles track ${embeddedIndex}`,
-                file: getSubtitlesSourceFileFromFilesSubset(
+                sourceFile: getSubtitlesSourceFileFromFilesSubset(
+                  externalFiles,
+                  convertedFiles,
+                  t.id
+                ),
+                displayFile: getSubtitlesDisplayFileFromFilesSubset(
                   externalFiles,
                   convertedFiles,
                   t.id
                 ),
                 track: subtitlesTracks[t.id] || null,
               } as EmbeddedSubtitlesFileWithTrack
-
+            }
             case 'ExternalSubtitlesTrack':
               const externalIndex = ++externalCount
               return {
+                id: t.id,
                 relation: t,
                 externalIndex,
                 label: `External subtitles track ${externalIndex}`,
-                file: getSubtitlesSourceFileFromFilesSubset(
+                sourceFile: getSubtitlesSourceFileFromFilesSubset(
+                  externalFiles,
+                  convertedFiles,
+                  t.id
+                ),
+                displayFile: getSubtitlesDisplayFileFromFilesSubset(
                   externalFiles,
                   convertedFiles,
                   t.id

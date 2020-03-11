@@ -87,7 +87,7 @@ const highlightRightEpic: AppEpic = (
 ) =>
   action$.pipe(
     ofType<Action, HighlightRightClipRequest>(A.HIGHLIGHT_RIGHT_CLIP_REQUEST),
-    tap(() => {
+    switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
       if (!currentFileId) return empty()
@@ -98,23 +98,33 @@ const highlightRightEpic: AppEpic = (
       if (selection && nextIndex !== -1) {
         const lastIndex = waveformItems.length - 1
         const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
-        if (next)
-          return setCurrentTime(
+
+        if (next) {
+          setCurrentTime(
             r.getSecondsAtX(
               state$.value,
               Math.max(next.item.start, selection.item.end + 1)
             )
           )
+          return r.isMediaFileLoaded(state)
+            ? empty()
+            : of(r.selectWaveformItem(next))
+        }
       }
 
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
       const next =
         waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
+      if (next) {
+        setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
+        return r.isMediaFileLoaded(state)
+          ? empty()
+          : of(r.selectWaveformItem(next))
+      }
 
-      if (next) setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
-    }),
-    ignoreElements()
+      return empty()
+    })
   )
 
 const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
@@ -132,10 +142,10 @@ const highlightLeftEpic: AppEpic = (
 ) =>
   action$.pipe(
     ofType<Action, HighlightLeftClipRequest>(A.HIGHLIGHT_LEFT_CLIP_REQUEST),
-    tap(() => {
+    switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return
+      if (!currentFileId) return empty()
 
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
@@ -149,8 +159,12 @@ const highlightLeftEpic: AppEpic = (
               : highlightedIndex - 1
           ]
 
-        if (prev)
-          return setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+        if (prev) {
+          setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+          return r.isMediaFileLoaded(state)
+            ? empty()
+            : of(r.selectWaveformItem(prev))
+        }
       }
       const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
 
@@ -158,9 +172,15 @@ const highlightLeftEpic: AppEpic = (
         findLast(waveformItems, ({ item }) => item.end <= x) ||
         waveformItems[waveformItems.length - 1]
 
-      if (prev) setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
-    }),
-    ignoreElements()
+      if (prev) {
+        setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+        return r.isMediaFileLoaded(state)
+          ? empty()
+          : of(r.selectWaveformItem(prev))
+      }
+
+      return empty()
+    })
   )
 
 export default combineEpics(

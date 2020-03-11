@@ -95,7 +95,6 @@ const baseMediaFile: MediaFile = {
     {
       type: 'EmbeddedSubtitlesTrack',
       id: '37bd5e91-89c5-491b-9308-533c7be7338a',
-      streamIndex: 2,
     },
     {
       type: 'ExternalSubtitlesTrack',

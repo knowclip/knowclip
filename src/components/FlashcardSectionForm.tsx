@@ -25,7 +25,7 @@ enum $ {
   notesField = 'flashcard-form-notes',
 }
 
-const fieldLabels = {
+const fieldContainerLabels = {
   transcription: $.transcriptionField,
   pronunciation: $.pronunciationField,
   meaning: $.meaningField,
@@ -54,6 +54,7 @@ const FlashcardSectionForm = memo(
       isLoopOn,
       subtitlesFlashcardFieldLinks,
       flashcard,
+      subtitles,
       mediaIsPlaying,
       viewMode,
     } = useSelector((state: AppState) => ({
@@ -63,6 +64,7 @@ const FlashcardSectionForm = memo(
       isLoopOn: r.isLoopOn(state),
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
       flashcard: r.getHighlightedFlashcard(state),
+      subtitles: r.getSubtitlesFilesWithTracks(state),
       mediaIsPlaying: r.isMediaPlaying(state),
       viewMode: state.settings.viewMode,
     }))
@@ -152,7 +154,6 @@ const FlashcardSectionForm = memo(
     const fieldProps = {
       currentFlashcard: flashcard,
       setFlashcardText: setFlashcardText,
-      subtitles: mediaFile.subtitles,
       mediaFileId: mediaFile.id,
       inputProps: FIELD_INPUT_PROPS,
       onKeyPress: loopOnInteract,
@@ -182,22 +183,24 @@ const FlashcardSectionForm = memo(
         </section>
         <section className={css.formBody}>
           {currentNoteType &&
-            getNoteTypeFields(currentNoteType).map((fieldName, i) => (
-              <Field
-                key={`${fieldName}_${flashcard.id}`}
-                inputRef={
-                  fieldName === autofocusFieldName ? focusRef : undefined
-                }
-                name={fieldName}
-                label={capitalize(fieldName)}
-                linkedSubtitlesTrack={
-                  subtitlesFlashcardFieldLinks[fieldName] || null
-                }
-                onFocus={!initialFocus && i === 0 ? () => {} : handleFocus}
-                className={fieldLabels[fieldName]}
-                {...fieldProps}
-              />
-            ))}
+            getNoteTypeFields(currentNoteType).map((fieldName, i) => {
+              const linkedTrackId =
+                subtitlesFlashcardFieldLinks[fieldName] || null
+              return (
+                <Field
+                  key={`${fieldName}_${flashcard.id}`}
+                  inputRef={
+                    fieldName === autofocusFieldName ? focusRef : undefined
+                  }
+                  name={fieldName}
+                  subtitles={subtitles}
+                  linkedSubtitlesTrack={linkedTrackId}
+                  onFocus={!initialFocus && i === 0 ? () => {} : handleFocus}
+                  className={fieldContainerLabels[fieldName]}
+                  {...fieldProps}
+                />
+              )
+            })}
           <TagsInput
             allTags={allTags}
             tags={flashcard.tags}

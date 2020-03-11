@@ -14,6 +14,8 @@ import YAML from 'yaml'
 import {
   MediaJson,
   SubtitlesJson,
+  ExternalSubtitlesJson,
+  EmbeddedSubtitlesJson,
   ClipJson,
   ProjectJson,
 } from '../types/Project'
@@ -62,6 +64,7 @@ export const getProjectJson = <F extends FlashcardFields>(
   fieldsTemplate: F
 ): ProjectJson<F> => {
   const mediaFiles = getProjectMediaFiles(state, file.id)
+
   return {
     project: {
       name: file.name,
@@ -75,26 +78,60 @@ export const getProjectJson = <F extends FlashcardFields>(
       (mediaFile): MediaJson<F> => {
         const { name, format, durationSeconds, id } = mediaFile
 
-        const subtitles: SubtitlesJson[] = mediaFile.subtitles.map(s =>
-          s.type === 'EmbeddedSubtitlesTrack'
-            ? {
-                id: s.id,
-                streamIndex: s.streamIndex,
-                type: 'Embedded',
-              }
-            : {
+        const externalSubtitles = mediaFile.subtitles
+          .filter(
+            (s): s is ExternalSubtitlesTrack =>
+              s.type === 'ExternalSubtitlesTrack'
+          )
+          .map(
+            (s): ExternalSubtitlesJson => {
+              const sourceFile = getSubtitlesSourceFile(
+                state,
+                s.id
+              ) as ExternalSubtitlesFile | null
+              console.log({ s, sourceFile })
+              return {
                 id: s.id,
                 type: 'External',
-                name: (
-                  (getSubtitlesSourceFile(
-                    state,
-                    s.id
-                  ) as ExternalSubtitlesFile | null) || {
-                    name: 'External subtitles file',
-                  }
-                ).name,
+                chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
+                name: sourceFile ? sourceFile.name : 'External subtitles file',
               }
-        )
+            }
+          )
+        const embeddedSubtitles = mediaFile.subtitlesTracksStreamIndexes
+          .map(streamIndex => {
+            for (const s of mediaFile.subtitles) {
+              if (s.type !== 'EmbeddedSubtitlesTrack') continue
+
+              const file = getSubtitlesSourceFile(state, s.id)
+              if (
+                file &&
+                file.type === 'VttConvertedSubtitlesFile' &&
+                file.parentType === 'MediaFile' &&
+                file.streamIndex === streamIndex
+              ) {
+                const sourceFile = getSubtitlesSourceFile(
+                  state,
+                  s.id
+                ) as VttFromEmbeddedSubtitles | null
+                console.log({ s, sourceFile })
+                const subtitles: EmbeddedSubtitlesJson = {
+                  id: file.id,
+                  streamIndex: streamIndex,
+                  type: 'Embedded',
+                  chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
+                }
+                return subtitles
+              }
+            }
+
+            return undefined
+          })
+          .filter((s): s is EmbeddedSubtitlesJson => Boolean(s))
+        const subtitles: SubtitlesJson[] = [
+          ...embeddedSubtitles,
+          ...externalSubtitles,
+        ]
 
         const clips = getProjectClips(state, mediaFile, fieldsTemplate)
 
@@ -108,7 +145,7 @@ export const getProjectJson = <F extends FlashcardFields>(
           ),
           id,
         }
-
+        console.log({ subtitles })
         if (subtitles.length) newMediaFile.subtitles = subtitles
         if (clips.length) newMediaFile.clips = clips
         if (Object.keys(mediaFile.flashcardFieldsToSubtitlesTracks).length)
@@ -217,6 +254,7 @@ export const getProjectFileContents = (
     projectFile,
     getFieldsTemplate(projectFile)
   )
+  console.log({ media })
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
     [project, ...media].map(o => YAML.stringify(o)).join('---\n')

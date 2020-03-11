@@ -2,6 +2,7 @@ import * as r from '../redux'
 import {
   newExternalSubtitlesTrack,
   newEmbeddedSubtitlesTrack,
+  validateBeforeOpenFileAction,
 } from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
 
@@ -21,38 +22,46 @@ export default {
       file
     )
 
-    return [r.openFileSuccess(file, vttFilePath)]
+    return await validateBeforeOpenFileAction(state, vttFilePath, file)
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      const sourceFile = r.getFileAvailabilityById(
+      const source = r.getFileAvailabilityById(
         state,
         validatedFile.parentType,
         validatedFile.parentId
       )
-      if (!(sourceFile && sourceFile.filePath)) return []
+      const sourceFile = r.getSubtitlesSourceFile(state, validatedFile.id)
+
+      if (!(source && source.filePath && sourceFile)) return []
 
       const chunks = await effects.getSubtitlesFromFile(state, filePath)
 
       if (validatedFile.parentType === 'MediaFile') {
-        if (r.getCurrentFileId(state) !== sourceFile.id) return []
+        if (r.getCurrentFileId(state) !== source.id) return []
 
-        const track = newEmbeddedSubtitlesTrack(
-          validatedFile.id,
-          validatedFile.parentId,
-          chunks,
-          validatedFile.streamIndex,
-          filePath
-        )
         const mediaFile = r.getFile<MediaFile>(
           state,
           'MediaFile',
           validatedFile.parentId
         )
+
+        if ('error' in chunks) {
+          return [
+            r.simpleMessageSnackbar(
+              `There was a problem reading subtitles from ${
+                mediaFile ? mediaFile.name : 'media file'
+              }: ${chunks.error}`
+            ),
+          ]
+        }
+
+        const track = newEmbeddedSubtitlesTrack(validatedFile.id, chunks)
+
         return [
           ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
             ? [
-                r.addSubtitlesTrack(track),
+                r.addSubtitlesTrack(track, mediaFile.id),
                 r.linkSubtitlesDialog(validatedFile, mediaFile.id),
               ]
             : []),
@@ -65,13 +74,16 @@ export default {
         'ExternalSubtitlesFile',
         validatedFile.parentId
       ) as ExternalSubtitlesFile
-      const track = newExternalSubtitlesTrack(
-        validatedFile.id,
-        external.parentId,
-        chunks,
-        sourceFile.filePath,
-        filePath
-      )
+      if ('error' in chunks) {
+        return [
+          r.simpleMessageSnackbar(
+            `There was a problem reading subtitles from ${
+              external ? external.name : 'media file'
+            }: ${chunks.error}`
+          ),
+        ]
+      }
+      const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
       const mediaFile = r.getFile<MediaFile>(
         state,
         'MediaFile',
@@ -82,7 +94,7 @@ export default {
       return [
         ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
           ? [
-              r.addSubtitlesTrack(track),
+              r.addSubtitlesTrack(track, mediaFile.id),
               ...(state.dialog.queue.some(d => d.type === 'SubtitlesClips')
                 ? []
                 : [r.linkSubtitlesDialog(external, mediaFile.id)]), // TODO: extract and share between here and externalSubtitlesFile.ts
@@ -117,7 +129,7 @@ export default {
               source.filePath,
               file
             )
-            return [r.locateFileSuccess(file, tmpFilePath)]
+            return await validateBeforeOpenFileAction(state, tmpFilePath, file)
           }
           case 'ExternalSubtitlesFile':
             const tmpFilePath = await effects.getSubtitlesFilePath(
@@ -125,7 +137,7 @@ export default {
               source.filePath,
               file
             )
-            return [r.locateFileSuccess(file, tmpFilePath)]
+            return await validateBeforeOpenFileAction(state, tmpFilePath, file)
         }
       }
     } catch (err) {

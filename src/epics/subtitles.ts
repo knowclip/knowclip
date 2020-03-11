@@ -198,7 +198,9 @@ function validateTracks(
     return { status: 'NO_LINKS_GIVEN' }
 
   const allMediaSubtitles = r.getSubtitlesFilesWithTracks(state)
-  const missingFileRecords = allMediaSubtitles.all.filter(({ file }) => !file)
+  const missingFileRecords = allMediaSubtitles.all.filter(
+    ({ sourceFile: file }) => !file
+  )
   if (missingFileRecords.length)
     return { status: 'MISSING_FILE_RECORDS', result: missingFileRecords }
 

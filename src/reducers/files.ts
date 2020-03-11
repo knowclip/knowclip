@@ -88,7 +88,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
     }
 
     case A.ADD_SUBTITLES_TRACK: {
-      const existingMediaFile = state.MediaFile[action.track.mediaFileId]
+      const existingMediaFile = state.MediaFile[action.mediaFileId]
       if (!existingMediaFile) {
         console.error(
           `Action ${action.type} was dispatched during illegal state.`
@@ -101,7 +101,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       return edit(
         state,
         'MediaFile',
-        action.track.mediaFileId,
+        action.mediaFileId,
         (file = existingMediaFile): MediaFile => ({
           ...file,
           subtitles: file.subtitles.some(s => s.id === action.track.id) // should not happen... but just in case
@@ -112,7 +112,6 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
                   ? {
                       type: 'EmbeddedSubtitlesTrack',
                       id: action.track.id,
-                      streamIndex: action.track.streamIndex,
                     }
                   : { type: 'ExternalSubtitlesTrack', id: action.track.id },
               ],
@@ -257,6 +256,23 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
 
     default:
       return state
+  }
+}
+
+export function findMediaFileWithSubtitles(
+  files: FilesState['MediaFile'],
+  subtitlesId: SubtitlesTrackId
+) {
+  for (const id in files) {
+    const mediaFile = files[id]
+    const index = mediaFile
+      ? mediaFile.subtitles.findIndex(s => s.id === subtitlesId)
+      : -1
+    if (mediaFile && index !== -1)
+      return {
+        mediaFile,
+        index,
+      }
   }
 }
 

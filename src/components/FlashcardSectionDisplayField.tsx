@@ -1,9 +1,7 @@
 import React, { useCallback, ReactNodeArray } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
-import FieldMenu, {
-  useSubtitlesBySource,
-} from './FlashcardSectionFieldPopoverMenu'
+import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
 
 const FlashcardDisplayField = ({
@@ -34,16 +32,10 @@ const FlashcardDisplayField = ({
     [fieldName, onDoubleClick]
   )
 
-  const {
-    embeddedSubtitlesTracks,
-    externalSubtitlesTracks,
-  } = useSubtitlesBySource(subtitles)
   const linkedSubtitlesTrack = linkedTracks[fieldName] || null
   const subtitlesMenu = Boolean(subtitles.length) && (
     <FieldMenu
       className={css.previewFieldMenuButton}
-      embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-      externalSubtitlesTracks={externalSubtitlesTracks}
       linkedSubtitlesTrack={linkedSubtitlesTrack}
       mediaFileId={mediaFileId}
       fieldName={fieldName as TransliterationFlashcardFieldName}

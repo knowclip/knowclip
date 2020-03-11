@@ -6,6 +6,11 @@
 // won't open during dev.
 
 type NoteType = 'Simple' | 'Transliteration' // TODO: remove this duplication
+type SubtitlesChunksMetadata = {
+  // TODO: remove this duplication
+  count: number
+  endCue: number
+}
 export type ProjectMetadataJson = {
   name: string
   id: string
@@ -49,17 +54,19 @@ export type ClipJson<F extends FlashcardFields> = {
   id: string
 }
 
-export type SubtitlesJson =
-  | {
-      type: 'Embedded'
-      streamIndex: number
-      id: string
-    }
-  | {
-      type: 'External'
-      name: string
-      id: string
-    }
+export type SubtitlesJson = EmbeddedSubtitlesJson | ExternalSubtitlesJson
+export type EmbeddedSubtitlesJson = {
+  type: 'Embedded'
+  streamIndex: number
+  id: string
+  chunksMetadata: SubtitlesChunksMetadata | null
+}
+export type ExternalSubtitlesJson = {
+  type: 'External'
+  name: string
+  id: string
+  chunksMetadata: SubtitlesChunksMetadata | null
+}
 
 export type ProjectJson<F extends FlashcardFields> = {
   project: {

@@ -36,7 +36,7 @@ const Main = () => {
       clipsIdsForExport: currentMediaFile
         ? state.clips.idsByMediaFileId[currentMediaFile.id]
         : EMPTY,
-      subtitles: r.getSubtitlesTracks(state),
+      subtitles: r.getSubtitlesFilesWithTracks(state),
       viewMode: state.settings.viewMode,
     }
   })

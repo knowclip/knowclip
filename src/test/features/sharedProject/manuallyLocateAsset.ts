@@ -16,6 +16,7 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
   await mockElectronHelpers(app, {
     showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
   })
+  await client.waitForText_(fileSelectionForm$.container, 'pbc_jp.ass')
   await client.clickElement_(fileSelectionForm$.filePathField)
   await client.clickElement_(fileSelectionForm$.continueButton)
 

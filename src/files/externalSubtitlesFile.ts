@@ -1,26 +1,33 @@
 import * as r from '../redux'
-import { newExternalSubtitlesTrack } from '../utils/subtitles'
+import {
+  newExternalSubtitlesTrack,
+  validateBeforeOpenFileAction,
+} from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
 import { extname } from 'path'
 
 const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => [
-    r.openFileSuccess(file, filePath),
-  ],
-
+  openRequest: async ({ file }, filePath, state, effects) => {
+    return await validateBeforeOpenFileAction(state, filePath, file)
+  },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
       if (isVtt(filePath)) {
         const chunks = await effects.getSubtitlesFromFile(state, filePath)
-        const track = newExternalSubtitlesTrack(
-          validatedFile.id,
-          validatedFile.parentId,
-          chunks,
-          filePath,
-          filePath
-        )
+
+        if ('error' in chunks) {
+          return [
+            r.simpleMessageSnackbar(
+              `There was a problem reading subtitles from ${
+                validatedFile.name
+              }: ${chunks.error}`
+            ),
+          ]
+        }
+
+        const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
         const mediaFile = r.getFile<MediaFile>(
           state,
           'MediaFile',
@@ -31,7 +38,7 @@ export default {
         return [
           ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
             ? [
-                r.addSubtitlesTrack(track),
+                r.addSubtitlesTrack(track, mediaFile.id),
                 ...(state.dialog.queue.some(d => d.type === 'SubtitlesClips')
                   ? []
                   : [r.linkSubtitlesDialog(validatedFile, mediaFile.id)]),
@@ -53,6 +60,7 @@ export default {
               id: validatedFile.id,
               parentId: validatedFile.id, // not needed?
               parentType: 'ExternalSubtitlesFile',
+              chunksMetadata: null,
             }
           ),
         ]

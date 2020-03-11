@@ -61,7 +61,9 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
       for (const clip of action.clips) {
         byId[clip.id] = clip
-        idsByMediaFileId[clip.fileId].push(clip.id)
+        const ids = idsByMediaFileId[clip.fileId]
+
+        ids.push(clip.id) // TODO: secure case when ids is undefined
       }
       for (const fileId in idsByMediaFileId) {
         idsByMediaFileId[fileId].sort(byStart(byId))

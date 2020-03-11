@@ -7,9 +7,7 @@ import React, {
 } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
-import FieldMenu, {
-  useSubtitlesBySource,
-} from './FlashcardSectionFieldPopoverMenu'
+import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
 import { useSelector } from 'react-redux'
 import { getSelectionWithin, ClozeControls } from '../utils/useClozeUi'
@@ -40,16 +38,10 @@ const ClozeField = ({
   onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
   clozeControls: ClozeControls
 }) => {
-  const {
-    embeddedSubtitlesTracks,
-    externalSubtitlesTracks,
-  } = useSubtitlesBySource(subtitles)
   const linkedSubtitlesTrack = linkedTracks[fieldName] || null
   const subtitlesMenu = Boolean(subtitles.length) && (
     <FieldMenu
       className={css.previewFieldMenuButton}
-      embeddedSubtitlesTracks={embeddedSubtitlesTracks}
-      externalSubtitlesTracks={externalSubtitlesTracks}
       linkedSubtitlesTrack={linkedSubtitlesTrack}
       mediaFileId={mediaFileId}
       fieldName={fieldName as TransliterationFlashcardFieldName}
@@ -252,7 +244,9 @@ const ClozeField = ({
     >
       {subtitlesMenu}
       {editing ? (
-        <Tooltip title={clozeHint}>{content}</Tooltip>
+        <Tooltip title={clozeHint} key={value}>
+          {content}
+        </Tooltip>
       ) : (
         <Tooltip
           title="Select text and press C key to create new cloze deletion card."
@@ -313,7 +307,7 @@ const charSpan = (
   return (
     <span
       className={cn(className, { [css.clozeNewlinePlaceholder]: isNewline })}
-      key={String(index)}
+      key={String(index + char)}
       style={{
         ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
       }}

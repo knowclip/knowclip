@@ -163,39 +163,123 @@ export const getSubtitlesFromFile = async (
   state: AppState,
   sourceFilePath: string
 ) => {
-  const extension = extname(sourceFilePath).toLowerCase()
-  const fileContents = await readFile(sourceFilePath, 'utf8')
-  return parseSubtitles(state, fileContents, extension)
+  try {
+    const extension = extname(sourceFilePath).toLowerCase()
+    const fileContents = await readFile(sourceFilePath, 'utf8')
+    return parseSubtitles(state, fileContents, extension)
+  } catch (error) {
+    return { error }
+  }
+}
+
+export const validateBeforeOpenFileAction = async <S extends SubtitlesFile>(
+  state: AppState,
+  sourceFilePath: string,
+  existingFile: S
+) => {
+  const validation = await validateSubtitlesFromFilePath(
+    state,
+    sourceFilePath,
+    existingFile
+  )
+
+  const newChunksMetadata = validation.newChunksMetadata
+    ? { chunksMetadata: validation.newChunksMetadata }
+    : null
+  const file: S = newChunksMetadata
+    ? {
+        ...existingFile,
+        ...newChunksMetadata,
+      }
+    : existingFile
+  if (validation.valid) {
+    return [r.openFileSuccess(file, sourceFilePath)]
+  }
+
+  if (validation.differences)
+    // better "changes?"
+    return [
+      r.confirmationDialog(
+        validation.message,
+        r.openFileSuccess(file, sourceFilePath),
+        r.openFileFailure(
+          existingFile,
+          sourceFilePath,
+          `Some features may be unavailable until your file is located.`
+        ),
+        true
+      ),
+    ]
+
+  return [r.openFileFailure(existingFile, sourceFilePath, validation.error)]
+}
+
+export const validateSubtitlesFromFilePath = async (
+  state: AppState,
+  sourceFilePath: string,
+  existingFile: SubtitlesFile
+) => {
+  try {
+    const differences: { attribute: string; name: string }[] = []
+
+    const extension = extname(sourceFilePath).toLowerCase()
+    const fileContents = await readFile(sourceFilePath, 'utf8')
+    const parsed = parseSubtitles(state, fileContents, extension)
+
+    const { chunksMetadata } = existingFile
+
+    const endChunk = parsed[parsed.length - 1]
+    const endCue = endChunk ? endChunk.end : null
+    const newChunksMetadata =
+      parsed.length && typeof endCue === 'number'
+        ? {
+            count: parsed.length,
+            endCue: endCue,
+          }
+        : null
+
+    if (chunksMetadata) {
+      if (chunksMetadata.count !== parsed.length)
+        differences.push({ attribute: 'count', name: 'number of cues' })
+
+      if (chunksMetadata.endCue !== endCue)
+        differences.push({ attribute: 'endCue', name: 'timing' })
+
+      if (differences.length)
+        return {
+          differences,
+          newChunksMetadata,
+          message: `This ${
+            'name' in existingFile
+              ? `subtitles file "${existingFile.name}"`
+              : `embedded subtitles track`
+          } differs from the one on record by:\n\n ${differences
+            .map(({ name }) => name)
+            .join('\n')}. \n\nAre you sure this is the file you want to open?`,
+        }
+    }
+    return { valid: true, newChunksMetadata }
+  } catch (error) {
+    return { error }
+  }
 }
 
 export const newEmbeddedSubtitlesTrack = (
   id: string,
-  mediaFileId: MediaFileId,
-  chunks: Array<SubtitlesChunk>,
-  streamIndex: number,
-  tmpFilePath: string
+  chunks: Array<SubtitlesChunk>
 ): EmbeddedSubtitlesTrack => ({
   type: 'EmbeddedSubtitlesTrack',
   id,
   mode: 'hidden',
   chunks,
-  mediaFileId,
-  streamIndex,
-  tmpFilePath,
 })
 
 export const newExternalSubtitlesTrack = (
   id: string,
-  mediaFileId: MediaFileId,
-  chunks: Array<SubtitlesChunk>,
-  filePath: string,
-  vttFilePath: string
+  chunks: Array<SubtitlesChunk>
 ): ExternalSubtitlesTrack => ({
   mode: 'hidden',
   type: 'ExternalSubtitlesTrack',
   id,
-  mediaFileId,
   chunks,
-  filePath,
-  vttFilePath,
 })

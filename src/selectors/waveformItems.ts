@@ -113,6 +113,14 @@ export const getNewWaveformSelectionAt = (
 ): WaveformSelectionExpanded | null => {
   const selection = getWaveformSelection(state)
   const waveformItems = getWaveformItems(state)
+
+  return getNewWaveformSelectionAtFromSubset(selection, waveformItems, newX)
+}
+export const getNewWaveformSelectionAtFromSubset = (
+  selection: WaveformSelectionExpanded | null,
+  waveformItems: WaveformSelectionExpanded[],
+  newX: number
+): WaveformSelectionExpanded | null => {
   const updatedSelection =
     selection &&
     getUpdatedSameSelection(selection, waveformItems[selection.index] || null)
@@ -136,6 +144,7 @@ export const getNewWaveformSelectionAt = (
 
   return overlapping.find(({ type }) => type === 'Clip') || null
 }
+
 const getUpdatedSameSelection = (
   prev: WaveformSelectionExpanded,
   next: WaveformSelectionExpanded | null

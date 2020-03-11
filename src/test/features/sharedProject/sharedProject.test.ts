@@ -2,6 +2,7 @@ import { Application } from 'spectron'
 import { startApp, stopApp, TestSetup } from '../../spectronApp'
 import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
+import makeFlashcards from './makeFlashcards'
 import makeFlashcardsWithSubtitles from './makeFlashcardsWithSubtitles'
 import manuallyLocateAsset from './manuallyLocateAsset'
 import reviewWithMissingMedia from './reviewWithMissingMedia'
@@ -30,7 +31,9 @@ describe('opening a shared project', () => {
     openSharedProject(setup))
   test('navigate between as-of-yet unloaded media', () =>
     navigateBetweenMedia(setup))
-  test('make some flashcards', () => makeFlashcardsWithSubtitles(setup))
+  test('make some flashcards', () => makeFlashcards(setup))
+  test('make some flashcards using subtitles', () =>
+    makeFlashcardsWithSubtitles(setup))
   test('manually locate missing assets', () => manuallyLocateAsset(setup))
   test('review with missing media', () => reviewWithMissingMedia(setup))
   test('export deck with missing media', () => exportWithMissingMedia(setup))

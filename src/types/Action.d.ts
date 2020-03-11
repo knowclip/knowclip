@@ -330,6 +330,7 @@ declare type MountSubtitlesTrack = {
 declare type AddSubtitlesTrack = {
   type: 'ADD_SUBTITLES_TRACK'
   track: SubtitlesTrack
+  mediaFileId: MediaFileId
 }
 declare type DeleteSubtitlesTrack = {
   type: 'DELETE_SUBTITLES_TRACK'
@@ -338,12 +339,10 @@ declare type DeleteSubtitlesTrack = {
 }
 declare type ShowSubtitles = {
   type: 'SHOW_SUBTITLES'
-  mediaFileId: MediaFileId
   id: SubtitlesTrackId
 }
 declare type HideSubtitles = {
   type: 'HIDE_SUBTITLES'
-  mediaFileId: MediaFileId
   id: SubtitlesTrackId
 }
 declare type MakeClipsFromSubtitles = {
