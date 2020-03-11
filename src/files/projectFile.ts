@@ -24,6 +24,17 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
           ),
         ]
 
+      if (project.id !== file.id)
+        return [
+          r.openFileFailure(
+            file,
+            filePath,
+            `This project file has a different ID than the "${
+              file.name
+            }" on record.`
+          ),
+        ]
+
       effects.setAppMenuProjectSubmenuPermissions(true)
 
       return [

@@ -49,21 +49,18 @@ const openProjectById: AppEpic = (action$, state$) =>
         id
       )
       if (!project.filePath || !existsSync(project.filePath)) {
-        const projectFile: ProjectFile = {
-          id: id,
-          type: 'ProjectFile',
-          lastSaved: 'PLACEHOLDER',
-          createdAt: 'PLACEHOLDER',
-          noteType: 'Simple',
-          mediaFileIds: [],
-          error: null,
-          name: project.name,
-        }
-
-        return r.locateFileRequest(
-          projectFile,
-          'This project was either moved or renamed.'
+        const projectFile = r.getFile<ProjectFile>(
+          state$.value,
+          'ProjectFile',
+          id
         )
+
+        return projectFile
+          ? r.locateFileRequest(
+              projectFile,
+              'This project was either moved or renamed.'
+            )
+          : r.simpleMessageSnackbar(`Could not open project.`)
       }
       return r.openProjectByFilePath(project.filePath)
     })

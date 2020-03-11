@@ -66,10 +66,6 @@ export default {
               ]
             : []),
           r.mountSubtitlesTrack(track),
-          // r.addFile({
-          //   ...sourceFile,
-          //   chunksMetadata: validatedFile.chunksMetadata,
-          // }),
         ]
       }
 
@@ -105,10 +101,6 @@ export default {
             ]
           : []),
         r.mountSubtitlesTrack(track),
-        // r.addFile({
-        //   ...sourceFile,
-        //   chunksMetadata: validatedFile.chunksMetadata,
-        // }),
       ]
     },
   ],
