@@ -25,7 +25,7 @@ enum $ {
   notesField = 'flashcard-form-notes',
 }
 
-const fieldLabels = {
+const fieldContainerLabels = {
   transcription: $.transcriptionField,
   pronunciation: $.pronunciationField,
   meaning: $.meaningField,
@@ -196,7 +196,7 @@ const FlashcardSectionForm = memo(
                   subtitles={subtitles}
                   linkedSubtitlesTrack={linkedTrackId}
                   onFocus={!initialFocus && i === 0 ? () => {} : handleFocus}
-                  className={fieldLabels[fieldName]}
+                  className={fieldContainerLabels[fieldName]}
                   {...fieldProps}
                 />
               )

@@ -15,7 +15,7 @@ import css from './FlashcardSection.module.css'
 import { getSubtitlesFilesWithTracks } from '../selectors'
 
 enum $ {
-  openMenuButton = 'flashcard-field-menu-open-button',
+  openMenuButtons = 'flashcard-field-menu-open-button',
   menuItem = 'flashcard-field-menu-item',
 }
 
@@ -47,7 +47,7 @@ const FlashcardSectionFieldPopoverMenu = ({
       >
         <IconButton
           tabIndex={1}
-          className={cn(className, $.openMenuButton)}
+          className={cn(className, $.openMenuButtons)}
           buttonRef={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
         >

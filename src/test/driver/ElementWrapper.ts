@@ -56,27 +56,31 @@ export const element = (
       }
     },
     click: async () => {
-      const { state, message } = await client.elementIdClick(id)
-      if (state === 'failure') {
-        throw new Error(`Could not click element "${selector}": ${message}`)
+      try {
+        const { state, message } = await client.elementIdClick(id)
+        if (state === 'failure') {
+          throw new Error(message)
+        }
+      } catch (err) {
+        throw new Error(`Could not click element "${selector}": ${err}`)
       }
     },
     doubleClick: async () => {
-      const moveToResult: RawResult<void> = (await client.moveTo(id)) as any
-      if (moveToResult.state === 'failure') {
-        throw new Error(
-          `Could not move to element "${selector}": ${moveToResult.message}`
-        )
-      }
-      const doubleClickResult: RawResult<
-        void
-      > = (await client.doDoubleClick()) as any
-      if (doubleClickResult.state === 'failure') {
-        throw new Error(
-          `Could not double click element "${selector}": ${
-            doubleClickResult.message
-          }`
-        )
+      try {
+        const moveToResult: RawResult<void> = (await client.moveTo(id)) as any
+        if (moveToResult.state === 'failure') {
+          throw new Error(
+            `Could not move to element "${selector}": ${moveToResult.message}`
+          )
+        }
+        const doubleClickResult: RawResult<
+          void
+        > = (await client.doDoubleClick()) as any
+        if (doubleClickResult.state === 'failure') {
+          throw new Error(doubleClickResult.message)
+        }
+      } catch (err) {
+        throw new Error(`Could not double-click element "${selector}": ${err}`)
       }
     },
     getText,

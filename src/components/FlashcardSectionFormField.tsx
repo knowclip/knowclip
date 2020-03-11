@@ -51,7 +51,7 @@ const FlashcardSectionFormField = memo(
     )
 
     return (
-      <section className={css.field}>
+      <section className={cn(className, css.field)}>
         {Boolean(subtitles.all.length) && (
           <FieldMenu
             className={css.fieldMenuButton}
@@ -62,7 +62,7 @@ const FlashcardSectionFormField = memo(
         )}
         <TextField
           autoFocus={autoFocus}
-          className={cn(className, flashcardSectionForm$.flashcardFields)}
+          className={flashcardSectionForm$.flashcardFields}
           inputProps={inputProps}
           onChange={handleChange}
           onKeyPress={onKeyPress}
