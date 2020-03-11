@@ -1,8 +1,5 @@
 import { TestSetup } from '../../spectronApp'
 import { waveform$ } from '../../../components/Waveform'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
-import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
-import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
