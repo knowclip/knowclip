@@ -17,6 +17,7 @@ import { getSubtitlesFilesWithTracks } from '../selectors'
 enum $ {
   openMenuButtons = 'flashcard-field-menu-open-button',
   menuItem = 'flashcard-field-menu-item',
+  externalTrackMenuItem = 'flashcard-field-externl-track-menu-item',
 }
 
 const FlashcardSectionFieldPopoverMenu = ({
@@ -81,6 +82,7 @@ const FlashcardSectionFieldPopoverMenu = ({
                 mediaFileId={mediaFileId}
                 fieldName={fieldName}
                 closeMenu={subtitlesPopover.close}
+                className={$.externalTrackMenuItem}
               />
             ))}
           </MenuList>
@@ -97,6 +99,7 @@ const FieldMenuItem = ({
   mediaFileId,
   fieldName,
   closeMenu,
+  className,
 }: {
   trackId: string
   selected: boolean
@@ -104,6 +107,7 @@ const FieldMenuItem = ({
   mediaFileId: MediaFileId
   fieldName: TransliterationFlashcardFieldName
   closeMenu: (e: SyntheticEvent) => void
+  className?: string
 }) => {
   const dispatch = useDispatch()
   const handleClick = useCallback(
@@ -124,7 +128,11 @@ const FieldMenuItem = ({
       onClick={handleClick}
       autoFocus={selected}
       tabIndex={0}
-      className={cn($.menuItem, { [css.selectedMenuItem]: selected })}
+      className={cn(
+        $.menuItem,
+        { [css.selectedMenuItem]: selected },
+        className
+      )}
     >
       {label}
     </MenuItem>
