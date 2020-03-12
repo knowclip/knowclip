@@ -13,7 +13,7 @@ const writeFile = promisify(fs.writeFile)
 const exportMarkdown: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportMarkdown>(A.EXPORT_MARKDOWN),
-    flatMap<ExportMarkdown, Promise<Observable<Action>>>(async () => {
+    flatMap<ExportMarkdown, Promise<Observable<Action>>>(async action => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
         if (!filename)
@@ -26,7 +26,8 @@ const exportMarkdown: AppEpic = (action$, state$) =>
         const markdown = projectToMarkdown(
           state$.value,
           currentProject.id,
-          currentNoteType
+          currentNoteType,
+          action.mediaFileIdsToClipIds
         )
         await writeFile(filename, markdown, 'utf8')
         return from([

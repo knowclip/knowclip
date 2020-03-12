@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Dialog,
@@ -71,6 +71,10 @@ const Export = React.memo(
       setSelectionHasStarted,
     ])
     const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
+    const somethingSelected = useMemo(
+      () => Object.values(selectedIds).some(ids => ids.some(id => Boolean(id))),
+      [selectedIds]
+    )
     const exportApkg = useCallback(
       () => {
         dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
@@ -82,8 +86,8 @@ const Export = React.memo(
       [dispatch, selectedIds]
     )
     const exportMarkdown = useCallback(
-      () => dispatch(actions.exportMarkdown([])),
-      [dispatch]
+      () => dispatch(actions.exportMarkdown(selectedIds)),
+      [dispatch, selectedIds]
     )
 
     const onSelect = useCallback(
@@ -128,6 +132,7 @@ const Export = React.memo(
       },
       [setExpandedTableIndex]
     )
+    const submitDisabled = Boolean(progress) || !somethingSelected
 
     return (
       <Dialog
@@ -186,7 +191,7 @@ const Export = React.memo(
               <Button
                 variant="contained"
                 color="primary"
-                disabled={Boolean(progress)}
+                disabled={submitDisabled}
                 onClick={csvAndMp3ExportDialog}
               >
                 Export CSV and MP3 from selected clips
@@ -196,7 +201,7 @@ const Export = React.memo(
               <Button
                 variant="contained"
                 color="primary"
-                disabled={Boolean(progress)}
+                disabled={submitDisabled}
                 onClick={exportMarkdown}
               >
                 Export Markdown from selected clips
@@ -206,7 +211,7 @@ const Export = React.memo(
               <Button
                 variant="contained"
                 color="primary"
-                disabled={Boolean(progress)}
+                disabled={submitDisabled}
                 onClick={exportApkg}
                 id={$.exportApkgButton}
               >

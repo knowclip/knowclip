@@ -124,7 +124,9 @@ describe('projectToMarkdown', () => {
   }
 
   it('makes markdown file', () => {
-    const result = projectToMarkdown(state, projectMetadata.id, noteType)
+    const result = projectToMarkdown(state, projectMetadata.id, noteType, {
+      [mediaFileId]: ['clip1', 'clip2', 'clip3'],
+    })
 
     expect(result).toEqual(
       [

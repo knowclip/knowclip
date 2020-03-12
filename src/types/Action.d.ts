@@ -235,7 +235,7 @@ declare type ExportApkgSuccess = {
 }
 declare type ExportMarkdown = {
   type: 'EXPORT_MARKDOWN'
-  clipIds: Array<ClipId>
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
 }
 declare type ExportCsv = {
   type: 'EXPORT_CSV'

@@ -52,9 +52,11 @@ export const exportCsv = (
   rememberLocation,
 })
 
-export const exportMarkdown = (clipIds: Array<ClipId>): ExportMarkdown => ({
+export const exportMarkdown = (
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
+): ExportMarkdown => ({
   type: A.EXPORT_MARKDOWN,
-  clipIds,
+  mediaFileIdsToClipIds,
 })
 
 export const detectSilenceRequest = (): Action => ({
