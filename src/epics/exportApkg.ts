@@ -24,7 +24,7 @@ import { getApkgExportData } from '../utils/prepareExport'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
 import * as A from '../types/ActionType'
-import { processClip, AnkiNote } from '../utils/ankiNote'
+import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 
 const exportApkgFailure: AppEpic = action$ =>
   action$.pipe(
@@ -72,6 +72,13 @@ const exportApkg: AppEpic = (action$, state$) =>
         )
       }
 
+      console.log(
+        JSON.stringify(exportData.clips) ===
+          JSON.stringify(
+            exportData.clips.sort((a, b) => a.startTime - b.startTime)
+          )
+      )
+
       return makeApkg(exportData, directory)
     })
   )
@@ -86,22 +93,29 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
       const noteModel = new anki.Model(exportData.noteModel)
       const clozeNoteModel = new anki.ClozeModel(exportData.clozeNoteModel)
 
-      const processClipsObservables = exportData.clips.map(
-        (clipSpecs: ClipSpecs, i) =>
-          defer(async () => {
-            const clipDataResult = await processClip(clipSpecs, directory)
-            if (clipDataResult.errors)
-              throw new Error(clipDataResult.errors.join('; '))
+      let processed = 0
 
-            const clipData = clipDataResult.value
-            await registerClip(pkg, deck, noteModel, clozeNoteModel, clipData)
+      const processClipsObservables = exportData.clips.map(
+        (clipSpecs: ClipSpecs) => {
+          registerClip(deck, noteModel, clozeNoteModel, clipSpecs)
+
+          return defer(async () => {
+            const noteMediaResult = await processNoteMedia(clipSpecs, directory)
+            if (noteMediaResult.errors)
+              throw new Error(noteMediaResult.errors.join('; '))
+
+            const noteMedia = noteMediaResult.value
+            await addNoteMedia(pkg, noteMedia)
+
+            const number = ++processed
             return r.setProgress({
-              percentage: (i + 1 / exportData.clips.length) * 100,
-              message: `${i + 1} clips out of ${
+              percentage: (number / exportData.clips.length) * 100,
+              message: `${number} clips out of ${
                 exportData.clips.length
               } processed`,
             })
           })
+        }
       )
       return of(
         r.setProgress({
@@ -146,19 +160,35 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
   )
 }
 
-async function registerClip(
-  pkg: any,
+function registerClip(
   deck: any,
   noteModel: any,
   clozeNoteModel: any,
-  clipData: AnkiNote
+  clipSpecs: ClipSpecs
 ) {
-  const { note, clozeNote, soundData, imageData } = clipData
+  const {
+    flashcardSpecs: { fields, tags, id, clozeDeletions },
+  } = clipSpecs
+
+  const note = { fields, guid: id, tags }
+  // todo: try with knowclip id as second argument
+  const clozeNote = clozeDeletions
+    ? {
+        fields: [clozeDeletions, ...fields.slice(1)],
+        guid: `${id}__CLOZE`,
+        tags,
+      }
+    : null
+
   deck.addNote(noteModel.note(note.fields, note.guid, note.tags)) // todo: try with knowclip id as second argument
   if (clozeNote)
     deck.addNote(
       clozeNoteModel.note(clozeNote.fields, clozeNote.guid, clozeNote.tags)
     )
+}
+
+async function addNoteMedia(pkg: any, noteMedia: AnkiNoteMedia) {
+  const { soundData, imageData } = noteMedia
   pkg.addMedia(await soundData.data(), soundData.fileName)
   if (imageData) pkg.addMedia(await imageData.data(), imageData.fileName)
 }

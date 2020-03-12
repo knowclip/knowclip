@@ -9,12 +9,11 @@ import {
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, defer, empty } from 'rxjs'
-import { promises as fs } from 'fs'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
-import { processClip } from '../utils/ankiNote'
+import { processNoteMedia } from '../utils/ankiNote'
 import { writeFile } from 'fs-extra'
 import { join, basename } from 'path'
 
@@ -54,10 +53,12 @@ const exportCsv: AppEpic = (action$, state$) =>
 
         const { csvText, clozeCsvText } = getCsvText(exportData)
 
+        let processed = 0
+
         const processClipsObservables = exportData.clips.map(
-          (clipSpecs: ClipSpecs, i) =>
+          (clipSpecs: ClipSpecs) =>
             defer(async () => {
-              const clipDataResult = await processClip(
+              const clipDataResult = await processNoteMedia(
                 clipSpecs,
                 mediaFolderLocation
               )
@@ -72,10 +73,10 @@ const exportCsv: AppEpic = (action$, state$) =>
                   join(mediaFolderLocation, basename(imageData.filePath)),
                   await imageData.data()
                 )
-
+              const number = ++processed
               return r.setProgress({
-                percentage: (i + 1 / exportData.clips.length) * 100,
-                message: `${i + 1} clips out of ${
+                percentage: (number / exportData.clips.length) * 100,
+                message: `${number} clips out of ${
                   exportData.clips.length
                 } processed`,
               })

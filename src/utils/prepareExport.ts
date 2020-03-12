@@ -214,7 +214,7 @@ export const getApkgExportData = (
     projectId,
     deckName,
     noteModel: {
-      name: `Audio note (${deckName})`,
+      name: `Audio note (${project.name})`,
       id: projectId + 1,
       flds: fields,
       req: getCards(project.noteType).map((t, i) => [
@@ -231,7 +231,7 @@ export const getApkgExportData = (
     },
     clozeNoteModel: {
       id: projectId + 2,
-      name: `Cloze (${deckName})`,
+      name: `Cloze (${project.name})`,
       flds: fields,
       css: TEMPLATE_CSS,
       tmpl: {

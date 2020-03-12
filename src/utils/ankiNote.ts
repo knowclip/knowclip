@@ -4,17 +4,7 @@ import clipAudio from '../utils/clipAudio'
 import { getVideoStill } from '../utils/getVideoStill'
 const { readFile } = promises
 
-export type AnkiNote = {
-  note: {
-    fields: string[]
-    guid: null
-    tags: string
-  }
-  clozeNote: {
-    fields: string[]
-    guid: null
-    tags: string
-  } | null
+export type AnkiNoteMedia = {
   soundData: {
     data: () => Promise<Buffer>
     fileName: string
@@ -27,23 +17,21 @@ export type AnkiNote = {
   } | null
 }
 
-export async function processClip(
+export function getClozeFields(fields: string[], clozeDeletions: string) {
+  return [clozeDeletions, ...fields.slice(1)]
+}
+
+export async function processNoteMedia(
   clipSpecs: ClipSpecs,
   directory: string
-): AsyncResult<AnkiNote> {
+): AsyncResult<AnkiNoteMedia> {
   const {
     outputFilename,
     sourceFilePath,
     startTime,
     endTime,
-    flashcardSpecs: { fields, tags, clozeDeletions, image },
+    flashcardSpecs: { image },
   } = clipSpecs
-
-  const note = { fields, guid: null, tags }
-  // todo: try with knowclip id as second argument
-  const clozeNote = clozeDeletions
-    ? { fields: [clozeDeletions, ...fields.slice(1)], guid: null, tags }
-    : null
 
   const clipOutputFilePath = join(directory, outputFilename)
   const clipAudioResult = await clipAudio(
@@ -86,8 +74,6 @@ export async function processClip(
 
   return {
     value: {
-      note,
-      clozeNote,
       soundData,
       imageData,
     },

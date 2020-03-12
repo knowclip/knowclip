@@ -249,23 +249,30 @@ function IntroText({ currentTabIndex }: { currentTabIndex: number }) {
       {currentTabIndex === 0 && (
         <section className={css.introText}>
           <p>
-            Export an Anki .apkg file. This format is best for{' '}
-            <strong>starting a new deck.</strong>
+            Export an Anki .apkg file. Use this format to{' '}
+            <strong>create a new deck</strong> or to{' '}
+            <strong>update an existing deck</strong> which you previously
+            created with Knowclip.
           </p>
           <p>
-            If you want to update some flashcards you've previously exported, or
-            add some new cards to a previously exported deck, you probably want
-            to export CSV and MP3s.
+            All media will be bundled together with your flashcards in one
+            single file for importing into Anki.
           </p>
+          <p />
         </section>
       )}
       {currentTabIndex === 1 && (
         <section className={css.introText}>
-          <p>Export a Comma-Separated-Values file along with MP3s.</p>
+          <p>
+            Export a Comma-Separated-Values file along with MP3 audio clips and
+            PNG image files.
+          </p>
           <p>
             This format is best for{' '}
-            <strong>updating or adding to a deck</strong> which you've
-            previously exported.
+            <strong>updating or adding to an existing deck</strong> which you
+            didn't make using Knowclip. You might want this format in case
+            you're an advanced Anki user and want to work with some custom Anki
+            note formats.
           </p>
         </section>
       )}
