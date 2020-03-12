@@ -16,17 +16,17 @@ export default {
       if (!cbr) return []
 
       const pngPath = await effects.getWaveformPng(state, file, cbr)
-      if (pngPath instanceof Error)
+      if (pngPath.errors)
         return [
           r.openFileFailure(
             file,
             null,
             'Could not locate file: ' +
-              (pngPath.message || 'problem generating waveform.')
+              (pngPath.errors.join('; ') || 'problem generating waveform.')
           ),
         ]
 
-      return [r.locateFileSuccess(file, pngPath)]
+      return [r.locateFileSuccess(file, pngPath.value)]
     } catch (err) {
       return [
         r.openFileFailure(

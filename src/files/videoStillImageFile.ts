@@ -72,17 +72,18 @@ export default {
         parentFileAvailability.filePath,
         seconds
       )
-      if (pngPath instanceof Error)
+      if (pngPath.errors)
         return [
           r.openFileFailure(
             file,
             null,
             'Could not locate file: ' +
-              (pngPath.message || 'problem generating still image from media.')
+              (pngPath.errors.join('; ') ||
+                'problem generating still image from media.')
           ),
         ]
 
-      return [r.locateFileSuccess(file, pngPath)]
+      return [r.locateFileSuccess(file, pngPath.value)]
     } catch (err) {
       return [
         r.openFileFailure(

@@ -7,7 +7,7 @@ export const clipAudioStream = (
   sourceFilePath: string,
   startTime: number,
   endTime: number,
-  outputFilename: string
+  outputFilePath: string
 ): { done: Promise<string>; stream: Writable } => {
   const mp3 = ffmpeg(sourceFilePath)
     // .audioCodec('copy') // TODO: do this and change hardcoded '.mp3' for audio-only input
@@ -19,8 +19,8 @@ export const clipAudioStream = (
     done: new Promise((res, rej) => {
       mp3
         .on('end', () => {
-          console.log('done!', outputFilename)
-          res(outputFilename)
+          console.log('done!', outputFilePath)
+          res(outputFilePath)
         })
         .on('error', err => {
           console.error(err)
@@ -35,30 +35,36 @@ const clipAudio = async (
   sourceFilePath: string,
   startTime: number,
   endTime: number,
-  outputFilename: string
-): Promise<string> => {
+  outputFilePath: string
+): AsyncResult<string> => {
   const result = await new Promise((res, rej) => {
     ffmpeg(sourceFilePath)
       // .audioCodec('copy') // TODO: do this and change hardcoded '.mp3' for audio-only input
       .seekInput(toTimestamp(startTime))
       .inputOptions('-to ' + toTimestamp(endTime))
       .outputOptions('-vn')
-      .output(outputFilename)
+      .output(outputFilePath)
       .on('end', () => {
-        res(outputFilename)
+        res(outputFilePath)
       })
       .on('error', err => {
         console.error(err)
-        rej(err)
+        console.log({
+          sourceFilePath,
+          startTime,
+          endTime,
+          outputFilePath,
+        })
+        rej({ errors: [err] })
       })
       .run()
   })
 
-  if (!result || !existsSync(outputFilename)) {
-    console.log({ outputFilename, sourceFilePath, startTime, endTime })
+  if (!result || !existsSync(outputFilePath)) {
+    console.log({ outputFilePath, sourceFilePath, startTime, endTime })
     throw new Error(`Problem clipping audio from ${sourceFilePath}`)
   }
 
-  return outputFilename
+  return { value: outputFilePath }
 }
 export default clipAudio

@@ -1,7 +1,7 @@
 import * as r from '../redux'
 import { basename, join } from 'path'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
-import { readMediaFile, AsyncError } from '../utils/ffmpeg'
+import { readMediaFile } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
@@ -14,17 +14,17 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     // mediaPlayer.src = ''
 
     const validationResult = await validateMediaFile(file, filePath)
-    if (validationResult instanceof AsyncError)
+    if (validationResult.errors)
       return [
         r.openFileFailure(
           file,
           filePath,
           `Problem opening ${getHumanFileName(
             file
-          )}: ${validationResult.message || 'problem reading file.'}`
+          )}: ${validationResult.errors.join(', ') || 'problem reading file.'}`
         ),
       ]
-    const [errorMessage, validatedFile] = validationResult
+    const [errorMessage, validatedFile] = validationResult.value
     if (errorMessage)
       return [
         r.confirmationDialog(
@@ -55,11 +55,11 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     // works while fileavailability names can't be changed...
     for (const directory of autoSearchDirectories) {
       const nameMatch = join(directory, basename(availability.name))
-      const matchingFile =
-        existsSync(nameMatch) &&
-        (await validateMediaFile(action.file, nameMatch))
+      const matchingFile = existsSync(nameMatch)
+        ? await validateMediaFile(action.file, nameMatch)
+        : null
 
-      if (matchingFile && !(matchingFile instanceof AsyncError))
+      if (matchingFile && !matchingFile.errors)
         return [r.locateFileSuccess(action.file, nameMatch)]
     }
 
@@ -77,8 +77,8 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
 export const validateMediaFile = async (
   existingFile: MediaFile,
   filePath: string
-): Promise<[string | null, MediaFile] | AsyncError> => {
-  const newFile = await readMediaFile(
+): AsyncResult<[string | null, MediaFile]> => {
+  const result = await readMediaFile(
     filePath,
     existingFile.id,
     existingFile.parentId,
@@ -86,7 +86,9 @@ export const validateMediaFile = async (
     existingFile.flashcardFieldsToSubtitlesTracks
   )
 
-  if (newFile instanceof AsyncError) return newFile
+  if (result.errors) return result
+
+  const { value: newFile } = result
 
   const differences: { [attribute: string]: [string, string] } = {}
 
@@ -113,20 +115,22 @@ export const validateMediaFile = async (
     ]
 
   if (Object.keys(differences).length) {
-    return [
-      `This media file differs from the one on record by:\n\n ${Object.entries(
-        differences
-      )
-        .map(
-          ([attr, [old, current]]) =>
-            `${attr}: "${current}" for this file instead of "${old}"`
+    return {
+      value: [
+        `This media file differs from the one on record by:\n\n ${Object.entries(
+          differences
         )
-        .join('\n')}.`,
-      newFile,
-    ]
+          .map(
+            ([attr, [old, current]]) =>
+              `${attr}: "${current}" for this file instead of "${old}"`
+          )
+          .join('\n')}.`,
+        newFile,
+      ],
+    }
   }
 
-  return [null, newFile]
+  return { value: [null, newFile] }
 }
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (

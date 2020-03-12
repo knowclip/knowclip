@@ -40,27 +40,47 @@ declare type FlashcardSpecs = {
   id: string
   fields: Array<string>
   tags: string
-  image: FlashcardImage | null
+  image: FlashcardImageSpecs | null
   clozeDeletions?: string
 }
 
 declare type ApkgExportData = {
   deckName: string
   projectId: number
-  noteModelId: number
-  clozeModelId: number
-  template: ApkgExportTemplate
+
+  noteModel: ApkgExportNoteModel
+  clozeNoteModel: ApkgExportClozeNoteModel
   clips: Array<ClipSpecs>
 }
-declare type ApkgExportTemplate = {
-  fields: Array<string> // field names,
-  cards: Array<{
-    name: string
-    questionFormat: string
-    answerFormat: string
-  }>
+
+declare type ApkgExportNoteModel = {
+  name: string
+  id: number
+  flds: Array<{ name: string }>
+  req: Array<number, 'all' | 'any', number[]>
   css: string
-  sortField: number
+  tmpls: Array<{
+    name: string
+    qfmt: string
+    afmt: string
+  }>
+}
+
+declare type FlashcardImageSpecs = {
+  id: string
+  seconds: number
+}
+
+declare type ApkgExportClozeNoteModel = {
+  id: number
+  name: string
+  flds: Array<{ name: string }>
+  css: string
+  tmpl: {
+    name: string
+    qfmt: string
+    afmt: string
+  }
 }
 
 declare type ClipPre3_0_0 = {
