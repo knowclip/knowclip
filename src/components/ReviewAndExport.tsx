@@ -25,7 +25,7 @@ enum $ {
 const Export = React.memo(
   ({
     open,
-    data: { mediaOpenPrior, mediaIdsToClipsIds: initialSelectedClips },
+    data: { mediaOpenPrior, mediaFileIdsToClipIds: initialSelectedClips },
   }: DialogProps<ReviewAndExportDialogData>) => {
     const dispatch = useDispatch()
     const {
@@ -78,8 +78,8 @@ const Export = React.memo(
       [dispatch, selectedIds, mediaOpenPrior]
     )
     const csvAndMp3ExportDialog = useCallback(
-      () => dispatch(actions.csvAndMp3ExportDialog([])),
-      [dispatch]
+      () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
+      [dispatch, selectedIds]
     )
     const exportMarkdown = useCallback(
       () => dispatch(actions.exportMarkdown([])),

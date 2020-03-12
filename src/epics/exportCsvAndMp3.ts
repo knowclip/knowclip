@@ -4,6 +4,7 @@ import { of, from, Observable } from 'rxjs'
 import { promises as fs } from 'fs'
 import { join } from 'path'
 import * as r from '../redux'
+import * as A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
 import clipAudio from '../utils/clipAudio'
@@ -15,13 +16,17 @@ const exportCsv: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportCsv>(A.EXPORT_CSV),
     flatMap<ExportCsv, Promise<Observable<Action>>>(
-      async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
+      async ({ mediaFileIdsToClipIds, csvFilePath, mediaFolderLocation }) => {
         try {
           const currentProject = r.getCurrentProject(state$.value)
           if (!currentProject)
             return of(r.simpleMessageSnackbar('Could not find project'))
 
-          const exportData = getApkgExportData(state$.value, currentProject, {})
+          const exportData = getApkgExportData(
+            state$.value,
+            currentProject,
+            mediaFileIdsToClipIds
+          )
           if ('missingMediaFiles' in exportData) {
             return from(
               [...exportData.missingMediaFiles].map(file =>
@@ -35,8 +40,16 @@ const exportCsv: AppEpic = (action$, state$) =>
             )
           }
 
-          const csvText = getCsvText(exportData)
+          const { csvText, clozeCsvText } = getCsvText(exportData)
           await fs.writeFile(csvFilePath, csvText, 'utf8')
+          if (clozeCsvText) {
+            const clozeCsvFilePath = csvFilePath.replace(
+              /\.csv$/,
+              '__CLOZE.csv'
+            )
+            await fs.writeFile(clozeCsvFilePath, csvText, 'utf8')
+          }
+
           return from([
             r.simpleMessageSnackbar(`Flashcards saved in ${csvFilePath}`),
             r.setMediaFolderLocation(mediaFolderLocation), // should probably just get rid of this action

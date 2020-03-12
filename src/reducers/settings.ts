@@ -1,4 +1,5 @@
 import { Reducer } from 'redux'
+import * as A from '../types/ActionType'
 
 export const initialState: SettingsState = {
   mediaFolderLocation: null,

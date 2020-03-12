@@ -103,7 +103,7 @@ export const TEMPLATE_CSS = `.card {
 export const getApkgExportData = (
   state: AppState,
   project: ProjectFile,
-  mediaIdToClipsIds: ReviewAndExportDialogData['mediaIdsToClipsIds']
+  mediaIdToClipsIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
 ) => {
   const fieldNames = getNoteTypeFields(project.noteType)
   const mediaFiles = r.getProjectMediaFiles(state, project.id)
@@ -240,11 +240,19 @@ export const getApkgExportData = (
 }
 
 export const getCsvText = (exportData: ApkgExportData) => {
-  const csvData = exportData.clips.map(({ flashcardSpecs }) => [
-    ...flashcardSpecs.fields,
-    flashcardSpecs.tags,
-    flashcardSpecs.id,
-  ])
+  const csvData: string[][] = []
+  const clozeCsvData: string[][] = []
+  for (const {
+    flashcardSpecs: { fields, tags, clozeDeletions },
+  } of exportData.clips) {
+    csvData.push([...fields, tags])
+    if (clozeDeletions) {
+      clozeCsvData.push([...fields.slice(1), tags])
+    }
+  }
 
-  return unparse(csvData)
+  return {
+    csvText: unparse(csvData),
+    clozeCsvText: clozeCsvData.length ? unparse(csvData) : null,
+  }
 }

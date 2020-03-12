@@ -9,6 +9,7 @@ import {
 } from 'rxjs/operators'
 import { empty, of } from 'rxjs'
 import * as actions from '../actions'
+import * as A from '../types/ActionType'
 import { getClip, getCurrentMediaFile, getFile } from '../selectors'
 
 const remakeStill: AppEpic = (action$, state$) =>

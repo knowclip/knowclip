@@ -1,4 +1,5 @@
 import { Reducer } from 'redux'
+import * as A from '../types/ActionType'
 
 const initialState: DialogState = {
   queue: [],

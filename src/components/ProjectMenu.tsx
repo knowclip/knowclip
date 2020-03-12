@@ -53,7 +53,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
 
   const clipsIdsForExport = useMemo(
     () => {
-      const result: ReviewAndExportDialogData['mediaIdsToClipsIds'] = {}
+      const result: ReviewAndExportDialogData['mediaFileIdsToClipIds'] = {}
       for (const mediaFileId of mediaFileIds) result[mediaFileId] = []
       if (currentMediaFile)
         result[currentMediaFile.id] = [...currentFileClipsIds]

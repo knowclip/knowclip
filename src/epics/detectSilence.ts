@@ -1,6 +1,7 @@
 import { flatMap, map } from 'rxjs/operators'
 import { from, Observable } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
+import * as A from '../types/ActionType'
 import * as r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'

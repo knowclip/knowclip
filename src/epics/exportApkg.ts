@@ -17,18 +17,14 @@ import {
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
 import { of, empty, defer, from } from 'rxjs'
 import * as r from '../redux'
-import { join, basename } from 'path'
-import { promises } from 'fs'
 import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
 import sql from 'better-sqlite3'
 import { getApkgExportData } from '../utils/prepareExport'
-import clipAudio from '../utils/clipAudio'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
-import { getVideoStill } from '../utils/getVideoStill'
-
-const { readFile } = promises
+import * as A from '../types/ActionType'
+import { processClip, AnkiNote } from '../utils/ankiNote'
 
 const exportApkgFailure: AppEpic = action$ =>
   action$.pipe(
@@ -89,20 +85,18 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
       const noteModel = new anki.Model(exportData.noteModel)
       const clozeNoteModel = new anki.ClozeModel(exportData.clozeNoteModel)
 
-      let count = 0
       const processClipsObservables = exportData.clips.map(
-        (clipSpecs: ClipSpecs) =>
+        (clipSpecs: ClipSpecs, i) =>
           defer(async () => {
             const clipDataResult = await processClip(clipSpecs, directory)
             if (clipDataResult.errors)
               throw new Error(clipDataResult.errors.join('; '))
 
             const clipData = clipDataResult.value
-            registerClip(pkg, deck, noteModel, clozeNoteModel, clipData)
-            count += 1
+            await registerClip(pkg, deck, noteModel, clozeNoteModel, clipData)
             return r.setProgress({
-              percentage: (count / exportData.clips.length) * 100,
-              message: `${count} clips out of ${
+              percentage: (i + 1 / exportData.clips.length) * 100,
+              message: `${i + 1} clips out of ${
                 exportData.clips.length
               } processed`,
             })
@@ -152,12 +146,12 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
   )
 }
 
-function registerClip(
+async function registerClip(
   pkg: any,
   deck: any,
   noteModel: any,
   clozeNoteModel: any,
-  clipData: MkankiNoteData
+  clipData: AnkiNote
 ) {
   const { note, clozeNote, soundData, imageData } = clipData
   deck.addNote(noteModel.note(note.fields, note.guid, note.tags)) // todo: try with knowclip id as second argument
@@ -165,94 +159,8 @@ function registerClip(
     deck.addNote(
       clozeNoteModel.note(clozeNote.fields, clozeNote.guid, clozeNote.tags)
     )
-  pkg.addMedia(soundData.data, soundData.fileName)
-  if (imageData) pkg.addMedia(imageData.data, imageData.fileName)
-}
-
-type MkankiNoteData = {
-  note: {
-    fields: string[]
-    guid: null
-    tags: string
-  }
-  clozeNote: {
-    fields: string[]
-    guid: null
-    tags: string
-  } | null
-  soundData: {
-    data: Buffer
-    fileName: string
-  }
-  imageData: {
-    data: Buffer
-    fileName: string
-  } | null
-}
-
-async function processClip(
-  clipSpecs: ClipSpecs,
-  directory: string
-): AsyncResult<MkankiNoteData> {
-  const {
-    outputFilename,
-    sourceFilePath,
-    startTime,
-    endTime,
-    flashcardSpecs: { fields, tags, clozeDeletions, image },
-  } = clipSpecs
-
-  const note = { fields, guid: null, tags }
-  // todo: try with knowclip id as second argument
-  const clozeNote = clozeDeletions
-    ? { fields: [clozeDeletions, ...fields.slice(1)], guid: null, tags }
-    : null
-
-  const clipOutputFilePath = join(directory, outputFilename)
-  const clipAudioResult = await clipAudio(
-    sourceFilePath,
-    startTime,
-    endTime,
-    clipOutputFilePath
-  )
-  if (clipAudioResult.errors)
-    return {
-      errors: [
-        `Could not make clip from ${sourceFilePath}`,
-        ...clipAudioResult.errors,
-      ],
-    }
-  const soundData = {
-    data: await readFile(clipOutputFilePath),
-    fileName: outputFilename,
-  }
-
-  const imageResult = image
-    ? await getVideoStill(image.id, sourceFilePath, image.seconds)
-    : null
-  if (imageResult && imageResult.errors)
-    return {
-      errors: [
-        `Could not make clip from ${sourceFilePath}`,
-        ...imageResult.errors,
-      ],
-    }
-
-  const imageData = imageResult
-    ? {
-        data: await readFile(imageResult.value),
-        fileName: basename(imageResult.value),
-      }
-    : null
-
-  return {
-    value: {
-      note,
-      clozeNote,
-      soundData,
-      imageData,
-    },
-  }
+  pkg.addMedia(await soundData.data(), soundData.fileName)
+  if (imageData) pkg.addMedia(await imageData.data(), imageData.fileName)
 }
 
 function getMissingMedia(

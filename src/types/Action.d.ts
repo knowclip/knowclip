@@ -241,7 +241,7 @@ declare type ExportMarkdown = {
 }
 declare type ExportCsv = {
   type: 'EXPORT_CSV'
-  clipIds: Array<ClipId>
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   csvFilePath: string
   mediaFolderLocation: string
 }

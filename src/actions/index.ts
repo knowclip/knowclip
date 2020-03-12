@@ -1,3 +1,4 @@
+import * as A from '../types/ActionType'
 import { WaveformSelectionExpanded } from '../selectors/cardPreview'
 
 export * from './clips'
@@ -20,7 +21,7 @@ export const setCurrentFile = (index: number): Action => ({
 })
 
 export const exportApkgRequest = (
-  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaIdsToClipsIds'],
+  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
   mediaOpenPrior: MediaFile | null
 ): ExportApkgRequest => ({
   type: A.EXPORT_APKG_REQUEST,
@@ -44,17 +45,17 @@ export const exportMp3 = (exportData: ApkgExportData): Action => ({
 })
 
 export const exportCsv = (
-  clipIds: Array<ClipId>,
+  mediaFileIdsToClipIds: Record<string, (string | undefined)[]>,
   csvFilePath: string,
   mediaFolderLocation: string
-): Action => ({
+): ExportCsv => ({
   type: A.EXPORT_CSV,
-  clipIds,
+  mediaFileIdsToClipIds,
   csvFilePath,
   mediaFolderLocation,
 })
 
-export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({
+export const exportMarkdown = (clipIds: Array<ClipId>): ExportMarkdown => ({
   type: A.EXPORT_MARKDOWN,
   clipIds,
 })

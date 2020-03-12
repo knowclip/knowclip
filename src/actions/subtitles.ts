@@ -1,3 +1,4 @@
+import * as A from '../types/ActionType'
 import { basename } from 'path'
 import { openFileRequest } from './files'
 import { uuid } from '../utils/sideEffects'

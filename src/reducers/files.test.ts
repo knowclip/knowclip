@@ -1,5 +1,6 @@
 import files from './files'
 import { linkFlashcardFieldToSubtitlesTrack } from '../actions'
+import * as A from '../types/ActionType'
 
 describe('files reducer', () => {
   describe(A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK, () => {

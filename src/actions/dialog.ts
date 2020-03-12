@@ -1,3 +1,5 @@
+import * as A from '../types/ActionType'
+
 export const enqueueDialog = (
   dialog: DialogData,
   skipQueue: boolean = false
@@ -46,12 +48,12 @@ export const mediaFolderLocationFormDialog = (
 
 export const reviewAndExportDialog = (
   mediaOpenPrior: MediaFile | null,
-  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaIdsToClipsIds']
+  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
 ) =>
   enqueueDialog({
     type: 'ReviewAndExport',
     mediaOpenPrior,
-    mediaIdsToClipsIds: mediaFileIdsToClipIds,
+    mediaFileIdsToClipIds: mediaFileIdsToClipIds,
   })
 
 export const newProjectFormDialog = () =>
@@ -66,8 +68,10 @@ export const closeDialog = (): DialogAction => ({
   type: A.CLOSE_DIALOG,
 })
 
-export const csvAndMp3ExportDialog = (clipIds: Array<ClipId>): DialogAction =>
-  enqueueDialog({ type: 'CsvAndMp3Export', clipIds }, true)
+export const csvAndMp3ExportDialog = (
+  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
+): DialogAction =>
+  enqueueDialog({ type: 'CsvAndMp3Export', mediaFileIdsToClipIds }, true)
 
 export const subtitlesClipDialog = (): DialogAction =>
   enqueueDialog({ type: 'SubtitlesClips' })

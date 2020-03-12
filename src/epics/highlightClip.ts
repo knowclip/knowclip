@@ -1,6 +1,7 @@
 import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { empty, of } from 'rxjs'
+import * as A from '../types/ActionType'
 import * as r from '../redux'
 
 const elementWidth = (element: Element) => {

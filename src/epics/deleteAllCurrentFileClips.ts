@@ -2,6 +2,7 @@ import { of, empty } from 'rxjs'
 import { map, flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import * as r from '../redux'
+import * as A from '../types/ActionType'
 
 const deleteAllCurrentFileClips: AppEpic = (action$, state$) =>
   action$.pipe(

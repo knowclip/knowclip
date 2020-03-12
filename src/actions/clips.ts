@@ -1,5 +1,6 @@
 import { DeepPartial } from 'redux'
 import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
+import * as A from '../types/ActionType'
 
 export const addClip = (
   clip: Clip,

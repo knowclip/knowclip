@@ -1,6 +1,7 @@
 import { map } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import * as r from '../redux'
+import * as A from '../types/ActionType'
 
 const defaultTagsEpic: AppEpic = (action$, state$) =>
   action$.pipe(

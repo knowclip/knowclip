@@ -1,3 +1,5 @@
+import * as A from '../types/ActionType'
+
 export const dismissMedia = (): DismissMedia => ({ type: 'DISMISS_MEDIA' })
 
 export const toggleLoop = (): ToggleLoop => ({
