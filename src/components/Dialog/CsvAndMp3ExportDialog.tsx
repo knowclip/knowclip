@@ -163,7 +163,7 @@ const CsvAndMp3ExportDialog = ({
                   color="primary"
                 />
               }
-              label="Check in this folder automatically next time a file is missing"
+              label="Remember this folder as my Anki collection.media folder"
             />
           </FormControl>
         </form>
