@@ -39,20 +39,17 @@ export const exportApkgSuccess = (successMessage: string): Action => ({
   successMessage,
 })
 
-export const exportMp3 = (exportData: ApkgExportData): Action => ({
-  type: A.EXPORT_MP3,
-  exportData,
-})
-
 export const exportCsv = (
   mediaFileIdsToClipIds: Record<string, (string | undefined)[]>,
   csvFilePath: string,
-  mediaFolderLocation: string
+  mediaFolderLocation: string,
+  rememberLocation: boolean
 ): ExportCsv => ({
   type: A.EXPORT_CSV,
   mediaFileIdsToClipIds,
   csvFilePath,
   mediaFolderLocation,
+  rememberLocation,
 })
 
 export const exportMarkdown = (clipIds: Array<ClipId>): ExportMarkdown => ({

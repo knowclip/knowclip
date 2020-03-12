@@ -181,7 +181,6 @@ declare type ProjectAction =
   | CloseProjectRequest
   | SaveProjectRequest
   | SaveProjectAsRequest
-  | ExportMp3
   | ExportApkgRequest
   | ExportApkgFailure
   | ExportApkgSuccess
@@ -221,7 +220,6 @@ declare type CloseProject = { type: 'CLOSE_PROJECT' }
 declare type CloseProjectRequest = { type: 'CLOSE_PROJECT_REQUEST' }
 declare type SaveProjectRequest = { type: 'SAVE_PROJECT_REQUEST' }
 declare type SaveProjectAsRequest = { type: 'SAVE_PROJECT_AS_REQUEST' }
-declare type ExportMp3 = { type: 'EXPORT_MP3'; exportData: ApkgExportData }
 declare type ExportApkgRequest = {
   type: 'EXPORT_APKG_REQUEST'
   mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
@@ -244,6 +242,7 @@ declare type ExportCsv = {
   mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   csvFilePath: string
   mediaFolderLocation: string
+  rememberLocation: boolean
 }
 declare type SetWorkIsUnsaved = {
   type: 'SET_WORK_IS_UNSAVED'

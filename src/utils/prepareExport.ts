@@ -122,11 +122,14 @@ export const getApkgExportData = (
 
   for (const mediaFileId in mediaIdToClipsIds) {
     const clipIds = mediaIdToClipsIds[mediaFileId]
+    if (!clipIds.length) continue
+
     const media = r.getFile<MediaFile>(
       state,
       'MediaFile',
       mediaFileId
     ) as MediaFile
+
     const fileLoaded = getFileAvailability(state, media)
     if (!fileLoaded.filePath)
       throw new Error(`Please open ${media.name} and try again.`)
@@ -188,9 +191,11 @@ export const getApkgExportData = (
             : null,
 
           clozeDeletions: flashcard.cloze.length
-            ? encodeClozeDeletions(
-                flashcard.fields.transcription,
-                flashcard.cloze
+            ? roughEscape(
+                encodeClozeDeletions(
+                  flashcard.fields.transcription,
+                  flashcard.cloze
+                )
               )
             : undefined,
         },
@@ -247,12 +252,12 @@ export const getCsvText = (exportData: ApkgExportData) => {
   } of exportData.clips) {
     csvData.push([...fields, tags])
     if (clozeDeletions) {
-      clozeCsvData.push([...fields.slice(1), tags])
+      clozeCsvData.push([clozeDeletions, ...fields.slice(1), tags])
     }
   }
 
   return {
     csvText: unparse(csvData),
-    clozeCsvText: clozeCsvData.length ? unparse(csvData) : null,
+    clozeCsvText: clozeCsvData.length ? unparse(clozeCsvData) : null,
   }
 }

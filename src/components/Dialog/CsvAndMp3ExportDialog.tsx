@@ -6,6 +6,9 @@ import {
   DialogActions,
   Button,
   TextField,
+  FormControl,
+  FormControlLabel,
+  Checkbox,
 } from '@material-ui/core'
 import * as r from '../../redux'
 import {
@@ -28,7 +31,7 @@ type Props = {
 
 const CsvAndMp3ExportDialog = ({
   open,
-  data: { clipIds },
+  data: { mediaFileIdsToClipIds },
 }: DialogProps<CsvAndMp3ExportDialogData>) => {
   const { currentMediaFolderLocation } = useSelector((state: AppState) => ({
     currentMediaFolderLocation: r.getMediaFolderLocation(state),
@@ -51,13 +54,27 @@ const CsvAndMp3ExportDialog = ({
     [fields]
   )
   const [errors, setErrors] = useState<ErrorsState>({})
+  const [rememberLocation, setRememberLocation] = useState(true)
+  const toggleRememberLocation = useCallback(
+    () => {
+      setRememberLocation(l => !l)
+    },
+    [setRememberLocation]
+  )
 
   const onSubmit = useCallback(
     e => {
       const { csvFilePath, mediaFolderLocation } = fields
       if (csvFilePath && mediaFolderLocation) {
         dispatch(closeDialog())
-        return dispatch(exportCsv(clipIds, csvFilePath, mediaFolderLocation))
+        return dispatch(
+          exportCsv(
+            mediaFileIdsToClipIds,
+            csvFilePath,
+            mediaFolderLocation,
+            rememberLocation
+          )
+        )
       }
       const errors: ErrorsState = {}
       if (!csvFilePath)
@@ -68,7 +85,7 @@ const CsvAndMp3ExportDialog = ({
           'Please choose a location to save your audio clips.'
       setErrors(errors)
     },
-    [dispatch, clipIds, fields]
+    [dispatch, mediaFileIdsToClipIds, fields, rememberLocation]
   )
 
   const onFocusMediaFolderLocation = useCallback(
@@ -137,6 +154,18 @@ const CsvAndMp3ExportDialog = ({
             error={Boolean(errors.mediaFolderLocation)}
             helperText={errors.mediaFolderLocation}
           />
+          <FormControl fullWidth margin="normal">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rememberLocation}
+                  onChange={toggleRememberLocation}
+                  color="primary"
+                />
+              }
+              label="Check in this folder automatically next time a file is missing"
+            />
+          </FormControl>
         </form>
       </DialogContent>
       <DialogActions>

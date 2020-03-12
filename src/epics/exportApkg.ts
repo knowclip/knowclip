@@ -75,6 +75,7 @@ const exportApkg: AppEpic = (action$, state$) =>
       return makeApkg(exportData, directory)
     })
   )
+
 function makeApkg(exportData: ApkgExportData, directory: string) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
@@ -102,7 +103,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
             })
           })
       )
-      const result = of(
+      return of(
         r.setProgress({
           percentage: 0,
           message: 'Processing clips...',
@@ -134,7 +135,6 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           )
         )
       )
-      return result
     }),
     catchError(err => {
       console.error(err)
