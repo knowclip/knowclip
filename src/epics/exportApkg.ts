@@ -171,7 +171,6 @@ function registerClip(
   } = clipSpecs
 
   const note = { fields, guid: id, tags }
-  // todo: try with knowclip id as second argument
   const clozeNote = clozeDeletions
     ? {
         fields: [clozeDeletions, ...fields.slice(1)],
@@ -180,7 +179,7 @@ function registerClip(
       }
     : null
 
-  deck.addNote(noteModel.note(note.fields, note.guid, note.tags)) // todo: try with knowclip id as second argument
+  deck.addNote(noteModel.note(note.fields, note.guid, note.tags))
   if (clozeNote)
     deck.addNote(
       clozeNoteModel.note(clozeNote.fields, clozeNote.guid, clozeNote.tags)
