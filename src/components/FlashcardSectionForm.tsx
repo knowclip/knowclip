@@ -41,36 +41,31 @@ const FlashcardSectionForm = memo(
     className,
     mediaFile,
     autofocusFieldName,
+    flashcard,
   }: {
     className?: string
     mediaFile: MediaFile
     clipId: ClipId
+    flashcard: Flashcard
     autofocusFieldName: FlashcardFieldName
   }) => {
     const {
       allTags,
-      selectedClipTime,
       currentNoteType,
       isLoopOn,
       subtitlesFlashcardFieldLinks,
-      flashcard,
       subtitles,
       mediaIsPlaying,
       viewMode,
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),
-      selectedClipTime: r.getSelectedClipTime(state),
       currentNoteType: r.getCurrentNoteType(state),
       isLoopOn: r.isLoopOn(state),
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
-      flashcard: r.getHighlightedFlashcard(state),
       subtitles: r.getSubtitlesFilesWithTracks(state),
       mediaIsPlaying: r.isMediaPlaying(state),
       viewMode: state.settings.viewMode,
     }))
-
-    if (!selectedClipTime || !flashcard) throw new Error('Clip not found') // TODO: DELETE
-
     const { id } = flashcard
 
     const dispatch = useDispatch()
@@ -211,7 +206,7 @@ const FlashcardSectionForm = memo(
         </section>
 
         <section className={css.menu}>
-          <Tooltip title="Show card preview (Esc)">
+          <Tooltip title="Show card preview + cloze deletions (Esc)">
             <IconButton onClick={handleClickPreviewButton}>
               <ShortTextTwoTone />
             </IconButton>

@@ -4,12 +4,23 @@ import { getMidpoint } from '../utils/getVideoStill'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
-    return [await r.openFileSuccess(file, filePath)]
+    const img = new Image()
+    img.src = `file:///${filePath}`
+    return await new Promise((res, rej) => {
+      const onLoad = () => {
+        res([r.openFileSuccess(file, filePath)])
+        img.removeEventListener('load', onLoad)
+      }
+      const onError = (e: any) => {
+        res([r.openFileFailure(file, filePath, String(e))])
+        img.removeEventListener('error', onLoad)
+      }
+      img.addEventListener('load', onLoad)
+      img.addEventListener('error', onError)
+    })
   },
   openSuccess: [
     async ({ validatedFile, filePath }) => {
-      const img = new Image()
-      img.src = `file:///${filePath}`
       return []
     },
   ],

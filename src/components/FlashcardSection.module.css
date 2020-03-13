@@ -11,23 +11,21 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-
-  padding: 2rem;
-
 }
 
 
 .intro {
-  max-width: 800px;
+  max-width: 500px;
   display: flex;
   flex-flow: column;
   justify-content: center;
-  padding: 1rem;
+  padding: 4rem 2rem;
+}
+.intro.horizontalIntro {
+  padding: 2rem;
 }
 .introText {
   text-align: center;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
 }
 
 .introText,.introList {
@@ -62,10 +60,8 @@
   position: relative;
   display: flex;
   flex-flow: row nowrap;
-  align-items: center;
   border-radius: 0;
 }
-
 .clipsCount,
 .timeStamp {
   font-size: 0.8em;
@@ -77,14 +73,14 @@
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
   align-items: stretch;
-  padding: 4rem 1rem 1rem;
+  padding: 4rem 1rem 4rem;
 }
 
 .horizontalForm {
   padding: 2rem 4rem;
   flex-flow: row nowrap;
+  justify-content: center;
 }
 
 .formTop {
@@ -105,8 +101,6 @@
   opacity: 0.9;
   position: relative;
 
-  /* background: none;
-	color: inherit; */
 	border: none;
 	padding: 0;
 	font: inherit;
@@ -152,6 +146,7 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   text-align: center;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
 }
 .flashcardImageUnused::after {
   opacity: 1;

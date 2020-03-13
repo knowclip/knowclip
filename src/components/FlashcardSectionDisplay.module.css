@@ -20,16 +20,17 @@
 
 .preview {
   color: #777;
+  padding: 4rem 2rem;
 }
 .card {
   color: inherit;
+  padding: 4rem 2rem;
 }
 
 .horizontalPreview {
   margin-top: 0;
   font-size: 18px;
-  padding-left: 3em;
-  padding-right: 3em;
+  padding: 2rem 4rem;
 }
 .previewFields {
   flex-grow: 1;
@@ -110,7 +111,8 @@
   right: 1rem;
   text-align: right;
   background-color: rgba(255,255,255,0.8);
-  z-index: 5;
+  z-index: 6;
+  max-width: 16em;
 }
 .secondaryMenu {
   position: absolute;
@@ -122,7 +124,7 @@
 }
 
 .clozeButtons {
-  display: inline-block;
+  display: inline;
 
   --initial-width: auto;
 }

@@ -20,7 +20,7 @@ const Main = () => {
   const {
     loop,
     audioIsLoading,
-    currentProjectId,
+    currentProject,
     constantBitrateFilePath,
     currentMediaFile,
     subtitles,
@@ -30,7 +30,7 @@ const Main = () => {
     return {
       loop: r.isLoopOn(state),
       audioIsLoading: r.isAudioLoading(state),
-      currentProjectId: r.getCurrentProjectId(state),
+      currentProject: r.getCurrentProject(state),
       constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
       currentMediaFile,
       clipsIdsForExport: currentMediaFile
@@ -41,13 +41,13 @@ const Main = () => {
     }
   })
 
-  if (!currentProjectId) return <Redirect to="/projects" />
+  if (!currentProject) return <Redirect to="/projects" />
 
   return (
     <div className={css.container} id={$.container}>
       <DarkTheme>
         <Header
-          currentProjectId={currentProjectId}
+          currentProjectId={currentProject.id}
           currentMediaFile={currentMediaFile}
         />
       </DarkTheme>
@@ -76,6 +76,7 @@ const Main = () => {
         <FlashcardSection
           mediaFile={currentMediaFile}
           className={css.flashcardSection}
+          projectFile={currentProject}
         />
       </section>
 
