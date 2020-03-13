@@ -14,6 +14,7 @@ import electron, { shell } from 'electron'
 import rcompare from 'semver/functions/rcompare'
 import gt from 'semver/functions/gt'
 import { join } from 'path'
+import { REHYDRATE } from 'redux-persist'
 
 const showSettingsDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'show-settings-dialog').pipe(
@@ -83,7 +84,7 @@ const startupCheckForUpdates: AppEpic = (
   state$,
   { ipcRenderer, window }
 ) =>
-  action$.ofType<InitializeApp>('INITIALIZE_APP').pipe(
+  action$.ofType<any>(REHYDRATE).pipe(
     flatMap(async () => {
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
       if (!checkAtStartup) return empty()
