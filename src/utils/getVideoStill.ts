@@ -1,4 +1,4 @@
-import ffmpeg, { AsyncError } from '../utils/ffmpeg'
+import ffmpeg from '../utils/ffmpeg'
 import { existsSync } from 'fs'
 import tempy from 'tempy'
 import { join, basename } from 'path'
@@ -10,10 +10,11 @@ export const getVideoStill = async (
   clipId: ClipId,
   videoFilePath: string,
   seconds: number
-): Promise<string | Error> => {
+): AsyncResult<string> => {
   try {
     const outputFilePath = getVideoStillPngPath(clipId, videoFilePath, seconds)
-    if (outputFilePath && existsSync(outputFilePath)) return outputFilePath
+    if (outputFilePath && existsSync(outputFilePath))
+      return { value: outputFilePath }
 
     await new Promise((res, rej) => {
       ffmpeg(videoFilePath)
@@ -22,7 +23,7 @@ export const getVideoStill = async (
         .size(`?x${VIDEO_STILL_HEIGHT}`)
         .output(outputFilePath)
         .on('end', function() {
-          res(outputFilePath)
+          res({ value: outputFilePath })
         })
         .on('error', (err: any) => {
           console.error(
@@ -41,9 +42,9 @@ export const getVideoStill = async (
         )} at ${seconds} seconds.`
       )
 
-    return outputFilePath
-  } catch (err) {
-    return new AsyncError(err)
+    return { value: outputFilePath }
+  } catch (error) {
+    return { errors: [error] }
   }
 }
 

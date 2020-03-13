@@ -1,4 +1,5 @@
 import { nowUtcTimestamp } from '../utils/sideEffects'
+import * as A from '../types/ActionType'
 
 export const addFile = <F extends FileMetadata>(
   file: F,

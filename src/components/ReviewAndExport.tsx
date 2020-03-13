@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Dialog,
@@ -25,7 +25,7 @@ enum $ {
 const Export = React.memo(
   ({
     open,
-    data: { mediaOpenPrior, mediaIdsToClipsIds: initialSelectedClips },
+    data: { mediaOpenPrior, mediaFileIdsToClipIds: initialSelectedClips },
   }: DialogProps<ReviewAndExportDialogData>) => {
     const dispatch = useDispatch()
     const {
@@ -71,6 +71,10 @@ const Export = React.memo(
       setSelectionHasStarted,
     ])
     const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
+    const somethingSelected = useMemo(
+      () => Object.values(selectedIds).some(ids => ids.some(id => Boolean(id))),
+      [selectedIds]
+    )
     const exportApkg = useCallback(
       () => {
         dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
@@ -78,12 +82,12 @@ const Export = React.memo(
       [dispatch, selectedIds, mediaOpenPrior]
     )
     const csvAndMp3ExportDialog = useCallback(
-      () => dispatch(actions.csvAndMp3ExportDialog([])),
-      [dispatch]
+      () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
+      [dispatch, selectedIds]
     )
     const exportMarkdown = useCallback(
-      () => dispatch(actions.exportMarkdown([])),
-      [dispatch]
+      () => dispatch(actions.exportMarkdown(selectedIds)),
+      [dispatch, selectedIds]
     )
 
     const onSelect = useCallback(
@@ -128,6 +132,7 @@ const Export = React.memo(
       },
       [setExpandedTableIndex]
     )
+    const submitDisabled = Boolean(progress) || !somethingSelected
 
     return (
       <Dialog
@@ -186,7 +191,7 @@ const Export = React.memo(
               <Button
                 variant="contained"
                 color="primary"
-                disabled={Boolean(progress)}
+                disabled={submitDisabled}
                 onClick={csvAndMp3ExportDialog}
               >
                 Export CSV and MP3 from selected clips
@@ -196,7 +201,7 @@ const Export = React.memo(
               <Button
                 variant="contained"
                 color="primary"
-                disabled={Boolean(progress)}
+                disabled={submitDisabled}
                 onClick={exportMarkdown}
               >
                 Export Markdown from selected clips
@@ -206,7 +211,7 @@ const Export = React.memo(
               <Button
                 variant="contained"
                 color="primary"
-                disabled={Boolean(progress)}
+                disabled={submitDisabled}
                 onClick={exportApkg}
                 id={$.exportApkgButton}
               >
@@ -244,23 +249,30 @@ function IntroText({ currentTabIndex }: { currentTabIndex: number }) {
       {currentTabIndex === 0 && (
         <section className={css.introText}>
           <p>
-            Export an Anki .apkg file. This format is best for{' '}
-            <strong>starting a new deck.</strong>
+            Export an Anki .apkg file. Use this format to{' '}
+            <strong>create a new deck</strong> or to{' '}
+            <strong>update an existing deck</strong> which you previously
+            created with Knowclip.
           </p>
           <p>
-            If you want to update some flashcards you've previously exported, or
-            add some new cards to a previously exported deck, you probably want
-            to export CSV and MP3s.
+            All media will be bundled together with your flashcards in one
+            single file for importing into Anki.
           </p>
+          <p />
         </section>
       )}
       {currentTabIndex === 1 && (
         <section className={css.introText}>
-          <p>Export a Comma-Separated-Values file along with MP3s.</p>
+          <p>
+            Export a Comma-Separated-Values file along with MP3 audio clips and
+            PNG image files.
+          </p>
           <p>
             This format is best for{' '}
-            <strong>updating or adding to a deck</strong> which you've
-            previously exported.
+            <strong>updating or adding to an existing deck</strong> which you
+            didn't make using Knowclip. You might want this format in case
+            you're an advanced Anki user and want to work with some custom Anki
+            note formats.
           </p>
         </section>
       )}

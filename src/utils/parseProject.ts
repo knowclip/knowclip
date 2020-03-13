@@ -22,7 +22,7 @@ type NormalizedProjectFileData = {
 
 export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
-): Promise<Result<ProjectJson<F>>> => {
+): AsyncResult<ProjectJson<F>> => {
   try {
     const docs = YAML.parseAllDocuments(await readFile(filePath, 'utf8'), {
       // default of 100 is easily reached

@@ -1,6 +1,7 @@
 import { ignoreElements, mergeAll, tap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, of } from 'rxjs'
+import * as A from '../types/ActionType'
 import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'

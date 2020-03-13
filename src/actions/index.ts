@@ -1,3 +1,4 @@
+import * as A from '../types/ActionType'
 import { WaveformSelectionExpanded } from '../selectors/cardPreview'
 
 export * from './clips'
@@ -20,7 +21,7 @@ export const setCurrentFile = (index: number): Action => ({
 })
 
 export const exportApkgRequest = (
-  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaIdsToClipsIds'],
+  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
   mediaOpenPrior: MediaFile | null
 ): ExportApkgRequest => ({
   type: A.EXPORT_APKG_REQUEST,
@@ -38,25 +39,24 @@ export const exportApkgSuccess = (successMessage: string): Action => ({
   successMessage,
 })
 
-export const exportMp3 = (exportData: ApkgExportData): Action => ({
-  type: A.EXPORT_MP3,
-  exportData,
-})
-
 export const exportCsv = (
-  clipIds: Array<ClipId>,
+  mediaFileIdsToClipIds: Record<string, (string | undefined)[]>,
   csvFilePath: string,
-  mediaFolderLocation: string
-): Action => ({
+  mediaFolderLocation: string,
+  rememberLocation: boolean
+): ExportCsv => ({
   type: A.EXPORT_CSV,
-  clipIds,
+  mediaFileIdsToClipIds,
   csvFilePath,
   mediaFolderLocation,
+  rememberLocation,
 })
 
-export const exportMarkdown = (clipIds: Array<ClipId>): Action => ({
+export const exportMarkdown = (
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
+): ExportMarkdown => ({
   type: A.EXPORT_MARKDOWN,
-  clipIds,
+  mediaFileIdsToClipIds,
 })
 
 export const detectSilenceRequest = (): Action => ({

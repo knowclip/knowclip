@@ -1,5 +1,6 @@
 import { switchMap } from 'rxjs/operators'
 import * as r from '../redux'
+import * as A from '../types/ActionType'
 import { ofType } from 'redux-observable'
 import { from } from 'rxjs'
 

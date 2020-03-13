@@ -1,3 +1,5 @@
+import * as A from '../types/ActionType'
+
 export const setMediaFolderLocation = (
   directoryPath: string
 ): SetMediaFolderLocation => ({

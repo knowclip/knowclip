@@ -1,3 +1,5 @@
+import * as A from '../types/ActionType'
+
 export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
   type: A.ENQUEUE_SNACKBAR,
   snackbar,

@@ -3,6 +3,7 @@ import newFlashcard from '../utils/newFlashcard'
 import { getNoteTypeFields } from '../utils/noteType'
 import { arrayToMapById } from '../utils/arrayToMapById'
 import { TransliterationFlashcardFields } from '../types/Project'
+import * as A from '../types/ActionType'
 
 const initialState: ClipsState = {
   byId: {},

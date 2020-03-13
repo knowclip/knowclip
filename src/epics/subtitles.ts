@@ -14,6 +14,7 @@ import {
 } from 'rxjs/operators'
 import { of, Observable, defer } from 'rxjs'
 import * as r from '../redux'
+import * as A from '../types/ActionType'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'

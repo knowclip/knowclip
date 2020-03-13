@@ -32,28 +32,19 @@ export const toTimestamp = (
   return `${hoursStamp}${unitsSeparator}${minutesStamp}${unitsSeparator}${secondsStamp}${millisecondsSeparator}${millisecondsStamp}`
 }
 
-export class AsyncError extends Error {
-  thrown: any
-  constructor(thrown: any, message = '') {
-    const thrownMessage = thrown && 'message' in thrown ? thrown.message : null
-    super([message, thrownMessage].filter(x => x).join(''))
-    this.thrown = thrown
-  }
-}
-
 export const getMediaMetadata = async (
   path: string
-): Promise<FfprobeData | AsyncError> => {
+): AsyncResult<FfprobeData> => {
   try {
     return await new Promise((res, rej) => {
-      ffmpeg.ffprobe(path, (error, metadata) => {
+      ffmpeg.ffprobe(path, (error, ffprobeMetadata) => {
         if (error) rej(error)
 
-        res(metadata)
+        res({ value: ffprobeMetadata })
       })
     })
   } catch (error) {
-    return new AsyncError(error)
+    return { errors: [error] }
   }
 }
 
@@ -63,10 +54,11 @@ export const readMediaFile = async (
   projectId: string,
   subtitles: MediaFile['subtitles'] = [],
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
-): Promise<MediaFile | AsyncError> => {
-  const ffprobeMetadata = await getMediaMetadata(filePath)
-  if (ffprobeMetadata instanceof AsyncError) return ffprobeMetadata
+): AsyncResult<MediaFile> => {
+  const metadata = await getMediaMetadata(filePath)
+  if (metadata.errors) return { errors: metadata.errors }
 
+  const { value: ffprobeMetadata } = metadata
   const videoStream = ffprobeMetadata.streams.find(
     ({ codec_type }) => codec_type && /video/i.test(codec_type)
   )
@@ -88,16 +80,19 @@ export const readMediaFile = async (
       .map(stream => stream.index),
   }
 
-  return ffprobeMetadata.format.format_name !== 'mp3' && videoStream
-    ? {
-        ...base,
-        isVideo: true,
+  const file: MediaFile =
+    ffprobeMetadata.format.format_name !== 'mp3' && videoStream
+      ? {
+          ...base,
+          isVideo: true,
 
-        width: videoStream.width as number,
-        height: videoStream.height as number,
-      }
-    : {
-        ...base,
-        isVideo: false,
-      }
+          width: videoStream.width as number,
+          height: videoStream.height as number,
+        }
+      : {
+          ...base,
+          isVideo: false,
+        }
+
+  return { value: file }
 }

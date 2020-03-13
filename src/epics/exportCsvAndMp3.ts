@@ -1,94 +1,140 @@
-import { flatMap, mergeAll } from 'rxjs/operators'
+import {
+  flatMap,
+  mergeAll,
+  concat,
+  concatMap,
+  map,
+  endWith,
+  catchError,
+} from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, from, Observable } from 'rxjs'
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import { of, from, defer, empty } from 'rxjs'
 import * as r from '../redux'
+import * as A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
-import clipAudio from '../utils/clipAudio'
-
-const exportFailureSnackbar = (err: Error) =>
-  r.simpleMessageSnackbar(`There was a problem making clips: ${err.message}`)
+import { processNoteMedia } from '../utils/ankiNote'
+import { writeFile } from 'fs-extra'
+import { join, basename } from 'path'
 
 const exportCsv: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportCsv>(A.EXPORT_CSV),
-    flatMap<ExportCsv, Promise<Observable<Action>>>(
-      async ({ clipIds, csvFilePath, mediaFolderLocation }) => {
-        try {
-          const currentProject = r.getCurrentProject(state$.value)
-          if (!currentProject)
-            return of(r.simpleMessageSnackbar('Could not find project'))
+    flatMap(
+      ({
+        mediaFileIdsToClipIds,
+        csvFilePath,
+        mediaFolderLocation,
+        rememberLocation,
+      }) => {
+        const clozeCsvFilePath = csvFilePath.replace(/\.csv$/, '__CLOZE.csv')
 
-          const exportData = getApkgExportData(state$.value, currentProject, {})
-          if ('missingMediaFiles' in exportData) {
-            return from(
-              [...exportData.missingMediaFiles].map(file =>
-                r.locateFileRequest(
-                  file,
-                  `You can't make clips from this file until you've located it in the filesystem:\n${
-                    file.name
-                  }`
-                )
+        const currentProject = r.getCurrentProject(state$.value)
+        if (!currentProject)
+          return of(r.simpleMessageSnackbar('Could not find project'))
+
+        const exportData = getApkgExportData(
+          state$.value,
+          currentProject,
+          mediaFileIdsToClipIds
+        )
+        if ('missingMediaFiles' in exportData) {
+          return from(
+            [...exportData.missingMediaFiles].map(file =>
+              r.locateFileRequest(
+                file,
+                `You can't make clips from this file until you've located it in the filesystem:\n${
+                  file.name
+                }`
               )
             )
-          }
-
-          const csvText = getCsvText(exportData)
-          await fs.writeFile(csvFilePath, csvText, 'utf8')
-          return from([
-            r.simpleMessageSnackbar(`Flashcards saved in ${csvFilePath}`),
-            r.setMediaFolderLocation(mediaFolderLocation), // should probably just get rid of this action
-            r.exportMp3(exportData),
-          ])
-        } catch (err) {
-          return of(
-            r.simpleMessageSnackbar(`Problem saving flashcard: ${err.message}`)
           )
         }
+
+        const { csvText, clozeCsvText } = getCsvText(exportData)
+
+        let processed = 0
+
+        const processClipsObservables = exportData.clips.map(
+          (clipSpecs: ClipSpecs) =>
+            defer(async () => {
+              const clipDataResult = await processNoteMedia(
+                clipSpecs,
+                mediaFolderLocation
+              )
+              if (clipDataResult.errors)
+                throw new Error(clipDataResult.errors.join('; '))
+
+              const { soundData, imageData } = clipDataResult.value
+
+              await writeFile(soundData.filePath, await soundData.data())
+              if (imageData)
+                writeFile(
+                  join(mediaFolderLocation, basename(imageData.filePath)),
+                  await imageData.data()
+                )
+              const number = ++processed
+              return r.setProgress({
+                percentage: (number / exportData.clips.length) * 100,
+                message: `${number} clips out of ${
+                  exportData.clips.length
+                } processed`,
+              })
+            })
+        )
+
+        return of(
+          r.setProgress({
+            percentage: 0,
+            message: 'Processing clips...',
+          })
+        ).pipe(
+          concat(
+            rememberLocation &&
+              mediaFolderLocation !== r.getMediaFolderLocation(state$.value)
+              ? of(r.setMediaFolderLocation(mediaFolderLocation))
+              : empty()
+          ),
+          concat(from(processClipsObservables).pipe(mergeAll(20))),
+          concat(
+            of(
+              r.setProgress({
+                percentage: 100,
+                message: `Almost done! Saving csv ${
+                  clozeCsvText ? 'files' : 'file'
+                }...`,
+              })
+            ).pipe(
+              concatMap(() => {
+                return defer(async () => {
+                  await writeFile(csvFilePath, csvText, 'utf8')
+                  if (clozeCsvText) {
+                    await writeFile(clozeCsvFilePath, clozeCsvText, 'utf8')
+                  }
+                }).pipe(
+                  map(() =>
+                    r.exportApkgSuccess(
+                      'Flashcards made in ' +
+                        [csvFilePath, clozeCsvText && clozeCsvFilePath]
+                          .filter(s => s)
+                          .join(' and ')
+                    )
+                  ),
+                  endWith(r.setProgress(null))
+                )
+              })
+            )
+          )
+        )
       }
     ),
-    flatMap<Observable<Action>, Observable<Action>>(x => x)
+    catchError(err => {
+      console.error(err)
+      return from([
+        r.exportApkgFailure(err.message || err.toString()),
+        r.setProgress(null),
+      ])
+    })
   )
 
-const exportMp3: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType<Action, ExportMp3>(A.EXPORT_MP3),
-    flatMap<ExportMp3, Promise<Observable<Action>>>(async ({ exportData }) => {
-      const directory = r.getMediaFolderLocation(state$.value)
-
-      if (!directory)
-        return of(
-          r.mediaFolderLocationFormDialog(r.exportMp3(exportData), true)
-        )
-
-      try {
-        await Promise.all(
-          exportData.clips.map(async clipSpecs => {
-            const {
-              outputFilename,
-              sourceFilePath,
-              startTime,
-              endTime,
-            } = clipSpecs
-            const clipOutputFilePath = join(directory, outputFilename)
-            await clipAudio(
-              sourceFilePath,
-              startTime,
-              endTime,
-              clipOutputFilePath
-            )
-          })
-        )
-
-        return from([r.simpleMessageSnackbar('Clips made in ' + directory)])
-      } catch (err) {
-        console.error(err)
-        return of(exportFailureSnackbar(err))
-      }
-    }),
-    mergeAll()
-  )
-
-export default combineEpics(exportCsv, exportMp3)
+export default combineEpics(exportCsv)

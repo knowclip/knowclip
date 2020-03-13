@@ -1,4 +1,5 @@
 import { Reducer } from 'redux'
+import * as A from '../types/ActionType'
 import deleteKey from '../utils/deleteKey'
 import { areSelectionsEqual } from '../utils/waveformSelection'
 

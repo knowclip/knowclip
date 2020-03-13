@@ -17,23 +17,14 @@ import {
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
 import { of, empty, defer, from } from 'rxjs'
 import * as r from '../redux'
-import { join, basename } from 'path'
-import { promises } from 'fs'
 import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
 import sql from 'better-sqlite3'
-import {
-  getApkgExportData,
-  TEMPLATE_CSS,
-  CLOZE_QUESTION_FORMAT,
-  CLOZE_ANSWER_FORMAT,
-} from '../utils/prepareExport'
-import clipAudio from '../utils/clipAudio'
+import { getApkgExportData } from '../utils/prepareExport'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
-import { getVideoStill, getMidpoint } from '../utils/getVideoStill'
-
-const { readFile } = promises
+import * as A from '../types/ActionType'
+import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 
 const exportApkgFailure: AppEpic = action$ =>
   action$.pipe(
@@ -84,112 +75,42 @@ const exportApkg: AppEpic = (action$, state$) =>
       return makeApkg(exportData, directory)
     })
   )
+
 function makeApkg(exportData: ApkgExportData, directory: string) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
     flatMap(outputFilePath => {
       document.body.style.cursor = 'progress'
-      const fields = exportData.template.fields.map(fn => ({ name: fn }))
-      const noteModel = new anki.Model({
-        name: `Audio note (${exportData.deckName})`,
-        id: exportData.noteModelId,
-        flds: fields,
-        req: exportData.template.cards.map((t, i) => [
-          i,
-          'all',
-          [exportData.template.fields.indexOf('sound')],
-        ]),
-        css: TEMPLATE_CSS,
-        tmpls: exportData.template.cards.map(template => ({
-          name: template.name,
-          qfmt: template.questionFormat,
-          afmt: template.answerFormat,
-        })),
-      })
-      const clozeNoteModel = new anki.ClozeModel({
-        id: exportData.clozeModelId,
-        name: `Cloze (${exportData.deckName})`,
-        flds: fields,
-        css: TEMPLATE_CSS,
-        tmpl: {
-          name: 'Cloze',
-          qfmt: CLOZE_QUESTION_FORMAT,
-          afmt: CLOZE_ANSWER_FORMAT,
-        },
-      })
-
-      const deck = new anki.Deck(Date.now(), exportData.deckName)
-
       const pkg = new anki.Package()
+      const deck = new anki.Deck(exportData.projectId, exportData.deckName)
+      const noteModel = new anki.Model(exportData.noteModel)
+      const clozeNoteModel = new anki.ClozeModel(exportData.clozeNoteModel)
 
-      let count = 0
+      let processed = 0
+
       const processClipsObservables = exportData.clips.map(
-        (clipSpecs: ClipSpecs) =>
-          defer(async () => {
-            const {
-              outputFilename,
-              sourceFilePath,
-              startTime,
-              endTime,
-              flashcardSpecs,
-            } = clipSpecs
-            const { fields } = flashcardSpecs
-            deck.addNote(noteModel.note(fields, null, flashcardSpecs.tags))
-            if (flashcardSpecs.clozeDeletions)
-              deck.addNote(
-                clozeNoteModel.note(
-                  [flashcardSpecs.clozeDeletions, ...fields.slice(1)],
-                  null,
-                  flashcardSpecs.tags
-                )
-              )
-            const clipOutputFilePath = join(directory, outputFilename)
-            try {
-              await clipAudio(
-                sourceFilePath,
-                startTime,
-                endTime,
-                clipOutputFilePath
-              )
-              await pkg.addMedia(
-                await readFile(clipOutputFilePath),
-                outputFilename
-              )
-            } catch (err) {
-              console.error(err)
-              console.log({
-                sourceFilePath,
-                startTime,
-                endTime,
-                clipOutputFilePath,
-              })
-              throw new Error(`Could not make clip from ${sourceFilePath}.`)
-            }
-            if (clipSpecs.flashcardSpecs.image) {
-              const clipId = clipSpecs.flashcardSpecs.id
-              const { image } = clipSpecs.flashcardSpecs
-              const imagePath = await getVideoStill(
-                clipId,
-                sourceFilePath,
-                typeof image.seconds === 'number'
-                  ? image.seconds
-                  : +(getMidpoint(startTime, endTime) / 1000).toFixed(3)
-              )
-              if (imagePath instanceof Error) throw imagePath
+        (clipSpecs: ClipSpecs) => {
+          registerClip(deck, noteModel, clozeNoteModel, clipSpecs)
 
-              await pkg.addMedia(await readFile(imagePath), basename(imagePath))
-            }
-            count += 1
+          return defer(async () => {
+            const noteMediaResult = await processNoteMedia(clipSpecs, directory)
+            if (noteMediaResult.errors)
+              throw new Error(noteMediaResult.errors.join('; '))
 
+            const noteMedia = noteMediaResult.value
+            await addNoteMedia(pkg, noteMedia)
+
+            const number = ++processed
             return r.setProgress({
-              percentage: (count / exportData.clips.length) * 100,
-              message: `${count} clips out of ${
+              percentage: (number / exportData.clips.length) * 100,
+              message: `${number} clips out of ${
                 exportData.clips.length
               } processed`,
             })
           })
+        }
       )
-      const result = of(
+      return of(
         r.setProgress({
           percentage: 0,
           message: 'Processing clips...',
@@ -221,7 +142,6 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           )
         )
       )
-      return result
     }),
     catchError(err => {
       console.error(err)
@@ -231,6 +151,38 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
       ])
     })
   )
+}
+
+function registerClip(
+  deck: any,
+  noteModel: any,
+  clozeNoteModel: any,
+  clipSpecs: ClipSpecs
+) {
+  const {
+    flashcardSpecs: { fields, tags, id, clozeDeletions },
+  } = clipSpecs
+
+  const note = { fields, guid: id, tags }
+  const clozeNote = clozeDeletions
+    ? {
+        fields: [clozeDeletions, ...fields.slice(1)],
+        guid: `${id}__CLOZE`,
+        tags,
+      }
+    : null
+
+  deck.addNote(noteModel.note(note.fields, note.guid, note.tags))
+  if (clozeNote)
+    deck.addNote(
+      clozeNoteModel.note(clozeNote.fields, clozeNote.guid, clozeNote.tags)
+    )
+}
+
+async function addNoteMedia(pkg: any, noteMedia: AnkiNoteMedia) {
+  const { soundData, imageData } = noteMedia
+  pkg.addMedia(await soundData.data(), soundData.fileName)
+  if (imageData) pkg.addMedia(await imageData.data(), imageData.fileName)
 }
 
 function getMissingMedia(

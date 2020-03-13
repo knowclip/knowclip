@@ -29,7 +29,7 @@ declare type MediaFolderLocationFormDialogData = {
 declare type ReviewAndExportDialogData = {
   type: 'ReviewAndExport'
   mediaOpenPrior: MediaFile | null
-  mediaIdsToClipsIds: Record<MediaFileId, Array<ClipId | undefined>>
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
 }
 
 declare type NewProjectFormDialogData = {
@@ -45,7 +45,7 @@ declare type FileSelectionDialogData = {
 declare type CsvAndMp3ExportDialogData = {
   type: 'CsvAndMp3Export'
 
-  clipIds: Array<ClipId>
+  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
 }
 
 declare type SubtitlesClipsDialogData = {

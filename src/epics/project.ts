@@ -8,6 +8,7 @@ import {
 } from 'rxjs/operators'
 import { of, from, empty } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
+import * as A from '../types/ActionType'
 import * as r from '../redux'
 import { promisify } from 'util'
 import fs, { existsSync } from 'fs'

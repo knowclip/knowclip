@@ -1,4 +1,4 @@
-import ffmpeg, { getMediaMetadata, AsyncError } from '../utils/ffmpeg'
+import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import tempy from 'tempy'
 import { existsSync } from 'fs'
 import { getFileAvailabilityById } from '../selectors'
@@ -12,14 +12,14 @@ export const getWaveformPng = async (
   state: AppState,
   file: WaveformPng,
   constantBitrateFilePath: string
-): Promise<string | AsyncError> => {
+): AsyncResult<string> => {
   const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
-  if (ffprobeMetadata instanceof AsyncError) return ffprobeMetadata
+  if (ffprobeMetadata.errors) return ffprobeMetadata
 
   try {
     const {
       format: { duration = 0 },
-    } = ffprobeMetadata
+    } = ffprobeMetadata.value
     const { stepsPerSecond, stepLength } = state.waveform
     const width = ~~(duration * (stepsPerSecond * stepLength))
 
@@ -28,7 +28,8 @@ export const getWaveformPng = async (
       constantBitrateFilePath,
       file
     )
-    if (outputFilename && existsSync(outputFilename)) return outputFilename
+    if (outputFilename && existsSync(outputFilename))
+      return { value: outputFilename }
 
     const newFileName: string = await new Promise((res, rej) => {
       ffmpeg(constantBitrateFilePath)
@@ -57,9 +58,9 @@ export const getWaveformPng = async (
     if (!newFileName || !existsSync(newFileName))
       throw new Error('Problem creating waveform image')
 
-    return newFileName
+    return { value: newFileName }
   } catch (err) {
-    return new AsyncError(err)
+    return { errors: [err] }
   }
 }
 

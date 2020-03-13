@@ -4,7 +4,6 @@ import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import { join, basename } from 'path'
 import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
-import { AsyncError } from '../utils/ffmpeg'
 import { arrayToMapById } from '../utils/arrayToMapById'
 import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 
@@ -81,11 +80,11 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
         // works while fileavailability names can't be changed...
         for (const directory of r.getAssetsDirectories(state)) {
           const nameMatch = join(directory, basename(mediaFile.name))
-          const matchingFile =
-            existsSync(nameMatch) &&
-            (await validateMediaFile(mediaFile, nameMatch))
+          const matchingFile = existsSync(nameMatch)
+            ? await validateMediaFile(mediaFile, nameMatch)
+            : null
 
-          if (matchingFile && !(matchingFile instanceof AsyncError))
+          if (matchingFile && !matchingFile.errors)
             newlyAutoFoundMediaFilePaths[mediaFile.id] = nameMatch
         }
       }
