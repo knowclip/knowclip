@@ -17,7 +17,8 @@ import { getSubtitlesFilesWithTracks } from '../selectors'
 enum $ {
   openMenuButtons = 'flashcard-field-menu-open-button',
   menuItem = 'flashcard-field-menu-item',
-  externalTrackMenuItem = 'flashcard-field-externl-track-menu-item',
+  externalTrackMenuItem = 'flashcard-field-external-track-menu-item',
+  embeddedTrackMenuItem = 'flashcard-field-embedded-track-menu-item',
 }
 
 const FlashcardSectionFieldPopoverMenu = ({
@@ -71,6 +72,7 @@ const FlashcardSectionFieldPopoverMenu = ({
                 mediaFileId={mediaFileId}
                 fieldName={fieldName}
                 closeMenu={subtitlesPopover.close}
+                className={$.embeddedTrackMenuItem}
               />
             ))}
             {subtitles.external.map((track, i) => (

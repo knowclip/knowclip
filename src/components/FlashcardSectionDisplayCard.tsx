@@ -19,31 +19,25 @@ const FlashcardSectionDisplayCard = memo(
   ({
     mediaFile,
     onDoubleClickField,
+    flashcard,
     className,
   }: {
     className?: string
     mediaFile: MediaFile
+    flashcard: Flashcard
     clipId: ClipId
     onDoubleClickField?: (fieldName: FlashcardFieldName) => void
   }) => {
-    const {
-      selectedClipTime,
-      fieldsToTracks,
-      flashcard,
-      viewMode,
-      isLoopOn,
-    } = useSelector((state: AppState) => ({
-      allTags: r.getAllTags(state),
-      selectedClipTime: r.getSelectedClipTime(state),
-      currentNoteType: r.getCurrentNoteType(state),
-      isLoopOn: r.isLoopOn(state),
-      fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-      flashcard: r.getHighlightedFlashcard(state),
-      mediaIsPlaying: r.isMediaPlaying(state),
-      viewMode: state.settings.viewMode,
-    }))
-
-    if (!selectedClipTime || !flashcard) throw new Error('Clip not found')
+    const { fieldsToTracks, viewMode, isLoopOn } = useSelector(
+      (state: AppState) => ({
+        allTags: r.getAllTags(state),
+        currentNoteType: r.getCurrentNoteType(state),
+        isLoopOn: r.isLoopOn(state),
+        fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
+        mediaIsPlaying: r.isMediaPlaying(state),
+        viewMode: state.settings.viewMode,
+      })
+    )
 
     const { fields: f } = flashcard
     const fields = f as TransliterationFlashcardFields

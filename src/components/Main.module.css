@@ -21,7 +21,6 @@
 .flashcardSection {
   flex-shrink: 2;
   height: 100%;
-  /* overflow-y: hidden; */
   min-width: 30em;
   flex-basis: 30em;
 }

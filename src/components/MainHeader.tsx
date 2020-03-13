@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { IconButton, Tooltip } from '@material-ui/core'
-import { Hearing as HearingIcon } from '@material-ui/icons'
+import { IconButton } from '@material-ui/core'
+import { Delete } from '@material-ui/icons'
 import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'
 import ProjectMenu from '../components/ProjectMenu'
@@ -21,8 +21,8 @@ const MainHeader = ({
   currentMediaFile: MediaFile | null
 }) => {
   const dispatch = useDispatch()
-  const detectSilenceRequest = useCallback(
-    () => dispatch(actions.detectSilenceRequest()),
+  const deleteAllCurrentFileClipsRequest = useCallback(
+    () => dispatch(actions.deleteAllCurrentFileClipsRequest()),
     [dispatch]
   )
   return (
@@ -40,12 +40,17 @@ const MainHeader = ({
             <li className={headerCss.menuItem}>
               <SubtitlesMenu />
             </li>
-            <li className={headerCss.menuItem}>
+            {/* <li className={headerCss.menuItem}>
               <Tooltip title="Detect silences">
                 <IconButton onClick={detectSilenceRequest}>
                   <HearingIcon />
                 </IconButton>
               </Tooltip>
+            </li> */}
+            <li className={headerCss.menuItem}>
+              <IconButton onClick={deleteAllCurrentFileClipsRequest}>
+                <Delete />
+              </IconButton>
             </li>
           </Fragment>
         )}

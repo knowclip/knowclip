@@ -16,10 +16,7 @@ export default async function makeFlashcardsWithSubtitles({
     `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
   )
 
-  const [embeddedSubtitlesTrackButton] = await client.elements_(
-    flashcardFieldMenu$.menuItem
-  )
-  await embeddedSubtitlesTrackButton.click()
+  await client.clickElement_(flashcardFieldMenu$.embeddedTrackMenuItem)
   await client.clickElement_(confirmationDialog$.okButton)
 
   await client.clickElement_(flashcardForm$.deleteButton)

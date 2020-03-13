@@ -167,6 +167,7 @@ const TagsInput = ({
             inputRef={ref}
             chipRenderer={chipRenderer}
             onFocus={onFocus}
+            blurBehavior="add"
             {...other}
           />
         ),
