@@ -72,13 +72,6 @@ const exportApkg: AppEpic = (action$, state$) =>
         )
       }
 
-      console.log(
-        JSON.stringify(exportData.clips) ===
-          JSON.stringify(
-            exportData.clips.sort((a, b) => a.startTime - b.startTime)
-          )
-      )
-
       return makeApkg(exportData, directory)
     })
   )
