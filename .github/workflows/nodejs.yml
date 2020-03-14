@@ -23,8 +23,8 @@ jobs:
         yarn format --list-different
         yarn lint
         yarn tsc
-        yarn build:ci
         yarn test
+        yarn integration
         (cd homepage && yarn install --frozen-lockfile && yarn build)
       env:
         CI: true
