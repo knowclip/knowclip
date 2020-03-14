@@ -27,7 +27,7 @@ export class ClientWrapper {
       // if (result.length)
       return await element(this._client, result.value.ELEMENT, selector)
     } catch (err) {
-      throw new Error(`Could not find element "${selector}"`)
+      throw new Error(`Could not find element "${selector}": ${err}`)
     }
   }
   async firstElement_(testLabel: string): Promise<ElementWrapper> {
