@@ -32,3 +32,8 @@ skip_commits:
     - docker/*
     - travis.yml
     - '*.md'
+
+branches:
+  only:
+    - master
+    - /v\d+\.\d+.\d+(-.+)?/
