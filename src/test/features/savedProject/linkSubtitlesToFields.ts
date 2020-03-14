@@ -10,10 +10,11 @@ export default async function linkSubtitlesToFields({
   client,
 }: TestSetup) {
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
-  const [polarBearCafe] = await client.elements_(
-    mediaFilesMenu$.mediaFileMenuItem
+  await client.waitForText_(
+    mediaFilesMenu$.mediaFileMenuItem,
+    'polar_bear_cafe.mp4'
   )
-  await polarBearCafe.click()
+  await client.clickElement_(mediaFilesMenu$.mediaFileMenuItem)
   await client.waitForText_(
     mediaFilesMenu$.openMediaFilesMenuButton,
     'polar_bear_cafe.mp4'
@@ -22,6 +23,7 @@ export default async function linkSubtitlesToFields({
 
   await client.clickElement_(flashcardFieldMenu$.openMenuButtons)
   await client.clickElement_(flashcardFieldMenu$.externalTrackMenuItem)
+  await client.waitUntilPresent_(confirmationDialog$.okButton, 20000)
   await client.clickElement_(confirmationDialog$.okButton)
   await client.waitForText_(
     flashcardSection$.container,

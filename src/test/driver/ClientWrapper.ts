@@ -27,7 +27,7 @@ export class ClientWrapper {
       // if (result.length)
       return await element(this._client, result.value.ELEMENT, selector)
     } catch (err) {
-      throw new Error(`Could not find element "${selector}"`)
+      throw new Error(`Could not find element "${selector}": ${err}`)
     }
   }
   async firstElement_(testLabel: string): Promise<ElementWrapper> {
@@ -89,15 +89,15 @@ export class ClientWrapper {
     await this.doubleClickElement(getSelector(testLabel))
   }
 
-  async waitUntilPresent(selector: string) {
+  async waitUntilPresent(selector: string, ms?: number) {
     try {
-      return await this._client.waitForExist(selector)
+      return await this._client.waitForExist(selector, ms)
     } catch (err) {
       throw new Error(`Element "${selector}" would not appear: ${err.message}`)
     }
   }
-  async waitUntilPresent_(testLabel: string) {
-    return await this.waitUntilPresent(getSelector(testLabel))
+  async waitUntilPresent_(testLabel: string, ms?: number) {
+    return await this.waitUntilPresent(getSelector(testLabel), ms)
   }
 
   async waitUntilGone(selector: string) {
