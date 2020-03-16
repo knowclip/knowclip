@@ -53,7 +53,7 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 const initialize: AppEpic = () => of(r.initializeApp())
 
 const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
-  action$.ofType<SetProgress>(A.SET_PROGRESS).pipe(
+  action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
     tap(() => pauseMedia()),
     ignoreElements()
   )
