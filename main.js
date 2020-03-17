@@ -5,6 +5,11 @@ const { app, ipcMain } = electron
 const { isPackaged } = app
 const { BrowserWindow } = electron
 const setUpMenu = require('./electron/appMenu')
+const Sentry = require('@sentry/electron')
+
+Sentry.init({
+  dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',
+})
 
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 

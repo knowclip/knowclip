@@ -6,6 +6,19 @@ import App from './components/App'
 import store from './store'
 import './index.css'
 import { AppContainer, setConfig, cold } from 'react-hot-loader'
+import * as Sentry from '@sentry/electron'
+import ErrorMessage from './components/ErrorMessage'
+
+const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
+Sentry.init({
+  dsn: sentryDsn,
+})
+
+window.addEventListener('error', e => {
+  const errorRoot = document.getElementById('errorRoot') as HTMLDivElement
+  errorRoot.style.display = 'block'
+  ReactDOM.render(<ErrorMessage error={e.error} />, errorRoot)
+})
 
 setConfig({
   onComponentCreate: (type, name) =>
@@ -14,11 +27,11 @@ setConfig({
     cold(type),
 })
 
-const render = (Component: typeof React.Component.constructor) =>
+const render = (Component: typeof App.constructor) =>
   ReactDOM.render(
     <AppContainer>
       <Provider store={store}>
-        <Component />
+        <Component sentryDsn={sentryDsn} />
       </Provider>
     </AppContainer>,
     document.getElementById('root')
