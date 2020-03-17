@@ -126,3 +126,7 @@
 .mediaTables {
   margin-top: 1rem;
 }
+
+.clozeDeletion {
+  border-bottom: solid black 1px;
+}

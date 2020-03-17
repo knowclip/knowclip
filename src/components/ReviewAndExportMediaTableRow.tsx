@@ -1,4 +1,4 @@
-import React, { useCallback, memo, useEffect } from 'react'
+import React, { useCallback, memo, useEffect, ReactNode, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Checkbox, Chip, IconButton, Tooltip } from '@material-ui/core'
 import { Loop } from '@material-ui/icons'
@@ -37,7 +37,7 @@ const ReviewAndExportMediaTableRow = memo(
     registerChild,
   }: FlashcardRowProps) => {
     const {
-      flashcard: { fields, tags },
+      flashcard: { fields, tags, cloze },
       formattedClipTime,
       clipTime,
       isLoopOn,
@@ -102,7 +102,10 @@ const ReviewAndExportMediaTableRow = memo(
               [css.blank]: !fields.transcription.trim(),
             })}
           >
-            {fields.transcription.trim() || '[no transcription given]'}
+            <TranscriptionFieldPreview
+              value={fields.transcription.trim()}
+              clozeDeletions={cloze}
+            />
           </p>
           {'pronunciation' in fields && (
             <p className={css.pronunciation}>{fields.pronunciation}</p>
@@ -134,6 +137,57 @@ const ShortTag = ({ title }: { title: string }) =>
   ) : (
     <Chip label={title} />
   )
+
+const TranscriptionFieldPreview = ({
+  value,
+  clozeDeletions,
+}: {
+  value: string
+  clozeDeletions: ClozeDeletion[]
+}) => {
+  const rangesWithClozeIndexes = clozeDeletions
+    .flatMap(({ ranges }, clozeIndex) => {
+      return ranges.map(range => ({ range, clozeIndex }))
+    })
+    .sort((a, b) => a.range.start - b.range.start)
+  const segments: ReactNode[] = useMemo(
+    () => {
+      const segments: ReactNode[] = []
+      rangesWithClozeIndexes.forEach(
+        ({ range: { start, end }, clozeIndex }, i) => {
+          if (i === 0 && start > 0) {
+            segments.push(value.slice(0, start))
+          }
+          segments.push(
+            <span
+              className={css.clozeDeletion}
+              key={String(start) + String(end)}
+            >
+              {value.slice(start, end)}
+            </span>
+          )
+
+          const nextRange: {
+            range: ClozeRange
+            clozeIndex: number
+          } | null = rangesWithClozeIndexes[i + 1] || null
+          const subsequentGapEnd = nextRange
+            ? nextRange.range.start
+            : value.length
+
+          if (subsequentGapEnd - end > 0) {
+            segments.push(value.slice(end, subsequentGapEnd))
+          }
+        }
+      )
+      return segments
+    },
+    [rangesWithClozeIndexes, value]
+  )
+
+  if (!value) return <>[no transcription given]</>
+  return <>{segments}</>
+}
 
 export default ReviewAndExportMediaTableRow
 
