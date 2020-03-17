@@ -41,7 +41,7 @@ type MediaTableProps = {
 const cache = new CellMeasurerCache({
   fixedWidth: true,
   minHeight: 25,
-  defaultHeight: 65,
+  defaultHeight: 120,
 })
 
 const ReviewAndExportMediaTable = memo(

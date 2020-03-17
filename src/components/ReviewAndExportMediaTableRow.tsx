@@ -1,7 +1,7 @@
 import React, { useCallback, memo, useEffect, ReactNode, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Checkbox, Chip, IconButton, Tooltip } from '@material-ui/core'
-import { Loop } from '@material-ui/icons'
+import { Loop, Edit } from '@material-ui/icons'
 import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
@@ -55,6 +55,27 @@ const ReviewAndExportMediaTableRow = memo(
       dispatch,
     ])
 
+    const selectClip = useCallback(
+      () => {
+        if (currentMediaFile && !isHighlighted && clipTime) {
+          const mediaPlayer = document.getElementById(
+            'mediaPlayer'
+          ) as HTMLVideoElement | null
+          if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
+        }
+      },
+      [clipTime, currentMediaFile, isHighlighted]
+    )
+
+    const startEditing = useCallback(
+      () => {
+        selectClip()
+        dispatch(actions.startEditingCards())
+        dispatch(actions.closeDialog())
+      },
+      [dispatch, selectClip]
+    )
+
     useEffect(() => measure(), [measure])
 
     return (
@@ -65,17 +86,7 @@ const ReviewAndExportMediaTableRow = memo(
           [$.highlightedClipRow]: isHighlighted,
           [css.highlightedClipRow]: isHighlighted,
         })}
-        onDoubleClick={useCallback(
-          () => {
-            if (currentMediaFile && !isHighlighted && clipTime) {
-              const mediaPlayer = document.getElementById(
-                'mediaPlayer'
-              ) as HTMLVideoElement | null
-              if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
-            }
-          },
-          [clipTime, currentMediaFile, isHighlighted]
-        )}
+        onDoubleClick={selectClip}
       >
         <section className={css.checkbox}>
           <Checkbox
@@ -87,6 +98,9 @@ const ReviewAndExportMediaTableRow = memo(
         </section>
         <section className={css.clipTime}>
           <span className={css.clipTimeText}>{formattedClipTime}</span>
+          <IconButton className={css.editButton} onClick={startEditing}>
+            <Edit />
+          </IconButton>
           {isHighlighted && (
             <IconButton
               onClick={toggleLoop}
