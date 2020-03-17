@@ -167,11 +167,15 @@ const TranscriptionFieldPreview = ({
   const segments: ReactNode[] = useMemo(
     () => {
       const segments: ReactNode[] = []
+      const clozeStart = rangesWithClozeIndexes[0]
+        ? rangesWithClozeIndexes[0].range.start
+        : value.length
+      if (clozeStart > 0) {
+        segments.push(value.slice(0, clozeStart))
+      }
+
       rangesWithClozeIndexes.forEach(
         ({ range: { start, end }, clozeIndex }, i) => {
-          if (i === 0 && start > 0) {
-            segments.push(value.slice(0, start))
-          }
           segments.push(
             <span
               className={css.clozeDeletion}

@@ -167,7 +167,7 @@ const ReviewAndExportMediaTable = memo(
               {({ width }) => (
                 <List
                   className={css.table}
-                  height={clipsIds.length ? 430 : 80}
+                  height={clipsIds.length ? 450 : 80}
                   width={width}
                   padding={10}
                   rowHeight={cache.rowHeight}
