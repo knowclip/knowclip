@@ -33,12 +33,14 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
         flatMap(() => {
           const state = state$.value
           const newlyUpdatedTime = effects.getCurrentTime()
+          const newMilliseconds = newlyUpdatedTime * 1000
+          const newX = r.getXAtMilliseconds(state, newMilliseconds)
+
+          const pendingMousedownItem =
+            r.getPendingClip(state) || r.getPendingStretch(state)
 
           const selection = r.getWaveformSelection(state)
-          const possibleNewSelection = r.getNewWaveformSelectionAt(
-            state,
-            r.getXAtMilliseconds(state, newlyUpdatedTime * 1000)
-          )
+          const possibleNewSelection = r.getNewWaveformSelectionAt(state, newX)
           const newSelection =
             selection &&
             selection.type === 'Clip' &&
@@ -56,6 +58,10 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
 
           const wasSeeking = seeking
           seeking = false
+
+          if (wasSeeking) {
+            setCursorX(r.getXAtMilliseconds(state$.value, newMilliseconds))
+          }
 
           const loopImminent =
             !wasSeeking &&
@@ -78,7 +84,8 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
             newlyUpdatedTime,
             effects.getWaveformSvgWidth(),
             newSelection,
-            wasSeeking
+            wasSeeking,
+            pendingMousedownItem
           )
 
           if (newSelection && !areSelectionsEqual(selection, newSelection)) {
@@ -104,7 +111,8 @@ const setViewBox = (
   newlySetTime: number,
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
-  seeking: boolean
+  seeking: boolean,
+  pendingMousedownItem: PendingClip | PendingStretch | null
 ) => {
   const viewBox = state.waveform.viewBox
 
@@ -114,10 +122,15 @@ const setViewBox = (
 
   if (newX < viewBox.xMin) {
     return [
-      setWaveformCursor(newX, {
-        ...viewBox,
-        xMin: Math.max(0, newX - buffer),
-      }),
+      setWaveformCursor(
+        newX,
+        pendingMousedownItem
+          ? undefined
+          : {
+              ...viewBox,
+              xMin: Math.max(0, newX - buffer),
+            }
+      ),
     ]
   }
   if (newX >= svgWidth + viewBox.xMin) {
@@ -125,7 +138,12 @@ const setViewBox = (
       newSelection ? newSelection.item.end + buffer : newX,
       Math.max(state.waveform.length - svgWidth, 0)
     )
-    return [setWaveformCursor(newX, { ...viewBox, xMin })]
+    return [
+      setWaveformCursor(
+        newX,
+        pendingMousedownItem ? undefined : { ...viewBox, xMin }
+      ),
+    ]
   }
   return seeking ? [setWaveformCursor(newX)] : []
 }

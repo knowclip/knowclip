@@ -1,6 +1,7 @@
 import * as r from '../redux'
 
 import { FileEventHandlers } from './eventHandlers'
+import { getWaveformPngs } from '../utils/getWaveform'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -9,17 +10,14 @@ export default {
 
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      // TODO:  break up big PNGs
-      const waveform = r.getFile(state, 'WaveformPng', validatedFile.id)
-      return [
-        r.openFileRequest(
-          waveform || {
-            type: 'WaveformPng',
-            parentId: validatedFile.id,
-            id: validatedFile.id,
-          }
-        ),
-      ]
+      const sourceFile = r.getFile<MediaFile>(
+        state,
+        'MediaFile',
+        validatedFile.id
+      )
+      if (!sourceFile) return []
+
+      return [r.generateWaveformImages(getWaveformPngs(sourceFile))]
     },
   ],
 

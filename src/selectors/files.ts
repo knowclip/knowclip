@@ -1,5 +1,13 @@
 import { getCurrentMediaFile } from '.'
 import { getHumanFileName } from '../utils/files'
+import {
+  getWaveformPng,
+  getWaveformPngs,
+  getWaveformIds,
+} from '../utils/getWaveform'
+import { createSelector } from 'reselect'
+import { getXAtMillisecondsFromWaveform } from '../utils/waveformCoordinates'
+import fileAvailabilities from '../reducers/fileAvailabilities'
 
 export const getFileAvailability = (
   state: AppState,
@@ -50,20 +58,6 @@ export const getFileWithAvailability = <F extends FileMetadata>(
 
   const availability = getFileAvailabilityById(state, type, id)
   return { file, availability }
-}
-
-export const getWaveformPath = (state: AppState): string | null => {
-  const currentMediaFile = getCurrentMediaFile(state)
-  if (!currentMediaFile) return null
-
-  const waveformFile = getFileAvailabilityById(
-    state,
-    'WaveformPng',
-    currentMediaFile.id
-  )
-  return waveformFile && waveformFile.status === 'CURRENTLY_LOADED'
-    ? waveformFile.filePath
-    : null
 }
 
 export const getFileDescendants = (

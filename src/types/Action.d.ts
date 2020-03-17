@@ -134,6 +134,7 @@ declare type WaveformAction =
   | ClearPendingClip
   | SetPendingStretch
   | ClearPendingStretch
+  | GenerateWaveformImages
 declare type SetCursorPosition = {
   type: 'SET_CURSOR_POSITION'
   x: number
@@ -153,6 +154,10 @@ declare type SetPendingStretch = {
 }
 declare type ClearPendingStretch = {
   type: 'CLEAR_PENDING_STRETCH'
+}
+declare type GenerateWaveformImages = {
+  type: 'GENERATE_WAVEFORM_IMAGES'
+  waveformPngs: WaveformPng[]
 }
 
 declare type DialogAction = EnqueueDialog | CloseDialog

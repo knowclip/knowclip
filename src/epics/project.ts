@@ -153,6 +153,7 @@ const PROJECT_EDIT_ACTIONS = [
   A.DELETE_MEDIA_FROM_PROJECT,
   A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK,
   A.SET_PROJECT_NAME,
+  A.ADD_MEDIA_TO_PROJECT_REQUEST,
 ] as const
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>

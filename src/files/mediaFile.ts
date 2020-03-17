@@ -7,6 +7,7 @@ import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 import { existsSync } from 'fs-extra'
+import { getWaveformPngs } from '../utils/getWaveform'
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -200,16 +201,7 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   state,
   effects
 ) => {
-  const waveform = r.getFile(state, 'WaveformPng', validatedFile.id)
-  return [
-    r.openFileRequest(
-      waveform || {
-        type: 'WaveformPng',
-        parentId: validatedFile.id,
-        id: validatedFile.id,
-      }
-    ),
-  ]
+  return [r.generateWaveformImages(getWaveformPngs(validatedFile))]
 }
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (

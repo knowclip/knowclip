@@ -22,6 +22,7 @@ import files from './files'
 import defaultTags from './defaultTags'
 import loopMedia from './loopMedia'
 import preloadVideoStills from './preloadVideoStills'
+import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import { showMessageBox } from '../utils/electron'
 
@@ -80,6 +81,7 @@ const rootEpic: AppEpic = combineEpics(
   subtitlesLinks,
   files,
   preloadVideoStills,
+  generateWaveformImages,
   menu,
   pauseOnBusy
 )

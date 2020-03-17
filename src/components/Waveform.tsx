@@ -1,4 +1,4 @@
-import React, { memo, useRef, useCallback } from 'react'
+import React, { memo, useRef, useCallback, useMemo } from 'react'
 import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import * as r from '../redux'
@@ -392,7 +392,7 @@ const SubtitlesTimelines = memo(
 const Waveform = ({ show }: { show: boolean }) => {
   const {
     waveform,
-    path,
+    images,
     clips,
     pendingClip,
     pendingStretch,
@@ -403,7 +403,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     mediaIsLoaded,
   } = useSelector((state: AppState) => ({
     waveform: r.getWaveform(state),
-    path: r.getWaveformPath(state),
+    images: r.getWaveformImages(state),
     clips: r.getCurrentFileClips(state),
     pendingClip: r.getPendingClip(state),
     pendingStretch: r.getPendingStretch(state),
@@ -473,6 +473,20 @@ const Waveform = ({ show }: { show: boolean }) => {
     [waveform]
   )
 
+  const imageBitmaps = useMemo(
+    () => {
+      return images.map(({ path, x, file }) => (
+        <image
+          key={file.id}
+          xlinkHref={`file://${path}`}
+          style={{ pointerEvents: 'none' }}
+          x={x}
+        />
+      ))
+    },
+    [images]
+  )
+
   return show ? (
     <svg
       ref={svgRef}
@@ -510,9 +524,7 @@ const Waveform = ({ show }: { show: boolean }) => {
           height={height}
         />
       )}
-      {path && (
-        <image xlinkHref={`file://${path}`} style={{ pointerEvents: 'none' }} />
-      )}
+      {imageBitmaps}
 
       {Boolean(subtitles.cards.length || subtitles.excludedTracks.length) && (
         <SubtitlesTimelines

@@ -35,3 +35,10 @@ export const setWaveformViewBox = (
   type: A.SET_WAVEFORM_VIEW_BOX,
   viewBox,
 })
+
+export const generateWaveformImages = (
+  waveformPngs: WaveformPng[]
+): GenerateWaveformImages => ({
+  type: A.GENERATE_WAVEFORM_IMAGES,
+  waveformPngs,
+})

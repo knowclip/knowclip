@@ -117,6 +117,8 @@ declare type WaveformPng = {
   type: 'WaveformPng'
   id: FileId
   parentId: MediaFileId
+  startSeconds: number
+  endSeconds: number
 }
 declare type ConstantBitrateMp3 = {
   type: 'ConstantBitrateMp3'
