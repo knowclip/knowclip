@@ -1,6 +1,5 @@
 import {
   switchMap,
-  expand,
   filter,
   take,
   ignoreElements,
@@ -13,7 +12,7 @@ import { ofType } from 'redux-observable'
 import { from, of } from 'rxjs'
 import { areSameFile } from '../utils/files'
 
-const generateWaveformImages: AppEpic = (action$, state$) =>
+const generateWaveformImages: AppEpic = action$ =>
   action$.pipe(
     ofType<Action, GenerateWaveformImages>(A.GENERATE_WAVEFORM_IMAGES),
     switchMap(action => {

@@ -1,13 +1,4 @@
-import { getCurrentMediaFile } from '.'
 import { getHumanFileName } from '../utils/files'
-import {
-  getWaveformPng,
-  getWaveformPngs,
-  getWaveformIds,
-} from '../utils/getWaveform'
-import { createSelector } from 'reselect'
-import { getXAtMillisecondsFromWaveform } from '../utils/waveformCoordinates'
-import fileAvailabilities from '../reducers/fileAvailabilities'
 
 export const getFileAvailability = (
   state: AppState,
