@@ -118,7 +118,11 @@ declare type EditClips = {
     flashcardOverride: DeepPartial<Flashcard> | null
   }[]
 }
-declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
+declare type MergeClips = {
+  type: 'MERGE_CLIPS'
+  ids: Array<ClipId>
+  newSelection: WaveformSelection | null
+}
 declare type SelectWaveformItem = {
   type: 'SELECT_WAVEFORM_ITEM'
   selection: WaveformSelection | null

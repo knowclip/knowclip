@@ -165,7 +165,11 @@ describe('clips reducer', () => {
       },
       { type: '@@INIT' }
     )
-    const mergeAction = r.mergeClips(['a', 'b'])
+    const mergeAction = r.mergeClips(['a', 'b'], {
+      type: 'Clip',
+      index: 0,
+      id: 'a',
+    })
 
     const expectedA = newClip({ start: 1, end: 2.5 }, fileId, 'a', mergedFields)
     const expectedC = newClip(
@@ -237,7 +241,11 @@ describe('clips reducer', () => {
       },
       { type: '@@INIT' }
     )
-    const mergeAction = r.mergeClips(['a', 'b'])
+    const mergeAction = r.mergeClips(['a', 'b'], {
+      type: 'Clip',
+      index: 0,
+      id: 'a',
+    })
 
     const expectedMergeResult = newClip({ start: 1, end: 2.5 }, fileId, 'a', {
       transcription: 'The quick brown fox\njumps over the lazy dog',

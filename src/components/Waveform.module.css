@@ -37,7 +37,6 @@
 .waveformPendingStretch {
   stroke: rgba(0, 255, 255, 0.4);
   fill: rgba(0, 255, 255, 0.4);
-  pointer-events: none;
 }
 
 .highlightedClip {
