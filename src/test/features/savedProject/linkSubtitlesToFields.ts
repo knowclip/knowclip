@@ -22,8 +22,10 @@ export default async function linkSubtitlesToFields({
   await client.clickElement_(waveform$.waveformClip)
 
   await client.clickElement_(flashcardFieldMenu$.openMenuButtons)
+  await client.elements_(flashcardFieldMenu$.menuItem, 2)
   await client.clickElement_(flashcardFieldMenu$.externalTrackMenuItem)
-  await client.waitUntilPresent_(confirmationDialog$.okButton, 20000)
+  await client.waitUntilGone_(flashcardFieldMenu$.externalTrackMenuItem)
+  await client.waitUntilPresent_(confirmationDialog$.okButton)
   await client.clickElement_(confirmationDialog$.okButton)
   await client.waitForText_(
     flashcardSection$.container,
