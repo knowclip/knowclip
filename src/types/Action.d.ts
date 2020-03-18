@@ -118,7 +118,11 @@ declare type EditClips = {
     flashcardOverride: DeepPartial<Flashcard> | null
   }[]
 }
-declare type MergeClips = { type: 'MERGE_CLIPS'; ids: Array<ClipId> }
+declare type MergeClips = {
+  type: 'MERGE_CLIPS'
+  ids: Array<ClipId>
+  newSelection: WaveformSelection | null
+}
 declare type SelectWaveformItem = {
   type: 'SELECT_WAVEFORM_ITEM'
   selection: WaveformSelection | null
@@ -134,6 +138,7 @@ declare type WaveformAction =
   | ClearPendingClip
   | SetPendingStretch
   | ClearPendingStretch
+  | GenerateWaveformImages
 declare type SetCursorPosition = {
   type: 'SET_CURSOR_POSITION'
   x: number
@@ -153,6 +158,10 @@ declare type SetPendingStretch = {
 }
 declare type ClearPendingStretch = {
   type: 'CLEAR_PENDING_STRETCH'
+}
+declare type GenerateWaveformImages = {
+  type: 'GENERATE_WAVEFORM_IMAGES'
+  waveformPngs: WaveformPng[]
 }
 
 declare type DialogAction = EnqueueDialog | CloseDialog

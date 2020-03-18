@@ -34,7 +34,7 @@ const TAGS = `{{#Tags}}
 
 const LISTENING_CARD = {
   name: 'Listening',
-  questionFormat: [IMAGE, `♫{{sound}}`].join('\n'),
+  questionFormat: [IMAGE, `{{sound}}`].join('\n'),
   answerFormat: [
     FRONT_SIDE,
     HR,

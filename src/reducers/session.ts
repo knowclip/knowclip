@@ -105,6 +105,12 @@ const session: Reducer<SessionState, Action> = (
         pendingStretch: null,
       }
 
+    case A.MERGE_CLIPS:
+      return {
+        ...state,
+        waveformSelection: action.newSelection,
+      }
+
     case A.SET_DEFAULT_CLIP_SPECS:
       return {
         ...state,

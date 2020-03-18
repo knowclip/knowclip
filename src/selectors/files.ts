@@ -1,4 +1,3 @@
-import { getCurrentMediaFile } from '.'
 import { getHumanFileName } from '../utils/files'
 
 export const getFileAvailability = (
@@ -50,20 +49,6 @@ export const getFileWithAvailability = <F extends FileMetadata>(
 
   const availability = getFileAvailabilityById(state, type, id)
   return { file, availability }
-}
-
-export const getWaveformPath = (state: AppState): string | null => {
-  const currentMediaFile = getCurrentMediaFile(state)
-  if (!currentMediaFile) return null
-
-  const waveformFile = getFileAvailabilityById(
-    state,
-    'WaveformPng',
-    currentMediaFile.id
-  )
-  return waveformFile && waveformFile.status === 'CURRENTLY_LOADED'
-    ? waveformFile.filePath
-    : null
 }
 
 export const getFileDescendants = (

@@ -91,9 +91,13 @@ export const removeFlashcardImage = (id: ClipId): EditClip => ({
   override: null,
 })
 
-export const mergeClips = (ids: Array<ClipId>): ClipAction => ({
+export const mergeClips = (
+  ids: Array<ClipId>,
+  newSelection: WaveformSelection | null
+): ClipAction => ({
   type: A.MERGE_CLIPS,
   ids,
+  newSelection,
 })
 
 export const setFlashcardField = (

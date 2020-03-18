@@ -8,9 +8,20 @@ export default {
   openSuccess: [],
   locateRequest: async ({ file }, availability, state, effects) => {
     try {
-      const parentFile = r.getFileAvailabilityById(state, 'MediaFile', file.id)
-      if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
-        return [r.openFileFailure(file, null, null)]
+      const parentFile = r.getFileAvailabilityById(
+        state,
+        'MediaFile',
+        file.parentId
+      )
+      if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED') {
+        return [
+          r.openFileFailure(
+            file,
+            null,
+            `Parent media file has not been loaded.`
+          ),
+        ]
+      }
 
       const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
       if (!cbr) return []

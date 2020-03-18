@@ -53,6 +53,13 @@
   display: flex;
   padding: 1rem;
 }
+.editButton {
+  opacity: 0;
+}
+.tableRow:hover .editButton,
+.tableRow:focus-within .editButton {
+  opacity: 1;
+}
 .highlightedClipRow {
   background-color: rgb(255, 254, 240);
 }
@@ -125,4 +132,8 @@
 
 .mediaTables {
   margin-top: 1rem;
+}
+
+.clozeDeletion {
+  border-bottom: solid black 1px;
 }

@@ -1,7 +1,7 @@
-import React, { useCallback, memo, useEffect } from 'react'
+import React, { useCallback, memo, useEffect, ReactNode, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Checkbox, Chip, IconButton, Tooltip } from '@material-ui/core'
-import { Loop } from '@material-ui/icons'
+import { Loop, Edit } from '@material-ui/icons'
 import * as r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
@@ -37,7 +37,7 @@ const ReviewAndExportMediaTableRow = memo(
     registerChild,
   }: FlashcardRowProps) => {
     const {
-      flashcard: { fields, tags },
+      flashcard: { fields, tags, cloze },
       formattedClipTime,
       clipTime,
       isLoopOn,
@@ -55,6 +55,27 @@ const ReviewAndExportMediaTableRow = memo(
       dispatch,
     ])
 
+    const selectClip = useCallback(
+      () => {
+        if (currentMediaFile && !isHighlighted && clipTime) {
+          const mediaPlayer = document.getElementById(
+            'mediaPlayer'
+          ) as HTMLVideoElement | null
+          if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
+        }
+      },
+      [clipTime, currentMediaFile, isHighlighted]
+    )
+
+    const startEditing = useCallback(
+      () => {
+        selectClip()
+        dispatch(actions.startEditingCards())
+        dispatch(actions.closeDialog())
+      },
+      [dispatch, selectClip]
+    )
+
     useEffect(() => measure(), [measure])
 
     return (
@@ -65,17 +86,7 @@ const ReviewAndExportMediaTableRow = memo(
           [$.highlightedClipRow]: isHighlighted,
           [css.highlightedClipRow]: isHighlighted,
         })}
-        onDoubleClick={useCallback(
-          () => {
-            if (currentMediaFile && !isHighlighted && clipTime) {
-              const mediaPlayer = document.getElementById(
-                'mediaPlayer'
-              ) as HTMLVideoElement | null
-              if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
-            }
-          },
-          [clipTime, currentMediaFile, isHighlighted]
-        )}
+        onDoubleClick={selectClip}
       >
         <section className={css.checkbox}>
           <Checkbox
@@ -87,6 +98,9 @@ const ReviewAndExportMediaTableRow = memo(
         </section>
         <section className={css.clipTime}>
           <span className={css.clipTimeText}>{formattedClipTime}</span>
+          <IconButton className={css.editButton} onClick={startEditing}>
+            <Edit />
+          </IconButton>
           {isHighlighted && (
             <IconButton
               onClick={toggleLoop}
@@ -102,7 +116,10 @@ const ReviewAndExportMediaTableRow = memo(
               [css.blank]: !fields.transcription.trim(),
             })}
           >
-            {fields.transcription.trim() || '[no transcription given]'}
+            <TranscriptionFieldPreview
+              value={fields.transcription.trim()}
+              clozeDeletions={cloze}
+            />
           </p>
           {'pronunciation' in fields && (
             <p className={css.pronunciation}>{fields.pronunciation}</p>
@@ -134,6 +151,61 @@ const ShortTag = ({ title }: { title: string }) =>
   ) : (
     <Chip label={title} />
   )
+
+const TranscriptionFieldPreview = ({
+  value,
+  clozeDeletions,
+}: {
+  value: string
+  clozeDeletions: ClozeDeletion[]
+}) => {
+  const rangesWithClozeIndexes = clozeDeletions
+    .flatMap(({ ranges }, clozeIndex) => {
+      return ranges.map(range => ({ range, clozeIndex }))
+    })
+    .sort((a, b) => a.range.start - b.range.start)
+  const segments: ReactNode[] = useMemo(
+    () => {
+      const segments: ReactNode[] = []
+      const clozeStart = rangesWithClozeIndexes[0]
+        ? rangesWithClozeIndexes[0].range.start
+        : value.length
+      if (clozeStart > 0) {
+        segments.push(value.slice(0, clozeStart))
+      }
+
+      rangesWithClozeIndexes.forEach(
+        ({ range: { start, end }, clozeIndex }, i) => {
+          segments.push(
+            <span
+              className={css.clozeDeletion}
+              key={String(start) + String(end)}
+            >
+              {value.slice(start, end)}
+            </span>
+          )
+
+          const nextRange: {
+            range: ClozeRange
+            clozeIndex: number
+          } | null = rangesWithClozeIndexes[i + 1] || null
+          const subsequentGapEnd = nextRange
+            ? nextRange.range.start
+            : value.length
+
+          if (subsequentGapEnd - end > 0) {
+            segments.push(value.slice(end, subsequentGapEnd))
+          }
+        }
+      )
+      return segments
+    },
+    [rangesWithClozeIndexes, value]
+  )
+
+  if (!value) return <>[no transcription given]</>
+  return <>{segments}</>
+}
 
 export default ReviewAndExportMediaTableRow
 

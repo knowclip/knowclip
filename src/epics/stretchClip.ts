@@ -7,7 +7,7 @@ import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 const stretchClipEpic: AppEpic = (
   action$,
   state$,
-  { window, getWaveformSvgElement, document }
+  { window, getWaveformSvgElement, document, setCurrentTime }
 ) => {
   const clipMousedowns = fromEvent<WaveformMousedownEvent>(
     document,
@@ -49,6 +49,12 @@ const stretchClipEpic: AppEpic = (
             } = lastPendingStretch
             const stretchedClip = r.getClip(state$.value, id)
 
+            const waveformItems = r.getWaveformItems(state$.value)
+            const stretchedClipItem =
+              stretchedClip &&
+              waveformItems.find(
+                item => item.type === 'Clip' && item.id === stretchedClip.id
+              )
             // if pendingStretch.end is inside a clip separate from stretchedClip,
             // take the start from the earlier and the end from the later,
             // use those as the new start/end of stretchedClip,
@@ -58,18 +64,43 @@ const stretchClipEpic: AppEpic = (
             const previousClip =
               previousClipId && r.getClip(state$.value, previousClipId)
             if (previousClip && previousClipId && end <= previousClip.end) {
+              setCurrentTime(r.getSecondsAtX(state$.value, previousClip.start))
+
               return from([
                 r.clearPendingStretch(),
-                r.mergeClips([id, previousClipId]),
+                r.mergeClips(
+                  [id, previousClipId],
+                  stretchedClipItem && stretchedClipItem.type === 'Clip'
+                    ? {
+                        type: 'Clip',
+                        id: stretchedClipItem.id,
+                        index: stretchedClipItem.index,
+                      }
+                    : null
+                ),
               ])
             }
 
             const nextClipId = r.getNextClipId(state$.value, id)
             const nextClip = nextClipId && r.getClip(state$.value, nextClipId)
             if (nextClip && nextClipId && end >= nextClip.start) {
+              if (stretchedClip)
+                setCurrentTime(
+                  r.getSecondsAtX(state$.value, stretchedClip.start)
+                )
+
               return from([
                 r.clearPendingStretch(),
-                r.mergeClips([id, nextClipId]),
+                r.mergeClips(
+                  [id, nextClipId],
+                  stretchedClipItem && stretchedClipItem.type === 'Clip'
+                    ? {
+                        type: 'Clip',
+                        id: stretchedClipItem.id,
+                        index: stretchedClipItem.index,
+                      }
+                    : null
+                ),
               ])
             }
 
@@ -88,6 +119,7 @@ const stretchClipEpic: AppEpic = (
                 { start, end: stretchedClip.end },
                 'PREPEND'
               )
+              setCurrentTime(r.getSecondsAtX(state$.value, start))
               return from([
                 r.clearPendingStretch(),
                 r.editClip(

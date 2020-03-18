@@ -22,6 +22,7 @@ import files from './files'
 import defaultTags from './defaultTags'
 import loopMedia from './loopMedia'
 import preloadVideoStills from './preloadVideoStills'
+import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import { showMessageBox } from '../utils/electron'
 
@@ -53,7 +54,7 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 const initialize: AppEpic = () => of(r.initializeApp())
 
 const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
-  action$.ofType<SetProgress>(A.SET_PROGRESS).pipe(
+  action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
     tap(() => pauseMedia()),
     ignoreElements()
   )
@@ -80,6 +81,7 @@ const rootEpic: AppEpic = combineEpics(
   subtitlesLinks,
   files,
   preloadVideoStills,
+  generateWaveformImages,
   menu,
   pauseOnBusy
 )

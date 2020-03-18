@@ -94,15 +94,19 @@ export const getWaveformSelection = createSelector(
 
     switch (selection.type) {
       case 'Clip':
-        return {
-          ...selection,
-          item: clipsById[selection.id],
-        }
+        return clipsById[selection.id]
+          ? {
+              ...selection,
+              item: clipsById[selection.id],
+            }
+          : null
       case 'Preview':
-        return {
-          ...selection,
-          item: cardsBases.cards[selection.cardBaseIndex],
-        }
+        return cardsBases.cards[selection.cardBaseIndex]
+          ? {
+              ...selection,
+              item: cardsBases.cards[selection.cardBaseIndex],
+            }
+          : null
     }
   }
 )

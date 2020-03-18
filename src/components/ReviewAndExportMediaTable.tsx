@@ -41,7 +41,7 @@ type MediaTableProps = {
 const cache = new CellMeasurerCache({
   fixedWidth: true,
   minHeight: 25,
-  defaultHeight: 65,
+  defaultHeight: 120,
 })
 
 const ReviewAndExportMediaTable = memo(
@@ -167,7 +167,7 @@ const ReviewAndExportMediaTable = memo(
               {({ width }) => (
                 <List
                   className={css.table}
-                  height={clipsIds.length ? 430 : 80}
+                  height={clipsIds.length ? 450 : 80}
                   width={width}
                   padding={10}
                   rowHeight={cache.rowHeight}

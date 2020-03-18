@@ -1,7 +1,7 @@
-import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 import tempy from 'tempy'
 import { existsSync } from 'fs'
-import { getFileAvailabilityById } from '../selectors'
+import { getFileAvailabilityById, getXAtMilliseconds } from '../selectors'
 import { basename, join } from 'path'
 
 const WAVE_COLOR = '#b7cee0'
@@ -13,16 +13,10 @@ export const getWaveformPng = async (
   file: WaveformPng,
   constantBitrateFilePath: string
 ): AsyncResult<string> => {
-  const ffprobeMetadata = await getMediaMetadata(constantBitrateFilePath)
-  if (ffprobeMetadata.errors) return ffprobeMetadata
-
   try {
-    const {
-      format: { duration = 0 },
-    } = ffprobeMetadata.value
-    const { stepsPerSecond, stepLength } = state.waveform
-    const width = ~~(duration * (stepsPerSecond * stepLength))
-
+    const startX = getXAtMilliseconds(state, file.startSeconds * 1000)
+    const endX = getXAtMilliseconds(state, file.endSeconds * 1000)
+    const width = ~~(endX - startX)
     const outputFilename = getWaveformPngPath(
       state,
       constantBitrateFilePath,
@@ -33,6 +27,9 @@ export const getWaveformPng = async (
 
     const newFileName: string = await new Promise((res, rej) => {
       ffmpeg(constantBitrateFilePath)
+        .seekInput(file.startSeconds)
+        .inputOptions(`-to ${toTimestamp(file.endSeconds * 1000)}`)
+        .withNoVideo()
         .complexFilter(
           [
             `[0:a]aformat=channel_layouts=mono,`,
@@ -80,5 +77,31 @@ const getWaveformPngPath = (
   return join(
     tempy.root,
     basename(constantBitrateFilePath) + '_' + file.id + '.png'
+  )
+}
+
+export const getWaveformPngs = (mediaFile: MediaFile): WaveformPng[] => {
+  const { durationSeconds } = mediaFile
+
+  return getWaveformIds(mediaFile).map(
+    (id, i): WaveformPng => ({
+      type: 'WaveformPng',
+      parentId: mediaFile.id,
+      id,
+      startSeconds: i * WAVEFORM_SEGMENT_LENGTH,
+      endSeconds: Math.min(durationSeconds, (i + 1) * WAVEFORM_SEGMENT_LENGTH),
+    })
+  )
+}
+const WAVEFORM_SEGMENT_LENGTH = 2 * 60
+function getWaveformId(mediaFileId: MediaFileId, i: number): string {
+  return mediaFileId + '__' + i
+}
+
+export function getWaveformIds(mediaFile: MediaFile) {
+  const { durationSeconds } = mediaFile
+  const segmentsCount = Math.ceil(durationSeconds / WAVEFORM_SEGMENT_LENGTH)
+  return [...Array(segmentsCount).keys()].map(index =>
+    getWaveformId(mediaFile.id, index)
   )
 }

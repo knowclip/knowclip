@@ -327,9 +327,8 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         ...state,
 
         flashcards: {
+          ...state.flashcards,
           [id]: {
-            ...state.flashcards[id],
-
             ...state.flashcards[id],
             tags: newTags,
           },
