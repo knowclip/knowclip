@@ -20,6 +20,7 @@ export default async function linkSubtitlesToFields({
     'polar_bear_cafe.mp4'
   )
   await client.clickElement_(waveform$.waveformClip)
+  await client.waitForText_(flashcardSection$.container, '1 / 3')
 
   await client.clickElement_(flashcardFieldMenu$.openMenuButtons)
   await client.elements_(flashcardFieldMenu$.menuItem, 2)
