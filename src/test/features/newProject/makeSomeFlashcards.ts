@@ -3,6 +3,7 @@ import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/Waveform'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { waveformMouseDrag } from '../../driver/waveform'
+import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await waveformMouseDrag(app, client, 402, 625)
@@ -25,6 +26,7 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await client.waitForText_(tagsInput$.tagChip, 'pbc')
 
   await waveformMouseDrag(app, client, 756, 920)
+  await client.waitForText_(flashcardSection$.container, '2 / 2')
 
   await waveformMouseDrag(app, client, 917, 888)
 
