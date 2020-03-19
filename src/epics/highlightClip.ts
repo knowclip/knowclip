@@ -1,6 +1,6 @@
 import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { empty, of } from 'rxjs'
+import { empty, of, merge } from 'rxjs'
 import * as A from '../types/ActionType'
 import * as r from '../redux'
 
@@ -31,15 +31,40 @@ const centerSelectedClip: AppEpic = (
   state$,
   { getWaveformSvgElement, getCurrentTime }
 ) =>
-  action$.pipe(
-    ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
-    switchMap(action => {
-      const selection = r.getWaveformSelection(state$.value)
-      const clip = selection && selection.item
+  merge(
+    action$.pipe(
+      ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
+      switchMap(() => {
+        const selection = r.getWaveformSelection(state$.value)
+        const clip = selection && selection.item
+        return clip && (window as any).seeking ? of(clip) : empty()
+      })
+    ),
+    action$.ofType<EditClip>(A.EDIT_CLIP).pipe(
+      switchMap(action => {
+        if (
+          action.override &&
+          ('start' in action.override || 'end' in action.override)
+        ) {
+          const clip = r.getHighlightedClip(state$.value)
+          return clip ? of(clip) : empty()
+        }
 
-      if (!(window as any).seeking) return empty()
+        return empty()
+      })
+    ),
+    action$.ofType<MergeClips>(A.MERGE_CLIPS).pipe(
+      switchMap(action => {
+        if (action.newSelection && action.newSelection.type === 'Clip') {
+          const clip = r.getClip(state$.value, action.newSelection.id)
+          return clip ? of(clip) : empty()
+        }
 
-      if (!clip) return empty()
+        return empty()
+      })
+    )
+  ).pipe(
+    switchMap(clip => {
       const svgElement = getWaveformSvgElement()
       if (!svgElement) return empty()
       const svgWidth = elementWidth(svgElement)

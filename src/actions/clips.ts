@@ -25,7 +25,7 @@ export const addClips = (
 })
 
 export const selectWaveformItem = (
-  selection: WaveformSelection | null
+  selection: WaveformSelection
 ): SelectWaveformItem => ({
   type: A.SELECT_WAVEFORM_ITEM,
   selection,
@@ -93,7 +93,7 @@ export const removeFlashcardImage = (id: ClipId): EditClip => ({
 
 export const mergeClips = (
   ids: Array<ClipId>,
-  newSelection: WaveformSelection | null
+  newSelection: WaveformSelection
 ): ClipAction => ({
   type: A.MERGE_CLIPS,
   ids,

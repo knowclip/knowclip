@@ -193,6 +193,7 @@ const NewProjectFormDialog = ({
             error={Boolean(errors.name)}
             helperText={errors.name}
             onChange={handleChangeNameText}
+            autoFocus
           />
 
           <br />

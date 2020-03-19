@@ -121,7 +121,7 @@ declare type EditClips = {
 declare type MergeClips = {
   type: 'MERGE_CLIPS'
   ids: Array<ClipId>
-  newSelection: WaveformSelection | null
+  newSelection: WaveformSelection
 }
 declare type SelectWaveformItem = {
   type: 'SELECT_WAVEFORM_ITEM'

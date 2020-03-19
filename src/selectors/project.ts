@@ -254,7 +254,6 @@ export const getProjectFileContents = (
     projectFile,
     getFieldsTemplate(projectFile)
   )
-  console.log({ media })
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
     [project, ...media].map(o => YAML.stringify(o)).join('---\n')

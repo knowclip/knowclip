@@ -68,16 +68,15 @@ const stretchClipEpic: AppEpic = (
 
               return from([
                 r.clearPendingStretch(),
-                r.mergeClips(
-                  [id, previousClipId],
-                  stretchedClipItem && stretchedClipItem.type === 'Clip'
-                    ? {
+                ...(stretchedClipItem && stretchedClipItem.type === 'Clip'
+                  ? [
+                      r.mergeClips([id, previousClipId], {
                         type: 'Clip',
                         id: stretchedClipItem.id,
                         index: stretchedClipItem.index,
-                      }
-                    : null
-                ),
+                      }),
+                    ]
+                  : []),
               ])
             }
 
@@ -91,16 +90,15 @@ const stretchClipEpic: AppEpic = (
 
               return from([
                 r.clearPendingStretch(),
-                r.mergeClips(
-                  [id, nextClipId],
-                  stretchedClipItem && stretchedClipItem.type === 'Clip'
-                    ? {
+                ...(stretchedClipItem && stretchedClipItem.type === 'Clip'
+                  ? [
+                      r.mergeClips([id, nextClipId], {
                         type: 'Clip',
                         id: stretchedClipItem.id,
                         index: stretchedClipItem.index,
-                      }
-                    : null
-                ),
+                      }),
+                    ]
+                  : []),
               ])
             }
 
