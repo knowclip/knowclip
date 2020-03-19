@@ -1,23 +1,15 @@
 import * as r from '../redux'
 
 import { FileEventHandlers } from './eventHandlers'
-import { getWaveformPngs } from '../utils/getWaveform'
 
-export default {
+const eventHandlers: FileEventHandlers<ConstantBitrateMp3> = {
   openRequest: async ({ file }, filePath, state, effects) => {
     return [r.openFileSuccess(file, filePath)]
   },
 
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
-      const sourceFile = r.getFile<MediaFile>(
-        state,
-        'MediaFile',
-        validatedFile.id
-      )
-      if (!sourceFile) return []
-
-      return [r.generateWaveformImages(getWaveformPngs(sourceFile))]
+      return []
     },
   ],
 
@@ -32,4 +24,10 @@ export default {
     )
     return [r.locateFileSuccess(file, cbrFilePath)]
   },
-} as FileEventHandlers<ConstantBitrateMp3>
+
+  locateSuccess: null,
+  deleteRequest: [],
+  deleteSuccess: [],
+}
+
+export default eventHandlers

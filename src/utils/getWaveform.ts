@@ -11,22 +11,18 @@ const CORRECTION_OFFSET = 0
 export const getWaveformPng = async (
   state: AppState,
   file: WaveformPng,
-  constantBitrateFilePath: string
+  mediaFilePath: string
 ): AsyncResult<string> => {
   try {
     const startX = getXAtMilliseconds(state, file.startSeconds * 1000)
     const endX = getXAtMilliseconds(state, file.endSeconds * 1000)
     const width = ~~(endX - startX)
-    const outputFilename = getWaveformPngPath(
-      state,
-      constantBitrateFilePath,
-      file
-    )
+    const outputFilename = getWaveformPngPath(state, mediaFilePath, file)
     if (outputFilename && existsSync(outputFilename))
       return { value: outputFilename }
 
     const newFileName: string = await new Promise((res, rej) => {
-      ffmpeg(constantBitrateFilePath)
+      ffmpeg(mediaFilePath)
         .seekInput(file.startSeconds)
         .inputOptions(`-to ${toTimestamp(file.endSeconds * 1000)}`)
         .withNoVideo()
@@ -63,7 +59,7 @@ export const getWaveformPng = async (
 
 const getWaveformPngPath = (
   state: AppState,
-  constantBitrateFilePath: string,
+  mediaFilePath: string,
   file: WaveformPng
 ) => {
   const fileAvailability = getFileAvailabilityById(
@@ -74,10 +70,7 @@ const getWaveformPngPath = (
   if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
     return fileAvailability.filePath
   }
-  return join(
-    tempy.root,
-    basename(constantBitrateFilePath) + '_' + file.id + '.png'
-  )
+  return join(tempy.root, basename(mediaFilePath) + '_' + file.id + '.png')
 }
 
 export const getWaveformPngs = (mediaFile: MediaFile): WaveformPng[] => {

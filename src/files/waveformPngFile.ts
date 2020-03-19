@@ -23,10 +23,10 @@ export default {
         ]
       }
 
-      const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
-      if (!cbr) return []
+      const path = parentFile.filePath
+      if (!path) return []
 
-      const pngPath = await effects.getWaveformPng(state, file, cbr)
+      const pngPath = await effects.getWaveformPng(state, file, path)
       if (pngPath.errors)
         return [
           r.openFileFailure(
