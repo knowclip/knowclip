@@ -91,6 +91,7 @@ const session: Reducer<SessionState, Action> = (
         : {
             ...state,
             waveformSelection: action.selection,
+            loopMedia: action.selection ? state.loopMedia : false,
           }
 
     case A.SET_PENDING_STRETCH:

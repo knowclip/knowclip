@@ -139,14 +139,14 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
           )
         })
 
-      const loadFirstMediaFile = media.length
-        ? [r.openFileRequest(media[0])]
+      const loadLastMediaFile = media.length
+        ? [r.openFileRequest(media[media.length - 1])]
         : []
 
       return [
         ...addNewMediaFiles,
         ...addNewSubtitlesFiles,
-        ...loadFirstMediaFile,
+        ...loadLastMediaFile,
       ]
     },
   ],

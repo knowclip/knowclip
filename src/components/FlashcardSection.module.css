@@ -39,11 +39,17 @@
 .clipsCount {
   position: absolute;
   right: 4rem;
-  top: 2rem;
+  padding: 1rem;
+  top: 1rem;
+  z-index: 1;
+  opacity: 0.8;
+  border-radius: 1em;
+  background-color: white;
 }
 .navButton {
   position: absolute !important;
   top: 1rem;
+  background-color: rgba(255,255,255,0.8) !important;
 }
 .prevButton {
   composes: navButton;
