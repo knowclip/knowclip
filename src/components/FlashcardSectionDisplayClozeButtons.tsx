@@ -53,7 +53,9 @@ const ClozeButtons = ({
         key={nextId}
         hoverText={
           currentClozeIndex === -1
-            ? 'Edit cloze deletions (C key)'
+            ? 'Make cloze deletion (C key)'
+            : currentClozeIndex === deletions.length
+            ? 'Stop editing cloze deletions'
             : 'Make a new cloze deletion card (C key)'
         }
         index={deletions.length}

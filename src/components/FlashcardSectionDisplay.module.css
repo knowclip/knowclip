@@ -190,8 +190,10 @@
 
 .previewBlank {
   color: #ffffff00;
-  background-color: white !important;
   border-bottom: solid 2px #000 !important;
+}
+.previewBlank:not(.blankEditing) {
+  background-color: white;
 }
 
 .blank {
@@ -204,7 +206,7 @@
   background: transparent;
 }
 
-.blankEditing {
+.blankEditing:not(.previewBlank) {
   border-bottom: solid 2px #000;
   background-color: hsla(var(--cloze-background-hue), 90%, 85%, 65%);
 }
@@ -215,3 +217,4 @@
   background-color: hsla(var(--cloze-selection-hue), 100%, 90%, 75%);
   color: hsl(calc(var(--cloze-selection-hue) + 150), 100%, 30%);
 }
+

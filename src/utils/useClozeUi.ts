@@ -140,39 +140,35 @@ export default function useClozeControls({
         selection.current = null
 
         if (
-          e.keyCode === 13 ||
-          (e.keyCode === 67 && !e.metaKey && !e.ctrlKey)
+          (e.keyCode === 13 ||
+            (e.keyCode === 67 && !e.metaKey && !e.ctrlKey)) &&
+          currentSelection &&
+          currentSelection.start !== currentSelection.end
         ) {
           // C key
           // enter key
-          if (
-            currentSelection &&
-            currentSelection.start !== currentSelection.end
-          ) {
-            if (clozeIndex === -1) {
-              const newIndex = deletions.length
-              if (newIndex < ClozeIds.length)
-                return confirmSelection(newIndex, currentSelection)
-              else
-                return dispatch(
-                  r.simpleMessageSnackbar(
-                    `You've already reached the maximum of ${
-                      ClozeIds.length
-                    } cloze deletions per card.`
-                  )
+          if (clozeIndex === -1) {
+            const newIndex = deletions.length
+            if (newIndex < ClozeIds.length)
+              return confirmSelection(newIndex, currentSelection)
+            else
+              return dispatch(
+                r.simpleMessageSnackbar(
+                  `You've already reached the maximum of ${
+                    ClozeIds.length
+                  } cloze deletions per card.`
                 )
-            }
-            return confirmSelection(clozeIndex, currentSelection)
-          } else if (e.keyCode === 67) {
-            const potentialNewIndex = clozeIndex + 1
-            const newIndex =
-              potentialNewIndex > deletions.length ? -1 : potentialNewIndex
-            return setClozeIndex(newIndex)
+              )
           }
-        }
-
-        // esc
-        else if (e.keyCode === 27) {
+          return confirmSelection(clozeIndex, currentSelection)
+          // C key
+        } else if (e.keyCode === 67 && !e.metaKey && !e.ctrlKey) {
+          const potentialNewIndex = clozeIndex + 1
+          const newIndex =
+            potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+          return setClozeIndex(newIndex)
+          // enter or esc
+        } else if (e.keyCode === 13 || e.keyCode === 27) {
           if (clozeIndex !== -1) setClozeIndex(-1)
         }
       }

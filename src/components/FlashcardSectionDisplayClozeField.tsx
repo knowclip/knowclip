@@ -49,7 +49,8 @@ const ClozeField = ({
   )
 
   const currentClozeId = ClozeIds[currentClozeIndex]
-  const selectionHue = ClozeHues[currentClozeId || ClozeIds[deletions.length]]
+  const selectionHue =
+    ClozeHues[currentClozeId || ClozeIds[deletions.length]] || 200
   const handleDoubleClick = useCallback(
     () => {
       if (onDoubleClick) onDoubleClick(fieldName)
@@ -249,7 +250,11 @@ const ClozeField = ({
         </Tooltip>
       ) : (
         <Tooltip
-          title="Select text and press C key to create new cloze deletion card."
+          title={
+            deletions.length >= ClozeIds.length
+              ? "You've reached the maximum number of cloze deletions for this card."
+              : 'Select text and press C key to create a new cloze deletion card (a.k.a. fill-in-the blank).'
+          }
           placement="top"
         >
           {content}
