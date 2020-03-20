@@ -78,6 +78,8 @@ const sideEffectsMocks = {
     '2020-02-02T15:31:43Z',
     '2020-02-02T15:31:43Z',
     '2020-02-02T15:31:44Z',
+    '2020-03-20T13:27:57Z',
+    '2020-03-20T13:27:58Z',
   ],
 }
 const persistedState: Partial<AppState> = {
