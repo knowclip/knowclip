@@ -15,10 +15,14 @@ const ErrorMessage = (error: any) => {
       <Dialog open={true}>
         <DialogContent>
           <DialogContentText>
-            An error has occurred.Please restart the app to continue.
+            An error has occurred. Please restart the app to continue.
             <details>
               <summary>Details</summary>
-              <pre>{String(error)}</pre>
+              <pre>
+                {String(error) === '[object Object]'
+                  ? JSON.stringify(error, null, 2)
+                  : String(error)}
+              </pre>
             </details>
           </DialogContentText>
         </DialogContent>

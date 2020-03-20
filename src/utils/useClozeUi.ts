@@ -139,44 +139,44 @@ export default function useClozeControls({
         const currentSelection = selection.current
         selection.current = null
 
-        switch (e.keyCode) {
+        if (
+          e.keyCode === 13 ||
+          (e.keyCode === 67 && !e.metaKey && !e.ctrlKey)
+        ) {
           // C key
           // enter key
-          case 67:
-          case 13: {
-            if (
-              currentSelection &&
-              currentSelection.start !== currentSelection.end
-            ) {
-              if (clozeIndex === -1) {
-                const newIndex = deletions.length
-                if (newIndex < ClozeIds.length)
-                  return confirmSelection(newIndex, currentSelection)
-                else
-                  return dispatch(
-                    r.simpleMessageSnackbar(
-                      `You've already reached the maximum of ${
-                        ClozeIds.length
-                      } cloze deletions per card.`
-                    )
+          if (
+            currentSelection &&
+            currentSelection.start !== currentSelection.end
+          ) {
+            if (clozeIndex === -1) {
+              const newIndex = deletions.length
+              if (newIndex < ClozeIds.length)
+                return confirmSelection(newIndex, currentSelection)
+              else
+                return dispatch(
+                  r.simpleMessageSnackbar(
+                    `You've already reached the maximum of ${
+                      ClozeIds.length
+                    } cloze deletions per card.`
                   )
-              }
-              return confirmSelection(clozeIndex, currentSelection)
-            } else if (e.keyCode === 67) {
-              const potentialNewIndex = clozeIndex + 1
-              const newIndex =
-                potentialNewIndex > deletions.length ? -1 : potentialNewIndex
-              return setClozeIndex(newIndex)
+                )
             }
-            break
-          }
-
-          // esc
-          case 27: {
-            if (clozeIndex !== -1) setClozeIndex(-1)
+            return confirmSelection(clozeIndex, currentSelection)
+          } else if (e.keyCode === 67) {
+            const potentialNewIndex = clozeIndex + 1
+            const newIndex =
+              potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+            return setClozeIndex(newIndex)
           }
         }
+
+        // esc
+        else if (e.keyCode === 27) {
+          if (clozeIndex !== -1) setClozeIndex(-1)
+        }
       }
+
       document.addEventListener('keyup', keyup)
 
       return () => document.removeEventListener('keyup', keyup)
@@ -200,10 +200,9 @@ export default function useClozeControls({
 
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
-      switch (e.keyCode) {
-        case 67: //c
-        case 13: //enter
-          registerSelection()
+      // enter or C
+      if (e.keyCode === 13 || (e.keyCode === 67 && !e.metaKey && !e.ctrlKey)) {
+        registerSelection()
       }
     }
     document.addEventListener('keydown', keydown)

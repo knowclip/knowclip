@@ -193,7 +193,7 @@ const session: Reducer<SessionState, Action> = (
       return { ...state, currentMediaFileId: null, waveformSelection: null }
 
     case A.START_EDITING_CARDS:
-      return { ...state, editingCards: true }
+      return { ...state, editingCards: true, loopMedia: true }
 
     case A.STOP_EDITING_CARDS:
       return { ...state, editingCards: false }
