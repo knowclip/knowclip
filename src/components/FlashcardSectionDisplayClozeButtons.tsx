@@ -62,7 +62,6 @@ const ClozeButtons = ({
         id={nextId}
         isActive={currentClozeIndex === deletions.length}
         setClozeIndex={setClozeIndex}
-        setPreviewClozeIndex={setPreviewClozeIndex}
         getSelection={getSelection}
         confirmSelection={confirmSelection}
         selection={selection}
