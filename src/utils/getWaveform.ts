@@ -21,11 +21,17 @@ export const getWaveformPng = async (
     if (outputFilename && existsSync(outputFilename))
       return { value: outputFilename }
 
+    console.log({
+      from: file.startSeconds,
+      to: toTimestamp(file.endSeconds * 1000),
+      width,
+    })
+
     const newFileName: string = await new Promise((res, rej) => {
       ffmpeg(mediaFilePath)
         .seekInput(file.startSeconds)
         .inputOptions(`-to ${toTimestamp(file.endSeconds * 1000)}`)
-        .withNoVideo()
+        // .withNoVideo()
         .complexFilter(
           [
             `[0:a]aformat=channel_layouts=mono,`,
@@ -86,7 +92,9 @@ export const getWaveformPngs = (mediaFile: MediaFile): WaveformPng[] => {
     })
   )
 }
-const WAVEFORM_SEGMENT_LENGTH = 2 * 60
+const WAVEFORM_SEGMENT_LENGTH = 5 * 60
+// TODO: investigate why this produced an empty
+//       second segment for pbc demo video when set to 2 minutes
 function getWaveformId(mediaFileId: MediaFileId, i: number): string {
   return mediaFileId + '__' + i
 }
