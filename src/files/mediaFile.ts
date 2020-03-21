@@ -8,6 +8,7 @@ import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 import { existsSync } from 'fs-extra'
 import { getWaveformPngs } from '../utils/getWaveform'
+import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -175,27 +176,55 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile: { subtitles, name, id: mediaFileId }, filePath },
   state,
   effects
-) => [
-  ...subtitles
-    .filter(s => s.type === 'ExternalSubtitlesTrack')
-    .map(({ id }) => {
-      const externalSubtitles = r.getFile(state, 'ExternalSubtitlesFile', id)
-      const availability = r.getFileAvailabilityById(
-        state,
-        'ExternalSubtitlesFile',
-        id
-      )
-      return r.openFileRequest(
-        externalSubtitles || {
+) => {
+  return await Promise.all([
+    ...subtitles
+      .filter(s => s.type === 'ExternalSubtitlesTrack')
+      .map(async ({ id }) => {
+        const externalSubtitles = r.getFile<ExternalSubtitlesFile>(
+          state,
+          'ExternalSubtitlesFile',
+          id
+        )
+        const availability = r.getFileAvailabilityById(
+          state,
+          'ExternalSubtitlesFile',
+          id
+        )
+        const file: ExternalSubtitlesFile = externalSubtitles || {
           id,
           type: 'ExternalSubtitlesFile',
           name: availability.name,
           parentId: mediaFileId,
           chunksMetadata: null,
         }
-      )
-    }),
-]
+
+        const newlyAutoFoundSubtitlesPaths: {
+          [id: string]:
+            | { singleMatch: string }
+            | { multipleMatches: true; singleMatch: undefined }
+            | undefined
+        } = {}
+        for (const directory of r.getAssetsDirectories(state)) {
+          const nameMatch = join(directory, basename(file.name))
+          const matchingFile = existsSync(nameMatch)
+            ? await validateSubtitlesFromFilePath(state, nameMatch, file)
+            : null
+
+          if (matchingFile && matchingFile.valid)
+            newlyAutoFoundSubtitlesPaths[
+              file.id
+            ] = newlyAutoFoundSubtitlesPaths[file.id]
+              ? { multipleMatches: true, singleMatch: undefined }
+              : { singleMatch: nameMatch }
+        }
+
+        const match = newlyAutoFoundSubtitlesPaths[file.id]
+        const filePath = match && match.singleMatch
+        return r.openFileRequest(file, filePath)
+      }),
+  ])
+}
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   { validatedFile, filePath },
   state,

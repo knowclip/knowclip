@@ -35,6 +35,7 @@ const FlashcardSection = ({
 }) => {
   const {
     waveformSelection,
+    waveformItems,
     clipsIds,
     editing,
     flashcard,
@@ -43,6 +44,7 @@ const FlashcardSection = ({
     viewMode,
   } = useSelector((state: AppState) => ({
     waveformSelection: r.getWaveformSelection(state),
+    waveformItems: r.getWaveformItems(state),
     clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
     editing: state.session.editingCards,
     flashcard: r.getHighlightedFlashcard(state),
@@ -56,6 +58,7 @@ const FlashcardSection = ({
       ? waveformSelection.item
       : null
 
+  const itemsLength = waveformItems.length
   const clipsLength = clipsIds.length
   const clipIndex = useMemo(
     () => (highlightedClip ? clipsIds.indexOf(highlightedClip.id) : -1),
@@ -90,7 +93,7 @@ const FlashcardSection = ({
       <Tooltip title="Previous (← key)">
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
-          disabled={clipsLength < 2}
+          disabled={itemsLength < 2}
           onClick={useCallback(
             () => dispatch(actions.highlightLeftClipRequest()),
             [dispatch]
@@ -142,7 +145,7 @@ const FlashcardSection = ({
       <Tooltip title="Next (→ key)">
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
-          disabled={clipsLength < 2}
+          disabled={itemsLength < 2}
           onClick={useCallback(
             () => dispatch(actions.highlightRightClipRequest()),
             [dispatch]

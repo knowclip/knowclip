@@ -76,6 +76,8 @@ const FileSelectionDialog = ({
     },
     [cancel, dispatch]
   )
+  // TODO: check if file path exists due to recent change
+  //       and close dialog in that case.
 
   return (
     <Dialog open={open}>

@@ -34,12 +34,12 @@ const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
     case 'Simple':
       return (
         <section className={css.cardsPreview} id={$.cardsPreview}>
-          <h3 className={css.cardPreviewHeading}>Preview</h3>
+          <h3 className={css.cardPreviewHeading}>Flashcard Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, meaning, and notes.
           </p>
           <Paper className={cn(css.cardPreview, 'card')}>
-            ♫
+            <div className={css.playButton} />
             <hr />
             <p className="transcription">¿Cuál es tu nombre?</p>
             <p className="meaning">What's your name?</p>
@@ -53,14 +53,14 @@ const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
     case 'Transliteration':
       return (
         <section className={css.cardsPreview} id={$.cardsPreview}>
-          <h3 className={css.cardPreviewHeading}>Preview</h3>
+          <h3 className={css.cardPreviewHeading}>Flashcard Preview</h3>
           <p className={css.cardPreviewSummary}>
             Includes fields for transcription, pronunciation, meaning, and
             notes. Especially useful when learning a language with a different
             writing system.
           </p>
           <Paper className={cn(css.cardPreview, 'card')}>
-            ♫
+            <div className={css.playButton} />
             <hr />
             <p className="transcription">你叫什麼名字?</p>
             <p className="pronunciation">Nǐ jiào shénme míngzi?</p>

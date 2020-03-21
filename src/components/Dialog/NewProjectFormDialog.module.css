@@ -7,6 +7,24 @@
   padding: 1em;
 }
 
+.playButton::after {
+  width: 0;
+  height: 0;
+  border-top: 1em solid transparent;
+  border-left: 1.8em solid black;
+  border-bottom: 1em solid transparent;
+  display: block;
+  transform: translate(.8em, .5em);
+  content: "";
+}
+.playButton {
+  width: 3em;
+  height: 3em;
+  border: solid 1px black;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 .noteTypeFieldControl {
   width: 15rem;
 }
