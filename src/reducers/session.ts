@@ -91,7 +91,10 @@ const session: Reducer<SessionState, Action> = (
         : {
             ...state,
             waveformSelection: action.selection,
-            loopMedia: action.selection ? state.loopMedia : false,
+            loopMedia:
+              !action.selection || action.selection.type === 'Preview'
+                ? false
+                : state.loopMedia,
           }
 
     case A.SET_PENDING_STRETCH:
@@ -197,7 +200,10 @@ const session: Reducer<SessionState, Action> = (
       return { ...state, editingCards: true, loopMedia: true }
 
     case A.STOP_EDITING_CARDS:
-      return { ...state, editingCards: false }
+      return { ...state, editingCards: false, loopMedia: false }
+
+    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
+      return { ...state, waveformSelection: null }
 
     default:
       return state
@@ -205,3 +211,6 @@ const session: Reducer<SessionState, Action> = (
 }
 
 export default session
+
+// don't loop when making selection on transcription field
+// even when not in cloze mode

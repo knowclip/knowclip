@@ -4,15 +4,16 @@ import React, {
   useEffect,
   ReactNode,
   useMemo,
+  useState,
 } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { getSelectionWithin, ClozeControls } from '../utils/useClozeUi'
+import * as r from '../redux'
 
-let shiftKeyHeld = false
 const ClozeField = ({
   className,
   fieldName,
@@ -57,20 +58,27 @@ const ClozeField = ({
     },
     [fieldName, onDoubleClick]
   )
+  const editing = currentClozeIndex !== -1
 
   useEffect(
     () => {
-      if (ref.current) {
+      if (ref.current && editing) {
         const selection = window.getSelection()
         if (selection) selection.empty()
         ref.current.blur()
         ref.current.focus()
       }
     },
-    [currentClozeIndex, ref]
+    [currentClozeIndex, ref, editing]
   )
   const clozeId = ClozeIds[currentClozeIndex]
-  const viewMode = useSelector((state: AppState) => state.settings.viewMode)
+  const { isMediaPlaying, loopIsOn, viewMode } = useSelector(
+    (state: AppState) => ({
+      isMediaPlaying: r.isMediaPlaying(state),
+      loopIsOn: r.isLoopOn(state),
+      viewMode: state.settings.viewMode,
+    })
+  )
 
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
@@ -150,8 +158,6 @@ const ClozeField = ({
     e.preventDefault()
   }, [])
 
-  const editing = currentClozeIndex !== -1
-
   const onKeyDown = useCallback(
     e => {
       if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
@@ -172,40 +178,37 @@ const ClozeField = ({
           }
           break
         }
-        // shift
-        case 16:
-          return (shiftKeyHeld = true)
+          // esc
+        case 27:
+          e.target.blur()
+          break
 
         default:
       }
     },
-    // [confirmSelection]
     [onBackspace, onPressDelete, ref]
   )
   const preventDefault = useCallback(e => {
     e.preventDefault()
   }, [])
-  const handleSelect = useCallback(
+
+  const dispatch = useDispatch()
+  const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
+  const handleFocus = useCallback(
     e => {
-      if (!shiftKeyHeld) {
-        const selection = getSelectionWithin(e.target)
-        if (selection.start === selection.end) return
-        onSelect(selection)
+      if (!editing && isMediaPlaying) {
+        setWasLoopingBeforeFocus(loopIsOn)
+        dispatch(r.setLoop(true))
       }
     },
-    [onSelect]
+    [loopIsOn, setWasLoopingBeforeFocus, isMediaPlaying, editing]
   )
-  const handleKeyUp = useCallback(
+  const handleBlur = useCallback(
     e => {
-      // shift key
-      if (e.keyCode === 16) {
-        shiftKeyHeld = false
-        const selection = getSelectionWithin(e.target)
-        if (selection.start === selection.end) return
-        onSelect(selection)
-      }
+      if (!editing && wasLoopingBeforeFocus !== loopIsOn)
+        dispatch(r.setLoop(wasLoopingBeforeFocus))
     },
-    [onSelect]
+    [loopIsOn, wasLoopingBeforeFocus, editing]
   )
 
   const content = (
@@ -213,7 +216,8 @@ const ClozeField = ({
       className={cn(css.clozeFieldValue, clozeId, {
         [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
       })}
-      contentEditable={editing}
+      contentEditable={true}
+      tabIndex={0}
       suppressContentEditableWarning
       onKeyDown={onKeyDown}
       onPaste={preventDefault}
@@ -221,9 +225,9 @@ const ClozeField = ({
       onDragEnd={preventDefault}
       onDragExit={preventDefault}
       onDragOver={preventDefault}
-      onSelect={handleSelect}
-      onKeyUp={handleKeyUp}
       onCopy={onCopy}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       ref={ref}
     >
       {segments}

@@ -21,6 +21,13 @@ const getMediaPlayer = () =>
 const getWaveformSvgElement = () =>
   (document.getElementById('waveform-svg') as SVGElement | null) || null
 
+export const pauseMedia = () => {
+  const el = getMediaPlayer()
+  if (el) {
+    el.pause()
+  }
+}
+
 const dependencies = {
   document,
   window,
@@ -40,12 +47,7 @@ const dependencies = {
     const media = getMediaPlayer()
     return media ? media.currentTime : 0
   },
-  pauseMedia: () => {
-    const el = getMediaPlayer()
-    if (el) {
-      el.pause()
-    }
-  },
+  pauseMedia,
   playMedia: () => {
     const el = getMediaPlayer()
     if (el) {

@@ -5,12 +5,15 @@ import electron, {
   MessageBoxReturnValue,
 } from 'electron'
 import { extname } from 'path'
+import { pauseMedia } from '../../epicsDependencies'
 
 const showSaveDialog = (
   name: string,
   extensions: Array<string>
 ): Promise<string | null> =>
   new Promise(async (res, rej) => {
+    pauseMedia()
+
     try {
       const { filePath } = await electron.remote.dialog.showSaveDialog(
         electron.remote.getCurrentWindow(),
@@ -38,6 +41,8 @@ const showOpenDialog = (
   multiSelections = false
 ): Promise<Array<string> | null> =>
   new Promise(async (res, rej) => {
+    pauseMedia()
+
     try {
       const { filePaths } = await electron.remote.dialog.showOpenDialog(
         electron.remote.getCurrentWindow(),
@@ -58,6 +63,8 @@ const showOpenDirectoryDialog = (
   showHiddenFiles = true
 ): Promise<string | null> =>
   new Promise(async (res, rej) => {
+    pauseMedia()
+
     try {
       const properties = [
         'openDirectory' as const,
@@ -80,6 +87,8 @@ const showOpenDirectoriesDialog = (
   showHiddenFiles = true
 ): Promise<string[] | null> =>
   new Promise(async (res, rej) => {
+    pauseMedia()
+
     try {
       const properties = [
         'openDirectory' as const,
@@ -103,18 +112,20 @@ const showOpenDirectoriesDialog = (
   })
 
 const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  pauseMedia()
   e.preventDefault()
   shell.openExternal((e.target as HTMLAnchorElement).href)
 }
 
 const showMessageBox: (
   options: MessageBoxOptions
-) => Promise<MessageBoxReturnValue | null> = options =>
-  electron.remote.dialog.showMessageBox(
+) => Promise<MessageBoxReturnValue | null> = options => {
+  pauseMedia()
+  return electron.remote.dialog.showMessageBox(
     electron.remote.getCurrentWindow(),
     options
   )
-
+}
 export default {
   showSaveDialog,
   showOpenDialog,
