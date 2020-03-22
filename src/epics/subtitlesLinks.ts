@@ -1,14 +1,5 @@
 import { combineEpics } from 'redux-observable'
-import {
-  flatMap,
-  map,
-  switchMap,
-  concatMap,
-  take,
-  sample,
-  tap,
-  ignoreElements,
-} from 'rxjs/operators'
+import { flatMap, map, sample } from 'rxjs/operators'
 import { of, empty, from } from 'rxjs'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
@@ -104,11 +95,7 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       })
     )
 
-export const newClipFromChunkOnEdit: AppEpic = (
-  action$,
-  state$,
-  { setCurrentTime }
-) =>
+export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
   action$.ofType<StartEditingCards>(A.START_EDITING_CARDS).pipe(
     flatMap(() => {
       const selection = r.getWaveformSelection(state$.value)

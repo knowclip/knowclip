@@ -201,14 +201,14 @@ const ClozeField = ({
         dispatch(r.setLoop(true))
       }
     },
-    [loopIsOn, setWasLoopingBeforeFocus, isMediaPlaying, editing]
+    [loopIsOn, setWasLoopingBeforeFocus, isMediaPlaying, editing, dispatch]
   )
   const handleBlur = useCallback(
     e => {
       if (!editing && wasLoopingBeforeFocus !== loopIsOn)
         dispatch(r.setLoop(wasLoopingBeforeFocus))
     },
-    [loopIsOn, wasLoopingBeforeFocus, editing]
+    [loopIsOn, wasLoopingBeforeFocus, editing, dispatch]
   )
 
   const content = (
