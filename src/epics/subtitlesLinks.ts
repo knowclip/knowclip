@@ -1,5 +1,14 @@
 import { combineEpics } from 'redux-observable'
-import { flatMap, map } from 'rxjs/operators'
+import {
+  flatMap,
+  map,
+  switchMap,
+  concatMap,
+  take,
+  sample,
+  tap,
+  ignoreElements,
+} from 'rxjs/operators'
 import { of, empty, from } from 'rxjs'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
@@ -147,7 +156,52 @@ export const newClipFromChunk: AppEpic = (
       })
     )
 
+const updateSelectionAfterLink: AppEpic = (
+  action$,
+  state$,
+  { setCurrentTime, getCurrentTime }
+) =>
+  action$
+    .ofType<LinkFlashcardFieldToSubtitlesTrackRequest>(
+      A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST
+    )
+    .pipe(
+      map(() => {
+        return r.getWaveformSelection(state$.value)
+      }),
+      sample(
+        action$.ofType<LinkFlashcardFieldToSubtitlesTrack>(
+          A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK
+        )
+      ),
+      flatMap(selection => {
+        if (selection && selection.type === 'Preview') {
+          const newSelection = r.getNewWaveformSelectionAt(
+            state$.value,
+            selection.item.start
+          )
+          if (
+            newSelection &&
+            r.getSecondsAtX(state$.value, newSelection.item.start) !==
+              getCurrentTime()
+          ) {
+            setCurrentTime(
+              r.getSecondsAtX(state$.value, newSelection.item.start)
+            )
+          }
+          return of(
+            newSelection
+              ? r.selectWaveformItem(newSelection)
+              : r.clearWaveformSelection()
+          )
+        }
+
+        return empty()
+      })
+    )
+
 export default combineEpics(
+  updateSelectionAfterLink,
   linkFieldToTrackRequest,
   linkFieldToTrack,
   newClipFromChunk,

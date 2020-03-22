@@ -178,7 +178,7 @@ const ClozeField = ({
           }
           break
         }
-          // esc
+        // esc
         case 27:
           e.target.blur()
           break

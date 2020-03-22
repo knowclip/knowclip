@@ -203,7 +203,13 @@ const session: Reducer<SessionState, Action> = (
       return { ...state, editingCards: false, loopMedia: false }
 
     case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
-      return { ...state, waveformSelection: null }
+      return {
+        ...state,
+        waveformSelection:
+          state.waveformSelection && state.waveformSelection.type === 'Preview'
+            ? null
+            : state.waveformSelection,
+      }
 
     default:
       return state
