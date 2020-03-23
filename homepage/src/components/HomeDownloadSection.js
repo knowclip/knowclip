@@ -10,7 +10,7 @@ const WINDOWS = "win"
 const MAC = "mac"
 const LINUX = "linux"
 const getOs = ({ userAgent }) => {
-  if (userAgent.includes("MacOS")) return MAC
+  if (userAgent.includes("Mac OS")) return MAC
   if (userAgent.includes("Linux")) return LINUX
   if (userAgent.includes("Win")) return WINDOWS
   return WINDOWS
