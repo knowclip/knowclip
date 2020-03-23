@@ -87,7 +87,7 @@ const IndexPage = () => {
               title="demo-video"
               width="560"
               height="315"
-              src="https://www.youtube-nocookie.com/embed/kFEfS8dyKQ8"
+              src="https://www.youtube-nocookie.com/embed/Duy8f4bOa-Y"
               frameBorder="0"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             />
@@ -346,8 +346,9 @@ const IndexPage = () => {
         setOpenSections={setOpenSections}
       >
         <>
-          <p>
-            The only way to get good at speaking a language with real humans is
+          <p>Knowclip has a handy <a className={css.link} href="https://www.youtube.com/watch?v=Duy8f4bOa-Y&feature=youtu.be&t=162">cloze-deletion (a.k.a. fill-in-the blanks) feature</a> than you can use to hone your speaking abilities to a certain extent, 
+            {' '}and you always have the option to practice shadowing (a.k.a. repeating after the recording) as you're making flashcards in Knowclip and reviewing them in Anki.
+            But when it comes down to it, the only way to get good at speaking a language with real humans is
             to
           </p>
           <p>
@@ -366,7 +367,7 @@ const IndexPage = () => {
             <a href="#how" className={css.link}>
               a great way to learn to understand the language
             </a>
-            .
+            . 
           </p>
           <p>
             Also keep in mind that{" "}
