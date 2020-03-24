@@ -13,7 +13,7 @@ It works like this:
 Currently being built with [Electron](https://electronjs.org), [Create React App](https://github.com/facebookincubator/create-react-app), [Redux](https://redux.js.org/) and [RxJS](https://rxjs-dev.firebaseapp.com/). Audio processing is done with [ffmpeg](https://ffmpeg.org/).
 
 ### Demo: [Making cards automatically with subtitled video](https://www.youtube.com/watch?v=kFEfS8dyKQ8)
-[![Knowclip](img/screenshot_190604.png)](https://www.youtube.com/watch?v=kFEfS8dyKQ8)
+[![Knowclip](img/screenshot_200324.png)](https://www.youtube.com/watch?v=Duy8f4bOa-Y)
 
 
 ### Development
