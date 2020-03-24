@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { IconButton } from '@material-ui/core'
+import { IconButton, Tooltip } from '@material-ui/core'
 import { Delete } from '@material-ui/icons'
 import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'
@@ -47,10 +47,13 @@ const MainHeader = ({
                 </IconButton>
               </Tooltip>
             </li> */}
+
             <li className={headerCss.menuItem}>
-              <IconButton onClick={deleteAllCurrentFileClipsRequest}>
-                <Delete />
-              </IconButton>
+              <Tooltip title="Delete all clips for this media file">
+                <IconButton onClick={deleteAllCurrentFileClipsRequest}>
+                  <Delete />
+                </IconButton>
+              </Tooltip>
             </li>
           </Fragment>
         )}

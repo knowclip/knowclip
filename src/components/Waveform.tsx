@@ -500,41 +500,43 @@ const Waveform = ({ show }: { show: boolean }) => {
       height={height}
       style={mediaIsLoaded ? undefined : { pointerEvents: 'none' }}
     >
-      <rect
-        fill="#222222"
-        x={0}
-        y={0}
-        width={waveform.length}
-        height={height}
-      />
-      <Clips
-        {...{ clips, highlightedClipId, stepsPerSecond, height, waveform }}
-      />
-      {pendingClip && (
-        <PendingClip
-          {...pendingClip}
-          stepsPerSecond={stepsPerSecond}
+      <g>
+        <rect
+          fill="#222222"
+          x={0}
+          y={0}
+          width={waveform.length}
           height={height}
         />
-      )}
-      {pendingStretch && (
-        <PendingStretch
-          {...pendingStretch}
-          stepsPerSecond={stepsPerSecond}
-          height={height}
+        <Clips
+          {...{ clips, highlightedClipId, stepsPerSecond, height, waveform }}
         />
-      )}
-      {imageBitmaps}
+        {pendingClip && (
+          <PendingClip
+            {...pendingClip}
+            stepsPerSecond={stepsPerSecond}
+            height={height}
+          />
+        )}
+        {pendingStretch && (
+          <PendingStretch
+            {...pendingStretch}
+            stepsPerSecond={stepsPerSecond}
+            height={height}
+          />
+        )}
+        {imageBitmaps}
 
-      {Boolean(subtitles.cards.length || subtitles.excludedTracks.length) && (
-        <SubtitlesTimelines
-          subtitles={subtitles}
-          goToSubtitlesChunk={goToSubtitlesChunk}
-          highlightedChunkIndex={highlightedChunkIndex}
-          waveformItems={waveformItems}
-        />
-      )}
-      <Cursor x={cursor.x} height={height} />
+        {Boolean(subtitles.cards.length || subtitles.excludedTracks.length) && (
+          <SubtitlesTimelines
+            subtitles={subtitles}
+            goToSubtitlesChunk={goToSubtitlesChunk}
+            highlightedChunkIndex={highlightedChunkIndex}
+            waveformItems={waveformItems}
+          />
+        )}
+        <Cursor x={cursor.x} height={height} />
+      </g>
     </svg>
   ) : (
     <div className={css.waveformPlaceholder} />

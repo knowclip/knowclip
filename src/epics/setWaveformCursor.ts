@@ -11,7 +11,6 @@ import { setWaveformCursor } from '../actions'
 import * as r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
-import { setCursorX } from '../utils/waveform'
 import { overlapsSignificantly } from '../selectors'
 
 let seeking = false
@@ -59,9 +58,9 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           const wasSeeking = seeking
           seeking = false
 
-          if (wasSeeking) {
-            setCursorX(r.getXAtMilliseconds(state$.value, newMilliseconds))
-          }
+          // if (wasSeeking) {
+          //   setCursorX(r.getXAtMilliseconds(state$.value, newMilliseconds))
+          // }
 
           const loopImminent =
             !wasSeeking &&
@@ -75,7 +74,6 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
               selection.item.start
             )
             effects.setCurrentTime(selectionStartTime)
-            setCursorX(selection.item.start)
             return of(setWaveformCursor(selection.item.start))
           }
 
