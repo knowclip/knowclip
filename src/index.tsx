@@ -17,7 +17,6 @@ Sentry.init({
 })
 
 window.addEventListener('error', e => {
-  console.log({ e })
   if (e && e.message && e.message.includes(RESIZE_OBSERVER_ERROR_MESSAGE))
     return
   const errorRoot = document.getElementById('errorRoot') as HTMLDivElement

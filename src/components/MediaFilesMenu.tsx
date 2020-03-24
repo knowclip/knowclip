@@ -168,7 +168,6 @@ function usePlayButtonSync() {
   useEffect(
     () => {
       const startPlaying = () => {
-        console.log('play event triggered')
         playMedia()
       }
 
