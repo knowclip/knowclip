@@ -58,10 +58,6 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
           const wasSeeking = seeking
           seeking = false
 
-          // if (wasSeeking) {
-          //   setCursorX(r.getXAtMilliseconds(state$.value, newMilliseconds))
-          // }
-
           const loopImminent =
             !wasSeeking &&
             r.isLoopOn(state) &&
