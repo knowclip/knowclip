@@ -158,6 +158,8 @@ const ClozeField = ({
     e.preventDefault()
   }, [])
 
+  const dispatch = useDispatch()
+
   const onKeyDown = useCallback(
     e => {
       if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
@@ -182,17 +184,20 @@ const ClozeField = ({
         case 27:
           e.target.blur()
           break
-
+        // e key
+        case 69:
+          dispatch(r.startEditingCards())
+          e.preventDefault()
+          break
         default:
       }
     },
-    [onBackspace, onPressDelete, ref]
+    [onBackspace, onPressDelete, ref, dispatch]
   )
   const preventDefault = useCallback(e => {
     e.preventDefault()
   }, [])
 
-  const dispatch = useDispatch()
   const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
   const handleFocus = useCallback(
     e => {
@@ -367,6 +372,7 @@ const ENABLED_KEYS = [
   37, // left
   39, // right
   27, // escape
+  69, // e
 ]
 const ENABLED_CTRL_KEYS = [
   ...ENABLED_KEYS,
