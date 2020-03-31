@@ -442,7 +442,7 @@ const IndexPage = () => {
 
         <p>
           Please consider{" "}
-          <a href="https://patreon.com/knowclip" className={css.link}>
+          <a href="https://patreon.com/knowclip" className={css.link} {...TARGET_BLANK}>
             supporting me on Patreon
           </a>
           . You'll be directly enabling me to roll out new features and bugfixes
