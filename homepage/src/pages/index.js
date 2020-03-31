@@ -2,10 +2,10 @@ import React, { useState, useCallback, useEffect, useLayoutEffect } from "react"
 import css from "./index.module.css"
 import cn from "classnames"
 import Layout from "../components/layout"
+import A from "../components/Link"
 import FaqSubsection from "../components/HomeFaqSubsection"
 import DownloadSection from "../components/HomeDownloadSection"
 import SEO from "../components/seo"
-import TARGET_BLANK from "../helpers/targetBlank"
 
 const IndexPage = () => {
   const [openSections, setOpenSections] = useState({
@@ -74,9 +74,9 @@ const IndexPage = () => {
             </li>
             <li>
               instantly bundle them into a ready-to-use{" "}
-              <a href="#anki" onClick={focusAnki} className={css.link}>
+              <A href="#anki" onClick={focusAnki} className={css.link}>
                 Anki deck
-              </a>
+              </A>
               .
             </li>
           </ol>
@@ -98,9 +98,9 @@ const IndexPage = () => {
         <p>
           Try it out and see what it's like to learn a language with tools{" "}
           <strong>
-            <a href="#how" onClick={focusHow} className={css.link}>
+            <A href="#how" onClick={focusHow} className={css.link}>
               made for learning
-            </a>
+            </A>
             , not for profit!
           </strong>
         </p>
@@ -123,13 +123,13 @@ const IndexPage = () => {
       >
         <>
           <p>
-            <a
+            <A
               href="https://apps.ankiweb.net"
               className={css.link}
-              {...TARGET_BLANK}
+              newWindow
             >
               Anki
-            </a>{" "}
+            </A>{" "}
             is the gold standard in <i>spaced-repetition</i> flashcard software.
             It's a favorite of medical students, as well as pretty much everyone
             on the Internet who wants to{" "}
@@ -137,13 +137,13 @@ const IndexPage = () => {
           </p>
           <p>
             It's available on{" "}
-            <a
+            <A
               href="https://apps.ankiweb.net/#dlarea"
               className={css.link}
-              {...TARGET_BLANK}
+              newWindow
             >
               Desktop, Android, IOS
-            </a>
+            </A>
             , and even in your web browser, so you can learn at home or on the
             go.
           </p>
@@ -187,9 +187,9 @@ const IndexPage = () => {
               there's more to the immersion story than most people realize
             </strong>
             . Knowclip was designed to help you get{" "}
-            <a href="#immersion" className={css.link}>
+            <A href="#immersion" className={css.link}>
               the right kind of immersion
-            </a>{" "}
+            </A>{" "}
             you need at this step in your journey towards fluency.
           </p>
         </>
@@ -228,14 +228,14 @@ const IndexPage = () => {
 
           <p>
             This is the only way to{" "}
-            <a
+            <A
               href="https://youtu.be/J_EQDtpYSNM?t=230"
               className={css.link}
               onClick={openInputVideo}
-              {...TARGET_BLANK}
+              newWindow
             >
               truly acquire a language
-            </a>
+            </A>
             , versus just learning <em>about</em> it, like you would in a
             classroom.{" "}
             {inputVideoIsOpen && (
@@ -256,13 +256,13 @@ const IndexPage = () => {
             </strong>
             . You <em>definitely</em> don't need boring textbooks and silly
             classroom speaking exercises. What you need is{" "}
-            <a
+            <A
               href="http://www.antimoon.com/how/input.htm"
               className={css.link}
-              {...TARGET_BLANK}
+              newWindow
             >
               lots and lots of input
-            </a>{" "}
+            </A>{" "}
             from engaging sources.
           </p>
 
@@ -275,9 +275,9 @@ const IndexPage = () => {
               focus on the bits you <em>can</em> understand
             </strong>
             . With the addition of{" "}
-            <a href="#anki" className={css.link}>
+            <A href="#anki" className={css.link}>
               Anki
-            </a>
+            </A>
             , you can be sure to remember what you learn and easily keep track
             of your progress.
           </p>
@@ -297,13 +297,13 @@ const IndexPage = () => {
             language you're learning and what you're personally interested in. I
             plan to update this site with specific recommendations over the
             coming weeks. (
-            <a
+            <A
               href="https://twitter.com/@knowclip"
               className={css.link}
-              {...TARGET_BLANK}
+              newWindow
             >
               Follow @knowclip on Twitter
-            </a>{" "}
+            </A>{" "}
             to stay updated.)
           </p>
           <p>
@@ -311,18 +311,18 @@ const IndexPage = () => {
             <strong>find something that holds your interest</strong>. Something
             like your favorite TV show is ideal—if you're familiar with the
             story, it can help you stay engaged and{" "}
-            <a href="#immersion" className={css.link}>
+            <A href="#immersion" className={css.link}>
               make sense of the language
-            </a>
+            </A>
             .
           </p>
           <p>
             Of course, finding that content to download isn't always easy. I'm
             hoping to build a platform to make this easier, either as a web
             site, or as an integrated feature in Knowclip—please consider{" "}
-            <a href="https://patreon.com/knowclip" className={css.link}>
+            <span><A href="https://patreon.com/knowclip" className={css.link}>
               supporting me on Patreon
-            </a>{" "}
+            </A></span>{" "}
             so I can make this happen while continuing to keep Knowclip free to
             download and use!
           </p>
@@ -331,9 +331,9 @@ const IndexPage = () => {
             collaborate with you to make your work more easily available for use
             with Knowclip, while making sure you're fairly compensated. If that
             sounds interesting to you, please feel free to{" "}
-            <a href="mailto:knowclip@protonmail.com" className={css.link}>
+            <A href="mailto:knowclip@protonmail.com" className={css.link}>
               get in touch
-            </a>
+            </A>
             !
           </p>
         </>
@@ -346,7 +346,7 @@ const IndexPage = () => {
         setOpenSections={setOpenSections}
       >
         <>
-          <p>Knowclip has a handy <a className={css.link} href="https://www.youtube.com/watch?v=Duy8f4bOa-Y&feature=youtu.be&t=162">cloze-deletion (a.k.a. fill-in-the blanks) feature</a> than you can use to hone your speaking abilities to a certain extent, 
+          <p>Knowclip has a handy <A className={css.link} href="https://www.youtube.com/watch?v=Duy8f4bOa-Y&feature=youtu.be&t=162">cloze-deletion (a.k.a. fill-in-the blanks) feature</A> than you can use to hone your speaking abilities to a certain extent, 
             {' '}and you always have the option to practice shadowing (a.k.a. repeating after the recording) as you're making flashcards in Knowclip and reviewing them in Anki.
             But when it comes down to it, the only way to get good at speaking a language with real humans is
             to
@@ -364,9 +364,9 @@ const IndexPage = () => {
             </span>{" "}
             But immersing yourself in native media (with the help of Knowclip)
             is{" "}
-            <a href="#how" className={css.link}>
+            <A href="#how" className={css.link}>
               a great way to learn to understand the language
-            </a>
+            </A>
             . 
           </p>
           <p>
@@ -376,14 +376,13 @@ const IndexPage = () => {
             </strong>
             —you can't have a conversation with someone unless you can
             understand what they're saying! There are even people who advocate
-            for a{" "}
-            <a
+            for a <span><A
               href="https://youtu.be/yW8M4Js4UBA?t=192"
               className={css.link}
-              {...TARGET_BLANK}
+              newWindow
             >
               silent period
-            </a>{" "}
+            </A></span>{" "}
             when starting a new language.
           </p>
         </>
@@ -408,13 +407,13 @@ const IndexPage = () => {
             <li>sentence difficulty ratings based on word frequency</li>
             <li>
               ...so much more! See all planned features on{" "}
-              <a
+              <A
                 href="https://github.com/knowclip/knowclip/projects/3"
                 className={css.link}
-                {...TARGET_BLANK}
+                newWindow
               >
                 Github
-              </a>
+              </A>
               .
             </li>
           </ul>
@@ -422,29 +421,29 @@ const IndexPage = () => {
 
         <p>
           If you don't see your idea already in the{" "}
-          <a
+          <A
             href="https://github.com/knowclip/knowclip/projects/3"
             className={css.link}
-            {...TARGET_BLANK}
+            newWindow
           >
             list of planned features
-          </a>
+          </A>
           , go ahead and tweet{" "}
-          <a
+          <A
             href="https://twitter.com/@knowclip"
             className={css.link}
-            {...TARGET_BLANK}
+            newWindow
           >
             @knowclip
-          </a>{" "}
+          </A>{" "}
           or open an issue on Github.
         </p>
 
         <p>
           Please consider{" "}
-          <a href="https://patreon.com/knowclip" className={css.link} {...TARGET_BLANK}>
+          <span><A href="https://patreon.com/knowclip" className={css.link} newWindow>
             supporting me on Patreon
-          </a>
+          </A></span>
           . You'll be directly enabling me to roll out new features and bugfixes
           on a regular basis, and you'll be helping me follow my dream of{" "}
           <strong>making quality language education free for everyone</strong>!

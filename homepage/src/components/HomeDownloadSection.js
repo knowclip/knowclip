@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react"
 import css from "../pages/index.module.css"
 import Icon from "../components/icon"
+import A from "../components/Link"
 import cn from "classnames"
-import TARGET_BLANK from "../helpers/targetBlank"
 
 import packageJson from "../../../package.json"
 
@@ -64,14 +64,14 @@ const DownloadSection = () => {
           <>
             <ol>
               <li>
-                <a
+                <A
                   href={getDownloadUrl(os, "exe")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
-                  {...TARGET_BLANK}
+                  newWindow
                 >
                   Download
-                </a>{" "}
+                </A>{" "}
                 the .exe file.
               </li>
               <li>Open the .exe file.</li>
@@ -104,14 +104,14 @@ const DownloadSection = () => {
           <>
             <ol>
               <li>
-                <a
+                <A
                   href={getDownloadUrl(os, "dmg")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
-                  {...TARGET_BLANK}
+                  newWindow
                 >
                   Download
-                </a>{" "}
+                </A>{" "}
                 the .dmg archive.
               </li>
               <li>
@@ -123,13 +123,13 @@ const DownloadSection = () => {
                   While holding the Ctrl key, single-click on the app
                 </strong>{" "}
                 and select "Open". Press "Open" when you see a prompt, like in{" "}
-                <a
+                <A
                   href="https://www.youtube.com/watch?v=AnCyEeOt82I"
                   className={css.link}
                   onClick={openMacInstallVideo}
                 >
                   this 30-second video
-                </a>
+                </A>
                 .
                 {macInstallVideoIsOpen && (
                   <div className={css.responsiveVideo}>
@@ -164,14 +164,14 @@ const DownloadSection = () => {
             </h5>
             <ol>
               <li>
-                <a
+                <A
                   href={getDownloadUrl(os, "deb")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
-                  {...TARGET_BLANK}
+                  newWindow
                 >
                   Download
-                </a>{" "}
+                </A>{" "}
                 the .deb package.
               </li>
               <li>
@@ -189,14 +189,14 @@ const DownloadSection = () => {
             <h5 className={css.subheading}>AppImage</h5>
             <p>
               For other distributions, there's an{" "}
-              <a
+              <A
                 href={getDownloadUrl("linux", "AppImage")}
                 className={css.link}
                 onClick={showPostDownloadMessage}
-                {...TARGET_BLANK}
+                newWindow
               >
                 AppImage
-              </a>{" "}
+              </A>{" "}
               available for download, though it hasn't been as thoroughly
               tested.
             </p>
@@ -249,7 +249,7 @@ const DownloadOsSection = ({
         )}
 
         <section className={css.downloadButtonSection}>
-          <a
+          <A
             className={css.downloadButton}
             href={getDownloadUrl(os, defaultExt)}
             onClick={showPostDownloadMessage}
@@ -263,7 +263,7 @@ const DownloadOsSection = ({
               </strong>{" "}
               <div> {buttonText}</div>
             </div>
-          </a>
+          </A>
         </section>
 
         <section className={css.installationInstructions}>
@@ -292,9 +292,9 @@ const PostDownloadMessage = () => (
 )
 
 const PatreonLink = ({ children }) => (
-  <a href="https://patreon.com/knowclip" className={css.link}>
+  <A href="https://patreon.com/knowclip" className={css.link}>
     {children}
-  </a>
+  </A>
 )
 
 export default DownloadSection
