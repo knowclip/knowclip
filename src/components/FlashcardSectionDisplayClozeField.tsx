@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import os from 'os'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
@@ -162,7 +163,7 @@ const ClozeField = ({
 
   const onKeyDown = useCallback(
     e => {
-      if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
+      if (!isEnabledKey(e)) e.preventDefault()
       switch (e.keyCode) {
         // delete
         case 46: {
@@ -374,12 +375,21 @@ const ENABLED_KEYS = [
   27, // escape
   69, // e
 ]
-const ENABLED_CTRL_KEYS = [
+const ENABLED_META_CTRL_KEYS = [
   ...ENABLED_KEYS,
   67, // c
   65, // a
 ]
-const isEnabledKey = (keyCode: number, ctrlKey: boolean) =>
-  ctrlKey ? ENABLED_CTRL_KEYS.includes(keyCode) : ENABLED_KEYS.includes(keyCode)
+const getMetaOrCtrlKey =
+  os.platform() === 'darwin'
+    ? (e: KeyboardEvent) => e.metaKey
+    : (e: KeyboardEvent) => e.ctrlKey
+const isEnabledKey = (e: KeyboardEvent) => {
+  const { keyCode } = e
+  const metaOrCtrlKey = getMetaOrCtrlKey(e)
+  return metaOrCtrlKey
+    ? ENABLED_META_CTRL_KEYS.includes(keyCode)
+    : ENABLED_KEYS.includes(keyCode)
+}
 
 export default ClozeField
