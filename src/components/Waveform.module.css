@@ -69,6 +69,7 @@
 .subtitlesChunk:hover .subtitlesText {
   fill: black;
   cursor: default;
+  pointer-events: none;
 }
  
 .subtitlesChunk:hover .subtitlesChunkRectangle {

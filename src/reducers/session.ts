@@ -92,9 +92,12 @@ const session: Reducer<SessionState, Action> = (
             ...state,
             waveformSelection: action.selection,
             loopMedia:
-              !action.selection || action.selection.type === 'Preview'
+              (state.editingCards &&
+                action.selection &&
+                action.selection.type === 'Clip') ||
+              (action.selection && action.selection.type === 'Preview'
                 ? false
-                : state.loopMedia,
+                : state.loopMedia),
           }
 
     case A.SET_PENDING_STRETCH:

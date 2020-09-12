@@ -21,23 +21,17 @@ export const getWaveformPng = async (
     if (outputFilename && existsSync(outputFilename))
       return { value: outputFilename }
 
-    console.log({
-      from: file.startSeconds,
-      to: toTimestamp(file.endSeconds * 1000),
-      width,
-    })
-
     const newFileName: string = await new Promise((res, rej) => {
-      ffmpeg(mediaFilePath)
-        .seekInput(file.startSeconds)
+      return ffmpeg(mediaFilePath)
+        .seekInput(toTimestamp(file.startSeconds * 1000))
         .inputOptions(`-to ${toTimestamp(file.endSeconds * 1000)}`)
-        // .withNoVideo()
+        .withNoVideo()
         .complexFilter(
           [
             `[0:a]aformat=channel_layouts=mono,`,
             `compand=gain=-6,`,
             `showwavespic=s=${width +
-              CORRECTION_OFFSET}x70:colors=${WAVE_COLOR}[fg];`,
+              CORRECTION_OFFSET}x70:colors=${WAVE_COLOR},setpts=0[fg];`,
             `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
             `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
           ].join(''),
