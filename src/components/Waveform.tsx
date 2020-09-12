@@ -136,7 +136,7 @@ const Clips = React.memo(
     height: number
     waveform: WaveformState
   }) => {
-    const handleMouseUp = useCallback(
+    const handleClick = useCallback(
       e => {
         const { dataset } = e.target
         if (dataset && dataset.clipId) {
@@ -166,7 +166,7 @@ const Clips = React.memo(
     )
 
     return (
-      <g className={$.waveformClipsContainer} onMouseUp={handleMouseUp}>
+      <g className={$.waveformClipsContainer} onClick={handleClick}>
         {clips.map((clip, i) => (
           <Clip
             {...clip}
@@ -315,7 +315,7 @@ const SubtitlesTimelines = memo(
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
     highlightedChunkIndex: number | null
   }) => {
-    const handleMouseUp = useCallback(
+    const handleClick = useCallback(
       e => {
         const { dataset } = e.target
 
@@ -351,7 +351,7 @@ const SubtitlesTimelines = memo(
       <g
         className={cn(css.subtitlesSvg, $.subtitlesTimelinesContainer)}
         width="100%"
-        onMouseUp={handleMouseUp}
+        onClick={handleClick}
         onDoubleClick={handleDoubleClick}
       >
         {subtitles.cards.map((c, i) => {
@@ -426,32 +426,14 @@ const Waveform = ({ show }: { show: boolean }) => {
   const height =
     WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
   const viewBoxString = getViewBoxString(viewBox.xMin, height)
-  const svgRef = useRef(null)
-
-  const handleMouseDown = useCallback(
-    e => {
-      const coords = toWaveformCoordinates(
-        e,
-        e.currentTarget,
-        waveform.viewBox.xMin
-      )
-      const x = Math.min(waveform.length, coords.x)
-      const waveformMousedown = new WaveformMousedownEvent(
-        e.currentTarget,
-        getSecondsAtXFromWaveform(waveform, x)
-      )
-      document.dispatchEvent(waveformMousedown)
-    },
-    [waveform]
-  )
+  const svgRef = useRef<SVGSVGElement>(null)
 
   const handleMouseUp = useCallback(
     e => {
-      const coords = toWaveformCoordinates(
-        e,
-        e.currentTarget,
-        waveform.viewBox.xMin
-      )
+      const svg = svgRef.current
+      if (!svg) return
+
+      const coords = toWaveformCoordinates(e, svg, waveform.viewBox.xMin)
       const x = Math.min(waveform.length, coords.x)
       const { dataset } = e.target
 
@@ -471,6 +453,29 @@ const Waveform = ({ show }: { show: boolean }) => {
       }
     },
     [waveform]
+  )
+
+  const handleMouseDown = useCallback(
+    e => {
+      const coords = toWaveformCoordinates(
+        e,
+        e.currentTarget,
+        waveform.viewBox.xMin
+      )
+      const x = Math.min(waveform.length, coords.x)
+      const waveformMousedown = new WaveformMousedownEvent(
+        e.currentTarget,
+        getSecondsAtXFromWaveform(waveform, x)
+      )
+      document.dispatchEvent(waveformMousedown)
+
+      const handleNextMouseUp = (e: MouseEvent) => {
+        handleMouseUp(e)
+        document.removeEventListener('mouseup', handleNextMouseUp)
+      }
+      document.addEventListener('mouseup', handleNextMouseUp)
+    },
+    [waveform, handleMouseUp]
   )
 
   const imageBitmaps = useMemo(
@@ -496,45 +501,46 @@ const Waveform = ({ show }: { show: boolean }) => {
       className={cn(css.waveformSvg, $.container)}
       width="100%"
       onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
       height={height}
       style={mediaIsLoaded ? undefined : { pointerEvents: 'none' }}
     >
-      <rect
-        fill="#222222"
-        x={0}
-        y={0}
-        width={waveform.length}
-        height={height}
-      />
-      <Clips
-        {...{ clips, highlightedClipId, stepsPerSecond, height, waveform }}
-      />
-      {pendingClip && (
-        <PendingClip
-          {...pendingClip}
-          stepsPerSecond={stepsPerSecond}
+      <g>
+        <rect
+          fill="#222222"
+          x={0}
+          y={0}
+          width={waveform.length}
           height={height}
         />
-      )}
-      {pendingStretch && (
-        <PendingStretch
-          {...pendingStretch}
-          stepsPerSecond={stepsPerSecond}
-          height={height}
+        <Clips
+          {...{ clips, highlightedClipId, stepsPerSecond, height, waveform }}
         />
-      )}
-      {imageBitmaps}
+        {pendingClip && (
+          <PendingClip
+            {...pendingClip}
+            stepsPerSecond={stepsPerSecond}
+            height={height}
+          />
+        )}
+        {pendingStretch && (
+          <PendingStretch
+            {...pendingStretch}
+            stepsPerSecond={stepsPerSecond}
+            height={height}
+          />
+        )}
+        {imageBitmaps}
 
-      {Boolean(subtitles.cards.length || subtitles.excludedTracks.length) && (
-        <SubtitlesTimelines
-          subtitles={subtitles}
-          goToSubtitlesChunk={goToSubtitlesChunk}
-          highlightedChunkIndex={highlightedChunkIndex}
-          waveformItems={waveformItems}
-        />
-      )}
-      <Cursor x={cursor.x} height={height} />
+        {Boolean(subtitles.cards.length || subtitles.excludedTracks.length) && (
+          <SubtitlesTimelines
+            subtitles={subtitles}
+            goToSubtitlesChunk={goToSubtitlesChunk}
+            highlightedChunkIndex={highlightedChunkIndex}
+            waveformItems={waveformItems}
+          />
+        )}
+        <Cursor x={cursor.x} height={height} />
+      </g>
     </svg>
   ) : (
     <div className={css.waveformPlaceholder} />

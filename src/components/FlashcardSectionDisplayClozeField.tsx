@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import os from 'os'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
@@ -79,7 +80,7 @@ const ClozeField = ({
       viewMode: state.settings.viewMode,
     })
   )
-
+  const [hash, setHash] = useState(Math.random())
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
       return ranges.map(range => ({ range, clozeIndex }))
@@ -90,13 +91,20 @@ const ClozeField = ({
       const newlineChar = viewMode === 'HORIZONTAL' ? '⏎' : '\n'
       const segments = rangesWithClozeIndexes.length
         ? []
-        : clearNewlines(value, viewMode)
+        : [<span key={String(hash)}>{clearNewlines(value, viewMode)}</span>]
       rangesWithClozeIndexes.forEach(
         ({ range: { start, end }, clozeIndex }, i) => {
           if (i === 0 && start > 0) {
             segments.push(
               ...[...value.slice(0, start)].map((c, i) =>
-                charSpan(c, i, css.clozeValueChar, clozeIndex, newlineChar)
+                charSpan(
+                  c,
+                  i,
+                  css.clozeValueChar,
+                  clozeIndex,
+                  newlineChar,
+                  hash
+                )
               )
             )
           }
@@ -112,7 +120,8 @@ const ClozeField = ({
                   [css.blankEditing]: clozeIndex === currentClozeIndex,
                 }),
                 clozeIndex,
-                newlineChar
+                newlineChar,
+                hash
               )
             )
           )
@@ -133,7 +142,8 @@ const ClozeField = ({
                   end + i,
                   css.clozeValueChar,
                   clozeIndex,
-                  newlineChar
+                  newlineChar,
+                  hash
                 )
               )
             )
@@ -148,6 +158,7 @@ const ClozeField = ({
       rangesWithClozeIndexes,
       value,
       viewMode,
+      hash,
     ]
   )
   const onCopy = useCallback(e => {
@@ -158,9 +169,11 @@ const ClozeField = ({
     e.preventDefault()
   }, [])
 
+  const dispatch = useDispatch()
+
   const onKeyDown = useCallback(
     e => {
-      if (!isEnabledKey(e.keyCode, e.ctrlKey)) e.preventDefault()
+      if (!isEnabledKey(e)) return e.preventDefault()
       switch (e.keyCode) {
         // delete
         case 46: {
@@ -168,6 +181,7 @@ const ClozeField = ({
             const selection = getSelectionWithin(ref.current)
             onPressDelete(selection)
           }
+          e.preventDefault()
           break
         }
         // backspace
@@ -176,23 +190,34 @@ const ClozeField = ({
             const selection = getSelectionWithin(ref.current)
             onBackspace(selection)
           }
+          e.preventDefault()
           break
         }
         // esc
         case 27:
           e.target.blur()
           break
-
+        // e key
+        case 69:
+          dispatch(r.startEditingCards())
+          e.preventDefault()
+          break
         default:
       }
     },
-    [onBackspace, onPressDelete, ref]
+    [onBackspace, onPressDelete, ref, dispatch]
   )
   const preventDefault = useCallback(e => {
     e.preventDefault()
   }, [])
 
-  const dispatch = useDispatch()
+  const forceRerender = useCallback(
+    () => {
+      setHash(Math.random())
+    },
+    [setHash]
+  )
+
   const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
   const handleFocus = useCallback(
     e => {
@@ -220,6 +245,12 @@ const ClozeField = ({
       tabIndex={0}
       suppressContentEditableWarning
       onKeyDown={onKeyDown}
+      onKeyUp={preventDefault}
+      onInput={preventDefault}
+      onBeforeInput={preventDefault}
+      onChange={preventDefault}
+      onKeyPress={preventDefault}
+      onCompositionEnd={forceRerender}
       onPaste={preventDefault}
       onCut={preventDefault}
       onDragEnd={preventDefault}
@@ -229,6 +260,7 @@ const ClozeField = ({
       onFocus={handleFocus}
       onBlur={handleBlur}
       ref={ref}
+      id={String(hash)}
     >
       {segments}
     </span>
@@ -310,13 +342,15 @@ const charSpan = (
   index: number,
   className: string,
   clozeIndex: number,
-  newlineChar: string
+  newlineChar: string,
+  hash: number
 ) => {
   const isNewline = char === '\n' || char === '\r'
   return (
     <span
       className={cn(className, { [css.clozeNewlinePlaceholder]: isNewline })}
-      key={String(index + char)}
+      key={String(index + char + hash)}
+      id={String(index + char + hash)}
       style={{
         ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
       }}
@@ -367,13 +401,26 @@ const ENABLED_KEYS = [
   37, // left
   39, // right
   27, // escape
+  69, // e
+  46, // delete
+  8, // backspace
+  27, //esc
 ]
-const ENABLED_CTRL_KEYS = [
+const ENABLED_META_CTRL_KEYS = [
   ...ENABLED_KEYS,
   67, // c
   65, // a
 ]
-const isEnabledKey = (keyCode: number, ctrlKey: boolean) =>
-  ctrlKey ? ENABLED_CTRL_KEYS.includes(keyCode) : ENABLED_KEYS.includes(keyCode)
+const getMetaOrCtrlKey =
+  os.platform() === 'darwin'
+    ? (e: KeyboardEvent) => e.metaKey
+    : (e: KeyboardEvent) => e.ctrlKey
+const isEnabledKey = (e: KeyboardEvent) => {
+  const { keyCode } = e
+  const metaOrCtrlKey = getMetaOrCtrlKey(e)
+  return metaOrCtrlKey
+    ? ENABLED_META_CTRL_KEYS.includes(keyCode)
+    : ENABLED_KEYS.includes(keyCode)
+}
 
 export default ClozeField

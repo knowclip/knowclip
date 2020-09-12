@@ -116,7 +116,7 @@ const MediaFilesMenu = ({
             onClose={popover.close}
           >
             <MenuList>
-              <div style={{ maxHeight: '20.5em', overflowY: 'auto' }}>
+              <div style={{ maxHeight: '30.5em', overflowY: 'auto' }}>
                 {projectMediaFiles.map(media => (
                   <MediaFilesMenuItem
                     key={media.id}
@@ -167,7 +167,9 @@ function usePlayButtonSync() {
 
   useEffect(
     () => {
-      const startPlaying = () => playMedia()
+      const startPlaying = () => {
+        playMedia()
+      }
 
       document.addEventListener('play', startPlaying, true)
 
