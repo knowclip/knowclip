@@ -475,7 +475,7 @@ const Waveform = ({ show }: { show: boolean }) => {
       }
       document.addEventListener('mouseup', handleNextMouseUp)
     },
-    [waveform]
+    [waveform, handleMouseUp]
   )
 
   const imageBitmaps = useMemo(
