@@ -223,11 +223,6 @@ declare module 'react' {
     mode?: TextTrackMode
   }
 }
-declare global {
-  interface TextTrack {
-    id?: string
-  }
-}
 
 const Subtitles = ({
   track,
