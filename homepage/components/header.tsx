@@ -6,7 +6,7 @@ import Link from 'next/link'
 const Header = ({ siteTitle }: { siteTitle: string }) => (
   <header className={css.container}>
     <h1 className={cn(css.heading, css.filmBackground)}>
-      <img src="/static/lightbulb.png" className={css.lightbulbIcon} alt="" />
+      <img src="/lightbulb.png" className={css.lightbulbIcon} alt="" />
 
       <Link
         href="/" passHref>

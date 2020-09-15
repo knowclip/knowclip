@@ -262,7 +262,7 @@ const DownloadOsSection = ({
             onClick={showPostDownloadMessage}
           >
             <div className={css.callToAction}>Download latest</div>
-            <img className={css.downloadIcon} alt="" src='/static/icon.png' />
+            <img className={css.downloadIcon} alt="" src='/icon.png' />
             <div className={css.downloadName}>
               Knowclip{" "}
               <strong className={css.versionNumber}>

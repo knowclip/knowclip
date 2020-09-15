@@ -9,7 +9,7 @@ const Footer = ({ className }: { className?: string }) => (
       <section className={css.branding}>
         <a href="/" className={css.link}>
           <h4 className={css.brandingHeading}>
-            <img className={css.icon} src="/static/icon.png" alt="" />
+            <img className={css.icon} src="/icon.png" alt="" />
             Knowclip
           </h4>
         </a>
