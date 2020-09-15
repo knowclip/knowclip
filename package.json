@@ -64,6 +64,7 @@
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
+    "build:homepage": "yarn --cwd homepage run build",
     "postinstall": "electron-builder install-app-deps",
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
     "build": "yarn build-schemas && REACT_APP_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",

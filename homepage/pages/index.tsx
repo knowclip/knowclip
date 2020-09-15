@@ -1,14 +1,24 @@
-import React, { useState, useCallback, useEffect, useLayoutEffect } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import css from "./index.module.css"
 import cn from "classnames"
 import Layout from "../components/layout"
 import A from "../components/Link"
 import FaqSubsection from "../components/HomeFaqSubsection"
 import DownloadSection from "../components/HomeDownloadSection"
-import SEO from "../components/seo"
+
+type InfoSectionId =
+| 'anki'
+| 'how'
+| 'immersion'
+| 'beginner'
+| 'content'
+| 'speaking'
+| 'featureRequest'
+
+type OpenSections = Partial<Record<InfoSectionId, boolean>>
 
 const IndexPage = () => {
-  const [openSections, setOpenSections] = useState({
+  const [openSections, setOpenSections] = useState<OpenSections>({
     anki: true,
     how: true,
     immersion: true,
@@ -20,8 +30,8 @@ const IndexPage = () => {
   useEffect(
     () =>
       setOpenSections(o => {
-        const result = {}
-        for (const k in o) result[k] = window.location.hash === `#${k}`
+        const result: typeof o = {}
+        for (const k in o) result[k as keyof typeof o] = window.location.hash === `#${k}`
         return result
       }),
     []
@@ -52,7 +62,6 @@ const IndexPage = () => {
 
   return (
     <Layout>
-      <SEO title="Learn languages for free through native media" />
       <section className={css.intro}>
         <h2 className={css.heading}>
           Learn a new language by enjoying <strong>native media</strong>.
@@ -207,20 +216,18 @@ const IndexPage = () => {
             to maximize your exposure to native speech. In order to actually
             learn from that speech, it must be
           </p>
-          <p>
-            <ol>
-              <li>
-                <strong>within rich context</strong>, like the plot of a story
-                or the thread of a conversation
-              </li>
-              <li>
-                <strong>
-                  <em>just</em> beyond your current level of understanding
-                </strong>
-                .
-              </li>
-            </ol>
-          </p>
+          <ol>
+            <li>
+              <strong>within rich context</strong>, like the plot of a story
+              or the thread of a conversation
+            </li>
+            <li>
+              <strong>
+                <em>just</em> beyond your current level of understanding
+              </strong>
+              .
+            </li>
+          </ol>
           <p>
             This way, your brain can <strong>fill in the gaps</strong> and make
             sense of new words or grammar structures almost automatically.
@@ -245,9 +252,9 @@ const IndexPage = () => {
                   width="560"
                   height="315"
                   src="https://www.youtube.com/embed/J_EQDtpYSNM?start=230&autoplay=1"
-                  frameborder="0"
+                  frameBorder="0"
                   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture;"
-                  allowfullscreen
+                  allowFullScreen
                 ></iframe>
               </div>
             )}
@@ -351,12 +358,10 @@ const IndexPage = () => {
             But when it comes down to it, the only way to get good at speaking a language with real humans is
             to
           </p>
-          <p>
-            <ol>
-              <li>Learn to understand the language</li>
-              <li>Practice speaking with real humans</li>
-            </ol>
-          </p>
+          <ol>
+            <li>Learn to understand the language</li>
+            <li>Practice speaking with real humans</li>
+          </ol>
           <p>
             Software can't replace #2, at least not yet{" "}
             <span role="img" aria-label="smile">

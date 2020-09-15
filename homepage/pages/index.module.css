@@ -1,11 +1,3 @@
-html {
-  scroll-behavior: smooth;
-}
-
-.noJs {
-  display: initial;
-}
-
 .content {
   composes: mainContent from '../components/layout.module.css';
 
@@ -166,7 +158,8 @@ composes: content;
 
 
 .downloadIcon {
-  height: auto;
+  width: 80px;
+  height: 80px;
   margin: .5em;
 }
 
@@ -303,8 +296,8 @@ composes: content;
   color: #0080ff;
 }
 
-html.noJs .info:not(:focus-within) .infoBody,
-html.noJs .info:not(:focus-within) .downloadLinkP {
+:global(.noJs) .info:not(:focus-within) .infoBody,
+:global(.noJs) .info:not(:focus-within) .downloadLinkP {
   position:absolute;
   left:-10000px;
   top:auto;
@@ -312,7 +305,7 @@ html.noJs .info:not(:focus-within) .downloadLinkP {
   height:1px;
   overflow:hidden;
 }
-html.noJs .info:focus .infoBody {
+:global(.noJs) .info:focus .infoBody {
   display: block !important;
 }
 
@@ -322,8 +315,8 @@ html.noJs .info:focus .infoBody {
 .openInfo .infoBody {
   display: block;
 }
-html.noJs .info:focus .infoBody,
-html:not(.noJs) .openInfo .infoBody {
+:global(.noJs) .info:focus .infoBody,
+html:not(:global(.noJs)) .openInfo .infoBody {
   animation: fadeIn .4s;
 }
 
