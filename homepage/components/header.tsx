@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React from "react"
 import css from "./header.module.css"
 import cn from "classnames"
@@ -23,10 +22,6 @@ const Header = ({ siteTitle }: { siteTitle: string }) => (
     </h1>
   </header>
 )
-
-Header.propTypes = {
-  siteTitle: PropTypes.string,
-}
 
 Header.defaultProps = {
   siteTitle: ``,
