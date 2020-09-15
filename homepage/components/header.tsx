@@ -1,23 +1,24 @@
-import { Link } from "gatsby"
 import PropTypes from "prop-types"
 import React from "react"
-import Image from "./lightbulb"
 import css from "./header.module.css"
 import cn from "classnames"
+import Link from 'next/link'
 
-const Header = ({ siteTitle }) => (
+const Header = ({ siteTitle }: { siteTitle: string }) => (
   <header className={css.container}>
     <h1 className={cn(css.heading, css.filmBackground)}>
-      <Image />
+      <img src="/static/lightbulb.png" className={css.lightbulbIcon} alt="" />
 
       <Link
-        to="/"
-        style={{
-          color: `white`,
-          textDecoration: `none`,
-        }}
-      >
-        {siteTitle}
+        href="/" passHref>
+        <a
+          style={{
+            color: `white`,
+            textDecoration: `none`,
+          }}
+        >
+          {siteTitle}
+        </a>
       </Link>
     </h1>
   </header>

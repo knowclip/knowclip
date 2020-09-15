@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react"
+import React, { PropsWithChildren, ReactNode, useCallback, useRef } from "react"
 import css from "../pages/index.module.css"
 import cn from "classnames"
 
@@ -6,19 +6,25 @@ const FaqSubsection = ({
   children,
   heading,
   id,
-  isOpen,
+  isOpen = false,
   setOpenSections,
   className,
-}) => {
+}: PropsWithChildren<{
+  heading: ReactNode,
+  id: string,
+  isOpen?: boolean,
+  setOpenSections: React.Dispatch<React.SetStateAction<Partial<Record<string, boolean>>>>
+  className?: string
+}>) => {
   const open = useCallback(() => {
-    setOpenSections(o => ({ ...o, [id]: true }))
+    setOpenSections((o) => ({ ...o, [id]: true }))
     window.location.hash = "#" + id
   }, [setOpenSections, id])
   const close = useCallback(
-    () => setOpenSections(o => ({ ...o, [id]: false })),
+    () => setOpenSections((o) => ({ ...o, [id]: false })),
     [setOpenSections, id]
   )
-  const headingRef = useRef()
+  const headingRef = useRef<HTMLHeadingElement>(null)
   const skipFocusAction = useRef(false)
   const handleHeadingMouseDown = useCallback(() => {
     const notFocused =
@@ -46,7 +52,7 @@ const FaqSubsection = ({
     <section
       className={cn(css.info, { [css.openInfo]: isOpen }, className)}
       id={id}
-      tabIndex="0"
+      tabIndex={0}
       onFocus={handleFocus}
     >
       <h2

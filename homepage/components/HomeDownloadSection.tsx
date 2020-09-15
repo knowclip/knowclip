@@ -1,34 +1,33 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, PropsWithChildren, ReactNode } from "react"
 import css from "../pages/index.module.css"
-import Icon from "../components/icon"
-import A from "../components/Link"
+import A from "./Link"
 import cn from "classnames"
 
-import packageJson from "../../../package.json"
+import packageJson from "../../package.json"
 
 const WINDOWS = "win"
 const MAC = "mac"
 const LINUX = "linux"
-const getOs = ({ userAgent }) => {
+const getOs = ({ userAgent }: Navigator) => {
   if (userAgent.includes("Mac OS")) return MAC
   if (userAgent.includes("Linux")) return LINUX
   if (userAgent.includes("Win")) return WINDOWS
   return WINDOWS
 }
 
-const getFileName = (osCode, ext, arch) =>
+const getFileName = (osCode: string, ext: string, arch?: string) =>
   `Knowclip_${[packageJson.version, osCode, arch]
     .filter(s => s)
     .join("_")}.${ext}`
 
-const getDownloadUrl = (osCode, ext, arch) =>
+const getDownloadUrl = (osCode: string, ext: string, arch?: string) =>
   `https://github.com/knowclip/knowclip/releases/download/v${
     packageJson.version
   }/${getFileName(osCode, ext, arch)}`
 
 const DownloadSection = () => {
-  const [os, setOs] = useState()
-  const [firstOs, setFirstOs] = useState()
+  const [os, setOs] = useState<string>()
+  const [firstOs, setFirstOs] = useState<string>()
 
   useEffect(() => {
     const firstOs = getOs(window.navigator)
@@ -60,12 +59,12 @@ const DownloadSection = () => {
         osName="Windows"
         buttonText="for Windows 7+"
       >
-        {showPostDownloadMessage => (
+        {(showPostDownloadMessage) => (
           <>
             <ol>
               <li>
                 <A
-                  href={getDownloadUrl(os, "exe")}
+                  href={os && getDownloadUrl(os, "exe")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
                   newWindow
@@ -100,12 +99,12 @@ const DownloadSection = () => {
         buttonText="for Mac OS X 10.10+"
         defaultExt="dmg"
       >
-        {showPostDownloadMessage => (
+        {(showPostDownloadMessage) => (
           <>
             <ol>
               <li>
                 <A
-                  href={getDownloadUrl(os, "dmg")}
+                  href={os && getDownloadUrl(os, "dmg")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
                   newWindow
@@ -138,9 +137,9 @@ const DownloadSection = () => {
                       width="560"
                       height="315"
                       src="https://www.youtube.com/embed/AnCyEeOt82I?start=0&autoplay=1"
-                      frameborder="0"
+                      frameBorder="0"
                       allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                      allowfullscreen
+                      allowFullScreen
                     ></iframe>
                   </div>
                 )}
@@ -157,7 +156,7 @@ const DownloadSection = () => {
         buttonText="Debian archive (amd64)"
         defaultExt="deb"
       >
-        {showPostDownloadMessage => (
+        {(showPostDownloadMessage) => (
           <>
             <h5 className={css.subheading}>
               Debian-based distributions (Ubuntu, ElementaryOS, etc.)
@@ -165,7 +164,7 @@ const DownloadSection = () => {
             <ol>
               <li>
                 <A
-                  href={getDownloadUrl(os, "deb")}
+                  href={os && getDownloadUrl(os, "deb")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
                   newWindow
@@ -215,6 +214,14 @@ const DownloadOsSection = ({
   setOs,
   children,
   buttonText,
+}: {
+  os: string
+  defaultExt: string
+  current?: string
+  osName: string
+  setOs: (os: string) => void
+  children: (showPostDownloadMessage: () => void) => ReactNode
+  buttonText: string
 }) => {
   const isCurrent = current === os
 
@@ -231,7 +238,7 @@ const DownloadOsSection = ({
       <h3
         className={cn(css.downloadOsName, { [css.currentOsName]: isCurrent })}
         onClick={() => setOs(os)}
-        tabIndex="0"
+        tabIndex={0}
         onFocus={() => setOs(os)}
       >
         {osName}
@@ -255,7 +262,7 @@ const DownloadOsSection = ({
             onClick={showPostDownloadMessage}
           >
             <div className={css.callToAction}>Download latest</div>
-            <Icon className={css.downloadIcon} alt="Knowclip icon" />
+            <img className={css.downloadIcon} alt="" src='/static/icon.png' />
             <div className={css.downloadName}>
               Knowclip{" "}
               <strong className={css.versionNumber}>
@@ -275,7 +282,7 @@ const DownloadOsSection = ({
   )
 }
 
-const PostDownloadMessage = () => (
+const PostDownloadMessage = (_: { os: string }) => (
   <>
     <p>Thanks for downloading Knowclip!</p>
     <p>
@@ -291,7 +298,7 @@ const PostDownloadMessage = () => (
   </>
 )
 
-const PatreonLink = ({ children }) => (
+const PatreonLink = ({ children }: PropsWithChildren<{}>) => (
   <A href="https://patreon.com/knowclip" className={css.link}>
     {children}
   </A>
