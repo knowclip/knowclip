@@ -12,6 +12,7 @@
   "dependencies": {
     "@icons-pack/react-simple-icons": "^3.10.0",
     "@pinjollist/next-with-analytics": "^1.0.0-rc.0",
+    "@types/classnames": "^2.2.10",
     "classnames": "^2.2.6",
     "next": "latest",
     "react": "^16.12.0",
