@@ -1,10 +1,9 @@
-const electron = require('electron')
-const path = require('path')
-const url = require('url')
-const { app, ipcMain } = electron
+import { BrowserWindow , screen, app, ipcMain, Menu } from 'electron'
+import * as path from 'path'
+import * as url from 'url'
 const { isPackaged } = app
-const { BrowserWindow } = electron
-const setUpMenu = require('./electron/appMenu')
+import setUpMenu from './appMenu'
+import installDevtools from './devtools'
 const Sentry = require('@sentry/electron')
 
 Sentry.init({
@@ -13,25 +12,26 @@ Sentry.init({
 
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
-const installDevtools = require('./electron/devtools')
 const useDevtools = process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : true
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
-const context = { mainWindow: null }
+const context: { mainWindow: BrowserWindow | null } = { mainWindow: null }
 
 // have to do it this to access ffmpeg path from within webpack bundle
 const ffmpegStaticBasePath = require('ffmpeg-static').path
 const ffprobeStaticBasePath = require('ffprobe-static').path
-const getFfmpegStaticPath = basePath =>
+const getFfmpegStaticPath = (basePath: string) =>
   basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
 
+// @ts-ignore
 global.ffmpegpath = getFfmpegStaticPath(ffmpegStaticBasePath)
+// @ts-ignore
 global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
 
 async function createWindow() {
-  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -63,7 +63,7 @@ async function createWindow() {
       url.format({
         pathname: path.join(__dirname, 'icons', 'icon.png'),
         protocol: 'file',
-        slashes: 'true',
+        slashes: 'true' as unknown as boolean,
       })
     )
 
@@ -83,9 +83,9 @@ async function createWindow() {
   mainWindow.loadURL(
     isPackaged || (process.env.NODE_ENV === 'test' && !INTEGRATION_DEV)
       ? url.format({
-          pathname: path.join(__dirname, 'build', 'index.html'),
+          pathname: path.join(__dirname, '..', 'build', 'index.html'),
           protocol: 'file',
-          slashes: 'true',
+          slashes: 'true' as unknown as boolean,
         })
       : 'http://localhost:3000'
   )
@@ -114,7 +114,7 @@ async function createWindow() {
 app.on('ready', () => {
   createWindow()
 
-  setUpMenu(electron, context, true)
+  setUpMenu(context.mainWindow as BrowserWindow, true)
 })
 
 app.on('will-quit', () => {
