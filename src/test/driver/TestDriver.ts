@@ -121,6 +121,7 @@ export async function createTestDriver({
   // await chromedriverLauncher
 
   const browser: BrowserObject = await remote({
+    waitforTimeout: 30000,
     hostname, // Use localhost as chrome driver server
     port, // "9515" is the port opened by chrome driver.
     capabilities: {
