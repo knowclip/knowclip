@@ -48,8 +48,8 @@ export async function startApp(
   const app = await createTestDriver({
     path: (electron as unknown) as string,
     chromedriverArgs: [
+      'headless',      
       'disable-extensions',
-      // "debug",
       'no-sandbox',
       // ...(process.env.APPVEYOR) ? ["no-sandbox"] : [],
     ], // ? does this actually correspond?
