@@ -1,15 +1,15 @@
-import { Application } from 'spectron'
-import { startApp, stopApp, TestSetup, TMP_DIRECTORY } from '../../spectronApp'
+import { startApp, stopApp, TestSetup, TMP_DIRECTORY } from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import { runAll } from '../step'
 import { newProjectTestSteps } from './newProjectTestSteps'
 import { join } from 'path'
 import { parseProjectJson } from '../../../utils/parseProject'
+import { TestDriver } from '../../driver/TestDriver'
 
 jest.setTimeout(60000)
 
 describe('create a deck from a new project', () => {
-  let context: { app: Application | null; testId: string } = {
+  let context: { app: TestDriver | null; testId: string } = {
     app: null,
     testId: 'newProject',
   }

@@ -1,5 +1,4 @@
-import { Application } from 'spectron'
-import { startApp, stopApp, TestSetup } from '../../spectronApp'
+import { startApp, stopApp, TestSetup } from '../../setUpDriver'
 import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
 import makeFlashcards from './makeFlashcards'
@@ -9,13 +8,14 @@ import reviewWithMissingMedia from './reviewWithMissingMedia'
 import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects'
+import { TestDriver } from '../../driver/TestDriver'
 
 jest.setTimeout(60000)
 
 const testId = 'sharedProject'
 
 describe('opening a shared project', () => {
-  let context: { app: Application | null; testId: string } = {
+  let context: { app: TestDriver | null; testId: string } = {
     app: null,
     testId,
   }

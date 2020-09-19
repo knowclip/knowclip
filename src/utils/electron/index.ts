@@ -1,4 +1,3 @@
-import mocks from './mocks'
 import helpers from './helpers'
 import spectronMocks from '../../test/spectronMocks'
 

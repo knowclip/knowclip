@@ -1,14 +1,20 @@
-import { BrowserWindow , screen, app, ipcMain, Menu } from 'electron'
+import { BrowserWindow , screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
 const { isPackaged } = app
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
+import { onMessage } from './messages'
+
+app.allowRendererProcessReuse = false
+
 const Sentry = require('@sentry/electron')
 
 Sentry.init({
   dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',
 })
+
+const rootDir = path.join(__dirname, '..')
 
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
@@ -44,6 +50,7 @@ async function createWindow() {
       webSecurity: isPackaged,
       nodeIntegration: true,
       devTools: useDevtools,
+      enableRemoteModule: true,
     },
   })
 
@@ -61,7 +68,7 @@ async function createWindow() {
   if (splash) {
     splash.loadURL(
       url.format({
-        pathname: path.join(__dirname, 'icons', 'icon.png'),
+        pathname: path.join(rootDir, 'icons', 'icon.png'),
         protocol: 'file',
         slashes: 'true' as unknown as boolean,
       })
@@ -83,7 +90,7 @@ async function createWindow() {
   mainWindow.loadURL(
     isPackaged || (process.env.NODE_ENV === 'test' && !INTEGRATION_DEV)
       ? url.format({
-          pathname: path.join(__dirname, '..', 'build', 'index.html'),
+          pathname: path.join(rootDir, 'build', 'index.html'),
           protocol: 'file',
           slashes: 'true' as unknown as boolean,
         })
@@ -107,6 +114,14 @@ async function createWindow() {
     context.mainWindow = null
   })
 }
+
+app.whenReady().then(() => {
+  // https://github.com/electron/electron/issues/23757#issuecomment-640146333
+  protocol.registerFileProtocol('file', (request, callback) => {
+    const pathname = decodeURI(request.url.replace('file:///', ''));
+    callback(pathname);
+  });
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -148,3 +163,8 @@ ipcMain.on('closed', function() {
   context.mainWindow = null
   app.quit()
 })
+
+ipcMain.handle('message', (event, message) => {
+  return onMessage(message)
+})
+

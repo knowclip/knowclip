@@ -1,4 +1,4 @@
-import { TestSetup } from '../spectronApp'
+import { TestSetup } from '../setUpDriver'
 
 type TestStep = {
   description: string

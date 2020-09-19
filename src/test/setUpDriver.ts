@@ -1,9 +1,9 @@
-import { Application } from 'spectron'
 import electron from 'electron'
 import { join } from 'path'
 import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
+import { createTestDriver, TestDriver } from './driver/TestDriver'
 
 export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
@@ -11,14 +11,14 @@ export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 export type TestSetup = {
-  app: Application
+  app: TestDriver
   client: ClientWrapper
   logPersistedData: () => Promise<void>
 }
 
 export async function startApp(
   context: {
-    app: Application | null
+    app: TestDriver | null
     testId: string
   },
   persistedState?: Partial<AppState>
@@ -29,32 +29,43 @@ export async function startApp(
   if (persistedStatePath)
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
 
-  const app = new Application({
-    chromeDriverArgs: ['--disable-extensions', '--debug'],
-    waitTimeout: 10000, // until apkg generation/ffmpeg stuff is properly mocked
-    webdriverOptions: { deprecationWarnings: false },
+  // const app = new Application({
+  //   chromeDriverArgs: ['--disable-extensions', '--debug'],
+  //   waitTimeout: 10000, // until apkg generation/ffmpeg stuff is properly mocked
+  //   webdriverOptions: { deprecationWarnings: false },
+  //   path: (electron as unknown) as string,
+  //   env: {
+  //     NODE_ENV: 'test',
+  //     REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
+  //     INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
+  //     ...(persistedStatePath
+  //       ? { PERSISTED_STATE_PATH: persistedStatePath }
+  //       : null),
+  //   },
+  //   args: [join(__dirname, '..', '..')],
+  // })
+  const app = await createTestDriver({
     path: (electron as unknown) as string,
+    chromedriverArgs: ['--disable-extensions', '--debug'], // ? does this actually correspond?
+    // webdriverOptions: { deprecationWarnings: false },
     env: {
       NODE_ENV: 'test',
-      REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
-      INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
+      REACT_APP_SPECTRON: String(Boolean(process.env.REACT_APP_SPECTRON)),
+      INTEGRATION_DEV: String(Boolean(process.env.INTEGRATION_DEV)),
       ...(persistedStatePath
         ? { PERSISTED_STATE_PATH: persistedStatePath }
         : null),
     },
-    args: [join(__dirname, '..', '..')],
   })
   context.app = app
 
-  await app.start()
-
-  app.webContents.send('start-test', context.testId)
+  await app.webContentsSend('start-test', context.testId)
 
   const setup = {
     app,
-    client: new ClientWrapper(app.client),
+    client: new ClientWrapper(app),
     logPersistedData: async () => {
-      app.webContents.send('log-persisted-data', context.testId, {
+      await app.webContentsSend('log-persisted-data', context.testId, {
         ASSETS_DIRECTORY,
         GENERATED_ASSETS_DIRECTORY,
         TMP_DIRECTORY,
@@ -65,7 +76,7 @@ export async function startApp(
 }
 
 export async function stopApp(context: {
-  app: Application | null
+  app: TestDriver | null
   testId: string
 }): Promise<null> {
   const { app } = context
@@ -74,12 +85,12 @@ export async function stopApp(context: {
   }
 
   if (app) {
-    app.webContents.send('end-test')
+    await app.webContentsSend('end-test')
 
     await app.stop()
   }
 
-  if (app && app.isRunning()) app.mainProcess.exit(0)
+  // if (app && app.isRunning()) app.mainProcess.exit(0)
 
   context.app = null
 

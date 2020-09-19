@@ -1,4 +1,3 @@
-import { Application } from 'spectron'
 import {
   startApp,
   stopApp,
@@ -6,19 +5,20 @@ import {
   TMP_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
-} from '../../spectronApp'
+} from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import { join } from 'path'
 import { runAll } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
 import { parseProjectJson } from '../../../utils/parseProject'
+import { TestDriver } from '../../driver/TestDriver'
 
 jest.setTimeout(60000)
 
 const testId = 'savedProject'
 
 describe('opening and saving a previously saved project', () => {
-  let context: { app: Application | null; testId: string } = {
+  let context: { app: TestDriver | null; testId: string } = {
     app: null,
     testId,
   }

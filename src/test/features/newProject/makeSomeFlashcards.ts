@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/Waveform'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
@@ -6,7 +6,7 @@ import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeTwoFlashcards({ app, client }: TestSetup) {
-  await waveformMouseDrag(app, client, 402, 625)
+  await waveformMouseDrag(client, 402, 625)
 
   await fillInTransliterationCardFields(client, {
     transcription: '笹を食べながらのんびりするのは最高だなぁ',
@@ -25,10 +25,10 @@ export default async function makeTwoFlashcards({ app, client }: TestSetup) {
   await client.elements_(tagsInput$.tagChip, 1)
   await client.waitForText_(tagsInput$.tagChip, 'pbc')
 
-  await waveformMouseDrag(app, client, 756, 920)
+  await waveformMouseDrag(client, 756, 920)
   await client.waitForText_(flashcardSection$.container, '2 / 2')
 
-  await waveformMouseDrag(app, client, 917, 888)
+  await waveformMouseDrag(client, 917, 888)
 
   await client.elements_(tagsInput$.tagChip, 1)
   await client.waitForText_(tagsInput$.tagChip, 'pbc')

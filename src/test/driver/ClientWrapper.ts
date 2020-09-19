@@ -1,7 +1,7 @@
-import { SpectronClient } from 'spectron'
 import { dragMouse, clickAt } from './runEvents'
-import { RawResult, Element } from 'webdriverio'
+import { Element } from 'webdriverio'
 import { ElementWrapper, element } from './ElementWrapper'
+import { TestDriver } from './TestDriver'
 
 export { dragMouse, clickAt }
 
@@ -13,19 +13,17 @@ export class ClientWrapper {
    * when Spectron moves to WebdriverIO v5.
    *
    * The WebDriverIO v4 API docs can be found here: http://v4.webdriver.io/api.html. */
-  _client: SpectronClient
+  _client: TestDriver
 
-  constructor(client: SpectronClient) {
+  constructor(client: TestDriver) {
     this._client = client
   }
 
   async firstElement(selector: string): Promise<ElementWrapper> {
     try {
-      await this.waitUntilPresent(selector)
-
-      const result = await this._client.$(selector)
-      // if (result.length)
-      return await element(this._client, result.value.ELEMENT, selector)
+      const result = await this._client.client.$(selector)
+      await result.waitForExist()
+      return await element(this._client, result, selector)
     } catch (err) {
       throw new Error(`Could not find element "${selector}": ${err}`)
     }
@@ -37,19 +35,22 @@ export class ClientWrapper {
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
     if (typeof count === 'number' && count <= 0)
       throw new Error('Count must be at least 1')
-    let elementsSoFar: RawResult<Element>[] | undefined
+    let elementsSoFar: Element[] | undefined
     try {
       if (count)
-        await this._client.waitUntil(async () => {
-          const elements: RawResult<Element>[] = await this._client.$$(selector)
-          elementsSoFar = elements
-          return elements.length === count
-        }, 10000)
-      else elementsSoFar = await this._client.$$(selector)
+        await this._client.client.waitUntil(
+          async () => {
+            const elements: Element[] = await this._client.client.$$(selector)
+            elementsSoFar = elements
+            return elements.length === count
+          },
+          { timeout: 10000 }
+        )
+      else elementsSoFar = await this._client.client.$$(selector)
 
-      return (elementsSoFar as RawResult<Element>[]).map(v =>
-        element(this._client, v.value.ELEMENT, selector)
-      )
+      if (!elementsSoFar) throw new Error('Elements were null')
+
+      return elementsSoFar.map(v => element(this._client, v, selector))
     } catch (err) {
       throw new Error(
         `Could not find ${count} elements with selector "${selector}". Instead found ${
@@ -91,7 +92,9 @@ export class ClientWrapper {
 
   async waitUntilPresent(selector: string, ms?: number) {
     try {
-      return await this._client.waitForExist(selector, ms)
+      return await (await this._client.client.$(selector)).waitForExist({
+        timeout: ms,
+      })
     } catch (err) {
       throw new Error(`Element "${selector}" would not appear: ${err.message}`)
     }
@@ -102,8 +105,26 @@ export class ClientWrapper {
 
   async waitUntilGone(selector: string) {
     try {
-      return await this._client.waitUntil(
-        async () => !(await this._client.isExisting(selector))
+      return await this._client.client.waitUntil(
+        async () => {
+          try {
+            const elements = await this._client.client.$$(selector)
+            console.log({ elements: elements.length })
+            if (!elements.length) return true
+            const element = await this._client.client.$(selector)
+            const displayed = await element.isDisplayedInViewport()
+
+            return !displayed
+          } catch (err) {
+            console.log('whoops')
+            console.log({ err })
+            console.error(err)
+            if (err.message.includes('no such element')) return true
+            else
+              throw new Error(`Problem detecting element "${selector}": ${err}`)
+          }
+        },
+        { timeout: 30000, interval: 200 }
       )
     } catch (err) {
       throw new Error(
@@ -157,10 +178,13 @@ export class ClientWrapper {
 
   async waitForVisible(selector: string) {
     try {
-      return await this._client.waitUntil(async () => {
-        const element = await this.firstElement(selector)
-        return await element.isVisible()
-      }, 30000)
+      return await this._client.client.waitUntil(
+        async () => {
+          const element = await this.firstElement(selector)
+          return await element.isVisible()
+        },
+        { timeout: 30000 }
+      )
     } catch (err) {
       throw new Error(`Element "${selector}" would not show: ${err.message}`)
     }
@@ -171,10 +195,13 @@ export class ClientWrapper {
 
   async waitForHidden(selector: string) {
     try {
-      return await this._client.waitUntil(async () => {
-        const element = await this.firstElement(selector)
-        return !(await element.isVisible())
-      }, 30000)
+      return await this._client.client.waitUntil(
+        async () => {
+          const element = await this.firstElement(selector)
+          return !(await element.isVisible())
+        },
+        { timeout: 30000 }
+      )
     } catch (err) {
       throw new Error(`Element "${selector}" would not hide: ${err.message}`)
     }
@@ -185,18 +212,33 @@ export class ClientWrapper {
 
   /** possible values listed here: https://w3c.github.io/webdriver/#keyboard-actions **/
   async pressKeys(normalizedKeyValues: string[]) {
-    await this._client.keys(normalizedKeyValues)
+    await this._client.client.keys(normalizedKeyValues)
   }
 
-  async submitForm() {
-    await this._client.submitForm()
-  }
-
-  async waitUntil(condition: () => boolean | Promise<boolean>) {
+  async waitUntil(condition: () => Promise<boolean>) {
     try {
-      await this._client.waitUntil(condition)
+      await this._client.client.waitUntil(condition, {
+        timeout: 30000,
+        interval: 200,
+      })
     } catch (err) {
-      throw new Error(`Wait condition was not met: ${condition.toString()}`)
+      throw new Error(
+        `Wait condition was not met: ${condition.toString()}: ${err}`
+      )
     }
+  }
+
+  async clickAtOffset(selector: string, { x, y }: { x: number; y: number }) {
+    try {
+      const el = await this.firstElement(selector)
+      return el.clickAtOffset({ x, y })
+    } catch (err) {
+      throw new Error(
+        `Could not click element "${selector}" at offset ${x}, ${y}: ${err}`
+      )
+    }
+  }
+  async clickAtOffset_(testLabel: string, { x, y }: { x: number; y: number }) {
+    return await this.clickAtOffset(getSelector(testLabel), { x, y })
   }
 }

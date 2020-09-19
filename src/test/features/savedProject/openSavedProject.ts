@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { waveform$ } from '../../../components/Waveform'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'

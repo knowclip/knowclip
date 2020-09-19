@@ -1,4 +1,3 @@
-import { Application } from 'spectron'
 import {
   startApp,
   stopApp,
@@ -6,18 +5,19 @@ import {
   TMP_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
-} from '../../spectronApp'
+} from '../../setUpDriver'
 import makeCardsFromSubtitles from './makeCardsFromSubtitles'
 import saveAndCloseProject from './saveAndCloseProject'
 import { join } from 'path'
 import { mockSideEffects } from '../../../utils/sideEffects'
+import { TestDriver } from '../../driver/TestDriver'
 
 jest.setTimeout(60000)
 
 const testId = 'subtitlesProject'
 
 describe('make clips and cards from subtitles', () => {
-  let context: { app: Application | null; testId: string } = {
+  let context: { app: TestDriver | null; testId: string } = {
     app: null,
     testId,
   }
