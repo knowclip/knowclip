@@ -108,7 +108,7 @@
     }
   },
   "browserslist": [
-    "electron >= 7.1.9"
+    "electron >= 10.1.2"
   ],
   "devDependencies": {
     "@types/better-sqlite3": "^5.4.0",

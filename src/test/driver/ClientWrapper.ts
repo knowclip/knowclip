@@ -124,7 +124,7 @@ export class ClientWrapper {
               throw new Error(`Problem detecting element "${selector}": ${err}`)
           }
         },
-        { timeout: 30000, interval: 200 }
+        { timeout: 60000, interval: 200 }
       )
     } catch (err) {
       throw new Error(
@@ -183,7 +183,7 @@ export class ClientWrapper {
           const element = await this.firstElement(selector)
           return await element.isVisible()
         },
-        { timeout: 30000 }
+        { timeout: 60000 }
       )
     } catch (err) {
       throw new Error(`Element "${selector}" would not show: ${err.message}`)
@@ -200,7 +200,7 @@ export class ClientWrapper {
           const element = await this.firstElement(selector)
           return !(await element.isVisible())
         },
-        { timeout: 30000 }
+        { timeout: 60000 }
       )
     } catch (err) {
       throw new Error(`Element "${selector}" would not hide: ${err.message}`)
@@ -218,7 +218,7 @@ export class ClientWrapper {
   async waitUntil(condition: () => Promise<boolean>) {
     try {
       await this._client.client.waitUntil(condition, {
-        timeout: 30000,
+        timeout: 60000,
         interval: 200,
       })
     } catch (err) {
