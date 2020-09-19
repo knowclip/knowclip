@@ -45,10 +45,12 @@ export async function startApp(
   //   },
   //   args: [join(__dirname, '..', '..')],
   // })
+
+  // thse ppl got headless working?
+  // https://github.com/electron-userland/spectron/issues/323 ??
   const app = await createTestDriver({
     path: (electron as unknown) as string,
-    chromedriverArgs: [
-      'headless',      
+    chromeArgs: [
       'disable-extensions',
       'no-sandbox',
       // ...(process.env.APPVEYOR) ? ["no-sandbox"] : [],

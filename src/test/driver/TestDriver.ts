@@ -81,15 +81,19 @@ function waitForChromeDriverToStop(
 
 export async function createTestDriver({
   path,
-  chromedriverArgs,
+  chromeArgs: chromeArgs,
   env: givenEnv,
   logLevel = 'silent',
 }: {
   path: string
-  chromedriverArgs: string[]
+  chromeArgs: string[]
   env?: NodeJS.ProcessEnv
   logLevel?: string
 }) {
+  const hostname = '127.0.0.1'
+  const port = 9515
+  const urlBase = '/'
+
   const env = {
     NODE_ENV: 'test',
     REACT_APP_TEST_DRIVER: 'true',
@@ -99,25 +103,28 @@ export async function createTestDriver({
   } as NodeJS.ProcessEnv
 
   // const {chromeDriverProcess: driverProcess, stop: stopChromeDriver }  = runChromeDriver([], env);
-  const driver = new Chromedriver(chromedriverArgs, env)
+  const driver = new Chromedriver(
+    ['--port=' + port, '--url-base=' + urlBase],
+    env
+  )
   await waitForChromeDriver(
     driver.process,
-    'http://localhost:9515/status',
+    `http://${hostname}:${port}/status`,
     7000
   )
 
   // await chromedriverLauncher
 
   const browser: BrowserObject = await remote({
-    hostname: 'localhost', // Use localhost as chrome driver server
-    port: 9515, // "9515" is the port opened by chrome driver.
+    hostname, // Use localhost as chrome driver server
+    port, // "9515" is the port opened by chrome driver.
     capabilities: {
       browserName: 'chrome',
       'goog:chromeOptions': {
         binary: path,
         args: [
           'app=' + process.cwd(),
-          ...chromedriverArgs,
+          ...chromeArgs,
           // '--disable-extensions',
           // '--debug'
         ],
