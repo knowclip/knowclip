@@ -121,6 +121,7 @@ export async function createTestDriver({
           // '--disable-extensions',
           // '--debug'
         ],
+        windowTypes: ['app', 'webview'],
       },
     },
     logLevel: (logLevel || 'silent') as

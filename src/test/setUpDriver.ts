@@ -26,8 +26,9 @@ export async function startApp(
   await copyFixtures()
 
   const persistedStatePath = persistedState ? tempy.file() : null
-  if (persistedStatePath)
+  if (persistedStatePath) {
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
+  }
 
   // const app = new Application({
   //   chromeDriverArgs: ['--disable-extensions', '--debug'],
@@ -46,7 +47,12 @@ export async function startApp(
   // })
   const app = await createTestDriver({
     path: (electron as unknown) as string,
-    chromedriverArgs: ['--disable-extensions', '--debug'], // ? does this actually correspond?
+    chromedriverArgs: [
+      'disable-extensions',
+      // "debug",
+      'no-sandbox',
+      // ...(process.env.APPVEYOR) ? ["no-sandbox"] : [],
+    ], // ? does this actually correspond?
     // webdriverOptions: { deprecationWarnings: false },
     env: {
       NODE_ENV: 'test',
