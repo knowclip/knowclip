@@ -52,8 +52,7 @@ export async function startApp(
     path: (electron as unknown) as string,
     chromeArgs: [
       'disable-extensions',
-      'no-sandbox',
-      // ...(process.env.APPVEYOR) ? ["no-sandbox"] : [],
+      ...(process.env.APPVEYOR) ? ["no-sandbox"] : [],
     ], // ? does this actually correspond?
     // webdriverOptions: { deprecationWarnings: false },
     env: {

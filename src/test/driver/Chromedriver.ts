@@ -62,13 +62,13 @@ export default class Chromedriver {
 }
 
 function startChromedriver(args: string[], env: any) {
-  return ChildProcess.spawn(BIN_PATH, args, {
-    cwd: process.cwd(),
-    env: {
-      ...process.env,
-      ...env,
-    },
-    // https://www.electronjs.org/docs/tutorial/automated-testing-with-a-custom-driver
-    stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
-  })
+  return ChildProcess.spawn(
+    BIN_PATH,
+    args //    {
+    //   cwd: process.cwd(),
+    //   // https://www.electronjs.org/docs/tutorial/automated-testing-with-a-custom-driver
+    //   // stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+    //   stdio: 'inherit',
+    // }
+  )
 }

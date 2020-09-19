@@ -104,7 +104,8 @@ export async function createTestDriver({
 
   // const {chromeDriverProcess: driverProcess, stop: stopChromeDriver }  = runChromeDriver([], env);
   const driver = new Chromedriver(
-    ['--port=' + port, '--url-base=' + urlBase],
+    [],
+    // ['--port=' + port, '--url-base=' + urlBase],
     env
   )
   await waitForChromeDriver(
@@ -123,8 +124,8 @@ export async function createTestDriver({
       'goog:chromeOptions': {
         binary: path,
         args: [
-          'app=' + process.cwd(),
           ...chromeArgs,
+          'app=' + process.cwd(),
           // '--disable-extensions',
           // '--debug'
         ],
