@@ -125,7 +125,7 @@
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
     "build": "yarn build-schemas && REACT_APP_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER node scripts/build.js",
     "build:main": "yarn tsc ./electron/main.ts --outDir ./build-main",
-    "build:ci": "CI=false && yarn build:main && yarn build",
+    "build:ci": "export CI=false && yarn build:main && yarn build",
     "build:appveyor": "yarn build:main && node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom ./src --testPathIgnorePatterns=./src/test",
     "integration": "REACT_APP_SPECTRON=true yarn build:ci && node scripts/test.js ./src/test/ --watchAll=false  --runInBand",

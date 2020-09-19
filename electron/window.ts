@@ -9,7 +9,7 @@ export const WINDOW_START_DIMENSIONS = {
 
 export function getStartUrl(startUrl?: string) {
   return startUrl || url.format({
-    pathname: path.join(ROOT_DIRECTORY, 'index.html'),
+    pathname: path.join(ROOT_DIRECTORY, 'build', 'index.html'),
     protocol: 'file:',
     slashes: true,
   });
