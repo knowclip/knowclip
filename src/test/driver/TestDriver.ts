@@ -102,14 +102,15 @@ export async function createTestDriver({
     NODE_ENV: 'test',
     REACT_APP_TEST_DRIVER: 'true',
     ELECTRON_START_URL: 'http://localhost:3000',
-    PATH: process.env.PATH,
+    // PATH: process.env.PATH,
     ...givenEnv,
   } as NodeJS.ProcessEnv
 
   // const {chromeDriverProcess: driverProcess, stop: stopChromeDriver }  = runChromeDriver([], env);
   const driver = new Chromedriver(
     chromedriverPath,
-    []
+    [],
+    env
     // ['--port=' + port, '--url-base=' + urlBase],
   )
   await waitForChromeDriver(

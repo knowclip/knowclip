@@ -10,7 +10,7 @@ export default class Chromedriver {
 
   stop: () => Boolean
 
-  constructor(path: string, args: string[]) {
+  constructor(path: string, args: string[], env?: NodeJS.ProcessEnv) {
     // this.process = chromedriver.start([
     //   // `--homepage=${getStartUrl(process.env.ELECTRON_START_URL)}`
     //   `--homepage=http://localhost:3000`,
@@ -22,7 +22,7 @@ export default class Chromedriver {
     //   ...args,
     // ])
 
-    this.process = startChromedriver(path, args)
+    this.process = startChromedriver(path, args, env)
 
     const chromedriverCloseHandler = (code: any, ...args: any[]) => {
       console.log(`closing chrome driver ${code}, ${args}`)
@@ -71,6 +71,12 @@ export default class Chromedriver {
   }
 }
 
-function startChromedriver(path: string, args: string[]) {
-  return ChildProcess.spawn(path, args)
+function startChromedriver(
+  path: string,
+  args: string[],
+  env?: NodeJS.ProcessEnv
+) {
+  return ChildProcess.spawn(path, args, {
+    env,
+  })
 }
