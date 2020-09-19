@@ -24,6 +24,8 @@ jobs:
         yarn lint
         yarn tsc
         yarn test
+        sudo apt-get install xvfb
+        xvfb-run --auto-servernum yarn integration
         (cd homepage && yarn install --frozen-lockfile && yarn build)
       env:
         CI: true
