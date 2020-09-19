@@ -69,6 +69,7 @@ export async function startApp(
     },
   })
   context.app = app
+  if (!(await app.isReady)) throw new Error('Problem starting test driver')
 
   await app.webContentsSend('start-test', context.testId)
 
