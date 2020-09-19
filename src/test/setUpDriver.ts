@@ -12,6 +12,15 @@ export const ASSETS_DIRECTORY = join(__dirname, 'assets')
 export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
+// https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
+const electronChromedriverPath = require(join(
+  process.cwd(),
+  'node_modules',
+  'chromedriver',
+  'lib',
+  'chromedriver'
+)).path
+
 export type TestSetup = {
   app: TestDriver
   client: ClientWrapper
@@ -51,7 +60,8 @@ export async function startApp(
   // thse ppl got headless working?
   // https://github.com/electron-userland/spectron/issues/323 ??
   const app = await createTestDriver({
-    path: chromedriver.path,
+    // path: chromedriver.path,
+    path: electronChromedriverPath,
     // path: (electron as unknown) as string,
     appDir: ROOT_DIRECTORY,
     chromeArgs: [
@@ -60,6 +70,7 @@ export async function startApp(
     ], // ? does this actually correspond?
     // webdriverOptions: { deprecationWarnings: false },
     env: {
+      PUBLIC_URL: process.env.PUBLIC_URL,
       NODE_ENV: 'test',
       REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON)
         ? 'true'

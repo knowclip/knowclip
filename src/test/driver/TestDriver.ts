@@ -106,6 +106,7 @@ export async function createTestDriver({
 
   // const {chromeDriverProcess: driverProcess, stop: stopChromeDriver }  = runChromeDriver([], env);
   const driver = new Chromedriver(
+    path,
     []
     // ['--port=' + port, '--url-base=' + urlBase],
   )

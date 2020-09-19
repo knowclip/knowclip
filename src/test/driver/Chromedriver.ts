@@ -5,27 +5,24 @@ import { getStartUrl } from '../../../electron/window'
 
 // chrome version 85.0.4183.98
 
-// // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
-// const binaryPath = require(path.join(process.cwd(), "node_modules", "chromedriver", "lib", "chromedriver")).path;
-
 export default class Chromedriver {
   process: ReturnType<typeof ChildProcess.spawn>
 
   stop: () => Boolean
 
-  constructor(args: string[]) {
-    this.process = chromedriver.start([
-      // `--homepage=${getStartUrl(process.env.ELECTRON_START_URL)}`
-      `--homepage=http://localhost:3000`,
-      '--port=' + 9515,
-      '--url-base=' + '/',
-      '--no-sandbox',
-      '--disable-dev-shm-usage',
-      '--log-level=info',
-      ...args,
-    ])
+  constructor(path: string, args: string[]) {
+    // this.process = chromedriver.start([
+    //   // `--homepage=${getStartUrl(process.env.ELECTRON_START_URL)}`
+    //   `--homepage=http://localhost:3000`,
+    //   '--port=' + 9515,
+    //   '--url-base=' + '/',
+    //   '--no-sandbox',
+    //   '--disable-dev-shm-usage',
+    //   '--log-level=info',
+    //   ...args,
+    // ])
 
-    // startChromedriver(args, env)
+    this.process = startChromedriver(path, args)
 
     const chromedriverCloseHandler = (code: any, ...args: any[]) => {
       console.log(`closing chrome driver ${code}, ${args}`)
@@ -74,6 +71,6 @@ export default class Chromedriver {
   }
 }
 
-function startChromedriver(args: string[], env: any) {
-  return ChildProcess.spawn(chromedriver.path, args)
+function startChromedriver(path: string, args: string[]) {
+  return ChildProcess.spawn(path, args)
 }
