@@ -77,7 +77,10 @@ function startChromedriver(
   env?: NodeJS.ProcessEnv
 ) {
   return ChildProcess.spawn(path, args, {
-    // ...process.env,
-    // env,
+    cwd: process.cwd(),
+    env: {
+      ...process.env,
+      ...env,
+    },
   })
 }
