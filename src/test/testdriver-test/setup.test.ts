@@ -10,7 +10,8 @@ describe('integration test', () => {
   beforeAll(async () => {
     console.log('creating test driver')
     app = await createTestDriver({
-      path: chromedriver.path,
+      webdriverIoPath: (electronPath as unknown) as string,
+      chromedriverPath: chromedriver.path,
       appDir: join(__dirname, '..', '..', '..'),
       chromeArgs: [
         'disable-extensions',

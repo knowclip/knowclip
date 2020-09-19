@@ -61,8 +61,8 @@ export async function startApp(
   // https://github.com/electron-userland/spectron/issues/323 ??
   const app = await createTestDriver({
     // path: chromedriver.path,
-    path: electronChromedriverPath,
-    // path: (electron as unknown) as string,
+    chromedriverPath: electronChromedriverPath,
+    webdriverIoPath: (electron as unknown) as string,
     appDir: ROOT_DIRECTORY,
     chromeArgs: [
       'disable-extensions',
