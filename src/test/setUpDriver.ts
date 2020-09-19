@@ -4,6 +4,8 @@ import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
+import chromedriver from 'chromedriver'
+import { ROOT_DIRECTORY } from '../../electron/root'
 
 export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
@@ -49,7 +51,9 @@ export async function startApp(
   // thse ppl got headless working?
   // https://github.com/electron-userland/spectron/issues/323 ??
   const app = await createTestDriver({
-    path: (electron as unknown) as string,
+    path: chromedriver.path,
+    // path: (electron as unknown) as string,
+    appDir: ROOT_DIRECTORY,
     chromeArgs: [
       'disable-extensions',
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
@@ -69,7 +73,9 @@ export async function startApp(
     },
   })
   context.app = app
-  if (!(await app.isReady)) throw new Error('Problem starting test driver')
+  if (!(await app.isReady)) {
+    throw new Error('Problem starting test driver')
+  }
 
   await app.webContentsSend('start-test', context.testId)
 

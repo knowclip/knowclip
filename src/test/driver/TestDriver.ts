@@ -81,11 +81,13 @@ function waitForChromeDriverToStop(
 
 export async function createTestDriver({
   path,
+  appDir,
   chromeArgs: chromeArgs,
   env: givenEnv,
   logLevel = 'silent',
 }: {
   path: string
+  appDir: string
   chromeArgs: string[]
   env?: NodeJS.ProcessEnv
   logLevel?: string
@@ -104,13 +106,12 @@ export async function createTestDriver({
 
   // const {chromeDriverProcess: driverProcess, stop: stopChromeDriver }  = runChromeDriver([], env);
   const driver = new Chromedriver(
-    [],
+    []
     // ['--port=' + port, '--url-base=' + urlBase],
-    env
   )
   await waitForChromeDriver(
     driver.process,
-    `http://${hostname}:${port}/status`,
+    `http://${hostname}:${port}${urlBase}status`,
     7000
   )
 
@@ -123,12 +124,7 @@ export async function createTestDriver({
       browserName: 'chrome',
       'goog:chromeOptions': {
         binary: path,
-        args: [
-          ...chromeArgs,
-          'app=' + process.cwd(),
-          // '--disable-extensions',
-          // '--debug'
-        ],
+        args: [...chromeArgs, 'app=' + appDir],
         windowTypes: ['app', 'webview'],
       },
     },

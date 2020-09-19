@@ -1,22 +1,31 @@
 import ChildProcess from 'child_process'
 import path from 'path'
+import chromedriver from 'chromedriver'
+import { getStartUrl } from '../../../electron/window'
 
-// https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
-const BIN_PATH = require(path.join(
-  process.cwd(),
-  'node_modules',
-  'chromedriver',
-  'lib',
-  'chromedriver'
-)).path
+// chrome version 85.0.4183.98
+
+// // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
+// const binaryPath = require(path.join(process.cwd(), "node_modules", "chromedriver", "lib", "chromedriver")).path;
 
 export default class Chromedriver {
   process: ReturnType<typeof ChildProcess.spawn>
 
   stop: () => Boolean
 
-  constructor(args: string[], env: any) {
-    this.process = startChromedriver(args, env)
+  constructor(args: string[]) {
+    this.process = chromedriver.start([
+      // `--homepage=${getStartUrl(process.env.ELECTRON_START_URL)}`
+      `--homepage=http://localhost:3000`,
+      '--port=' + 9515,
+      '--url-base=' + '/',
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--log-level=info',
+      ...args,
+    ])
+
+    // startChromedriver(args, env)
 
     const chromedriverCloseHandler = (code: any, ...args: any[]) => {
       console.log(`closing chrome driver ${code}, ${args}`)
@@ -44,6 +53,10 @@ export default class Chromedriver {
       this.stop = null
 
       this.process.removeListener('close', chromedriverCloseHandler)
+
+      // TODO: investigate if this is better
+      //    and maybe include 'wait for stop'
+      // const x = chromedriver.stop()
       const killed = this.process.kill('SIGTERM')
       console.log('Chromedriver process killed?', { success: killed })
 
@@ -62,13 +75,5 @@ export default class Chromedriver {
 }
 
 function startChromedriver(args: string[], env: any) {
-  return ChildProcess.spawn(
-    BIN_PATH,
-    args //    {
-    //   cwd: process.cwd(),
-    //   // https://www.electronjs.org/docs/tutorial/automated-testing-with-a-custom-driver
-    //   // stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
-    //   stdio: 'inherit',
-    // }
-  )
+  return ChildProcess.spawn(chromedriver.path, args)
 }
