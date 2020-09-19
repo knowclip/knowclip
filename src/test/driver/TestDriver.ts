@@ -117,6 +117,7 @@ export async function createTestDriver({
         binary: path,
         args: [
           'app=' + process.cwd(),
+          ...chromedriverArgs,
           // '--disable-extensions',
           // '--debug'
         ],
