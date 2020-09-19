@@ -1,46 +1,30 @@
 {
   "name": "knowclip-homepage",
   "private": true,
-  "description": "The homepage for the Knowclip app",
-  "version": "0.1.0",
-  "author": "Justin Silvestre <justinsilvestre@gmail.com>",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "postbuild": "next-on-netlify",
+    "type-check": "tsc"
+  },
   "dependencies": {
-    "@icons-pack/react-simple-icons": "^2.2.0",
+    "@icons-pack/react-simple-icons": "^3.10.0",
+    "@pinjollist/next-with-analytics": "^1.0.0-rc.0",
+    "@types/classnames": "^2.2.10",
     "classnames": "^2.2.6",
-    "gatsby": "^2.19.7",
-    "gatsby-image": "^2.2.39",
-    "gatsby-plugin-manifest": "^2.2.39",
-    "gatsby-plugin-offline": "^3.0.32",
-    "gatsby-plugin-react-helmet": "^3.1.21",
-    "gatsby-plugin-sharp": "^2.4.3",
-    "gatsby-plugin-web-font-loader": "^1.0.4",
-    "gatsby-source-filesystem": "^2.1.46",
-    "gatsby-transformer-sharp": "^2.3.13",
-    "prop-types": "^15.7.2",
+    "next": "latest",
+    "next-on-netlify": "^2.4.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-helmet": "^5.2.1"
+    "sass": "^1.26.10"
   },
   "devDependencies": {
-    "prettier": "^1.19.1"
+    "@types/node": "^12.12.21",
+    "@types/react": "^16.9.16",
+    "@types/react-dom": "^16.9.4",
+    "typescript": "4.0"
   },
-  "keywords": [
-    "gatsby"
-  ],
-  "scripts": {
-    "build": "gatsby build",
-    "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "start": "npm run develop",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/knowclip/knowclip"
-  },
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
-  }
+  "license": "MIT"
 }

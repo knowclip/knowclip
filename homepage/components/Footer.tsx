@@ -1,16 +1,15 @@
 import React from "react"
 import css from "./Footer.module.css"
 import cn from "classnames"
-import Lightbulb from "./iconSmall"
-import { Twitter, Patreon, Github } from "@icons-pack/react-simple-icons"
+import { Twitter, Patreon, Github, Icon as IconComponent } from "@icons-pack/react-simple-icons"
 
-const Footer = ({ className }) => (
+const Footer = ({ className }: { className?: string }) => (
   <footer className={cn(className, css.container)}>
     <div className={css.body}>
       <section className={css.branding}>
         <a href="/" className={css.link}>
           <h4 className={css.brandingHeading}>
-            <Lightbulb className={css.icon} />
+            <img className={css.icon} src="/icon.png" alt="" />
             Knowclip
           </h4>
         </a>
@@ -77,9 +76,9 @@ const Footer = ({ className }) => (
   </footer>
 )
 
-const SocialLink = ({ title, href, Icon }) => {
+const SocialLink = ({ title, href, Icon, className }: { title: string, href: string, Icon: IconComponent, className?: string }) => {
   return (
-    <li className={css.socialLinkLi}>
+    <li className={cn(css.socialLinkLi, className)}>
       <a href={href} className={css.socialLink}>
         <Icon color="white" size={24} className={css.socialLinkIcon} />
         {title}

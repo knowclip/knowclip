@@ -1,0 +1,10 @@
+@import '../components/base.scss';
+
+html {
+  background-color: #fbfdff;
+  scroll-behavior: smooth;
+}
+
+html.noJs {
+  display: initial;
+}
