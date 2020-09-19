@@ -52,13 +52,13 @@ export async function startApp(
     path: (electron as unknown) as string,
     chromeArgs: [
       'disable-extensions',
-      ...(process.env.APPVEYOR) ? ["no-sandbox"] : [],
+      ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
     ], // ? does this actually correspond?
     // webdriverOptions: { deprecationWarnings: false },
     env: {
       NODE_ENV: 'test',
-      REACT_APP_SPECTRON: String(Boolean(process.env.REACT_APP_SPECTRON)),
-      INTEGRATION_DEV: String(Boolean(process.env.INTEGRATION_DEV)),
+      REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON) ? "true" : undefined,
+      INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV) ? "true" : undefined,
       ...(persistedStatePath
         ? { PERSISTED_STATE_PATH: persistedStatePath }
         : null),
