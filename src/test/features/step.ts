@@ -15,7 +15,7 @@ export const runAll = (testSteps: TestStep[], getSetup: () => TestSetup) => {
     test(description, async () => {
       const setup = getSetup()
       try {
-        runTest(setup)
+        await runTest(setup)
       } catch (err) {
         try {
           console.log('Logging markup from failed test:')
