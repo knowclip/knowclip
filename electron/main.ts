@@ -4,9 +4,9 @@ import * as url from 'url'
 const { isPackaged } = app
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
-import { onMessage } from '../src/messages'
 import { ROOT_DIRECTORY } from './root'
 import { getStartUrl, WINDOW_START_DIMENSIONS } from './window'
+import { handleMessages } from '../src/messages'
 
 app.allowRendererProcessReuse = false
 
@@ -53,6 +53,9 @@ async function createWindow() {
       enableRemoteModule: true,
     },
   })
+
+  console.log({ browserWindow: BrowserWindow.getFocusedWindow()}, BrowserWindow.getAllWindows())
+
 
   const splash =
     process.env.NODE_ENV !== 'test'
@@ -126,6 +129,7 @@ app.on('ready', () => {
   createWindow()
 
   setUpMenu(context.mainWindow as BrowserWindow, true)
+  handleMessages(context.mainWindow as BrowserWindow)
 })
 
 app.on('will-quit', () => {
@@ -160,7 +164,4 @@ ipcMain.on('closed', function() {
   app.quit()
 })
 
-ipcMain.handle('message', (event, message) => {
-  return onMessage(message)
-})
 

@@ -5,7 +5,6 @@ import {
   MessageResponse,
   MessageHandlerResult,
   MessageToMain,
-  MESSAGE_RESPONSES,
 } from '../../messages'
 import { ChildProcess } from 'child_process'
 
@@ -184,21 +183,48 @@ export class TestDriver {
     }, message)
   }
 
+  /** send message to renderer */
   async webContentsSend(channel: string, ...args: any[]) {
-    // TODO: get rid of `any`
-    await this.client.execute(
-      (channel, ...args) => {
-        console.log(`sending via ${channel}: ${args.join(', ')}`)
-        const electron = require('electron')
-        console.log('getting web contents')
-        const webContents = electron.remote.getCurrentWebContents()
-        console.log('sending...')
-        webContents.send(channel, ...args)
-        console.log('sent')
-      },
-      channel,
-      ...args
-    )
+    // return await this.client.execute(
+    //   (channel, ...args) => {
+    //     const electron = require('electron')
+    //     const webContents = electron.remote.getCurrentWebContents()
+    //     webContents.send(channel, ...args)
+    //   },
+    //   channel, ...args
+    // )
+    try {
+      console.log('sending!')
+      const result = await this.sendToMainProcess({
+        type: 'sendToRenderer',
+        args: [channel, args],
+      })
+      console.log('sent!')
+      return result
+    } catch (err) {
+      console.log('ERROR:', err)
+      console.error(err)
+      return
+    }
+
+    // // TODO: get rid of `any`
+    // // const webcontentsId = BrowserWindow.getFocusedWindow()?.webContents.id
+    // // if (!webcontentsId) throw new Error('Could not find webContentsId for any focused window')
+    // return await this.sendToMainProcess({ type: 'sendToRenderer', args: [channel, args] })
+    // // await this.client.execute(
+    // //   (channel, ...args) => {
+    // //   // (webcontentsId, channel, ...args) => {
+    // //     // console.log(`sending via ${channel}: ${args.join(', ')}`)
+    // //     // const electron = require('electron')
+    // //     // console.log('getting web contents')
+    // //     // const webContents = electron.webContents.fromId(webcontentsId)
+    // //     // console.log('sending...')
+    // //     // webContents.send(channel, ...args)
+    // //     // console.log('sent')
+    // //   },
+    // //   channel,
+    // //   ...args
+    // // )
   }
 
   //   async sendToMainProcessSync(channel: string, ...args: any[]) { // TODO: get rid of `any`
