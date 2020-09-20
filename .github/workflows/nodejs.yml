@@ -17,6 +17,7 @@ jobs:
         yarn integration:appveyor -t "shared project"
       env:
         REACT_APP_SPECTRON: true
+        APPVEYOR: true
   build:
     runs-on: ubuntu-latest
 
