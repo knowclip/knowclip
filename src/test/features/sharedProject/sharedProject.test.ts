@@ -26,10 +26,23 @@ describe('opening a shared project', () => {
     setup = await startApp(context)
 
     if (context.app) {
+      console.log('logging process.env')
+      console.log('process.env:', process.env)
+
       console.log('logging window location')
-      console.log(await context.app.client.execute(() => {
-        return window.location
-      }))
+      console.log(
+        'window location:',
+        await context.app.client.execute(() => {
+          return window.location
+        })
+      )
+      console.log('logging window process.env')
+      console.log(
+        'window process.env:',
+        await context.app.client.execute(() => {
+          return process.env
+        })
+      )
     } else {
       throw new Error('Problem starting app')
     }

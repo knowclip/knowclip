@@ -131,7 +131,6 @@
     "integration": "REACT_APP_SPECTRON=true yarn build:ci && node scripts/test.js ./src/test/ --watchAll=false  --runInBand",
     "integration:appveyor": "node scripts/test.js ./src/test/ --watchAll=false  --runInBand",
     "integration:skip-build": "REACT_APP_SPECTRON=true node scripts/test.js ./src/test/ --watchAll=false --runInBand",
-    "integration:new": "REACT_APP_INTEGRATION=true node scripts/test.js ./src/test/new/ --watchAll=false --runInBand",
     "integration:debug": "INTEGRATION_DEV=true yarn integration:skip-build --verbose",
     "build-fixture:saved": "yarn integration:build-fixture -t \"testing saved projects\"",
     "build-fixture:shared": "yarn integration:build-fixture -t \"shared project\" && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",
