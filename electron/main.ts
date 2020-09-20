@@ -6,7 +6,7 @@ import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { onMessage } from './messages'
 import { ROOT_DIRECTORY } from './root'
-import { getStartUrl } from './window'
+import { getStartUrl, WINDOW_START_DIMENSIONS } from './window'
 
 app.allowRendererProcessReuse = false
 
@@ -42,8 +42,8 @@ async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     show: false,
-    width: Math.min(1027, width),
-    height: Math.min(768, height),
+    width: Math.min(WINDOW_START_DIMENSIONS.width, width),
+    height: Math.min(WINDOW_START_DIMENSIONS.height, height),
     minWidth: 740,
     minHeight: 570,
     webPreferences: {

@@ -9,6 +9,7 @@ import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import { TestDriver } from '../../driver/TestDriver'
+import { app } from 'electron'
 
 jest.setTimeout(60000)
 
@@ -23,6 +24,15 @@ describe('opening a shared project', () => {
 
   beforeAll(async () => {
     setup = await startApp(context)
+
+    if (context.app) {
+      console.log('logging window location')
+      console.log(await context.app.client.execute(() => {
+        return window.location
+      }))
+    } else {
+      throw new Error('Problem starting app')
+    }
 
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
