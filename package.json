@@ -116,7 +116,7 @@
     "xss": "^1.0.6",
     "yaml": "^1.7.2"
   },
-  "main": "./build-main/main.js",
+  "main": "./build-main/electron/main.js",
   "homepage": "./",
   "scripts": {
     "start": "node scripts/start.js",
