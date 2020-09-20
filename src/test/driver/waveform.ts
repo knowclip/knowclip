@@ -11,13 +11,9 @@ export async function waveformMouseDrag(
 ) {
   const waveform = await client.firstElement_(waveform$.container)
   try {
-    const { state, message, value } = await client._client.elementIdRect(
-      waveform.elementId
-    )
-    if (state === 'failure')
-      throw new Error(`Could not drag mouse on waveform: ${message}`)
+    const rectangle = await client._client.getElementRect(waveform.elementId)
 
-    const { y, height } = value
+    const { y, height } = rectangle
     const midpoint = y + Math.round(height / 2)
     await dragMouse(app, [start, midpoint], [end, midpoint])
   } catch (err) {

@@ -7,6 +7,8 @@ const { BrowserWindow } = electron
 const setUpMenu = require('./electron/appMenu')
 const Sentry = require('@sentry/electron')
 
+app.allowRendererProcessReuse = false
+
 Sentry.init({
   dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',
 })
@@ -107,6 +109,14 @@ async function createWindow() {
     context.mainWindow = null
   })
 }
+
+app.whenReady().then(() => {
+  // https://github.com/electron/electron/issues/23757#issuecomment-640146333
+  protocol.registerFileProtocol('file', (request, callback) => {
+    const pathname = decodeURI(request.url.replace('file:///', ''))
+    callback(pathname)
+  })
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

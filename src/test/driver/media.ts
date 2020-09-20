@@ -3,11 +3,15 @@ import { ClientWrapper } from './ClientWrapper'
 export async function setVideoTime(client: ClientWrapper, seconds: number) {
   try {
     await client._client.execute(
-      (video: HTMLVideoElement, seconds: number) => {
-        video.currentTime = seconds
+      (seconds: number, mediaPlayerId: string) => {
+        const video = document.getElementById(
+          mediaPlayerId
+        ) as HTMLVideoElement | null
+        if (video) video.currentTime = seconds
+        else throw new Error('Could not find video element')
       },
-      (await client._client.$('video')).value,
-      seconds
+      seconds,
+      'mediaPlayer'
     )
   } catch (err) {
     throw new Error(

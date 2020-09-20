@@ -11,11 +11,13 @@ import { projectMenu$ } from '../../../components/ProjectMenu'
 
 export default async function reviewWithMissingMedia({ client }: TestSetup) {
   // maybe the first part for the loaded media should go in a different integration test
+  console.log('waiting for text')
   await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
   await client.clickElement_(projectMenu$.exportButton)
 
   await client.clickElement_(dialog$.continueButton)
   await client.elements_(mediaTables$.container, 2)
+  console.log('waiting for text 2')
   await client.waitForText_(
     reviewAndExportMediaTableRow$.highlightedClipRow,
     'ああー  吸わないで'
@@ -40,15 +42,19 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
   ).toMatchObject([true, true, true, true])
 
+  console.log('waiting for text 3')
   await client.waitForText_(
     mediaTableRows$.container,
     '笹を食べながらのんびりするのは最高だなぁ'
   )
   await client.doubleClickElement_(mediaTableRows$.container)
+  console.log('waiting for highlighted')
   await client.waitUntil(async () => {
     const row = await client.firstElement_(mediaTableRows$.container)
     const classNames = await row.getAttribute('className')
-    return classNames.includes(mediaTableRows$.highlightedClipRow)
+    return Boolean(
+      classNames && classNames.includes(mediaTableRows$.highlightedClipRow)
+    )
   })
 
   const [, piggeldyHeader] = await client.elements_(mediaTables$.header)

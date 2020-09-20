@@ -1,5 +1,4 @@
-import { SpectronClient } from 'spectron'
-import { RawResult } from 'webdriverio'
+import { BrowserObject, Element } from 'webdriverio'
 
 /** A wrapper for `WebDriverIO.Client` method results
  * for when the `ClientWrapper` methods can't be called directly, e.g.
@@ -10,75 +9,57 @@ export interface ElementWrapper {
   selector: string
   setFieldValue: (value: string) => Promise<void>
   click: () => Promise<void>
+  clickAtOffset: (opts: { x: number; y: number }) => Promise<void>
   getText: () => Promise<string>
   waitForText: (text: string) => Promise<void>
   doubleClick: () => Promise<void>
   isVisible: () => Promise<boolean>
+  isVisibleOrDisplayed: () => Promise<boolean>
+  isExisting: () => Promise<boolean>
   isSelected: () => Promise<boolean>
-  getAttribute: (attributeName: string) => Promise<string>
+  getAttribute: (attributeName: string) => Promise<string | null>
 }
 
 export const element = (
-  client: SpectronClient,
-  id: string,
+  client: BrowserObject,
+  element: Element,
   selector: string
 ): ElementWrapper => {
   const getText = async () => {
-    const result = await client.elementIdText(id)
-    const { state, value, message } = result
+    try {
+      const result = await element.getText()
 
-    if (state === 'failure') {
-      throw new Error(
-        `Could not get text for element "${selector}": ${message}`
-      )
+      if (typeof result !== 'string') {
+        console.error(result, JSON.stringify(result))
+        throw new Error(
+          'Could not get text, instead got ' +
+            (result && JSON.stringify(result as any))
+        )
+      }
+
+      return result
+    } catch (err) {
+      throw err
     }
-
-    if (typeof value !== 'string') {
-      console.error(result, JSON.stringify(result))
-      throw new Error(
-        'Could not get text, instead got ' +
-          (value && JSON.stringify(value as any))
-      )
-    }
-
-    return value
   }
+
+  const id = element.elementId
   return {
     elementId: id,
     selector,
     setFieldValue: async (value: string) => {
-      const { state, message } = await client.elementIdValue(id, value)
-
-      if (state === 'failure') {
-        throw new Error(
-          `Could not set value for element "${selector}": ${message}`
-        )
-      }
+      await element.setValue(value)
     },
     click: async () => {
       try {
-        const { state, message } = await client.elementIdClick(id)
-        if (state === 'failure') {
-          throw new Error(message)
-        }
+        await element.click()
       } catch (err) {
         throw new Error(`Could not click element "${selector}": ${err}`)
       }
     },
     doubleClick: async () => {
       try {
-        const moveToResult: RawResult<void> = (await client.moveTo(id)) as any
-        if (moveToResult.state === 'failure') {
-          throw new Error(
-            `Could not move to element "${selector}": ${moveToResult.message}`
-          )
-        }
-        const doubleClickResult: RawResult<
-          void
-        > = (await client.doDoubleClick()) as any
-        if (doubleClickResult.state === 'failure') {
-          throw new Error(doubleClickResult.message)
-        }
+        await element.doubleClick()
       } catch (err) {
         throw new Error(`Could not double-click element "${selector}": ${err}`)
       }
@@ -102,42 +83,46 @@ export const element = (
       }
     },
     isVisible: async () => {
-      const result: RawResult<boolean> = (await client.elementIdDisplayed(
-        id
-      )) as any
-      const { state, message, value } = result
-
-      if (state === 'failure') {
-        throw new Error(`Could not get visibility of "${selector}": ${message}`)
+      try {
+        return await client.isElementDisplayed(id)
+      } catch (err) {
+        throw Error(`Could not get displayed status of "${selector}": ${err}`)
       }
-      return value
+    },
+    isVisibleOrDisplayed: async () => {
+      try {
+        return await element.isDisplayed()
+      } catch (err) {
+        throw Error(`Could not get displayed status of "${selector}": ${err}`)
+      }
+    },
+    isExisting: async () => {
+      try {
+        return await element.isExisting()
+      } catch (err) {
+        throw Error(`Could not get displayed status of "${selector}": ${err}`)
+      }
     },
     getAttribute: async (attributeName: string) => {
-      const result: RawResult<string> = (await client.elementIdAttribute(
-        id,
-        attributeName
-      )) as any
-      const { state, message, value } = result
-
-      if (state === 'failure') {
+      try {
+        return element.getAttribute(attributeName)
+      } catch (err) {
         throw new Error(
-          `Could not get ${attributeName} attribute of "${selector}": ${message}`
+          `Could not get ${attributeName} attribute of "${selector}": ${err}`
         )
       }
-      return value
     },
     isSelected: async () => {
-      const result: RawResult<boolean> = (await client.elementIdSelected(
-        id
-      )) as any
-      const { state, message, value } = result
-
-      if (state === 'failure') {
+      return await client.isElementSelected(id)
+    },
+    clickAtOffset: async ({ x, y }: { x: number; y: number }) => {
+      try {
+        await element.click({ x, y })
+      } catch (err) {
         throw new Error(
-          `Could not get selected status of "${selector}": ${message}`
+          `Could not click "${selector}" at offset ${x} ${y}: ${err}`
         )
       }
-      return value
     },
   }
 }
