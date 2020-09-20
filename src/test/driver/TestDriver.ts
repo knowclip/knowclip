@@ -188,8 +188,13 @@ export class TestDriver {
     // TODO: get rid of `any`
     await this.client.execute(
       (channel, ...args) => {
+        console.log(`sending via ${channel}: ${args.join(', ')}`)
         const electron = require('electron')
-        electron.remote.getCurrentWebContents().send(channel, ...args)
+        console.log('getting web contents')
+        const webContents = electron.remote.getCurrentWebContents()
+        console.log('sending...')
+        webContents.send(channel, ...args)
+        console.log('sent')
       },
       channel,
       ...args
