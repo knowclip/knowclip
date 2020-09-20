@@ -51,10 +51,11 @@ describe('opening a shared project', () => {
   })
 
   runAll(sharedProjectTestSteps(), () => setup)
-  test('save and close project', () => saveAndCloseProject(setup)),
-    afterAll(async () => {
-      await stopApp(context)
-    })
+  test('save and close project', () => saveAndCloseProject(setup))
+
+  afterAll(async () => {
+    await stopApp(context)
+  })
 })
 
 function sharedProjectTestSteps() {
