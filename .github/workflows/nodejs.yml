@@ -4,7 +4,12 @@ on: [push]
 
 jobs:
   windows_test:
-    runs-on: windows-2019
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
