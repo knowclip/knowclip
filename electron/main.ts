@@ -4,7 +4,7 @@ import * as url from 'url'
 const { isPackaged } = app
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
-import { onMessage } from './messages'
+import { onMessage } from '../src/messages'
 import { ROOT_DIRECTORY } from './root'
 import { getStartUrl, WINDOW_START_DIMENSIONS } from './window'
 

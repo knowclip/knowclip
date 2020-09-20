@@ -3,9 +3,10 @@ import Chromedriver from './Chromedriver'
 import request from 'request'
 import {
   MessageResponse,
+  MessageHandlerResult,
   MessageToMain,
   MESSAGE_RESPONSES,
-} from '../../../electron/messages'
+} from '../../messages'
 import { ChildProcess } from 'child_process'
 
 function isRunning(statusUrl: string, callback: Function) {
@@ -172,16 +173,9 @@ export class TestDriver {
     })
   }
 
-  async sendToMainProcess<
-    M extends MessageToMain,
-    R extends ReturnType<(typeof MESSAGE_RESPONSES)[M['type']]>
-  >(
+  async sendToMainProcess<M extends MessageToMain>(
     message: M
-  ): Promise<
-    // so we don't end up with a promise of a promise
-    // https://stackoverflow.com/a/49889856/4495411
-    MessageResponse<R extends PromiseLike<infer U> ? U : R>
-  > {
+  ): Promise<MessageResponse<MessageHandlerResult<M>>> {
     return this.client.executeAsync(async (message: MessageToMain, done) => {
       const { ipcRenderer } = require('electron')
       ipcRenderer.invoke('message', message).then(async result => {

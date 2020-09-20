@@ -3,6 +3,7 @@ import { promises } from 'fs'
 import { join } from 'path'
 import { TestDriver } from './driver/TestDriver'
 import moment from 'moment'
+import { sendToMainProcess } from '../messages'
 
 type ModuleLike = { [name: string]: (...args: any) => any }
 
@@ -78,7 +79,16 @@ export default function spectronMocks<M extends ModuleLike>(
     })
 
     ipcRenderer.on(mockMessageName, (event, functionName, newReturnValue) => {
+      console.log(`Function ${functionName} mocked with: ${newReturnValue}`)
       returnValues[functionName].push(deserializeReturnValue(newReturnValue))
+      sendToMainProcess({
+        type: 'log',
+        args: [
+          `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
+            newReturnValue
+          )}\n\n\n`,
+        ],
+      })
     })
 
     ipcRenderer.on('reset-mocks', () => {
@@ -95,6 +105,7 @@ export default function spectronMocks<M extends ModuleLike>(
     functionName: F,
     returnValue: ReturnType<M[F]>
   ) {
+    console.log(`Mocking function ${functionName} with: ${returnValue}`)
     return await app.webContentsSend(
       mockMessageName,
       functionName,

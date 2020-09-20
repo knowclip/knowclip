@@ -24,13 +24,17 @@ export default class Chromedriver {
 
     this.process = startChromedriver(path, args, env)
 
+    const stdout = (chunk: any) => {
+      console.log('RENDERER LOG: ' + chunk)
+    }
+    if (this.process.stdout) this.process.stdout.on('data', stdout)
+
     const chromedriverCloseHandler = (code: any, ...args: any[]) => {
       console.log(`closing chrome driver ${code}, ${args}`)
       if (code !== 0) {
         throw new Error(`Chromedriver exited with error code: ${code}, ${args}`)
       }
     }
-    this.process.on('close', chromedriverCloseHandler)
     this.process.on('error', (error: any) => {
       throw new Error(error)
     })
@@ -43,6 +47,8 @@ export default class Chromedriver {
       process.removeListener('exit', this._kill)
       // @ts-ignore
       process.removeListener('SIGTERM', this._kill)
+      if (this.process.stdout)
+        this.process.stdout.removeListener('data', stdout)
 
       // @ts-ignore
       this._kill = null

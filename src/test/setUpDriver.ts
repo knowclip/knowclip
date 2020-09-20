@@ -66,6 +66,7 @@ export async function startApp(
     appDir: ROOT_DIRECTORY,
     chromeArgs: [
       'disable-extensions',
+      ...(process.env.INTEGRATION_DEV ? ['verbose'] : []), // TODO: check
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
     ], // ? does this actually correspond?
     // webdriverOptions: { deprecationWarnings: false },

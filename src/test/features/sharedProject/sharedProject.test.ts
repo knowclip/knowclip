@@ -25,36 +25,36 @@ describe('opening a shared project', () => {
   beforeAll(async () => {
     setup = await startApp(context)
 
-    if (context.app) {
-      console.log('logging process.env')
-      console.log('process.env:', process.env)
+    // if (context.app) {
+    //   console.log('logging process.env')
+    //   console.log('process.env:', process.env)
 
-      console.log('logging window location')
-      console.log(
-        'window location:',
-        await context.app.client.execute(() => {
-          return window.location
-        })
-      )
-      console.log('logging window process.env')
-      console.log(
-        'window process.env:',
-        await context.app.client.execute(() => {
-          return process.env
-        })
-      )
-    } else {
-      throw new Error('Problem starting app')
-    }
+    //   console.log('logging window location')
+    //   console.log(
+    //     'window location:',
+    //     await context.app.client.execute(() => {
+    //       return window.location
+    //     })
+    //   )
+    //   console.log('logging window process.env')
+    //   console.log(
+    //     'window process.env:',
+    //     await context.app.client.execute(() => {
+    //       return process.env
+    //     })
+    //   )
+    // } else {
+    //   throw new Error('Problem starting app')
+    // }
 
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
   runAll(sharedProjectTestSteps(), () => setup)
-
-  afterAll(async () => {
-    await stopApp(context)
-  })
+  test('save and close project', () => saveAndCloseProject(setup)),
+    afterAll(async () => {
+      await stopApp(context)
+    })
 })
 
 function sharedProjectTestSteps() {
@@ -69,7 +69,6 @@ function sharedProjectTestSteps() {
     step('manually locate missing assets', manuallyLocateAsset),
     step('review with missing media', reviewWithMissingMedia),
     step('export deck with missing media', exportWithMissingMedia),
-    step('save and close project', saveAndCloseProject),
   ]
 }
 
