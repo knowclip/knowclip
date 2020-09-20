@@ -91,5 +91,3 @@ const getMessageResponders = (mainWindow: BrowserWindow) => ({
     else mainWindow.webContents.send(channel, ...args)
   },
 })
-
-type Context = { mainWindow: BrowserWindow | null }
