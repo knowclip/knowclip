@@ -62,7 +62,16 @@ export async function startApp(
   const app = await createTestDriver({
     // path: chromedriver.path,
     chromedriverPath: electronChromedriverPath,
-    webdriverIoPath: (electron as unknown) as string,
+    webdriverIoPath:
+      process.platform === 'win32'
+        ? join(
+            ROOT_DIRECTORY,
+            'node_modules',
+            'electron',
+            'dist',
+            'electron.exe'
+          )
+        : ((electron as unknown) as string),
     appDir: ROOT_DIRECTORY,
     chromeArgs: [
       'disable-extensions',
