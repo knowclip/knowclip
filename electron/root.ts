@@ -1,3 +1,3 @@
 import { join } from "path";
 
-export const ROOT_DIRECTORY = join(process.cwd())
+export const ROOT_DIRECTORY = join(__dirname, '..', '..')

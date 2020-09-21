@@ -134,7 +134,7 @@
     "@typescript-eslint/parser": "^2.16.0",
     "chromedriver": "^85.0.1",
     "electron": "^10.1.2",
-    "electron-builder": "^22.2.0",
+    "electron-builder": "^22.8.1",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-react-app": "^5.1.0",
     "eslint-plugin-react-hooks": "^1.6.0",
@@ -149,10 +149,9 @@
     "productName": "Knowclip",
     "copyright": "Copyright 2020 Justin Silvestre",
     "files": [
-      "./build",
-      "./icons",
-      "./build-main",
-      "./electron"
+      "./build/**/*",
+      "./icons/**/*",
+      "./build-main/**/*"
     ],
     "win": {
       "target": [
