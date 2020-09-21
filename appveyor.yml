@@ -18,14 +18,6 @@ build_script:
   - cmd: set REACT_APP_BUILD_NUMBER=%APPVEYOR_BUILD_NUMBER%
   - yarn dist:appveyor -p onTag --win
 
-test_script:
-  - cmd: set REACT_APP_SPECTRON=True
-  # only testing this one for now to save time and
-  # copyFixtures is broken on Windows, so tests
-  # relying on it won't work here
-  - yarn integration:appveyor -t "shared project"
-  - cmd: set REACT_APP_SPECTRON=False
-
 skip_commits:
   files:
     - homepage/*

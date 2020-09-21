@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
+import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'

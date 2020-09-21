@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { waveform$ } from '../../../components/Waveform'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
@@ -12,6 +12,6 @@ export default async function makeFlashcards({ app, client }: TestSetup) {
   await setVideoTime(client, 39)
   await client.waitForHidden_(waveform$.waveformClip)
 
-  await waveformMouseDrag(app, client, 589, 824)
+  await waveformMouseDrag(client, 589, 824)
   await client.waitForText_(flashcardSection$.container, '3 / 4')
 }

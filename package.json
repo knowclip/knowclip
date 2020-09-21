@@ -57,21 +57,25 @@
     "tempy": "^0.3.0",
     "ts-json-schema-generator": "^0.58.1",
     "uuid": "^3.3.2",
+    "webdriverio": "^6.5.2",
     "xss": "^1.0.6",
     "yaml": "^1.7.2"
   },
-  "main": "./main.js",
+  "main": "./build-main/electron/main.js",
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
     "postinstall": "electron-builder install-app-deps",
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
     "build": "yarn build-schemas && REACT_APP_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",
+    "build:main": "yarn tsc ./electron/main.ts --outDir ./build-main",
+    "build:win": "react-scripts build",
     "build:ci": "CI=false yarn build",
+    "build:ci-win": "set CI=false&& yarn build:win",
     "build:appveyor": "react-scripts build",
-    "test": "react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test",
-    "integration": "REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
-    "integration:appveyor": "yarn build:appveyor && react-scripts test ./src/test/ --watchAll=false  --runInBand",
+    "test": "yarn build:main && react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test",
+    "integration": "yarn build:main && REACT_APP_SPECTRON=true yarn build:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
+    "integration:win": "yarn build:ci-win && react-scripts test ./src/test/ --watchAll=false  --runInBand",
     "integration:skip-build": "REACT_APP_SPECTRON=true react-scripts test ./src/test/ --watchAll=false --runInBand",
     "integration:debug": "INTEGRATION_DEV=true yarn integration:skip-build --verbose",
     "build-fixture:saved": "yarn integration:build-fixture -t \"testing saved projects\"",
@@ -79,7 +83,7 @@
     "build-fixture:subtitles": "yarn integration:build-fixture -t \"from subtitles\"",
     "integration:build-fixture": "INTEGRATION_DEV=true REACT_APP_SPECTRON=true BUILDING_FIXTURES=true react-scripts test ./src/test/ --testMatch=**/*.fixture.{js,jsx,ts,tsx} --watchAll=false --runInBand",
     "eject": "react-scripts eject",
-    "electron": "NODE_ENV=development electron .",
+    "electron": "export NODE_ENV=development && yarn build:main && electron .",
     "lint": "eslint src/**/*.{ts,tsx,js}",
     "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.{js,ts,tsx}\"",
     "format:write": "yarn format --write",
@@ -102,10 +106,11 @@
     }
   },
   "browserslist": [
-    "electron >= 9.0.0"
+    "electron >= 10.1.2"
   ],
   "devDependencies": {
     "@types/better-sqlite3": "^5.4.0",
+    "@types/chromedriver": "^81.0.0",
     "@types/classnames": "^2.2.9",
     "@types/fluent-ffmpeg": "^2.1.11",
     "@types/fs-extra": "^8.0.1",
@@ -117,15 +122,16 @@
     "@types/react-dom": "^16.9.1",
     "@types/react-redux": "^7.1.4",
     "@types/react-router-dom": "^5.1.3",
+    "@types/request": "^2.48.5",
     "@types/reselect": "^2.2.0",
-    "@types/semver": "^7.1.0",
+    "@types/semver": "^7.3.2",
     "@types/subtitle": "^2.0.2",
     "@types/uuid": "^3.4.5",
-    "@types/webdriverio": "^4.13.0",
     "@types/yaml": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
-    "electron": "^9.0.0",
+    "chromedriver": "^85.0.1",
+    "electron": "^10.1.2",
     "electron-builder": "^22.2.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-react-app": "^5.1.0",
@@ -133,7 +139,6 @@
     "husky": "^1.1.3",
     "prettier": "1.15.3",
     "silvestre-afa-react-scripts": "3.4.1-0",
-    "spectron": "^11.1.0",
     "typescript": "^3.6.3"
   },
   "build": {
@@ -144,7 +149,7 @@
     "files": [
       "./build",
       "./icons",
-      "./main.js",
+      "./build-main",
       "./electron"
     ],
     "win": {

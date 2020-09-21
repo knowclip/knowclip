@@ -1,4 +1,4 @@
-import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
+import { TestSetup, TMP_DIRECTORY } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectFormDialog'
 import { main$ } from '../../../components/Main'

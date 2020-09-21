@@ -1,4 +1,5 @@
-import { BrowserObject, Element } from 'webdriverio'
+import { Element } from 'webdriverio'
+import { TestDriver } from './TestDriver'
 
 /** A wrapper for `WebDriverIO.Client` method results
  * for when the `ClientWrapper` methods can't be called directly, e.g.
@@ -21,10 +22,12 @@ export interface ElementWrapper {
 }
 
 export const element = (
-  client: BrowserObject,
+  driver: TestDriver,
   element: Element,
   selector: string
 ): ElementWrapper => {
+  const client = driver.client
+
   const getText = async () => {
     try {
       const result = await element.getText()

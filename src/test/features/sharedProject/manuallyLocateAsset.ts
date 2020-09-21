@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
+import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
@@ -23,7 +23,7 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
   await client.clickElement('body')
   await client.waitUntilGone_(subtitlesMenu$.trackMenuItems)
 
-  await waveformMouseDrag(app, client, 591, 572)
+  await waveformMouseDrag(client, 591, 572)
 
   await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
 }

@@ -1,6 +1,7 @@
 import { dragMouse, clickAt } from './runEvents'
-import { BrowserObject, Element } from 'webdriverio'
+import { Element } from 'webdriverio'
 import { ElementWrapper, element } from './ElementWrapper'
+import { TestDriver } from './TestDriver'
 
 export { dragMouse, clickAt }
 
@@ -12,15 +13,15 @@ export class ClientWrapper {
    * when Spectron moves to WebdriverIO v5.
    *
    * The WebDriverIO v4 API docs can be found here: http://v4.webdriver.io/api.html. */
-  _client: BrowserObject
+  _client: TestDriver
 
-  constructor(client: BrowserObject) {
+  constructor(client: TestDriver) {
     this._client = client
   }
 
   async firstElement(selector: string): Promise<ElementWrapper> {
     try {
-      const result = await this._client.$(selector)
+      const result = await this._client.client.$(selector)
       await result.waitForExist()
       return await element(this._client, result, selector)
     } catch (err) {
@@ -37,15 +38,15 @@ export class ClientWrapper {
     let elementsSoFar: Element[] | undefined
     try {
       if (count)
-        await this._client.waitUntil(
+        await this._client.client.waitUntil(
           async () => {
-            const elements: Element[] = await this._client.$$(selector)
+            const elements: Element[] = await this._client.client.$$(selector)
             elementsSoFar = elements
             return elements.length === count
           },
           { timeout: 10000 }
         )
-      else elementsSoFar = await this._client.$$(selector)
+      else elementsSoFar = await this._client.client.$$(selector)
 
       if (!elementsSoFar) throw new Error('Elements were null')
 
@@ -91,7 +92,7 @@ export class ClientWrapper {
 
   async waitUntilPresent(selector: string, ms?: number) {
     try {
-      return await (await this._client.$(selector)).waitForExist({
+      return await (await this._client.client.$(selector)).waitForExist({
         timeout: ms,
       })
     } catch (err) {
@@ -104,13 +105,13 @@ export class ClientWrapper {
 
   async waitUntilGone(selector: string) {
     try {
-      return await this._client.waitUntil(
+      return await this._client.client.waitUntil(
         async () => {
           try {
-            const elements = await this._client.$$(selector)
+            const elements = await this._client.client.$$(selector)
             console.log({ elements: elements.length })
             if (!elements.length) return true
-            const element = await this._client.$(selector)
+            const element = await this._client.client.$(selector)
             const displayed = await element.isDisplayedInViewport()
 
             return !displayed
@@ -177,7 +178,7 @@ export class ClientWrapper {
 
   async waitForVisible(selector: string) {
     try {
-      return await this._client.waitUntil(
+      return await this._client.client.waitUntil(
         async () => {
           const element = await this.firstElement(selector)
           return await element.isVisible()
@@ -194,7 +195,7 @@ export class ClientWrapper {
 
   async waitForHidden(selector: string) {
     try {
-      return await this._client.waitUntil(
+      return await this._client.client.waitUntil(
         async () => {
           const element = await this.firstElement(selector)
           return !(await element.isVisible())
@@ -211,12 +212,12 @@ export class ClientWrapper {
 
   /** possible values listed here: https://w3c.github.io/webdriver/#keyboard-actions **/
   async pressKeys(normalizedKeyValues: string[]) {
-    await this._client.keys(normalizedKeyValues)
+    await this._client.client.keys(normalizedKeyValues)
   }
 
   async waitUntil(condition: () => Promise<boolean>) {
     try {
-      await this._client.waitUntil(condition, {
+      await this._client.client.waitUntil(condition, {
         timeout: 60000,
         interval: 200,
       })

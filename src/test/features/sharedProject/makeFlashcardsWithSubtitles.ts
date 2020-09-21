@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { waveform$ } from '../../../components/Waveform'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
@@ -24,7 +24,7 @@ export default async function makeFlashcardsWithSubtitles({
 
   await client.elements_(waveform$.waveformClip, 3)
 
-  await waveformMouseDrag(app, client, 589, 824)
+  await waveformMouseDrag(client, 589, 824)
   await client.elements_(waveform$.waveformClip, 4)
 
   await client.waitForText_(

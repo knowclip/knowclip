@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY, TMP_DIRECTORY } from '../../spectronApp'
+import { TestSetup, ASSETS_DIRECTORY, TMP_DIRECTORY } from '../../setUpDriver'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
 import { snackbar$ } from '../../../components/Snackbar'

@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { projectMenu$ } from '../../../components/ProjectMenu'
 
 export default async function changeProjectName(

@@ -25,3 +25,5 @@ yarn-error.log*
 release-builds
 
 .vscode
+
+build-main

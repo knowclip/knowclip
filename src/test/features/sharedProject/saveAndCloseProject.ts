@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
+import { TestSetup, TMP_DIRECTORY } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 import { parseProjectJson } from '../../../utils/parseProject'

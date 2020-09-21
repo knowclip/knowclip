@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { waveform$ } from '../../../components/Waveform'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
@@ -10,7 +10,7 @@ import { flashcardSection$ } from '../../../components/FlashcardSection'
 export default async function makeSomeFlashcards({ app, client }: TestSetup) {
   const { deleteButton } = flashcardForm$
 
-  await waveformMouseDrag(app, client, 351, 438)
+  await waveformMouseDrag(client, 351, 438)
   await client.waitForText_(flashcardSection$.container, '1 / 1')
 
   await fillInTransliterationCardFields(client, {
@@ -18,7 +18,7 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
     meaning: 'I am not a cat, said Frederick angrily',
   })
 
-  await waveformMouseDrag(app, client, 921, 1000)
+  await waveformMouseDrag(client, 921, 1000)
   await client.waitForText_(flashcardSection$.container, '2 / 2')
 
   await fillInTransliterationCardFields(client, {
@@ -29,7 +29,7 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
   await setVideoTime(client, 38)
   await client.waitForHidden_(waveform$.waveformClip)
 
-  await waveformMouseDrag(app, client, 176, 355)
+  await waveformMouseDrag(client, 176, 355)
   await client.waitForText_(flashcardSection$.container, '3 / 3')
 
   await client.clickElement_(deleteButton)
@@ -39,12 +39,12 @@ export default async function makeSomeFlashcards({ app, client }: TestSetup) {
 
   // await setVideoTime(client, 0)
   // await setVideoTime(client, 20)
-  // await waveformMouseDrag(app, client, 20, 445)
+  // await waveformMouseDrag(client, 20, 445)
   // await fillInTransliterationCardFields(client, {
   //   transcription:
   //     'Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«',
   // })
-  // await waveformMouseDrag(app, client, 575, 1024)
+  // await waveformMouseDrag(client, 575, 1024)
   // await fillInTransliterationCardFields(client, {
   //   transcription:
   //     'Schön! seufzte Piggeldy verzückt.\n\nSchön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse frisst.',

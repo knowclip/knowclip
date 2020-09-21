@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
+import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { waveform$ } from '../../../components/Waveform'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'

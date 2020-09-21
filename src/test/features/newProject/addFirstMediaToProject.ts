@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
+import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { waveform$ } from '../../../components/Waveform'
 import { join } from 'path'
