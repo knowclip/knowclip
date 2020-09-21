@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
 import {
@@ -48,7 +48,9 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
   await client.waitUntil(async () => {
     const row = await client.firstElement_(mediaTableRows$.container)
     const classNames = await row.getAttribute('className')
-    return classNames.includes(mediaTableRows$.highlightedClipRow)
+    return Boolean(
+      classNames && classNames.includes(mediaTableRows$.highlightedClipRow)
+    )
   })
 
   const [, piggeldyHeader] = await client.elements_(mediaTables$.header)

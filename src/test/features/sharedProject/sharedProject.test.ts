@@ -1,5 +1,4 @@
-import { Application } from 'spectron'
-import { startApp, stopApp, TestSetup } from '../../spectronApp'
+import { startApp, stopApp, TestSetup } from '../../setUpDriver'
 import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
 import makeFlashcards from './makeFlashcards'
@@ -9,13 +8,15 @@ import reviewWithMissingMedia from './reviewWithMissingMedia'
 import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects'
+import { TestDriver } from '../../driver/TestDriver'
+import { runAll, step } from '../step'
 
 jest.setTimeout(60000)
 
 const testId = 'sharedProject'
 
 describe('opening a shared project', () => {
-  let context: { app: Application | null; testId: string } = {
+  let context: { app: TestDriver | null; testId: string } = {
     app: null,
     testId,
   }
@@ -27,22 +28,28 @@ describe('opening a shared project', () => {
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('open a shared project and locates media in local filesystem', () =>
-    openSharedProject(setup))
-  test('navigate between as-of-yet unloaded media', () =>
-    navigateBetweenMedia(setup))
-  test('make some flashcards', () => makeFlashcards(setup))
-  test('make some flashcards using subtitles', () =>
-    makeFlashcardsWithSubtitles(setup))
-  test('manually locate missing assets', () => manuallyLocateAsset(setup))
-  test('review with missing media', () => reviewWithMissingMedia(setup))
-  test('export deck with missing media', () => exportWithMissingMedia(setup))
+  runAll(sharedProjectTestSteps(), () => setup)
   test('save and close project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
     await stopApp(context)
   })
 })
+
+function sharedProjectTestSteps() {
+  return [
+    step(
+      'open a shared project and locates media in local filesystem',
+      openSharedProject
+    ),
+    step('navigate between as-of-yet unloaded media', navigateBetweenMedia),
+    step('make some flashcards', makeFlashcards),
+    step('make some flashcards using subtitles', makeFlashcardsWithSubtitles),
+    step('manually locate missing assets', manuallyLocateAsset),
+    step('review with missing media', reviewWithMissingMedia),
+    step('export deck with missing media', exportWithMissingMedia),
+  ]
+}
 
 const sideEffectsMocks = {
   uuid: [

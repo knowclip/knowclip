@@ -1,4 +1,6 @@
-const template = ({ app }, mainWindow, useDevTools) => [
+import { BrowserWindow, app, Menu } from 'electron'
+
+const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => [
   {
     label: 'Application',
     submenu: [
@@ -52,22 +54,22 @@ const template = ({ app }, mainWindow, useDevTools) => [
       { role: 'cut' },
       { role: 'copy' },
       { role: 'paste' },
-      { role: 'selectall' },
+      { role: 'selectAll' },
     ],
   },
 
   {
     label: '&View',
     submenu: [
-      { role: 'resetzoom' },
-      { accelerator: 'CmdOrCtrl+=', role: 'zoomin' },
-      { accelerator: 'CmdOrCtrl+-', role: 'zoomout' },
+      { role: 'resetZoom' },
+      { accelerator: 'CmdOrCtrl+=', role: 'zoomIn' },
+      { accelerator: 'CmdOrCtrl+-', role: 'zoomOut' },
       { role: 'togglefullscreen' },
       { type: 'separator' },
       ...(useDevTools
         ? [
             {
-              role: 'toggledevtools',
+              role: 'toggleDevTools' as const,
             },
           ]
         : []),
@@ -91,9 +93,8 @@ const template = ({ app }, mainWindow, useDevTools) => [
   },
 ]
 
-module.exports = (electron, { mainWindow }, useDevTools = false) => {
-  const { Menu } = electron
+export default function(mainWindow: BrowserWindow, useDevTools: boolean = false) {
   return Menu.setApplicationMenu(
-    Menu.buildFromTemplate(template(electron, mainWindow, useDevTools))
+    Menu.buildFromTemplate(template(mainWindow, useDevTools))
   )
 }

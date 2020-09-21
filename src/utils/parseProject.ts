@@ -31,7 +31,7 @@ export const parseProjectJson = async <F extends FlashcardFields>(
       //       and then retrying after confirmation without limit
       //       after user confirmation.
       maxAliasCount: -1,
-    } as YAML.ParseOptions)
+    } as YAML.Options)
     const errors = docs.flatMap(v => v.errors)
     if (errors.length) return { errors: errors.map(e => e.message) }
 

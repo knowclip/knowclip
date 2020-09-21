@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { clickAt } from '../../driver/ClientWrapper'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'

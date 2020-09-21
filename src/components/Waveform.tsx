@@ -57,48 +57,50 @@ type ClipClickDataProps = {
   'data-clip-index': number
   'data-clip-is-highlighted'?: number
 }
-const Clip = ({ id, start, end, isHighlighted, height, index }: ClipProps) => {
-  const clickDataProps: ClipClickDataProps = {
-    'data-clip-id': id,
-    'data-clip-start': start,
-    'data-clip-end': end,
-    'data-clip-index': index,
+const Clip = React.memo(
+  ({ id, start, end, isHighlighted, height, index }: ClipProps) => {
+    const clickDataProps: ClipClickDataProps = {
+      'data-clip-id': id,
+      'data-clip-start': start,
+      'data-clip-end': end,
+      'data-clip-index': index,
+    }
+    if (isHighlighted) clickDataProps['data-clip-is-highlighted'] = 1
+
+    return (
+      <g id={id} {...clickDataProps}>
+        <rect
+          className={cn(
+            css.waveformClip,
+            { [css.highlightedClip]: isHighlighted },
+            $.waveformClip
+          )}
+          {...getClipRectProps(start, end, height)}
+          {...clickDataProps}
+        />
+
+        <rect
+          className={css.waveformClipBorder}
+          x={start}
+          y="0"
+          width={SELECTION_BORDER_WIDTH}
+          height={height}
+          {...clickDataProps}
+        />
+        <rect
+          className={cn(css.waveformClipBorder, {
+            [css.highlightedClipBorder]: isHighlighted,
+          })}
+          x={end - SELECTION_BORDER_WIDTH}
+          y="0"
+          width={SELECTION_BORDER_WIDTH}
+          height={height}
+          {...clickDataProps}
+        />
+      </g>
+    )
   }
-  if (isHighlighted) clickDataProps['data-clip-is-highlighted'] = 1
-
-  return (
-    <g id={id} {...clickDataProps}>
-      <rect
-        className={cn(
-          css.waveformClip,
-          { [css.highlightedClip]: isHighlighted },
-          $.waveformClip
-        )}
-        {...getClipRectProps(start, end, height)}
-        {...clickDataProps}
-      />
-
-      <rect
-        className={css.waveformClipBorder}
-        x={start}
-        y="0"
-        width={SELECTION_BORDER_WIDTH}
-        height={height}
-        {...clickDataProps}
-      />
-      <rect
-        className={cn(css.waveformClipBorder, {
-          [css.highlightedClipBorder]: isHighlighted,
-        })}
-        x={end - SELECTION_BORDER_WIDTH}
-        y="0"
-        width={SELECTION_BORDER_WIDTH}
-        height={height}
-        {...clickDataProps}
-      />
-    </g>
-  )
-}
+)
 
 type ChunkProps = {
   start: number

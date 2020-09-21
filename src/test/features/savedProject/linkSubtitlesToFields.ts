@@ -1,4 +1,4 @@
-import { TestSetup } from '../../spectronApp'
+import { TestSetup } from '../../setUpDriver'
 import { waveform$ } from '../../../components/Waveform'
 import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'

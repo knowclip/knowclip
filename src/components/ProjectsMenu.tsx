@@ -73,7 +73,7 @@ const ProjectMenuItem = ({
             primary={availability.name}
             secondary={
               availability && (
-                <Tooltip title={availability.filePath}>
+                <Tooltip title={availability.filePath || ''}>
                   <span>
                     {availability.filePath
                       ? join(

@@ -1,17 +1,24 @@
-import { Application } from 'spectron'
+import { TestDriver } from './TestDriver'
 
 export default async function runEvents(
-  app: Application,
+  app: TestDriver,
   [next, ...rest]: any[]
 ) {
   if (next) {
-    await app.webContents.sendInputEvent(next)
+    sleep(42)
+    await app.sendToMainProcess({ type: 'sendInputEvent', args: [next] })
     await runEvents(app, rest)
   }
 }
 
+function sleep(ms: number) {
+  return new Promise(res => {
+    setTimeout(res, ms)
+  })
+}
+
 export async function dragMouse(
-  app: Application,
+  app: TestDriver,
   start: [number, number],
   end: [number, number]
 ) {
@@ -29,7 +36,7 @@ export async function dragMouse(
   }
 }
 
-export async function clickAt(app: Application, [x, y]: [number, number]) {
+export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
   try {
     await runEvents(app, [
       {

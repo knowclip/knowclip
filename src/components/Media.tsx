@@ -14,6 +14,8 @@ import { Tooltip, IconButton } from '@material-ui/core'
 import { VerticalSplitSharp, HorizontalSplitSharp } from '@material-ui/icons'
 import { SubtitlesFileWithTrack, MediaSubtitles } from '../redux'
 
+export const MEDIA_PLAYER_ID = 'mediaPlayer'
+
 type MediaProps = {
   constantBitrateFilePath: string | null
   loop: boolean
@@ -64,7 +66,7 @@ const Media = ({
     loop: false,
     controls: true,
     // disablePictureInPicture: true,
-    id: 'mediaPlayer',
+    id: MEDIA_PLAYER_ID,
     controlsList: 'nodownload nofullscreen',
     src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',
     // @ts-ignore
@@ -221,11 +223,6 @@ function useSyncSubtitlesVisibility(
 declare module 'react' {
   interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
     mode?: TextTrackMode
-  }
-}
-declare global {
-  interface TextTrack {
-    id?: string
   }
 }
 

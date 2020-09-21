@@ -1,10 +1,11 @@
-import { TestSetup, TMP_DIRECTORY } from '../../spectronApp'
+import { TestSetup, TMP_DIRECTORY } from '../../setUpDriver'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTableRow$ as dialogTableRow$ } from '../../../components/ReviewAndExportMediaTableRow'
 import { snackbar$ } from '../../../components/Snackbar'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { projectMenu$ } from '../../../components/ProjectMenu'
+import { ClientWrapper } from '../../driver/ClientWrapper'
 
 export default async function reviewAndExportApkg({ client, app }: TestSetup) {
   await client.clickElement_(projectMenu$.exportButton)
@@ -21,16 +22,10 @@ export default async function reviewAndExportApkg({ client, app }: TestSetup) {
   )
   await third.click()
 
-  const checkboxesChecked = async () => {
-    const checkboxInputs = await client.elements_(
-      `${dialogTableRow$.clipCheckboxes} input`,
-      3
-    )
-
-    return await Promise.all(checkboxInputs.map(cbi => cbi.isSelected()))
-  }
-
-  expect(await checkboxesChecked()).toMatchObject([true, true, false])
+  client.waitUntil(async () => {
+    return (await checkboxesChecked(client)).join(' ') === `true true false`
+  })
+  expect(await checkboxesChecked(client)).toMatchObject([true, true, false])
 
   await mockElectronHelpers(app, {
     showSaveDialog: [
@@ -45,4 +40,13 @@ export default async function reviewAndExportApkg({ client, app }: TestSetup) {
 
   await client.clickElement_(dialog$.exitButton)
   await client.waitUntilGone_(dialog$.exitButton)
+}
+
+async function checkboxesChecked(client: ClientWrapper) {
+  const checkboxInputs = await client.elements_(
+    `${dialogTableRow$.clipCheckboxes} input`,
+    3
+  )
+
+  return await Promise.all(checkboxInputs.map(cbi => cbi.isSelected()))
 }

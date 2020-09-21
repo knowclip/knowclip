@@ -1,4 +1,4 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../spectronApp'
+import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
@@ -23,6 +23,6 @@ export default async function addMoreMediaToProject({
 
   await client.waitUntil(async () => {
     const videoPath = await client.getAttribute('video', 'src')
-    return videoPath.includes(germanVideoPath)
+    return Boolean(videoPath && videoPath.includes(germanVideoPath))
   })
 }

@@ -1,8 +1,9 @@
 import { ipcRenderer } from 'electron'
-import { Application } from 'spectron'
 import { promises } from 'fs'
 import { join } from 'path'
+import { TestDriver } from './driver/TestDriver'
 import moment from 'moment'
+import { sendToMainProcess } from '../messages'
 
 type ModuleLike = { [name: string]: (...args: any) => any }
 
@@ -15,10 +16,10 @@ export default function spectronMocks<M extends ModuleLike>(
   mocked: MockedModule<M>
   resetMocks: () => void
   mockFunctions: (
-    app: Application,
+    app: TestDriver,
     mocks: Partial<{ [K in keyof M]: ReturnType<M[K]>[] }>
   ) => Promise<void>
-  logMocks: (app: Application) => Promise<void>
+  logMocks: (app: TestDriver) => Promise<void>
 } {
   const now = moment.utc().format()
   let currentTestId = ''
@@ -78,7 +79,17 @@ export default function spectronMocks<M extends ModuleLike>(
     })
 
     ipcRenderer.on(mockMessageName, (event, functionName, newReturnValue) => {
+      console.log(`Function ${functionName} mocked with: ${newReturnValue}`)
       returnValues[functionName].push(deserializeReturnValue(newReturnValue))
+      if (process.env.INTEGRATION_DEV)
+        sendToMainProcess({
+          type: 'log',
+          args: [
+            `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
+              newReturnValue
+            )}\n\n\n`,
+          ],
+        })
     })
 
     ipcRenderer.on('reset-mocks', () => {
@@ -91,11 +102,11 @@ export default function spectronMocks<M extends ModuleLike>(
   })
 
   async function mockFunction<F extends keyof M>(
-    app: Application,
+    app: TestDriver,
     functionName: F,
     returnValue: ReturnType<M[F]>
   ) {
-    return app.webContents.send(
+    return await app.webContentsSend(
       mockMessageName,
       functionName,
       await serializeReturnValue(returnValue)
@@ -103,10 +114,14 @@ export default function spectronMocks<M extends ModuleLike>(
   }
 
   async function mockFunctions(
-    app: Application,
+    app: TestDriver,
     mocks: Partial<{ [K in keyof M]: ReturnType<M[K]>[] }>
   ) {
-    await app.client.waitUntilWindowLoaded()
+    if (!(await app.isReady).result)
+      throw new Error(
+        `Can't mock functions because test driver failed to start.`
+      )
+
     for (const entry of Object.entries(mocks)) {
       const functionName: keyof M = entry[0] as any
       const returnValues: ReturnType<M[typeof functionName]>[] = entry[1] as any
@@ -116,8 +131,8 @@ export default function spectronMocks<M extends ModuleLike>(
     }
   }
 
-  async function logMocks(app: Application) {
-    app.webContents.send(logMessageName)
+  async function logMocks(app: TestDriver) {
+    await app.webContentsSend(logMessageName)
     await null
   }
 

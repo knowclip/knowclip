@@ -1,10 +1,15 @@
-const electron = require('electron')
-const path = require('path')
-const url = require('url')
-const { app, ipcMain } = electron
+import { BrowserWindow , screen, app, ipcMain, protocol } from 'electron'
+import * as path from 'path'
+import * as url from 'url'
 const { isPackaged } = app
-const { BrowserWindow } = electron
-const setUpMenu = require('./electron/appMenu')
+import setUpMenu from './appMenu'
+import installDevtools from './devtools'
+import { ROOT_DIRECTORY } from './root'
+import { getStartUrl, WINDOW_START_DIMENSIONS } from './window'
+import { handleMessages } from '../src/messages'
+
+app.allowRendererProcessReuse = false
+
 const Sentry = require('@sentry/electron')
 
 Sentry.init({
@@ -13,37 +18,39 @@ Sentry.init({
 
 const INTEGRATION_DEV = JSON.parse(process.env.INTEGRATION_DEV || 'false')
 
-const installDevtools = require('./electron/devtools')
 const useDevtools = process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : true
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
-const context = { mainWindow: null }
+const context: { mainWindow: BrowserWindow | null } = { mainWindow: null }
 
 // have to do it this to access ffmpeg path from within webpack bundle
 const ffmpegStaticBasePath = require('ffmpeg-static').path
 const ffprobeStaticBasePath = require('ffprobe-static').path
-const getFfmpegStaticPath = basePath =>
+const getFfmpegStaticPath = (basePath: string) =>
   basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
 
+// @ts-ignore
 global.ffmpegpath = getFfmpegStaticPath(ffmpegStaticBasePath)
+// @ts-ignore
 global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
 
 async function createWindow() {
-  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     show: false,
-    width: Math.min(1027, width),
-    height: Math.min(768, height),
+    width: Math.min(WINDOW_START_DIMENSIONS.width, width),
+    height: Math.min(WINDOW_START_DIMENSIONS.height, height),
     minWidth: 740,
     minHeight: 570,
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,
       devTools: useDevtools,
+      enableRemoteModule: true,
     },
   })
 
@@ -61,9 +68,9 @@ async function createWindow() {
   if (splash) {
     splash.loadURL(
       url.format({
-        pathname: path.join(__dirname, 'icons', 'icon.png'),
+        pathname: path.join(ROOT_DIRECTORY, 'icons', 'icon.png'),
         protocol: 'file',
-        slashes: 'true',
+        slashes: 'true' as unknown as boolean,
       })
     )
 
@@ -82,11 +89,7 @@ async function createWindow() {
   // and load the index.html of the app.
   mainWindow.loadURL(
     isPackaged || (process.env.NODE_ENV === 'test' && !INTEGRATION_DEV)
-      ? url.format({
-          pathname: path.join(__dirname, 'build', 'index.html'),
-          protocol: 'file',
-          slashes: 'true',
-        })
+      ? getStartUrl()
       : 'http://localhost:3000'
   )
 
@@ -108,13 +111,22 @@ async function createWindow() {
   })
 }
 
+app.whenReady().then(() => {
+  // https://github.com/electron/electron/issues/23757#issuecomment-640146333
+  protocol.registerFileProtocol('file', (request, callback) => {
+    const pathname = decodeURI(request.url.replace('file:///', ''));
+    callback(pathname);
+  });
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow()
 
-  setUpMenu(electron, context, true)
+  setUpMenu(context.mainWindow as BrowserWindow, true)
+  handleMessages(context.mainWindow as BrowserWindow)
 })
 
 app.on('will-quit', () => {
@@ -148,3 +160,5 @@ ipcMain.on('closed', function() {
   context.mainWindow = null
   app.quit()
 })
+
+

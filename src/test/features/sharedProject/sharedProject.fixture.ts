@@ -1,24 +1,24 @@
-import { Application } from 'spectron'
 import {
   startApp,
   stopApp,
   TestSetup,
   TMP_DIRECTORY,
   FIXTURES_DIRECTORY,
-} from '../../spectronApp'
+} from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects'
 import { runAll } from '../step'
 import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'
 import { join } from 'path'
 import { savedProjectTestSteps } from '../savedProject/savedProjectTestSteps'
+import { TestDriver } from '../../driver/TestDriver'
 
 jest.setTimeout(60000)
 
 const testId = 'sharedProject'
 
 describe('make a project file for testing shared projects', () => {
-  let context: { app: Application | null; testId: string } = {
+  let context: { app: TestDriver | null; testId: string } = {
     app: null,
     testId,
   }
