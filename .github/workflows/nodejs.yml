@@ -18,7 +18,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: integration test
       run: |
-        yarn install
+        yarn install --network-timeout 1000000
         yarn integration:appveyor -t "shared project"
       env:
         REACT_APP_SPECTRON: true
