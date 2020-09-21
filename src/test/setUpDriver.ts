@@ -4,7 +4,6 @@ import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
-import chromedriver from 'chromedriver'
 import { ROOT_DIRECTORY } from '../../electron/root'
 
 export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
@@ -13,7 +12,7 @@ export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
-const electronChromedriverPath = require(join(
+const chromedriverPath = require(join(
   process.cwd(),
   'node_modules',
   'chromedriver',
@@ -41,27 +40,8 @@ export async function startApp(
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
   }
 
-  // const app = new Application({
-  //   chromeDriverArgs: ['--disable-extensions', '--debug'],
-  //   waitTimeout: 10000, // until apkg generation/ffmpeg stuff is properly mocked
-  //   webdriverOptions: { deprecationWarnings: false },
-  //   path: (electron as unknown) as string,
-  //   env: {
-  //     NODE_ENV: 'test',
-  //     REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON),
-  //     INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV),
-  //     ...(persistedStatePath
-  //       ? { PERSISTED_STATE_PATH: persistedStatePath }
-  //       : null),
-  //   },
-  //   args: [join(__dirname, '..', '..')],
-  // })
-
-  // thse ppl got headless working?
-  // https://github.com/electron-userland/spectron/issues/323 ??
   const app = await createTestDriver({
-    // path: chromedriver.path,
-    chromedriverPath: electronChromedriverPath,
+    chromedriverPath: chromedriverPath,
     webdriverIoPath:
       process.platform === 'win32'
         ? join(
@@ -75,10 +55,9 @@ export async function startApp(
     appDir: ROOT_DIRECTORY,
     chromeArgs: [
       'disable-extensions',
-      ...(process.env.INTEGRATION_DEV ? ['verbose'] : []), // TODO: check
+      ...(process.env.INTEGRATION_DEV ? ['verbose'] : []),
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
-    ], // ? does this actually correspond?
-    // webdriverOptions: { deprecationWarnings: false },
+    ],
     env: {
       PUBLIC_URL: process.env.PUBLIC_URL,
       NODE_ENV: 'test',
@@ -128,8 +107,6 @@ export async function stopApp(context: {
 
     await app.stop()
   }
-
-  // if (app && app.isRunning()) app.mainProcess.exit(0)
 
   context.app = null
 

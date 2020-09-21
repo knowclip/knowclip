@@ -1,15 +1,15 @@
 import { BrowserWindow, ipcMain, ipcRenderer, remote } from 'electron'
 
-export type MessageToMain =
-  | { type: 'isReady' }
-  | { type: 'sayHi' }
-  | { type: 'double'; args: [number] }
-  | { type: 'asyncTriple'; args: [number] }
-  | { type: 'log'; args: any[] }
-  | { type: 'sendToRenderer'; args: [string, any[]] }
+export type MessageToMain<T extends MessageToMainType> = {
+  type: T
+  args: Parameters<MessageResponders[T]>
+}
 
-export type MessageHandlerResult<M extends MessageToMain> = ReturnType<
-  ReturnType<typeof getMessageResponders>[M['type']]
+type MessageResponders = ReturnType<typeof getMessageResponders>
+export type MessageToMainType = keyof MessageResponders
+
+export type MessageHandlerResult<T extends MessageToMainType> = ReturnType<
+  MessageResponders[T]
 >
 
 export type MessageResponse<R> =
@@ -18,10 +18,10 @@ export type MessageResponse<R> =
 
 type Awaited<R> = R extends PromiseLike<infer U> ? U : R
 
-async function respond<M extends MessageToMain>(
-  messageHandlers: ReturnType<typeof getMessageResponders>,
-  message: M
-): Promise<Awaited<MessageHandlerResult<M>>> {
+async function respond<T extends MessageToMainType>(
+  messageHandlers: MessageResponders,
+  message: MessageToMain<T>
+): Promise<Awaited<MessageHandlerResult<T>>> {
   const responseHandler = messageHandlers[message.type]
   // @ts-ignore
   const result = responseHandler(...(message.args || []))
@@ -32,8 +32,8 @@ async function respond<M extends MessageToMain>(
 export function handleMessages(mainWindow: BrowserWindow) {
   const messageHandlers = getMessageResponders(mainWindow)
 
-  async function onMessage(
-    message: MessageToMain
+  async function onMessage<T extends MessageToMainType>(
+    message: MessageToMain<T>
   ): Promise<MessageResponse<any>> {
     try {
       const responseHandler = messageHandlers[message.type]
@@ -59,34 +59,18 @@ export function handleMessages(mainWindow: BrowserWindow) {
   })
 }
 
-export async function sendToMainProcess<M extends MessageToMain>(
-  message: M
-): Promise<MessageHandlerResult<M>> {
+export async function sendToMainProcess<T extends MessageToMainType>(
+  message: MessageToMain<T>
+): Promise<MessageHandlerResult<T>> {
   return await ipcRenderer.invoke('message', message)
 }
 
-// export const handleMessage(message: MessageToMain) {
-//   switch (message.type) {
-
-//   }
-//   isReady: () => true,
-//   sayHi: () => 'hi there',
-//   double: (num: number) => num * 2,
-//   asyncTriple: async (num: number) => num * 3,
-//   log: (args: string[]) => {
-//     console.log(...args)
-//   }
-// }
-
 const getMessageResponders = (mainWindow: BrowserWindow) => ({
   isReady: () => true,
-  sayHi: () => 'hi there',
-  double: (num: number) => num * 2,
-  asyncTriple: async (num: number) => num * 3,
   log: (...args: any[]) => {
     console.log(...args)
   },
-  sendToRenderer: (channel: string, args: any[]) => {
+  sendToRenderer: (channel: string, args: string[]) => {
     if (!mainWindow) console.error('No focused window')
     else mainWindow.webContents.send(channel, ...args)
   },

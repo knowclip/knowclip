@@ -5,6 +5,7 @@ import {
   MessageResponse,
   MessageHandlerResult,
   MessageToMain,
+  MessageToMainType,
 } from '../../messages'
 import { ChildProcess } from 'child_process'
 
@@ -52,7 +53,7 @@ function waitForChromeDriver(
     checkIfRunning()
   })
 }
-function waitForChromeDriverToStop(
+export function waitForChromeDriverToStop(
   driverProcess: ChildProcess,
   statusUrl: string,
   stopTimeout: number
@@ -102,28 +103,19 @@ export async function createTestDriver({
     NODE_ENV: 'test',
     REACT_APP_TEST_DRIVER: 'true',
     ELECTRON_START_URL: 'http://localhost:3000',
-    // PATH: process.env.PATH,
     ...givenEnv,
   } as NodeJS.ProcessEnv
 
-  // const {chromeDriverProcess: driverProcess, stop: stopChromeDriver }  = runChromeDriver([], env);
-  const driver = new Chromedriver(
-    chromedriverPath,
-    [],
-    env
-    // ['--port=' + port, '--url-base=' + urlBase],
-  )
+  const driver = new Chromedriver(chromedriverPath, [], { env })
   await waitForChromeDriver(
     driver.process,
     `http://${hostname}:${port}${urlBase}status`,
     7000
   )
 
-  // await chromedriverLauncher
-
   const browser: BrowserObject = await remote({
     waitforTimeout: 30000,
-    hostname, // Use localhost as chrome driver server
+    hostname,
     port, // "9515" is the port opened by chrome driver.
     capabilities: {
       browserName: 'chrome',
@@ -164,18 +156,19 @@ export class TestDriver {
     this.client = browser
     this._driver = driver
 
-    // wait for ready
-    this.isReady = this.sendToMainProcess({ type: 'isReady' }).catch(err => {
-      console.error('Application failed to start', err)
-      this.stop()
-      process.exit(1)
-    })
+    this.isReady = this.sendToMainProcess({ type: 'isReady', args: [] }).catch(
+      err => {
+        console.error('Application failed to start', err)
+        this.stop()
+        process.exit(1)
+      }
+    )
   }
 
-  async sendToMainProcess<M extends MessageToMain>(
-    message: M
-  ): Promise<MessageResponse<MessageHandlerResult<M>>> {
-    return this.client.executeAsync(async (message: MessageToMain, done) => {
+  async sendToMainProcess<T extends MessageToMainType>(
+    message: MessageToMain<T>
+  ): Promise<MessageResponse<MessageHandlerResult<T>>> {
+    return this.client.executeAsync(async (message: MessageToMain<T>, done) => {
       const { ipcRenderer } = require('electron')
       ipcRenderer.invoke('message', message).then(async result => {
         done(await result)
@@ -185,61 +178,27 @@ export class TestDriver {
 
   /** send message to renderer */
   async webContentsSend(channel: string, ...args: any[]) {
-    // return await this.client.execute(
-    //   (channel, ...args) => {
-    //     const electron = require('electron')
-    //     const webContents = electron.remote.getCurrentWebContents()
-    //     webContents.send(channel, ...args)
-    //   },
-    //   channel, ...args
-    // )
     try {
-      console.log('sending!')
+      // roundabout, but probably the only way to do it
+      // without using electron.remote
       const result = await this.sendToMainProcess({
         type: 'sendToRenderer',
         args: [channel, args],
       })
-      console.log('sent!')
       return result
     } catch (err) {
-      console.log('ERROR:', err)
+      console.error(
+        `Problem sending "${channel}" with args: ${args.join(', ')}`
+      )
       console.error(err)
       return
     }
-
-    // // TODO: get rid of `any`
-    // // const webcontentsId = BrowserWindow.getFocusedWindow()?.webContents.id
-    // // if (!webcontentsId) throw new Error('Could not find webContentsId for any focused window')
-    // return await this.sendToMainProcess({ type: 'sendToRenderer', args: [channel, args] })
-    // // await this.client.execute(
-    // //   (channel, ...args) => {
-    // //   // (webcontentsId, channel, ...args) => {
-    // //     // console.log(`sending via ${channel}: ${args.join(', ')}`)
-    // //     // const electron = require('electron')
-    // //     // console.log('getting web contents')
-    // //     // const webContents = electron.webContents.fromId(webcontentsId)
-    // //     // console.log('sending...')
-    // //     // webContents.send(channel, ...args)
-    // //     // console.log('sent')
-    // //   },
-    // //   channel,
-    // //   ...args
-    // // )
   }
 
-  //   async sendToMainProcessSync(channel: string, ...args: any[]) { // TODO: get rid of `any`
-  //   await this.client.execute((channel, ...args) => {
-  //     const { ipcRenderer } = require("electron");
-  //     ipcRenderer
-  //       .send(channel, ...args)
-  //   }, channel, ...args)
-  // }
-
   async stop() {
-    console.log('closing window')
     await this.client.closeWindow()
     // await browser.deleteSession();
-    console.log('running?')
+
     const isRunningNow = () =>
       new Promise((res, rej) => {
         try {
@@ -251,13 +210,11 @@ export class TestDriver {
           return res(false)
         }
       })
-    console.log('running?', { isRunningNow: await isRunningNow() })
+
     if (await isRunningNow()) {
-      console.log('trying to stop chromedriver process')
       const killed = this._stopChromeDriver()
       if (!killed) throw new Error('Could not kill chromedriver process')
     }
-    console.log('done stopping app')
   }
 
   _stopChromeDriver() {
@@ -266,7 +223,6 @@ export class TestDriver {
 
   async closeWindow() {
     await this.client.execute(() => {
-      console.log('trying to close')
       return require('electron').ipcRenderer.invoke('close')
     }, [])
   }

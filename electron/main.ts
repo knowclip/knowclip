@@ -54,9 +54,6 @@ async function createWindow() {
     },
   })
 
-  console.log({ browserWindow: BrowserWindow.getFocusedWindow()}, BrowserWindow.getAllWindows())
-
-
   const splash =
     process.env.NODE_ENV !== 'test'
       ? new BrowserWindow({

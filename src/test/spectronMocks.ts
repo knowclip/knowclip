@@ -81,14 +81,15 @@ export default function spectronMocks<M extends ModuleLike>(
     ipcRenderer.on(mockMessageName, (event, functionName, newReturnValue) => {
       console.log(`Function ${functionName} mocked with: ${newReturnValue}`)
       returnValues[functionName].push(deserializeReturnValue(newReturnValue))
-      sendToMainProcess({
-        type: 'log',
-        args: [
-          `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
-            newReturnValue
-          )}\n\n\n`,
-        ],
-      })
+      if (process.env.INTEGRATION_DEV)
+        sendToMainProcess({
+          type: 'log',
+          args: [
+            `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
+              newReturnValue
+            )}\n\n\n`,
+          ],
+        })
     })
 
     ipcRenderer.on('reset-mocks', () => {
@@ -122,7 +123,7 @@ export default function spectronMocks<M extends ModuleLike>(
         `Can't mock functions because test driver failed to start.`
       )
     console.log('About to mock functions for ' + moduleId)
-    // .waitUntilWindowLoaded() // TODO: check whether we need a domcontentloaded check
+
     for (const entry of Object.entries(mocks)) {
       const functionName: keyof M = entry[0] as any
       const returnValues: ReturnType<M[typeof functionName]>[] = entry[1] as any

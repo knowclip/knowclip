@@ -25,9 +25,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
 
   await client.waitUntil(async () => {
     try {
-      const visibility = (await clipsVisibility(client._client, client)).join(
-        ' '
-      )
+      const visibility = (await clipsVisibility(client)).join(' ')
       return visibility === 'false false true'
     } catch (err) {
       console.error(err)
@@ -36,32 +34,21 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
       )
     }
   })
-  expect(await clipsVisibility(client._client, client)).toMatchObject([
-    false,
-    false,
-    true,
-  ])
+  expect(await clipsVisibility(client)).toMatchObject([false, false, true])
 
   await client.clickElement_(flashcardSection$.previousClipButton)
   await client.waitForText('body', '2 / 3')
 
   await client.waitUntil(async () => {
-    return (
-      (await clipsVisibility(client._client, client)).join(' ') ===
-      'false true false'
-    )
+    return (await clipsVisibility(client)).join(' ') === 'false true false'
   })
-  expect(await clipsVisibility(client._client, client)).toMatchObject([
-    false,
-    true,
-    false,
-  ])
+  expect(await clipsVisibility(client)).toMatchObject([false, true, false])
   expect(
     Number(await client.getAttribute('video', 'currentTime'))
   ).toBeLessThan(53)
 }
 
-async function clipsVisibility(client: TestDriver, wrapper: ClientWrapper) {
+async function clipsVisibility(wrapper: ClientWrapper) {
   return await Promise.all(
     await (await wrapper.elements_(waveform$.waveformClip)).map(el =>
       el.isVisible()

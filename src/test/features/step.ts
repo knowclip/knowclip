@@ -19,7 +19,7 @@ export const runAll = (testSteps: TestStep[], getSetup: () => TestSetup) => {
       } catch (err) {
         try {
           console.log('Logging markup from failed test:')
-          const source = await setup.client._client.client.getPageSource()
+          const source = await setup.client._driver.client.getPageSource()
           console.log(source)
 
           console.log('Logging persisted data from failed test:')

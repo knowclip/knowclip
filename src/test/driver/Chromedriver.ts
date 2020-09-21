@@ -10,24 +10,22 @@ export default class Chromedriver {
 
   stop: () => Boolean
 
-  constructor(path: string, args: string[], env?: NodeJS.ProcessEnv) {
-    // this.process = chromedriver.start([
-    //   // `--homepage=${getStartUrl(process.env.ELECTRON_START_URL)}`
-    //   `--homepage=http://localhost:3000`,
-    //   '--port=' + 9515,
-    //   '--url-base=' + '/',
-    //   '--no-sandbox',
-    //   '--disable-dev-shm-usage',
-    //   '--log-level=info',
-    //   ...args,
-    // ])
-
+  constructor(
+    path: string,
+    args: string[],
+    {
+      env,
+      showBrowserLogs = false,
+    }: { env?: NodeJS.ProcessEnv; showBrowserLogs?: boolean } = {}
+  ) {
     this.process = startChromedriver(path, args, env)
 
     const stdout = (chunk: any) => {
       console.log('RENDERER LOG: ' + chunk)
     }
-    if (this.process.stdout) this.process.stdout.on('data', stdout)
+    if (showBrowserLogs && this.process.stdout) {
+      this.process.stdout.on('data', stdout)
+    }
 
     const chromedriverCloseHandler = (code: any, ...args: any[]) => {
       console.log(`closing chrome driver ${code}, ${args}`)
@@ -57,11 +55,8 @@ export default class Chromedriver {
 
       this.process.removeListener('close', chromedriverCloseHandler)
 
-      // TODO: investigate if this is better
-      //    and maybe include 'wait for stop'
-      // const x = chromedriver.stop()
       const killed = this.process.kill('SIGTERM')
-      console.log('Chromedriver process killed?', { success: killed })
+      if (!killed) console.error(`Failed to kill Chromedriver process.`)
 
       return killed
     }
