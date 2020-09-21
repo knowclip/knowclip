@@ -106,7 +106,6 @@ export default function spectronMocks<M extends ModuleLike>(
     functionName: F,
     returnValue: ReturnType<M[F]>
   ) {
-    console.log(`Mocking function ${functionName} with: ${returnValue}`)
     return await app.webContentsSend(
       mockMessageName,
       functionName,
@@ -122,7 +121,6 @@ export default function spectronMocks<M extends ModuleLike>(
       throw new Error(
         `Can't mock functions because test driver failed to start.`
       )
-    console.log('About to mock functions for ' + moduleId)
 
     for (const entry of Object.entries(mocks)) {
       const functionName: keyof M = entry[0] as any

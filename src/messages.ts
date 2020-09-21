@@ -71,7 +71,16 @@ const getMessageResponders = (mainWindow: BrowserWindow) => ({
     console.log(...args)
   },
   sendToRenderer: (channel: string, args: string[]) => {
-    if (!mainWindow) console.error('No focused window')
+    if (!mainWindow) console.error('Main window reference lost')
     else mainWindow.webContents.send(channel, ...args)
+  },
+  sendInputEvent: (
+    inputEvent:
+      | Electron.MouseInputEvent
+      | Electron.MouseWheelInputEvent
+      | Electron.KeyboardInputEvent
+  ) => {
+    if (!mainWindow) console.error('Main window reference lost')
+    else mainWindow.webContents.sendInputEvent(inputEvent)
   },
 })

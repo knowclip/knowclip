@@ -6,11 +6,7 @@ export default async function runEvents(
 ) {
   if (next) {
     sleep(42)
-    await app.client.execute(next => {
-      const electron = require('electron')
-      const webContents = electron.remote.getCurrentWebContents()
-      webContents.sendInputEvent(next)
-    }, next)
+    await app.sendToMainProcess({ type: 'sendInputEvent', args: [next] })
     await runEvents(app, rest)
   }
 }
