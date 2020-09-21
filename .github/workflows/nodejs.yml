@@ -43,6 +43,6 @@ jobs:
         yarn lint
         yarn tsc
         yarn test
-        (cd homepage && yarn install --frozen-lockfile && yarn build-main && yarn webpack)
+        (cd homepage && yarn install --frozen-lockfile && yarn build)
       env:
         CI: true
