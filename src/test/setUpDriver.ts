@@ -4,16 +4,17 @@ import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
-import { ROOT_DIRECTORY } from '../../electron/root'
 
-export const TMP_DIRECTORY = join(process.cwd(), 'tmp-test')
+const rootDir = join(process.cwd())
+
+export const TMP_DIRECTORY = join(rootDir, 'tmp-test')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
 export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
 const chromedriverPath = require(join(
-  process.cwd(),
+  rootDir,
   'node_modules',
   'chromedriver',
   'lib',
@@ -44,15 +45,9 @@ export async function startApp(
     chromedriverPath: chromedriverPath,
     webdriverIoPath:
       process.platform === 'win32'
-        ? join(
-            ROOT_DIRECTORY,
-            'node_modules',
-            'electron',
-            'dist',
-            'electron.exe'
-          )
+        ? join(rootDir, 'node_modules', 'electron', 'dist', 'electron.exe')
         : ((electron as unknown) as string),
-    appDir: ROOT_DIRECTORY,
+    appDir: rootDir,
     chromeArgs: [
       'disable-extensions',
       ...(process.env.INTEGRATION_DEV ? ['verbose'] : []),
