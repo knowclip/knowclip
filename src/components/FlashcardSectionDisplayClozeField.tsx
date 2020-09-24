@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useMemo,
   useState,
+  KeyboardEventHandler,
 } from 'react'
 import os from 'os'
 import cn from 'classnames'
@@ -12,8 +13,13 @@ import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
 import { useSelector, useDispatch } from 'react-redux'
-import { getSelectionWithin, ClozeControls } from '../utils/useClozeUi'
+import {
+  getSelectionWithin,
+  ClozeControls,
+  setSelectionRange,
+} from '../utils/useClozeUi'
 import * as r from '../redux'
+import { KeyId, KEYS } from '../utils/keyboard'
 
 const ClozeField = ({
   className,
@@ -80,7 +86,37 @@ const ClozeField = ({
       viewMode: state.settings.viewMode,
     })
   )
-  const [hash, setHash] = useState(Math.random())
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null)
+  useEffect(
+    () => {
+      const onlyShowCursorWhenNoSelectionInClozeField = () => {
+        if (ref.current) {
+          if (document.activeElement !== ref.current)
+            return setCursorPosition(null)
+
+          const currentClozeSelection = getSelectionWithin(ref.current)
+
+          const clozeSelectionCurrentlyMade =
+            currentClozeSelection.end - currentClozeSelection.start !== 0
+          const newPosition = clozeSelectionCurrentlyMade
+            ? null
+            : currentClozeSelection.end
+          setCursorPosition(newPosition)
+        }
+      }
+      document.addEventListener(
+        'selectionchange',
+        onlyShowCursorWhenNoSelectionInClozeField
+      )
+      return () =>
+        document.removeEventListener(
+          'selectionchange',
+          onlyShowCursorWhenNoSelectionInClozeField
+        )
+    },
+    [ref]
+  )
+
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
       return ranges.map(range => ({ range, clozeIndex }))
@@ -89,25 +125,27 @@ const ClozeField = ({
   const segments: ReactNode[] = useMemo(
     () => {
       const newlineChar = viewMode === 'HORIZONTAL' ? '⏎' : '\n'
-      const segments = rangesWithClozeIndexes.length
-        ? []
-        : [<span key={String(hash)}>{clearNewlines(value, viewMode)}</span>]
+      const segments: ReactNode[] = []
+
+      const first = rangesWithClozeIndexes[0]
+      if (!first || first.range.start > 0) {
+        const startPaddingEnd = first ? first.range.start : value.length
+        segments.push(
+          ...[...value.slice(0, startPaddingEnd)].map((c, i) =>
+            charSpan(
+              c,
+              i,
+              css.clozeValueChar,
+              0, // ?
+              newlineChar,
+              cursorPosition === i
+            )
+          )
+        )
+      }
+
       rangesWithClozeIndexes.forEach(
         ({ range: { start, end }, clozeIndex }, i) => {
-          if (i === 0 && start > 0) {
-            segments.push(
-              ...[...value.slice(0, start)].map((c, i) =>
-                charSpan(
-                  c,
-                  i,
-                  css.clozeValueChar,
-                  clozeIndex,
-                  newlineChar,
-                  hash
-                )
-              )
-            )
-          }
           segments.push(
             ...[...value.slice(start, end)].map((c, i) =>
               charSpan(
@@ -121,7 +159,7 @@ const ClozeField = ({
                 }),
                 clozeIndex,
                 newlineChar,
-                hash
+                cursorPosition === start + i
               )
             )
           )
@@ -143,7 +181,7 @@ const ClozeField = ({
                   css.clozeValueChar,
                   clozeIndex,
                   newlineChar,
-                  hash
+                  cursorPosition === end + i
                 )
               )
             )
@@ -158,69 +196,117 @@ const ClozeField = ({
       rangesWithClozeIndexes,
       value,
       viewMode,
-      hash,
+      cursorPosition,
     ]
   )
-  const onCopy = useCallback(e => {
-    const selection = window.getSelection()
-    if (!selection) return
-    var text = selection.toString().replace(/⏎/g, '\n')
-    e.clipboardData.setData('text/plain', text)
-    e.preventDefault()
-  }, [])
 
   const dispatch = useDispatch()
 
-  const onKeyDown = useCallback(
+  const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = useCallback(
     e => {
       if (!isEnabledKey(e)) return e.preventDefault()
-      switch (e.keyCode) {
-        // delete
-        case 46: {
-          if (ref.current) {
-            const selection = getSelectionWithin(ref.current)
-            onPressDelete(selection)
+      switch (e.key) {
+        case KEYS.arrowLeft: {
+          const selection = getSelectionWithin(e.target as HTMLInputElement)
+          const selectionMade = selection.end - selection.start !== 0
+          if (selectionMade) {
+            if (e.shiftKey) {
+              break
+            } else {
+              setSelectionRange(
+                e.target as HTMLSpanElement,
+                selection.start,
+                selection.start
+              )
+
+              setCursorPosition(selection.start)
+              break
+            }
+          } else {
+            if (e.shiftKey) {
+              const start = cursorPosition == null ? 0 : cursorPosition - 1
+              const end = cursorPosition == null ? 0 : cursorPosition
+
+              setSelectionRange(e.target as HTMLSpanElement, start, end)
+              e.preventDefault()
+            } else
+              setCursorPosition(cursorPosition =>
+                cursorPosition == null
+                  ? cursorPosition
+                  : Math.max(cursorPosition - 1, 0)
+              )
           }
+          break
+        }
+        case KEYS.arrowRight: {
+          const selection = getSelectionWithin(e.target as HTMLSpanElement)
+          const selectionMade = selection.end - selection.start !== 0
+          if (selectionMade) {
+            if (e.shiftKey) {
+              break
+            } else {
+              setSelectionRange(
+                e.target as HTMLSpanElement,
+                selection.end,
+                selection.end
+              )
+              setCursorPosition(selection.end)
+              e.preventDefault()
+              break
+            }
+          } else {
+            if (e.shiftKey) {
+              const start = cursorPosition == null ? 0 : cursorPosition
+              const end = cursorPosition == null ? 0 : cursorPosition + 1
+
+              console.log({ start, end })
+              ref.current && setSelectionRange(ref.current, start, end)
+              e.preventDefault()
+            } else {
+              setCursorPosition(cursorPosition =>
+                cursorPosition == null
+                  ? cursorPosition
+                  : Math.min(cursorPosition + 1, value.length)
+              )
+            }
+          }
+          break
+        }
+
+        case KEYS.delete: {
+          const selection = getSelectionWithin(e.target as HTMLInputElement)
+          onPressDelete(selection)
           e.preventDefault()
           break
         }
-        // backspace
-        case 8: {
-          if (ref.current) {
-            const selection = getSelectionWithin(ref.current)
-            onBackspace(selection)
-          }
+        case KEYS.backspace: {
+          const selection = getSelectionWithin(e.target as HTMLInputElement)
+          onBackspace(selection)
           e.preventDefault()
           break
         }
-        // esc
-        case 27:
-          e.target.blur()
+        case KEYS.escape:
+          ;(e.target as HTMLSpanElement).blur()
           break
-        // e key
-        case 69:
+        case KEYS.eLowercase:
+        case KEYS.eUppercase:
           dispatch(r.startEditingCards())
           e.preventDefault()
           break
         default:
       }
     },
-    [onBackspace, onPressDelete, ref, dispatch]
-  )
-  const preventDefault = useCallback(e => {
-    e.preventDefault()
-  }, [])
-
-  const forceRerender = useCallback(
-    () => {
-      setHash(Math.random())
-    },
-    [setHash]
+    [onBackspace, onPressDelete, dispatch, value, cursorPosition]
   )
 
   const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
   const handleFocus = useCallback(
     e => {
+      if (ref.current) {
+        const selection = getSelectionWithin(ref.current)
+        const currentlySelected = selection.end - selection.start !== 0
+        if (!currentlySelected) setCursorPosition(0)
+      }
       if (!editing && isMediaPlaying) {
         setWasLoopingBeforeFocus(loopIsOn)
         dispatch(r.setLoop(true))
@@ -230,6 +316,7 @@ const ClozeField = ({
   )
   const handleBlur = useCallback(
     e => {
+      setCursorPosition(null)
       if (!editing && wasLoopingBeforeFocus !== loopIsOn)
         dispatch(r.setLoop(wasLoopingBeforeFocus))
     },
@@ -241,28 +328,14 @@ const ClozeField = ({
       className={cn(css.clozeFieldValue, clozeId, {
         [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
       })}
-      contentEditable={true}
       tabIndex={0}
-      suppressContentEditableWarning
       onKeyDown={onKeyDown}
-      onKeyUp={preventDefault}
-      onInput={preventDefault}
-      onBeforeInput={preventDefault}
-      onChange={preventDefault}
-      onKeyPress={preventDefault}
-      onCompositionEnd={forceRerender}
-      onPaste={preventDefault}
-      onCut={preventDefault}
-      onDragEnd={preventDefault}
-      onDragExit={preventDefault}
-      onDragOver={preventDefault}
-      onCopy={onCopy}
       onFocus={handleFocus}
       onBlur={handleBlur}
       ref={ref}
-      id={String(hash)}
     >
       {segments}
+      {cursorPosition === value.length && <span className={css.clozeCursor} />}
     </span>
   )
 
@@ -298,6 +371,10 @@ const ClozeField = ({
       )}
     </div>
   )
+}
+
+type SelectState = {
+  position: number
 }
 
 export type ClozeId =
@@ -343,19 +420,22 @@ const charSpan = (
   className: string,
   clozeIndex: number,
   newlineChar: string,
-  hash: number
+  hasCursor?: boolean
 ) => {
   const isNewline = char === '\n' || char === '\r'
+  const content = isNewline ? newlineChar : char
   return (
     <span
-      className={cn(className, { [css.clozeNewlinePlaceholder]: isNewline })}
-      key={String(index + char + hash)}
-      id={String(index + char + hash)}
+      className={cn(className, {
+        [css.clozeNewlinePlaceholder]: isNewline,
+        [css.clozeCursor]: hasCursor,
+      })}
+      key={String(index + char)}
       style={{
         ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
       }}
     >
-      {isNewline ? newlineChar : char}
+      {content}
     </span>
   )
 }
@@ -384,7 +464,7 @@ const clearNewlines = (
 }
 
 const clozeHint = (
-  <>
+  <div>
     Select the text you wish to blank out.
     <br />
     <br />
@@ -392,35 +472,38 @@ const clozeHint = (
     <br />
     <br />
     Hit Enter when finished.
-  </>
+  </div>
 )
 
-const ENABLED_KEYS = [
-  9, // tab
-  16, // shift
-  37, // left
-  39, // right
-  27, // escape
-  69, // e
-  46, // delete
-  8, // backspace
-  27, //esc
-]
-const ENABLED_META_CTRL_KEYS = [
+const ENABLED_KEYS = new Set<KeyId>([
+  KEYS.tab,
+  KEYS.shift,
+  KEYS.arrowLeft,
+  KEYS.arrowRight,
+  KEYS.escape,
+  KEYS.eLowercase,
+  KEYS.eUppercase,
+  KEYS.delete,
+  KEYS.backspace,
+  KEYS.backspace,
+])
+const ENABLED_META_CTRL_KEYS = new Set<KeyId>([
   ...ENABLED_KEYS,
-  67, // c
-  65, // a
-]
-const getMetaOrCtrlKey =
+  KEYS.cLowercase,
+  KEYS.cUppercase,
+  KEYS.aLowercase,
+  KEYS.aUppercase,
+])
+export const getMetaOrCtrlKey =
   os.platform() === 'darwin'
-    ? (e: KeyboardEvent) => e.metaKey
-    : (e: KeyboardEvent) => e.ctrlKey
-const isEnabledKey = (e: KeyboardEvent) => {
-  const { keyCode } = e
+    ? (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.metaKey
+    : (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.ctrlKey
+const isEnabledKey = (e: KeyboardEvent | React.KeyboardEvent<Element>) => {
+  const { key } = e
   const metaOrCtrlKey = getMetaOrCtrlKey(e)
   return metaOrCtrlKey
-    ? ENABLED_META_CTRL_KEYS.includes(keyCode)
-    : ENABLED_KEYS.includes(keyCode)
+    ? ENABLED_META_CTRL_KEYS.has(key as KeyId)
+    : ENABLED_KEYS.has(key as KeyId)
 }
 
 export default ClozeField

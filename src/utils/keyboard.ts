@@ -1,0 +1,26 @@
+export const KEYS = {
+  delete: 'Delete',
+  backspace: 'Backspace',
+  enter: 'Enter',
+  escape: 'Escape',
+  space: ' ',
+  tab: 'Tab',
+  shift: 'Shift',
+  aLowercase: 'a',
+  aUppercase: 'A',
+  cLowercase: 'c',
+  cUppercase: 'C',
+  eLowercase: 'e',
+  eUppercase: 'E',
+  lLowercase: 'l',
+  lUppercase: 'L',
+  pLowercase: 'p',
+  pUppercase: 'P',
+  sLowercase: 's',
+  sUppercase: 'S',
+  arrowLeft: 'ArrowLeft',
+  arrowRight: 'ArrowRight',
+  cmd: 'Meta',
+} as const
+
+export type KeyId = (typeof KEYS)[keyof typeof KEYS]

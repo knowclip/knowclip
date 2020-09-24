@@ -100,6 +100,40 @@
   color: rgba(0,0,0,0.3);
 }
 
+.clozeValueChar {
+  white-space: nowrap;
+  white-space: pre;
+
+  position: relative;
+
+}
+
+.clozeCursor::before {
+  display: inline;
+  content: '';
+
+  border-left: solid black 2px;
+  margin-left: -2px;
+  box-sizing: content-box;
+  pointer-events: none;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1
+  }
+  50% {
+    opacity: 1
+  }
+  51% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .previewTags {
   padding: 1rem;
   font-size: .8rem;
@@ -172,10 +206,9 @@
     display: inline;
     position: relative;
     z-index: 1;
-}
-.fieldValue:not([contenteditable]) {
-    letter-spacing: 0.0035em;
-   letter-spacing: 0.00425em;
+
+  /* word-break: break-all; */
+
 }
 .clozeFieldValue {
   composes: fieldValue;
@@ -183,6 +216,7 @@
   z-index: 4;
 
   position: relative;
+  white-space: no-wrap;
 }
 .clozeFieldValue::selection {
   background-color: rgba(0,0,0,0.3)
@@ -216,6 +250,9 @@
 }
 .blank::selection {
   background-color: hsla(var(--cloze-background-hue), 100%, 80%, 80%);
+}
+.clozeValueChar {
+  position: relative;
 }
 .clozeValueChar::selection {
   background-color: hsla(var(--cloze-selection-hue), 100%, 90%, 75%);

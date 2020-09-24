@@ -160,7 +160,7 @@ const TagsInput = ({
             onAdd={handleAddChip}
             onDelete={handleDeleteChip}
             dataSource={allTags}
-            newChipKeyCodes={[13, 9, 32]}
+            newChipKeyCodes={[13, 9, 32] /* enter tab space */}
             onUpdateInput={onChange}
             value={chips}
             clearInputValueOnChange
