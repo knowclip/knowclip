@@ -260,7 +260,6 @@ declare type SetWorkIsUnsaved = {
 
 declare type MediaAction =
   | AddMediaToProjectRequest
-  | DeleteMediaFromProject
   | SetCurrentFile
   | ToggleLoop
   | SetLoop
@@ -272,11 +271,6 @@ declare type AddMediaToProjectRequest = {
   type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
   projectId: ProjectId
   filePaths: Array<MediaFilePath>
-}
-declare type DeleteMediaFromProject = {
-  type: 'DELETE_MEDIA_FROM_PROJECT'
-  projectId: ProjectId
-  mediaFileId: MediaFileId
 }
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
 declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
@@ -316,9 +310,9 @@ declare type OverrideSettings = {
 declare type DismissMedia = { type: 'DISMISS_MEDIA' }
 
 declare type SubtitlesAction =
-  | AddSubtitlesTrack
+  // | AddSubtitlesTrack
   | MountSubtitlesTrack
-  | DeleteSubtitlesTrack
+  // | DeleteSubtitlesTrack
   | ShowSubtitles
   | HideSubtitles
   | MakeClipsFromSubtitles
@@ -334,16 +328,6 @@ declare type LoadSubtitlesFailure = {
 declare type MountSubtitlesTrack = {
   type: 'MOUNT_SUBTITLES_TRACK'
   track: SubtitlesTrack
-}
-declare type AddSubtitlesTrack = {
-  type: 'ADD_SUBTITLES_TRACK'
-  track: SubtitlesTrack
-  mediaFileId: MediaFileId
-}
-declare type DeleteSubtitlesTrack = {
-  type: 'DELETE_SUBTITLES_TRACK'
-  mediaFileId: MediaFileId
-  id: SubtitlesTrackId
 }
 declare type ShowSubtitles = {
   type: 'SHOW_SUBTITLES'
@@ -397,6 +381,7 @@ declare type FileAction =
   | CommitFileDeletions
   | AbortFileDeletions
   | PreloadVideoStills
+  | UpdateFile
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -429,6 +414,10 @@ declare type OpenFileSuccess = {
   filePath: FilePath
   timestamp: string
 }
+declare interface OpenFileSuccessWith<T extends FileMetadata>
+  extends OpenFileSuccess {
+  validatedFile: T
+}
 declare type OpenFileFailure = {
   type: 'OPEN_FILE_FAILURE'
   file: FileMetadata
@@ -446,6 +435,15 @@ declare type LocateFileSuccess = {
   type: 'LOCATE_FILE_SUCCESS'
   file: FileMetadata
   filePath: FilePath
+}
+
+declare type UpdateFile = {
+  type: 'UPDATE_FILE'
+  update: FileUpdate<keyof FileUpdates>
+}
+declare interface UpdateFileWith<T extends keyof FileUpdates>
+  extends UpdateFile {
+  update: FileUpdate<T>
 }
 
 declare type PreloadVideoStills = {

@@ -1,4 +1,5 @@
 import { Reducer } from 'redux'
+import { isUpdateWith } from '../files/updates'
 import * as A from '../types/ActionType'
 import { getHumanFileName } from '../utils/files'
 
@@ -207,27 +208,29 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       return newState
     }
 
-    case A.SET_PROJECT_NAME: {
-      // TODO: investigate whether to generalize for all file types?
-      const existingProjectFile = state.ProjectFile[action.id]
-      if (!existingProjectFile) {
-        console.error(
-          `Action ${action.type} was dispatched during illegal state.`
-        )
-        console.log(action, state)
-        // should be impossible
-        return state
-      }
+    case A.UPDATE_FILE: {
+      if (isUpdateWith('setProjectName', action)) {
+        const projectId = action.update.id
+        const [name] = action.update.updatePayload
+        // TODO: investigate whether to generalize for all file types?
+        const existingProjectFile = state.ProjectFile[projectId]
+        if (!existingProjectFile) {
+          console.error(`Action ${action.type} was dispatched during illegal state.`)
+          console.log(action, state)
+          // should be impossible
+          return state
+        }
 
-      return {
-        ...state,
-        ProjectFile: {
-          [action.id]: {
-            ...existingProjectFile,
-            name: action.name,
+        return {
+          ...state,
+          ProjectFile: {
+            [projectId]: {
+              ...existingProjectFile,
+              name,
+            },
           },
-        },
-      }
+        }
+      } else return state
     }
 
     default:

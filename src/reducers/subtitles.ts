@@ -31,10 +31,20 @@ const subtitles: Reducer<SubtitlesState> = (
           mode: 'showing',
         } as SubtitlesTrack,
       }
+    case A.UPDATE_FILE: {
+      const { update } = action as UpdateFileWith<any>
+      const updateName: keyof FileUpdates = update.updateName
 
-    case A.DELETE_SUBTITLES_TRACK: {
-      const { [action.id]: _, ...newState } = state
-      return newState
+      switch (updateName) {
+        case 'deleteSubtitlesTrack': {
+          const trackId = (action as UpdateFileWith<'deleteSubtitlesTrack'>)
+            .update.updatePayload[0]
+          const { [trackId]: _, ...newState } = state
+          return newState
+        }
+        default:
+          return state
+      }
     }
 
     default:

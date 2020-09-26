@@ -80,6 +80,15 @@ export const abortFileDeletions = (): AbortFileDeletions => ({
   type: A.ABORT_FILE_DELETIONS,
 })
 
+export const updateFile = <U extends keyof FileUpdates>({
+  update,
+}: {
+  update: FileUpdate<U>
+}): UpdateFile => ({
+  type: A.UPDATE_FILE,
+  update,
+})
+
 export const preloadVideoStills = (
   file: FileMetadata,
   clipId: ClipId

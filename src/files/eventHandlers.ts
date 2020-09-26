@@ -1,7 +1,9 @@
 export type FileEventHandlers<F extends FileMetadata> = {
+  /** should eventually result in OPEN_FILE_SUCCESS or OPEN_FILE_FAILURE ? */
   openRequest: OpenFileRequestHandler<F>
   openSuccess: OpenFileSuccessHandler<F>[]
   openFailure?: OpenFileFailureHandler<F>
+  /** should eventually result in OPEN_FILE_SUCCESS or OPEN_FILE_FAILURE ? */
   locateRequest: LocateFileRequestHandler<F>
   locateSuccess: LocateFileSuccessHandler<F> | null
   deleteRequest: DeleteFileRequestHandler<F>[]
@@ -17,7 +19,7 @@ export type OpenFileRequestHandler<F extends FileMetadata> = (
 ) => Promise<Array<Action>>
 
 export type OpenFileSuccessHandler<F extends FileMetadata> = (
-  action: OpenFileSuccess & { validatedFile: F },
+  action: OpenFileSuccessWith<F>,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
