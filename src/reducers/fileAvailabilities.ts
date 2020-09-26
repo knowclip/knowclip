@@ -215,7 +215,9 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
         // TODO: investigate whether to generalize for all file types?
         const existingProjectFile = state.ProjectFile[projectId]
         if (!existingProjectFile) {
-          console.error(`Action ${action.type} was dispatched during illegal state.`)
+          console.error(
+            `Action ${action.type} was dispatched during illegal state.`
+          )
           console.log(action, state)
           // should be impossible
           return state
