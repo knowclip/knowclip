@@ -7,6 +7,7 @@ declare type SettingsState = {
   assetsDirectories: string[]
   checkForUpdatesAutomatically: boolean
   viewMode: ViewMode
+  activeDictionaries?: { id: FileId; type: DictionaryFileType }[]
   // TODO: save recent `ProjectFile`s here?
 }
 

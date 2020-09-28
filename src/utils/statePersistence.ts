@@ -5,13 +5,26 @@ import { join } from 'path'
 
 type FilesyState<F> = Record<FileMetadata['type'], { [fileId: string]: F }>
 
+const FILE_TYPES: FileMetadata['type'][] = [
+  'ProjectFile',
+  'MediaFile',
+  'ExternalSubtitlesFile',
+  'VttConvertedSubtitlesFile',
+  'WaveformPng',
+  'ConstantBitrateMp3',
+  'VideoStillImage',
+  'YomichanDictionary',
+  'DictCCDictionary',
+  'CEDictDictionary',
+]
+
 const mapFileState = <F, G>(
   state: FilesyState<F>,
   transform: (type: FileMetadata['type'], f: F) => G
 ) =>
-  (Object.keys(state) as FileMetadata['type'][]).reduce(
+  FILE_TYPES.reduce(
     (all, type) => {
-      all[type] = Object.keys(state[type]).reduce(
+      all[type] = Object.keys(state[type] || {}).reduce(
         (xxx, id) => {
           xxx[id] = transform(type, state[type][id])
           return xxx

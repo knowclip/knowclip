@@ -12,6 +12,8 @@ export const KEYS = {
   cUppercase: 'C',
   eLowercase: 'e',
   eUppercase: 'E',
+  dLowercase: 'd',
+  dUppercase: 'D',
   lLowercase: 'l',
   lUppercase: 'L',
   pLowercase: 'p',

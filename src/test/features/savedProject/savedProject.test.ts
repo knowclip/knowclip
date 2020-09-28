@@ -228,5 +228,8 @@ const persistedState: Partial<AppState> = {
         lastOpened: '2020-02-01T13:21:08Z',
       },
     },
+    YomichanDictionary: {},
+    CEDictDictionary: {},
+    DictCCDictionary: {},
   },
 }

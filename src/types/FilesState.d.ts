@@ -6,6 +6,9 @@ declare type FilesState = {
   WaveformPng: Dict<FileId, WaveformPng>
   ConstantBitrateMp3: Dict<FileId, ConstantBitrateMp3>
   VideoStillImage: Dict<FileId, VideoStillImageFile>
+  YomichanDictionary: Dict<FileId, YomichanDictionary>
+  CEDictDictionary: Dict<FileId, YomichanDictionary>
+  DictCCDictionary: Dict<FileId, YomichanDictionary>
 }
 
 declare type FileId = string
@@ -23,6 +26,9 @@ declare type FileMetadata =
   | WaveformPng
   | ConstantBitrateMp3
   | VideoStillImageFile
+  | YomichanDictionary
+  | CEDictDictionary
+  | DictCCDictionary
 
 declare type ProjectFile = {
   type: 'ProjectFile'
@@ -136,3 +142,26 @@ declare type UserProvidedImageFile = {
   id: FileId
   parentId: ClipId
 }
+
+declare type YomichanDictionary = {
+  type: 'YomichanDictionary'
+  id: FileId
+  name: string
+}
+declare type CEDictDictionary = {
+  type: 'CEDictDictionary'
+  id: FileId
+  name: string
+}
+declare type DictCCDictionary = {
+  type: 'DictCCDictionary'
+  id: FileId
+  name: string
+}
+
+declare type DictionaryFile =
+  | YomichanDictionary
+  | CEDictDictionary
+  | DictCCDictionary
+
+declare type DictionaryFileType = DictionaryFile['type']

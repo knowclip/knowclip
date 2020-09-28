@@ -20,6 +20,8 @@ import {
 } from '../utils/useClozeUi'
 import * as r from '../redux'
 import { KeyId, KEYS } from '../utils/keyboard'
+import { lookUpJapanese, TokenTranslations } from '../utils/dictionaryFiles'
+import { isTextFieldFocused } from '../utils/isTextFieldFocused'
 
 const ClozeField = ({
   className,
@@ -46,6 +48,14 @@ const ClozeField = ({
   onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
   clozeControls: ClozeControls
 }) => {
+  // if dictionary file present
+  // perform tokenize
+  // and then lookup
+
+  // then on double-click OR mouseover + D,
+  // detect position from tokens and display word
+  // https://github.com/FooSoft/yomichan/blob/39cf302eefe1b3bc19e4a91c222872b322426354/ext/fg/js/frontend.js#L82
+
   const linkedSubtitlesTrack = linkedTracks[fieldName] || null
   const subtitlesMenu = Boolean(subtitles.length) && (
     <FieldMenu
@@ -117,6 +127,47 @@ const ClozeField = ({
     [ref]
   )
 
+  const activeDictionaries = useSelector((state: AppState) =>
+    r.getActiveDictionaries(state)
+  )
+  const doParseJapanese = activeDictionaries.some(
+    dict => dict.type === 'YomichanDictionary'
+  )
+
+  const [tokens, setTokens] = useState<TokenTranslations[]>([])
+  const [tokenHit, setTokenHit] = useState<ReturnType<typeof findTokenHit>>(
+    null
+  )
+
+  useEffect(
+    () => {
+      console.log({ doParseJapanese })
+      if (doParseJapanese) {
+        lookUpJapanese(value).then(tokensTranslations => {
+          console.log('new value lookup done!', { tokensTranslations })
+          setTokens(tokensTranslations)
+        })
+      } else {
+        console.log('not parsing anymore!')
+        setTokens([])
+      }
+    },
+    [value, doParseJapanese]
+  )
+
+  const handleCharMouseEnter_ = useCallback(
+    (characterIndex: number) => {
+      console.log('characterIndex', characterIndex, { tokens })
+      const tokenHit = findTokenHit(tokens, characterIndex)
+      setTokenHit(tokenHit)
+    },
+    [tokens]
+  )
+  const handleCharMouseEnter = doParseJapanese
+    ? handleCharMouseEnter_
+    : undefined
+  const handleMouseLeave = useCallback(() => setTokenHit(null), [])
+
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
       return ranges.map(range => ({ range, clozeIndex }))
@@ -131,37 +182,45 @@ const ClozeField = ({
       if (!first || first.range.start > 0) {
         const startPaddingEnd = first ? first.range.start : value.length
         segments.push(
-          ...[...value.slice(0, startPaddingEnd)].map((c, i) =>
-            charSpan(
-              c,
-              i,
-              css.clozeValueChar,
-              0, // ?
-              newlineChar,
-              cursorPosition === i
-            )
-          )
+          ...[...value.slice(0, startPaddingEnd)].map((c, i) => (
+            <CharSpan
+              key={`${c}${i}`}
+              onMouseEnter={handleCharMouseEnter}
+              {...{
+                char: c,
+                index: i,
+                className: css.clozeValueChar,
+                clozeIndex: 0,
+                newlineChar,
+                hasCursor: cursorPosition === i,
+              }}
+            />
+          ))
         )
       }
 
       rangesWithClozeIndexes.forEach(
         ({ range: { start, end }, clozeIndex }, i) => {
           segments.push(
-            ...[...value.slice(start, end)].map((c, i) =>
-              charSpan(
-                c,
-                start + i,
-                cn(css.blank, {
-                  [css.previewBlank]:
-                    previewClozeIndex !== -1 &&
-                    previewClozeIndex === clozeIndex,
-                  [css.blankEditing]: clozeIndex === currentClozeIndex,
-                }),
-                clozeIndex,
-                newlineChar,
-                cursorPosition === start + i
-              )
-            )
+            ...[...value.slice(start, end)].map((c, i) => (
+              <CharSpan
+                key={`${c}${start + i}`}
+                onMouseEnter={handleCharMouseEnter}
+                {...{
+                  char: c,
+                  index: start + i,
+                  className: cn(css.blank, {
+                    [css.previewBlank]:
+                      previewClozeIndex !== -1 &&
+                      previewClozeIndex === clozeIndex,
+                    [css.blankEditing]: clozeIndex === currentClozeIndex,
+                  }),
+                  clozeIndex,
+                  newlineChar,
+                  hasCursor: cursorPosition === start + i,
+                }}
+              />
+            ))
           )
 
           const nextRange: {
@@ -174,16 +233,20 @@ const ClozeField = ({
 
           if (subsequentGapEnd - end > 0) {
             segments.push(
-              ...[...value.slice(end, subsequentGapEnd)].map((c, i) =>
-                charSpan(
-                  c,
-                  end + i,
-                  css.clozeValueChar,
-                  clozeIndex,
-                  newlineChar,
-                  cursorPosition === end + i
-                )
-              )
+              ...[...value.slice(end, subsequentGapEnd)].map((c, i) => (
+                <CharSpan
+                  key={`${c}${end + i}`}
+                  onMouseEnter={handleCharMouseEnter}
+                  {...{
+                    char: c,
+                    index: end + i,
+                    className: css.clozeValueChar,
+                    clozeIndex,
+                    newlineChar,
+                    hasCursor: cursorPosition === end + i,
+                  }}
+                />
+              ))
             )
           }
         }
@@ -197,14 +260,42 @@ const ClozeField = ({
       value,
       viewMode,
       cursorPosition,
+      handleCharMouseEnter_,
+      doParseJapanese,
+      tokens,
     ]
   )
 
   const dispatch = useDispatch()
 
+  useEffect(
+    () => {
+      const showDictionaryPopup = (e: KeyboardEvent) => {
+        const dKey =
+          (ref.current && e.key === KEYS.dLowercase) ||
+          e.key === KEYS.dUppercase
+        if (
+          dKey &&
+          (!isTextFieldFocused() || ref.current === document.activeElement)
+        ) {
+          console.log({ tokenHit })
+          if (tokens.length && tokenHit && tokenHit.token) {
+            setSelectionRange(
+              ref.current as HTMLElement,
+              tokenHit.translations.index,
+              tokenHit.translations.index + tokenHit.token.token.length
+            )
+          }
+        }
+      }
+      document.addEventListener('keydown', showDictionaryPopup)
+      return () => document.removeEventListener('keydown', showDictionaryPopup)
+    },
+    [tokenHit]
+  )
+
   const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = useCallback(
     e => {
-      if (!isEnabledKey(e)) return e.preventDefault()
       switch (e.key) {
         case KEYS.arrowLeft: {
           const selection = getSelectionWithin(e.target as HTMLInputElement)
@@ -325,6 +416,7 @@ const ClozeField = ({
 
   const content = (
     <span
+      onMouseLeave={handleMouseLeave}
       className={cn(css.clozeFieldValue, clozeId, {
         [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
       })}
@@ -414,18 +506,34 @@ export const ClozeHues = {
   c10: 271,
 }
 
-const charSpan = (
-  char: string,
-  index: number,
-  className: string,
-  clozeIndex: number,
-  newlineChar: string,
+function CharSpan({
+  char,
+  index,
+  className,
+  clozeIndex,
+  newlineChar,
+  hasCursor,
+  onMouseEnter,
+}: {
+  char: string
+  index: number
+  className: string
+  clozeIndex: number
+  newlineChar: string
   hasCursor?: boolean
-) => {
+  onMouseEnter?: (index: number) => void
+}) {
   const isNewline = char === '\n' || char === '\r'
   const content = isNewline ? newlineChar : char
+  const handleMouseEnter = useCallback(
+    () => {
+      if (onMouseEnter) onMouseEnter(index)
+    },
+    [index, char, onMouseEnter]
+  )
   return (
     <span
+      onMouseEnter={handleMouseEnter}
       className={cn(className, {
         [css.clozeNewlinePlaceholder]: isNewline,
         [css.clozeCursor]: hasCursor,
@@ -438,29 +546,6 @@ const charSpan = (
       {content}
     </span>
   )
-}
-
-const clearNewlines = (
-  value: string,
-  viewMode: ViewMode,
-  className?: string
-) => {
-  const char = viewMode === 'VERTICAL' ? '\n' : '⏎'
-  const withoutNewlines: ReactNodeArray = []
-  const lines = value.split(/[\n\r]/)
-  lines.forEach((line, i) => {
-    if (i !== 0)
-      withoutNewlines.push(
-        <span
-          className={cn(css.clozeNewlinePlaceholder, className)}
-          key={String(i)}
-        >
-          {char}
-        </span>
-      )
-    withoutNewlines.push(<span className={className}>{line}</span>)
-  })
-  return withoutNewlines
 }
 
 const clozeHint = (
@@ -507,3 +592,53 @@ const isEnabledKey = (e: KeyboardEvent | React.KeyboardEvent<Element>) => {
 }
 
 export default ClozeField
+
+function findTokenHit(tokensTranslations: TokenTranslations[], index: number) {
+  const firstOverlapIndex = tokensTranslations.findIndex(tr => {
+    const exactMatch = tr.index === index
+    if (exactMatch) return true
+    const betweenMatch =
+      index >= tr.index &&
+      tr.tokens.some(t => index <= t.token.length + tr.index)
+
+    return betweenMatch
+  })
+
+  if (firstOverlapIndex === -1) return null
+
+  const firstOverlap = tokensTranslations[firstOverlapIndex]
+
+  if (firstOverlap.index === index)
+    return {
+      translations: firstOverlap,
+      token: firstOverlap.tokens.find(
+        t =>
+          firstOverlap.index === index ||
+          index <= t.token.length + firstOverlap.index
+      ),
+    }
+
+  let lastOverlap = tokensTranslations[firstOverlapIndex]
+  for (let i = firstOverlapIndex; i < tokensTranslations.length; i++) {
+    const tr = tokensTranslations[i]
+    if (tr.index > index)
+      return {
+        translations: tr,
+        token: lastOverlap.tokens.find(
+          t =>
+            lastOverlap.index === index ||
+            index <= t.token.length + lastOverlap.index
+        ),
+      }
+    if (tr.index === index)
+      return {
+        translations: tr,
+        token: tr.tokens.find(
+          t => tr.index === index || index <= t.token.length + tr.index
+        ),
+      }
+    lastOverlap = tr
+  }
+
+  return null
+}

@@ -10,6 +10,9 @@ export const initialState: FilesState = {
   WaveformPng: {},
   ConstantBitrateMp3: {},
   VideoStillImage: {},
+  YomichanDictionary: {},
+  CEDictDictionary: {},
+  DictCCDictionary: {},
 }
 
 type FindByTag<Union, Tag> = Union extends { type: Tag } ? Union : never

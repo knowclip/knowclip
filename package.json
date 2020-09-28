@@ -26,6 +26,7 @@
     "better-ajv-errors": "^0.6.7",
     "better-sqlite3": "^5.4.3",
     "dataurl": "^0.1.0",
+    "dexie": "^3.0.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-store": "^5.1.0",
     "ffmpeg-static": "^2.4.0",
@@ -59,7 +60,8 @@
     "uuid": "^3.3.2",
     "webdriverio": "^6.5.2",
     "xss": "^1.0.6",
-    "yaml": "^1.7.2"
+    "yaml": "^1.7.2",
+    "yauzl": "^2.10.0"
   },
   "main": "./build-main/electron/main.js",
   "homepage": "./",

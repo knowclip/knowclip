@@ -11,6 +11,7 @@ import ErrorDialog from './ErrorDialog'
 import SettingsDialog from './SettingsDialog'
 import { getCurrentDialog } from '../../selectors'
 import LinkSubtitlesDialog from './LinkSubtitlesDialog'
+import Dictionaries from './DictionariesDialog'
 
 const DialogView = () => {
   const currentDialog = useSelector((state: AppState) =>
@@ -52,6 +53,8 @@ const DialogView = () => {
           key={currentDialog.subtitles.id}
         />
       )
+    case 'Dictionaries':
+      return <Dictionaries open={true} data={{ type: 'Dictionaries' }} />
   }
 }
 

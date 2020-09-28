@@ -1,6 +1,13 @@
-import { ignoreElements, mergeAll, tap } from 'rxjs/operators'
-import { combineEpics } from 'redux-observable'
-import { fromEvent, of } from 'rxjs'
+import {
+  flatMap,
+  ignoreElements,
+  map,
+  mergeAll,
+  skipUntil,
+  tap,
+} from 'rxjs/operators'
+import { combineEpics, ofType } from 'redux-observable'
+import { empty, from, fromEvent, of } from 'rxjs'
 import * as A from '../types/ActionType'
 import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
@@ -53,6 +60,33 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 
 const initialize: AppEpic = () => of(r.initializeApp())
 
+const initializeDictionaries: AppEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('persist/REHYDRATE' as any),
+    flatMap(_rehydrated => {
+      const dicts = Object.entries({
+        ...state$.value.fileAvailabilities.YomichanDictionary,
+        ...state$.value.fileAvailabilities.DictCCDictionary,
+        ...state$.value.fileAvailabilities.CEDictDictionary,
+      })
+      const openFileActions = dicts.flatMap(([id, fileAvailability]) => {
+        if (!fileAvailability) {
+          console.error('Problem initializing dictionaries')
+          return []
+        }
+        const file = r.getFile(state$.value, fileAvailability.type, id) || {
+          type: fileAvailability.type as DictionaryFileType,
+          name: fileAvailability.name,
+          id: fileAvailability.id,
+        }
+        return [r.openFileRequest(file, fileAvailability.filePath)]
+      })
+      console.log({ openFileActions, dicts })
+
+      return from(openFileActions)
+    })
+  )
+
 const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
   action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
     tap(() => pauseMedia()),
@@ -83,7 +117,8 @@ const rootEpic: AppEpic = combineEpics(
   preloadVideoStills,
   generateWaveformImages,
   menu,
-  pauseOnBusy
+  pauseOnBusy,
+  initializeDictionaries
 )
 
 export default rootEpic

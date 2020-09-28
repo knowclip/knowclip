@@ -11,6 +11,9 @@ export const initialState: FileAvailabilitiesState = {
   WaveformPng: {},
   ConstantBitrateMp3: {},
   VideoStillImage: {},
+  YomichanDictionary: {},
+  CEDictDictionary: {},
+  DictCCDictionary: {},
 }
 
 const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (

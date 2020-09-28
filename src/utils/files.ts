@@ -29,6 +29,15 @@ const fileFilters = {
   WaveformPng: [
     { name: 'Waveform image from audio track', extensions: ['png'] },
   ],
+  YomichanDictionary: [
+    { name: 'Yomichan Japanese Dictionary file', extensions: ['zip'] },
+  ],
+  DictCCDictionary: [
+    { name: 'Dict.cc Dictionary file', extensions: ['zip', 'txt'] },
+  ],
+  CEDictDictionary: [
+    { name: 'CEDict Dictionary file', extensions: ['zip', 'u8'] },
+  ],
 }
 
 export const getExtensions = (fileType: FileMetadata['type']) => {
@@ -75,6 +84,9 @@ export const isGeneratedFile = (type: FileMetadata['type']): boolean => {
     case 'ProjectFile':
     case 'MediaFile':
     case 'ExternalSubtitlesFile':
+    case 'YomichanDictionary':
+    case 'DictCCDictionary':
+    case 'CEDictDictionary':
       return false
   }
 }

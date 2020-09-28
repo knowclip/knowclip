@@ -7,6 +7,7 @@ import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './uti
 import { remote, ipcRenderer } from 'electron'
 import { nowUtcTimestamp } from './utils/sideEffects'
 import { setAppMenuProjectSubmenuPermissions } from './utils/appMenu'
+import { getDexieDb } from './utils/dictionaryFiles'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -75,6 +76,7 @@ const dependencies = {
   ipcRenderer,
   setAppMenuProjectSubmenuPermissions,
   nowUtcTimestamp,
+  dexie: getDexieDb(),
 }
 
 export default dependencies

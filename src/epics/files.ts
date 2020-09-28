@@ -12,6 +12,11 @@ import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
 import videoStillImage from '../files/videoStillImageFile'
 import {
+  yomichanActions as yomichanDictionary,
+  dictCcActions as dictCCDictionary,
+  ceDictActions as ceDictDictionary,
+} from '../files/dictionaryFile'
+import {
   FileEventHandlers,
   OpenFileSuccessHandler,
 } from '../files/eventHandlers'
@@ -28,6 +33,9 @@ const fileEventHandlers: Record<
   WaveformPng: waveformPng,
   ConstantBitrateMp3: constantBitrateMp3,
   VideoStillImage: videoStillImage,
+  YomichanDictionary: yomichanDictionary,
+  CEDictDictionary: ceDictDictionary,
+  DictCCDictionary: dictCCDictionary,
 }
 
 const openFileRequest: AppEpic = (action$, state$, effects) =>

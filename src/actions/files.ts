@@ -1,6 +1,7 @@
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import * as A from '../types/ActionType'
 
+/** Add file to records without opening or doing anything with it */
 export const addFile = <F extends FileMetadata>(
   file: F,
   path?: string
