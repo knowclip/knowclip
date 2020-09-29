@@ -1,21 +1,45 @@
 import Dexie, { Database } from 'dexie'
+import { basename } from 'path'
 import { getTableName, LexiconMainEntry } from '../files/dictionaryFile'
+import { uuid } from './sideEffects'
 import yomichanLemmatization from './yomichanLemmatization.json'
 
 const LATEST_DEXIE_DB_VERSION = 1
 
-let db: Dexie
+const DICTIONARIES_TABLE = 'dictionaries'
+
+/** remember to check defined */
+let dexie: Dexie
 
 export function getDexieDb() {
-  db = new Dexie('DictionaryEntries')
+  dexie = new Dexie('DictionaryEntries')
 
-  db.version(LATEST_DEXIE_DB_VERSION).stores({
-    YomichanDictionary: '++id, head, pronunciation, dictionaryId',
-    CEDictDictionary: '++id, head, pronunciation, dictionaryId',
-    DictCCDictionary: '++id, head, pronunciation, dictionaryId',
+  dexie.version(LATEST_DEXIE_DB_VERSION).stores({
+    [DICTIONARIES_TABLE]: '++key, id, type',
+    YomichanDictionary: '++key, head, pronunciation, dictionaryKey',
+    CEDictDictionary: '++key, head, pronunciation, dictionaryKey',
+    DictCCDictionary: '++key, head, pronunciation, dictionaryKey',
   })
 
-  return db
+  return dexie
+}
+
+export async function newDictionary(
+  db: Database,
+  type: DictionaryFileType,
+  filePath: string
+) {
+  const dicProps: Omit<DictionaryFile, 'key'> = {
+    type,
+    id: uuid(),
+    name: basename(filePath),
+  }
+  const key = await db.table(DICTIONARIES_TABLE).add(dicProps)
+  const dic: DictionaryFile = {
+    ...dicProps,
+    key,
+  }
+  return dic
 }
 
 export type TokenTranslations = {
@@ -29,7 +53,7 @@ export type TokenTranslations = {
 export async function lookUpJapanese(
   text: string
 ): Promise<TokenTranslations[]> {
-  if (!db) return []
+  if (!dexie) return []
   const potentialTokens = parseFlat(text)
 
   return await Promise.all(
@@ -42,7 +66,7 @@ export async function lookUpJapanese(
           const lookupTokens = differingBases
             ? [token, ...potentialBases]
             : [token]
-          const query: LexiconMainEntry[] = await db
+          const query: LexiconMainEntry[] = await dexie
             .table(getTableName('YomichanDictionary'))
             .where('head')
             .anyOfIgnoreCase(lookupTokens)
@@ -126,16 +150,18 @@ function lemmatize(text: string) {
 export async function deleteDictionary(
   db: Database,
   allDictionaries: DictionaryFile[],
-  id: number,
+  key: number,
   type: DictionaryFileType
 ) {
   const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
-  if (allDictionariesOfType.length === 1)
-    return await db.table(getTableName(type)).clear()
+  if (allDictionariesOfType.length <= 1)
+    await db.table(getTableName(type)).clear()
+  else
+    await db
+      .table(getTableName(type))
+      .where('dictionaryKey')
+      .equals(key)
+      .delete()
 
-  return await db
-    .table(getTableName(type))
-    .where('dictionaryId')
-    .equals(id)
-    .delete()
+  return await db.table(DICTIONARIES_TABLE).delete(key)
 }

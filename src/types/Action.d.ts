@@ -394,6 +394,8 @@ declare type FileAction =
   | UpdateFile
   | PreloadVideoStills
   | DeleteDictionaryDatabase
+  | ImportDictionaryRequest
+  | StartDictionaryImport
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -467,6 +469,16 @@ declare type PreloadVideoStills = {
 
 declare type DeleteDictionaryDatabase = {
   type: 'DELETE_DICTIONARY_DATABASE'
+}
+
+declare type ImportDictionaryRequest = {
+  type: 'IMPORT_DICTIONARY_REQUEST'
+  dictionaryType: DictionaryFileType
+}
+declare type StartDictionaryImport = {
+  type: 'START_DICTIONARY_IMPORT'
+  file: DictionaryFile
+  filePath: FilePath
 }
 
 interface WithRecordType<F extends FileMetadata> {

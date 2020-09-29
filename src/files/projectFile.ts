@@ -168,7 +168,14 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
       r.deleteFileSuccess(availability, descendants),
     ],
   ],
-  deleteSuccess: [async (action, state) => [r.commitFileDeletions()]],
+  deleteSuccess: [
+    async (action, state) => [
+      r.commitFileDeletions('ProjectFile'),
+      ...Array.from(new Set(action.descendants.map(a => a.type))).map(type =>
+        r.commitFileDeletions(type)
+      ),
+    ],
+  ],
 }
 
 export default projectFileEventHandlers

@@ -16,7 +16,7 @@ import { deleteDictionary } from '../utils/dictionaryFiles'
 export type LexiconEntry = LexiconMainEntry | LexiconVariantEntry
 export type LexiconMainEntry = {
   variant: false
-  dictionaryId: number
+  dictionaryKey: number
   head: string
   meanings: string[]
   /** parts of speech etc. */
@@ -28,7 +28,7 @@ export type LexiconVariantEntry =
   // for trad/simpl chinese
   {
     variant: true
-    dictionaryId: number
+    dictionaryKey: number
     head: string
     mainEntry: string
   }
@@ -44,12 +44,16 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
 ) => {
   if (file) {
     try {
-      await deleteDictionary(
-        effects.dexie,
-        r.getOpenDictionaryFiles(state).map(d => d.file),
-        +file.id,
-        file.type
+      if (
+        availability.status === 'CURRENTLY_LOADED' ||
+        availability.status === 'PREVIOUSLY_LOADED'
       )
+        await deleteDictionary(
+          effects.dexie,
+          r.getOpenDictionaryFiles(state).map(d => d.file),
+          file.key,
+          file.type
+        )
 
       return [
         r.removeActiveDictionary(file.id),
@@ -143,7 +147,7 @@ async function parseYomichanZip(
               ] of entriesJSON) {
                 const dictEntry: LexiconEntry = {
                   variant: false,
-                  dictionaryId: +file.id,
+                  dictionaryKey: file.key,
                   head,
                   pronunciation,
                   tags: pos,
@@ -177,7 +181,10 @@ async function parseYomichanZip(
   })
 }
 
-const currentlyImporting = (state: AppState, file: DictionaryFile) => {
+export const dictionaryWasNeverImported = (
+  state: AppState,
+  file: DictionaryFile
+) => {
   const availability = r.getFileAvailability(state, file)
   return !['CURRENTLY_LOADED', 'PREVIOUSLY_LOADED'].includes(
     availability.status
@@ -186,25 +193,7 @@ const currentlyImporting = (state: AppState, file: DictionaryFile) => {
 
 export const yomichanActions: FileEventHandlers<YomichanDictionary> = {
   openRequest: async ({ file }, filePath, state, effects) => {
-    try {
-      // const availability = r.getFileAvailability(state, file)
-      if (
-        // !['CURRENTLY_LOADED', 'PREVIOUSLY_LOADED'].includes(availability.status)
-        currentlyImporting(state, file)
-      ) {
-        await parseYomichanZip(file, filePath, effects)
-
-        return [
-          r.simpleMessageSnackbar('Your dictionary has finished importing!'),
-          r.openFileSuccess(file, filePath),
-        ]
-      }
-
-      return [r.openFileSuccess(file, filePath)]
-    } catch (err) {
-      console.error(err)
-      return [r.openFileFailure(file, filePath, String(err))]
-    }
+    return [r.openFileSuccess(file, filePath)]
   },
   openSuccess: [
     async ({ validatedFile, filePath }, state, effects) => {
@@ -225,29 +214,7 @@ export const yomichanActions: FileEventHandlers<YomichanDictionary> = {
 }
 
 export const dictCcActions: FileEventHandlers<DictCCDictionary> = {
-  openRequest: async ({ file }, filePath, state, effects) => {
-    // first look in indexeddb
-    // then look in filesystem, parse, put into indexeddb
-
-    // parseDictionaryFile(file, filePath, effects);
-    console.log('parsing!', { file })
-    return [r.openFileSuccess(file, filePath)]
-  },
-  openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => {
-      // set last active dictionary
-      // (effectively same thing as setting current active dictionary)
-      return [r.addActiveDictionary(validatedFile.id, validatedFile.type)]
-    },
-  ],
-
-  locateRequest: async ({ file }, availability, state, effects) => {
-    return []
-  },
-
-  locateSuccess: null,
-  deleteRequest: [deleteRequest],
-  deleteSuccess: [deleteSuccess],
+  ...((yomichanActions as unknown) as FileEventHandlers<DictCCDictionary>),
 }
 
 async function parseCedictZipOrU8TextFile(
@@ -292,7 +259,7 @@ async function parseCedictZipOrU8TextFile(
                 ] of entriesJSON) {
                   const dictEntry: LexiconEntry = {
                     variant: false,
-                    dictionaryId: +file.id,
+                    dictionaryKey: file.key,
                     head,
                     pronunciation,
                     tags,
@@ -327,33 +294,5 @@ async function parseCedictZipOrU8TextFile(
 }
 
 export const ceDictActions: FileEventHandlers<CEDictDictionary> = {
-  openRequest: async ({ file }, filePath, state, effects) => {
-    // first look in indexeddb
-    // then look in filesystem, parse, put into indexeddb
-    if (currentlyImporting(state, file)) {
-      await parseCedictZipOrU8TextFile(file, filePath, effects)
-      console.log('parsing!', { file })
-      return [
-        r.simpleMessageSnackbar('Your dictionary has finished importing!'),
-        r.openFileSuccess(file, filePath),
-      ]
-    }
-
-    return [r.openFileSuccess(file, filePath)]
-  },
-  openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => {
-      // set last active dictionary
-      // (effectively same thing as setting current active dictionary)
-      return [r.addActiveDictionary(validatedFile.id, validatedFile.type)]
-    },
-  ],
-
-  locateRequest: async ({ file }, availability, state, effects) => {
-    return []
-  },
-
-  locateSuccess: null,
-  deleteRequest: [deleteRequest],
-  deleteSuccess: [deleteSuccess],
+  ...((yomichanActions as unknown) as FileEventHandlers<CEDictDictionary>),
 }

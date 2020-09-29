@@ -213,33 +213,6 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       return newState
     }
 
-    case A.UPDATE_FILE: {
-      if (isUpdateWith('setProjectName', action)) {
-        const projectId = action.update.id
-        const [name] = action.update.updatePayload
-        // TODO: investigate whether to generalize for all file types?
-        const existingProjectFile = state.ProjectFile[projectId]
-        if (!existingProjectFile) {
-          console.error(
-            `Action ${action.type} was dispatched during illegal state.`
-          )
-          console.log(action, state)
-          // should be impossible
-          return state
-        }
-
-        return {
-          ...state,
-          ProjectFile: {
-            [projectId]: {
-              ...existingProjectFile,
-              name,
-            },
-          },
-        }
-      } else return state
-    }
-
     default:
       return state
   }

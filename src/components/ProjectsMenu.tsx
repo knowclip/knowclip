@@ -30,9 +30,11 @@ enum $ {
 }
 
 const ProjectMenuItem = ({
-  project: availability,
+  availability,
+  file,
 }: {
-  project: FileAvailability
+  availability: FileAvailability
+  file?: ProjectFile
 }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
 
@@ -70,7 +72,7 @@ const ProjectMenuItem = ({
       >
         <RootRef rootRef={anchorCallbackRef}>
           <ListItemText
-            primary={availability.name}
+            primary={file ? file.name : availability.name}
             secondary={
               availability && (
                 <Tooltip title={availability.filePath || ''}>
@@ -143,8 +145,12 @@ const ProjectsMenu = () => {
               {projects.length ? null : (
                 <MenuItem disabled>No recent projects.</MenuItem>
               )}
-              {projects.map(project => (
-                <ProjectMenuItem key={project.id} project={project} />
+              {projects.map(({ availability, file }) => (
+                <ProjectMenuItem
+                  key={availability.id}
+                  availability={availability}
+                  file={file}
+                />
               ))}
             </MenuList>
           </Paper>

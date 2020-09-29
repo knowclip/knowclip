@@ -5,10 +5,13 @@ export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
   snackbar,
 })
 
-export const simpleMessageSnackbar = (message: string) =>
+export const simpleMessageSnackbar = (
+  message: string,
+  autoHideDuration?: number | null
+): SnackbarAction =>
   enqueueSnackbar({
     type: 'SimpleMessage',
-    props: { message },
+    props: { message, autoHideDuration },
   })
 
 export const closeSnackbar = (): SnackbarAction => ({

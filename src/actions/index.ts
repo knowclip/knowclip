@@ -8,6 +8,7 @@ export * from './dialog'
 export * from './projects'
 export * from './subtitles'
 export * from './files'
+export * from './dictionaries'
 export * from './session'
 export * from './settings'
 

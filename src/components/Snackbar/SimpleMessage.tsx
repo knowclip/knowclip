@@ -10,9 +10,11 @@ import { snackbar$ } from '.'
 const SimpleMessageSnackbar = ({
   message,
   closeButtonId,
+  autoHideDuration = 15000,
 }: {
   message: string
   closeButtonId: string
+  autoHideDuration?: number | null
 }) => {
   const [open, setOpen] = useState(true)
 
@@ -27,7 +29,7 @@ const SimpleMessageSnackbar = ({
       className={cn(snackbar$.container)}
       open={open}
       message={message}
-      autoHideDuration={15000}
+      autoHideDuration={autoHideDuration}
       onClose={handleClose}
       onExited={handleExited}
       action={

@@ -27,6 +27,7 @@ import { openInBrowser, showOpenDirectoriesDialog } from '../../utils/electron'
 import css from './SettingsDialog.module.css'
 import { Delete, Add } from '@material-ui/icons'
 import truncate from '../../utils/truncate'
+import { displayDictionaryType } from '../../selectors'
 
 enum $ {
   cancelButton = 'settings-dialog-cancel-button',
@@ -204,7 +205,10 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                         // disableRipple
                       />
                     </ListItemIcon>
-                    <ListItemText primary={file.name} />
+                    <ListItemText
+                      primary={`${displayDictionaryType(file.type)}`}
+                      secondary={file.name}
+                    />
                   </ListItem>
                 )
               })}

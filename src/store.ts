@@ -1,14 +1,10 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-import reducer from './reducers'
+import persistedReducer from './reducers'
 import epic from './epics'
-import {
-  resetFileAvailabilities,
-  listenForPersistedDataLogMessage,
-} from './utils/statePersistence'
+import { listenForPersistedDataLogMessage } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
-import { persistStore, persistReducer, createTransform } from 'redux-persist'
-import createElectronStorage from 'redux-persist-electron-storage'
+import { persistStore } from 'redux-persist'
 import electron from 'electron'
 import { readFileSync } from 'fs-extra'
 
@@ -19,24 +15,6 @@ if (process.env.REACT_APP_SPECTRON)
         readFileSync(electron.remote.process.env.PERSISTED_STATE_PATH, 'utf8')
       )
     : undefined
-
-const transform = createTransform(
-  (inbound: FileAvailabilitiesState) => inbound,
-  (outbound: FileAvailabilitiesState) => resetFileAvailabilities(outbound),
-  {
-    whitelist: ['fileAvailabilities'],
-  }
-)
-
-const persistedReducer = persistReducer(
-  {
-    key: 'root',
-    storage: createElectronStorage(),
-    transforms: [transform],
-    whitelist: ['fileAvailabilities', 'settings'],
-  },
-  reducer
-)
 
 const getDevToolsCompose = () => {
   const devToolsCompose = ((window as unknown) as {
@@ -79,6 +57,6 @@ export { persistor }
 if (module.hot) {
   // @ts-ignore
   module.hot.accept('./reducers', () => {
-    store.replaceReducer(reducer)
+    store.replaceReducer(persistedReducer)
   })
 }

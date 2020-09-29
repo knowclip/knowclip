@@ -2,6 +2,7 @@ declare type SnackbarData = {
   type: 'SimpleMessage'
   props: {
     message: string
+    autoHideDuration?: number | null
   }
 }
 

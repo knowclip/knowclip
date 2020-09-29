@@ -22,6 +22,7 @@ declare type KnownFile =
 declare type PreviouslyLoadedFile = {
   id: FileId
   parentId: FileId | null
+  /** deprecated */
   name: string
   /** A file that was successfully opened
    * previously to this session.
@@ -39,6 +40,7 @@ declare type PreviouslyLoadedFile = {
 declare type CurrentlyLoadedFile = {
   id: FileId
   parentId: FileId | null
+  /** deprecated */
   name: string
   /** A file that was successfully opened
    * this session.
@@ -56,6 +58,7 @@ declare type CurrentlyLoadedFile = {
 declare type ErroredFile = {
   id: FileId
   parentId: FileId | null
+  /** deprecated */
   name: string
   /** A file that has failed to open at the most
    * recent attempt during this session or before.
@@ -75,6 +78,7 @@ declare type ErroredFile = {
 declare type NeverLoadedFile = {
   id: FileId
   parentId: FileId | null
+  /** deprecated */
   name: string
   /** Stored in state but was never loaded.
    * From a project file that was opened
@@ -93,6 +97,7 @@ declare type NeverLoadedFile = {
 declare type PendingDeletionFile = {
   id: FileId
   parentId: FileId | null
+  /** deprecated */
   name: string
   /** A file whose record is being kept
    * in case the user does not save the parent project
@@ -111,6 +116,7 @@ declare type PendingDeletionFile = {
 declare type NotFoundFile = {
   id: FileId
   parentId: FileId | null
+  /** deprecated */
   name: string
   /** Not stored in state tree.
    * This is a placeholder value

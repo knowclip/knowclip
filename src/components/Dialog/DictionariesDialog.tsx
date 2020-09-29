@@ -2,10 +2,8 @@
 // parse fails after "CC" in onomappu video
 
 import React, {
-  ReactChildren,
   ReactNode,
   useCallback,
-  useEffect,
   useState,
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,51 +14,37 @@ import {
   DialogActions,
   DialogContent,
   IconButton,
-  Menu,
+  List,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
   MenuItem,
   Select,
-  TextField,
 } from '@material-ui/core'
 import { DialogProps } from './DialogProps'
-import { closeDialog } from '../../actions'
 import * as r from '../../redux'
-import { Add, Delete } from '@material-ui/icons'
+import { Delete } from '@material-ui/icons'
 import { dictionaryTypes, displayDictionaryType } from '../../redux'
-import { openInBrowser, showOpenDialog } from '../../utils/electron'
-import { getFileFilters } from '../../utils/files'
-import { basename } from 'path'
-import uuid from 'uuid'
+import { openInBrowser } from '../../utils/electron'
 
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
   const close = useCallback(() => dispatch(r.closeDialog()), [])
-  const { dictionaryFiles, workIsUnsaved } = useSelector((state: AppState) => ({
+  const { dictionaryFiles, progress } = useSelector((state: AppState) => ({
     dictionaryFiles: r.getOpenDictionaryFiles(state),
-    workIsUnsaved: r.isWorkUnsaved(state),
+    progress: state.session.progress,
   }))
 
-  const [
-    loadingNewDictionary,
-    setLoadingNewDictionary,
-  ] = useState<DictionaryFile | null>(null)
-  const isLoading = Boolean(loadingNewDictionary)
+  const isLoading = Boolean(progress)
 
-  useEffect(
-    () => {
-      loadingNewDictionaryEffect(
-        loadingNewDictionary,
-        dictionaryFiles,
-        setLoadingNewDictionary
-      )
-    },
-    [loadingNewDictionary, dictionaryFiles]
-  )
 
   const onClickDelete = useCallback((type: DictionaryFileType, id: string) => {
     dispatch(
       r.confirmationDialog(
         `This action may take a few minutes to complete. Are you sure you want to delete this dictionary data at this moment?`,
-        r.deleteFileRequest(type, id)
+        r.deleteFileRequest(type, id),
+        null,
+        true
       )
     )
   }, [])
@@ -77,109 +61,87 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
             'Please select the type of dictionary you wish to import.'
           )
         )
-      showOpenDialog(getFileFilters(newDictionaryType)).then(files => {
-        if (!files) return
-
-        const [filePath] = files
-        if (workIsUnsaved)
-          dispatch(
-            r.simpleMessageSnackbar(
-              `Please save your work before trying to import a dictionary.`
-            )
-          )
-        else {
-          const indexedIds = dictionaryFiles.map(d => +d.file.id)
-          let newIndexedId: number = Math.floor(Math.random() * 10000)
-          while (indexedIds.includes(newIndexedId)) {
-            newIndexedId = Math.floor(Math.random() * 10000)
-          }
-
-          const newFile: DictionaryFile = {
-            type: newDictionaryType,
-            name: basename(filePath),
-            id: String(newIndexedId),
-          }
-          console.log({ newFile })
-          setLoadingNewDictionary(newFile)
-          dispatch(r.openFileRequest(newFile, filePath))
-        }
-      })
+      dispatch(r.importDictionaryRequest(newDictionaryType))
     },
-    [newDictionaryType, workIsUnsaved, dictionaryFiles]
+    [newDictionaryType, dictionaryFiles]
   )
 
   return (
     <Dialog open={open}>
       <DialogContent>
-        {isLoading && (
-          <>
-            <p>Please wait a moment while your dictionary loads.</p>
+        <div style={{ minWidth: '500px' }}>
+          {isLoading && (
+            <>
+              <p>Please wait a moment while your dictionary loads.</p>
 
-            <p>This should take just a couple minutes.</p>
+              <p>This should take just a couple minutes.</p>
 
-            <section style={{ textAlign: 'center' }}>
-              <CircularProgress />
-            </section>
+              <section style={{ textAlign: 'center' }}>
+                <CircularProgress />
+              </section>
 
-            <p>
-              After this import is finished, the dictionary will be available
-              instantly after you open up Knowclip.
-            </p>
-          </>
-        )}
-        {!isLoading && (
-          <>
-            <h3>Add/remove dictionaries</h3>
-            {!dictionaryFiles.length && (
-              <p>You haven't added any dictionaries yet.</p>
-            )}
-            {dictionaryFiles.map(({ file, availability }) => {
-              return (
-                <DictionaryFileItem
-                  {...{ availability, file, onClickDelete }}
-                />
-              )
-            })}
-
-            <p>
-              <Select
-                displayEmpty
-                onChange={event => {
-                  setNewDictionaryType(event.target.value as any)
-                }}
-                value={newDictionaryType}
-              >
-                <MenuItem value={''}>Add a new dictionary of type:</MenuItem>
-                {dictionaryTypes.map(type => {
+              <p>
+                After this import is finished, the dictionary will be available
+                instantly after you open up Knowclip.
+              </p>
+            </>
+          )}
+          {!isLoading && (
+            <>
+              <h3>Add/remove dictionaries</h3>
+              {!dictionaryFiles.length && (
+                <p>You haven't added any dictionaries yet.</p>
+              )}
+              <List>
+                {dictionaryFiles.map(({ file, availability }) => {
                   return (
-                    <MenuItem key={type} value={type}>
-                      {displayDictionaryType(type)}
-                    </MenuItem>
+                    <DictionaryFileItem
+                      {...{ availability, file, onClickDelete }}
+                    />
                   )
                 })}
-              </Select>
-            </p>
+              </List>
 
-            {newDictionaryType && (
-              <>
-                <DictionaryInstructions
-                  {...{
-                    dictionaryType: newDictionaryType as DictionaryFileType,
-                    button: (
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        onClick={handleClickImportDictionaryFile}
-                      >
-                        Import dictionary .zip file
-                      </Button>
-                    ),
+              <p>
+                <Select
+                  displayEmpty
+                  onChange={event => {
+                    setNewDictionaryType(event.target.value as any)
                   }}
-                />
-              </>
-            )}
-          </>
-        )}
+                  value={newDictionaryType}
+                >
+                  <MenuItem value={''}>Add a new dictionary of type:</MenuItem>
+                  {dictionaryTypes.map(type => {
+                    return (
+                      <MenuItem key={type} value={type}>
+                        {displayDictionaryType(type)}
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              </p>
+
+              {newDictionaryType && (
+                <>
+                  <DictionaryInstructions
+                    {...{
+                      dictionaryType: newDictionaryType as DictionaryFileType,
+                      button: (
+                        <Button
+                          color="primary"
+                          variant="contained"
+                          onClick={handleClickImportDictionaryFile}
+                        >
+                          Import dictionary .zip file
+                        </Button>
+                      ),
+                    }}
+                  />
+                </>
+              )}
+            </>
+          )}
+        </div>
       </DialogContent>
       {/* TODO: DELETE ALL BUTTON */}
       <DialogActions>
@@ -189,39 +151,6 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   )
 }
 export default DictionariesDialog
-
-function loadingNewDictionaryEffect(
-  loadingNewDictionary:
-    | YomichanDictionary
-    | CEDictDictionary
-    | DictCCDictionary
-    | null,
-  dictionaryFiles: { file: DictionaryFile; availability: FileAvailability }[],
-  setLoadingNewDictionary: React.Dispatch<
-    React.SetStateAction<
-      YomichanDictionary | CEDictDictionary | DictCCDictionary | null
-    >
-  >
-) {
-  //TODO: optional chaining after prettier update
-  const justFinishedLoadingDictionary =
-    loadingNewDictionary &&
-    (
-      (dictionaryFiles.find(
-        f => f.availability.id === loadingNewDictionary.id
-      ) as any) || {}
-    ).file.id === loadingNewDictionary.id &&
-    ['FAILED_TO_LOAD', 'CURRENTLY_LOADED'].includes(
-      (
-        (dictionaryFiles.find(
-          f => f.availability.id === loadingNewDictionary.id
-        ) as any) || {}
-      ).availability.status || ''
-    )
-  if (justFinishedLoadingDictionary) {
-    setLoadingNewDictionary(null)
-  }
-}
 
 function DictionaryFileItem({
   availability,
@@ -237,19 +166,18 @@ function DictionaryFileItem({
     [availability.id]
   )
   return (
-    <div key={availability.id}>
-      <h4>
-        {displayDictionaryType(file.type)} - {file.name}
-      </h4>
-      <TextField
-        label="File location"
-        value={availability.filePath}
-        style={{ width: 'calc(100% - 4em)' }}
+    <ListItem key={availability.id} value={file.id}>
+      <ListItemText
+        primary={`${displayDictionaryType(file.type)}`}
+        secondary={file.name}
+        title={availability.filePath || ''}
       />
-      <IconButton onClick={handleClickDelete}>
-        <Delete />
-      </IconButton>
-    </div>
+      <ListItemSecondaryAction>
+        <IconButton onClick={handleClickDelete}>
+          <Delete />
+        </IconButton>
+      </ListItemSecondaryAction>
+    </ListItem>
   )
 }
 
@@ -274,22 +202,26 @@ export function DictionaryInstructions({
             The wonderful online German dictionary dict.cc makes their entire
             dictionary available for free on their web site.
           </p>
+          <h3 style={{ textAlign: 'center' }}>Step 1:</h3>
           <p>
-            Download link:{' '}
+            Open this link in your internet browser and follow the download
+            instructions:{' '}
             <a onClick={openInBrowser} href={DICT_CC_DOWNLOAD_URL}>
               {DICT_CC_DOWNLOAD_URL}
             </a>
           </p>
           <p>
             After providing an e-mail address, you'll receive instructions on
-            how to proceed to downloading the.ZIP file.
+            how to proceed to downloading the .ZIP file.{' '}
             <strong>Remember what folder you download it into!</strong>
           </p>
+
+          <h3 style={{ textAlign: 'center' }}>Step 2:</h3>
           <p>
             Once you've received the ZIP file, you may push the button below to
             import it into Knowclip.
           </p>
-          <p style={{ textAlign: 'center' }}>{button}</p>
+          <section style={{ textAlign: 'center' }}>{button}</section>
         </>
       )
     case 'YomichanDictionary':
@@ -300,29 +232,31 @@ export function DictionaryInstructions({
             Japanese-English dictionary, which you may have already downloaded
             with the popular Chrome extension.
           </p>
+          <h3 style={{ textAlign: 'center' }}>Step 1:</h3>
           <p>
-            Japanese-English download link:
+            Download the Japanese-English dictionary from this link:
             <br />
             <a onClick={openInBrowser} href={YOMICHAN_JMDICT_DOWNLOAD_URL}>
               {YOMICHAN_JMDICT_DOWNLOAD_URL}
             </a>
+            <p>
+              For other languages than English, you may try using any of the{' '}
+              <strong>JMDict</strong> files from the Yomichan site, but these
+              haven't been tested with Knowclip.
+            </p>
+            <p>
+              Japanese - Other languages download link:{' '}
+              <a onClick={openInBrowser} href={YOMICHAN_SITE_URL}>
+                {YOMICHAN_JMDICT_DOWNLOAD_URL}
+              </a>
+            </p>
           </p>
+          <h3 style={{ textAlign: 'center' }}>Step 2:</h3>
           <p>
-            Once the .ZIP file is finished downloading, press the IMPORT
-            DICTIONARY button and point to the file in your download folder.
+            Once the .ZIP file is finished downloading, press the button below
+            and point to the .ZIP file you just downloaded.
           </p>
-          <p style={{ textAlign: 'center' }}>{button}</p>
-          <p>
-            For other languages than English, you may try using any of the{' '}
-            <strong>JMDict</strong> files from the Yomichan site, but these
-            haven't been tested with Knowclip.
-          </p>
-          <p>
-            Japanese-Other download link:{' '}
-            <a onClick={openInBrowser} href={YOMICHAN_SITE_URL}>
-              {YOMICHAN_JMDICT_DOWNLOAD_URL}
-            </a>
-          </p>
+          <section style={{ textAlign: 'center' }}>{button}</section>
         </>
       )
     case 'CEDictDictionary':
@@ -332,28 +266,34 @@ export function DictionaryInstructions({
             This Chinese-English dictionary data is a mirror of the data from
             the MDBG dictionary, used in popular apps like Pleco.
           </p>
-          <p>
-            Chinese-English download link:{' '}
+          <h3 style={{ textAlign: 'center' }}>Step 1:</h3>
+          <p style={{ textAlign: 'center' }}>
+            Download the Chinese-English dictionary from this link:
+            <br />
             <a onClick={openInBrowser} href={CEDICT_DOWNLOAD_URL}>
               {CEDICT_DOWNLOAD_URL}
             </a>
           </p>
+
           <p>
-            Once the .ZIP file is finished downloading, press the IMPORT
-            DICTIONARY button and point to the file in your download folder.
-          </p>
-          <p style={{ textAlign: 'center' }}>{button}</p>
-          <p>
-            The MDBG data is updated frequently, and you can get the latest
-            version of it here. Just be warned it may not have been tested with
+            The MDBG data is updated frequently. As an alternative to the link
+            about, you can get the latest version of the MDBG dictionary data at
+            the link below. Just be warned it may not have been tested with
             Knowclip.
           </p>
           <p>
-            Latest Chinese-English download link:{' '}
+            Latest Chinese - English download link:{' '}
             <a onClick={openInBrowser} href={CEDICT_SITE_URL}>
               {CEDICT_SITE_URL}
             </a>
           </p>
+
+          <h3 style={{ textAlign: 'center' }}>Step 2:</h3>
+          <p>
+            Once the .ZIP file is finished downloading, press the IMPORT
+            DICTIONARY button and point to the file in your download folder.
+          </p>
+          <section style={{ textAlign: 'center' }}>{button}</section>
         </>
       )
   }

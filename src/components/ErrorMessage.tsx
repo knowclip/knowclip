@@ -10,6 +10,8 @@ import {
 import { theme } from './App'
 
 const ErrorMessage = (error: any) => {
+  console.log(error)
+  console.error(error)
   return (
     <MuiThemeProvider theme={theme}>
       <Dialog open={true}>

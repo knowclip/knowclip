@@ -31,7 +31,9 @@ import loopMedia from './loopMedia'
 import preloadVideoStills from './preloadVideoStills'
 import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
+import dictionaries from './dictionaries'
 import { showMessageBox } from '../utils/electron'
+import { dictionaryWasNeverImported } from '../files/dictionaryFile'
 
 const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'app-close', async () => {
@@ -69,20 +71,39 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
         ...state$.value.fileAvailabilities.DictCCDictionary,
         ...state$.value.fileAvailabilities.CEDictDictionary,
       })
-      const openFileActions = dicts.flatMap(([id, fileAvailability]) => {
-        if (!fileAvailability) {
-          console.error('Problem initializing dictionaries')
-          return []
+      const openFileActions = dicts.flatMap(
+        ([id, fileAvailability]): Action[] => {
+          if (!fileAvailability) {
+            console.error('Problem initializing dictionaries')
+            return []
+          }
+          const file = r.getFile(
+            state$.value,
+            fileAvailability.type as DictionaryFileType,
+            id
+          )
+          if (!file) {
+            const snackbarAction: Action = r.simpleMessageSnackbar(
+              'There was a problem initializing dictionaries. Try restarting the app, or deleting the dictionaries database in the settings menu.'
+            )
+            return [snackbarAction]
+          }
+
+          const openFileRequest = r.openFileRequest(
+            file as DictionaryFile,
+            fileAvailability.filePath
+          )
+
+          return [
+            dictionaryWasNeverImported(state$.value, file as DictionaryFile)
+              ? r.confirmationDialog(
+                  `It appears a dictionary import process was recently interrupted. Would you like to resume your dictionary import? This may take a few minutes.`,
+                  openFileRequest
+                )
+              : openFileRequest,
+          ]
         }
-        const file = r.getFile(state$.value, fileAvailability.type, id) || {
-          type: fileAvailability.type as DictionaryFileType,
-          name: fileAvailability.name,
-          id: fileAvailability.id,
-        }
-        return [
-          r.openFileRequest(file as DictionaryFile, fileAvailability.filePath),
-        ]
-      })
+      )
       console.log({ openFileActions, dicts })
 
       return from(openFileActions)
@@ -120,7 +141,8 @@ const rootEpic: AppEpic = combineEpics(
   generateWaveformImages,
   menu,
   pauseOnBusy,
-  initializeDictionaries
+  initializeDictionaries,
+  dictionaries
 )
 
 export default rootEpic

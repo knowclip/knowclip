@@ -5,6 +5,7 @@ import {
   tap,
   flatMap,
   mergeAll,
+  take,
 } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, empty, of } from 'rxjs'
@@ -85,6 +86,7 @@ const startupCheckForUpdates: AppEpic = (
   { ipcRenderer, window }
 ) =>
   action$.ofType<any>(REHYDRATE).pipe(
+    take(1),
     flatMap(async () => {
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
       if (!checkAtStartup) return empty()

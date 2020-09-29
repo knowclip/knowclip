@@ -32,12 +32,8 @@ const fileFilters = {
   YomichanDictionary: [
     { name: 'Yomichan Japanese Dictionary file', extensions: ['zip'] },
   ],
-  DictCCDictionary: [
-    { name: 'Dict.cc Dictionary file', extensions: ['zip', 'txt'] },
-  ],
-  CEDictDictionary: [
-    { name: 'CEDict Dictionary file', extensions: ['zip', 'u8'] },
-  ],
+  DictCCDictionary: [{ name: 'Dict.cc Dictionary file', extensions: ['zip'] }],
+  CEDictDictionary: [{ name: 'CEDict Dictionary file', extensions: ['zip'] }],
 }
 
 export const getExtensions = (fileType: FileMetadata['type']) => {

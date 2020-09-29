@@ -101,7 +101,3 @@ export const preloadVideoStills = (
   clipId,
   file,
 })
-
-export const deleteDictionaryDatabase = (): DeleteDictionaryDatabase => ({
-  type: 'DELETE_DICTIONARY_DATABASE',
-})

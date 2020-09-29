@@ -8,6 +8,7 @@ import { remote, ipcRenderer } from 'electron'
 import { nowUtcTimestamp } from './utils/sideEffects'
 import { setAppMenuProjectSubmenuPermissions } from './utils/appMenu'
 import { getDexieDb } from './utils/dictionaryFiles'
+import * as electron from './utils/electron'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -77,6 +78,7 @@ const dependencies = {
   setAppMenuProjectSubmenuPermissions,
   nowUtcTimestamp,
   dexie: getDexieDb(),
+  electron,
 }
 
 export default dependencies
