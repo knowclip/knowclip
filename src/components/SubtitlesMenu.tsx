@@ -159,7 +159,7 @@ const EmbeddedTrackMenuItem = ({
   title,
 }: {
   id: string
-  file: VttConvertedSubtitlesFile & { parentType: 'MediaFile' } | null
+  file: (VttConvertedSubtitlesFile & { parentType: 'MediaFile' }) | null
   track: EmbeddedSubtitlesTrack | null
   title: string
 }) => {

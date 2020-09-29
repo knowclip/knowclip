@@ -95,7 +95,7 @@ const ClozeButton = ({
   index: number
   setClozeIndex: (index: number) => void
   setPreviewClozeIndex?: (index: number) => void
-  confirmSelection: ((clozeIndex: number, selection: ClozeRange) => void)
+  confirmSelection: (clozeIndex: number, selection: ClozeRange) => void
   getSelection: () => ClozeRange | null
   selection: MutableRefObject<ClozeRange | null>
 }) => {

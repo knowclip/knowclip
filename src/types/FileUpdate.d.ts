@@ -9,9 +9,9 @@ declare type FileUpdate<
     Parameters<import('../files/updates').FileUpdates[U]['update']>
   >
 }
-type Tail<T extends any[]> = ((...x: T) => void) extends ((
+type Tail<T extends any[]> = ((...x: T) => void) extends (
   h: infer A,
   ...t: infer R
-) => void)
+) => void
   ? R
   : never

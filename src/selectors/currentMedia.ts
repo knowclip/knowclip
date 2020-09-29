@@ -184,9 +184,9 @@ export const getNextClipId = (state: AppState, id: ClipId): ClipId | null => {
   return clipsOrder[clipsOrder.indexOf(id) + 1]
 }
 
-export const getCurrentFileClips: ((
+export const getCurrentFileClips: (
   state: AppState
-) => Array<Clip>) = createSelector(
+) => Array<Clip> = createSelector(
   getCurrentFileClipsOrder,
   getClipsObject,
   getClipsByIds

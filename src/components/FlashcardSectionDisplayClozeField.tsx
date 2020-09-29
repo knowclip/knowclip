@@ -45,7 +45,7 @@ const ClozeField = ({
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
   value: string
-  onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
+  onDoubleClick?: (fieldName: FlashcardFieldName) => void
   clozeControls: ClozeControls
 }) => {
   // if dictionary file present
@@ -286,7 +286,7 @@ const ClozeField = ({
               )
             )
           }
-          
+
           console.log({ tokenHit })
           if (tokens.length && tokenHit && tokenHit.token) {
             setSelectionRange(
