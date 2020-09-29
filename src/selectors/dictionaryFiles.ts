@@ -37,7 +37,7 @@ export const displayDictionaryType = (dictionaryType: DictionaryFileType) => {
     case 'YomichanDictionary':
       return 'Japanese - Yomichan JMDict'
     case 'CEDictDictionary':
-      return 'Mandarin Chinese MDBG CEDict'
+      return 'Mandarin Chinese - MDBG CEDict'
   }
 }
 

@@ -73,8 +73,11 @@ export const locateFileSuccess = (
   filePath,
 })
 
-export const commitFileDeletions = (): CommitFileDeletions => ({
+export const commitFileDeletions = (
+  fileType?: FileMetadata['type']
+): CommitFileDeletions => ({
   type: A.COMMIT_FILE_DELETIONS,
+  fileType,
 })
 
 export const abortFileDeletions = (): AbortFileDeletions => ({
@@ -97,4 +100,8 @@ export const preloadVideoStills = (
   type: A.PRELOAD_VIDEO_STILLS,
   clipId,
   file,
+})
+
+export const deleteDictionaryDatabase = (): DeleteDictionaryDatabase => ({
+  type: 'DELETE_DICTIONARY_DATABASE',
 })

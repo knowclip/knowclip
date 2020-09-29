@@ -1,12 +1,8 @@
-import Dexie from 'dexie'
-import { LexiconMainEntry } from '../files/dictionaryFile'
+import Dexie, { Database } from 'dexie'
+import { getTableName, LexiconMainEntry } from '../files/dictionaryFile'
 import yomichanLemmatization from './yomichanLemmatization.json'
 
 const LATEST_DEXIE_DB_VERSION = 1
-
-const YOMICHAN_DB_NAME = 'YomichanJMDict'
-const CEDICT_DB_NAME = 'CEDict'
-const DICT_CC_NAME = 'DictCC'
 
 let db: Dexie
 
@@ -14,7 +10,9 @@ export function getDexieDb() {
   db = new Dexie('DictionaryEntries')
 
   db.version(LATEST_DEXIE_DB_VERSION).stores({
-    entries: '++id, head, pronunciation, dictionaryId',
+    YomichanDictionary: '++id, head, pronunciation, dictionaryId',
+    CEDictDictionary: '++id, head, pronunciation, dictionaryId',
+    DictCCDictionary: '++id, head, pronunciation, dictionaryId',
   })
 
   return db
@@ -45,7 +43,7 @@ export async function lookUpJapanese(
             ? [token, ...potentialBases]
             : [token]
           const query: LexiconMainEntry[] = await db
-            .table('entries')
+            .table(getTableName('YomichanDictionary'))
             .where('head')
             .anyOfIgnoreCase(lookupTokens)
             .or('pronunciation')
@@ -123,4 +121,21 @@ function lemmatize(text: string) {
       candidates.push(text.replace(new RegExp(`${kanaIn}$`), kanaOut))
   }
   return candidates
+}
+
+export async function deleteDictionary(
+  db: Database,
+  allDictionaries: DictionaryFile[],
+  id: number,
+  type: DictionaryFileType
+) {
+  const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
+  if (allDictionariesOfType.length === 1)
+    return await db.table(getTableName(type)).clear()
+
+  return await db
+    .table(getTableName(type))
+    .where('dictionaryId')
+    .equals(id)
+    .delete()
 }

@@ -237,6 +237,7 @@ export default function useClozeControls({
       ]
     ),
     onBackspace: useCallback(
+      // TODO: fix cloze trim behavior
       selection => {
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end && selection.start !== 0) {

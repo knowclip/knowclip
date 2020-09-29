@@ -274,10 +274,19 @@ const ClozeField = ({
         const dKey =
           (ref.current && e.key === KEYS.dLowercase) ||
           e.key === KEYS.dUppercase
+
         if (
           dKey &&
           (!isTextFieldFocused() || ref.current === document.activeElement)
         ) {
+          if (!doParseJapanese) {
+            return dispatch(
+              r.simpleMessageSnackbar(
+                'You need to select a dictionary in your settings first.'
+              )
+            )
+          }
+          
           console.log({ tokenHit })
           if (tokens.length && tokenHit && tokenHit.token) {
             setSelectionRange(

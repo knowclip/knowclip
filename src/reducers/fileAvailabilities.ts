@@ -169,9 +169,11 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
 
     case A.COMMIT_FILE_DELETIONS: {
-      const newState = {} as typeof state
+      const newState = { ...state }
 
-      for (const t in state) {
+      for (const t of 'fileType' in action
+        ? [action.fileType]
+        : Object.keys(state)) {
         const type: keyof typeof state = t as any
         const files = state[type]
 

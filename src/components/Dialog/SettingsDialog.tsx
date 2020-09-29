@@ -17,7 +17,6 @@ import {
   ListItemIcon,
   FormControlLabel,
   Checkbox,
-  MenuList,
 } from '@material-ui/core'
 import * as actions from '../../actions'
 import * as selectors from '../../selectors'
@@ -183,6 +182,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
               )}
               {dictionaryFiles.map(({ file, availability }) => {
                 const activeDictionaries = settings.activeDictionaries || []
+                console.log({ activeDictionaries, settings })
                 const selected =
                   Boolean(activeDictionaries) &&
                   activeDictionaries.some(
@@ -196,16 +196,9 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                         tabIndex={-1}
                         onChange={e =>
                           dispatchLocal(
-                            actions.overrideSettings({
-                              activeDictionaries: selected
-                                ? activeDictionaries.filter(
-                                    ({ id }) => id !== file.id
-                                  )
-                                : [
-                                    ...activeDictionaries,
-                                    { id: file.id, type: file.type },
-                                  ],
-                            })
+                            selected
+                              ? actions.removeActiveDictionary(file.id)
+                              : actions.addActiveDictionary(file.id, file.type)
                           )
                         }
                         // disableRipple

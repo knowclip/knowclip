@@ -1,7 +1,11 @@
-import React, { ReactChildren, ReactNode, useCallback, useState } from 'react'
+// dictionaries wont get deleted after close app
+// parse fails after "CC" in onomappu video
+
+import React, { ReactChildren, ReactNode, useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -24,12 +28,28 @@ import uuid from 'uuid'
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
   const close = useCallback(() => dispatch(r.closeDialog()), [])
-  const { dictionaryFiles } = useSelector((state: AppState) => ({
+  const { dictionaryFiles, workIsUnsaved } = useSelector((state: AppState) => ({
     dictionaryFiles: r.getOpenDictionaryFiles(state),
+    workIsUnsaved: r.isWorkUnsaved(state),
   }))
+
+  const [loadingNewDictionary, setLoadingNewDictionary] = useState<DictionaryFile | null>(null)
+  const isLoading = Boolean(loadingNewDictionary)
+
+  useEffect(() => {
+    const justFinishedLoadingDictionary = loadingNewDictionary
+      && dictionaryFiles.find(f => f.availability.id === loadingNewDictionary.id)?.file.id === loadingNewDictionary.id
+      && ["FAILED_TO_LOAD", "CURRENTLY_LOADED"].includes(dictionaryFiles.find(f => f.availability.id === loadingNewDictionary.id)?.availability.status || '')
+    if (justFinishedLoadingDictionary) {
+      setLoadingNewDictionary(null)
+    }
+  }, [loadingNewDictionary, dictionaryFiles])
+
+
   const onClickDelete = useCallback(
-    (type: DictionaryFileType, id: string) =>
-      dispatch(r.deleteFileRequest(type, id)),
+    (type: DictionaryFileType, id: string) => {
+      dispatch(r.confirmationDialog(`This action may take a few minutes to complete. Are you sure you want to delete this dictionary data at this moment?`, r.deleteFileRequest(type, id)))
+    },
     []
   )
 
@@ -49,24 +69,59 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
         if (!files) return
 
         const [filePath] = files
-        dispatch(
-          r.openFileRequest(
-            {
+        if (workIsUnsaved)
+          dispatch(
+            r.simpleMessageSnackbar(`Please save your work before trying to import a dictionary.`)
+          )
+          else {
+            const indexedIds = dictionaryFiles.map(d => +d.file.id)
+            let newIndexedId: number = Math.floor(Math.random() * 10000)
+            while (indexedIds.includes(newIndexedId)) {
+              newIndexedId =  Math.floor(Math.random() * 10000)
+            }
+
+
+            const newFile: DictionaryFile = {
               type: newDictionaryType,
               name: basename(filePath),
-              id: uuid(),
-            },
-            filePath
-          )
-        )
-      })
+              id: String(newIndexedId)
+            }
+            console.log({ newFile })
+            setLoadingNewDictionary(newFile)
+            dispatch(
+              r.openFileRequest(
+                newFile,
+                filePath
+              )
+            )
+          }
+        })
     },
-    [newDictionaryType]
+    [newDictionaryType, workIsUnsaved, dictionaryFiles]
   )
 
   return (
     <Dialog open={open}>
       <DialogContent>
+        {isLoading && 
+        <>
+        <p>
+          Please wait a moment while your dictionary loads.
+        </p>
+
+        <p>This should take just a couple minutes.</p>
+        
+        <section style={{ textAlign: 'center' }}>
+          <CircularProgress />
+        </section>
+
+        <p>
+          After this import is finished, the dictionary will be available instantly
+          after you open up Knowclip.
+        </p>
+        </>
+        }
+      {!isLoading && <>
         <h3>Add/remove dictionaries</h3>
         {!dictionaryFiles.length && (
           <p>You haven't added any dictionaries yet.</p>
@@ -77,22 +132,24 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
           )
         })}
 
-        <Select
-          displayEmpty
-          onChange={event => {
-            setNewDictionaryType(event.target.value as any)
-          }}
-          value={newDictionaryType}
-        >
-          <MenuItem value={''}>What kind of new dictionary to add?</MenuItem>
-          {dictionaryTypes.map(type => {
-            return (
-              <MenuItem key={type} value={type}>
-                {displayDictionaryType(type)}
-              </MenuItem>
-            )
-          })}
-        </Select>
+        <p>
+          <Select
+            displayEmpty
+            onChange={event => {
+              setNewDictionaryType(event.target.value as any)
+            }}
+            value={newDictionaryType}
+          >
+            <MenuItem value={''}>Add a new dictionary of type:</MenuItem>
+            {dictionaryTypes.map(type => {
+              return (
+                <MenuItem key={type} value={type}>
+                  {displayDictionaryType(type)}
+                </MenuItem>
+              )
+            })}
+          </Select>
+        </p>
 
         {newDictionaryType && (
           <>
@@ -112,9 +169,13 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
             />
           </>
         )}
+        </>}
       </DialogContent>
+      {/* TODO: DELETE ALL BUTTON */}
       <DialogActions>
-        <Button onClick={close}>Close</Button>
+        {!isLoading
+          && <Button onClick={close}>Close</Button>
+        }
       </DialogActions>
     </Dialog>
   )
@@ -128,7 +189,7 @@ function DictionaryFileItem({
 }: {
   availability: FileAvailability
   file: DictionaryFile
-  onClickDelete: (type: DictionaryFileType, id: string) => DeleteFileRequest
+  onClickDelete: (type: DictionaryFileType, id: string) => void
 }) {
   const handleClickDelete = useCallback(
     () => onClickDelete(file.type, availability.id),

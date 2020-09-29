@@ -6,7 +6,7 @@ import {
 import { FileEventHandlers } from './eventHandlers'
 import { extname } from 'path'
 
-const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
+const isVtt = (filePath: FilePath) => extname(filePath).toLowerCase() === '.vtt'
 
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {

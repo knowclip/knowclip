@@ -79,7 +79,9 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
           name: fileAvailability.name,
           id: fileAvailability.id,
         }
-        return [r.openFileRequest(file, fileAvailability.filePath)]
+        return [
+          r.openFileRequest(file as DictionaryFile, fileAvailability.filePath),
+        ]
       })
       console.log({ openFileActions, dicts })
 

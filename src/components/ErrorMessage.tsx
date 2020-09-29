@@ -20,7 +20,13 @@ const ErrorMessage = (error: any) => {
               <summary>Details</summary>
               <pre>
                 {String(error) === '[object Object]'
-                  ? JSON.stringify(error, null, 2)
+                  ? JSON.stringify(
+                      {
+                        message: error.message,
+                      },
+                      null,
+                      2
+                    )
                   : String(error)}
               </pre>
             </details>

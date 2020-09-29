@@ -31,3 +31,17 @@ export const overrideSettings = (
   type: A.OVERRIDE_SETTINGS,
   settings,
 })
+
+export const addActiveDictionary = (
+  id: string,
+  dictionaryType: DictionaryFileType
+): AddActiveDictionary => ({
+  type: A.ADD_ACTIVE_DICTIONARY,
+  id,
+  dictionaryType,
+})
+
+export const removeActiveDictionary = (id: string): RemoveActiveDictionary => ({
+  type: A.REMOVE_ACTIVE_DICTIONARY,
+  id,
+})

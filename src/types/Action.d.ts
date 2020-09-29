@@ -285,6 +285,8 @@ declare type SettingsAction =
   | RemoveAssetsDirectories
   | SetCheckForUpdatesAutomatically
   | OverrideSettings
+  | AddActiveDictionary
+  | RemoveActiveDictionary
 
 declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
@@ -305,6 +307,15 @@ declare type SetCheckForUpdatesAutomatically = {
 declare type OverrideSettings = {
   type: 'OVERRIDE_SETTINGS'
   settings: PartialSettings<SettingsState>
+}
+declare type AddActiveDictionary = {
+  type: 'ADD_ACTIVE_DICTIONARY'
+  id: FileId
+  dictionaryType: DictionaryFileType
+}
+declare type RemoveActiveDictionary = {
+  type: 'REMOVE_ACTIVE_DICTIONARY'
+  id: FileId
 }
 
 declare type DismissMedia = { type: 'DISMISS_MEDIA' }
@@ -380,8 +391,9 @@ declare type FileAction =
   | LocateFileSuccess
   | CommitFileDeletions
   | AbortFileDeletions
-  | PreloadVideoStills
   | UpdateFile
+  | PreloadVideoStills
+  | DeleteDictionaryDatabase
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -399,6 +411,7 @@ declare type DeleteFileSuccess = {
 }
 declare type CommitFileDeletions = {
   type: 'COMMIT_FILE_DELETIONS'
+  fileType?: FileMetadata['type']
 }
 declare type AbortFileDeletions = {
   type: 'ABORT_FILE_DELETIONS'
@@ -450,6 +463,10 @@ declare type PreloadVideoStills = {
   type: 'PRELOAD_VIDEO_STILLS'
   file: FileMetadata
   clipId: ClipId
+}
+
+declare type DeleteDictionaryDatabase = {
+  type: 'DELETE_DICTIONARY_DATABASE'
 }
 
 interface WithRecordType<F extends FileMetadata> {
