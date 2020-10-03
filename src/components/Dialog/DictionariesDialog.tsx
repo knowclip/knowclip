@@ -1,11 +1,7 @@
 // dictionaries wont get deleted after close app
 // parse fails after "CC" in onomappu video
 
-import React, {
-  ReactNode,
-  useCallback,
-  useState,
-} from 'react'
+import React, { ReactNode, useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
@@ -37,7 +33,6 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
 
   const isLoading = Boolean(progress)
 
-
   const onClickDelete = useCallback((type: DictionaryFileType, id: string) => {
     dispatch(
       r.confirmationDialog(
@@ -61,7 +56,14 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
             'Please select the type of dictionary you wish to import.'
           )
         )
-      dispatch(r.importDictionaryRequest(newDictionaryType))
+      dispatch(
+        r.confirmationDialog(
+          `Are you sure you want to import this dictionary right now? This could take a while.`,
+          r.importDictionaryRequest(newDictionaryType),
+          null,
+          true
+        )
+      )
     },
     [newDictionaryType, dictionaryFiles]
   )
@@ -74,7 +76,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
             <>
               <p>Please wait a moment while your dictionary loads.</p>
 
-              <p>This should take just a couple minutes.</p>
+              <p>This can take several minutes or longer on some computers.</p>
 
               <section style={{ textAlign: 'center' }}>
                 <CircularProgress />
@@ -82,7 +84,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
 
               <p>
                 After this import is finished, the dictionary will be available
-                instantly after you open up Knowclip.
+                instantly each time you open up Knowclip.
               </p>
             </>
           )}
@@ -239,17 +241,22 @@ export function DictionaryInstructions({
             <a onClick={openInBrowser} href={YOMICHAN_JMDICT_DOWNLOAD_URL}>
               {YOMICHAN_JMDICT_DOWNLOAD_URL}
             </a>
-            <p>
-              For other languages than English, you may try using any of the{' '}
-              <strong>JMDict</strong> files from the Yomichan site, but these
-              haven't been tested with Knowclip.
-            </p>
-            <p>
-              Japanese - Other languages download link:{' '}
-              <a onClick={openInBrowser} href={YOMICHAN_SITE_URL}>
-                {YOMICHAN_JMDICT_DOWNLOAD_URL}
-              </a>
-            </p>
+            <details>
+              <summary>Other languages (experimental)</summary>
+              <section>
+                <p>
+                  For other languages than English, you may try using any of the{' '}
+                  <strong>JMDict</strong> files from the Yomichan site, but
+                  these haven't been tested with Knowclip.
+                </p>
+                <p>
+                  Japanese - Other languages download link:{' '}
+                  <a onClick={openInBrowser} href={YOMICHAN_SITE_URL}>
+                    {YOMICHAN_SITE_URL}
+                  </a>
+                </p>
+              </section>
+            </details>
           </p>
           <h3 style={{ textAlign: 'center' }}>Step 2:</h3>
           <p>

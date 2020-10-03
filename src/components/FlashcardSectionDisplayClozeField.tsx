@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
   KeyboardEventHandler,
+  memo,
 } from 'react'
 import os from 'os'
 import cn from 'classnames'
@@ -20,7 +21,11 @@ import {
 } from '../utils/useClozeUi'
 import * as r from '../redux'
 import { KeyId, KEYS } from '../utils/keyboard'
-import { lookUpJapanese, TokenTranslations } from '../utils/dictionaryFiles'
+import {
+  lookUpInDictionary,
+  lookUpJapanese,
+  TokenTranslations,
+} from '../utils/dictionariesDatabase'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
 
 const ClozeField = ({
@@ -127,12 +132,9 @@ const ClozeField = ({
     [ref]
   )
 
-  const activeDictionaries = useSelector((state: AppState) =>
-    r.getActiveDictionaries(state)
-  )
-  const doParseJapanese = activeDictionaries.some(
-    dict => dict.type === 'YomichanDictionary'
-  )
+  const { activeDictionaryType } = useSelector((state: AppState) => ({
+    activeDictionaryType: r.getActiveDictionaryType(state),
+  }))
 
   const [tokens, setTokens] = useState<TokenTranslations[]>([])
   const [tokenHit, setTokenHit] = useState<ReturnType<typeof findTokenHit>>(
@@ -141,29 +143,31 @@ const ClozeField = ({
 
   useEffect(
     () => {
-      console.log({ doParseJapanese })
-      if (doParseJapanese) {
-        lookUpJapanese(value).then(tokensTranslations => {
-          console.log('new value lookup done!', { tokensTranslations })
-          setTokens(tokensTranslations)
-        })
+      if (activeDictionaryType) {
+        lookUpInDictionary(activeDictionaryType, value).then(
+          tokensTranslations => {
+            console.log('new value lookup done!', { tokensTranslations })
+            setTokens(tokensTranslations)
+          }
+        )
       } else {
         console.log('not parsing anymore!')
         setTokens([])
       }
     },
-    [value, doParseJapanese]
+    [value, activeDictionaryType]
   )
 
   const handleCharMouseEnter_ = useCallback(
     (characterIndex: number) => {
       console.log('characterIndex', characterIndex, { tokens })
+      // maybe shoudl store index in tokenhit structure so we don't perform extra findTokenHit here
       const tokenHit = findTokenHit(tokens, characterIndex)
       setTokenHit(tokenHit)
     },
     [tokens]
   )
-  const handleCharMouseEnter = doParseJapanese
+  const handleCharMouseEnter = activeDictionaryType
     ? handleCharMouseEnter_
     : undefined
   const handleMouseLeave = useCallback(() => setTokenHit(null), [])
@@ -260,8 +264,8 @@ const ClozeField = ({
       value,
       viewMode,
       cursorPosition,
-      handleCharMouseEnter_,
-      doParseJapanese,
+      handleCharMouseEnter,
+      activeDictionaryType,
       tokens,
     ]
   )
@@ -272,17 +276,17 @@ const ClozeField = ({
     () => {
       const showDictionaryPopup = (e: KeyboardEvent) => {
         const dKey =
-          (ref.current && e.key === KEYS.dLowercase) ||
-          e.key === KEYS.dUppercase
+          ref.current &&
+          (e.key === KEYS.dLowercase || e.key === KEYS.dUppercase)
 
         if (
           dKey &&
           (!isTextFieldFocused() || ref.current === document.activeElement)
         ) {
-          if (!doParseJapanese) {
+          if (!activeDictionaryType) {
             return dispatch(
               r.simpleMessageSnackbar(
-                'You need to select a dictionary in your settings first.'
+                'Select a dictionary in settings menu to enable word lookup.'
               )
             )
           }
@@ -300,7 +304,12 @@ const ClozeField = ({
       document.addEventListener('keydown', showDictionaryPopup)
       return () => document.removeEventListener('keydown', showDictionaryPopup)
     },
-    [tokenHit]
+    [
+      activeDictionaryType,
+      tokenHit && tokenHit.token,
+      tokenHit && tokenHit.translations.index,
+      tokens.length,
+    ]
   )
 
   const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = useCallback(
@@ -515,47 +524,51 @@ export const ClozeHues = {
   c10: 271,
 }
 
-function CharSpan({
-  char,
-  index,
-  className,
-  clozeIndex,
-  newlineChar,
-  hasCursor,
-  onMouseEnter,
-}: {
-  char: string
-  index: number
-  className: string
-  clozeIndex: number
-  newlineChar: string
-  hasCursor?: boolean
-  onMouseEnter?: (index: number) => void
-}) {
-  const isNewline = char === '\n' || char === '\r'
-  const content = isNewline ? newlineChar : char
-  const handleMouseEnter = useCallback(
-    () => {
-      if (onMouseEnter) onMouseEnter(index)
-    },
-    [index, char, onMouseEnter]
-  )
-  return (
-    <span
-      onMouseEnter={handleMouseEnter}
-      className={cn(className, {
-        [css.clozeNewlinePlaceholder]: isNewline,
-        [css.clozeCursor]: hasCursor,
-      })}
-      key={String(index + char)}
-      style={{
-        ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
-      }}
-    >
-      {content}
-    </span>
-  )
-}
+const CharSpan = memo(
+  ({
+    char,
+    index,
+    className,
+    clozeIndex,
+    newlineChar,
+    hasCursor,
+    onMouseEnter,
+  }: {
+    char: string
+    index: number
+    className: string
+    clozeIndex: number
+    newlineChar: string
+    hasCursor?: boolean
+    onMouseEnter?: (index: number) => void
+  }) => {
+    const isNewline = char === '\n' || char === '\r'
+    const content = isNewline ? newlineChar : char
+    const handleMouseEnter = useCallback(
+      e => {
+        console.log(index, char)
+        if (onMouseEnter) onMouseEnter(index)
+      },
+      [onMouseEnter]
+    )
+    return (
+      <span
+        data-charIndex={index}
+        onMouseEnter={handleMouseEnter}
+        className={cn(className, {
+          [css.clozeNewlinePlaceholder]: isNewline,
+          [css.clozeCursor]: hasCursor,
+        })}
+        key={String(index + char)}
+        style={{
+          ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
+        }}
+      >
+        {content}
+      </span>
+    )
+  }
+)
 
 const clozeHint = (
   <div>
@@ -602,50 +615,58 @@ const isEnabledKey = (e: KeyboardEvent | React.KeyboardEvent<Element>) => {
 
 export default ClozeField
 
-function findTokenHit(tokensTranslations: TokenTranslations[], index: number) {
+function findTokenHit(
+  tokensTranslations: TokenTranslations[],
+  mouseCharacterIndex: number
+) {
   const firstOverlapIndex = tokensTranslations.findIndex(tr => {
-    const exactMatch = tr.index === index
+    const exactMatch = tr.index === mouseCharacterIndex
     if (exactMatch) return true
     const betweenMatch =
-      index >= tr.index &&
-      tr.tokens.some(t => index <= t.token.length + tr.index)
+      mouseCharacterIndex >= tr.index &&
+      tr.tokens.some(t => mouseCharacterIndex <= t.token.length - 1 + tr.index)
 
     return betweenMatch
   })
 
-  if (firstOverlapIndex === -1) return null
+  if (firstOverlapIndex === -1) {
+    return null
+  }
 
   const firstOverlap = tokensTranslations[firstOverlapIndex]
 
-  if (firstOverlap.index === index)
+  if (firstOverlap.index <= mouseCharacterIndex) {
     return {
       translations: firstOverlap,
       token: firstOverlap.tokens.find(
-        t =>
-          firstOverlap.index === index ||
-          index <= t.token.length + firstOverlap.index
+        t => mouseCharacterIndex <= t.token.length - 1 + firstOverlap.index
       ),
     }
+  }
 
   let lastOverlap = tokensTranslations[firstOverlapIndex]
   for (let i = firstOverlapIndex; i < tokensTranslations.length; i++) {
     const tr = tokensTranslations[i]
-    if (tr.index > index)
+    if (tr.index > mouseCharacterIndex) {
       return {
         translations: tr,
         token: lastOverlap.tokens.find(
           t =>
-            lastOverlap.index === index ||
-            index <= t.token.length + lastOverlap.index
+            lastOverlap.index === mouseCharacterIndex ||
+            mouseCharacterIndex <= t.token.length - 1 + lastOverlap.index
         ),
       }
-    if (tr.index === index)
+    }
+    if (tr.index === mouseCharacterIndex) {
       return {
         translations: tr,
         token: tr.tokens.find(
-          t => tr.index === index || index <= t.token.length + tr.index
+          t =>
+            tr.index === mouseCharacterIndex ||
+            mouseCharacterIndex <= t.token.length + tr.index
         ),
       }
+    }
     lastOverlap = tr
   }
 

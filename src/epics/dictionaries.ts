@@ -4,7 +4,7 @@ import { catchError, endWith, filter, flatMap, map } from 'rxjs/operators'
 import * as A from '../types/ActionType'
 import * as actions from '../actions'
 import * as s from '../selectors'
-import { deleteDictionary, newDictionary } from '../utils/dictionaryFiles'
+import { deleteDictionary, newDictionary } from '../utils/dictionariesDatabase'
 import { getFileFilters } from '../utils/files'
 import {
   getTableName,
@@ -13,6 +13,11 @@ import {
   LexiconVariantEntry,
 } from '../files/dictionaryFile'
 import { concat, from, of } from 'rxjs'
+import {
+  getGermanSearchTokens,
+  getGermanDifferingStems,
+  toSortedX,
+} from '../utils/dictCc'
 
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
@@ -60,16 +65,14 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
             message: 'Import in progress.',
           })
         ),
-        from(
-          parseDictionaryFile(file, filePath, effects)
-          // ['boop']
-        ).pipe(
+        from(parseDictionaryFile(file, filePath, effects)).pipe(
           flatMap(() => {
             return from([
               actions.openFileRequest(file, filePath),
               actions.setProgress(null),
+              actions.addActiveDictionary(file.id, file.type),
               actions.simpleMessageSnackbar(
-                `Dictionary import complete! Select some flashcard text and press the 'D' key to look up a word.`,
+                `Mouse over flashcard text and press the 'D' key to look up words.`,
                 null
               ),
             ])
@@ -103,15 +106,132 @@ function parseDictionaryFile(
     case 'YomichanDictionary':
       return parseYomichanZip(file, filePath, effects)
     case 'CEDictDictionary':
-      return parseCedictZipOrU8TextFile(file, filePath, effects)
+      return parseCedictZip(file, filePath, effects)
     case 'DictCCDictionary':
-      throw new Error('unimplemented')
+      return parseDictCCZip(file, filePath, effects)
   }
 }
 
 // TODO: 'import complete' property
 
-async function parseCedictZipOrU8TextFile(
+function onZipArchiveEntry(filePath: string, callback: Function) {
+  // return new Promise((res, reject) => {
+  //   yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
+  //     if (err) return reject(err)
+  //     if (!zipfile) throw new Error('problem reading zip file')
+  //     const rejectAndClose = (err: any) => {
+  //       rejectAndClose(err)
+  //       zipfile.close()
+  //     }
+  //     // let cache: StemsCache = {}
+  //     let total = 0
+  //     zipfile.on('entry', entry => {
+}
+
+async function parseDictCCZip(
+  file: DictCCDictionary,
+  filePath: string,
+  effects: EpicsDependencies
+) {
+  let textFileMet = false
+
+  return new Promise((res, reject) => {
+    yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
+      if (err) return reject(err)
+      if (!zipfile) throw new Error('problem reading zip file')
+
+      const rejectAndClose = (err: any) => {
+        rejectAndClose(err)
+        zipfile.close()
+      }
+      zipfile.on('entry', entry => {
+        console.log('cc', { entry })
+        if (/\.txt/.test(entry.fileName)) {
+          textFileMet = true
+          console.log('importing!', new Date(Date.now()), Date.now())
+
+          zipfile.openReadStream(entry, function(err, readStream) {
+            if (err) return rejectAndClose(err)
+            if (!readStream)
+              return rejectAndClose(new Error('problem streaming zip file'))
+
+            let nextChunkStart = ''
+
+            let buffer: LexiconEntry[] = []
+            readStream.on('data', async data => {
+              // const entries: LexiconEntry[] = []
+              const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
+              const lastLineIndex = lines.length - 1
+              nextChunkStart = lines[lastLineIndex]
+              for (let i = 0; i < lastLineIndex; i++) {
+                const line = lines[i]
+                // console.log(line, "!line.startsWith('#') && i !== lastLineIndex", !line.startsWith('#'), i !== lastLineIndex)
+                if (line && !line.startsWith('#') && i !== lastLineIndex) {
+                  // (aufgeregt) auffliegen~~~~~to flush [fly away]~~~~~verb~~~~~[hunting] [zool.]
+                  // Rosenwaldsänger {m}~~~~~pink-headed warbler [Ergaticus versicolor]	noun	[orn.]
+                  const [head, meaning, pos, endTags] = line.split('\t')
+                  // strip affixes and bits inside curly braces
+
+                  const grammTags = [...head.matchAll(/\{.+?}/g)] || []
+
+                  const searchTokens = getGermanSearchTokens(head)
+                  const searchStems = getGermanDifferingStems(head)
+                  if (searchTokens.length !== searchStems.length) {
+                    console.error('mismatch')
+                    console.log({ searchStems, searchTokens })
+                  }
+
+                  buffer.push({
+                    head,
+                    meanings: [meaning],
+                    tags: `${pos}\n${endTags}\n${grammTags.join(' ')}`,
+                    variant: false,
+                    pronunciation: null,
+                    dictionaryKey: file.key,
+                    frequencyScore: null,
+                    searchStems,
+                    searchStemsSorted: toSortedX(searchStems),
+                    searchTokens,
+                    searchTokensCount: searchTokens.length,
+                    searchTokensSorted: toSortedX(searchTokens),
+                  })
+                }
+              }
+              // total += entries.length
+              if (buffer.length >= 5000) {
+                const oldBuffer = buffer
+                buffer = []
+
+                console.log('5000 more!')
+                await effects.dexie
+                  .table(getTableName(file.type))
+                  .bulkAdd(oldBuffer)
+                  .catch(err => rejectAndClose(err))
+              }
+            })
+
+            readStream.on('end', async function() {
+              // TODO: should process leftovers from final chunk
+              zipfile.readEntry()
+            })
+          })
+        } else {
+          zipfile.readEntry()
+        }
+      })
+
+      zipfile.on('close', () => {
+        console.log('done importing!', new Date(Date.now()), Date.now())
+        if (textFileMet) res()
+        else reject(new Error(`Invalid dict.cc dictionary file.`))
+      })
+
+      zipfile.readEntry()
+    })
+  })
+}
+
+async function parseCedictZip(
   file: CEDictDictionary,
   filePath: string,
   effects: EpicsDependencies
@@ -128,6 +248,7 @@ async function parseCedictZipOrU8TextFile(
         zipfile.close()
       }
 
+      console.log('importing cedict!', new Date(Date.now()), Date.now())
       zipfile.on('entry', entry => {
         if (/cedict_ts\.u8/.test(entry.fileName)) {
           textFileMet = true
@@ -136,16 +257,18 @@ async function parseCedictZipOrU8TextFile(
             if (err) return rejectAndClose(err)
             if (!readStream)
               return rejectAndClose(new Error('problem streaming zip file'))
+            // reading = true
+
+            let buffer: LexiconEntry[] = []
 
             let nextChunkStart = ''
             readStream.on('data', async data => {
-              const entries: LexiconEntry[] = []
+              console.log('stream read working')
               const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
               const lastLineIndex = lines.length - 1
               nextChunkStart = lines[lastLineIndex]
               for (let i = 0; i < lastLineIndex; i++) {
                 const line = lines[i]
-                // console.log(line, "!line.startsWith('#') && i !== lastLineIndex", !line.startsWith('#'), i !== lastLineIndex)
                 if (line && !line.startsWith('#') && i !== lastLineIndex) {
                   // 一個人 一个人 [yi1 ge4 ren2] /by oneself (without assistance)/alone (without company)/
                   const matchData = line.match(
@@ -167,6 +290,11 @@ async function parseCedictZipOrU8TextFile(
                     pronunciation: pinyin,
                     dictionaryKey: file.key,
                     frequencyScore: null,
+                    searchStems: [],
+                    searchStemsSorted: '',
+                    searchTokens: [],
+                    searchTokensSorted: '',
+                    searchTokensCount: 0,
                   }
                   const simplEntry: LexiconVariantEntry = {
                     variant: true,
@@ -174,20 +302,20 @@ async function parseCedictZipOrU8TextFile(
                     mainEntry: trad,
                     dictionaryKey: file.key,
                   }
-                  entries.push(tradEntry, simplEntry)
+                  buffer.push(tradEntry, simplEntry)
                   // if (i< 20)
                   // console.log({ trad, simpl, pinyin, en })
+
+                  if (buffer.length >= 3000) {
+                    const oldBuffer = buffer
+                    buffer = []
+                    await effects.dexie
+                      .table(getTableName(file.type))
+                      .bulkAdd(oldBuffer)
+                      .catch(err => rejectAndClose(err))
+                  }
                 }
               }
-
-              const e = await effects.dexie
-                .table(getTableName(file.type))
-                .bulkAdd(entries)
-                .then(() => {
-                  zipfile.readEntry()
-                })
-                .catch(err => rejectAndClose(err))
-              console.log('entries added', e)
             })
 
             readStream.on('end', function() {
@@ -202,6 +330,7 @@ async function parseCedictZipOrU8TextFile(
       })
 
       zipfile.on('close', () => {
+        console.log('done importing cedict!', new Date(Date.now()), Date.now())
         if (textFileMet) res()
         else reject(new Error(`Invalid CEDict dictionary file.`))
       })
@@ -229,6 +358,7 @@ async function parseYomichanZip(
         rejectAndClose(err)
         zipfile.close()
       }
+      console.log('importing!', new Date(Date.now()), Date.now())
 
       zipfile.on('entry', function(entry) {
         console.log(entry.uncompressedSize)
@@ -247,6 +377,7 @@ async function parseYomichanZip(
             })
 
             readStream.on('end', function() {
+              // const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
               const entriesJSON = JSON.parse(rawJson) as [
                 string,
                 string,
@@ -254,12 +385,11 @@ async function parseYomichanZip(
                 string,
                 number,
                 string[],
+                number,
                 string
               ][]
+              rawJson = ''
               const entries: LexiconEntry[] = []
-              // [["ライフハックス","","n","",2,["life hack","life hacks"]
-              // const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;f
-              // return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags};
               for (const [
                 head,
                 pronunciation,
@@ -267,6 +397,7 @@ async function parseYomichanZip(
                 _rules,
                 frequencyScore,
                 meanings,
+                _sequence,
                 _termTags,
               ] of entriesJSON) {
                 const dictEntry: LexiconEntry = {
@@ -277,6 +408,11 @@ async function parseYomichanZip(
                   tags: pos,
                   frequencyScore,
                   meanings,
+                  searchStems: [],
+                  searchStemsSorted: '',
+                  searchTokens: [],
+                  searchTokensSorted: '',
+                  searchTokensCount: 0,
                 }
                 // console.log({ dictEntry })
                 entries.push(dictEntry)
@@ -297,6 +433,8 @@ async function parseYomichanZip(
       })
 
       zipfile.on('close', () => {
+        console.log('import complete!', new Date(Date.now()), Date.now())
+
         if (termBankMet) res()
         else rej(new Error(`Invalid Yomichan dictionary file.`))
       })

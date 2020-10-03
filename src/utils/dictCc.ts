@@ -1,3 +1,5 @@
+import * as cistem from './cistem'
+
 export const germanSeparablePrefixes = new Set([
   'ab',
   'an',
@@ -79,3 +81,74 @@ export const fillerWords = new Set([
   'jdm./etw.',
   'jdn./etw.',
 ])
+
+const trimmedFillerWords = new Set(['jd', 'jds', 'jdn', 'jdm', 'etw'])
+
+const prefixesRegex = new RegExp(
+  `^(${[...germanSeparablePrefixes].join('|')})(zu)?(?=...)`,
+  'ui'
+)
+
+export const NON_LETTERS_DIGITS_WHITESPACE = /[^\s\p{L}\p{N}]/gu
+export const NON_LETTERS_DIGITS_PLUS = /[^\p{L}\p{N}]+/gu
+
+export function trimNonLettersDigitsOrWhitespace(text: string) {
+  return text.replace(NON_LETTERS_DIGITS_WHITESPACE, '')
+}
+
+export function getGermanSearchTokens(text: string) {
+  const withoutAnnotations = trimAnnotations(text)
+    .trim()
+    .toLowerCase()
+  return withoutAnnotations
+    .split(NON_LETTERS_DIGITS_PLUS)
+    .filter(x => x && !trimmedFillerWords.has(x))
+}
+
+// REMOVE ETW , JDN etc.
+
+function trimAnnotations(text: string) {
+  return text
+    .replace(/\{.+?\}/g, '')
+    .replace(/\(.+?\)/g, '')
+    .replace(/\[.+?\]/g, '')
+    .replace(/<.+?>/g, '')
+}
+
+export function getGermanDifferingStems(entryHead: string) {
+  const stems: string[] = []
+
+  for (const word of getGermanSearchTokens(entryHead)) {
+    const stem = getDifferingSearchStem(word) || word
+
+    if (stem) stems.push(stem)
+  }
+
+  return stems
+}
+
+export function toSortedX(x: string[]) {
+  return [...x].sort().join(' ')
+}
+
+export function getGermanStems(entryHead: string) {
+  const stems: string[] = []
+
+  for (const word of getGermanSearchTokens(entryHead)) {
+    const stem = getDifferingSearchStem(word) || word
+    stems.push(stem)
+  }
+
+  return stems
+}
+
+export function getDifferingSearchStem(trimmedWord: string) {
+  // really should only do this for -(e)n -(e)t -st...
+  let withoutPrefixes = trimmedWord.replace(prefixesRegex, '')
+
+  const stem = cistem.stem(withoutPrefixes)
+
+  return stem === trimmedWord ? undefined : stem
+}
+
+export const DICT_CC_ALL_BRACKETS = /\(.+?\)\s?|\{.+?\}\s?|\[.+?\]\s?/g

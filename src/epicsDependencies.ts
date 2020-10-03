@@ -7,7 +7,7 @@ import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './uti
 import { remote, ipcRenderer } from 'electron'
 import { nowUtcTimestamp } from './utils/sideEffects'
 import { setAppMenuProjectSubmenuPermissions } from './utils/appMenu'
-import { getDexieDb } from './utils/dictionaryFiles'
+import { getDexieDb } from './utils/dictionariesDatabase'
 import * as electron from './utils/electron'
 
 const elementWidth = (element: Element) => {

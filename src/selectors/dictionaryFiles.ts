@@ -6,6 +6,17 @@ export const getActiveDictionaries = (state: AppState) => {
     .filter((file): file is DictionaryFile => Boolean(file))
 }
 
+export const getActiveDictionaryType = (
+  state: AppState
+): DictionaryFileType | null => {
+  if (
+    !state.settings.activeDictionaries ||
+    !state.settings.activeDictionaries.length
+  )
+    return null
+  else return state.settings.activeDictionaries[0].type
+}
+
 export const getOpenDictionaryFiles = (
   state: AppState
 ): { file: DictionaryFile; availability: FileAvailability }[] => {

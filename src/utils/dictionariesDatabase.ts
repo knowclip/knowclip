@@ -1,7 +1,11 @@
 import Dexie, { Database } from 'dexie'
+import { promises } from 'dns'
 import { basename } from 'path'
+import { CLIENT_RENEG_LIMIT } from 'tls'
 import { getTableName, LexiconMainEntry } from '../files/dictionaryFile'
+import { getGermanSearchTokens, getGermanStems, toSortedX } from './dictCc'
 import { uuid } from './sideEffects'
+import { getTokenCombinations } from './tokenCombinations'
 import yomichanLemmatization from './yomichanLemmatization.json'
 
 const LATEST_DEXIE_DB_VERSION = 1
@@ -18,7 +22,10 @@ export function getDexieDb() {
     [DICTIONARIES_TABLE]: '++key, id, type',
     YomichanDictionary: '++key, head, pronunciation, dictionaryKey',
     CEDictDictionary: '++key, head, pronunciation, dictionaryKey',
-    DictCCDictionary: '++key, head, pronunciation, dictionaryKey',
+    // all these indexes takes too long to import maybe.
+    // would it be ok with just the multi-entry indexes + search sped up with frequency
+    DictCCDictionary:
+      '++key, head, dictionaryKey, searchTokensSorted, *searchTokens, searchTokensCount, *searchStems, searchStemsSorted',
   })
 
   return dexie
@@ -48,6 +55,108 @@ export type TokenTranslations = {
     token: string
     candidates: LexiconMainEntry[]
   }[]
+}
+
+export function lookUpInDictionary(
+  dictionaryType: DictionaryFileType,
+  text: string
+) {
+  switch (dictionaryType) {
+    case 'YomichanDictionary':
+      return lookUpJapanese(text)
+    case 'DictCCDictionary':
+      return lookUpGerman(text)
+    case 'CEDictDictionary':
+      throw 'unimplemented'
+  }
+}
+
+const SEARCH_TOKENS_SORTED: keyof LexiconMainEntry = 'searchTokensSorted'
+const SEARCH_STEMS_SORTED: keyof LexiconMainEntry = 'searchStemsSorted'
+
+export async function lookUpGerman(
+  text: string,
+  maxQueryTokensLength: number = 5
+): Promise<TokenTranslations[]> {
+  ;(window as any).d = dexie
+
+  if (!dexie) return []
+
+  const textTokens = getGermanSearchTokens(text)
+  const textStems = getGermanStems(text)
+
+  const table = dexie.table(getTableName('DictCCDictionary'))
+
+  const results: TokenTranslations[] = []
+
+  let indexingCursor = 0
+  let tokenIndex = 0
+  for (const exactToken of textTokens) {
+    const searchTokens = textTokens.slice(
+      tokenIndex,
+      tokenIndex + maxQueryTokensLength
+    )
+    const searchStems = textStems.slice(
+      tokenIndex,
+      tokenIndex + maxQueryTokensLength
+    )
+    const potentialParsingsAtIndex = getTokenCombinations(searchTokens)
+
+    const tokenCharacterIndex = text
+      .toLowerCase()
+      .indexOf(exactToken, indexingCursor)
+
+    const exactTokensMatches = (await Promise.all(
+      getTokenCombinations(searchTokens).map(async parsing => {
+        const searchValue = toSortedX(parsing)
+        console.log({ searchValue })
+        const lex: LexiconMainEntry[] = await table
+          .where(SEARCH_TOKENS_SORTED)
+          .equals(searchValue)
+          .toArray()
+        return lex
+      })
+    )).flatMap(x => x)
+    const approxMatches =
+      // should really always run this? or maybe exactTokensMatches lenght threshold?
+      // should filter out candidates with separable prefixes according to context.
+      // sort should prioritize words without padding punctuation
+      //    and without semantic annotations.
+      (await Promise.all(
+        getTokenCombinations(searchStems).map(async parsing => {
+          const searchValue = toSortedX(parsing)
+          console.log({ searchValue })
+          const lex: LexiconMainEntry[] = await table
+            .where(SEARCH_STEMS_SORTED)
+            .equals(searchValue)
+            .limit(50)
+            .toArray()
+          return lex
+        })
+      )).flatMap(x => x)
+    const matches = [...exactTokensMatches, ...approxMatches]
+    if (matches.length)
+      results.push({
+        index: tokenCharacterIndex,
+        tokens: [
+          {
+            token: exactToken,
+            // todo: filter out repeat keys
+            candidates: matches,
+          },
+        ],
+      })
+
+    console.log(
+      { exactToken, indexingCursor, tokenIndex, potentialParsingsAtIndex },
+      { tokens: exactTokensMatches }
+    )
+
+    indexingCursor = tokenCharacterIndex + exactToken.length - 1
+    tokenIndex++
+  }
+
+  return results
 }
 
 export async function lookUpJapanese(
@@ -104,16 +213,19 @@ export async function lookUpJapanese(
 function wordIndexes(s: string) {
   const rx = /([^\uFF0C\uFE10\uFE50\u1F101-\u1F10A\u0000-\u007F\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F\u3200-\u32FF\u3300-\u33FF\uFE30-\uFE4F\u12400-\u1247F\u16FE0-\u16FFF \w\s]+)[\uFF0C\uFE10\uFE50\u1F101-\u1F10A\u0000-\u007F\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F\u3200-\u32FF\u3300-\u33FF\uFE30-\uFE4F\u12400-\u1247F\u16FE0-\u16FFF \w\s]*/gu
   const match = [...s.matchAll(rx)]
-  return match.map((v, i) => ({ string: v[1] as string, index: i }))
+  return match.map((v, i) => ({
+    string: v[1] as string,
+    index: v.index as number,
+  }))
 }
 
 type CJTextTokens = { index: number; tokens: string[] }[]
-export function parseFlat(data: string, maxWordLength = 8) {
+export function parseFlat(text: string, maxWordLength = 8) {
   let tokens: CJTextTokens = []
-  if (!data) return tokens
+  if (!text) return tokens
 
-  const sentences = wordIndexes(data)
-  for (let { index: startIndex, string: sentence } of sentences.filter(
+  const textSegments = wordIndexes(text)
+  for (let { index: startIndex, string: sentence } of textSegments.filter(
     ({ index, string }) => string.length
   )) {
     for (let start = 0; start < sentence.length; ++start) {
@@ -153,6 +265,7 @@ export async function deleteDictionary(
   key: number,
   type: DictionaryFileType
 ) {
+  console.log('deleting dictionary items!')
   const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
   if (allDictionariesOfType.length <= 1)
     await db.table(getTableName(type)).clear()
@@ -163,5 +276,10 @@ export async function deleteDictionary(
       .equals(key)
       .delete()
 
-  return await db.table(DICTIONARIES_TABLE).delete(key)
+  console.log('deleting dictionary!')
+
+  const tableDeletion = await db.table(DICTIONARIES_TABLE).delete(key)
+  console.log('done deleting dictionary!')
+
+  return tableDeletion
 }
