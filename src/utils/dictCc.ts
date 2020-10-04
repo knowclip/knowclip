@@ -91,6 +91,7 @@ const prefixesRegex = new RegExp(
 
 export const NON_LETTERS_DIGITS_WHITESPACE = /[^\s\p{L}\p{N}]/gu
 export const NON_LETTERS_DIGITS_PLUS = /[^\p{L}\p{N}]+/gu
+export const LETTERS_DIGITS_PLUS = /[\p{L}\p{N}]+/gu
 
 export function trimNonLettersDigitsOrWhitespace(text: string) {
   return text.replace(NON_LETTERS_DIGITS_WHITESPACE, '')

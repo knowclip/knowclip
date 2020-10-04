@@ -1,12 +1,16 @@
 import Dexie, { Database } from 'dexie'
-import { promises } from 'dns'
 import { basename } from 'path'
-import { CLIENT_RENEG_LIMIT } from 'tls'
 import { getTableName, LexiconMainEntry } from '../files/dictionaryFile'
-import { getGermanSearchTokens, getGermanStems, toSortedX } from './dictCc'
+import {
+  getGermanSearchTokens,
+  getGermanStems,
+  LETTERS_DIGITS_PLUS,
+  NON_LETTERS_DIGITS_PLUS,
+  toSortedX,
+} from './dictCc'
 import { uuid } from './sideEffects'
 import { getTokenCombinations } from './tokenCombinations'
-import yomichanLemmatization from './yomichanLemmatization.json'
+import { lemmatize } from './yomichanDictionary'
 
 const LATEST_DEXIE_DB_VERSION = 1
 
@@ -51,9 +55,9 @@ export async function newDictionary(
 
 export type TokenTranslations = {
   index: number
-  tokens: {
+  translatedTokens: {
     token: string
-    candidates: LexiconMainEntry[]
+    candidates: { entry: LexiconMainEntry; inflections: string[] }[]
   }[]
 }
 
@@ -138,11 +142,11 @@ export async function lookUpGerman(
     if (matches.length)
       results.push({
         index: tokenCharacterIndex,
-        tokens: [
+        translatedTokens: [
           {
             token: exactToken,
             // todo: filter out repeat keys
-            candidates: matches,
+            candidates: matches.map(m => ({ entry: m, inflections: [] })),
           },
         ],
       })
@@ -159,70 +163,130 @@ export async function lookUpGerman(
   return results
 }
 
+const HEAD: keyof LexiconMainEntry = 'head'
+const PRONUNCIATION: keyof LexiconMainEntry = 'pronunciation'
+
 export async function lookUpJapanese(
   text: string
+  // activeDictionaries: string[] ???
 ): Promise<TokenTranslations[]> {
   if (!dexie) return []
-  const potentialTokens = parseFlat(text)
+  const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
 
-  return await Promise.all(
-    potentialTokens.map(async ({ tokens, index }) => {
-      const tokenQueries = await Promise.all(
-        tokens.map(async token => {
-          const potentialBases = lemmatize(token)
-          const differingBases =
-            potentialBases.length > 1 || potentialBases[0] !== token
-          const lookupTokens = differingBases
-            ? [token, ...potentialBases]
-            : [token]
-          const query: LexiconMainEntry[] = await dexie
-            .table(getTableName('YomichanDictionary'))
-            .where('head')
-            .anyOfIgnoreCase(lookupTokens)
-            .or('pronunciation')
-            .anyOfIgnoreCase(lookupTokens)
-            .toArray()
+  const allLookupTokens = Array.from(allTokens, token => [
+    token,
+    // maybe memoize lemmatize in this function
+    ...lemmatize(token).map(t => t.text),
+  ]).flat()
+  const allQueries: LexiconMainEntry[] = await dexie
+    .table(getTableName('YomichanDictionary'))
+    .where(HEAD)
+    .anyOf(allLookupTokens)
+    .or(PRONUNCIATION)
+    .anyOf(allLookupTokens)
+    .distinct()
+    .toArray()
 
-          const candidates = query.sort((a, b) => {
-            if (a.head === token || a.pronunciation == token) return 1
+  console.log(allQueries.length + ' total results!')
 
-            const aScore =
-              typeof a.frequencyScore === 'number' ? a.frequencyScore : -9999
-            const bScore =
-              typeof b.frequencyScore === 'number' ? b.frequencyScore : -9999
-            return bScore - aScore
-          })
+  return potentialTokens.flatMap(({ tokens, index }) => {
+    const translatedTokens = tokens.flatMap(token => {
+      const candidates = allQueries.flatMap(entry => {
+        const exactMatch = entry.head === token || entry.pronunciation === token
 
-          return {
-            token,
-            candidates,
-          }
-        })
-      )
+        const posTags = entry.tags ? entry.tags.split(' ') : []
+        return [
+          ...(exactMatch ? [{ entry, inflections: [] }] : []),
+          ...lemmatize(token).flatMap(potentialLemma => {
+            const textIsMatching =
+              // potentialLemma.text === entry.head  ||
+              potentialLemma.text === entry.head ||
+              potentialLemma.text === entry.pronunciation
+            if (textIsMatching && entry.head.includes('表')) {
+              console.log(
+                {
+                  entry: {
+                    head: entry.head,
+                    pronunciation: entry.pronunciation,
+                    tags: entry.tags,
+                    tagsSplit: posTags,
+                  },
+                },
+                { potentialLemma }
+              )
+            }
 
-      return {
-        index,
-        tokens: tokenQueries
-          .filter(({ candidates }) => candidates.length)
-          .sort((a, b) => b.token.length - a.token.length),
-      }
+            return textIsMatching &&
+              potentialLemma.wordClasses.some(wc => posTags.includes(wc))
+              ? [{ entry, inflections: potentialLemma.inferredInflections }]
+              : []
+          }),
+        ]
+      })
+
+      return candidates.length
+        ? [
+            {
+              token,
+              candidates: candidates.sort((a, b) => {
+                if (
+                  [a.entry.head, b.entry.head].filter(head => head === token)
+                    .length != 1
+                ) {
+                  const aScore =
+                    typeof a.entry.frequencyScore === 'number'
+                      ? a.entry.frequencyScore
+                      : Infinity
+                  const bScore =
+                    typeof b.entry.frequencyScore === 'number'
+                      ? b.entry.frequencyScore
+                      : Infinity
+
+                  const frequencyDifference = bScore - aScore
+                  if (frequencyDifference) return frequencyDifference
+
+                  const inflectionsDifference =
+                    a.inflections.length - b.inflections.length
+                  // if (inflectionsDifference)
+                  return inflectionsDifference
+                } else {
+                  return a.entry.head === token ? -1 : 1
+                }
+              }),
+            },
+          ]
+        : []
     })
-  )
+
+    return translatedTokens.length
+      ? [
+          {
+            index,
+            translatedTokens,
+          },
+        ]
+      : []
+    // TODO: fix "precise token hit"
+    // e.g. in kusukusurawarau, mouseover warau should not give kusukusuwarau but warau.
+  })
 }
 
 function wordIndexes(s: string) {
-  const rx = /([^\uFF0C\uFE10\uFE50\u1F101-\u1F10A\u0000-\u007F\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F\u3200-\u32FF\u3300-\u33FF\uFE30-\uFE4F\u12400-\u1247F\u16FE0-\u16FFF \w\s]+)[\uFF0C\uFE10\uFE50\u1F101-\u1F10A\u0000-\u007F\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F\u3200-\u32FF\u3300-\u33FF\uFE30-\uFE4F\u12400-\u1247F\u16FE0-\u16FFF \w\s]*/gu
+  // 々
+  // const rx = /([^\uFF0C\uFE10\uFE50\u1F101-\u1F10A\u0000-\u007F\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F\u3200-\u32FF\u3300-\u33FF\uFE30-\uFE4F\u12400-\u1247F\u16FE0-\u16FFF \w\s]+)[\uFF0C\uFE10\uFE50\u1F101-\u1F10A\u0000-\u007F\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F\u3200-\u32FF\u3300-\u33FF\uFE30-\uFE4F\u12400-\u1247F\u16FE0-\u16FFF \w\s]*/gu
+  const rx = LETTERS_DIGITS_PLUS
   const match = [...s.matchAll(rx)]
   return match.map((v, i) => ({
-    string: v[1] as string,
+    string: v[0] as string,
     index: v.index as number,
   }))
 }
 
 type CJTextTokens = { index: number; tokens: string[] }[]
 export function parseFlat(text: string, maxWordLength = 8) {
-  let tokens: CJTextTokens = []
-  if (!text) return tokens
+  let tokensByIndex: CJTextTokens = []
+  let allTokens: Set<string> = new Set()
+  if (!text) return { tokensByIndex, allTokens }
 
   const textSegments = wordIndexes(text)
   for (let { index: startIndex, string: sentence } of textSegments.filter(
@@ -230,7 +294,8 @@ export function parseFlat(text: string, maxWordLength = 8) {
   )) {
     for (let start = 0; start < sentence.length; ++start) {
       const tokensAtIndex: string[] = []
-      tokens.push({ index: startIndex + start, tokens: tokensAtIndex })
+      tokensByIndex.push({ index: startIndex + start, tokens: tokensAtIndex })
+
       let maxCurrLength = sentence.length - start
       for (
         let amount =
@@ -240,23 +305,13 @@ export function parseFlat(text: string, maxWordLength = 8) {
       ) {
         const token = sentence.substr(start, amount)
         tokensAtIndex.push(token)
+        allTokens.add(token)
       }
+
+      tokensAtIndex.sort((a, b) => b.length - a.length) // this the right place?
     }
   }
-  return tokens
-}
-
-const yomichanLemmatizationEntries = Object.entries(yomichanLemmatization)
-function lemmatize(text: string) {
-  const candidates: string[] = []
-  for (const [
-    formName,
-    { kanaIn, kanaOut },
-  ] of yomichanLemmatizationEntries as any) {
-    if (text.endsWith(kanaIn))
-      candidates.push(text.replace(new RegExp(`${kanaIn}$`), kanaOut))
-  }
-  return candidates
+  return { tokensByIndex, allTokens }
 }
 
 export async function deleteDictionary(

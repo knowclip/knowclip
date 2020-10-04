@@ -58,7 +58,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
         )
       dispatch(
         r.confirmationDialog(
-          `Are you sure you want to import this dictionary right now? This could take a while.`,
+          `Are you sure you want to import a dictionary right now? You won't be able to use the app while the import is in progress.`,
           r.importDictionaryRequest(newDictionaryType),
           null,
           true

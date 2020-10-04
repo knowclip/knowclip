@@ -1,0 +1,31 @@
+.container {
+  min-width: 15rem;
+  max-width: 25rem;
+  max-height: 20rem;
+  padding: 0.5rem;
+}
+
+.dictionaryEntry {
+
+}
+
+.dictionaryEntry {
+
+}
+.entryHead {
+  margin: 0;
+  display: inline;
+  margin-right: 0.5em;
+}
+.japaneseEntryHeadWithFurigana {
+  font-size: 1.8rem;
+  font-weight: normal;
+}
+.entryTags {
+  font-style: italic;
+  font-size: 0.8em;
+  display: inline;
+}
+.entryMeaningsList {
+  padding: 0;
+}

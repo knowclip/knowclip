@@ -1,12 +1,13 @@
 import React, {
   useCallback,
-  ReactNodeArray,
   useEffect,
   ReactNode,
   useMemo,
   useState,
   KeyboardEventHandler,
   memo,
+  SyntheticEvent,
+  useRef,
 } from 'react'
 import os from 'os'
 import cn from 'classnames'
@@ -23,10 +24,11 @@ import * as r from '../redux'
 import { KeyId, KEYS } from '../utils/keyboard'
 import {
   lookUpInDictionary,
-  lookUpJapanese,
   TokenTranslations,
 } from '../utils/dictionariesDatabase'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
+import usePopover from '../utils/usePopover'
+import { DictionaryPopover } from './DictionaryPopover'
 
 const ClozeField = ({
   className,
@@ -53,14 +55,6 @@ const ClozeField = ({
   onDoubleClick?: (fieldName: FlashcardFieldName) => void
   clozeControls: ClozeControls
 }) => {
-  // if dictionary file present
-  // perform tokenize
-  // and then lookup
-
-  // then on double-click OR mouseover + D,
-  // detect position from tokens and display word
-  // https://github.com/FooSoft/yomichan/blob/39cf302eefe1b3bc19e4a91c222872b322426354/ext/fg/js/frontend.js#L82
-
   const linkedSubtitlesTrack = linkedTracks[fieldName] || null
   const subtitlesMenu = Boolean(subtitles.length) && (
     <FieldMenu
@@ -137,9 +131,7 @@ const ClozeField = ({
   }))
 
   const [tokens, setTokens] = useState<TokenTranslations[]>([])
-  const [tokenHit, setTokenHit] = useState<ReturnType<typeof findTokenHit>>(
-    null
-  )
+  const [tokenHit, setTokenHit] = useState<ReturnType<typeof findTokenHit>>([])
 
   useEffect(
     () => {
@@ -157,20 +149,26 @@ const ClozeField = ({
     },
     [value, activeDictionaryType]
   )
+  const popover = usePopover()
 
+  const [mouseoverChar, setMouseoverChar] = useState<HTMLSpanElement | null>(
+    null
+  )
   const handleCharMouseEnter_ = useCallback(
-    (characterIndex: number) => {
-      console.log('characterIndex', characterIndex, { tokens })
-      // maybe shoudl store index in tokenhit structure so we don't perform extra findTokenHit here
-      const tokenHit = findTokenHit(tokens, characterIndex)
-      setTokenHit(tokenHit)
+    (characterIndex: number, charSpanRef: HTMLSpanElement | null) => {
+      setMouseoverChar(charSpanRef)
+      popover.anchorCallbackRef(charSpanRef)
+      return
     },
-    [tokens]
+    [tokens, setMouseoverChar, popover.anchorCallbackRef]
   )
   const handleCharMouseEnter = activeDictionaryType
     ? handleCharMouseEnter_
     : undefined
-  const handleMouseLeave = useCallback(() => setTokenHit(null), [])
+  const handleMouseLeave = useCallback(() => {
+    // setTokenHit([])
+    // popover.anchorCallbackRef(null)
+  }, [])
 
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
@@ -290,14 +288,34 @@ const ClozeField = ({
               )
             )
           }
-
-          console.log({ tokenHit })
-          if (tokens.length && tokenHit && tokenHit.token) {
+          console.log(
+            mouseoverChar ? mouseoverChar.dataset : 'no mouseover char'
+          )
+          const mouseCharIndex =
+            mouseoverChar &&
+            mouseoverChar.dataset &&
+            !isNaN(+(mouseoverChar.dataset.characterIndex || ''))
+              ? +(mouseoverChar.dataset.characterIndex || '')
+              : -1
+          const tokenHit =
+            mouseoverChar && mouseoverChar.dataset
+              ? findTokenHit(tokens, mouseCharIndex)
+              : []
+          console.log(
+            { tokenHit },
+            mouseoverChar &&
+              mouseoverChar.dataset &&
+              +(mouseoverChar.dataset.characterIndex || 0)
+          )
+          setTokenHit(tokenHit)
+          // if (tokens.length && tokenHit && tokenHit.token) {
+          if (tokenHit.length && mouseCharIndex != -1) {
             setSelectionRange(
               ref.current as HTMLElement,
-              tokenHit.translations.index,
-              tokenHit.translations.index + tokenHit.token.token.length
+              tokenHit[0].index,
+              tokenHit[0].index + tokenHit[0].translatedTokens[0].token.length
             )
+            popover.open((e as any) as SyntheticEvent)
           }
         }
       }
@@ -306,8 +324,10 @@ const ClozeField = ({
     },
     [
       activeDictionaryType,
-      tokenHit && tokenHit.token,
-      tokenHit && tokenHit.translations.index,
+      mouseoverChar &&
+        mouseoverChar.dataset &&
+        mouseoverChar.dataset.characterIndex,
+      tokens,
       tokens.length,
     ]
   )
@@ -446,6 +466,9 @@ const ClozeField = ({
     >
       {segments}
       {cursorPosition === value.length && <span className={css.clozeCursor} />}
+      {popover.isOpen && activeDictionaryType && (
+        <DictionaryPopover {...{ popover, tokenHit, activeDictionaryType }} />
+      )}
     </span>
   )
 
@@ -540,20 +563,22 @@ const CharSpan = memo(
     clozeIndex: number
     newlineChar: string
     hasCursor?: boolean
-    onMouseEnter?: (index: number) => void
+    onMouseEnter?: (index: number, ref: HTMLSpanElement | null) => void
   }) => {
     const isNewline = char === '\n' || char === '\r'
     const content = isNewline ? newlineChar : char
+    const ref = useRef<HTMLSpanElement>(null)
     const handleMouseEnter = useCallback(
       e => {
         console.log(index, char)
-        if (onMouseEnter) onMouseEnter(index)
+        if (onMouseEnter) onMouseEnter(index, ref.current)
       },
       [onMouseEnter]
     )
     return (
       <span
-        data-charIndex={index}
+        ref={ref}
+        data-character-index={index}
         onMouseEnter={handleMouseEnter}
         className={cn(className, {
           [css.clozeNewlinePlaceholder]: isNewline,
@@ -582,93 +607,32 @@ const clozeHint = (
   </div>
 )
 
-const ENABLED_KEYS = new Set<KeyId>([
-  KEYS.tab,
-  KEYS.shift,
-  KEYS.arrowLeft,
-  KEYS.arrowRight,
-  KEYS.escape,
-  KEYS.eLowercase,
-  KEYS.eUppercase,
-  KEYS.delete,
-  KEYS.backspace,
-  KEYS.backspace,
-])
-const ENABLED_META_CTRL_KEYS = new Set<KeyId>([
-  ...ENABLED_KEYS,
-  KEYS.cLowercase,
-  KEYS.cUppercase,
-  KEYS.aLowercase,
-  KEYS.aUppercase,
-])
 export const getMetaOrCtrlKey =
   os.platform() === 'darwin'
     ? (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.metaKey
     : (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.ctrlKey
-const isEnabledKey = (e: KeyboardEvent | React.KeyboardEvent<Element>) => {
-  const { key } = e
-  const metaOrCtrlKey = getMetaOrCtrlKey(e)
-  return metaOrCtrlKey
-    ? ENABLED_META_CTRL_KEYS.has(key as KeyId)
-    : ENABLED_KEYS.has(key as KeyId)
-}
 
 export default ClozeField
 
-function findTokenHit(
+export function findTokenHit(
   tokensTranslations: TokenTranslations[],
   mouseCharacterIndex: number
-) {
-  const firstOverlapIndex = tokensTranslations.findIndex(tr => {
-    const exactMatch = tr.index === mouseCharacterIndex
-    if (exactMatch) return true
-    const betweenMatch =
-      mouseCharacterIndex >= tr.index &&
-      tr.tokens.some(t => mouseCharacterIndex <= t.token.length - 1 + tr.index)
-
-    return betweenMatch
-  })
-
-  if (firstOverlapIndex === -1) {
-    return null
-  }
-
-  const firstOverlap = tokensTranslations[firstOverlapIndex]
-
-  if (firstOverlap.index <= mouseCharacterIndex) {
-    return {
-      translations: firstOverlap,
-      token: firstOverlap.tokens.find(
-        t => mouseCharacterIndex <= t.token.length - 1 + firstOverlap.index
-      ),
-    }
-  }
-
-  let lastOverlap = tokensTranslations[firstOverlapIndex]
-  for (let i = firstOverlapIndex; i < tokensTranslations.length; i++) {
-    const tr = tokensTranslations[i]
-    if (tr.index > mouseCharacterIndex) {
-      return {
-        translations: tr,
-        token: lastOverlap.tokens.find(
-          t =>
-            lastOverlap.index === mouseCharacterIndex ||
-            mouseCharacterIndex <= t.token.length - 1 + lastOverlap.index
-        ),
+): TokenTranslations[] {
+  const result: TokenTranslations[] = []
+  for (const tokenTranslations of tokensTranslations) {
+    if (mouseCharacterIndex === tokenTranslations.index) {
+      result.push(tokenTranslations)
+    } else if (mouseCharacterIndex > tokenTranslations.index) {
+      // if `translatedTokens` are sorted && never empty,
+      // only first need be queried.
+      const [translatedToken] = tokenTranslations.translatedTokens
+      if (
+        mouseCharacterIndex <
+        tokenTranslations.index + translatedToken.token.length - 1
+      ) {
+        result.push(tokenTranslations)
       }
     }
-    if (tr.index === mouseCharacterIndex) {
-      return {
-        translations: tr,
-        token: tr.tokens.find(
-          t =>
-            tr.index === mouseCharacterIndex ||
-            mouseCharacterIndex <= t.token.length + tr.index
-        ),
-      }
-    }
-    lastOverlap = tr
   }
-
-  return null
+  return result
 }

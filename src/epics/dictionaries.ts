@@ -393,11 +393,11 @@ async function parseYomichanZip(
               for (const [
                 head,
                 pronunciation,
-                pos,
-                _rules,
+                tags,
+                rules, // v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns.
                 frequencyScore,
                 meanings,
-                _sequence,
+                sequence, // used for grouping results
                 _termTags,
               ] of entriesJSON) {
                 const dictEntry: LexiconEntry = {
@@ -405,7 +405,9 @@ async function parseYomichanZip(
                   dictionaryKey: file.key,
                   head,
                   pronunciation,
-                  tags: pos,
+                  tags: [
+                    ...new Set([...tags.split(' '), ...rules.split(' ')]),
+                  ].join(' '),
                   frequencyScore,
                   meanings,
                   searchStems: [],
