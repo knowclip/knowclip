@@ -12,7 +12,18 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
     2
   )
   await secondMediaFile.click()
+  await client.waitForText_(
+    fileSelectionForm$.container,
+    'Please locate your media file "piggeldy_cat.mp4" in the filesystem so you can make clips with it.'
+  )
   await client.clickElement_(fileSelectionForm$.cancelButton)
+
+  await client.waitForText_(
+    snackbar$.container,
+    'Could not locate media file "piggeldy_cat.mp4". Some features may be unavailable until it is located.'
+  )
+  await client.clickElement_(snackbar$.closeButton)
+  await client.waitUntilGone_(snackbar$.closeButton)
 
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
   const [firstMediaFile] = await client.elements_(

@@ -72,7 +72,9 @@ const VideoStillDisplay = ({
       >
         <CardMedia
           className={cn(css.flashcardImage)}
-          image={filePath ? `file://${filePath}` : undefined}
+          image={
+            filePath ? new URL(`file://${filePath}`).toString() : undefined
+          }
         >
           {videoStill.availability.status !== 'CURRENTLY_LOADED' &&
           mediaFileAvailability.status === 'CURRENTLY_LOADED' ? (

@@ -7,6 +7,7 @@ import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
+import { getHalfSecond } from './waveform'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,
@@ -328,5 +329,3 @@ export const getNewFlashcardForStretchedClip = (
 
   return { ...flashcard, fields: newFields }
 }
-const getHalfSecond = ({ waveform }: AppState) =>
-  (waveform.stepsPerSecond * waveform.stepLength) / 2

@@ -1,6 +1,6 @@
 import * as yauzl from 'yauzl'
 import { combineEpics, ofType } from 'redux-observable'
-import { catchError, endWith, filter, flatMap, map } from 'rxjs/operators'
+import { catchError, flatMap } from 'rxjs/operators'
 import * as A from '../types/ActionType'
 import * as actions from '../actions'
 import * as s from '../selectors'
@@ -13,11 +13,9 @@ import {
   LexiconVariantEntry,
 } from '../files/dictionaryFile'
 import { concat, from, of } from 'rxjs'
-import {
-  getGermanSearchTokens,
-  getGermanDifferingStems,
-  toSortedX,
-} from '../utils/dictCc'
+import { getGermanSearchTokens, getGermanDifferingStems } from '../utils/dictCc'
+import { getTokenCombinations } from '../utils/tokenCombinations'
+import { toHiragana } from 'wanakana'
 
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
@@ -172,14 +170,19 @@ async function parseDictCCZip(
                   const [head, meaning, pos, endTags] = line.split('\t')
                   // strip affixes and bits inside curly braces
 
+                  const searchTokens = getGermanSearchTokens(head)
+                  if (!searchTokens.length) continue
+
+                  const searchStems = getGermanDifferingStems(head)
                   const grammTags = [...head.matchAll(/\{.+?}/g)] || []
 
-                  const searchTokens = getGermanSearchTokens(head)
-                  const searchStems = getGermanDifferingStems(head)
                   if (searchTokens.length !== searchStems.length) {
                     console.error('mismatch')
                     console.log({ searchStems, searchTokens })
                   }
+
+                  if (searchStems.length > 5)
+                    console.log(head, searchStems.join(' '))
 
                   buffer.push({
                     head,
@@ -189,20 +192,30 @@ async function parseDictCCZip(
                     pronunciation: null,
                     dictionaryKey: file.key,
                     frequencyScore: null,
-                    searchStems,
-                    searchStemsSorted: toSortedX(searchStems),
-                    searchTokens,
+                    // searchStems,
+                    // searchStemsSorted: toSortedX(searchStems),
+                    // searchTokens,
                     searchTokensCount: searchTokens.length,
-                    searchTokensSorted: toSortedX(searchTokens),
+                    tokenCombos:
+                      // should get chunks from all places, just doing the start for now
+                      getTokenCombinations(searchStems.slice(0, 5)).map(
+                        tokenCombo => {
+                          return [
+                            ...tokenCombo.sort(),
+                            searchStems.length.toString(16).padStart(2, '0'),
+                          ].join(' ')
+                        }
+                      ),
+                    // searchTokensSorted: toSortedX(searchTokens),
                   })
                 }
               }
               // total += entries.length
-              if (buffer.length >= 5000) {
+              if (buffer.length >= 2000) {
                 const oldBuffer = buffer
                 buffer = []
 
-                console.log('5000 more!')
+                console.log('2000 more!')
                 await effects.dexie
                   .table(getTableName(file.type))
                   .bulkAdd(oldBuffer)
@@ -290,10 +303,11 @@ async function parseCedictZip(
                     pronunciation: pinyin,
                     dictionaryKey: file.key,
                     frequencyScore: null,
-                    searchStems: [],
-                    searchStemsSorted: '',
-                    searchTokens: [],
-                    searchTokensSorted: '',
+                    // searchStems: [],
+                    // searchStemsSorted: '',
+                    // searchTokens: [],
+                    // searchTokensSorted: '',
+                    tokenCombos: [],
                     searchTokensCount: 0,
                   }
                   const simplEntry: LexiconVariantEntry = {
@@ -397,9 +411,10 @@ async function parseYomichanZip(
                 rules, // v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns.
                 frequencyScore,
                 meanings,
-                sequence, // used for grouping results
+                _sequence, // used for grouping results
                 _termTags,
               ] of entriesJSON) {
+                const coercedHiragana = toHiragana(pronunciation || head)
                 const dictEntry: LexiconEntry = {
                   variant: false,
                   dictionaryKey: file.key,
@@ -410,10 +425,14 @@ async function parseYomichanZip(
                   ].join(' '),
                   frequencyScore,
                   meanings,
-                  searchStems: [],
-                  searchStemsSorted: '',
-                  searchTokens: [],
-                  searchTokensSorted: '',
+                  // searchStems: [],
+                  // searchStemsSorted: '',
+                  // searchTokens: [],
+                  // searchTokensSorted: '',
+                  tokenCombos:
+                    coercedHiragana !== (pronunciation || head)
+                      ? [coercedHiragana]
+                      : [],
                   searchTokensCount: 0,
                 }
                 // console.log({ dictEntry })

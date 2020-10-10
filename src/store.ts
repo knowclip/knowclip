@@ -51,12 +51,3 @@ const { store, persistor } = getStore()
 export default store
 
 export { persistor }
-
-// should this go before running epic middleware?
-// @ts-ignore
-if (module.hot) {
-  // @ts-ignore
-  module.hot.accept('./reducers', () => {
-    store.replaceReducer(persistedReducer)
-  })
-}

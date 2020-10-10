@@ -27,7 +27,7 @@ const FlashcardSectionFieldPopoverMenu = ({
   fieldName,
   className,
 }: {
-  linkedSubtitlesTrack: string | null
+  linkedSubtitlesTrack?: string | null
   mediaFileId: MediaFileId
   fieldName: TransliterationFlashcardFieldName
   className: string

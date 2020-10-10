@@ -3,7 +3,7 @@ import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import FlashcardDisplayField from './FlashcardSectionDisplayField'
-import { ClozeControls } from '../utils/useClozeUi'
+import { ClozeControls } from '../utils/clozeField/useClozeControls'
 import ClozeField from './FlashcardSectionDisplayClozeField'
 
 const empty: ClozeDeletion[] = []

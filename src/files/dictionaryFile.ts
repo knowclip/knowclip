@@ -24,17 +24,19 @@ export type LexiconMainEntry = {
 
   searchTokensCount: number
 
-  /** for filtering entries that resolve exactly to given tokens */
-  searchTokensSorted: string
-  /** for filtering entries that contain given tokens.
-   *  slower than `searchTokensSorted` because it requires JS filtering step */
-  searchTokens: string[]
+  // /** for filtering entries that resolve exactly to given tokens */
+  // searchTokensSorted: string
+  // /** for filtering entries that contain given tokens.
+  //  *  slower than `searchTokensSorted` because it requires JS filtering step */
+  // searchTokens: string[]
 
-  /** for filtering entries that resolve exactly to given stems */
-  searchStems: string[]
-  /** for filtering entries that contain given tokens.
-   *  slower than `searchStems` because it requires JS filtering step */
-  searchStemsSorted: string
+  // /** for filtering entries that resolve exactly to given stems */
+  // searchStems: string[]
+  // /** for filtering entries that contain given tokens.
+  //  *  slower than `searchStems` because it requires JS filtering step */
+  // searchStemsSorted: string
+
+  tokenCombos: string[]
 }
 
 // TODO: test different entry shapes

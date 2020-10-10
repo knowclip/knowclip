@@ -5,7 +5,7 @@ import { getMidpoint } from '../utils/getVideoStill'
 export default {
   openRequest: async ({ file }, filePath, state, effects) => {
     const img = new Image()
-    img.src = `file:///${filePath}`
+    img.src = new URL(`file:///${filePath}`).toString()
     return await new Promise((res, rej) => {
       const onLoad = () => {
         res([r.openFileSuccess(file, filePath)])

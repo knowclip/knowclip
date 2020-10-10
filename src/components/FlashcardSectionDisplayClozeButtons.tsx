@@ -7,7 +7,7 @@ import {
   ClozeIds,
   ClozeHues,
 } from './FlashcardSectionDisplayClozeField'
-import { ClozeControls } from '../utils/useClozeUi'
+import { ClozeControls } from '../utils/clozeField/useClozeControls'
 
 const empty: ClozeDeletion[] = []
 

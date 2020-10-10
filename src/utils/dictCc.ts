@@ -97,8 +97,8 @@ export function trimNonLettersDigitsOrWhitespace(text: string) {
   return text.replace(NON_LETTERS_DIGITS_WHITESPACE, '')
 }
 
-export function getGermanSearchTokens(text: string) {
-  const withoutAnnotations = trimAnnotations(text)
+export function getGermanSearchTokens(dictCcEntryHead: string) {
+  const withoutAnnotations = trimAnnotations(dictCcEntryHead)
     .trim()
     .toLowerCase()
   return withoutAnnotations
@@ -126,10 +126,6 @@ export function getGermanDifferingStems(entryHead: string) {
   }
 
   return stems
-}
-
-export function toSortedX(x: string[]) {
-  return [...x].sort().join(' ')
 }
 
 export function getGermanStems(entryHead: string) {

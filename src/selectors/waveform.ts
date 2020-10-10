@@ -6,3 +6,6 @@ export const getWaveform = (state: AppState): WaveformState => state.waveform
 
 export const getWaveformViewBoxXMin = (state: AppState) =>
   state.waveform.viewBox.xMin
+
+export const getHalfSecond = ({ waveform }: AppState) =>
+  (waveform.stepsPerSecond * waveform.stepLength) / 2

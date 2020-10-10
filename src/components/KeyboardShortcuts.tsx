@@ -35,7 +35,7 @@ const KeyboardShortcuts = () => {
           <CardContent className={css.card}>
             <h3 className={css.heading}>Media</h3>
             <section className={css.group}>
-              <Shortcut keys="Ctrl + P" action="Play/pause" />
+              <Shortcut keys="Shift + Spacebar" action="Play/pause" />
               <Shortcut keys="Ctrl + L" action="Toggle loop" />
               <Shortcut keys="Esc" action="Stop looping" />
             </section>

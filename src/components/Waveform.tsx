@@ -410,9 +410,9 @@ const Waveform = ({ show }: { show: boolean }) => {
     pendingClip: r.getPendingClip(state),
     pendingStretch: r.getPendingStretch(state),
     highlightedClipId: r.getHighlightedClipId(state),
-    subtitles: r.getSubtitlesCardBases(state),
+    subtitles: r.getDisplayedSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
-    waveformItems: r.getWaveformItems(state),
+    waveformItems: r.getDisplayedWaveformItems(state),
     mediaIsLoaded: r.isMediaFileLoaded(state),
   }))
 
@@ -485,7 +485,7 @@ const Waveform = ({ show }: { show: boolean }) => {
       return images.map(({ path, x, file }) => (
         <image
           key={file.id}
-          xlinkHref={`file://${path}`}
+          xlinkHref={new URL(`file://${path}`).toString()}
           style={{ pointerEvents: 'none' }}
           x={x}
         />

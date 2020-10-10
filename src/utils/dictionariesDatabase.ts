@@ -2,11 +2,9 @@ import Dexie, { Database } from 'dexie'
 import { basename } from 'path'
 import { getTableName, LexiconMainEntry } from '../files/dictionaryFile'
 import {
-  getGermanSearchTokens,
-  getGermanStems,
+  getDifferingSearchStem,
   LETTERS_DIGITS_PLUS,
   NON_LETTERS_DIGITS_PLUS,
-  toSortedX,
 } from './dictCc'
 import { uuid } from './sideEffects'
 import { getTokenCombinations } from './tokenCombinations'
@@ -28,8 +26,7 @@ export function getDexieDb() {
     CEDictDictionary: '++key, head, pronunciation, dictionaryKey',
     // all these indexes takes too long to import maybe.
     // would it be ok with just the multi-entry indexes + search sped up with frequency
-    DictCCDictionary:
-      '++key, head, dictionaryKey, searchTokensSorted, *searchTokens, searchTokensCount, *searchStems, searchStemsSorted',
+    DictCCDictionary: '++key, head, dictionaryKey, *tokenCombos',
   })
 
   return dexie
@@ -53,18 +50,29 @@ export async function newDictionary(
   return dic
 }
 
-export type TokenTranslations = {
-  index: number
-  translatedTokens: {
-    token: string
-    candidates: { entry: LexiconMainEntry; inflections: string[] }[]
-  }[]
+export type TranslatedTokensAtCharacterIndex = {
+  textCharacterIndex: number
+  /** To be sorted by length of matchedTokenText */
+  translatedTokens: TranslatedToken[]
+}
+type TranslatedToken = {
+  /** For whitespace languages, there
+   * will only be one tokenText per textCharacterIndex.
+   * So right now, for German `TranslatedTokensAtCharacterIndex.translatedTokens[n].matchedTokenText` will be the same.
+   */
+  matchedTokenText: string
+  candidates: { entry: LexiconMainEntry; inflections: string[] }[]
+}
+
+type TextTokensTranslations = {
+  tokensTranslations: TranslatedTokensAtCharacterIndex[]
+  characterIndexToTranslationsMappings: Array<undefined | number>
 }
 
 export function lookUpInDictionary(
   dictionaryType: DictionaryFileType,
   text: string
-) {
+): Promise<TextTokensTranslations> {
   switch (dictionaryType) {
     case 'YomichanDictionary':
       return lookUpJapanese(text)
@@ -75,23 +83,96 @@ export function lookUpInDictionary(
   }
 }
 
-const SEARCH_TOKENS_SORTED: keyof LexiconMainEntry = 'searchTokensSorted'
-const SEARCH_STEMS_SORTED: keyof LexiconMainEntry = 'searchStemsSorted'
+// const SEARCH_TOKENS_SORTED: keyof LexiconMainEntry = 'searchTokensSorted'
+// const SEARCH_STEMS_SORTED: keyof LexiconMainEntry = 'searchStemsSorted'
+const TOKEN_COMBOS: keyof LexiconMainEntry = 'tokenCombos'
+const MAX_GERMAN_SEARCH_TOKENS_COUNT = 5
+
+const getGermanSearchTokensStrings = (searchStems: string[]) =>
+  getTokenCombinations(
+    searchStems.slice(0, MAX_GERMAN_SEARCH_TOKENS_COUNT).sort()
+  ).map(tokenCombo => {
+    return getTokenComboWithLengthString(tokenCombo, searchStems.length)
+  })
+function getTokenComboWithLengthString(tokenCombo: string[], length: number) {
+  return [...tokenCombo.sort(), length.toString(16).padStart(2, '0')].join(' ')
+}
+function getGermanSearchTokensFromText(germanText: string) {
+  const withoutAnnotations = germanText.trim().toLowerCase()
+  const tokens = withoutAnnotations
+    .split(NON_LETTERS_DIGITS_PLUS)
+    .filter(x => x)
+  return tokens
+}
+function getGermanTextSearchTokensCombos(tokens: string[]) {
+  return getTokenCombinations(
+    tokens.slice(0, MAX_GERMAN_SEARCH_TOKENS_COUNT)
+  ).map(tokenCombo => {
+    return getTokenComboWithLengthString(tokenCombo, tokenCombo.length)
+  })
+}
+;(window as any).getGermanTextSearchTokensCombos = getGermanTextSearchTokensCombos
+export function getGermanTextSearchStems(tokens: string[]) {
+  const stems: string[] = []
+
+  for (const word of tokens) {
+    const stem = getDifferingSearchStem(word) || word
+    stems.push(stem)
+  }
+
+  return stems
+}
 
 export async function lookUpGerman(
   text: string,
   maxQueryTokensLength: number = 5
-): Promise<TokenTranslations[]> {
-  ;(window as any).d = dexie
+): Promise<TextTokensTranslations> {
+  console.log('lookign up!')
 
-  if (!dexie) return []
+  if (!dexie)
+    return {
+      tokensTranslations: [],
+      characterIndexToTranslationsMappings: [],
+    }
 
-  const textTokens = getGermanSearchTokens(text)
-  const textStems = getGermanStems(text)
+  const textTokens = getGermanSearchTokensFromText(text)
+  const textStems = getGermanTextSearchStems(textTokens)
 
   const table = dexie.table(getTableName('DictCCDictionary'))
 
-  const results: TokenTranslations[] = []
+  const allSearchStemsStrings = textStems.flatMap((stem, tokenIndex) => {
+    const searchStems = textStems.slice(
+      tokenIndex,
+      tokenIndex + maxQueryTokensLength
+    )
+    const combos = getGermanTextSearchTokensCombos(searchStems)
+    // console.log({tokenIndex,stem, searchStems, combos})
+    return combos
+  })
+  console.log({ textStems, allSearchStemsStrings })
+
+  const {
+    exactStemsMatches,
+    // , approxMatches
+  } = await dexie.transaction('r', table, async () => {
+    const exactStemsMatches = table
+      .where(TOKEN_COMBOS)
+      .anyOf(allSearchStemsStrings)
+      .distinct()
+      .toArray()
+    return {
+      exactStemsMatches: (await exactStemsMatches) as LexiconMainEntry[],
+      // approxMatches: (await approxMatches).flatMap(x => x) as LexiconMainEntry[],
+    }
+  })
+
+  console.log({
+    exactStemsMatches: exactStemsMatches,
+    exactCount: exactStemsMatches.length,
+    // approxMatches: approxMatches.length
+  })
+
+  const results: TranslatedTokensAtCharacterIndex[] = []
 
   let indexingCursor = 0
   let tokenIndex = 0
@@ -104,63 +185,46 @@ export async function lookUpGerman(
       tokenIndex,
       tokenIndex + maxQueryTokensLength
     )
-    const potentialParsingsAtIndex = getTokenCombinations(searchTokens)
+    const tokenCombinationsAtIndex = getTokenCombinations(searchTokens)
+    const stemCombinationsAtIndex = getTokenCombinations(searchStems)
 
     const tokenCharacterIndex = text
       .toLowerCase()
       .indexOf(exactToken, indexingCursor)
-
-    const exactTokensMatches = (await Promise.all(
-      getTokenCombinations(searchTokens).map(async parsing => {
-        const searchValue = toSortedX(parsing)
-        console.log({ searchValue })
-        const lex: LexiconMainEntry[] = await table
-          .where(SEARCH_TOKENS_SORTED)
-          .equals(searchValue)
-          .toArray()
-        return lex
+    const searchStemsAtIndex = stemCombinationsAtIndex.flatMap(stemCombo => {
+      const stemComboString = stemCombo.sort().join(' ')
+      // perhaps can use entry.tokenCombos first value instead of calling getGermanSearchTokens each time here?
+      // except here we're testing "raw" tokens, not stems
+      const exactMatches = exactStemsMatches.filter(entry => {
+        // return getGermanSearchTokens(entry.head).sort().join(' ') === stemComboString
+        return (
+          entry.tokenCombos[0] ===
+          stemComboString + ` ${stemCombo.length.toString(16).padStart(2, '0')}`
+        )
       })
-    )).flatMap(x => x)
-    const approxMatches =
-      // should really always run this? or maybe exactTokensMatches lenght threshold?
-      // should filter out candidates with separable prefixes according to context.
-      // sort should prioritize words without padding punctuation
-      //    and without semantic annotations.
-      (await Promise.all(
-        getTokenCombinations(searchStems).map(async parsing => {
-          const searchValue = toSortedX(parsing)
-          console.log({ searchValue })
-          const lex: LexiconMainEntry[] = await table
-            .where(SEARCH_STEMS_SORTED)
-            .equals(searchValue)
-            .limit(50)
-            .toArray()
-          return lex
-        })
-      )).flatMap(x => x)
-    const matches = [...exactTokensMatches, ...approxMatches]
-    if (matches.length)
+      return exactMatches
+    })
+    if (searchStemsAtIndex.length)
       results.push({
-        index: tokenCharacterIndex,
-        translatedTokens: [
-          {
-            token: exactToken,
-            // todo: filter out repeat keys
-            candidates: matches.map(m => ({ entry: m, inflections: [] })),
-          },
-        ],
+        textCharacterIndex: tokenCharacterIndex,
+        translatedTokens: searchStemsAtIndex.map(
+          (entry): TranslatedToken => ({
+            matchedTokenText: exactToken,
+            candidates: [{ entry: entry, inflections: [] }],
+          })
+        ),
       })
-
-    console.log(
-      { exactToken, indexingCursor, tokenIndex, potentialParsingsAtIndex },
-      { tokens: exactTokensMatches }
-    )
 
     indexingCursor = tokenCharacterIndex + exactToken.length - 1
     tokenIndex++
   }
-
-  return results
+  // should sort to prioritize
+  // exact matches and matches
+  // preserving the order parts corresponding to query tokens
+  return {
+    tokensTranslations: results,
+    characterIndexToTranslationsMappings: [],
+  }
 }
 
 const HEAD: keyof LexiconMainEntry = 'head'
@@ -169,8 +233,12 @@ const PRONUNCIATION: keyof LexiconMainEntry = 'pronunciation'
 export async function lookUpJapanese(
   text: string
   // activeDictionaries: string[] ???
-): Promise<TokenTranslations[]> {
-  if (!dexie) return []
+): Promise<TextTokensTranslations> {
+  if (!dexie)
+    return {
+      tokensTranslations: [],
+      characterIndexToTranslationsMappings: [],
+    }
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
 
   const allLookupTokens = Array.from(allTokens, token => [
@@ -189,7 +257,7 @@ export async function lookUpJapanese(
 
   console.log(allQueries.length + ' total results!')
 
-  return potentialTokens.flatMap(({ tokens, index }) => {
+  const tokensTranslations = potentialTokens.flatMap(({ tokens, index }) => {
     const translatedTokens = tokens.flatMap(token => {
       const candidates = allQueries.flatMap(entry => {
         const exactMatch = entry.head === token || entry.pronunciation === token
@@ -224,10 +292,10 @@ export async function lookUpJapanese(
         ]
       })
 
-      return candidates.length
+      const translatedTokensAtCharacterIndex: TranslatedToken[] = candidates.length
         ? [
             {
-              token,
+              matchedTokenText: token,
               candidates: candidates.sort((a, b) => {
                 if (
                   [a.entry.head, b.entry.head].filter(head => head === token)
@@ -256,19 +324,25 @@ export async function lookUpJapanese(
             },
           ]
         : []
+      return translatedTokensAtCharacterIndex
     })
 
     return translatedTokens.length
       ? [
           {
-            index,
+            textCharacterIndex: index,
             translatedTokens,
           },
         ]
       : []
+
     // TODO: fix "precise token hit"
     // e.g. in kusukusurawarau, mouseover warau should not give kusukusuwarau but warau.
   })
+  return {
+    tokensTranslations: tokensTranslations,
+    characterIndexToTranslationsMappings: [],
+  }
 }
 
 function wordIndexes(s: string) {

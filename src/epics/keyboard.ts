@@ -17,7 +17,7 @@ import { isTextFieldFocused } from '../utils/isTextFieldFocused'
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
-      const { ctrlKey, altKey, key } = event
+      const { shiftKey, ctrlKey, altKey, key } = event
       const meta = getMetaOrCtrlKey(event)
 
       if (
@@ -38,10 +38,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return of(r.startEditingCards())
       }
 
-      if (
-        key.toLowerCase() === KEYS.pLowercase &&
-        (ctrlKey || !isTextFieldFocused())
-      ) {
+      if (key === KEYS.space && (shiftKey || !isTextFieldFocused())) {
         event.preventDefault()
         effects.toggleMediaPaused()
         return empty()

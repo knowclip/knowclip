@@ -205,7 +205,6 @@
 .fieldValue {
     display: inline;
     position: relative;
-    z-index: 1;
 
   /* word-break: break-all; */
 
@@ -213,7 +212,6 @@
 .clozeFieldValue {
   composes: fieldValue;
   color: black;
-  z-index: 4;
 
   position: relative;
   white-space: no-wrap;
