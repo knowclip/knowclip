@@ -205,9 +205,6 @@
 .fieldValue {
     display: inline;
     position: relative;
-
-  /* word-break: break-all; */
-
 }
 .clozeFieldValue {
   composes: fieldValue;

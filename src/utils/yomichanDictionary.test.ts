@@ -2,11 +2,11 @@ import { lemmatize } from './yomichanDictionary'
 
 describe('lemmatize', () => {
   it('works with 描いた', () => {
-    expect(lemmatize('描いた')).toContain('描く')
+    expect(lemmatize('描いた').map(l => l.text)).toContain('描く')
   })
 
   it('works with 出来ます', () => {
-    expect(lemmatize('出来ます')).toEqual(['出来る'])
+    expect(lemmatize('出来ます').map(l => l.text)).toEqual(['出来る'])
   })
 
   it('works with 表されます', () => {
@@ -19,6 +19,15 @@ describe('lemmatize', () => {
   })
 
   it('works with されている', () => {
-    expect(lemmatize('されている')).toEqual(['される', 'さる'])
+    expect(lemmatize('されている').map(l => l.text)).toEqual([
+      'されて',
+      'される',
+      'する',
+      'す',
+      'さる',
+      'されつ',
+      'されてる',
+      'されつ',
+    ])
   })
 })
