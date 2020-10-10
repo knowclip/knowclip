@@ -7,6 +7,7 @@ import {
   removeRange,
   trimClozeRangeOverlaps,
 } from './clozeRanges'
+import { KEYS } from './keyboard'
 
 const empty: ClozeDeletion[] = []
 
@@ -140,8 +141,10 @@ export default function useClozeControls({
         selection.current = null
 
         if (
-          (e.keyCode === 13 ||
-            (e.keyCode === 67 && !e.metaKey && !e.ctrlKey)) &&
+          (e.key === KEYS.enter ||
+            (e.key.toLowerCase() === KEYS.cLowercase &&
+              !e.metaKey &&
+              !e.ctrlKey)) &&
           currentSelection &&
           currentSelection.start !== currentSelection.end
         ) {
@@ -161,14 +164,16 @@ export default function useClozeControls({
               )
           }
           return confirmSelection(clozeIndex, currentSelection)
-          // C key
-        } else if (e.keyCode === 67 && !e.metaKey && !e.ctrlKey) {
+        } else if (
+          e.key.toLowerCase() === KEYS.cLowercase &&
+          !e.metaKey &&
+          !e.ctrlKey
+        ) {
           const potentialNewIndex = clozeIndex + 1
           const newIndex =
             potentialNewIndex > deletions.length ? -1 : potentialNewIndex
           return setClozeIndex(newIndex)
-          // enter or esc
-        } else if (e.keyCode === 13 || e.keyCode === 27) {
+        } else if (e.key === KEYS.enter || e.key === KEYS.escape) {
           if (clozeIndex !== -1) setClozeIndex(-1)
         }
       }
@@ -196,8 +201,10 @@ export default function useClozeControls({
 
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
-      // enter or C
-      if (e.keyCode === 13 || (e.keyCode === 67 && !e.metaKey && !e.ctrlKey)) {
+      if (
+        e.key === KEYS.enter ||
+        (e.key.toLowerCase() === KEYS.cLowercase && !e.metaKey && !e.ctrlKey)
+      ) {
         registerSelection()
       }
     }
@@ -335,7 +342,7 @@ function getTextNodesIn(node: Node) {
   return textNodes
 }
 
-function setSelectionRange(el: HTMLElement, start: number, end: number) {
+export function setSelectionRange(el: HTMLElement, start: number, end: number) {
   var range = document.createRange()
   range.selectNodeContents(el)
   var textNodes = getTextNodesIn(el)

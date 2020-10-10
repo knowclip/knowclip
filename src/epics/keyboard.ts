@@ -10,30 +10,33 @@ import { fromEvent, from, of, merge, OperatorFunction, empty } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
+import { KEYS } from '../utils/keyboard'
+import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 
 const isTextFieldFocused = () => {
-  const { activeElement } = document
-  if (!activeElement) return false
+  const { activeElement, body } = document
+  if (!activeElement || activeElement === body) return false
   return (
     activeElement instanceof HTMLInputElement ||
     activeElement instanceof HTMLTextAreaElement ||
-    activeElement instanceof HTMLDivElement ||
-    activeElement instanceof HTMLSpanElement
+    activeElement instanceof HTMLSelectElement
   )
 }
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
-      const { ctrlKey, altKey, keyCode } = event
+      const { ctrlKey, altKey, key } = event
+      const meta = getMetaOrCtrlKey(event)
 
-      // L key
-      if (keyCode === 76 && (ctrlKey || !isTextFieldFocused()))
+      if (
+        key.toLowerCase() === KEYS.lLowercase &&
+        (ctrlKey || !isTextFieldFocused())
+      )
         return of(r.toggleLoop())
 
-      // E key
       if (
-        keyCode === 69 &&
+        key.toLowerCase() === KEYS.eLowercase &&
         !isTextFieldFocused() &&
         !(
           r.getHighlightedClipId(state$.value) &&
@@ -44,28 +47,24 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return of(r.startEditingCards())
       }
 
-      // space
-      if (keyCode === 32 && (ctrlKey || !document.activeElement)) {
+      if (
+        key.toLowerCase() === KEYS.pLowercase &&
+        (ctrlKey || !isTextFieldFocused())
+      ) {
         event.preventDefault()
-        const activeElement = window.document.activeElement
-        if (
-          !(activeElement && ['VIDEO', 'AUDIO'].includes(activeElement.tagName))
-        )
-          effects.toggleMediaPaused()
+        effects.toggleMediaPaused()
         return empty()
       }
-      // right arrow
-      if (keyCode === 39 && (altKey || !isTextFieldFocused())) {
+
+      if (key === KEYS.arrowRight && (altKey || !isTextFieldFocused())) {
         return of(r.highlightRightClipRequest())
       }
 
-      // left arrow
-      if (keyCode === 37 && (altKey || !isTextFieldFocused())) {
+      if (key === KEYS.arrowLeft && (altKey || !isTextFieldFocused())) {
         return of(r.highlightLeftClipRequest())
       }
 
-      // esc
-      if (keyCode === 27) {
+      if (key === KEYS.escape) {
         if (r.getCurrentDialog(state$.value) || (window as any).cloze)
           return of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)
 
@@ -92,23 +91,13 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
     })
   )
 
-const cmd: OperatorFunction<KeyboardEvent, KeyboardEvent> = filter(
-  ({ keyCode }) => keyCode === 91
-)
 const saveKey = (window: Window) =>
   merge(
     fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-      filter(({ ctrlKey, keyCode }) => keyCode === 83 && ctrlKey) // ctrl + S
-    ),
-    fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-      cmd,
-      switchMap(() =>
-        fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-          filter(({ keyCode }) => keyCode === 83), // S
-          takeUntil(fromEvent<KeyboardEvent>(window, 'keyup').pipe(cmd)),
-          take(1)
-        )
-      )
+      filter(e => {
+        const { key } = e
+        return key.toLowerCase() === KEYS.sLowercase && getMetaOrCtrlKey(e)
+      })
     )
   )
 
