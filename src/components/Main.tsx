@@ -58,8 +58,11 @@ const Main = () => {
         })}
       >
         {audioIsLoading ? (
-          <div className={css.media} style={{ alignItems: 'center' }}>
-            <CircularProgress />
+          <div
+            className={css.media}
+            style={{ alignItems: 'center', margin: '2rem' }}
+          >
+            <CircularProgress variant="indeterminate" />
           </div>
         ) : (
           <Media

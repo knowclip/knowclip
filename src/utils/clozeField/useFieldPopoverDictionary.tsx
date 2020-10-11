@@ -13,6 +13,7 @@ import usePopover from '../usePopover'
 import { findTranslationsAtCharIndex } from '../dictionaries/findTranslationsAtCharIndex'
 import { usePrevious } from '../usePrevious'
 import { useClozeUiEffects } from './useClozeUiEffects'
+import { LETTERS_DIGITS_PLUS } from '../dictCc'
 
 export function useFieldPopoverDictionary(
   popover: ReturnType<typeof usePopover>,
@@ -152,8 +153,14 @@ export function useFieldPopoverDictionary(
             mouseoverChar.dataset &&
             +(mouseoverChar.dataset.characterIndex || 0)
         )
-        setTranslationsAtCharacter(translationsAtCharacter)
 
+        const nonwordMouseenter =
+          !translationsAtCharacter.length &&
+          !LETTERS_DIGITS_PLUS.test(value[mouseCharIndex])
+        console.log({ nonwordMouseenter }, value[mouseCharIndex])
+        if (!nonwordMouseenter) {
+          setTranslationsAtCharacter(translationsAtCharacter)
+        }
         // if (tokens.length && tokenHit && tokenHit.token) {
         if (translationsAtCharacter.length && mouseCharIndex !== -1) {
           // if (!editing && isMediaPlaying) {
@@ -172,7 +179,7 @@ export function useFieldPopoverDictionary(
         }
       }
     },
-    [popover.isOpen, mouseoverChar, tokenTranslations, ref, editing]
+    [popover.isOpen, mouseoverChar, tokenTranslations, ref, editing, value]
   )
   // loop when using dictionary
   const previousPopoverIsOpen = usePrevious(popover.isOpen)
