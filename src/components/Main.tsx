@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { CircularProgress } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
@@ -11,6 +11,7 @@ import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import DarkTheme from '../components/DarkTheme'
 import css from '../components/Main.module.css'
 import * as r from '../selectors'
+import { setMousePosition } from '../utils/mousePosition'
 
 enum $ {
   container = 'main-screen-container',
@@ -40,6 +41,14 @@ const Main = () => {
       viewMode: state.settings.viewMode,
     }
   })
+
+  useEffect(() => {
+    const trackCursor = (e: MouseEvent) => {
+      setMousePosition([e.clientX, e.clientY])
+    }
+    document.addEventListener('mousemove', trackCursor)
+    return () => document.removeEventListener('mousemove', trackCursor)
+  }, [])
 
   if (!currentProject) return <Redirect to="/projects" />
 

@@ -17,6 +17,8 @@ declare type Action =
   | SetProgress
   | StartEditingCards
   | StopEditingCards
+  | OpenDictionaryPopover
+  | CloseDictionaryPopover
   | NewCardFromSubtitlesRequest
 
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
@@ -39,6 +41,12 @@ declare type StartEditingCards = {
 }
 declare type StopEditingCards = {
   type: 'STOP_EDITING_CARDS'
+}
+declare type OpenDictionaryPopover = {
+  type: 'OPEN_DICTIONARY_POPOVER'
+}
+declare type CloseDictionaryPopover = {
+  type: 'CLOSE_DICTIONARY_POPOVER'
 }
 
 declare type NewCardFromSubtitlesRequest = {

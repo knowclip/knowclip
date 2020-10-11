@@ -4,6 +4,23 @@
   max-height: 20rem;
   padding: 0.5rem;
   overflow: auto;
+  position: relative;
+  scroll-margin-top: 1rem;
+
+  /* for close button */
+  margin-top: 1em;
+  margin-right: 1em;
+}
+
+.closeButton {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  background-color: gray !important;
+  opacity: .7;
+}
+.closeButton:hover {
+  opacity: 1;
 }
 
 .dictionaryEntry {
@@ -14,8 +31,7 @@
 
 }
 .entryHead {
-  margin: 0;
-  display: inline;
+  margin: 0 1rem 0 0;
   margin-right: 0.5em;
 }
 .japaneseEntryHeadWithFurigana {
@@ -30,3 +46,4 @@
 .entryMeaningsList {
   padding: 0;
 }
+

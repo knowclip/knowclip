@@ -1,12 +1,5 @@
-import {
-  filter,
-  map,
-  flatMap,
-  switchMap,
-  takeUntil,
-  take,
-} from 'rxjs/operators'
-import { fromEvent, from, of, merge, OperatorFunction, empty } from 'rxjs'
+import { filter, map, flatMap, switchMap, takeUntil } from 'rxjs/operators'
+import { fromEvent, from, of, merge, empty } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
@@ -64,6 +57,10 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
             ...(r.isLoopOn(state$.value) ? [r.setLoop(false)] : []),
             r.stopEditingCards(),
           ])
+
+        if (state$.value.session.dictionaryPopoverIsOpen) {
+          return from([r.closeDictionaryPopover()])
+        }
 
         return of(
           effects.isMediaPlaying()

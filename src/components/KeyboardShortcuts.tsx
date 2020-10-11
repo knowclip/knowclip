@@ -35,7 +35,7 @@ const KeyboardShortcuts = () => {
           <CardContent className={css.card}>
             <h3 className={css.heading}>Media</h3>
             <section className={css.group}>
-              <Shortcut keys="Shift + Spacebar" action="Play/pause" />
+              <Shortcut keys="Shift + Space" action="Play/pause" />
               <Shortcut keys="Ctrl + L" action="Toggle loop" />
               <Shortcut keys="Esc" action="Stop looping" />
             </section>
@@ -44,7 +44,18 @@ const KeyboardShortcuts = () => {
               <h3 className={css.heading}>Navigate between clips/subtitles</h3>
               <Shortcut keys="←" action="Select previous" />
               <Shortcut keys="→" action="Select next" />
+              <Shortcut
+                keys="Alt + ←"
+                action="Select previous (while editing)"
+              />
+              <Shortcut keys="Alt + →" action="Select next (while editing)" />
               <Shortcut keys="Esc" action="Deselect current" />
+            </section>
+
+            <section className={css.group}>
+              <h3 className={css.heading}>Dictionary</h3>
+              <Shortcut keys="D" action="Look up word at mouse cursor" />
+              <Shortcut keys="Esc" action="Close dictionary popover" />
             </section>
 
             <section className={css.group}>

@@ -9,6 +9,7 @@ import {
 } from '../clozeRanges'
 import { KEYS } from '../keyboard'
 import { getSelectionWithin, setSelectionRange } from './domSelection'
+import { useClozeCursorPosition } from './useClozeUiEffects'
 
 const empty: ClozeDeletion[] = []
 
@@ -32,6 +33,8 @@ export default function useClozeControls({
   const playing = useSelector((state: AppState) => r.isMediaPlaying(state))
   const dispatch = useDispatch()
 
+  const inputRef = useRef<HTMLSpanElement>(null)
+  const { cursorPosition, setCursorPosition } = useClozeCursorPosition(inputRef)
   const selection = useRef<ClozeRange | null>(null)
 
   const [clozeIndex, _setClozeIndex] = useState<number>(-1)
@@ -63,8 +66,6 @@ export default function useClozeControls({
     },
     [clozeIndex]
   )
-
-  const inputRef = useRef<HTMLSpanElement>(null)
 
   const getSelection = useCallback(() => {
     const el = inputRef.current
@@ -114,8 +115,10 @@ export default function useClozeControls({
         if (currentClozeIndex !== clozeIndex) setClozeIndex(clozeIndex)
       }
 
-      if (inputRef.current)
+      if (inputRef.current) {
         setSelectionRange(inputRef.current, selection.end, selection.end)
+        setCursorPosition(selection.end)
+      }
 
       return selection || undefined
     },
@@ -126,6 +129,7 @@ export default function useClozeControls({
       onNewClozeCard,
       currentClozeIndex,
       setClozeIndex,
+      setCursorPosition,
     ]
   )
 
@@ -215,35 +219,14 @@ export default function useClozeControls({
   })
 
   const clozeTextInputActions = {
-    // onSelect: useCallback(
-    //   selection => {
-    //     if (selectionGivesNewCard(selection)) {
-    //       onNewClozeCard({
-    //         ranges: [selection],
-    //       })
-    //     }
-    //     if (editingCard && onEditClozeCard) {
-    //       const ranges = collapseRanges(deletions[clozeIndex].ranges, selection)
-    //       if (ranges !== deletions[clozeIndex].ranges)
-    //         onEditClozeCard(clozeIndex, ranges)
-    //     }
-    //   },
-    //   [
-    //     clozeIndex,
-    //     deletions,
-    //     editingCard,
-    //     onEditClozeCard,
-    //     onNewClozeCard,
-    //     selectionGivesNewCard,
-    //   ]
-    // ),
     onBackspace: useCallback(
-      // TODO: fix cloze trim behavior
       selection => {
+        console.log({ selection })
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end && selection.start !== 0) {
             const newCursor = selection.start - 1
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             const newRanges = removeRange(deletions[clozeIndex].ranges, {
               start: newCursor,
               end: selection.start,
@@ -252,6 +235,7 @@ export default function useClozeControls({
           } else {
             const newCursor = Math.min(selection.start, selection.end)
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             onEditClozeCard(
               clozeIndex,
               removeRange(deletions[clozeIndex].ranges, selection)
@@ -260,9 +244,10 @@ export default function useClozeControls({
         } else if (inputRef.current) {
           const newCursor = selection.end - 1
           setSelectionRange(inputRef.current, newCursor, newCursor)
+          setCursorPosition(newCursor)
         }
       },
-      [clozeIndex, deletions, editingCard, onEditClozeCard]
+      [clozeIndex, deletions, editingCard, onEditClozeCard, setCursorPosition]
     ),
     onPressDelete: useCallback(
       selection => {
@@ -270,6 +255,7 @@ export default function useClozeControls({
           if (selection.start === selection.end) {
             const newCursor = selection.end + 1
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             onEditClozeCard(
               clozeIndex,
               removeRange(deletions[clozeIndex].ranges, {
@@ -280,6 +266,7 @@ export default function useClozeControls({
           } else {
             const newCursor = Math.max(selection.start, selection.end)
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             onEditClozeCard(
               clozeIndex,
               removeRange(deletions[clozeIndex].ranges, selection)
@@ -287,7 +274,7 @@ export default function useClozeControls({
           }
         }
       },
-      [clozeIndex, deletions, editingCard, onEditClozeCard]
+      [clozeIndex, deletions, editingCard, onEditClozeCard, setCursorPosition]
     ),
   }
 
@@ -302,5 +289,7 @@ export default function useClozeControls({
     confirmSelection,
     clozeTextInputActions,
     getSelection,
+    setCursorPosition,
+    cursorPosition,
   }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ClozeControls } from './useClozeControls'
 import { setSelectionRange } from './domSelection'
@@ -14,25 +14,135 @@ import { findTranslationsAtCharIndex } from '../dictionaries/findTranslationsAtC
 import { usePrevious } from '../usePrevious'
 import { useClozeUiEffects } from './useClozeUiEffects'
 import { LETTERS_DIGITS_PLUS } from '../dictCc'
+import { getMousePosition } from '../mousePosition'
+
+function getMouseoverChar(mousePosition: [number, number] | null) {
+  if (!mousePosition) return null
+
+  const mouseoverCharSpan = document.elementFromPoint(...mousePosition)
+  if (
+    mouseoverCharSpan &&
+    mouseoverCharSpan.tagName === 'SPAN' &&
+    (mouseoverCharSpan as HTMLSpanElement).dataset.characterIndex
+  )
+    return mouseoverCharSpan as HTMLSpanElement
+  else return null
+}
 
 export function useFieldPopoverDictionary(
   popover: ReturnType<typeof usePopover>,
   activeDictionaryType: DictionaryFileType | null,
-  clozeTextInputActions: ClozeControls['clozeTextInputActions'],
-  ref: ClozeControls['inputRef'],
+  clozeControls: ClozeControls,
   value: string,
   editing: boolean
 ) {
+  const { inputRef: ref } = clozeControls
   const dispatch = useDispatch()
-  const { isMediaPlaying, loopIsOn } = useSelector((state: AppState) => ({
-    isMediaPlaying: r.isMediaPlaying(state),
-    loopIsOn: r.isLoopOn(state),
-  }))
+  const { isMediaPlaying, loopIsOn, popoverIsOpenFromStore } = useSelector(
+    (state: AppState) => ({
+      isMediaPlaying: r.isMediaPlaying(state),
+      loopIsOn: r.isLoopOn(state),
+      popoverIsOpenFromStore: state.session.dictionaryPopoverIsOpen,
+    })
+  )
   const dictionaryPopoverIsShowing = Boolean(
     popover.isOpen && activeDictionaryType
   )
 
+  const previousPopoverIsOpen = usePrevious(popover.isOpen)
   const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
+
+  useEffect(
+    () => {
+      dispatch(
+        popover.isOpen ? r.openDictionaryPopover() : r.closeDictionaryPopover()
+      )
+    },
+    [popover.isOpen, dispatch]
+  )
+  const { close: closePopover } = popover
+
+  // loop when using dictionary
+  useEffect(
+    () => {
+      if (
+        popover.isOpen &&
+        !previousPopoverIsOpen &&
+        !editing &&
+        isMediaPlaying
+      ) {
+        console.log('looping now!', { loopIsOn })
+        setWasLoopingBeforeFocus(loopIsOn)
+        dispatch(r.setLoop(true))
+      }
+    },
+    [
+      isMediaPlaying,
+      popover.isOpen,
+      editing,
+      previousPopoverIsOpen,
+      loopIsOn,
+      dispatch,
+      setWasLoopingBeforeFocus,
+    ]
+  )
+
+  const popoverWasOpen = usePrevious(popover.isOpen)
+
+  useEffect(
+    () => {
+      if (popoverWasOpen && !popover.isOpen) {
+        console.log('closed popover!')
+        if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
+          console.log('unlooping now!', { wasLoopingBeforeFocus })
+          dispatch(r.setLoop(wasLoopingBeforeFocus))
+        }
+      }
+    },
+    [
+      dispatch,
+      editing,
+      isMediaPlaying,
+      loopIsOn,
+      popover.isOpen,
+      popoverWasOpen,
+      wasLoopingBeforeFocus,
+    ]
+  )
+
+  useEffect(
+    () => {
+      console.log({ popoverIsOpenFromStore })
+      if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {
+        console.log('closing popover due to redux signal')
+
+        if (
+          isMediaPlaying &&
+          // dictionaryPopoverIsShowing &&
+          !editing &&
+          wasLoopingBeforeFocus !== loopIsOn
+        ) {
+          console.log('unlooping now!', { wasLoopingBeforeFocus })
+          dispatch(r.setLoop(wasLoopingBeforeFocus))
+        }
+
+        closePopover({} as SyntheticEvent)
+      }
+    },
+    [
+      popoverWasOpen,
+      popover.isOpen,
+      popoverIsOpenFromStore,
+      closePopover,
+      isMediaPlaying,
+      editing,
+      wasLoopingBeforeFocus,
+      loopIsOn,
+      dispatch,
+    ]
+  )
+
+  const { anchorCallbackRef } = popover
 
   const [tokenTranslations, setTokenTranslations] = useState<
     TranslatedTokensAtCharacterIndex[]
@@ -47,8 +157,7 @@ export function useFieldPopoverDictionary(
     handleBlur,
     cursorPosition,
   } = useClozeUiEffects(
-    clozeTextInputActions,
-    ref,
+    clozeControls,
     value,
     dispatch,
     dictionaryPopoverIsShowing,
@@ -79,22 +188,25 @@ export function useFieldPopoverDictionary(
   const [mouseoverChar, setMouseoverChar] = useState<HTMLSpanElement | null>(
     null
   )
-  const { anchorCallbackRef } = popover
-  const handleCharMouseEnter_ = useCallback(
-    (characterIndex: number, charSpanRef: HTMLSpanElement | null) => {
-      setMouseoverChar(charSpanRef)
-      anchorCallbackRef(charSpanRef)
-      return
+  useEffect(
+    () => {
+      const mouseoverCharSpan = getMouseoverChar(getMousePosition())
+
+      setMouseoverChar(mouseoverCharSpan)
+      anchorCallbackRef(mouseoverCharSpan)
+
+      const trackCursor = (e: MouseEvent) => {
+        const mouseoverCharSpan = getMouseoverChar([e.clientX, e.clientY])
+        if (mouseoverCharSpan) {
+          setMouseoverChar(mouseoverCharSpan)
+          anchorCallbackRef(mouseoverCharSpan)
+        }
+      }
+      document.addEventListener('mousemove', trackCursor)
+      return () => document.removeEventListener('mousemove', trackCursor)
     },
     [anchorCallbackRef]
   )
-  const handleCharMouseEnter = activeDictionaryType
-    ? handleCharMouseEnter_
-    : undefined
-  const handleMouseLeave = useCallback(() => {
-    // setTokenHit([])
-    // popover.anchorCallbackRef(null)
-  }, [])
 
   // show popup on press D
   useEffect(
@@ -116,7 +228,9 @@ export function useFieldPopoverDictionary(
             )
           }
 
-          popover.open(e as any)
+          if (mouseoverChar) {
+            popover.open(e as any)
+          }
         }
       }
       document.addEventListener('keydown', showDictionaryPopup)
@@ -125,6 +239,7 @@ export function useFieldPopoverDictionary(
     [
       activeDictionaryType,
       dispatch,
+      mouseoverChar,
       popover,
       ref,
       tokenTranslations,
@@ -147,12 +262,6 @@ export function useFieldPopoverDictionary(
           mouseoverChar && mouseoverChar.dataset
             ? findTranslationsAtCharIndex(tokenTranslations, mouseCharIndex)
             : []
-        console.log(
-          { tokenHit: translationsAtCharacter },
-          mouseoverChar &&
-            mouseoverChar.dataset &&
-            +(mouseoverChar.dataset.characterIndex || 0)
-        )
 
         const nonwordMouseenter =
           !translationsAtCharacter.length &&
@@ -161,14 +270,7 @@ export function useFieldPopoverDictionary(
         if (!nonwordMouseenter) {
           setTranslationsAtCharacter(translationsAtCharacter)
         }
-        // if (tokens.length && tokenHit && tokenHit.token) {
         if (translationsAtCharacter.length && mouseCharIndex !== -1) {
-          // if (!editing && isMediaPlaying) {
-          //   console.log('looping now!')
-          //   setWasLoopingBeforeFocus(loopIsOn)
-          //   dispatch(r.setLoop(true))
-          //   // (ref.current as HTMLElement).focus()
-          // }
           setSelectionRange(
             ref.current as HTMLElement,
             translationsAtCharacter[0].textCharacterIndex,
@@ -181,61 +283,6 @@ export function useFieldPopoverDictionary(
     },
     [popover.isOpen, mouseoverChar, tokenTranslations, ref, editing, value]
   )
-  // loop when using dictionary
-  const previousPopoverIsOpen = usePrevious(popover.isOpen)
-  useEffect(
-    () => {
-      console.log('checking for loop!')
-      if (
-        popover.isOpen &&
-        !previousPopoverIsOpen &&
-        !editing &&
-        isMediaPlaying
-      ) {
-        console.log('looping now!', { loopIsOn })
-        setWasLoopingBeforeFocus(loopIsOn)
-        dispatch(r.setLoop(true))
-      }
-    },
-    [
-      isMediaPlaying,
-      popover.isOpen,
-      editing,
-      previousPopoverIsOpen,
-      loopIsOn,
-      dispatch,
-      setWasLoopingBeforeFocus,
-    ]
-  )
-  useEffect(
-    () => {
-      console.log('checking for unloop!', {
-        popoverIsOpen: popover.isOpen,
-        previousPopoverIsOpen,
-      })
-      if (
-        !popover.isOpen &&
-        previousPopoverIsOpen &&
-        isMediaPlaying &&
-        // dictionaryPopoverIsShowing &&
-        !editing &&
-        wasLoopingBeforeFocus !== loopIsOn
-      ) {
-        console.log('looping now!', { wasLoopingBeforeFocus })
-        dispatch(r.setLoop(wasLoopingBeforeFocus))
-      }
-    },
-    [
-      dictionaryPopoverIsShowing,
-      editing,
-      wasLoopingBeforeFocus,
-      loopIsOn,
-      isMediaPlaying,
-      dispatch,
-      popover.isOpen,
-      previousPopoverIsOpen,
-    ]
-  )
 
   return {
     cursorPosition,
@@ -243,7 +290,5 @@ export function useFieldPopoverDictionary(
     onKeyDown,
     handleFocus,
     handleBlur,
-    handleCharMouseEnter,
-    handleMouseLeave,
   }
 }

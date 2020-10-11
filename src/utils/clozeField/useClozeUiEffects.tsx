@@ -10,8 +10,7 @@ import { KEYS } from '../keyboard'
 import { ClozeControls } from './useClozeControls'
 
 export function useClozeUiEffects(
-  { onBackspace, onPressDelete }: ClozeControls['clozeTextInputActions'],
-  ref: ClozeControls['inputRef'],
+  clozeControls: ClozeControls,
   value: string,
   dispatch: any,
   dictionaryPopoverIsShowing: boolean,
@@ -21,7 +20,12 @@ export function useClozeUiEffects(
   loopIsOn: boolean,
   wasLoopingBeforeFocus: boolean
 ) {
-  const { cursorPosition, setCursorPosition } = useClozeCursorPosition(ref)
+  const {
+    clozeTextInputActions: { onBackspace, onPressDelete },
+    inputRef: ref,
+    cursorPosition,
+    setCursorPosition,
+  } = clozeControls
 
   const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = useCallback(
     e => {
@@ -95,13 +99,29 @@ export function useClozeUiEffects(
 
         case KEYS.delete: {
           const selection = getSelectionWithin(e.target as HTMLInputElement)
-          onPressDelete(selection)
+          const cursorPositionSelection = {
+            start: cursorPosition || 0,
+            end: cursorPosition || 0,
+          }
+          onPressDelete(
+            selection.start === selection.end
+              ? cursorPositionSelection
+              : selection
+          )
           e.preventDefault()
           break
         }
         case KEYS.backspace: {
           const selection = getSelectionWithin(e.target as HTMLInputElement)
-          onBackspace(selection)
+          const cursorPositionSelection = {
+            start: cursorPosition || 0,
+            end: cursorPosition || 0,
+          }
+          onBackspace(
+            selection.start === selection.end
+              ? cursorPositionSelection
+              : selection
+          )
           e.preventDefault()
           break
         }
@@ -172,7 +192,7 @@ export function useClozeUiEffects(
   return { onKeyDown, handleFocus, handleBlur, cursorPosition }
 }
 
-function useClozeCursorPosition(ref: React.RefObject<HTMLSpanElement>) {
+export function useClozeCursorPosition(ref: React.RefObject<HTMLSpanElement>) {
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
 
   useEffect(

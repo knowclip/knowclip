@@ -17,6 +17,7 @@ import * as r from '../redux'
 import usePopover from '../utils/usePopover'
 import { DictionaryPopover } from './DictionaryPopover'
 import { useFieldPopoverDictionary } from '../utils/clozeField/useFieldPopoverDictionary'
+import { getSelectionWithin } from '../utils/clozeField/domSelection'
 
 // check nico 38:53 einverstanden? gives no result
 // check tobira
@@ -27,7 +28,6 @@ const ClozeField = ({
   linkedTracks,
   mediaFileId,
   value,
-  onDoubleClick,
   clozeControls,
 }: {
   className?: string
@@ -36,7 +36,6 @@ const ClozeField = ({
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
   value: string
-  onDoubleClick?: (fieldName: FlashcardFieldName) => void
   clozeControls: ClozeControls
 }) => {
   const {
@@ -44,18 +43,37 @@ const ClozeField = ({
     previewClozeIndex = -1,
     deletions,
     inputRef: clozeInputRef,
-    clozeTextInputActions,
   } = clozeControls
 
   const currentClozeId = ClozeIds[currentClozeIndex]
   const selectionHue =
     ClozeHues[currentClozeId || ClozeIds[deletions.length]] || 200
+
+  const popover = usePopover()
+
   const handleDoubleClick = useCallback(
-    () => {
-      if (onDoubleClick) onDoubleClick(fieldName)
+    (e: any) => {
+      if (!clozeInputRef.current) return
+
+      const { start, end } = getSelectionWithin(clozeInputRef.current)
+      const selection = value.slice(start, end)
+      console.log(selection)
+      popover.open(e)
+      clozeInputRef.current.blur()
     },
-    [fieldName, onDoubleClick]
+    [clozeInputRef, popover, value]
   )
+
+  const handleMouseDown = useCallback(
+    (e: any) => {
+      if (popover.isOpen) {
+        // don't focus when closing popover
+        e.preventDefault()
+      }
+    },
+    [popover.isOpen]
+  )
+
   const editing = currentClozeIndex !== -1
 
   useEffect(
@@ -75,21 +93,16 @@ const ClozeField = ({
     activeDictionaryType: r.getActiveDictionaryType(state),
   }))
 
-  const popover = usePopover()
-
   const {
     cursorPosition,
     translationsAtCharacter,
-    onKeyDown,
+    onKeyDown: handleKeyDown,
     handleFocus,
     handleBlur,
-    handleCharMouseEnter,
-    handleMouseLeave,
   } = useFieldPopoverDictionary(
     popover,
     activeDictionaryType,
-    clozeTextInputActions,
-    clozeInputRef,
+    clozeControls,
     value,
     editing
   )
@@ -111,7 +124,6 @@ const ClozeField = ({
           ...[...value.slice(0, startPaddingEnd)].map((c, i) => (
             <CharSpan
               key={`${c}${i}`}
-              onMouseEnter={handleCharMouseEnter}
               {...{
                 char: c,
                 index: i,
@@ -131,7 +143,6 @@ const ClozeField = ({
             ...[...value.slice(start, end)].map((c, i) => (
               <CharSpan
                 key={`${c}${start + i}`}
-                onMouseEnter={handleCharMouseEnter}
                 {...{
                   char: c,
                   index: start + i,
@@ -162,7 +173,6 @@ const ClozeField = ({
               ...[...value.slice(end, subsequentGapEnd)].map((c, i) => (
                 <CharSpan
                   key={`${c}${end + i}`}
-                  onMouseEnter={handleCharMouseEnter}
                   {...{
                     char: c,
                     index: end + i,
@@ -186,7 +196,6 @@ const ClozeField = ({
       value,
       viewMode,
       cursorPosition,
-      handleCharMouseEnter,
     ]
   )
 
@@ -210,7 +219,6 @@ const ClozeField = ({
       className={cn(css.previewField, className, {
         [css.previewFieldWithPopover]: Boolean(subtitles.length),
       })}
-      onDoubleClick={handleDoubleClick}
       style={{
         ['--cloze-selection-hue' as any]: selectionHue,
       }}
@@ -223,16 +231,21 @@ const ClozeField = ({
           fieldName={fieldName as TransliterationFlashcardFieldName}
         />
       )}
-      <Tooltip key={value} {...tooltipProps}>
+      <Tooltip
+        key={value}
+        {...tooltipProps}
+        title={popover.isOpen && activeDictionaryType ? '' : tooltipProps.title}
+      >
         <span
-          onMouseLeave={handleMouseLeave}
           className={cn(css.clozeFieldValue, clozeId, {
             [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
           })}
           tabIndex={0}
-          onKeyDown={onKeyDown}
+          onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onDoubleClick={handleDoubleClick}
+          onMouseDown={handleMouseDown}
           ref={clozeInputRef}
         >
           {segments}
@@ -297,7 +310,6 @@ const CharSpan = memo(
     clozeIndex,
     newlineChar,
     hasCursor,
-    onMouseEnter,
   }: {
     char: string
     index: number
@@ -305,23 +317,15 @@ const CharSpan = memo(
     clozeIndex: number
     newlineChar: string
     hasCursor?: boolean
-    onMouseEnter?: (index: number, ref: HTMLSpanElement | null) => void
   }) => {
     const isNewline = char === '\n' || char === '\r'
     const content = isNewline ? newlineChar : char
     const ref = useRef<HTMLSpanElement>(null)
-    const handleMouseEnter = useCallback(
-      e => {
-        console.log(index, char)
-        if (onMouseEnter) onMouseEnter(index, ref.current)
-      },
-      [char, index, onMouseEnter]
-    )
+
     return (
       <span
         ref={ref}
         data-character-index={index}
-        onMouseEnter={handleMouseEnter}
         className={cn(className, {
           [css.clozeNewlinePlaceholder]: isNewline,
           [css.clozeCursor]: hasCursor,

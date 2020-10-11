@@ -1,10 +1,12 @@
-import React, { Fragment, memo, ReactNode } from 'react'
-import { ClickAwayListener, Paper, Popper } from '@material-ui/core'
+import React, { Fragment, memo, ReactNode, useCallback } from 'react'
+import { ClickAwayListener, IconButton, Paper, Popper } from '@material-ui/core'
 import usePopover from '../utils/usePopover'
 import css from './DictionaryPopover.module.css'
 import { tokenize } from 'wanakana'
 import { LexiconMainEntry } from '../files/dictionaryFile'
 import { TranslatedTokensAtCharacterIndex } from '../utils/dictionariesDatabase'
+import { Close } from '@material-ui/icons'
+import DarkTheme from './DarkTheme'
 
 // TODO: language codes here and for clozefield
 
@@ -52,47 +54,54 @@ export function DictionaryPopover({
   return (
     <ClickAwayListener onClickAway={e => popover.close(e as any)}>
       <Popper open={true} anchorEl={popover.anchorEl}>
-        <Paper>
-          <section className={css.container}>
-            {!translationsAtCharacter.length && <>No results</>}
-            {translationsAtCharacter.map(tokenTranslations => {
-              return tokenTranslations.translatedTokens.map(translatedToken => {
-                return groupIdenticalEntryHeads(translatedToken.candidates).map(
-                  ({ entries, head, pronunciation }, i) => {
-                    return (
-                      <section
-                        className={css.dictionaryEntry}
-                        key={`${head}${i}`}
-                      >
-                        <h3 className={css.entryHead}>
-                          <EntryHead
-                            head={head}
-                            pronunciation={pronunciation}
-                            activeDictionaryType={activeDictionaryType}
-                          />
-                        </h3>
-                        {entries.map(({ entry, inflections }, i) => {
-                          return (
-                            <Fragment key={`${entry.head}_${i}`}>
-                              <p className={css.entryTags}>
-                                {entry.tags}
-                                {Boolean(inflections.length) && (
-                                  <> ({inflections.join(' › ')})</>
-                                )}
-                              </p>
-                              <p className={css.entryMeaningsList}>
-                                {entry.meanings.join('; ')}
-                              </p>
-                            </Fragment>
-                          )
-                        })}
-                      </section>
-                    )
-                  }
-                )
-              })
-            })}
-          </section>
+        <Paper className={css.container}>
+          <DarkTheme>
+            <IconButton
+              size="small"
+              onClick={popover.close}
+              className={css.closeButton}
+            >
+              <Close />
+            </IconButton>
+          </DarkTheme>
+          {!translationsAtCharacter.length && <>No results</>}
+          {translationsAtCharacter.map(tokenTranslations => {
+            return tokenTranslations.translatedTokens.map(translatedToken => {
+              return groupIdenticalEntryHeads(translatedToken.candidates).map(
+                ({ entries, head, pronunciation }, i) => {
+                  return (
+                    <section
+                      className={css.dictionaryEntry}
+                      key={`${head}${i}`}
+                    >
+                      <h3 className={css.entryHead}>
+                        <EntryHead
+                          head={head}
+                          pronunciation={pronunciation}
+                          activeDictionaryType={activeDictionaryType}
+                        />
+                      </h3>
+                      {entries.map(({ entry, inflections }, i) => {
+                        return (
+                          <Fragment key={`${entry.head}_${i}`}>
+                            <p className={css.entryTags}>
+                              {entry.tags}
+                              {Boolean(inflections.length) && (
+                                <> ({inflections.join(' › ')})</>
+                              )}
+                            </p>
+                            <p className={css.entryMeaningsList}>
+                              {entry.meanings.join('; ')}
+                            </p>
+                          </Fragment>
+                        )
+                      })}
+                    </section>
+                  )
+                }
+              )
+            })
+          })}
         </Paper>
       </Popper>
     </ClickAwayListener>
