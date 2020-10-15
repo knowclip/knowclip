@@ -76,7 +76,7 @@ export const isMediaFileLoaded = (state: AppState): boolean => {
   return availability.status === 'CURRENTLY_LOADED'
 }
 
-export const isAudioLoading = (state: AppState): boolean => {
+export const isMediaEffectivelyLoading = (state: AppState): boolean => {
   const currentFile = getCurrentMediaFile(state)
   if (!currentFile) return false
   const availability = getFileAvailability(state, currentFile)

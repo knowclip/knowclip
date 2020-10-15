@@ -391,7 +391,7 @@ const SubtitlesTimelines = memo(
   }
 )
 
-const Waveform = ({ show }: { show: boolean }) => {
+const Waveform = () => {
   const {
     waveform,
     images,
@@ -494,7 +494,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     [images]
   )
 
-  return show ? (
+  return (
     <svg
       ref={svgRef}
       id="waveform-svg"
@@ -544,8 +544,6 @@ const Waveform = ({ show }: { show: boolean }) => {
         <Cursor x={cursor.x} height={height} />
       </g>
     </svg>
-  ) : (
-    <div className={css.waveformPlaceholder} />
   )
 }
 

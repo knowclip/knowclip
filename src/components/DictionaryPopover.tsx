@@ -1,4 +1,4 @@
-import React, { Fragment, memo, ReactNode, useCallback } from 'react'
+import React, { Fragment, memo, ReactNode } from 'react'
 import { ClickAwayListener, IconButton, Paper, Popper } from '@material-ui/core'
 import usePopover from '../utils/usePopover'
 import css from './DictionaryPopover.module.css'
@@ -48,7 +48,7 @@ export function DictionaryPopover({
   activeDictionaryType,
 }: {
   popover: ReturnType<typeof usePopover>
-  translationsAtCharacter: TranslatedTokensAtCharacterIndex[]
+  translationsAtCharacter: TranslatedTokensAtCharacterIndex | null
   activeDictionaryType: DictionaryFileType
 }) {
   return (
@@ -64,9 +64,9 @@ export function DictionaryPopover({
               <Close />
             </IconButton>
           </DarkTheme>
-          {!translationsAtCharacter.length && <>No results</>}
-          {translationsAtCharacter.map(tokenTranslations => {
-            return tokenTranslations.translatedTokens.map(translatedToken => {
+          {!translationsAtCharacter && <>No results</>}
+          {translationsAtCharacter &&
+            translationsAtCharacter.translatedTokens.map(translatedToken => {
               return groupIdenticalEntryHeads(translatedToken.candidates).map(
                 ({ entries, head, pronunciation }, i) => {
                   return (
@@ -100,8 +100,7 @@ export function DictionaryPopover({
                   )
                 }
               )
-            })
-          })}
+            })}
         </Paper>
       </Popper>
     </ClickAwayListener>

@@ -147,9 +147,10 @@ export function useFieldPopoverDictionary(
   const [tokenTranslations, setTokenTranslations] = useState<
     TranslatedTokensAtCharacterIndex[]
   >([])
-  const [translationsAtCharacter, setTranslationsAtCharacter] = useState<
-    ReturnType<typeof findTranslationsAtCharIndex>
-  >([])
+  const [
+    translationsAtCharacter,
+    setTranslationsAtCharacter,
+  ] = useState<TranslatedTokensAtCharacterIndex | null>(null)
 
   const {
     onKeyDown,
@@ -261,21 +262,21 @@ export function useFieldPopoverDictionary(
         const translationsAtCharacter =
           mouseoverChar && mouseoverChar.dataset
             ? findTranslationsAtCharIndex(tokenTranslations, mouseCharIndex)
-            : []
+            : null
 
         const nonwordMouseenter =
-          !translationsAtCharacter.length &&
+          !translationsAtCharacter &&
           !LETTERS_DIGITS_PLUS.test(value[mouseCharIndex])
         console.log({ nonwordMouseenter }, value[mouseCharIndex])
         if (!nonwordMouseenter) {
           setTranslationsAtCharacter(translationsAtCharacter)
         }
-        if (translationsAtCharacter.length && mouseCharIndex !== -1) {
+        if (translationsAtCharacter && mouseCharIndex !== -1) {
           setSelectionRange(
             ref.current as HTMLElement,
-            translationsAtCharacter[0].textCharacterIndex,
-            translationsAtCharacter[0].textCharacterIndex +
-              translationsAtCharacter[0].translatedTokens[0].matchedTokenText
+            translationsAtCharacter.textCharacterIndex,
+            translationsAtCharacter.textCharacterIndex +
+              translationsAtCharacter.translatedTokens[0].matchedTokenText
                 .length
           )
         }

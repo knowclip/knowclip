@@ -170,7 +170,6 @@ export const getDisplayedSubtitlesCardBases = createSelector(
       ...bases,
       cards: limitSubtitlesCardsBasesCardsToDisplayed(bases.cards, xMin),
     }
-    console.log({ bases, xMin, newBases: subtitlesCardBases })
     return subtitlesCardBases
   }
 )

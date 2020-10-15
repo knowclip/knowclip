@@ -10,6 +10,7 @@ import Header from '../components/MainHeader'
 import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import DarkTheme from '../components/DarkTheme'
 import css from '../components/Main.module.css'
+import waveformCss from '../components/Waveform.module.css'
 import * as r from '../selectors'
 import { setMousePosition } from '../utils/mousePosition'
 
@@ -20,7 +21,7 @@ enum $ {
 const Main = () => {
   const {
     loop,
-    audioIsLoading,
+    mediaIsEffectivelyLoading,
     currentProject,
     constantBitrateFilePath,
     currentMediaFile,
@@ -30,7 +31,7 @@ const Main = () => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
       loop: r.isLoopOn(state),
-      audioIsLoading: r.isAudioLoading(state),
+      mediaIsEffectivelyLoading: r.isMediaEffectivelyLoading(state),
       currentProject: r.getCurrentProject(state),
       constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
       currentMediaFile,
@@ -66,7 +67,7 @@ const Main = () => {
           [css.horizontal]: viewMode === 'HORIZONTAL',
         })}
       >
-        {audioIsLoading ? (
+        {mediaIsEffectivelyLoading ? (
           <div
             className={css.media}
             style={{ alignItems: 'center', margin: '2rem' }}
@@ -92,7 +93,11 @@ const Main = () => {
         />
       </section>
 
-      <Waveform show={Boolean(currentMediaFile && !audioIsLoading)} />
+      {Boolean(currentMediaFile && !mediaIsEffectivelyLoading) ? (
+        <Waveform />
+      ) : (
+        <div className={waveformCss.waveformPlaceholder} />
+      )}
 
       <KeyboardShortcuts />
     </div>
