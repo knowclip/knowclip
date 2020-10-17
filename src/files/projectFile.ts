@@ -6,6 +6,7 @@ import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
 import { arrayToMapById } from '../utils/arrayToMapById'
 import { validateSubtitlesFromFilePath } from '../utils/subtitles'
+import { updaterGetter } from './updaterGetter'
 
 const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -180,26 +181,16 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
 
 export default projectFileEventHandlers
 
+const updater = updaterGetter<ProjectFile>()
 export const updates = {
-  setProjectName: projectUpdate((file: ProjectFile, name: string) => {
+  setProjectName: updater((file: ProjectFile, name: string) => {
     return {
       ...file,
       name,
     }
   }),
-  deleteProjectMedia: projectUpdate(
-    (file: ProjectFile, mediaFileId: string) => ({
-      ...file,
-      mediaFileIds: file.mediaFileIds.filter(id => id !== mediaFileId),
-    })
-  ),
-}
-
-function projectUpdate<U extends any[]>(
-  update: (file: ProjectFile, ...args: U) => ProjectFile
-) {
-  return {
-    type: 'ProjectFile' as const,
-    update,
-  }
+  deleteProjectMedia: updater((file: ProjectFile, mediaFileId: string) => ({
+    ...file,
+    mediaFileIds: file.mediaFileIds.filter(id => id !== mediaFileId),
+  })),
 }

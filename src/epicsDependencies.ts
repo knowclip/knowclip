@@ -77,7 +77,7 @@ const dependencies = {
   ipcRenderer,
   setAppMenuProjectSubmenuPermissions,
   nowUtcTimestamp,
-  dexie: getDexieDb(),
+  getDexieDb,
   electron,
 }
 

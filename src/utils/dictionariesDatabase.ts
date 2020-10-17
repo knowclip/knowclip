@@ -1,6 +1,10 @@
 import Dexie, { Database } from 'dexie'
 import { basename } from 'path'
-import { getTableName, LexiconMainEntry } from '../files/dictionaryFile'
+import {
+  getTableName,
+  LexiconEntry,
+  LexiconMainEntry,
+} from '../files/dictionaryFile'
 import {
   getDifferingSearchStem,
   LETTERS_DIGITS_PLUS,
@@ -12,21 +16,39 @@ import { lemmatize } from './yomichanDictionary'
 
 const LATEST_DEXIE_DB_VERSION = 1
 
-const DICTIONARIES_TABLE = 'dictionaries'
+export const DICTIONARIES_TABLE = 'dictionaries'
+
+const YOMICHAN_DICTIONARY: DictionaryFileType = 'YomichanDictionary'
+const CEDICT_DICTIONARY: DictionaryFileType = 'CEDictDictionary'
+const DICT_CC_DICTIONARY: DictionaryFileType = 'DictCCDictionary'
+
+const dictionaryProp = (propertyName: keyof DictionaryFile) => propertyName
+const prop = (propertyName: keyof LexiconEntry | (keyof LexiconMainEntry)) =>
+  propertyName
 
 /** remember to check defined */
-let dexie: Dexie
+let dexie: Dexie | null
 
 export function getDexieDb() {
+  if (dexie) return dexie
+
   dexie = new Dexie('DictionaryEntries')
 
   dexie.version(LATEST_DEXIE_DB_VERSION).stores({
-    [DICTIONARIES_TABLE]: '++key, id, type',
-    YomichanDictionary: '++key, head, pronunciation, dictionaryKey',
-    CEDictDictionary: '++key, head, pronunciation, dictionaryKey',
+    [DICTIONARIES_TABLE]: `++${dictionaryProp('key')}, ${dictionaryProp(
+      'id'
+    )}, ${dictionaryProp('type')}`,
+    [YOMICHAN_DICTIONARY]: `++key, ${prop('head')}, ${prop(
+      'pronunciation'
+    )}, ${prop('dictionaryKey')}`,
+    [CEDICT_DICTIONARY]: `++key, ${prop('head')}, ${prop(
+      'pronunciation'
+    )}, ${prop('dictionaryKey')}`,
     // all these indexes takes too long to import maybe.
     // would it be ok with just the multi-entry indexes + search sped up with frequency
-    DictCCDictionary: '++key, head, dictionaryKey, *tokenCombos',
+    [DICT_CC_DICTIONARY]: `++key, ${prop('head')}, ${prop(
+      'dictionaryKey'
+    )}, *${prop('tokenCombos')}`,
   })
 
   return dexie
@@ -41,6 +63,7 @@ export async function newDictionary(
     type,
     id: uuid(),
     name: basename(filePath),
+    importComplete: false,
   }
   const key = await db.table(DICTIONARIES_TABLE).add(dicProps)
   const dic: DictionaryFile = {
@@ -389,26 +412,62 @@ export function parseFlat(text: string, maxWordLength = 8) {
 }
 
 export async function deleteDictionary(
-  db: Database,
+  effects: EpicsDependencies,
   allDictionaries: DictionaryFile[],
   key: number,
   type: DictionaryFileType
 ) {
-  console.log('deleting dictionary items!')
-  const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
-  if (allDictionariesOfType.length <= 1)
-    await db.table(getTableName(type)).clear()
-  else
-    await db
-      .table(getTableName(type))
-      .where('dictionaryKey')
-      .equals(key)
-      .delete()
+  const db = effects.getDexieDb()
+  let result: {
+    dictionaryDeletion: 'SUCCESS' | Error
+    entriesDeletion: 'SUCCESS' | Error
+  } = {
+    dictionaryDeletion: 'SUCCESS',
+    entriesDeletion: 'SUCCESS',
+  }
 
   console.log('deleting dictionary!')
+  try {
+    const record = await db.table(DICTIONARIES_TABLE).get(key)
+    console.log({ record })
+    if (record) await db.table(DICTIONARIES_TABLE).delete(key)
+  } catch (err) {
+    result.dictionaryDeletion = err
+  }
 
-  const tableDeletion = await db.table(DICTIONARIES_TABLE).delete(key)
+  console.log('deleting dictionary items!')
+  try {
+    const record = await db
+      .table(getTableName(type))
+      .where(prop('dictionaryKey'))
+      .equals(key)
+      .first()
+    console.log({ record })
+
+    if (record) {
+      const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
+      if (allDictionariesOfType.length <= 1)
+        await db.table(getTableName(type)).clear()
+      else
+        await db
+          .table(getTableName(type))
+          .where('dictionaryKey')
+          .equals(key)
+          .delete()
+    }
+  } catch (err) {
+    result.entriesDeletion = err
+  }
+
   console.log('done deleting dictionary!')
 
-  return tableDeletion
+  return result
+}
+
+export async function resetDictionariesDatabase() {
+  if (dexie) dexie.delete()
+
+  dexie = null
+
+  getDexieDb()
 }

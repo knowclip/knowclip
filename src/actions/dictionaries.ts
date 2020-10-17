@@ -1,4 +1,5 @@
 import * as A from '../types/ActionType'
+import { updateFile } from './files'
 
 export const importDictionaryRequest = (
   dictionaryType: DictionaryFileType
@@ -16,6 +17,24 @@ export const startDictionaryImport = (
   filePath,
 })
 
-export const deleteDictionaryDatabase = (): DeleteDictionaryDatabase => ({
-  type: A.DELETE_DICTIONARY_DATABASE,
+export const finishDictionaryImport = (
+  fileType: DictionaryFileType,
+  id: FileId
+): UpdateFile =>
+  updateFile({
+    updateName: 'finishDictionaryImport',
+    updatePayload: [],
+    id,
+    fileType,
+  })
+
+export const deleteImportedDictionary = (
+  file: DictionaryFile
+): DeleteImportedDictionary => ({
+  type: A.DELETE_IMPORTED_DICTIONARY,
+  file,
+})
+
+export const resetDictionariesDatabase = (): ResetDictionariesDatabase => ({
+  type: A.RESET_DICTIONARIES_DATABASE,
 })

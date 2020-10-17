@@ -4,7 +4,8 @@ import {
   DeleteFileSuccessHandler,
   FileEventHandlers,
 } from './eventHandlers'
-import { deleteDictionary } from '../utils/dictionariesDatabase'
+import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
+import { updaterGetter } from './updaterGetter'
 
 export type LexiconEntry = LexiconMainEntry | LexiconVariantEntry
 export type LexiconMainEntry = {
@@ -60,34 +61,40 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
   state,
   effects
 ) => {
-  if (file) {
-    try {
-      if (
-        availability.status === 'CURRENTLY_LOADED' ||
-        availability.status === 'PREVIOUSLY_LOADED'
-      )
-        await deleteDictionary(
-          effects.dexie,
-          r.getOpenDictionaryFiles(state).map(d => d.file),
-          file.key,
-          file.type
-        )
+  if (
+    file &&
+    (availability.status === 'CURRENTLY_LOADED' ||
+      availability.status === 'PREVIOUSLY_LOADED')
+  ) {
+    const dictionaryExistsInDb = Boolean(
+      await effects
+        .getDexieDb()
+        .table(DICTIONARIES_TABLE)
+        .get(file.key)
+    )
+    const entriesExistInDb = Boolean(
+      await effects
+        .getDexieDb()
+        .table(getTableName(file.type))
+        .where('dictionaryKey' as keyof LexiconEntry)
+        .equals(file.key)
+        .first()
+    )
 
+    if (dictionaryExistsInDb || entriesExistInDb)
       return [
         r.removeActiveDictionary(file.id),
-        r.deleteFileSuccess(availability, []),
-      ]
-    } catch (err) {
-      return [
-        r.errorDialog(
-          `There was a problem deleting this dictionary file: ${err}`,
-          String(err)
-        ),
-      ]
-    }
-  }
+        r.deleteImportedDictionary(file),
+        // r.deleteFileSuccess(availability, []),
 
-  return [r.deleteFileSuccess(availability, [])]
+        // should be like:
+        // r.beginDictionaryDeletion()
+      ]
+  }
+  return [
+    ...(file ? [r.removeActiveDictionary(file.id)] : []),
+    r.deleteFileSuccess(availability, []),
+  ]
 }
 const deleteSuccess: DeleteFileSuccessHandler = async (
   { file },
@@ -128,4 +135,13 @@ export const dictCcActions: FileEventHandlers<DictCCDictionary> = {
 
 export const ceDictActions: FileEventHandlers<CEDictDictionary> = {
   ...((yomichanActions as unknown) as FileEventHandlers<CEDictDictionary>),
+}
+
+const updater = updaterGetter<DictionaryFile>()
+
+export const updates = {
+  finishDictionaryImport: updater(file => ({
+    ...file,
+    importComplete: true,
+  })),
 }

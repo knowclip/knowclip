@@ -148,18 +148,21 @@ declare type YomichanDictionary = {
   id: FileId
   key: number
   name: string
+  importComplete: boolean
 }
 declare type CEDictDictionary = {
   type: 'CEDictDictionary'
   id: FileId
   key: number
   name: string
+  importComplete: boolean
 }
 declare type DictCCDictionary = {
   type: 'DictCCDictionary'
   id: FileId
   key: number
   name: string
+  importComplete: boolean
 }
 
 declare type DictionaryFile =

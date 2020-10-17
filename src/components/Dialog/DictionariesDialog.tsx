@@ -33,16 +33,19 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
 
   const isLoading = Boolean(progress)
 
-  const onClickDelete = useCallback((type: DictionaryFileType, id: string) => {
-    dispatch(
-      r.confirmationDialog(
-        `This action may take a few minutes to complete. Are you sure you want to delete this dictionary data at this moment?`,
-        r.deleteFileRequest(type, id),
-        null,
-        true
+  const onClickDelete = useCallback(
+    (type: DictionaryFileType, id: string) => {
+      dispatch(
+        r.confirmationDialog(
+          `This action may take a few minutes to complete. Are you sure you want to delete this dictionary data at this moment?`,
+          r.deleteFileRequest(type, id),
+          null,
+          true
+        )
       )
-    )
-  }, [])
+    },
+    [dispatch]
+  )
 
   const [newDictionaryType, setNewDictionaryType] = useState<
     DictionaryFileType | ''
@@ -65,14 +68,28 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
         )
       )
     },
-    [newDictionaryType, dictionaryFiles]
+    [newDictionaryType, dispatch]
+  )
+
+  const handleClickDeleteDatabase = useCallback(
+    () => {
+      dispatch(
+        r.confirmationDialog(
+          `Are you sure you want to delete the entire dictionaries database? You will have to import any dictionaries you've added again.`,
+          r.resetDictionariesDatabase(),
+          null,
+          true
+        )
+      )
+    },
+    [dispatch]
   )
 
   return (
     <Dialog open={open}>
       <DialogContent>
         <div style={{ minWidth: '500px' }}>
-          {isLoading && (
+          {progress && progress.message.toLowerCase().includes('import') && (
             <>
               <p>Please wait a moment while your dictionary loads.</p>
 
@@ -88,9 +105,29 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
               </p>
             </>
           )}
+          {progress && !progress.message.toLowerCase().includes('import') && (
+            <>
+              <p>Please wait a moment while this operation completes.</p>
+
+              <p>This can take several minutes or longer on some computers.</p>
+
+              <section style={{ textAlign: 'center' }}>
+                <CircularProgress />
+              </section>
+            </>
+          )}
           {!isLoading && (
             <>
-              <h3>Add/remove dictionaries</h3>
+              <h3>
+                Imported dictionaries:{' '}
+                <Button
+                  onClick={handleClickDeleteDatabase}
+                  size="small"
+                  style={{ float: 'right' }}
+                >
+                  (Reset database)
+                </Button>
+              </h3>
               {!dictionaryFiles.length && (
                 <p>You haven't added any dictionaries yet.</p>
               )}
@@ -165,7 +202,7 @@ function DictionaryFileItem({
 }) {
   const handleClickDelete = useCallback(
     () => onClickDelete(file.type, availability.id),
-    [availability.id]
+    [availability.id, file.type, onClickDelete]
   )
   return (
     <ListItem key={availability.id} value={file.id}>

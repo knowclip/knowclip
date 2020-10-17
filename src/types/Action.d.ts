@@ -401,9 +401,10 @@ declare type FileAction =
   | AbortFileDeletions
   | UpdateFile
   | PreloadVideoStills
-  | DeleteDictionaryDatabase
   | ImportDictionaryRequest
   | StartDictionaryImport
+  | DeleteImportedDictionary
+  | ResetDictionariesDatabase
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -462,7 +463,7 @@ declare type LocateFileSuccess = {
 
 declare type UpdateFile = {
   type: 'UPDATE_FILE'
-  update: FileUpdate<keyof FileUpdates>
+  update: FileUpdate<any>
 }
 declare interface UpdateFileWith<T extends keyof FileUpdates>
   extends UpdateFile {
@@ -475,8 +476,8 @@ declare type PreloadVideoStills = {
   clipId: ClipId
 }
 
-declare type DeleteDictionaryDatabase = {
-  type: 'DELETE_DICTIONARY_DATABASE'
+declare type ResetDictionariesDatabase = {
+  type: 'RESET_DICTIONARIES_DATABASE'
 }
 
 declare type ImportDictionaryRequest = {
@@ -487,6 +488,10 @@ declare type StartDictionaryImport = {
   type: 'START_DICTIONARY_IMPORT'
   file: DictionaryFile
   filePath: FilePath
+}
+declare type DeleteImportedDictionary = {
+  type: 'DELETE_IMPORTED_DICTIONARY'
+  file: DictionaryFile
 }
 
 interface WithRecordType<F extends FileMetadata> {

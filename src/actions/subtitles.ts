@@ -27,6 +27,7 @@ export const addSubtitlesTrack = (
 ): UpdateFileWith<'addSubtitlesTrack'> => ({
   type: A.UPDATE_FILE,
   update: {
+    fileType: 'MediaFile',
     updateName: 'addSubtitlesTrack',
     id: mediaFileId,
     updatePayload: [track],
@@ -54,6 +55,7 @@ export const deleteSubtitlesTrackFromMedia = (
 ): UpdateFileWith<'deleteSubtitlesTrack'> => ({
   type: A.UPDATE_FILE,
   update: {
+    fileType: 'MediaFile',
     updateName: 'deleteSubtitlesTrack',
     id: mediaFileId,
     updatePayload: [id],
@@ -96,6 +98,7 @@ export const linkFlashcardFieldToSubtitlesTrack = (
 ): UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> => ({
   type: A.UPDATE_FILE,
   update: {
+    fileType: 'MediaFile',
     updateName: 'linkFlashcardFieldToSubtitlesTrack',
     id: mediaFileId,
     updatePayload: [flashcardFieldName, subtitlesTrackId, fieldToClear || null],

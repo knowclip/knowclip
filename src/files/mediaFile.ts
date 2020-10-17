@@ -9,6 +9,9 @@ import moment from 'moment'
 import { existsSync } from 'fs-extra'
 import { getWaveformPngs } from '../utils/getWaveform'
 import { validateSubtitlesFromFilePath } from '../utils/subtitles'
+import { updaterGetter } from './updaterGetter'
+
+const updater = updaterGetter<MediaFile>()
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async ({ file }, filePath, state, effects) => {
@@ -309,7 +312,7 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
 export default handlers()
 
 export const updates = {
-  addSubtitlesTrack: mediaUpdate((file: MediaFile, track: SubtitlesTrack) => {
+  addSubtitlesTrack: updater((file: MediaFile, track: SubtitlesTrack) => {
     return {
       ...file,
       subtitles: file.subtitles.some(s => s.id === track.id) // should not happen... but just in case
@@ -325,14 +328,14 @@ export const updates = {
           ],
     }
   }),
-  deleteSubtitlesTrack: mediaUpdate(
+  deleteSubtitlesTrack: updater(
     (file: MediaFile, trackId: SubtitlesTrackId) => ({
       ...file,
       subtitles: file.subtitles.filter(({ id }) => id !== trackId),
       flashcardFieldsToSubtitlesTracks: Object.entries(
         file.flashcardFieldsToSubtitlesTracks
       )
-        .filter(([fieldName, trackId]) => trackId !== trackId)
+        .filter(([fieldName, givenTrackId]) => trackId !== givenTrackId)
         .reduce(
           (all, [fieldName, id]) => {
             all[fieldName as TransliterationFlashcardFieldName] = id
@@ -342,7 +345,7 @@ export const updates = {
         ),
     })
   ),
-  linkFlashcardFieldToSubtitlesTrack: mediaUpdate(
+  linkFlashcardFieldToSubtitlesTrack: updater(
     (
       file: MediaFile,
       flashcardFieldName: FlashcardFieldName,
@@ -373,13 +376,4 @@ export const updates = {
       }
     }
   ),
-}
-
-function mediaUpdate<U extends any[]>(
-  update: (file: MediaFile, ...args: U) => MediaFile
-) {
-  return {
-    type: 'MediaFile' as const,
-    update,
-  }
 }

@@ -17,6 +17,15 @@ export const getActiveDictionaryType = (
   else return state.settings.activeDictionaries[0].type
 }
 
+export const getRememberedDictionaryFiles = (state: AppState) => {
+  const dictFiles = {
+    ...state.fileAvailabilities.YomichanDictionary,
+    ...state.fileAvailabilities.CEDictDictionary,
+    ...state.fileAvailabilities.DictCCDictionary,
+  }
+  return Object.values(dictFiles) as KnownFile[]
+}
+
 export const getOpenDictionaryFiles = (
   state: AppState
 ): { file: DictionaryFile; availability: FileAvailability }[] => {
