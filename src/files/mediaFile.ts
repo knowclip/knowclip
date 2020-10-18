@@ -14,7 +14,7 @@ import { updaterGetter } from './updaterGetter'
 const updater = updaterGetter<MediaFile>()
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
@@ -56,22 +56,22 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     getWaveform,
     setDefaultClipSpecs,
   ],
-  locateRequest: async (action, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     const autoSearchDirectories = r.getAssetsDirectories(state)
 
     // works while fileavailability names can't be changed...
     for (const directory of autoSearchDirectories) {
       const nameMatch = join(directory, basename(availability.name))
       const matchingFile = existsSync(nameMatch)
-        ? await validateMediaFile(action.file, nameMatch)
+        ? await validateMediaFile(file, nameMatch)
         : null
 
       if (matchingFile && !matchingFile.errors) {
-        return [r.locateFileSuccess(action.file, nameMatch)]
+        return [r.locateFileSuccess(file, nameMatch)]
       }
     }
 
-    return [r.fileSelectionDialog(action.message, action.file)]
+    return [r.fileSelectionDialog(message, file)]
   },
   locateSuccess: null,
   deleteRequest: [
@@ -146,7 +146,8 @@ export const validateMediaFile = async (
 }
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
+  { subtitlesTracksStreamIndexes, id, subtitles },
+  filePath,
   state,
   effects
 ) =>
@@ -183,7 +184,8 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   })
 
 const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile: { subtitles, name, id: mediaFileId }, filePath },
+  { subtitles, name, id: mediaFileId },
+  filePath,
   state,
   effects
 ) => {
@@ -237,7 +239,8 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   ])
 }
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile, filePath },
+  validatedFile,
+  filePath,
   state,
   effects
 ) => {
@@ -245,7 +248,8 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
 }
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile },
+  validatedFile,
+  filePath,
   state,
   effects
 ) => {
@@ -266,7 +270,8 @@ const getCbr: OpenFileSuccessHandler<MediaFile> = async (
 }
 
 const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
-  action,
+  validatedFile,
+  filePath,
   state,
   effects
 ) => {
@@ -280,7 +285,7 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
     return [
       r.setDefaultClipSpecs({
         tags: [basename(currentFileName).replace(/\s/g, '_')],
-        includeStill: action.validatedFile.isVideo,
+        includeStill: validatedFile.isVideo,
       }),
     ]
   }

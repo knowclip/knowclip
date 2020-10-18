@@ -12,14 +12,16 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
   MenuItem,
   Select,
+  Tooltip,
 } from '@material-ui/core'
 import { DialogProps } from './DialogProps'
 import * as r from '../../redux'
-import { Delete } from '@material-ui/icons'
+import { Delete, Warning } from '@material-ui/icons'
 import { dictionaryTypes, displayDictionaryType } from '../../redux'
 import { openInBrowser } from '../../utils/electron'
 
@@ -206,6 +208,7 @@ function DictionaryFileItem({
   )
   return (
     <ListItem key={availability.id} value={file.id}>
+      {!file.importComplete && <ImportInterruptedListIcon />}
       <ListItemText
         primary={`${displayDictionaryType(file.type)}`}
         secondary={file.name}
@@ -341,4 +344,14 @@ export function DictionaryInstructions({
         </>
       )
   }
+}
+
+export function ImportInterruptedListIcon() {
+  return (
+    <Tooltip title="Import was interrupted. May not function correctly.">
+      <ListItemIcon>
+        <Warning />
+      </ListItemIcon>
+    </Tooltip>
+  )
 }

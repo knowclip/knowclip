@@ -28,6 +28,7 @@ import css from './SettingsDialog.module.css'
 import { Delete, Add } from '@material-ui/icons'
 import truncate from '../../utils/truncate'
 import { displayDictionaryType } from '../../selectors'
+import { ImportInterruptedListIcon } from './DictionariesDialog'
 
 enum $ {
   cancelButton = 'settings-dialog-cancel-button',
@@ -191,6 +192,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                   )
                 return (
                   <ListItem value={file.id} selected={selected}>
+                    {!file.importComplete && <ImportInterruptedListIcon />}
                     <ListItemIcon>
                       <Checkbox
                         checked={selected}

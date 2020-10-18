@@ -56,8 +56,8 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         [action.file.type]: {
           ...state[action.file.type],
           [action.file.id]: {
-            ...state[action.file.type][action.file.id], // needed?
             ...action.file,
+            ...state[action.file.type][action.file.id],
           },
         },
       }

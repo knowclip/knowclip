@@ -12,27 +12,31 @@ export type FileEventHandlers<F extends FileMetadata> = {
 }
 
 export type OpenFileRequestHandler<F extends FileMetadata> = (
-  action: OpenFileRequest & { file: F },
+  validatedFile: F,
   filePath: FilePath,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
 export type OpenFileSuccessHandler<F extends FileMetadata> = (
-  action: OpenFileSuccessWith<F>,
+  validatedFile: F,
+  filePath: FilePath,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
 export type OpenFileFailureHandler<F extends FileMetadata> = (
-  action: OpenFileFailure & { file: F },
+  file: F,
+  filePath: FilePath | null,
+  errorMessage: string | null,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
 export type LocateFileRequestHandler<F extends FileMetadata> = (
-  action: LocateFileRequest & { file: F },
+  file: F,
   availability: FileAvailability,
+  message: string,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>

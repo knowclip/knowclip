@@ -6,6 +6,7 @@ import {
 } from './eventHandlers'
 import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
 import { updaterGetter } from './updaterGetter'
+import { basename } from 'path'
 
 export type LexiconEntry = LexiconMainEntry | LexiconVariantEntry
 export type LexiconMainEntry = {
@@ -61,11 +62,7 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
   state,
   effects
 ) => {
-  if (
-    file &&
-    (availability.status === 'CURRENTLY_LOADED' ||
-      availability.status === 'PREVIOUSLY_LOADED')
-  ) {
+  if (file) {
     const dictionaryExistsInDb = Boolean(
       await effects
         .getDexieDb()
@@ -85,12 +82,9 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
       return [
         r.removeActiveDictionary(file.id),
         r.deleteImportedDictionary(file),
-        // r.deleteFileSuccess(availability, []),
-
-        // should be like:
-        // r.beginDictionaryDeletion()
       ]
   }
+
   return [
     ...(file ? [r.removeActiveDictionary(file.id)] : []),
     r.deleteFileSuccess(availability, []),
@@ -104,37 +98,29 @@ const deleteSuccess: DeleteFileSuccessHandler = async (
   return [r.commitFileDeletions(file.type)]
 }
 
-export const dictionaryWasNeverImported = (
-  state: AppState,
-  file: DictionaryFile
-) => {
-  const availability = r.getFileAvailability(state, file)
-  return !['CURRENTLY_LOADED', 'PREVIOUSLY_LOADED'].includes(
-    availability.status
-  )
-}
+export const dictionaryActions: FileEventHandlers<DictionaryFile> = {
+  openRequest: async (file, filePath, state, effects) => {
+    if (file.importComplete) return [r.openFileSuccess(file, filePath)]
 
-export const yomichanActions: FileEventHandlers<YomichanDictionary> = {
-  openRequest: async ({ file }, filePath, state, effects) => {
-    return [r.openFileSuccess(file, filePath)]
+    return [
+      r.openFileFailure(file, filePath, null),
+      r.promptSnackbar(
+        `It appears the import process was interrupted for dictionary file "${basename(
+          filePath
+        )}". Try removing it from Knowclip in the settings, or resetting the dictionaries database.`,
+        [['Dictionary settings', r.dictionariesDialog()]]
+      ),
+    ]
   },
   openSuccess: [],
 
-  locateRequest: async ({ file }, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     return []
   },
 
   locateSuccess: null,
   deleteRequest: [deleteRequest],
   deleteSuccess: [deleteSuccess],
-}
-
-export const dictCcActions: FileEventHandlers<DictCCDictionary> = {
-  ...((yomichanActions as unknown) as FileEventHandlers<DictCCDictionary>),
-}
-
-export const ceDictActions: FileEventHandlers<CEDictDictionary> = {
-  ...((yomichanActions as unknown) as FileEventHandlers<CEDictDictionary>),
 }
 
 const updater = updaterGetter<DictionaryFile>()

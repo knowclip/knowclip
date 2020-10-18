@@ -2,11 +2,11 @@ import * as r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     return [await r.openFileSuccess(file, filePath)]
   },
   openSuccess: [],
-  locateRequest: async ({ file }, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     try {
       const parentFile = r.getFileAvailabilityById(
         state,

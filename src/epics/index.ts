@@ -1,13 +1,6 @@
-import {
-  flatMap,
-  ignoreElements,
-  map,
-  mergeAll,
-  skipUntil,
-  tap,
-} from 'rxjs/operators'
-import { combineEpics, ofType } from 'redux-observable'
-import { empty, from, fromEvent, of } from 'rxjs'
+import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
+import { combineEpics } from 'redux-observable'
+import { fromEvent, of } from 'rxjs'
 import * as A from '../types/ActionType'
 import * as r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
@@ -33,81 +26,51 @@ import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import dictionaries from './dictionaries'
 import { showMessageBox } from '../utils/electron'
-import { dictionaryWasNeverImported } from '../files/dictionaryFile'
 
 const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'app-close', async () => {
-    if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
-      ipcRenderer.send('closed')
-      return await { type: 'QUIT_APP' }
-    }
+  fromEvent(ipcRenderer, 'app-close').pipe(
+    mergeMap(async () => {
+      if (state$.value.session.progress) {
+        return await r.promptSnackbar(
+          'If you close the app before this operation is finished, you risk losing some data.',
+          [
+            ['Wait (recommended)', r.closeSnackbar()],
+            ['Force close', r.quitApp()],
+          ]
+        )
+      }
 
-    const choice = await showMessageBox({
-      type: 'question',
-      buttons: ['Cancel', 'Quit'],
-      title: 'Confirm',
-      message: 'Are you sure you want to quit without saving your work?',
+      if (
+        !r.getCurrentProject(state$.value) ||
+        !r.isWorkUnsaved(state$.value)
+      ) {
+        return await r.quitApp()
+      }
+
+      const choice = await showMessageBox({
+        type: 'question',
+        buttons: ['Cancel', 'Quit'],
+        title: 'Confirm',
+        message: 'Are you sure you want to quit without saving your work?',
+      })
+      if (!choice || choice.response === 0) {
+        // e.preventDefault()
+        return ((await { type: "DON'T QUIT ON ME!!" }) as unknown) as Action
+      } else {
+        ipcRenderer.send('closed')
+        return await r.quitApp()
+      }
     })
-    if (!choice || choice.response === 0) {
-      // e.preventDefault()
-      return await { type: "DON'T QUIT ON ME!!" }
-    } else {
-      ipcRenderer.send('closed')
-      return await { type: 'QUIT_APP' }
-    }
-  }).pipe(
-    mergeAll(),
-    ignoreElements()
   )
 
 const initialize: AppEpic = () => of(r.initializeApp())
 
-const initializeDictionaries: AppEpic = (action$, state$) =>
-  action$.pipe(
-    ofType('persist/REHYDRATE' as any),
-    flatMap(_rehydrated => {
-      const dicts = Object.entries({
-        ...state$.value.fileAvailabilities.YomichanDictionary,
-        ...state$.value.fileAvailabilities.DictCCDictionary,
-        ...state$.value.fileAvailabilities.CEDictDictionary,
-      })
-      const openFileActions = dicts.flatMap(
-        ([id, fileAvailability]): Action[] => {
-          if (!fileAvailability) {
-            console.error('Problem initializing dictionaries')
-            return []
-          }
-          const file = r.getFile(
-            state$.value,
-            fileAvailability.type as DictionaryFileType,
-            id
-          )
-          if (!file) {
-            const snackbarAction: Action = r.simpleMessageSnackbar(
-              'There was a problem initializing dictionaries. Try restarting the app, or deleting the dictionaries database in the settings menu.'
-            )
-            return [snackbarAction]
-          }
-
-          const openFileRequest = r.openFileRequest(
-            file as DictionaryFile,
-            fileAvailability.filePath
-          )
-
-          return [
-            dictionaryWasNeverImported(state$.value, file as DictionaryFile)
-              ? r.confirmationDialog(
-                  `It appears a dictionary import process was recently interrupted. Would you like to resume your dictionary import? This may take a few minutes.`,
-                  openFileRequest
-                )
-              : openFileRequest,
-          ]
-        }
-      )
-      console.log({ openFileActions, dicts })
-
-      return from(openFileActions)
-    })
+const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
+  action$.ofType(A.QUIT_APP).pipe(
+    tap(() => {
+      ipcRenderer.send('closed')
+    }),
+    ignoreElements()
   )
 
 const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
@@ -118,6 +81,7 @@ const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
 
 const rootEpic: AppEpic = combineEpics(
   initialize,
+  quit,
   addMediaToProject,
   setWaveformCursorEpic,
   loopMedia,
@@ -141,7 +105,6 @@ const rootEpic: AppEpic = combineEpics(
   generateWaveformImages,
   menu,
   pauseOnBusy,
-  initializeDictionaries,
   dictionaries
 )
 

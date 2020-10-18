@@ -9,7 +9,7 @@ import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 import { updaterGetter } from './updaterGetter'
 
 const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     try {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
@@ -59,7 +59,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     }
   },
   openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => {
+    async (validatedFile, filePath, state, effects) => {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
@@ -152,11 +152,11 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     },
   ],
 
-  openFailure: async ({ file, filePath, errorMessage }) => [
+  openFailure: async (file, filePath, errorMessage) => [
     r.errorDialog('Problem opening project file:', errorMessage || ''),
   ],
 
-  locateRequest: async ({ file }, availability, state, effects) => [
+  locateRequest: async (file, availability, state, effects) => [
     r.fileSelectionDialog(
       `Please locate this project file "${file.name}"`,
       file

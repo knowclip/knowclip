@@ -1,6 +1,7 @@
 declare type Action =
   | { type: '@@INIT' }
   | InitializeApp
+  | QuitApp
   | SnackbarAction
   | DialogAction
   | WaveformAction
@@ -22,6 +23,7 @@ declare type Action =
   | NewCardFromSubtitlesRequest
 
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
+declare type QuitApp = { type: 'QUIT_APP' }
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
 declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }

@@ -14,6 +14,16 @@ export const simpleMessageSnackbar = (
     props: { message, autoHideDuration },
   })
 
+export const promptSnackbar = (
+  message: string,
+  actions: [string, Action][],
+  autoHideDuration?: number | null
+): SnackbarAction =>
+  enqueueSnackbar({
+    type: 'Prompt',
+    props: { message, autoHideDuration, actions },
+  })
+
 export const closeSnackbar = (): SnackbarAction => ({
   type: A.CLOSE_SNACKBAR,
 })

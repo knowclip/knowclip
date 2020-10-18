@@ -1,5 +1,4 @@
 import { Reducer } from 'redux'
-import { isUpdateWith } from '../files/updates'
 import * as A from '../types/ActionType'
 import { getHumanFileName } from '../utils/files'
 

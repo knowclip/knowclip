@@ -7,7 +7,7 @@ import {
 import { FileEventHandlers } from './eventHandlers'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     const parentFile = r.getFileAvailabilityById(
       state,
       file.parentType,
@@ -25,7 +25,7 @@ export default {
     return await validateBeforeOpenFileAction(state, vttFilePath, file)
   },
   openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => {
+    async (validatedFile, filePath, state, effects) => {
       const source = r.getFileAvailabilityById(
         state,
         validatedFile.parentType,
@@ -105,7 +105,7 @@ export default {
     },
   ],
 
-  locateRequest: async ({ file }, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     try {
       const source = r.getFileAvailabilityById(
         state,

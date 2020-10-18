@@ -12,11 +12,15 @@ export * from './dictionaries'
 export * from './session'
 export * from './settings'
 
-export const initializeApp = (): Action => ({
+export const initializeApp = (): InitializeApp => ({
   type: A.INITIALIZE_APP,
 })
 
-export const setCurrentFile = (index: number): Action => ({
+export const quitApp = (): QuitApp => ({
+  type: A.QUIT_APP,
+})
+
+export const setCurrentFile = (index: number): SetCurrentFile => ({
   type: A.SET_CURRENT_FILE,
   index,
 })

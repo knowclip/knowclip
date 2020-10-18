@@ -33,7 +33,7 @@ function getStore() {
 
   const store = createStore(
     persistedReducer,
-    initialState,
+    initialState as any,
     composeEnhancers(applyMiddleware(epicMiddleware))
   )
 

@@ -1,5 +1,5 @@
 import { combineEpics, ofType } from 'redux-observable'
-import { catchError, flatMap, map } from 'rxjs/operators'
+import { catchError, filter, flatMap, map } from 'rxjs/operators'
 import * as A from '../types/ActionType'
 import * as actions from '../actions'
 import * as s from '../selectors'
@@ -13,6 +13,53 @@ import { concat, from, of } from 'rxjs'
 import { parseYomichanZip } from '../utils/dictionaries/parseYomichanZip'
 import { parseCedictZip } from '../utils/dictionaries/parseCedictZip'
 import { parseDictCCZip } from '../utils/dictionaries/parseDictCCZip'
+import { RehydrateAction } from 'redux-persist'
+
+const initializeDictionaries: AppEpic = (action$, state$) =>
+  action$.pipe(
+    ofType('persist/REHYDRATE' as any),
+    filter(action => ((action as unknown) as RehydrateAction).key === 'files'),
+    flatMap(_rehydrated => {
+      // TODO: investigate if it would be better to get these from indexed DB dictionaries table instead
+      const dicts = Object.entries({
+        ...state$.value.fileAvailabilities.YomichanDictionary,
+        ...state$.value.fileAvailabilities.DictCCDictionary,
+        ...state$.value.fileAvailabilities.CEDictDictionary,
+      })
+      const openFileActions = dicts.flatMap(
+        ([id, fileAvailability]): Action[] => {
+          if (!fileAvailability) {
+            console.error('Problem initializing dictionaries')
+            return []
+          }
+          const file = s.getFile(
+            state$.value,
+            fileAvailability.type as DictionaryFileType,
+            id
+          )
+          if (!file) {
+            console.error(`Missing file:`)
+            console.error(fileAvailability)
+            const snackbarAction: Action = actions.promptSnackbar(
+              'There was a problem initializing dictionaries. Try restarting the app, or deleting the dictionaries database.',
+              [['dictionary settings', actions.dictionariesDialog()]]
+            )
+            return [snackbarAction]
+          }
+
+          return [
+            actions.openFileRequest(
+              file as DictionaryFile,
+              fileAvailability.filePath
+            ),
+          ]
+        }
+      )
+      console.log({ openFileActions, dicts })
+
+      return from(openFileActions)
+    })
+  )
 
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
@@ -54,12 +101,13 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.ofType<StartDictionaryImport>(A.START_DICTIONARY_IMPORT).pipe(
     flatMap(({ file, filePath }) => {
       return concat(
-        of(
+        from([
           actions.setProgress({
             percentage: 50,
             message: 'Import in progress.',
-          })
-        ),
+          }),
+          actions.addFile(file, filePath),
+        ]),
         from(parseAndImportDictionary(file, filePath, effects)).pipe(
           flatMap(() => {
             return from([
@@ -187,6 +235,7 @@ function onZipArchiveEntry(filePath: string, callback: Function) {
 }
 
 export default combineEpics(
+  initializeDictionaries,
   importDictionaryRequestEpic,
   startImportEpic,
   deleteDatabaseEpic,

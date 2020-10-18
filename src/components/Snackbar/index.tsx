@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import * as r from '../../redux'
 import SimpleMessage from './SimpleMessage'
+import Prompt from './Prompt'
 
 enum $ {
   container = 'snackbar-container',
@@ -19,6 +20,15 @@ const SnackbarView = () => {
     case 'SimpleMessage':
       return (
         <SimpleMessage
+          key={Date.now().toString()}
+          {...currentSnackbar.props}
+          closeButtonId={$.closeButton}
+        />
+      )
+
+    case 'Prompt':
+      return (
+        <Prompt
           key={Date.now().toString()}
           {...currentSnackbar.props}
           closeButtonId={$.closeButton}

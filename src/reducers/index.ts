@@ -9,19 +9,9 @@ import subtitles from './subtitles'
 import settings from './settings'
 import fileAvailabilities from './fileAvailabilities'
 import files from './files'
-import { readFileSync } from 'fs-extra'
-import electron from 'electron'
 import { PersistConfig, createTransform, persistReducer } from 'redux-persist'
 import createElectronStorage from 'redux-persist-electron-storage'
 import { resetFileAvailabilities } from '../utils/statePersistence'
-
-let initialState: Partial<AppState> | undefined
-if (process.env.REACT_APP_SPECTRON)
-  initialState = electron.remote.process.env.PERSISTED_STATE_PATH
-    ? JSON.parse(
-        readFileSync(electron.remote.process.env.PERSISTED_STATE_PATH, 'utf8')
-      )
-    : undefined
 
 const storage = createElectronStorage()
 const filesPersistConfig: PersistConfig<
@@ -48,7 +38,7 @@ const transform = createTransform(
   }
 )
 
-const rootConfig = {
+const rootConfig: PersistConfig<AppState> = {
   key: 'root',
   storage,
   transforms: [transform],
