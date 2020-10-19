@@ -9,6 +9,7 @@ import { nowUtcTimestamp } from './utils/sideEffects'
 import { setAppMenuProjectSubmenuPermissions } from './utils/appMenu'
 import { getDexieDb } from './utils/dictionariesDatabase'
 import * as electron from './utils/electron'
+import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDictionary'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -79,6 +80,7 @@ const dependencies = {
   nowUtcTimestamp,
   getDexieDb,
   electron,
+  parseAndImportDictionary,
 }
 
 export default dependencies

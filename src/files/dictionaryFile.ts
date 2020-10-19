@@ -15,7 +15,7 @@ export type LexiconMainEntry = {
   head: string
   meanings: string[]
   /** parts of speech etc. */
-  tags: string | null
+  tags: string | null // should separate into term + __ tags?
   pronunciation: string | null
   frequencyScore: number | null
   // maybe should include both
@@ -25,19 +25,6 @@ export type LexiconMainEntry = {
   //  and/or stems joined
 
   searchTokensCount: number
-
-  // /** for filtering entries that resolve exactly to given tokens */
-  // searchTokensSorted: string
-  // /** for filtering entries that contain given tokens.
-  //  *  slower than `searchTokensSorted` because it requires JS filtering step */
-  // searchTokens: string[]
-
-  // /** for filtering entries that resolve exactly to given stems */
-  // searchStems: string[]
-  // /** for filtering entries that contain given tokens.
-  //  *  slower than `searchStems` because it requires JS filtering step */
-  // searchStemsSorted: string
-
   tokenCombos: string[]
 }
 

@@ -1,3 +1,6 @@
+import { fromEvent, of, concat, from, defer } from 'rxjs'
+import { takeUntil, mergeMap, tap, map, catchError } from 'rxjs/operators'
+import { Readable } from 'stream'
 import * as yauzl from 'yauzl'
 import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import {
@@ -5,120 +8,180 @@ import {
   getGermanDifferingStems,
 } from '../../utils/dictCc'
 import { getTokenCombinations } from '../../utils/tokenCombinations'
+import { getDexieDb } from '../dictionariesDatabase'
 
-export async function parseDictCCZip(
-  file: DictCCDictionary,
-  filePath: string,
-  effects: EpicsDependencies
-) {
-  let textFileMet = false
-
-  return new Promise((res, reject) => {
+export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
+  // create table for dictionary entry
+  // for each term_bank_*.json file in archive
+  // add to indexeddb
+  let termBankMet = false
+  const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
-      if (err) return reject(err)
-      if (!zipfile) throw new Error('problem reading zip file')
+      if (err) return rej(err)
+      if (!zipfile) return rej(new Error('problem reading zip file'))
 
-      const rejectAndClose = (err: any) => {
-        rejectAndClose(err)
-        zipfile.close()
-      }
-      zipfile.on('entry', entry => {
-        console.log('cc', { entry })
-        if (/\.txt/.test(entry.fileName)) {
-          textFileMet = true
-          console.log('importing!', new Date(Date.now()), Date.now())
-
-          zipfile.openReadStream(entry, function(err, readStream) {
-            if (err) return rejectAndClose(err)
-            if (!readStream)
-              return rejectAndClose(new Error('problem streaming zip file'))
-
-            let nextChunkStart = ''
-
-            let buffer: LexiconEntry[] = []
-            readStream.on('data', async data => {
-              // const entries: LexiconEntry[] = []
-              const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
-              const lastLineIndex = lines.length - 1
-              nextChunkStart = lines[lastLineIndex]
-              for (let i = 0; i < lastLineIndex; i++) {
-                const line = lines[i]
-                // console.log(line, "!line.startsWith('#') && i !== lastLineIndex", !line.startsWith('#'), i !== lastLineIndex)
-                if (line && !line.startsWith('#') && i !== lastLineIndex) {
-                  // (aufgeregt) auffliegen~~~~~to flush [fly away]~~~~~verb~~~~~[hunting] [zool.]
-                  // Rosenwaldsänger {m}~~~~~pink-headed warbler [Ergaticus versicolor]	noun	[orn.]
-                  const [head, meaning, pos, endTags] = line.split('\t')
-                  // strip affixes and bits inside curly braces
-                  const searchTokens = getGermanSearchTokens(head)
-                  if (!searchTokens.length) continue
-
-                  const searchStems = getGermanDifferingStems(head)
-                  const grammTags = [...head.matchAll(/\{.+?}/g)] || []
-
-                  if (searchTokens.length !== searchStems.length) {
-                    console.error('mismatch')
-                    console.log({ searchStems, searchTokens })
-                  }
-
-                  if (searchStems.length > 5)
-                    console.log(head, searchStems.join(' '))
-
-                  buffer.push({
-                    head,
-                    meanings: [meaning],
-                    tags: `${pos}\n${endTags}\n${grammTags.join(' ')}`,
-                    variant: false,
-                    pronunciation: null,
-                    dictionaryKey: file.key,
-                    frequencyScore: null,
-                    // searchStems,
-                    // searchStemsSorted: toSortedX(searchStems),
-                    // searchTokens,
-                    searchTokensCount: searchTokens.length,
-                    tokenCombos:
-                      // should get chunks from all places, just doing the start for now
-                      getTokenCombinations(searchStems.slice(0, 5)).map(
-                        tokenCombo => {
-                          return [
-                            ...tokenCombo.sort(),
-                            searchStems.length.toString(16).padStart(2, '0'),
-                          ].join(' ')
-                        }
-                      ),
-                  })
-                }
-              }
-              // total += entries.length
-              if (buffer.length >= 2000) {
-                const oldBuffer = buffer
-                buffer = []
-
-                console.log('2000 more!')
-                await effects
-                  .getDexieDb()
-                  .table(getTableName(file.type))
-                  .bulkAdd(oldBuffer)
-                  .catch(err => rejectAndClose(err))
-              }
-            })
-
-            readStream.on('end', async function() {
-              // TODO: should process leftovers from final chunk
-              zipfile.readEntry()
-            })
-          })
-        } else {
-          zipfile.readEntry()
-        }
-      })
-
-      zipfile.on('close', () => {
-        console.log('done importing!', new Date(Date.now()), Date.now())
-        if (textFileMet) res()
-        else reject(new Error(`Invalid dict.cc dictionary file.`))
-      })
-
-      zipfile.readEntry()
+      res(zipfile)
     })
   })
+
+  const { entryCount } = zipfile
+
+  let visitedEntries = 0
+
+  const entriesObservable = fromEvent(zipfile, 'entry').pipe(
+    takeUntil(fromEvent(zipfile, 'close')),
+    mergeMap(_entry => {
+      visitedEntries++
+
+      const entry: yauzl.Entry = _entry as any
+      console.log(entry.uncompressedSize)
+      if (!/\.txt/.test(entry.fileName)) {
+        zipfile.readEntry()
+        return of(visitedEntries / entryCount)
+      }
+      termBankMet = true
+      console.log('match!')
+
+      const entryReadStreamPromise: Promise<Readable> = new Promise(
+        (res, rej) => {
+          zipfile.openReadStream(entry as yauzl.Entry, (err, readStream) => {
+            if (err) return rej(err)
+            if (!readStream) return rej(new Error('problem streaming zip file'))
+
+            res(readStream)
+          })
+        }
+      )
+
+      let entryBytesProcessed = 0
+      const { uncompressedSize: entryTotalBytes } = entry
+      return concat(
+        from(entryReadStreamPromise).pipe(
+          mergeMap(entryReadStream => {
+            const context = {
+              nextChunkStart: '',
+              buffer: [] as LexiconEntry[],
+            }
+
+            const readEntryObservable = fromEvent(entryReadStream, 'data').pipe(
+              takeUntil(fromEvent(entryReadStream, 'end')),
+              tap(async _data => {
+                const data: Buffer = _data as any
+
+                entryBytesProcessed += data.length
+
+                try {
+                  importDictionaryEntries(context, file, data)
+                } catch (err) {
+                  throw err
+                }
+              }),
+              map(() => {
+                const entryFractionProcessed =
+                  (entryBytesProcessed / entryTotalBytes) * (1 / entryCount)
+                return (
+                  entryFractionProcessed + (visitedEntries - 1) / entryCount
+                )
+              })
+            )
+
+            return concat(
+              readEntryObservable,
+              defer(() => {
+                zipfile.readEntry()
+                return of(visitedEntries / entryCount)
+              })
+            )
+          })
+        )
+        // TODO: stream error event?\
+      )
+    })
+  )
+
+  const progressObservable = concat(
+    entriesObservable,
+    defer(() => {
+      console.log('import complete!', new Date(Date.now()), Date.now())
+
+      if (!termBankMet) throw new Error(`Invalid dictionary file.`)
+
+      return from([100])
+    })
+  ).pipe(
+    catchError(err => {
+      zipfile.close()
+      throw err
+    })
+  )
+
+  zipfile.readEntry()
+
+  return progressObservable
+}
+
+async function importDictionaryEntries(
+  context: { nextChunkStart: string; buffer: LexiconEntry[] },
+  file: DictCCDictionary,
+  data: Buffer
+) {
+  const { nextChunkStart, buffer } = context
+  // const entries: LexiconEntry[] = []
+  const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
+  const lastLineIndex = lines.length - 1
+  context.nextChunkStart = lines[lastLineIndex]
+  for (let i = 0; i < lastLineIndex; i++) {
+    const line = lines[i]
+    // console.log(line, "!line.startsWith('#') && i !== lastLineIndex", !line.startsWith('#'), i !== lastLineIndex)
+    if (line && !line.startsWith('#') && i !== lastLineIndex) {
+      // (aufgeregt) auffliegen~~~~~to flush [fly away]~~~~~verb~~~~~[hunting] [zool.]
+      // Rosenwaldsänger {m}~~~~~pink-headed warbler [Ergaticus versicolor]	noun	[orn.]
+      const [head, meaning, pos, endTags] = line.split('\t')
+      // strip affixes and bits inside curly braces
+      const searchTokens = getGermanSearchTokens(head)
+      if (!searchTokens.length) continue
+
+      const searchStems = getGermanDifferingStems(head)
+      const grammTags = [...head.matchAll(/\{.+?}/g)] || []
+
+      if (searchTokens.length !== searchStems.length) {
+        console.error('mismatch')
+        console.log({ searchStems, searchTokens })
+      }
+
+      if (searchStems.length > 5) console.log(head, searchStems.join(' '))
+
+      buffer.push({
+        head,
+        meanings: [meaning],
+        tags: `${pos}\n${endTags}\n${grammTags.join(' ')}`,
+        variant: false,
+        pronunciation: null,
+        dictionaryKey: file.key,
+        frequencyScore: null,
+        // searchStems,
+        // searchStemsSorted: toSortedX(searchStems),
+        // searchTokens,
+        searchTokensCount: searchTokens.length,
+        tokenCombos:
+          // should get chunks from all places, just doing the start for now
+          getTokenCombinations(searchStems.slice(0, 5)).map(tokenCombo => {
+            return [
+              ...tokenCombo.sort(),
+              searchStems.length.toString(16).padStart(2, '0'),
+            ].join(' ')
+          }),
+      })
+    }
+  }
+  // total += entries.length
+  if (buffer.length >= 2000) {
+    const oldBuffer = buffer
+    context.buffer = []
+
+    console.log('2000 more!')
+    await getDexieDb()
+      .table(getTableName(file.type))
+      .bulkAdd(oldBuffer)
+  }
 }

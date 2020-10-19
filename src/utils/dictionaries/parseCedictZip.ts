@@ -1,3 +1,6 @@
+import { fromEvent, of, concat, from, defer } from 'rxjs'
+import { takeUntil, mergeMap, tap, map, catchError } from 'rxjs/operators'
+import { Readable } from 'stream'
 import * as yauzl from 'yauzl'
 import {
   getTableName,
@@ -5,111 +8,170 @@ import {
   LexiconMainEntry,
   LexiconVariantEntry,
 } from '../../files/dictionaryFile'
+import { getDexieDb } from '../dictionariesDatabase'
 
-export async function parseCedictZip(
-  file: CEDictDictionary,
-  filePath: string,
-  effects: EpicsDependencies
-) {
-  let textFileMet = false
-
-  return new Promise((res, reject) => {
+export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
+  // create table for dictionary entry
+  // for each term_bank_*.json file in archive
+  // add to indexeddb
+  let termBankMet = false
+  const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
-      if (err) return reject(err)
-      if (!zipfile) throw new Error('problem reading zip file')
+      if (err) return rej(err)
+      if (!zipfile) return rej(new Error('problem reading zip file'))
 
-      const rejectAndClose = (err: any) => {
-        rejectAndClose(err)
-        zipfile.close()
-      }
-
-      console.log('importing cedict!', new Date(Date.now()), Date.now())
-      zipfile.on('entry', entry => {
-        if (/cedict_ts\.u8/.test(entry.fileName)) {
-          textFileMet = true
-
-          zipfile.openReadStream(entry, function(err, readStream) {
-            if (err) return rejectAndClose(err)
-            if (!readStream)
-              return rejectAndClose(new Error('problem streaming zip file'))
-            // reading = true
-            let buffer: LexiconEntry[] = []
-
-            let nextChunkStart = ''
-            readStream.on('data', async data => {
-              console.log('stream read working')
-              const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
-              const lastLineIndex = lines.length - 1
-              nextChunkStart = lines[lastLineIndex]
-              for (let i = 0; i < lastLineIndex; i++) {
-                const line = lines[i]
-                if (line && !line.startsWith('#') && i !== lastLineIndex) {
-                  // 一個人 一个人 [yi1 ge4 ren2] /by oneself (without assistance)/alone (without company)/
-                  const matchData = line.match(
-                    /^(\S+)\s+(\S+)\s+\[(.+)\]\s+\/(.+)\/$/
-                  )
-
-                  if (!matchData) {
-                    console.error(line)
-                    console.log('invalid line!', { line })
-                    return rejectAndClose(`Invalid CEDict file format.`)
-                  }
-
-                  const [, trad, simpl, pinyin, en] = matchData
-                  const tradEntry: LexiconMainEntry = {
-                    head: trad,
-                    meanings: [en],
-                    tags: null,
-                    variant: false,
-                    pronunciation: pinyin,
-                    dictionaryKey: file.key,
-                    frequencyScore: null,
-                    // searchStems: [],
-                    // searchStemsSorted: '',
-                    // searchTokens: [],
-                    // searchTokensSorted: '',
-                    tokenCombos: [],
-                    searchTokensCount: 0,
-                  }
-                  const simplEntry: LexiconVariantEntry = {
-                    variant: true,
-                    head: simpl,
-                    mainEntry: trad,
-                    dictionaryKey: file.key,
-                  }
-                  buffer.push(tradEntry, simplEntry)
-                  // if (i< 20)
-                  // console.log({ trad, simpl, pinyin, en })
-                  if (buffer.length >= 3000) {
-                    const oldBuffer = buffer
-                    buffer = []
-                    await effects
-                      .getDexieDb()
-                      .table(getTableName(file.type))
-                      .bulkAdd(oldBuffer)
-                      .catch(err => rejectAndClose(err))
-                  }
-                }
-              }
-            })
-
-            readStream.on('end', function() {
-              // should process leftovers from final chunk
-              zipfile.readEntry()
-            })
-          })
-        } else {
-          zipfile.readEntry()
-        }
-      })
-
-      zipfile.on('close', () => {
-        console.log('done importing cedict!', new Date(Date.now()), Date.now())
-        if (textFileMet) res()
-        else reject(new Error(`Invalid CEDict dictionary file.`))
-      })
-
-      zipfile.readEntry()
+      res(zipfile)
     })
   })
+
+  const { entryCount } = zipfile
+
+  let visitedEntries = 0
+
+  const entriesObservable = fromEvent(zipfile, 'entry').pipe(
+    takeUntil(fromEvent(zipfile, 'close')),
+    mergeMap(_entry => {
+      visitedEntries++
+
+      const entry: yauzl.Entry = _entry as any
+      console.log(entry.uncompressedSize)
+      if (!/\.txt/.test(entry.fileName)) {
+        zipfile.readEntry()
+        return of(visitedEntries / entryCount)
+      }
+      termBankMet = true
+      console.log('match!')
+
+      const entryReadStreamPromise: Promise<Readable> = new Promise(
+        (res, rej) => {
+          zipfile.openReadStream(entry as yauzl.Entry, (err, readStream) => {
+            if (err) return rej(err)
+            if (!readStream) return rej(new Error('problem streaming zip file'))
+
+            res(readStream)
+          })
+        }
+      )
+
+      let entryBytesProcessed = 0
+      const { uncompressedSize: entryTotalBytes } = entry
+      return concat(
+        from(entryReadStreamPromise).pipe(
+          mergeMap(entryReadStream => {
+            const context = {
+              nextChunkStart: '',
+              buffer: [] as LexiconEntry[],
+            }
+
+            const readEntryObservable = fromEvent(entryReadStream, 'data').pipe(
+              takeUntil(fromEvent(entryReadStream, 'end')),
+              tap(async _data => {
+                const data: Buffer = _data as any
+
+                entryBytesProcessed += data.length
+
+                try {
+                  importDictionaryEntries(context, file, data)
+                } catch (err) {
+                  throw err
+                }
+              }),
+              map(() => {
+                const entryFractionProcessed =
+                  (entryBytesProcessed / entryTotalBytes) * (1 / entryCount)
+                return (
+                  entryFractionProcessed + (visitedEntries - 1) / entryCount
+                )
+              })
+            )
+
+            return concat(
+              readEntryObservable,
+              defer(() => {
+                zipfile.readEntry()
+                return of(visitedEntries / entryCount)
+              })
+            )
+          })
+        )
+        // TODO: stream error event?\
+      )
+    })
+  )
+
+  const progressObservable = concat(
+    entriesObservable,
+    defer(() => {
+      console.log('import complete!', new Date(Date.now()), Date.now())
+
+      if (!termBankMet) throw new Error(`Invalid dictionary file.`)
+
+      return from([100])
+    })
+  ).pipe(
+    catchError(err => {
+      zipfile.close()
+      throw err
+    })
+  )
+
+  zipfile.readEntry()
+
+  return progressObservable
+}
+
+async function importDictionaryEntries(
+  context: { nextChunkStart: string; buffer: LexiconEntry[] },
+  file: CEDictDictionary,
+  data: Buffer
+) {
+  const lines = (context.nextChunkStart + data.toString()).split(/[\n\r]+/)
+  const lastLineIndex = lines.length - 1
+  context.nextChunkStart = lines[lastLineIndex]
+  for (let i = 0; i < lastLineIndex; i++) {
+    const line = lines[i]
+    if (line && !line.startsWith('#') && i !== lastLineIndex) {
+      // 一個人 一个人 [yi1 ge4 ren2] /by oneself (without assistance)/alone (without company)/
+      const matchData = line.match(/^(\S+)\s+(\S+)\s+\[(.+)\]\s+\/(.+)\/$/)
+
+      if (!matchData) {
+        console.error(line)
+        console.log('invalid line!', { line })
+        throw new Error(`Invalid CEDict file format.`)
+      }
+
+      const [, trad, simpl, pinyin, en] = matchData
+      const tradEntry: LexiconMainEntry = {
+        head: trad,
+        meanings: [en],
+        tags: null,
+        variant: false,
+        pronunciation: pinyin,
+        dictionaryKey: file.key,
+        frequencyScore: null,
+        // searchStems: [],
+        // searchStemsSorted: '',
+        // searchTokens: [],
+        // searchTokensSorted: '',
+        tokenCombos: [],
+        searchTokensCount: 0,
+      }
+      const simplEntry: LexiconVariantEntry = {
+        variant: true,
+        head: simpl,
+        mainEntry: trad,
+        dictionaryKey: file.key,
+      }
+      context.buffer.push(tradEntry, simplEntry)
+      // if (i< 20)
+      // console.log({ trad, simpl, pinyin, en })
+      if (context.buffer.length >= 3000) {
+        const oldBuffer = context.buffer
+        context.buffer = []
+        await getDexieDb()
+          .table(getTableName(file.type))
+          .bulkAdd(oldBuffer)
+      }
+    }
+  }
 }

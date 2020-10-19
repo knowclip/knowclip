@@ -1,5 +1,5 @@
 import { combineEpics, ofType } from 'redux-observable'
-import { catchError, filter, flatMap, map } from 'rxjs/operators'
+import { catchError, filter, mergeMap } from 'rxjs/operators'
 import * as A from '../types/ActionType'
 import * as actions from '../actions'
 import * as s from '../selectors'
@@ -9,17 +9,14 @@ import {
   resetDictionariesDatabase,
 } from '../utils/dictionariesDatabase'
 import { getFileFilters } from '../utils/files'
-import { concat, from, of } from 'rxjs'
-import { parseYomichanZip } from '../utils/dictionaries/parseYomichanZip'
-import { parseCedictZip } from '../utils/dictionaries/parseCedictZip'
-import { parseDictCCZip } from '../utils/dictionaries/parseDictCCZip'
+import { concat, EMPTY, from, of } from 'rxjs'
 import { RehydrateAction } from 'redux-persist'
 
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType('persist/REHYDRATE' as any),
     filter(action => ((action as unknown) as RehydrateAction).key === 'files'),
-    flatMap(_rehydrated => {
+    mergeMap(_rehydrated => {
       // TODO: investigate if it would be better to get these from indexed DB dictionaries table instead
       const dicts = Object.entries({
         ...state$.value.fileAvailabilities.YomichanDictionary,
@@ -64,7 +61,7 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, ImportDictionaryRequest>(A.IMPORT_DICTIONARY_REQUEST),
-    flatMap(
+    mergeMap(
       async (action): Promise<Action> => {
         try {
           const files = await effects.electron.showOpenDialog(
@@ -99,63 +96,64 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
 
 const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.ofType<StartDictionaryImport>(A.START_DICTIONARY_IMPORT).pipe(
-    flatMap(({ file, filePath }) => {
+    mergeMap(({ file, filePath }) => {
       return concat(
         from([
           actions.setProgress({
-            percentage: 50,
+            percentage: 0,
             message: 'Import in progress.',
           }),
           actions.addFile(file, filePath),
         ]),
-        from(parseAndImportDictionary(file, filePath, effects)).pipe(
-          flatMap(() => {
-            return from([
-              actions.finishDictionaryImport(file.type, file.id),
-              actions.openFileRequest(file, filePath),
-              actions.setProgress(null),
-              actions.addActiveDictionary(file.id, file.type),
-              actions.simpleMessageSnackbar(
-                `Mouse over flashcard text and press the 'D' key to look up words.`,
-                null
-              ),
-            ])
-          }),
-          catchError(err => {
-            console.error(err)
+        from(effects.parseAndImportDictionary(file, filePath)).pipe(
+          mergeMap(obs =>
+            obs.pipe(
+              mergeMap(decimal => {
+                const newPercentage = Math.round(decimal * 100)
+                const { progress } = state$.value.session
+                if (progress && progress.percentage !== newPercentage)
+                  return of(
+                    actions.setProgress({
+                      percentage: newPercentage,
+                      message: 'Import in progress',
+                    })
+                  )
 
-            return from([
-              actions.openFileFailure(file, filePath, String(err)),
-              actions.simpleMessageSnackbar(
-                `There was a problem importing this dictionary file: ${err}`
-              ),
-              // actions.setProgress(null),
-              actions.deleteImportedDictionary(file),
-            ])
-          })
-        )
+                return EMPTY
+              })
+            )
+          )
+        ),
+        from([
+          actions.finishDictionaryImport(file.type, file.id),
+          actions.openFileRequest(file, filePath),
+          actions.setProgress(null),
+          actions.addActiveDictionary(file.id, file.type),
+          actions.simpleMessageSnackbar(
+            `Mouse over flashcard text and press the 'D' key to look up words.`,
+            null
+          ),
+        ])
+      ).pipe(
+        catchError(err => {
+          console.error(err)
+
+          return from([
+            actions.openFileFailure(file, filePath, String(err)),
+            actions.simpleMessageSnackbar(
+              `There was a problem importing this dictionary file: ${err}`
+            ),
+            // actions.setProgress(null),
+            actions.deleteImportedDictionary(file),
+          ])
+        })
       )
     })
   )
 
-function parseAndImportDictionary(
-  file: DictionaryFile,
-  filePath: string,
-  effects: EpicsDependencies
-) {
-  switch (file.type) {
-    case 'YomichanDictionary':
-      return parseYomichanZip(file, filePath, effects)
-    case 'CEDictDictionary':
-      return parseCedictZip(file, filePath, effects)
-    case 'DictCCDictionary':
-      return parseDictCCZip(file, filePath, effects)
-  }
-}
-
 const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
   action$.ofType<DeleteImportedDictionary>(A.DELETE_IMPORTED_DICTIONARY).pipe(
-    flatMap(action => {
+    mergeMap(action => {
       return concat(
         of(
           actions.setProgress({
@@ -171,7 +169,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
             action.file.type
           )
         ).pipe(
-          flatMap(() => {
+          mergeMap(() => {
             return from([
               actions.setProgress(null),
               actions.deleteFileSuccess(
@@ -197,9 +195,9 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
 
 const deleteDatabaseEpic: AppEpic = (action$, state$, effects) =>
   action$.ofType(A.RESET_DICTIONARIES_DATABASE).pipe(
-    flatMap(() => {
+    mergeMap(() => {
       return from(resetDictionariesDatabase()).pipe(
-        flatMap(() => {
+        mergeMap(() => {
           return [
             ...s
               .getRememberedDictionaryFiles(state$.value)

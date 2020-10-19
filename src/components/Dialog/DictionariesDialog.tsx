@@ -10,6 +10,7 @@ import {
   DialogActions,
   DialogContent,
   IconButton,
+  LinearProgress,
   List,
   ListItem,
   ListItemIcon,
@@ -98,7 +99,10 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
               <p>This can take several minutes or longer on some computers.</p>
 
               <section style={{ textAlign: 'center' }}>
-                <CircularProgress />
+                <LinearProgress
+                  value={progress.percentage}
+                  variant="determinate"
+                />
               </section>
 
               <p>
