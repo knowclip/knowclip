@@ -6,9 +6,12 @@ import {
   LexiconMainEntry,
 } from '../files/dictionaryFile'
 import {
+  germanSeparablePrefixes,
   getDifferingSearchStem,
+  getGermanSearchTokens,
   LETTERS_DIGITS_PLUS,
   NON_LETTERS_DIGITS_PLUS,
+  prefixesRegex,
 } from './dictCc'
 import { uuid } from './sideEffects'
 import { getTokenCombinations } from './tokenCombinations'
@@ -81,9 +84,10 @@ export type TranslatedTokensAtCharacterIndex = {
 type TranslatedToken = {
   /** For whitespace languages, there
    * will only be one tokenText per textCharacterIndex.
-   * So right now, for German `TranslatedTokensAtCharacterIndex.translatedTokens[n].matchedTokenText` will be the same.
+   * So right now, for German `TranslatedTokensAtCharacterIndex.tokensTranslations[n].matchedTokenText` will be the same.
    */
   matchedTokenText: string
+  /** only 1 for whitespace languages? */
   candidates: { entry: LexiconMainEntry; inflections: string[] }[]
 }
 
@@ -120,9 +124,15 @@ const getGermanSearchTokensStrings = (searchStems: string[]) =>
 function getTokenComboWithLengthString(tokenCombo: string[], length: number) {
   return [...tokenCombo.sort(), length.toString(16).padStart(2, '0')].join(' ')
 }
-function getGermanSearchTokensFromText(germanText: string) {
-  const withoutAnnotations = germanText.trim().toLowerCase()
-  const tokens = withoutAnnotations
+export function getGermanSearchTokensFromText(
+  germanText: string,
+  lowerCase: boolean = false
+) {
+  const withoutAnnotations = germanText.trim()
+  const tokens = (lowerCase
+    ? withoutAnnotations.toLowerCase()
+    : withoutAnnotations
+  )
     .split(NON_LETTERS_DIGITS_PLUS)
     .filter(x => x)
   return tokens
@@ -135,10 +145,10 @@ function getGermanTextSearchTokensCombos(tokens: string[]) {
   })
 }
 ;(window as any).getGermanTextSearchTokensCombos = getGermanTextSearchTokensCombos
-export function getGermanTextSearchStems(tokens: string[]) {
+export function getGermanTextSearchStems(lowercaseTokens: string[]) {
   const stems: string[] = []
 
-  for (const word of tokens) {
+  for (const word of lowercaseTokens) {
     const stem = getDifferingSearchStem(word) || word
     stems.push(stem)
   }
@@ -150,16 +160,15 @@ export async function lookUpGerman(
   text: string,
   maxQueryTokensLength: number = 5
 ): Promise<TextTokensTranslations> {
-  console.log('lookign up!')
-
-  if (!dexie)
-    return {
-      tokensTranslations: [],
-      characterIndexToTranslationsMappings: [],
-    }
+  const dexie = getDexieDb()
 
   const textTokens = getGermanSearchTokensFromText(text)
-  const textStems = getGermanTextSearchStems(textTokens)
+  const textPrefixes = new Set(
+    textTokens.filter(t => germanSeparablePrefixes.has(t.toLowerCase()))
+  )
+  const textStems = getGermanTextSearchStems(
+    textTokens.map(x => x.toLowerCase())
+  )
 
   const table = dexie.table(getTableName('DictCCDictionary'))
 
@@ -208,12 +217,13 @@ export async function lookUpGerman(
       tokenIndex,
       tokenIndex + maxQueryTokensLength
     )
-    const tokenCombinationsAtIndex = getTokenCombinations(searchTokens)
+    const tokenCombinationsAtIndex = getTokenCombinations(searchTokens) // not case insensitive
     const stemCombinationsAtIndex = getTokenCombinations(searchStems)
 
     const tokenCharacterIndex = text
       .toLowerCase()
-      .indexOf(exactToken, indexingCursor)
+      .indexOf(exactToken.toLowerCase(), indexingCursor)
+    console.log({ stemCombinationsAtIndex, exactStemsMatches })
     const searchStemsAtIndex = stemCombinationsAtIndex.flatMap(stemCombo => {
       const stemComboString = stemCombo.sort().join(' ')
       // perhaps can use entry.tokenCombos first value instead of calling getGermanSearchTokens each time here?
@@ -238,12 +248,136 @@ export async function lookUpGerman(
         ),
       })
 
+    // should also register
+
     indexingCursor = tokenCharacterIndex + exactToken.length - 1
     tokenIndex++
   }
   // should sort to prioritize
   // exact matches and matches
   // preserving the order parts corresponding to query tokens
+
+  function sortResult(a: boolean, b: boolean) {
+    if (a && !b) return -1
+    if (b && !a) return 1
+  }
+
+  // function getSortScore(a: TranslatedToken) {
+
+  // }
+
+  for (const result of results) {
+    result.translatedTokens.sort((a, b) => {
+      // is matchedTokenText always the same for german at one character index?
+      // maybe produce a score based on length deviation?
+
+      const sortByExactMatch = sortResult(
+        a.candidates[0].entry.head === a.matchedTokenText,
+        b.candidates[0].entry.head === b.matchedTokenText
+      )
+      if (sortByExactMatch) return sortByExactMatch
+
+      const sortByExactMatchWithoutAnnotations = sortResult(
+        getGermanSearchTokens(a.candidates[0].entry.head, false).join(' ') ===
+          a.matchedTokenText,
+        getGermanSearchTokens(b.candidates[0].entry.head, false).join(' ') ===
+          b.matchedTokenText
+      )
+      if (sortByExactMatchWithoutAnnotations)
+        return sortByExactMatchWithoutAnnotations
+
+      const sortByCaseInsensitiveTextMatch = sortResult(
+        a.candidates[0].entry.head.toLowerCase() ===
+          a.matchedTokenText.toLowerCase(),
+        b.candidates[0].entry.head.toLowerCase() ===
+          b.matchedTokenText.toLowerCase()
+      )
+      if (sortByCaseInsensitiveTextMatch) return sortByCaseInsensitiveTextMatch
+
+      const aSearchTokensLowercase = getGermanSearchTokens(
+        a.candidates[0].entry.head,
+        true
+      )
+      const bSearchTokensLowercase = getGermanSearchTokens(
+        b.candidates[0].entry.head,
+        true
+      )
+      const sortByCaseInsensitiveExactMatchWithoutAnnotations = sortResult(
+        aSearchTokensLowercase.join(' ') === a.matchedTokenText.toLowerCase(),
+        bSearchTokensLowercase.join(' ') === b.matchedTokenText.toLowerCase()
+      )
+      if (sortByCaseInsensitiveExactMatchWithoutAnnotations)
+        return sortByCaseInsensitiveExactMatchWithoutAnnotations
+
+      const [, aMatchPrefix] =
+        a.matchedTokenText.toLowerCase().match(prefixesRegex) || []
+      // should account for multiple?
+      const [aCandidatePrefix] = aSearchTokensLowercase.flatMap(
+        candidateToken => {
+          const candidateTokenStem =
+            getDifferingSearchStem(candidateToken) || candidateToken
+          if (
+            candidateTokenStem !==
+            (getDifferingSearchStem(a.matchedTokenText) || a.matchedTokenText)
+          )
+            return []
+
+          const [, prefix] = candidateToken.match(prefixesRegex) || []
+          return prefix ? [prefix] : []
+        }
+      )
+
+      const [, bMatchPrefix] =
+        b.matchedTokenText.toLowerCase().match(prefixesRegex) || []
+      const [bCandidatePrefix] = bSearchTokensLowercase.flatMap(
+        candidateToken => {
+          const candidateTokenStem =
+            getDifferingSearchStem(candidateToken) || candidateToken
+          if (
+            candidateTokenStem !==
+            (getDifferingSearchStem(b.matchedTokenText) || b.matchedTokenText)
+          )
+            return []
+
+          const [, prefix] = candidateToken.match(prefixesRegex) || []
+          return prefix ? [prefix] : []
+        }
+      )
+
+      // nico 05:41 geht das?
+      //      22:02 mitkommen
+      //      1:25:56   lueg mich nicht an
+
+      const aPrefixRelevanceScore = aMatchPrefix // "mit" (-kommst)
+        ? aCandidatePrefix
+          ? aMatchPrefix === aCandidatePrefix
+            ? 3
+            : 0
+          : 2
+        : aCandidatePrefix
+        ? textPrefixes.has(aCandidatePrefix)
+          ? 3
+          : 0
+        : 2
+      const bPrefixRelevanceScore = bMatchPrefix // "mit" (-kommst)
+        ? bCandidatePrefix
+          ? bMatchPrefix === bCandidatePrefix
+            ? 3
+            : 0
+          : 2
+        : bCandidatePrefix
+        ? textPrefixes.has(bCandidatePrefix)
+          ? 3
+          : 0
+        : 2
+
+      const prefixRelevance = bPrefixRelevanceScore - aPrefixRelevanceScore
+      if (prefixRelevance) return prefixRelevance
+
+      return 0
+    })
+  }
+
   return {
     tokensTranslations: results,
     characterIndexToTranslationsMappings: [],
@@ -257,11 +391,7 @@ export async function lookUpJapanese(
   text: string
   // activeDictionaries: string[] ???
 ): Promise<TextTokensTranslations> {
-  if (!dexie)
-    return {
-      tokensTranslations: [],
-      characterIndexToTranslationsMappings: [],
-    }
+  const dexie = getDexieDb()
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
 
   const allLookupTokens = Array.from(allTokens, token => [
@@ -322,7 +452,7 @@ export async function lookUpJapanese(
               candidates: candidates.sort((a, b) => {
                 if (
                   [a.entry.head, b.entry.head].filter(head => head === token)
-                    .length != 1
+                    .length !== 1
                 ) {
                   const aScore =
                     typeof a.entry.frequencyScore === 'number'

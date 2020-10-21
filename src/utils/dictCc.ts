@@ -84,7 +84,7 @@ export const fillerWords = new Set([
 
 const trimmedFillerWords = new Set(['jd', 'jds', 'jdn', 'jdm', 'etw'])
 
-const prefixesRegex = new RegExp(
+export const prefixesRegex = new RegExp(
   `^(${[...germanSeparablePrefixes].join('|')})(zu)?(?=...)`,
   'ui'
 )
@@ -97,11 +97,13 @@ export function trimNonLettersDigitsOrWhitespace(text: string) {
   return text.replace(NON_LETTERS_DIGITS_WHITESPACE, '')
 }
 
-export function getGermanSearchTokens(dictCcEntryHead: string) {
-  const withoutAnnotations = trimAnnotations(dictCcEntryHead)
-    .trim()
-    .toLowerCase()
-  return withoutAnnotations
+export function getGermanSearchTokens(
+  dictCcEntryHead: string,
+  lowerCase: boolean = true
+) {
+  const withoutAnnotations = trimAnnotations(dictCcEntryHead).trim()
+
+  return (lowerCase ? withoutAnnotations.toLowerCase() : withoutAnnotations)
     .split(NON_LETTERS_DIGITS_PLUS)
     .filter(x => x && !trimmedFillerWords.has(x))
 }
