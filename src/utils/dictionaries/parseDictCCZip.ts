@@ -34,7 +34,6 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
       visitedEntries++
 
       const entry: yauzl.Entry = _entry as any
-      console.log(entry.uncompressedSize)
       if (!/\.txt/.test(entry.fileName)) {
         zipfile.readEntry()
         return of(visitedEntries / entryCount)
@@ -102,8 +101,6 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
   const progressObservable = concat(
     entriesObservable,
     defer(() => {
-      console.log('import complete!', new Date(Date.now()), Date.now())
-
       if (!termBankMet) throw new Error(`Invalid dictionary file.`)
 
       return from([100])
@@ -121,7 +118,7 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
 }
 
 async function importDictionaryEntries(
-  context: { nextChunkStart: string; buffer: LexiconEntry[] },
+  context: { nextChunkStart: string; buffer: (Omit<LexiconEntry, 'key'>)[] },
   file: DictCCDictionary,
   data: Buffer
 ) {
@@ -154,8 +151,12 @@ async function importDictionaryEntries(
       buffer.push({
         head,
         meanings: [meaning],
-        tags: `${pos}\n${endTags}\n${grammTags.join(' ')}`,
-        variant: false,
+        tags: `${[
+          ...(pos ? [pos] : []),
+          ...(endTags ? endTags.split(/\s+/) : []),
+          ...grammTags,
+        ].join(' ')}`,
+        variant: null,
         pronunciation: null,
         dictionaryKey: file.key,
         frequencyScore: null,

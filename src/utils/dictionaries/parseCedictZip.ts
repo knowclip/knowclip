@@ -2,12 +2,7 @@ import { fromEvent, of, concat, from, defer } from 'rxjs'
 import { takeUntil, mergeMap, tap, map, catchError } from 'rxjs/operators'
 import { Readable } from 'stream'
 import * as yauzl from 'yauzl'
-import {
-  getTableName,
-  LexiconEntry,
-  LexiconMainEntry,
-  LexiconVariantEntry,
-} from '../../files/dictionaryFile'
+import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import { getDexieDb } from '../dictionariesDatabase'
 
 export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
@@ -17,6 +12,8 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
   let termBankMet = false
   const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
+      console.log('going to open zip file')
+      console.log({ err, zipfile })
       if (err) return rej(err)
       if (!zipfile) return rej(new Error('problem reading zip file'))
 
@@ -25,6 +22,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
   })
 
   const { entryCount } = zipfile
+  console.log('hi!', { entryCount, zipfile })
 
   let visitedEntries = 0
 
@@ -34,8 +32,9 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
       visitedEntries++
 
       const entry: yauzl.Entry = _entry as any
+      console.log({ entry, entryCount }, entry.uncompressedSize)
       console.log(entry.uncompressedSize)
-      if (!/\.txt/.test(entry.fileName)) {
+      if (!/\.u8/.test(entry.fileName)) {
         zipfile.readEntry()
         return of(visitedEntries / entryCount)
       }
@@ -88,6 +87,11 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
             return concat(
               readEntryObservable,
               defer(() => {
+                console.log(
+                  'import complete!!',
+                  new Date(Date.now()),
+                  Date.now()
+                )
                 zipfile.readEntry()
                 return of(visitedEntries / entryCount)
               })
@@ -121,7 +125,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
 }
 
 async function importDictionaryEntries(
-  context: { nextChunkStart: string; buffer: LexiconEntry[] },
+  context: { nextChunkStart: string; buffer: Omit<LexiconEntry, 'key'>[] },
   file: CEDictDictionary,
   data: Buffer
 ) {
@@ -141,28 +145,19 @@ async function importDictionaryEntries(
       }
 
       const [, trad, simpl, pinyin, en] = matchData
-      const tradEntry: LexiconMainEntry = {
+      const tradEntry: Omit<LexiconEntry, 'key'> = {
         head: trad,
         meanings: [en],
         tags: null,
-        variant: false,
+        variant: trad === simpl ? null : simpl,
         pronunciation: pinyin,
         dictionaryKey: file.key,
         frequencyScore: null,
-        // searchStems: [],
-        // searchStemsSorted: '',
-        // searchTokens: [],
-        // searchTokensSorted: '',
         tokenCombos: [],
         searchTokensCount: 0,
       }
-      const simplEntry: LexiconVariantEntry = {
-        variant: true,
-        head: simpl,
-        mainEntry: trad,
-        dictionaryKey: file.key,
-      }
-      context.buffer.push(tradEntry, simplEntry)
+
+      context.buffer.push(tradEntry)
       // if (i< 20)
       // console.log({ trad, simpl, pinyin, en })
       if (context.buffer.length >= 3000) {

@@ -110,7 +110,7 @@ export function getGermanSearchTokens(
 
 // REMOVE ETW , JDN etc.
 
-function trimAnnotations(text: string) {
+export function trimAnnotations(text: string) {
   return text
     .replace(/\{.+?\}/g, '')
     .replace(/\(.+?\)/g, '')

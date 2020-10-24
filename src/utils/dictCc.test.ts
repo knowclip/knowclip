@@ -1,5 +1,5 @@
 import { getDifferingSearchStem, getGermanDifferingStems } from './dictCc'
-import { getGermanSearchTokensFromText } from './dictionariesDatabase'
+import { getGermanSearchTokensFromText } from './dictionaries/lookUpDictCc'
 
 describe('getDifferingSearchStem', () => {
   it('works with prefix and ending', () => {

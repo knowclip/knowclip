@@ -123,7 +123,7 @@ async function importDictionaryEntries(
     string
   ][]
 
-  const entries: LexiconEntry[] = []
+  const entries: Omit<LexiconEntry, 'key'>[] = []
   for (const [
     head,
     pronunciation,
@@ -132,15 +132,21 @@ async function importDictionaryEntries(
     frequencyScore,
     meanings,
     _sequence,
-    _termTags,
+    termTags,
   ] of entriesJSON) {
     const coercedHiragana = toHiragana(pronunciation || head)
-    const dictEntry: LexiconEntry = {
-      variant: false,
+    const dictEntry: Omit<LexiconEntry, 'key'> = {
+      variant: null,
       dictionaryKey: file.key,
       head,
       pronunciation,
-      tags: [...new Set([...tags.split(' '), ...rules.split(' ')])].join(' '),
+      tags: [
+        ...new Set([
+          ...tags.split(' '),
+          ...rules.split(' '),
+          ...(termTags ? termTags.split(' ').map(t => `[${t}]`) : termTags),
+        ]),
+      ].join(' '),
       frequencyScore,
       meanings,
       // searchStems: [],

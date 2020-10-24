@@ -8,9 +8,9 @@ import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
 import { updaterGetter } from './updaterGetter'
 import { basename } from 'path'
 
-export type LexiconEntry = LexiconMainEntry | LexiconVariantEntry
-export type LexiconMainEntry = {
-  variant: false
+export type LexiconEntry = {
+  variant: string | null
+  key: number
   dictionaryKey: number
   head: string
   meanings: string[]
@@ -30,15 +30,6 @@ export type LexiconMainEntry = {
 
 // TODO: test different entry shapes
 // with navigator.storage.estimate()
-
-export type LexiconVariantEntry =
-  // for trad/simpl chinese
-  {
-    variant: true
-    dictionaryKey: number
-    head: string
-    mainEntry: string
-  }
 
 export const getTableName = (type: DictionaryFileType) => `${type}`
 

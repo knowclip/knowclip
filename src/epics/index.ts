@@ -73,9 +73,14 @@ const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
     ignoreElements()
   )
 
-const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
+const pauseAndChangeCursorOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
   action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
-    tap(() => pauseMedia()),
+    tap(action => {
+      if (action.type === A.SET_PROGRESS) {
+        document.body.style.cursor = action.progress ? 'progress' : 'default'
+      }
+      pauseMedia()
+    }),
     ignoreElements()
   )
 
@@ -104,7 +109,7 @@ const rootEpic: AppEpic = combineEpics(
   preloadVideoStills,
   generateWaveformImages,
   menu,
-  pauseOnBusy,
+  pauseAndChangeCursorOnBusy,
   dictionaries
 )
 
