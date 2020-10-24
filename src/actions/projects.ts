@@ -51,10 +51,16 @@ export const closeProjectRequest = (): Action => ({
   type: A.CLOSE_PROJECT_REQUEST,
 })
 
-export const setProjectName = (id: ProjectId, name: string): Action => ({
-  type: A.SET_PROJECT_NAME,
-  id,
-  name,
+export const setProjectName = (
+  id: ProjectId,
+  name: string
+): UpdateFileWith<'setProjectName'> => ({
+  type: A.UPDATE_FILE,
+  update: {
+    id,
+    updateName: 'setProjectName',
+    updatePayload: [name],
+  },
 })
 
 export const addMediaToProjectRequest = (
@@ -69,10 +75,13 @@ export const addMediaToProjectRequest = (
 export const deleteMediaFromProject = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
-): Action => ({
-  type: A.DELETE_MEDIA_FROM_PROJECT,
-  projectId,
-  mediaFileId,
+): UpdateFileWith<'deleteProjectMedia'> => ({
+  type: A.UPDATE_FILE,
+  update: {
+    updateName: 'deleteProjectMedia',
+    id: projectId,
+    updatePayload: [mediaFileId],
+  },
 })
 
 export const saveProjectRequest = (): Action => ({

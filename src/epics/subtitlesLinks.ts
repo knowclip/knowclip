@@ -1,10 +1,11 @@
 import { combineEpics } from 'redux-observable'
-import { flatMap, map, sample } from 'rxjs/operators'
+import { filter, flatMap, map, sample } from 'rxjs/operators'
 import { of, empty, from } from 'rxjs'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { uuid } from '../utils/sideEffects'
+import { isUpdateWith } from '../files/updates'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$
@@ -63,37 +64,47 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
     )
 
 const linkFieldToTrack: AppEpic = (action$, state$) =>
-  action$
-    .ofType<LinkFlashcardFieldToSubtitlesTrack>(
-      A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK
-    )
-    .pipe(
-      flatMap(action => {
-        const currentNoteType = r.getCurrentNoteType(state$.value)
-        if (!currentNoteType) return empty()
+  action$.pipe(
+    filter(
+      (
+        action
+      ): action is UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> =>
+        action.type === A.UPDATE_FILE &&
+        isUpdateWith('linkFlashcardFieldToSubtitlesTrack', action)
+    ),
+    flatMap(action => {
+      const currentNoteType = r.getCurrentNoteType(state$.value)
+      if (!currentNoteType) return empty()
 
-        const edits: EditClips['edits'] = []
+      const mediaFileId = action.update.id
+      const [
+        flashcardFieldName,
+        subtitlesTrackId,
+        fieldToClear,
+      ] = action.update.updatePayload
 
-        for (const clip of r.getClips(state$.value, action.mediaFileId)) {
-          const {
-            [action.flashcardFieldName as TransliterationFlashcardFieldName]: newValue,
-          } = r.getNewFieldsFromLinkedSubtitles(
-            state$.value,
-            clip
-          ) as TransliterationFlashcardFields
-          const newFields = { [action.flashcardFieldName]: newValue.trim() }
-          if (action.fieldToClear) newFields[action.fieldToClear] = ''
+      const edits: EditClips['edits'] = []
 
-          edits.push({
-            id: clip.id,
-            flashcardOverride: { fields: newFields },
-            override: null,
-          })
-        }
+      for (const clip of r.getClips(state$.value, mediaFileId)) {
+        const {
+          [flashcardFieldName as TransliterationFlashcardFieldName]: newValue,
+        } = r.getNewFieldsFromLinkedSubtitles(
+          state$.value,
+          clip
+        ) as TransliterationFlashcardFields
+        const newFields = { [flashcardFieldName]: newValue.trim() }
+        if (fieldToClear) newFields[fieldToClear] = ''
 
-        return of(r.editClips(edits))
-      })
-    )
+        edits.push({
+          id: clip.id,
+          flashcardOverride: { fields: newFields },
+          override: null,
+        })
+      }
+
+      return of(r.editClips(edits))
+    })
+  )
 
 export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
   action$.ofType<StartEditingCards>(A.START_EDITING_CARDS).pipe(
@@ -157,8 +168,14 @@ const updateSelectionAfterLink: AppEpic = (
         return r.getWaveformSelection(state$.value)
       }),
       sample(
-        action$.ofType<LinkFlashcardFieldToSubtitlesTrack>(
-          A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK
+        action$.pipe(
+          filter(
+            (
+              action
+            ): action is UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> =>
+              action.type === A.UPDATE_FILE &&
+              isUpdateWith('linkFlashcardFieldToSubtitlesTrack', action)
+          )
         )
       ),
       flatMap(selection => {

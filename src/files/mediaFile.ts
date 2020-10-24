@@ -16,7 +16,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     // mediaPlayer.src = ''
 
     const validationResult = await validateMediaFile(file, filePath)
-    if (validationResult.errors)
+    if (validationResult.errors) {
       return [
         r.openFileFailure(
           file,
@@ -26,8 +26,9 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
           )}: ${validationResult.errors.join(', ') || 'problem reading file.'}`
         ),
       ]
+    }
     const [errorMessage, validatedFile] = validationResult.value
-    if (errorMessage)
+    if (errorMessage) {
       return [
         r.confirmationDialog(
           errorMessage + '\n\nAre you sure this is the file you want to open?',
@@ -40,6 +41,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
           true
         ),
       ]
+    }
 
     return [r.openFileSuccess(validatedFile, filePath)]
   },
@@ -61,8 +63,9 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         ? await validateMediaFile(action.file, nameMatch)
         : null
 
-      if (matchingFile && !matchingFile.errors)
+      if (matchingFile && !matchingFile.errors) {
         return [r.locateFileSuccess(action.file, nameMatch)]
+      }
     }
 
     return [r.fileSelectionDialog(action.message, action.file)]
@@ -94,9 +97,10 @@ export const validateMediaFile = async (
 
   const differences: { [attribute: string]: [string, string] } = {}
 
-  if (existingFile.name !== newFile.name)
+  if (existingFile.name !== newFile.name) {
     differences.name = [existingFile.name, newFile.name]
-  if (existingFile.durationSeconds !== newFile.durationSeconds)
+  }
+  if (existingFile.durationSeconds !== newFile.durationSeconds) {
     differences.duration = [
       formatDurationWithMilliseconds(
         moment.duration({ seconds: existingFile.durationSeconds })
@@ -105,16 +109,19 @@ export const validateMediaFile = async (
         moment.duration({ seconds: newFile.durationSeconds })
       ),
     ]
-  if (existingFile.format !== newFile.format)
+  }
+  if (existingFile.format !== newFile.format) {
     differences.format = [existingFile.format, newFile.format]
+  }
   if (
     existingFile.subtitlesTracksStreamIndexes.sort().toString() !==
     newFile.subtitlesTracksStreamIndexes.sort().toString()
-  )
+  ) {
     differences['subtitles streams'] = [
       existingFile.subtitlesTracksStreamIndexes.join(', '),
       newFile.subtitlesTracksStreamIndexes.join(', '),
     ]
+  }
 
   if (Object.keys(differences).length) {
     return {
@@ -211,12 +218,13 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
             ? await validateSubtitlesFromFilePath(state, nameMatch, file)
             : null
 
-          if (matchingFile && matchingFile.valid)
+          if (matchingFile && matchingFile.valid) {
             newlyAutoFoundSubtitlesPaths[
               file.id
             ] = newlyAutoFoundSubtitlesPaths[file.id]
               ? { multipleMatches: true, singleMatch: undefined }
               : { singleMatch: nameMatch }
+          }
         }
 
         const match = newlyAutoFoundSubtitlesPaths[file.id]
@@ -265,13 +273,14 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
     ? r.getClipIdsByMediaFileId(state, currentFileId).length
     : 0
 
-  if (currentFileName && !clipsCount)
+  if (currentFileName && !clipsCount) {
     return [
       r.setDefaultClipSpecs({
         tags: [basename(currentFileName).replace(/\s/g, '_')],
         includeStill: action.validatedFile.isVideo,
       }),
     ]
+  }
 
   const commonTags = currentFileId
     ? r.getFlashcards(state, currentFileId).reduce(
@@ -298,3 +307,79 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
 }
 
 export default handlers()
+
+export const updates = {
+  addSubtitlesTrack: mediaUpdate((file: MediaFile, track: SubtitlesTrack) => {
+    return {
+      ...file,
+      subtitles: file.subtitles.some(s => s.id === track.id) // should not happen... but just in case
+        ? file.subtitles
+        : [
+            ...file.subtitles,
+            track.type === 'EmbeddedSubtitlesTrack'
+              ? {
+                  type: 'EmbeddedSubtitlesTrack',
+                  id: track.id,
+                }
+              : { type: 'ExternalSubtitlesTrack', id: track.id },
+          ],
+    }
+  }),
+  deleteSubtitlesTrack: mediaUpdate(
+    (file: MediaFile, trackId: SubtitlesTrackId) => ({
+      ...file,
+      subtitles: file.subtitles.filter(({ id }) => id !== trackId),
+      flashcardFieldsToSubtitlesTracks: Object.entries(
+        file.flashcardFieldsToSubtitlesTracks
+      )
+        .filter(([fieldName, trackId]) => trackId !== trackId)
+        .reduce(
+          (all, [fieldName, id]) => {
+            all[fieldName as TransliterationFlashcardFieldName] = id
+            return all
+          },
+          {} as Partial<Record<TransliterationFlashcardFieldName, string>>
+        ),
+    })
+  ),
+  linkFlashcardFieldToSubtitlesTrack: mediaUpdate(
+    (
+      file: MediaFile,
+      flashcardFieldName: FlashcardFieldName,
+      subtitlesTrackId: SubtitlesTrackId | null,
+      fieldToClear: FlashcardFieldName | null
+    ) => {
+      const flashcardFieldsToSubtitlesTracks = {
+        ...file.flashcardFieldsToSubtitlesTracks,
+      }
+      if (subtitlesTrackId) {
+        for (const [fieldName, trackId] of Object.entries(
+          flashcardFieldsToSubtitlesTracks
+        )) {
+          if (trackId === subtitlesTrackId)
+            delete flashcardFieldsToSubtitlesTracks[
+              fieldName as TransliterationFlashcardFieldName
+            ]
+        }
+
+        flashcardFieldsToSubtitlesTracks[flashcardFieldName] = subtitlesTrackId
+      } else {
+        delete flashcardFieldsToSubtitlesTracks[flashcardFieldName]
+      }
+
+      return {
+        ...file,
+        flashcardFieldsToSubtitlesTracks,
+      }
+    }
+  ),
+}
+
+function mediaUpdate<U extends any[]>(
+  update: (file: MediaFile, ...args: U) => MediaFile
+) {
+  return {
+    type: 'MediaFile' as const,
+    update,
+  }
+}

@@ -38,15 +38,36 @@ const session: Reducer<SessionState, Action> = (
         ? { ...state, waveformSelection: null, loopMedia: false }
         : state
 
-    case A.DELETE_MEDIA_FROM_PROJECT:
-      return action.mediaFileId === state.currentMediaFileId
-        ? {
+    case A.UPDATE_FILE: {
+      const { update } = action as UpdateFileWith<any>
+      const updateName: keyof FileUpdates = update.updateName
+
+      switch (updateName) {
+        case 'deleteProjectMedia': {
+          const mediaFileId = (action as UpdateFileWith<'deleteProjectMedia'>)
+            .update.updatePayload[0]
+          return state.currentMediaFileId === mediaFileId
+            ? {
+                ...state,
+                currentMediaFileId: null,
+                waveformSelection: null,
+                editingCards: false,
+              }
+            : state
+        }
+        case 'linkFlashcardFieldToSubtitlesTrack':
+          return {
             ...state,
-            currentMediaFileId: null,
-            waveformSelection: null,
-            editingCards: false,
+            waveformSelection:
+              state.waveformSelection &&
+              state.waveformSelection.type === 'Preview'
+                ? null
+                : state.waveformSelection,
           }
-        : state
+        default:
+          return state
+      }
+    }
 
     case A.OPEN_PROJECT:
       return {
@@ -204,15 +225,6 @@ const session: Reducer<SessionState, Action> = (
 
     case A.STOP_EDITING_CARDS:
       return { ...state, editingCards: false, loopMedia: false }
-
-    case A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK:
-      return {
-        ...state,
-        waveformSelection:
-          state.waveformSelection && state.waveformSelection.type === 'Preview'
-            ? null
-            : state.waveformSelection,
-      }
 
     default:
       return state

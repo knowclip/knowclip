@@ -24,10 +24,13 @@ export const mountSubtitlesTrack = (
 export const addSubtitlesTrack = (
   track: SubtitlesTrack,
   mediaFileId: MediaFileId
-): AddSubtitlesTrack => ({
-  type: A.ADD_SUBTITLES_TRACK,
-  track,
-  mediaFileId,
+): UpdateFileWith<'addSubtitlesTrack'> => ({
+  type: A.UPDATE_FILE,
+  update: {
+    updateName: 'addSubtitlesTrack',
+    id: mediaFileId,
+    updatePayload: [track],
+  },
 })
 
 export const loadNewSubtitlesFile = (
@@ -48,10 +51,13 @@ export const loadNewSubtitlesFile = (
 export const deleteSubtitlesTrackFromMedia = (
   id: SubtitlesTrackId,
   mediaFileId: MediaFileId
-): DeleteSubtitlesTrack => ({
-  type: A.DELETE_SUBTITLES_TRACK,
-  id,
-  mediaFileId,
+): UpdateFileWith<'deleteSubtitlesTrack'> => ({
+  type: A.UPDATE_FILE,
+  update: {
+    updateName: 'deleteSubtitlesTrack',
+    id: mediaFileId,
+    updatePayload: [id],
+  },
 })
 
 export const makeClipsFromSubtitles = (
@@ -87,12 +93,13 @@ export const linkFlashcardFieldToSubtitlesTrack = (
   mediaFileId: MediaFileId,
   subtitlesTrackId: SubtitlesTrackId | null,
   fieldToClear?: FlashcardFieldName
-): LinkFlashcardFieldToSubtitlesTrack => ({
-  type: A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK,
-  flashcardFieldName,
-  mediaFileId,
-  subtitlesTrackId,
-  fieldToClear: fieldToClear || null,
+): UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> => ({
+  type: A.UPDATE_FILE,
+  update: {
+    updateName: 'linkFlashcardFieldToSubtitlesTrack',
+    id: mediaFileId,
+    updatePayload: [flashcardFieldName, subtitlesTrackId, fieldToClear || null],
+  },
 })
 
 export const goToSubtitlesChunk = (

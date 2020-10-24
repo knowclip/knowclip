@@ -139,7 +139,7 @@ const saveProject: AppEpic = (action$, state$) =>
     mergeAll()
   )
 
-const PROJECT_EDIT_ACTIONS = [
+const PROJECT_EDIT_ACTIONS = new Set([
   A.DELETE_CARD,
   A.MAKE_CLIPS_FROM_SUBTITLES,
   A.DELETE_CARDS,
@@ -150,23 +150,35 @@ const PROJECT_EDIT_ACTIONS = [
   A.ADD_CLIP,
   A.ADD_CLIPS,
   A.MERGE_CLIPS,
-  A.DELETE_MEDIA_FROM_PROJECT,
-  A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK,
-  A.SET_PROJECT_NAME,
   A.ADD_MEDIA_TO_PROJECT_REQUEST,
-] as const
+])
+const PROJECT_EDIT_UPDATE_FILE_ACTIONS: Set<keyof FileUpdates> = new Set([
+  'deleteProjectMedia',
+  'linkFlashcardFieldToSubtitlesTrack',
+  'setProjectName',
+])
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, Action>(...PROJECT_EDIT_ACTIONS),
-    filter(() => Boolean(r.getCurrentProjectId(state$.value))),
+    filter(action => {
+      return (
+        (PROJECT_EDIT_ACTIONS.has(action.type) ||
+          (action.type === A.UPDATE_FILE &&
+            PROJECT_EDIT_UPDATE_FILE_ACTIONS.has(action.update.updateName))) &&
+        Boolean(r.getCurrentProjectId(state$.value))
+      )
+    }),
     map(() => r.setWorkIsUnsaved(true))
   )
 
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DeleteMediaFromProject>(A.DELETE_MEDIA_FROM_PROJECT),
-    flatMap(({ mediaFileId }) => {
+    filter(
+      (action): action is UpdateFileWith<'deleteProjectMedia'> =>
+        action.type === A.UPDATE_FILE &&
+        action.update.updateName === 'deleteProjectMedia'
+    ),
+    flatMap(({ update: { updatePayload: [mediaFileId] } }) => {
       const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
       return file ? of(r.deleteFileRequest(file.type, file.id)) : empty()
     })

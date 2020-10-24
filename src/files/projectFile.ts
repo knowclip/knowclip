@@ -172,3 +172,27 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
 }
 
 export default projectFileEventHandlers
+
+export const updates = {
+  setProjectName: projectUpdate((file: ProjectFile, name: string) => {
+    return {
+      ...file,
+      name,
+    }
+  }),
+  deleteProjectMedia: projectUpdate(
+    (file: ProjectFile, mediaFileId: string) => ({
+      ...file,
+      mediaFileIds: file.mediaFileIds.filter(id => id !== mediaFileId),
+    })
+  ),
+}
+
+function projectUpdate<U extends any[]>(
+  update: (file: ProjectFile, ...args: U) => ProjectFile
+) {
+  return {
+    type: 'ProjectFile' as const,
+    update,
+  }
+}
