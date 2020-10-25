@@ -18,7 +18,6 @@ const DICT_CC_DICTIONARY: DictionaryFileType = 'DictCCDictionary'
 const dictionaryProp = (propertyName: keyof DictionaryFile) => propertyName
 const prop = (propertyName: keyof LexiconEntry) => propertyName
 
-/** remember to check defined */
 let dexie: Dexie | null
 
 export function getDexieDb() {
