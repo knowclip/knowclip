@@ -11,7 +11,6 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
       const { shiftKey, ctrlKey, altKey, key } = event
-      const meta = getMetaOrCtrlKey(event)
 
       if (
         key.toLowerCase() === KEYS.lLowercase &&

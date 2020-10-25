@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, ipcRenderer, remote } from 'electron'
+import { BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 
 export type MessageToMain<T extends MessageToMainType> = {
   type: T

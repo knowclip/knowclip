@@ -11,7 +11,6 @@ import {
 
 export async function lookUpYomichanJMDict(
   text: string
-  // activeDictionaries: string[] ???
 ): Promise<TextTokensTranslations> {
   const dexie = getDexieDb()
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
@@ -42,7 +41,6 @@ export async function lookUpYomichanJMDict(
           ...(exactMatch ? [{ entry, inflections: [] }] : []),
           ...lemmatize(token).flatMap(potentialLemma => {
             const textIsMatching =
-              // potentialLemma.text === entry.head  ||
               potentialLemma.text === entry.head ||
               potentialLemma.text === entry.pronunciation
 
@@ -77,7 +75,7 @@ export async function lookUpYomichanJMDict(
                       : Infinity
 
                   const frequencyDifference = bScore - aScore
-                  // if (frequencyDifference)
+
                   return frequencyDifference
                 } else {
                   return a.entry.head === token ? -1 : 1
@@ -97,9 +95,6 @@ export async function lookUpYomichanJMDict(
           },
         ]
       : []
-
-    // TODO: fix "precise token hit"
-    // e.g. in kusukusurawarau, mouseover warau should not give kusukusuwarau but warau.
   })
   return {
     tokensTranslations,

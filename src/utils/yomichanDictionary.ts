@@ -1,6 +1,6 @@
 import yomichanLemmatization from './yomichanLemmatization.json'
 
-// maybe would be better to turn yomichanLemmatization into a map?
+// TODO: maybe would be better to turn yomichanLemmatization into a map?
 const cache: { [text: string]: PotentialLemma[] } = {}
 
 export function lemmatize(text: string) {
@@ -47,8 +47,8 @@ function lemmatizeRecursive(
         ) {
           const newCandidate: PotentialLemma = {
             text: candidateText,
-            // @ts-ignore
-            from: { text, wordClasses },
+            // for debugging:
+            // from: { text, wordClasses },
             inferredInflections: [...inflectionsChain, inflectionName],
             wordClasses: rulesOut,
           }

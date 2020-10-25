@@ -10,9 +10,6 @@ export async function parseYomichanZip(
   file: YomichanDictionary,
   filePath: string
 ) {
-  // create table for dictionary entry
-  // for each term_bank_*.json file in archive
-  // add to indexeddb
   let termBankMet = false
   const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
@@ -33,13 +30,11 @@ export async function parseYomichanZip(
       visitedEntries++
 
       const entry: yauzl.Entry = _entry as any
-      console.log(entry.uncompressedSize)
       if (!/term_bank_/.test(entry.fileName)) {
         zipfile.readEntry()
         return of(visitedEntries / entryCount)
       }
       termBankMet = true
-      console.log('match!')
 
       const entryReadStreamPromise: Promise<Readable> = new Promise(
         (res, rej) => {
@@ -75,9 +70,8 @@ export async function parseYomichanZip(
           })
         ),
 
-        // TODO: stream error event?\
         defer(() => {
-          return from(importDictionaryEntries(rawJson, file, zipfile)).pipe(
+          return from(importDictionaryEntries(rawJson, file)).pipe(
             tap(() => zipfile.readEntry()),
             map(() => visitedEntries / entryCount)
           )
@@ -109,8 +103,7 @@ export async function parseYomichanZip(
 
 async function importDictionaryEntries(
   rawJson: string,
-  file: YomichanDictionary,
-  zipfile: yauzl.ZipFile
+  file: YomichanDictionary
 ) {
   const entriesJSON = JSON.parse(rawJson) as [
     string,
@@ -149,15 +142,10 @@ async function importDictionaryEntries(
       ].join(' '),
       frequencyScore,
       meanings,
-      // searchStems: [],
-      // searchStemsSorted: '',
-      // searchTokens: [],
-      // searchTokensSorted: '',
       tokenCombos:
         coercedHiragana !== (pronunciation || head) ? [coercedHiragana] : [],
       searchTokensCount: 0,
     }
-    // console.log({ dictEntry })
     entries.push(dictEntry)
   }
 

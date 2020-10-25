@@ -71,7 +71,6 @@ export function useFieldPopoverDictionary(
         !editing &&
         isMediaPlaying
       ) {
-        console.log('looping now!', { loopIsOn })
         setWasLoopingBeforeFocus(loopIsOn)
         dispatch(r.setLoop(true))
       }
@@ -92,9 +91,7 @@ export function useFieldPopoverDictionary(
   useEffect(
     () => {
       if (popoverWasOpen && !popover.isOpen) {
-        console.log('closed popover!')
         if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
-          console.log('unlooping now!', { wasLoopingBeforeFocus })
           dispatch(r.setLoop(wasLoopingBeforeFocus))
         }
       }
@@ -112,17 +109,8 @@ export function useFieldPopoverDictionary(
 
   useEffect(
     () => {
-      console.log({ popoverIsOpenFromStore })
       if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {
-        console.log('closing popover due to redux signal')
-
-        if (
-          isMediaPlaying &&
-          // dictionaryPopoverIsShowing &&
-          !editing &&
-          wasLoopingBeforeFocus !== loopIsOn
-        ) {
-          console.log('unlooping now!', { wasLoopingBeforeFocus })
+        if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
           dispatch(r.setLoop(wasLoopingBeforeFocus))
         }
 
@@ -174,12 +162,10 @@ export function useFieldPopoverDictionary(
       if (activeDictionaryType) {
         lookUpInDictionary(activeDictionaryType, value).then(
           ({ tokensTranslations }) => {
-            console.log('new value lookup done!', { tokensTranslations })
             setTokenTranslations(tokensTranslations)
           }
         )
       } else {
-        console.log('not parsing anymore!')
         setTokenTranslations([])
       }
     },
@@ -252,7 +238,6 @@ export function useFieldPopoverDictionary(
   useEffect(
     () => {
       if (popover.isOpen && mouseoverChar && !editing) {
-        console.log(mouseoverChar ? mouseoverChar.dataset : 'no mouseover char')
         const mouseCharIndex =
           mouseoverChar &&
           mouseoverChar.dataset &&
@@ -267,7 +252,6 @@ export function useFieldPopoverDictionary(
         const nonwordMouseenter =
           !translationsAtCharacter &&
           !LETTERS_DIGITS_PLUS.test(value[mouseCharIndex])
-        console.log({ nonwordMouseenter }, value[mouseCharIndex])
         if (!nonwordMouseenter) {
           setTranslationsAtCharacter(translationsAtCharacter)
         }

@@ -108,8 +108,6 @@ export function getGermanSearchTokens(
     .filter(x => x && !trimmedFillerWords.has(x))
 }
 
-// REMOVE ETW , JDN etc.
-
 export function trimAnnotations(text: string) {
   return text
     .replace(/\{.+?\}/g, '')
@@ -149,5 +147,3 @@ export function getDifferingSearchStem(trimmedWord: string) {
 
   return stem === trimmedWord ? undefined : stem
 }
-
-export const DICT_CC_ALL_BRACKETS = /\(.+?\)\s?|\{.+?\}\s?|\[.+?\]\s?/g

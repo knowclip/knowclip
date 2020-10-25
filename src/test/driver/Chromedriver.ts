@@ -1,9 +1,4 @@
 import ChildProcess from 'child_process'
-import path from 'path'
-import chromedriver from 'chromedriver'
-import { getStartUrl } from '../../../electron/window'
-
-// chrome version 85.0.4183.98
 
 export default class Chromedriver {
   process: ReturnType<typeof ChildProcess.spawn>

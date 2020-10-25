@@ -12,7 +12,6 @@ import {
 
 export async function lookUpCeDict(
   text: string
-  // activeDictionaries: string[] ???
 ): Promise<TextTokensTranslations> {
   const dexie = getDexieDb()
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
@@ -47,29 +46,6 @@ export async function lookUpCeDict(
     return 0
   })
 
-  console.log(allQueries.length + ' total results!', {
-    allQueries,
-    allLookupTokens,
-  })
-
-  function findTraditional(simplifiedIndex: number, mainKey: number) {
-    for (
-      let i = simplifiedIndex - 1;
-      i > Math.max(-1, simplifiedIndex - 10);
-      i--
-    ) {
-      const potentialMain = allQueries[i]
-      if (
-        potentialMain &&
-        !potentialMain.variant &&
-        potentialMain.key === mainKey
-      )
-        return potentialMain
-    }
-  }
-
-  // TODO: simplified display
-  // tags refinement
   const tokensTranslations = potentialTokens.flatMap(({ tokens, index }) => {
     const translatedTokens = tokens.flatMap(token => {
       const candidates = allQueries.flatMap((entry, i) => {
@@ -82,38 +58,6 @@ export async function lookUpCeDict(
           ]
 
         return []
-        // if (entry.head === token && entry.variant) {
-        //   const main = findTraditional(i, entry.mainKey)
-        //   if (main)
-        //     return [
-        //       { entry: main, variant: entry, inflections: [] as string[] },
-        //     ]
-        //   else {
-        //     console.error(`Could not find main entry for ${entry.head}`)
-        //     return []
-        //   }
-        // } else if (entry.head === token && !entry.variant) {
-        //   const variant = findSimplified(i, entry.key, allQueries.length - 1)
-        //   if (
-        //     !variant ||
-        //     !variant.variant ||
-        //     variant.mainKey !== entry.key
-        //   ) {
-        //     if (variant && variant.variant && variant.mainKey !== entry.key)
-        //       console.error(
-        //         `Could not find variant entry for token ${entry.head}`
-        //       )
-        //   }
-        //   return [
-        //     {
-        //       entry,
-        //       // variant: undefined, // variant && variant.variant ? variant : undefined,
-        //       inflections: [] as string[],
-        //     },
-        //   ]
-        // } else {
-        //   return []
-        // }
       })
 
       const translatedTokensAtCharacterIndex: TranslatedToken[] = candidates.length
@@ -161,7 +105,6 @@ export async function lookUpCeDict(
       : []
   })
 
-  console.log({ tokensTranslations })
   return {
     tokensTranslations,
     characterIndexToTranslationsMappings: [],

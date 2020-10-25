@@ -40,10 +40,8 @@ export async function lookUpDictCc(
       tokenIndex + maxQueryTokensLength
     )
     const combos = getGermanTextSearchTokensCombos(searchStems)
-    // console.log({tokenIndex,stem, searchStems, combos})
     return combos
   })
-  console.log({ textStems, allSearchStemsStrings })
 
   const { exactStemsMatches } = await dexie.transaction(
     'r',
@@ -60,11 +58,6 @@ export async function lookUpDictCc(
     }
   )
 
-  console.log({
-    exactStemsMatches: exactStemsMatches,
-    exactCount: exactStemsMatches.length,
-  })
-
   const results: TranslatedTokensAtCharacterIndex[] = []
 
   let indexingCursor = 0
@@ -79,13 +72,11 @@ export async function lookUpDictCc(
     const tokenCharacterIndex = text
       .toLowerCase()
       .indexOf(exactToken.toLowerCase(), indexingCursor)
-    console.log({ stemCombinationsAtIndex, exactStemsMatches })
     const searchStemsAtIndex = stemCombinationsAtIndex.flatMap(stemCombo => {
       const stemComboString = stemCombo.sort().join(' ')
       // perhaps can use entry.tokenCombos first value instead of calling getGermanSearchTokens each time here?
       // except here we're testing "raw" tokens, not stems
       const exactMatches = exactStemsMatches.filter(entry => {
-        // return getGermanSearchTokens(entry.head).sort().join(' ') === stemComboString
         return (
           entry.tokenCombos[0] ===
           stemComboString + ` ${stemCombo.length.toString(16).padStart(2, '0')}`
@@ -108,21 +99,16 @@ export async function lookUpDictCc(
         ],
       })
 
-    // should also register
     indexingCursor = tokenCharacterIndex + exactToken.length - 1
     tokenIndex++
   }
   // should sort to prioritize
   // exact matches and matches
   // preserving the order parts corresponding to query tokens
-  // function getSortScore(a: TranslatedToken) {
-  // }
   for (const result of results) {
     const { matchedTokenText } = result.translatedTokens[0]
     const lowercaseMatchedTokenText = matchedTokenText.toLowerCase()
     result.translatedTokens[0].candidates.sort((a, b) => {
-      // is matchedTokenText always the same for german at one character index?
-      // maybe produce a score based on length deviation?
       const deprioritizeFictionTitles = sortResult(
         !(a.entry.tags && a.entry.tags.includes('[F]')),
         !(b.entry.tags && b.entry.tags.includes('[F]'))
@@ -157,8 +143,7 @@ export async function lookUpDictCc(
         aSearchTokensLowercase.join(' ') === matchedTokenTrimmed,
         bSearchTokensLowercase.join(' ') === matchedTokenTrimmed
       )
-      // console.log({ matchedTokenTrimmed, aSearchTokensLowercase })
-      // if ([a.entry.head, b.entry.head].some(x => x.includes('klein ['))) debugger
+
       if (sortByCaseInsensitiveExactMatchWithoutAnnotations)
         return sortByCaseInsensitiveExactMatchWithoutAnnotations
 
@@ -183,7 +168,7 @@ export async function lookUpDictCc(
 
       const [, aMatchPrefix] =
         lowercaseMatchedTokenText.match(prefixesRegex) || []
-      // should account for multiple?
+
       const [aCandidatePrefix] = aSearchTokensLowercase.flatMap(
         candidateToken => {
           const candidateTokenStem =
@@ -219,7 +204,8 @@ export async function lookUpDictCc(
       // nico 05:41 geht das?
       //      22:02 mitkommen
       //      1:25:56   lueg mich nicht an
-      const aPrefixRelevanceScore = aMatchPrefix // "mit" (-kommst)
+      //      1:33:32 kleinen
+      const aPrefixRelevanceScore = aMatchPrefix
         ? aCandidatePrefix
           ? aMatchPrefix === aCandidatePrefix
             ? 3
@@ -230,7 +216,7 @@ export async function lookUpDictCc(
           ? 3
           : 0
         : 2
-      const bPrefixRelevanceScore = bMatchPrefix // "mit" (-kommst)
+      const bPrefixRelevanceScore = bMatchPrefix
         ? bCandidatePrefix
           ? bMatchPrefix === bCandidatePrefix
             ? 3
@@ -264,7 +250,6 @@ export async function lookUpDictCc(
       if (prioritizePronounsAndConjunctions)
         return prioritizePronounsAndConjunctions
 
-      // 1:33:32 kleinen
       const prioritizeWithoutDash = sortResult(
         !/(- |-$)/.test(a.entry.head),
         !/(- |-$)/.test(b.entry.head)

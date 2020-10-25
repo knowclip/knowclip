@@ -19,8 +19,6 @@ import { Close } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import { numberToMark } from 'pinyin-utils'
 
-// TODO: language codes here and for clozefield
-
 function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
   const results: {
     head: string
@@ -36,7 +34,6 @@ function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
     const existingHead = results.find(
       r => r.head === entry.head && r.pronunciation === entry.pronunciation
     )
-    // && !r.variant
     if (existingHead) {
       existingHead.entries.push(entryWithInflection)
     } else {
@@ -57,7 +54,7 @@ function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
   return results
 }
 
-const groupEntries = (
+const groupEntriesAndOrganizeVariantHeads = (
   entries: {
     entry: LexiconEntry
     inflections: string[]
@@ -72,16 +69,7 @@ const groupEntries = (
   }[] = []
 
   for (const entry of entries) {
-    const existing = result.find(
-      e =>
-        e.head === entry.entry.head &&
-        new Set([...e.inflections, ...entry.inflections]).size ===
-          entry.inflections.length &&
-        new Set([
-          ...e.tags,
-          ...(entry.entry.tags ? entry.entry.tags.split(/\s/) : []),
-        ]).size === e.tags.length
-    )
+    const existing = result.find(e => doEntriesBelongTogether(e, entry))
     if (existing) {
       existing.entries.push(entry.entry)
     } else {
@@ -95,9 +83,27 @@ const groupEntries = (
     }
   }
 
-  console.log({ entries, result: [...result] })
-
   return result
+}
+
+function doEntriesBelongTogether(
+  e: {
+    head: string
+    inflections: string[]
+    tags: string[]
+    entries: LexiconEntry[]
+  },
+  entry: { entry: LexiconEntry; inflections: string[] }
+): unknown {
+  return (
+    e.head === entry.entry.head &&
+    new Set([...e.inflections, ...entry.inflections]).size ===
+      entry.inflections.length &&
+    new Set([
+      ...e.tags,
+      ...(entry.entry.tags ? entry.entry.tags.split(/\s/) : []),
+    ]).size === e.tags.length
+  )
 }
 
 export function DictionaryPopover({
@@ -161,7 +167,7 @@ export function DictionaryPopover({
                           activeDictionaryType={activeDictionaryType}
                         />
                       </h3>
-                      {groupEntries(entries).map(
+                      {groupEntriesAndOrganizeVariantHeads(entries).map(
                         ({ entries, head, tags, inflections }, i) => {
                           return (
                             <Fragment key={`${head}_${i}`}>

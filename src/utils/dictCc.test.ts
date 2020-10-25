@@ -52,8 +52,6 @@ describe('getGermanStems', () => {
   })
 })
 
-//wessentwegen [{m} / {n} {sg}] [veraltet] [weswegen]	on whose account	adv
-
 describe('getGermanSearchTokensFromText', () => {
   it('works with sentence beginning with unusual punctuation', () => {
     expect(getGermanSearchTokensFromText('- Geht das?')).toEqual([

@@ -36,8 +36,6 @@ export function getDexieDb() {
     [CEDICT_DICTIONARY]: `++key, ${prop('head')}, ${prop(
       'pronunciation'
     )}, ${prop('dictionaryKey')}, ${prop('variant')}`,
-    // all these indexes takes too long to import maybe.
-    // would it be ok with just the multi-entry indexes + search sped up with frequency
     [DICT_CC_DICTIONARY]: `++key, ${prop('head')}, ${prop(
       'dictionaryKey'
     )}, *${prop('tokenCombos')}`,
@@ -129,7 +127,7 @@ export function parseFlat(text: string, maxWordLength = 8) {
         allTokens.add(token)
       }
 
-      tokensAtIndex.sort((a, b) => b.length - a.length) // this the right place?
+      tokensAtIndex.sort((a, b) => b.length - a.length) // TODO: check: this the right place?
     }
   }
   return { tokensByIndex, allTokens }
@@ -158,23 +156,19 @@ export async function deleteDictionary(
     entriesDeletion: 'SUCCESS',
   }
 
-  console.log('deleting dictionary!')
   try {
     const record = await db.table(DICTIONARIES_TABLE).get(key)
-    console.log({ record })
     if (record) await db.table(DICTIONARIES_TABLE).delete(key)
   } catch (err) {
     result.dictionaryDeletion = err
   }
 
-  console.log('deleting dictionary items!')
   try {
     const record = await db
       .table(getTableName(type))
       .where(prop('dictionaryKey'))
       .equals(key)
       .first()
-    console.log({ record })
 
     if (record) {
       const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
@@ -190,8 +184,6 @@ export async function deleteDictionary(
   } catch (err) {
     result.entriesDeletion = err
   }
-
-  console.log('done deleting dictionary!')
 
   return result
 }

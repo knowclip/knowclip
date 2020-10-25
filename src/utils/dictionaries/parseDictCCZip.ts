@@ -11,9 +11,6 @@ import { getTokenCombinations } from '../../utils/tokenCombinations'
 import { getDexieDb } from '../dictionariesDatabase'
 
 export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
-  // create table for dictionary entry
-  // for each term_bank_*.json file in archive
-  // add to indexeddb
   let termBankMet = false
   const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
@@ -39,7 +36,6 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
         return of(visitedEntries / entryCount)
       }
       termBankMet = true
-      console.log('match!')
 
       const entryReadStreamPromise: Promise<Readable> = new Promise(
         (res, rej) => {
@@ -93,7 +89,6 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
             )
           })
         )
-        // TODO: stream error event?\
       )
     })
   )
@@ -123,18 +118,15 @@ async function importDictionaryEntries(
   data: Buffer
 ) {
   const { nextChunkStart, buffer } = context
-  // const entries: LexiconEntry[] = []
   const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
   const lastLineIndex = lines.length - 1
   context.nextChunkStart = lines[lastLineIndex]
   for (let i = 0; i < lastLineIndex; i++) {
     const line = lines[i]
-    // console.log(line, "!line.startsWith('#') && i !== lastLineIndex", !line.startsWith('#'), i !== lastLineIndex)
     if (line && !line.startsWith('#') && i !== lastLineIndex) {
       // (aufgeregt) auffliegen~~~~~to flush [fly away]~~~~~verb~~~~~[hunting] [zool.]
       // Rosenwaldsänger {m}~~~~~pink-headed warbler [Ergaticus versicolor]	noun	[orn.]
       const [head, meaning, pos, endTags] = line.split('\t')
-      // strip affixes and bits inside curly braces
       const searchTokens = getGermanSearchTokens(head)
       if (!searchTokens.length) continue
 
@@ -160,12 +152,9 @@ async function importDictionaryEntries(
         pronunciation: null,
         dictionaryKey: file.key,
         frequencyScore: null,
-        // searchStems,
-        // searchStemsSorted: toSortedX(searchStems),
-        // searchTokens,
         searchTokensCount: searchTokens.length,
         tokenCombos:
-          // should get chunks from all places, just doing the start for now
+          // TODO: should get chunks from all places, just doing the start for now
           getTokenCombinations(searchStems.slice(0, 5)).map(tokenCombo => {
             return [
               ...tokenCombo.sort(),
@@ -175,12 +164,10 @@ async function importDictionaryEntries(
       })
     }
   }
-  // total += entries.length
   if (buffer.length >= 2000) {
     const oldBuffer = buffer
     context.buffer = []
 
-    console.log('2000 more!')
     await getDexieDb()
       .table(getTableName(file.type))
       .bulkAdd(oldBuffer)

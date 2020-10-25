@@ -6,14 +6,9 @@ import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import { getDexieDb } from '../dictionariesDatabase'
 
 export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
-  // create table for dictionary entry
-  // for each term_bank_*.json file in archive
-  // add to indexeddb
   let termBankMet = false
   const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
-      console.log('going to open zip file')
-      console.log({ err, zipfile })
       if (err) return rej(err)
       if (!zipfile) return rej(new Error('problem reading zip file'))
 
@@ -22,7 +17,6 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
   })
 
   const { entryCount } = zipfile
-  console.log('hi!', { entryCount, zipfile })
 
   let visitedEntries = 0
 
@@ -32,14 +26,11 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
       visitedEntries++
 
       const entry: yauzl.Entry = _entry as any
-      console.log({ entry, entryCount }, entry.uncompressedSize)
-      console.log(entry.uncompressedSize)
       if (!/\.u8/.test(entry.fileName)) {
         zipfile.readEntry()
         return of(visitedEntries / entryCount)
       }
       termBankMet = true
-      console.log('match!')
 
       const entryReadStreamPromise: Promise<Readable> = new Promise(
         (res, rej) => {
@@ -158,8 +149,6 @@ async function importDictionaryEntries(
       }
 
       context.buffer.push(tradEntry)
-      // if (i< 20)
-      // console.log({ trad, simpl, pinyin, en })
       if (context.buffer.length >= 3000) {
         const oldBuffer = context.buffer
         context.buffer = []

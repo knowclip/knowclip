@@ -15,15 +15,9 @@ export type LexiconEntry = {
   head: string
   meanings: string[]
   /** parts of speech etc. */
-  tags: string | null // should separate into term + __ tags?
+  tags: string | null
   pronunciation: string | null
   frequencyScore: number | null
-  // maybe should include both
-  // exactMatchWords and stems?
-
-  // maybe also stems sorted and joined
-  //  and/or stems joined
-
   searchTokensCount: number
   tokenCombos: string[]
 }

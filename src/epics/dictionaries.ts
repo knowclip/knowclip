@@ -29,11 +29,7 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
             console.error('Problem initializing dictionaries')
             return []
           }
-          const file = s.getFile(
-            state$.value,
-            fileAvailability.type as DictionaryFileType,
-            id
-          )
+          const file = s.getFile(state$.value, fileAvailability.type, id)
           if (!file) {
             console.error(`Missing file:`)
             console.error(fileAvailability)
@@ -44,16 +40,9 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
             return [snackbarAction]
           }
 
-          return [
-            actions.openFileRequest(
-              file as DictionaryFile,
-              fileAvailability.filePath
-            ),
-          ]
+          return [actions.openFileRequest(file, fileAvailability.filePath)]
         }
       )
-      console.log({ openFileActions, dicts })
-
       return from(openFileActions)
     })
   )
@@ -82,7 +71,6 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
               `Please save your work before trying to import a dictionary.`
             )
 
-          // also progress
           return actions.startDictionaryImport(dictionary, filePath)
         } catch (err) {
           return actions.errorDialog(
@@ -217,20 +205,6 @@ const deleteDatabaseEpic: AppEpic = (action$, state$, effects) =>
       )
     })
   )
-
-function onZipArchiveEntry(filePath: string, callback: Function) {
-  // return new Promise((res, reject) => {
-  //   yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
-  //     if (err) return reject(err)
-  //     if (!zipfile) throw new Error('problem reading zip file')
-  //     const rejectAndClose = (err: any) => {
-  //       rejectAndClose(err)
-  //       zipfile.close()
-  //     }
-  //     // let cache: StemsCache = {}
-  //     let total = 0
-  //     zipfile.on('entry', entry => {
-}
 
 export default combineEpics(
   initializeDictionaries,

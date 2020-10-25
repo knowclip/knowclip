@@ -204,7 +204,6 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                               : actions.addActiveDictionary(file.id, file.type)
                           )
                         }
-                        // disableRipple
                       />
                     </ListItemIcon>
                     <ListItemText

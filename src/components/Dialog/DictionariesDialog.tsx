@@ -1,6 +1,3 @@
-// dictionaries wont get deleted after close app
-// parse fails after "CC" in onomappu video
-
 import React, { ReactNode, useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -28,7 +25,7 @@ import { openInBrowser } from '../../utils/electron'
 
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
-  const close = useCallback(() => dispatch(r.closeDialog()), [])
+  const close = useCallback(() => dispatch(r.closeDialog()), [dispatch])
   const { dictionaryFiles, progress } = useSelector((state: AppState) => ({
     dictionaryFiles: r.getOpenDictionaryFiles(state),
     progress: state.session.progress,
@@ -167,28 +164,26 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
               </p>
 
               {newDictionaryType && (
-                <>
-                  <DictionaryInstructions
-                    {...{
-                      dictionaryType: newDictionaryType as DictionaryFileType,
-                      button: (
-                        <Button
-                          color="primary"
-                          variant="contained"
-                          onClick={handleClickImportDictionaryFile}
-                        >
-                          Import dictionary .zip file
-                        </Button>
-                      ),
-                    }}
-                  />
-                </>
+                <DictionaryInstructions
+                  {...{
+                    dictionaryType: newDictionaryType as DictionaryFileType,
+                    button: (
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={handleClickImportDictionaryFile}
+                      >
+                        Import dictionary .zip file
+                      </Button>
+                    ),
+                  }}
+                />
               )}
             </>
           )}
         </div>
       </DialogContent>
-      {/* TODO: DELETE ALL BUTTON */}
+
       <DialogActions>
         {!isLoading && <Button onClick={close}>Close</Button>}
       </DialogActions>
