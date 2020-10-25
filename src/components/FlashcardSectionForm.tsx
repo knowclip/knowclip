@@ -99,7 +99,7 @@ const FlashcardSectionForm = memo(
         }
       },
       [mediaIsPlaying, initialFocus]
-    ) // eslint-disable-line react-hooks/exhaustive-deps
+    )
     const handleFocus = useCallback(
       () => {
         if (!initialFocus) setInitialFocusComplete(true)

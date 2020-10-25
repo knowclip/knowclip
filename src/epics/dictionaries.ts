@@ -127,6 +127,7 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
             actions.simpleMessageSnackbar(
               `There was a problem importing this dictionary file: ${err}`
             ),
+            // happens within deleteImportedDictionary:
             // actions.setProgress(null),
             actions.deleteImportedDictionary(file),
           ])
