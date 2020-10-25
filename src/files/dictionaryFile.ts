@@ -44,7 +44,7 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
     const entriesExistInDb = Boolean(
       await effects
         .getDexieDb()
-        .table(getTableName(file.type))
+        .table(getTableName(file.dictionaryType))
         .where('dictionaryKey' as keyof LexiconEntry)
         .equals(file.key)
         .first()

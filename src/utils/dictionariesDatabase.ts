@@ -46,11 +46,12 @@ export function getDexieDb() {
 
 export async function newDictionary(
   db: Database,
-  type: DictionaryFileType,
+  dictionaryType: DictionaryFileType,
   filePath: string
 ) {
   const dicProps: Omit<DictionaryFile, 'key'> = {
-    type,
+    type: 'Dictionary',
+    dictionaryType,
     id: uuid(),
     name: basename(filePath),
     importComplete: false,
@@ -171,7 +172,9 @@ export async function deleteDictionary(
       .first()
 
     if (record) {
-      const allDictionariesOfType = allDictionaries.filter(d => d.type === type)
+      const allDictionariesOfType = allDictionaries.filter(
+        d => d.dictionaryType === type
+      )
       if (allDictionariesOfType.length <= 1)
         await db.table(getTableName(type)).clear()
       else

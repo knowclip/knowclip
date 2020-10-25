@@ -29,9 +29,7 @@ const fileEventHandlers: Record<
   WaveformPng: waveformPng,
   ConstantBitrateMp3: constantBitrateMp3,
   VideoStillImage: videoStillImage,
-  YomichanDictionary: dictionaryActions,
-  CEDictDictionary: dictionaryActions,
-  DictCCDictionary: dictionaryActions,
+  Dictionary: dictionaryActions,
 }
 
 const openFileRequest: AppEpic = (action$, state$, effects) =>

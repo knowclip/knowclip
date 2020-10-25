@@ -150,6 +150,6 @@ async function importDictionaryEntries(
   }
 
   await getDexieDb()
-    .table(getTableName(file.type))
+    .table(getTableName(file.dictionaryType))
     .bulkAdd(entries)
 }

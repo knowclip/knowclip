@@ -169,7 +169,7 @@ async function importDictionaryEntries(
     context.buffer = []
 
     await getDexieDb()
-      .table(getTableName(file.type))
+      .table(getTableName(file.dictionaryType))
       .bulkAdd(oldBuffer)
   }
 }

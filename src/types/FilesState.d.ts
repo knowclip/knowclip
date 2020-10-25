@@ -6,9 +6,7 @@ declare type FilesState = {
   WaveformPng: Dict<FileId, WaveformPng>
   ConstantBitrateMp3: Dict<FileId, ConstantBitrateMp3>
   VideoStillImage: Dict<FileId, VideoStillImageFile>
-  YomichanDictionary: Dict<FileId, YomichanDictionary>
-  CEDictDictionary: Dict<FileId, YomichanDictionary>
-  DictCCDictionary: Dict<FileId, YomichanDictionary>
+  Dictionary: Dict<FileId, DictionaryFile>
 }
 
 declare type FileId = string
@@ -26,9 +24,7 @@ declare type FileMetadata =
   | WaveformPng
   | ConstantBitrateMp3
   | VideoStillImageFile
-  | YomichanDictionary
-  | CEDictDictionary
-  | DictCCDictionary
+  | DictionaryFile
 
 declare type ProjectFile = {
   type: 'ProjectFile'
@@ -143,31 +139,31 @@ declare type UserProvidedImageFile = {
   parentId: ClipId
 }
 
-declare type YomichanDictionary = {
-  type: 'YomichanDictionary'
-  id: FileId
-  key: number
-  name: string
-  importComplete: boolean
-}
-declare type CEDictDictionary = {
-  type: 'CEDictDictionary'
-  id: FileId
-  key: number
-  name: string
-  importComplete: boolean
-}
-declare type DictCCDictionary = {
-  type: 'DictCCDictionary'
-  id: FileId
-  key: number
-  name: string
-  importComplete: boolean
-}
-
 declare type DictionaryFile =
   | YomichanDictionary
   | CEDictDictionary
   | DictCCDictionary
 
-declare type DictionaryFileType = DictionaryFile['type']
+declare interface YomichanDictionary extends DictionaryFileBase {
+  dictionaryType: 'YomichanDictionary'
+}
+declare interface CEDictDictionary extends DictionaryFileBase {
+  dictionaryType: 'CEDictDictionary'
+}
+declare interface DictCCDictionary extends DictionaryFileBase {
+  dictionaryType: 'DictCCDictionary'
+}
+
+declare type DictionaryFileBase = {
+  type: 'Dictionary'
+  dictionaryType: DictionaryFileType
+  id: FileId
+  key: number
+  name: string
+  importComplete: boolean
+}
+
+declare type DictionaryFileType =
+  | 'YomichanDictionary'
+  | 'CEDictDictionary'
+  | 'DictCCDictionary'

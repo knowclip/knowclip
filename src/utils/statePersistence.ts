@@ -13,9 +13,7 @@ const FILE_TYPES: FileMetadata['type'][] = [
   'WaveformPng',
   'ConstantBitrateMp3',
   'VideoStillImage',
-  'YomichanDictionary',
-  'DictCCDictionary',
-  'CEDictDictionary',
+  'Dictionary',
 ]
 
 const mapFileState = <F, G>(

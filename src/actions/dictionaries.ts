@@ -17,15 +17,12 @@ export const startDictionaryImport = (
   filePath,
 })
 
-export const finishDictionaryImport = (
-  fileType: DictionaryFileType,
-  id: FileId
-): UpdateFile =>
+export const finishDictionaryImport = (id: FileId): UpdateFile =>
   updateFile({
     updateName: 'finishDictionaryImport',
     updatePayload: [],
     id,
-    fileType,
+    fileType: 'Dictionary',
   })
 
 export const deleteImportedDictionary = (

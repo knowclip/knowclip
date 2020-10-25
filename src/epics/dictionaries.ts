@@ -18,11 +18,7 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
     filter(action => ((action as unknown) as RehydrateAction).key === 'files'),
     mergeMap(_rehydrated => {
       // TODO: investigate if it would be better to get these from indexed DB dictionaries table instead
-      const dicts = Object.entries({
-        ...state$.value.fileAvailabilities.YomichanDictionary,
-        ...state$.value.fileAvailabilities.DictCCDictionary,
-        ...state$.value.fileAvailabilities.CEDictDictionary,
-      })
+      const dicts = Object.entries(state$.value.fileAvailabilities.Dictionary)
       const openFileActions = dicts.flatMap(
         ([id, fileAvailability]): Action[] => {
           if (!fileAvailability) {
@@ -54,7 +50,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
       async (action): Promise<Action> => {
         try {
           const files = await effects.electron.showOpenDialog(
-            getFileFilters(action.dictionaryType)
+            getFileFilters('Dictionary')
           )
 
           if (!files || !files.length)
@@ -113,10 +109,10 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           )
         ),
         from([
-          actions.finishDictionaryImport(file.type, file.id),
+          actions.finishDictionaryImport(file.id),
           actions.openFileRequest(file, filePath),
           actions.setProgress(null),
-          actions.addActiveDictionary(file.id, file.type),
+          actions.addActiveDictionary(file.id, file.dictionaryType),
           actions.simpleMessageSnackbar(
             `Mouse over flashcard text and press the 'D' key to look up words.`,
             null
@@ -154,7 +150,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
             effects,
             s.getOpenDictionaryFiles(state$.value).map(d => d.file),
             action.file.key,
-            action.file.type
+            action.file.dictionaryType
           )
         ).pipe(
           mergeMap(() => {

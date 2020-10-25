@@ -34,11 +34,11 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const isLoading = Boolean(progress)
 
   const onClickDelete = useCallback(
-    (type: DictionaryFileType, id: string) => {
+    (id: string) => {
       dispatch(
         r.confirmationDialog(
           `This action may take a few minutes to complete. Are you sure you want to delete this dictionary data at this moment?`,
-          r.deleteFileRequest(type, id),
+          r.deleteFileRequest('Dictionary', id),
           null,
           true
         )
@@ -199,17 +199,17 @@ function DictionaryFileItem({
 }: {
   availability: FileAvailability
   file: DictionaryFile
-  onClickDelete: (type: DictionaryFileType, id: string) => void
+  onClickDelete: (id: string) => void
 }) {
-  const handleClickDelete = useCallback(
-    () => onClickDelete(file.type, availability.id),
-    [availability.id, file.type, onClickDelete]
-  )
+  const handleClickDelete = useCallback(() => onClickDelete(availability.id), [
+    availability.id,
+    onClickDelete,
+  ])
   return (
     <ListItem key={availability.id} value={file.id}>
       {!file.importComplete && <ImportInterruptedListIcon />}
       <ListItemText
-        primary={`${displayDictionaryType(file.type)}`}
+        primary={`${displayDictionaryType(file.dictionaryType)}`}
         secondary={file.name}
         title={availability.filePath || ''}
       />

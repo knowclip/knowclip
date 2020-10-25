@@ -153,7 +153,7 @@ async function importDictionaryEntries(
         const oldBuffer = context.buffer
         context.buffer = []
         await getDexieDb()
-          .table(getTableName(file.type))
+          .table(getTableName(file.dictionaryType))
           .bulkAdd(oldBuffer)
       }
     }

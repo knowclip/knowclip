@@ -2,7 +2,7 @@ import { getFile } from './files'
 
 export const getActiveDictionaries = (state: AppState) => {
   return (state.settings.activeDictionaries || [])
-    .map(({ id, type }) => getFile(state, type, id))
+    .map(({ id }) => getFile(state, 'Dictionary', id))
     .filter((file): file is DictionaryFile => Boolean(file))
 }
 
@@ -18,12 +18,7 @@ export const getActiveDictionaryType = (
 }
 
 export const getRememberedDictionaryFiles = (state: AppState) => {
-  const dictFiles = {
-    ...state.fileAvailabilities.YomichanDictionary,
-    ...state.fileAvailabilities.CEDictDictionary,
-    ...state.fileAvailabilities.DictCCDictionary,
-  }
-  return Object.values(dictFiles) as KnownFile[]
+  return Object.values(state.fileAvailabilities.Dictionary) as KnownFile[]
 }
 
 export const getOpenDictionaryFiles = (
@@ -31,9 +26,7 @@ export const getOpenDictionaryFiles = (
 ): { file: DictionaryFile; availability: FileAvailability }[] => {
   const files: { file: DictionaryFile; availability: FileAvailability }[] = []
   const dictFiles = {
-    ...state.fileAvailabilities.YomichanDictionary,
-    ...state.fileAvailabilities.CEDictDictionary,
-    ...state.fileAvailabilities.DictCCDictionary,
+    ...state.fileAvailabilities.Dictionary,
   }
   for (const id in dictFiles) {
     const availability = dictFiles[id]

@@ -188,7 +188,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                 const selected =
                   Boolean(activeDictionaries) &&
                   activeDictionaries.some(
-                    f => f.id === file.id && f.type === file.type
+                    f => f.id === file.id && f.type === file.dictionaryType
                   )
                 return (
                   <ListItem value={file.id} selected={selected}>
@@ -201,13 +201,16 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                           dispatchLocal(
                             selected
                               ? actions.removeActiveDictionary(file.id)
-                              : actions.addActiveDictionary(file.id, file.type)
+                              : actions.addActiveDictionary(
+                                  file.id,
+                                  file.dictionaryType
+                                )
                           )
                         }
                       />
                     </ListItemIcon>
                     <ListItemText
-                      primary={`${displayDictionaryType(file.type)}`}
+                      primary={`${displayDictionaryType(file.dictionaryType)}`}
                       secondary={file.name}
                     />
                   </ListItem>

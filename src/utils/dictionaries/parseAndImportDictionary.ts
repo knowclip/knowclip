@@ -6,7 +6,7 @@ export function parseAndImportDictionary(
   file: DictionaryFile,
   filePath: string
 ) {
-  switch (file.type) {
+  switch (file.dictionaryType) {
     case 'YomichanDictionary':
       return parseYomichanZip(file, filePath)
     case 'CEDictDictionary':
