@@ -19,6 +19,7 @@ import {
   Checkbox,
 } from '@material-ui/core'
 import * as actions from '../../actions'
+import * as selectors from '../../selectors'
 import { DialogProps } from './DialogProps'
 import reducer from '../../reducers/settings'
 import FilePathTextField from '../FilePathTextField'
@@ -26,6 +27,8 @@ import { openInBrowser, showOpenDirectoriesDialog } from '../../utils/electron'
 import css from './SettingsDialog.module.css'
 import { Delete, Add } from '@material-ui/icons'
 import truncate from '../../utils/truncate'
+import { displayDictionaryType } from '../../selectors'
+import { ImportInterruptedListIcon } from './DictionariesDialog'
 
 enum $ {
   cancelButton = 'settings-dialog-cancel-button',
@@ -35,15 +38,20 @@ enum $ {
 const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   const dispatch = useDispatch()
 
-  const originalSettingsState = useSelector((state: AppState) => state.settings)
+  const { dictionaryFiles } = useSelector((state: AppState) => ({
+    dictionaryFiles: selectors.getOpenDictionaryFiles(state),
+  }))
 
-  const [settings, dispatchLocal] = useReducer(reducer, originalSettingsState)
-  const addAssetsDirectories = useCallback(async () => {
-    const paths = await showOpenDirectoriesDialog()
-    if (!paths) return
+  const { settings, dispatchLocal } = useLocalSettingsReducer()
+  const addAssetsDirectories = useCallback(
+    async () => {
+      const paths = await showOpenDirectoriesDialog()
+      if (!paths) return
 
-    dispatchLocal(actions.addAssetsDirectories(paths))
-  }, [])
+      dispatchLocal(actions.addAssetsDirectories(paths))
+    },
+    [dispatchLocal]
+  )
 
   const close = useCallback(() => dispatch(actions.closeDialog()), [dispatch])
   const saveSettings = useCallback(
@@ -164,6 +172,70 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
             </p>
           </section>
         </section>
+
+        <section className={css.settingsGroup}>
+          <Paper className={css.settingsGroupBody}>
+            <h3 className={css.heading}>Pop-up dictionary</h3>
+            <List>
+              {!dictionaryFiles.length && (
+                <ListItem value={undefined}>
+                  You haven't imported any dictionaries yet.
+                </ListItem>
+              )}
+              {dictionaryFiles.map(({ file, availability }) => {
+                const activeDictionaries = settings.activeDictionaries || []
+                console.log({ activeDictionaries, settings })
+                const selected =
+                  Boolean(activeDictionaries) &&
+                  activeDictionaries.some(
+                    f => f.id === file.id && f.type === file.dictionaryType
+                  )
+                return (
+                  <ListItem value={file.id} selected={selected}>
+                    {!file.importComplete && <ImportInterruptedListIcon />}
+                    <ListItemIcon>
+                      <Checkbox
+                        checked={selected}
+                        tabIndex={-1}
+                        onChange={e =>
+                          dispatchLocal(
+                            selected
+                              ? actions.removeActiveDictionary(file.id)
+                              : actions.addActiveDictionary(
+                                  file.id,
+                                  file.dictionaryType
+                                )
+                          )
+                        }
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${displayDictionaryType(file.dictionaryType)}`}
+                      secondary={file.name}
+                    />
+                  </ListItem>
+                )
+              })}
+            </List>
+            <p style={{ margin: '1em' }}>
+              <Button onClick={() => dispatch(actions.dictionariesDialog())}>
+                Manage dictionaries
+              </Button>
+            </p>
+          </Paper>
+
+          <section className={css.settingsGroupDescription}>
+            <p>
+              Import a free dictionary so you can look up words quickly inside
+              the Knowclip app.
+            </p>
+            <p>
+              Dictionaries aren't bundled with Knowclip automatically because
+              they take up lots of disk space. You may import a free dictionary
+              of your choice, according to your needs.
+            </p>
+          </section>
+        </section>
       </DialogContent>
 
       <DialogActions>
@@ -181,6 +253,18 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
       </DialogActions>
     </Dialog>
   )
+}
+
+export function useLocalSettingsReducer() {
+  const { originalSettingsState } = useSelector((state: AppState) => ({
+    originalSettingsState: state.settings,
+  }))
+
+  const [settings, dispatchLocal] = useReducer(reducer, originalSettingsState)
+  return {
+    settings,
+    dispatchLocal,
+  }
 }
 
 const RemoveAssetsDirectoryButton = ({

@@ -7,7 +7,7 @@ import { Tooltip, IconButton } from '@material-ui/core'
 import { LibraryAdd, Photo, Loop } from '@material-ui/icons'
 import { useDispatch, useSelector } from 'react-redux'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
-import useClozeControls from '../utils/useClozeUi'
+import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 
 const FlashcardSectionPreview = ({

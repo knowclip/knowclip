@@ -9,9 +9,12 @@ import moment from 'moment'
 import { existsSync } from 'fs-extra'
 import { getWaveformPngs } from '../utils/getWaveform'
 import { validateSubtitlesFromFilePath } from '../utils/subtitles'
+import { updaterGetter } from './updaterGetter'
+
+const updater = updaterGetter<MediaFile>()
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
@@ -53,22 +56,22 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     getWaveform,
     setDefaultClipSpecs,
   ],
-  locateRequest: async (action, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     const autoSearchDirectories = r.getAssetsDirectories(state)
 
     // works while fileavailability names can't be changed...
     for (const directory of autoSearchDirectories) {
       const nameMatch = join(directory, basename(availability.name))
       const matchingFile = existsSync(nameMatch)
-        ? await validateMediaFile(action.file, nameMatch)
+        ? await validateMediaFile(file, nameMatch)
         : null
 
       if (matchingFile && !matchingFile.errors) {
-        return [r.locateFileSuccess(action.file, nameMatch)]
+        return [r.locateFileSuccess(file, nameMatch)]
       }
     }
 
-    return [r.fileSelectionDialog(action.message, action.file)]
+    return [r.fileSelectionDialog(message, file)]
   },
   locateSuccess: null,
   deleteRequest: [
@@ -143,7 +146,8 @@ export const validateMediaFile = async (
 }
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile: { subtitlesTracksStreamIndexes, id, subtitles }, filePath },
+  { subtitlesTracksStreamIndexes, id, subtitles },
+  filePath,
   state,
   effects
 ) =>
@@ -180,7 +184,8 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   })
 
 const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile: { subtitles, name, id: mediaFileId }, filePath },
+  { subtitles, name, id: mediaFileId },
+  filePath,
   state,
   effects
 ) => {
@@ -234,7 +239,8 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   ])
 }
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile, filePath },
+  validatedFile,
+  filePath,
   state,
   effects
 ) => {
@@ -242,7 +248,8 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
 }
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (
-  { validatedFile },
+  validatedFile,
+  filePath,
   state,
   effects
 ) => {
@@ -263,7 +270,8 @@ const getCbr: OpenFileSuccessHandler<MediaFile> = async (
 }
 
 const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
-  action,
+  validatedFile,
+  filePath,
   state,
   effects
 ) => {
@@ -277,7 +285,7 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
     return [
       r.setDefaultClipSpecs({
         tags: [basename(currentFileName).replace(/\s/g, '_')],
-        includeStill: action.validatedFile.isVideo,
+        includeStill: validatedFile.isVideo,
       }),
     ]
   }
@@ -309,7 +317,7 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
 export default handlers()
 
 export const updates = {
-  addSubtitlesTrack: mediaUpdate((file: MediaFile, track: SubtitlesTrack) => {
+  addSubtitlesTrack: updater((file: MediaFile, track: SubtitlesTrack) => {
     return {
       ...file,
       subtitles: file.subtitles.some(s => s.id === track.id) // should not happen... but just in case
@@ -325,14 +333,14 @@ export const updates = {
           ],
     }
   }),
-  deleteSubtitlesTrack: mediaUpdate(
+  deleteSubtitlesTrack: updater(
     (file: MediaFile, trackId: SubtitlesTrackId) => ({
       ...file,
       subtitles: file.subtitles.filter(({ id }) => id !== trackId),
       flashcardFieldsToSubtitlesTracks: Object.entries(
         file.flashcardFieldsToSubtitlesTracks
       )
-        .filter(([fieldName, trackId]) => trackId !== trackId)
+        .filter(([fieldName, givenTrackId]) => trackId !== givenTrackId)
         .reduce(
           (all, [fieldName, id]) => {
             all[fieldName as TransliterationFlashcardFieldName] = id
@@ -342,7 +350,7 @@ export const updates = {
         ),
     })
   ),
-  linkFlashcardFieldToSubtitlesTrack: mediaUpdate(
+  linkFlashcardFieldToSubtitlesTrack: updater(
     (
       file: MediaFile,
       flashcardFieldName: FlashcardFieldName,
@@ -373,13 +381,4 @@ export const updates = {
       }
     }
   ),
-}
-
-function mediaUpdate<U extends any[]>(
-  update: (file: MediaFile, ...args: U) => MediaFile
-) {
-  return {
-    type: 'MediaFile' as const,
-    update,
-  }
 }

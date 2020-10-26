@@ -17,5 +17,10 @@ export default async function openSharedProject({ app, client }: TestSetup) {
   await client.waitUntilPresent_(main$.container)
 
   await client.clickElement_(fileSelectionForm$.cancelButton)
+  await client.waitForText_(
+    snackbar$.container,
+    'Could not locate media file "piggeldy_cat.mp4". Some features may be unavailable until it is located.'
+  )
   await client.clickElement_(snackbar$.closeButton)
+  await client.waitUntilGone_(snackbar$.closeButton)
 }

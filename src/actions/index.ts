@@ -8,14 +8,19 @@ export * from './dialog'
 export * from './projects'
 export * from './subtitles'
 export * from './files'
+export * from './dictionaries'
 export * from './session'
 export * from './settings'
 
-export const initializeApp = (): Action => ({
+export const initializeApp = (): InitializeApp => ({
   type: A.INITIALIZE_APP,
 })
 
-export const setCurrentFile = (index: number): Action => ({
+export const quitApp = (): QuitApp => ({
+  type: A.QUIT_APP,
+})
+
+export const setCurrentFile = (index: number): SetCurrentFile => ({
   type: A.SET_CURRENT_FILE,
   index,
 })
@@ -84,22 +89,30 @@ export const setDefaultClipSpecs = ({
   tags?: string[]
   includeStill?: boolean
 }): SetDefaultClipSpecs => ({
-  type: 'SET_DEFAULT_CLIP_SPECS',
+  type: A.SET_DEFAULT_CLIP_SPECS,
   tags,
   includeStill,
 })
 
 export const setProgress = (progress: ProgressInfo | null): SetProgress => ({
-  type: 'SET_PROGRESS',
+  type: A.SET_PROGRESS,
   progress,
 })
 
 export const startEditingCards = (): StartEditingCards => ({
-  type: 'START_EDITING_CARDS',
+  type: A.START_EDITING_CARDS,
 })
 
 export const stopEditingCards = (): StopEditingCards => ({
-  type: 'STOP_EDITING_CARDS',
+  type: A.STOP_EDITING_CARDS,
+})
+
+export const openDictionaryPopover = (): OpenDictionaryPopover => ({
+  type: A.OPEN_DICTIONARY_POPOVER,
+})
+
+export const closeDictionaryPopover = (): CloseDictionaryPopover => ({
+  type: A.CLOSE_DICTIONARY_POPOVER,
 })
 
 export const newClipFromSubtitlesChunk = (
@@ -107,7 +120,7 @@ export const newClipFromSubtitlesChunk = (
   clozeDeletion?: ClozeDeletion,
   startEditing: boolean = false
 ): NewCardFromSubtitlesRequest => ({
-  type: 'NEW_CARD_FROM_SUBTITLES_REQUEST',
+  type: A.NEW_CARD_FROM_SUBTITLES_REQUEST,
   linkedSubtitlesChunkSelection,
   clozeDeletion,
   startEditing,

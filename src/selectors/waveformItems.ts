@@ -14,9 +14,8 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-
-export const getHalfSecond = ({ waveform }: AppState) =>
-  (waveform.stepsPerSecond * waveform.stepLength) / 2
+import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
+import { getHalfSecond } from './waveform'
 
 export const getWaveformItems = createSelector(
   getCurrentFileClips,
@@ -82,6 +81,12 @@ export const getWaveformItems = createSelector(
 
     return result
   }
+)
+
+export const getDisplayedWaveformItems = createSelector(
+  getWaveformItems,
+  (state: AppState) => state.waveform.viewBox.xMin,
+  limitSelectorToDisplayedItems(waveformItem => waveformItem.item.start)
 )
 
 export const getWaveformSelection = createSelector(

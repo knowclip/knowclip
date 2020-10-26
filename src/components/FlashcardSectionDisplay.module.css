@@ -89,12 +89,6 @@
   padding-right: .45em;
   color: rgba(0,0,0,0.5);
 }
-.previewFieldNotes .newlinePlaceholder {
-  display: inline
-}
-.previewFieldNotes .newlinePlaceholder::before {
-  content: none;
-}
 
 .clozeNewlinePlaceholder {
   color: rgba(0,0,0,0.3);
@@ -145,7 +139,6 @@
   right: 1rem;
   text-align: right;
   background-color: rgba(255,255,255,0.8);
-  z-index: 6;
   max-width: 16em;
   border-radius: 1.4em;
 }
@@ -155,7 +148,6 @@
   left: 1rem;
   text-align: left;
   background-color: rgba(255,255,255,0.8);
-  z-index: 5;
   border-radius: 1.4em;
 }
 
@@ -205,15 +197,10 @@
 .fieldValue {
     display: inline;
     position: relative;
-    z-index: 1;
-
-  /* word-break: break-all; */
-
 }
 .clozeFieldValue {
   composes: fieldValue;
   color: black;
-  z-index: 4;
 
   position: relative;
   white-space: no-wrap;

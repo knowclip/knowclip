@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { CircularProgress } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
@@ -10,7 +10,9 @@ import Header from '../components/MainHeader'
 import KeyboardShortcuts from '../components/KeyboardShortcuts'
 import DarkTheme from '../components/DarkTheme'
 import css from '../components/Main.module.css'
+import waveformCss from '../components/Waveform.module.css'
 import * as r from '../selectors'
+import { setMousePosition } from '../utils/mousePosition'
 
 enum $ {
   container = 'main-screen-container',
@@ -19,7 +21,7 @@ enum $ {
 const Main = () => {
   const {
     loop,
-    audioIsLoading,
+    mediaIsEffectivelyLoading,
     currentProject,
     constantBitrateFilePath,
     currentMediaFile,
@@ -29,7 +31,7 @@ const Main = () => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
       loop: r.isLoopOn(state),
-      audioIsLoading: r.isAudioLoading(state),
+      mediaIsEffectivelyLoading: r.isMediaEffectivelyLoading(state),
       currentProject: r.getCurrentProject(state),
       constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
       currentMediaFile,
@@ -40,6 +42,14 @@ const Main = () => {
       viewMode: state.settings.viewMode,
     }
   })
+
+  useEffect(() => {
+    const trackCursor = (e: MouseEvent) => {
+      setMousePosition([e.clientX, e.clientY])
+    }
+    document.addEventListener('mousemove', trackCursor)
+    return () => document.removeEventListener('mousemove', trackCursor)
+  }, [])
 
   if (!currentProject) return <Redirect to="/projects" />
 
@@ -57,9 +67,12 @@ const Main = () => {
           [css.horizontal]: viewMode === 'HORIZONTAL',
         })}
       >
-        {audioIsLoading ? (
-          <div className={css.media} style={{ alignItems: 'center' }}>
-            <CircularProgress />
+        {mediaIsEffectivelyLoading ? (
+          <div
+            className={css.media}
+            style={{ alignItems: 'center', margin: '2rem' }}
+          >
+            <CircularProgress variant="indeterminate" />
           </div>
         ) : (
           <Media
@@ -80,7 +93,11 @@ const Main = () => {
         />
       </section>
 
-      <Waveform show={Boolean(currentMediaFile && !audioIsLoading)} />
+      {Boolean(currentMediaFile && !mediaIsEffectivelyLoading) ? (
+        <Waveform />
+      ) : (
+        <div className={waveformCss.waveformPlaceholder} />
+      )}
 
       <KeyboardShortcuts />
     </div>

@@ -5,7 +5,6 @@ import { Provider } from 'react-redux'
 import App from './components/App'
 import store from './store'
 import './index.css'
-import { AppContainer, setConfig, cold } from 'react-hot-loader'
 import * as Sentry from '@sentry/electron'
 import ErrorMessage from './components/ErrorMessage'
 
@@ -21,33 +20,15 @@ window.addEventListener('error', e => {
     return
   const errorRoot = document.getElementById('errorRoot') as HTMLDivElement
   errorRoot.style.display = 'block'
-  ReactDOM.render(<ErrorMessage error={e} />, errorRoot)
-})
-
-setConfig({
-  onComponentCreate: (type, name) =>
-    (String(type).indexOf('useState') > 0 ||
-      String(type).indexOf('useEffect') > 0) &&
-    cold(type),
+  ReactDOM.render(<ErrorMessage reactError={e} />, errorRoot)
 })
 
 const render = (Component: typeof App.constructor) =>
   ReactDOM.render(
-    <AppContainer>
-      <Provider store={store}>
-        <Component sentryDsn={sentryDsn} />
-      </Provider>
-    </AppContainer>,
+    <Provider store={store}>
+      <Component sentryDsn={sentryDsn} />
+    </Provider>,
     document.getElementById('root')
   )
 
 render(App)
-
-// @ts-ignore
-if (module.hot) {
-  // @ts-ignore
-  module.hot.accept('./components/App', () => {
-    const NextApp = require('./components/App').default
-    render(NextApp)
-  })
-}

@@ -12,6 +12,8 @@ export const KEYS = {
   cUppercase: 'C',
   eLowercase: 'e',
   eUppercase: 'E',
+  dLowercase: 'd',
+  dUppercase: 'D',
   lLowercase: 'l',
   lUppercase: 'L',
   pLowercase: 'p',
@@ -23,4 +25,4 @@ export const KEYS = {
   cmd: 'Meta',
 } as const
 
-export type KeyId = (typeof KEYS)[keyof typeof KEYS]
+export type KeyId = typeof KEYS[keyof typeof KEYS]

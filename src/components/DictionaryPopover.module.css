@@ -1,0 +1,42 @@
+.container {
+  min-width: 15rem;
+  max-width: 25rem;
+  max-height: 20rem;
+  padding: 0.5rem;
+  overflow: auto;
+  position: relative;
+  scroll-margin-top: 1rem;
+
+  /* for close button */
+  margin-top: 1em;
+  margin-right: 1em;
+}
+
+.closeButton {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  background-color: gray !important;
+  opacity: .7;
+}
+.closeButton:hover {
+  opacity: 1;
+}
+
+.entryHead {
+  margin: 0 1rem 0 0;
+  margin-right: 0.5em;
+}
+.entryHeadWithRuby {
+  font-size: 1.8rem;
+  font-weight: normal;
+}
+.entryTags {
+  font-style: italic;
+  font-size: 0.8em;
+  display: inline;
+}
+.entryMeaningsList {
+  padding: 0;
+}
+

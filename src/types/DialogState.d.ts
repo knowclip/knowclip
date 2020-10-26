@@ -13,6 +13,7 @@ declare type DialogData =
   | ErrorDialogData
   | SettingsDialogData
   | LinkSubtitlesDialogData
+  | DictionariesDialogData
 
 declare type ConfirmationDialogData = {
   type: 'Confirmation'
@@ -66,4 +67,8 @@ declare type LinkSubtitlesDialogData = {
   type: 'LinkSubtitles'
   subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles
   mediaFileId: MediaFileId
+}
+
+declare type DictionariesDialogData = {
+  type: 'Dictionaries'
 }

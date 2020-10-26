@@ -29,6 +29,7 @@ const fileFilters = {
   WaveformPng: [
     { name: 'Waveform image from audio track', extensions: ['png'] },
   ],
+  Dictionary: [{ name: 'Dictionary file', extensions: ['zip'] }],
 }
 
 export const getExtensions = (fileType: FileMetadata['type']) => {
@@ -75,6 +76,7 @@ export const isGeneratedFile = (type: FileMetadata['type']): boolean => {
     case 'ProjectFile':
     case 'MediaFile':
     case 'ExternalSubtitlesFile':
+    case 'Dictionary':
       return false
   }
 }

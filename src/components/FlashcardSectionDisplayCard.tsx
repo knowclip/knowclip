@@ -7,7 +7,7 @@ import css from './FlashcardSectionDisplay.module.css'
 import { Edit, Photo, Delete, Loop } from '@material-ui/icons'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import { TransliterationFlashcardFields } from '../types/Project'
-import useClozeControls from '../utils/useClozeUi'
+import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 
 enum $ {

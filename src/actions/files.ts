@@ -1,6 +1,8 @@
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import * as A from '../types/ActionType'
+import { FileUpdates } from '../files/updates'
 
+/** Add file to records without opening or doing anything with it */
 export const addFile = <F extends FileMetadata>(
   file: F,
   path?: string
@@ -72,19 +74,20 @@ export const locateFileSuccess = (
   filePath,
 })
 
-export const commitFileDeletions = (): CommitFileDeletions => ({
+export const commitFileDeletions = (
+  fileType?: FileMetadata['type']
+): CommitFileDeletions => ({
   type: A.COMMIT_FILE_DELETIONS,
+  fileType,
 })
 
 export const abortFileDeletions = (): AbortFileDeletions => ({
   type: A.ABORT_FILE_DELETIONS,
 })
 
-export const updateFile = <U extends keyof FileUpdates>({
-  update,
-}: {
+export const updateFile = <U extends keyof FileUpdates>(
   update: FileUpdate<U>
-}): UpdateFile => ({
+): UpdateFile => ({
   type: A.UPDATE_FILE,
   update,
 })

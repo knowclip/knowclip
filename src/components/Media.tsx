@@ -68,7 +68,9 @@ const Media = ({
     // disablePictureInPicture: true,
     id: MEDIA_PLAYER_ID,
     controlsList: 'nodownload nofullscreen',
-    src: constantBitrateFilePath ? `file://${constantBitrateFilePath}` : '',
+    src: constantBitrateFilePath
+      ? new URL(`file://${constantBitrateFilePath}`).toString()
+      : '',
     // @ts-ignore
     playbackspeed: 1,
 
@@ -249,7 +251,7 @@ const Subtitles = ({
     <track
       id={track.id}
       kind="subtitles"
-      src={`file://${availability.filePath}`}
+      src={new URL(`file://${availability.filePath}`).toString()}
       mode={track.mode}
       default={isDefault}
     />
@@ -257,7 +259,7 @@ const Subtitles = ({
     <track
       id={track.id}
       kind="subtitles"
-      src={`file://${availability.filePath}`}
+      src={new URL(`file://${availability.filePath}`).toString()}
       mode={track.mode}
       default={isDefault}
     />

@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getTokenCombinations gives all combinations for five items in right order 1`] = `
+Array [
+  Array [
+    "das",
+    "licht",
+    "spiegelt",
+    "sich",
+    "in",
+  ],
+  Array [
+    "das",
+    "licht",
+    "spiegelt",
+    "sich",
+  ],
+  Array [
+    "das",
+    "licht",
+    "spiegelt",
+    "in",
+  ],
+  Array [
+    "das",
+    "licht",
+    "sich",
+    "in",
+  ],
+  Array [
+    "das",
+    "spiegelt",
+    "sich",
+    "in",
+  ],
+  Array [
+    "das",
+    "licht",
+    "spiegelt",
+  ],
+  Array [
+    "das",
+    "licht",
+    "sich",
+  ],
+  Array [
+    "das",
+    "licht",
+    "in",
+  ],
+  Array [
+    "das",
+    "spiegelt",
+    "sich",
+  ],
+  Array [
+    "das",
+    "spiegelt",
+    "in",
+  ],
+  Array [
+    "das",
+    "sich",
+    "in",
+  ],
+  Array [
+    "das",
+    "licht",
+  ],
+  Array [
+    "das",
+    "spiegelt",
+  ],
+  Array [
+    "das",
+    "sich",
+  ],
+  Array [
+    "das",
+    "in",
+  ],
+  Array [
+    "das",
+  ],
+]
+`;

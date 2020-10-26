@@ -10,6 +10,7 @@ export const initialState: FilesState = {
   WaveformPng: {},
   ConstantBitrateMp3: {},
   VideoStillImage: {},
+  Dictionary: {},
 }
 
 type FindByTag<Union, Tag> = Union extends { type: Tag } ? Union : never
@@ -53,8 +54,8 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
         [action.file.type]: {
           ...state[action.file.type],
           [action.file.id]: {
-            ...state[action.file.type][action.file.id], // needed?
             ...action.file,
+            ...state[action.file.type][action.file.id],
           },
         },
       }
@@ -123,7 +124,7 @@ function updateFile<U extends keyof FileUpdates>(
   action: UpdateFile
 ) {
   const updateMethod = fileUpdates[update.updateName]
-  const existingFile = state[updateMethod.type][update.id]
+  const existingFile = state[update.fileType][update.id]
   if (!existingFile) {
     console.error(`Action ${action.type} was dispatched during illegal state.`)
     console.log(action, state)
@@ -133,9 +134,9 @@ function updateFile<U extends keyof FileUpdates>(
 
   const newState: FilesState = {
     ...state,
-    [updateMethod.type]: {
-      ...state[updateMethod.type],
-      [update.id]: updateMethod.update(
+    [update.fileType]: {
+      ...state[update.fileType],
+      [update.id]: updateMethod(
         existingFile as any,
         ...(update.updatePayload as any)
       ),

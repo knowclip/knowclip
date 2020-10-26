@@ -1,5 +1,4 @@
 import { Reducer } from 'redux'
-import { isUpdateWith } from '../files/updates'
 import * as A from '../types/ActionType'
 import { getHumanFileName } from '../utils/files'
 
@@ -11,6 +10,7 @@ export const initialState: FileAvailabilitiesState = {
   WaveformPng: {},
   ConstantBitrateMp3: {},
   VideoStillImage: {},
+  Dictionary: {},
 }
 
 const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
@@ -166,9 +166,11 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
     }
 
     case A.COMMIT_FILE_DELETIONS: {
-      const newState = {} as typeof state
+      const newState = { ...state }
 
-      for (const t in state) {
+      for (const t of 'fileType' in action
+        ? [action.fileType]
+        : Object.keys(state)) {
         const type: keyof typeof state = t as any
         const files = state[type]
 
@@ -206,33 +208,6 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
 
       return newState
-    }
-
-    case A.UPDATE_FILE: {
-      if (isUpdateWith('setProjectName', action)) {
-        const projectId = action.update.id
-        const [name] = action.update.updatePayload
-        // TODO: investigate whether to generalize for all file types?
-        const existingProjectFile = state.ProjectFile[projectId]
-        if (!existingProjectFile) {
-          console.error(
-            `Action ${action.type} was dispatched during illegal state.`
-          )
-          console.log(action, state)
-          // should be impossible
-          return state
-        }
-
-        return {
-          ...state,
-          ProjectFile: {
-            [projectId]: {
-              ...existingProjectFile,
-              name,
-            },
-          },
-        }
-      } else return state
     }
 
     default:

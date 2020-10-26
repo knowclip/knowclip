@@ -1,4 +1,4 @@
-import { ignoreElements, mergeAll, tap } from 'rxjs/operators'
+import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, of } from 'rxjs'
 import * as A from '../types/ActionType'
@@ -24,43 +24,68 @@ import loopMedia from './loopMedia'
 import preloadVideoStills from './preloadVideoStills'
 import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
+import dictionaries from './dictionaries'
 import { showMessageBox } from '../utils/electron'
 
 const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'app-close', async () => {
-    if (!r.getCurrentProject(state$.value) || !r.isWorkUnsaved(state$.value)) {
-      ipcRenderer.send('closed')
-      return await { type: 'QUIT_APP' }
-    }
+  fromEvent(ipcRenderer, 'app-close').pipe(
+    mergeMap(async () => {
+      if (state$.value.session.progress) {
+        return await r.promptSnackbar(
+          'If you close the app before this operation is finished, you risk losing some data.',
+          [
+            ['Wait (recommended)', r.closeSnackbar()],
+            ['Force close', r.quitApp()],
+          ]
+        )
+      }
 
-    const choice = await showMessageBox({
-      type: 'question',
-      buttons: ['Cancel', 'Quit'],
-      title: 'Confirm',
-      message: 'Are you sure you want to quit without saving your work?',
+      if (
+        !r.getCurrentProject(state$.value) ||
+        !r.isWorkUnsaved(state$.value)
+      ) {
+        return await r.quitApp()
+      }
+
+      const choice = await showMessageBox({
+        type: 'question',
+        buttons: ['Cancel', 'Quit'],
+        title: 'Confirm',
+        message: 'Are you sure you want to quit without saving your work?',
+      })
+      if (!choice || choice.response === 0) {
+        return ((await { type: "DON'T QUIT ON ME!!" }) as unknown) as Action
+      } else {
+        ipcRenderer.send('closed')
+        return await r.quitApp()
+      }
     })
-    if (!choice || choice.response === 0) {
-      // e.preventDefault()
-      return await { type: "DON'T QUIT ON ME!!" }
-    } else {
-      ipcRenderer.send('closed')
-      return await { type: 'QUIT_APP' }
-    }
-  }).pipe(
-    mergeAll(),
-    ignoreElements()
   )
 
 const initialize: AppEpic = () => of(r.initializeApp())
 
-const pauseOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
+const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
+  action$.ofType(A.QUIT_APP).pipe(
+    tap(() => {
+      ipcRenderer.send('closed')
+    }),
+    ignoreElements()
+  )
+
+const pauseAndChangeCursorOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
   action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
-    tap(() => pauseMedia()),
+    tap(action => {
+      if (action.type === A.SET_PROGRESS) {
+        document.body.style.cursor = action.progress ? 'progress' : 'default'
+      }
+      pauseMedia()
+    }),
     ignoreElements()
   )
 
 const rootEpic: AppEpic = combineEpics(
   initialize,
+  quit,
   addMediaToProject,
   setWaveformCursorEpic,
   loopMedia,
@@ -83,7 +108,8 @@ const rootEpic: AppEpic = combineEpics(
   preloadVideoStills,
   generateWaveformImages,
   menu,
-  pauseOnBusy
+  pauseAndChangeCursorOnBusy,
+  dictionaries
 )
 
 export default rootEpic

@@ -1,6 +1,30 @@
+import { combineReducers } from 'redux'
+
+import waveform from '../reducers/waveform'
+import clips from '../reducers/clips'
+import session from '../reducers/session'
+import snackbar from '../reducers/snackbar'
+import dialog from '../reducers/dialog'
+import subtitles from '../reducers/subtitles'
+import settings from '../reducers/settings'
+import fileAvailabilities from '../reducers/fileAvailabilities'
+import files from '../reducers/files'
+
 import projectToMarkdown from './projectToMarkdown'
-import reducer from '../reducers'
+
 import { initialState } from '../reducers/files'
+
+export const reducer = combineReducers<AppState>({
+  waveform,
+  clips,
+  session,
+  snackbar,
+  dialog,
+  subtitles,
+  settings,
+  fileAvailabilities,
+  files,
+})
 
 describe('projectToMarkdown', () => {
   const baseState = reducer(undefined, { type: '@@INIT' })

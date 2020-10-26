@@ -1,6 +1,7 @@
 declare type Action =
   | { type: '@@INIT' }
   | InitializeApp
+  | QuitApp
   | SnackbarAction
   | DialogAction
   | WaveformAction
@@ -17,9 +18,12 @@ declare type Action =
   | SetProgress
   | StartEditingCards
   | StopEditingCards
+  | OpenDictionaryPopover
+  | CloseDictionaryPopover
   | NewCardFromSubtitlesRequest
 
 declare type InitializeApp = { type: 'INITIALIZE_APP' }
+declare type QuitApp = { type: 'QUIT_APP' }
 
 declare type DetectSilence = { type: 'DETECT_SILENCE' }
 declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }
@@ -39,6 +43,12 @@ declare type StartEditingCards = {
 }
 declare type StopEditingCards = {
   type: 'STOP_EDITING_CARDS'
+}
+declare type OpenDictionaryPopover = {
+  type: 'OPEN_DICTIONARY_POPOVER'
+}
+declare type CloseDictionaryPopover = {
+  type: 'CLOSE_DICTIONARY_POPOVER'
 }
 
 declare type NewCardFromSubtitlesRequest = {
@@ -285,6 +295,8 @@ declare type SettingsAction =
   | RemoveAssetsDirectories
   | SetCheckForUpdatesAutomatically
   | OverrideSettings
+  | AddActiveDictionary
+  | RemoveActiveDictionary
 
 declare type SetMediaFolderLocation = {
   type: 'SET_MEDIA_FOLDER_LOCATION'
@@ -305,6 +317,15 @@ declare type SetCheckForUpdatesAutomatically = {
 declare type OverrideSettings = {
   type: 'OVERRIDE_SETTINGS'
   settings: PartialSettings<SettingsState>
+}
+declare type AddActiveDictionary = {
+  type: 'ADD_ACTIVE_DICTIONARY'
+  id: FileId
+  dictionaryType: DictionaryFileType
+}
+declare type RemoveActiveDictionary = {
+  type: 'REMOVE_ACTIVE_DICTIONARY'
+  id: FileId
 }
 
 declare type DismissMedia = { type: 'DISMISS_MEDIA' }
@@ -380,8 +401,12 @@ declare type FileAction =
   | LocateFileSuccess
   | CommitFileDeletions
   | AbortFileDeletions
-  | PreloadVideoStills
   | UpdateFile
+  | PreloadVideoStills
+  | ImportDictionaryRequest
+  | StartDictionaryImport
+  | DeleteImportedDictionary
+  | ResetDictionariesDatabase
 declare type AddFile = {
   type: 'ADD_FILE'
   file: FileMetadata
@@ -399,6 +424,7 @@ declare type DeleteFileSuccess = {
 }
 declare type CommitFileDeletions = {
   type: 'COMMIT_FILE_DELETIONS'
+  fileType?: FileMetadata['type']
 }
 declare type AbortFileDeletions = {
   type: 'ABORT_FILE_DELETIONS'
@@ -439,7 +465,7 @@ declare type LocateFileSuccess = {
 
 declare type UpdateFile = {
   type: 'UPDATE_FILE'
-  update: FileUpdate<keyof FileUpdates>
+  update: FileUpdate<any>
 }
 declare interface UpdateFileWith<T extends keyof FileUpdates>
   extends UpdateFile {
@@ -450,6 +476,24 @@ declare type PreloadVideoStills = {
   type: 'PRELOAD_VIDEO_STILLS'
   file: FileMetadata
   clipId: ClipId
+}
+
+declare type ResetDictionariesDatabase = {
+  type: 'RESET_DICTIONARIES_DATABASE'
+}
+
+declare type ImportDictionaryRequest = {
+  type: 'IMPORT_DICTIONARY_REQUEST'
+  dictionaryType: DictionaryFileType
+}
+declare type StartDictionaryImport = {
+  type: 'START_DICTIONARY_IMPORT'
+  file: DictionaryFile
+  filePath: FilePath
+}
+declare type DeleteImportedDictionary = {
+  type: 'DELETE_IMPORTED_DICTIONARY'
+  file: DictionaryFile
 }
 
 interface WithRecordType<F extends FileMetadata> {

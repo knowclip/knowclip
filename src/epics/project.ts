@@ -127,7 +127,10 @@ const saveProject: AppEpic = (action$, state$) =>
         return from([
           r.setWorkIsUnsaved(false),
           r.commitFileDeletions(),
-          r.simpleMessageSnackbar(`Project saved in ${projectFile.filePath}`),
+          r.simpleMessageSnackbar(
+            `Project saved in ${projectFile.filePath}`,
+            5000
+          ),
         ])
       } catch (err) {
         console.error(err)

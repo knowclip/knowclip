@@ -20,7 +20,7 @@ const FlashcardDisplayField = ({
   subtitles: MediaSubtitlesRelation[]
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
-  onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
+  onDoubleClick?: (fieldName: FlashcardFieldName) => void
   className?: string
   title?: string
   fieldValueRef?: React.RefObject<HTMLSpanElement>

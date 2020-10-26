@@ -9,6 +9,7 @@ import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_WIDTH } from './waveform'
+import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
 
 export const isLoopOn = (state: AppState) => state.session.loopMedia
 
@@ -75,7 +76,7 @@ export const isMediaFileLoaded = (state: AppState): boolean => {
   return availability.status === 'CURRENTLY_LOADED'
 }
 
-export const isAudioLoading = (state: AppState): boolean => {
+export const isMediaEffectivelyLoading = (state: AppState): boolean => {
   const currentFile = getCurrentMediaFile(state)
   if (!currentFile) return false
   const availability = getFileAvailability(state, currentFile)
@@ -184,12 +185,16 @@ export const getNextClipId = (state: AppState, id: ClipId): ClipId | null => {
   return clipsOrder[clipsOrder.indexOf(id) + 1]
 }
 
-export const getCurrentFileClips: ((
-  state: AppState
-) => Array<Clip>) = createSelector(
+export const getCurrentFileClips = createSelector(
   getCurrentFileClipsOrder,
   getClipsObject,
   getClipsByIds
+)
+
+export const getDisplayedCurrentFileClips = createSelector(
+  getCurrentFileClips,
+  state => state.waveform.viewBox.xMin,
+  limitSelectorToDisplayedItems(clip => clip.start)
 )
 
 export const getFlashcardIdBeforeCurrent = (state: AppState): ClipId | null => {

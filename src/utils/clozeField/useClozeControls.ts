@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import * as r from '../redux'
+import * as r from '../../redux'
 import { useSelector, useDispatch } from 'react-redux'
-import { ClozeIds } from '../components/FlashcardSectionDisplayClozeField'
+import { ClozeIds } from '../../components/FlashcardSectionDisplayClozeField'
 import {
   collapseRanges,
   removeRange,
   trimClozeRangeOverlaps,
-} from './clozeRanges'
-import { KEYS } from './keyboard'
+} from '../clozeRanges'
+import { KEYS } from '../keyboard'
+import { getSelectionWithin, setSelectionRange } from './domSelection'
+import { useClozeCursorPosition } from './useClozeUiEffects'
 
 const empty: ClozeDeletion[] = []
 
@@ -31,6 +33,8 @@ export default function useClozeControls({
   const playing = useSelector((state: AppState) => r.isMediaPlaying(state))
   const dispatch = useDispatch()
 
+  const inputRef = useRef<HTMLSpanElement>(null)
+  const { cursorPosition, setCursorPosition } = useClozeCursorPosition(inputRef)
   const selection = useRef<ClozeRange | null>(null)
 
   const [clozeIndex, _setClozeIndex] = useState<number>(-1)
@@ -62,8 +66,6 @@ export default function useClozeControls({
     },
     [clozeIndex]
   )
-
-  const inputRef = useRef<HTMLSpanElement>(null)
 
   const getSelection = useCallback(() => {
     const el = inputRef.current
@@ -113,8 +115,10 @@ export default function useClozeControls({
         if (currentClozeIndex !== clozeIndex) setClozeIndex(clozeIndex)
       }
 
-      if (inputRef.current)
+      if (inputRef.current) {
         setSelectionRange(inputRef.current, selection.end, selection.end)
+        setCursorPosition(selection.end)
+      }
 
       return selection || undefined
     },
@@ -125,6 +129,7 @@ export default function useClozeControls({
       onNewClozeCard,
       currentClozeIndex,
       setClozeIndex,
+      setCursorPosition,
     ]
   )
 
@@ -214,34 +219,14 @@ export default function useClozeControls({
   })
 
   const clozeTextInputActions = {
-    onSelect: useCallback(
-      selection => {
-        if (selectionGivesNewCard(selection)) {
-          onNewClozeCard({
-            ranges: [selection],
-          })
-        }
-        if (editingCard && onEditClozeCard) {
-          const ranges = collapseRanges(deletions[clozeIndex].ranges, selection)
-          if (ranges !== deletions[clozeIndex].ranges)
-            onEditClozeCard(clozeIndex, ranges)
-        }
-      },
-      [
-        clozeIndex,
-        deletions,
-        editingCard,
-        onEditClozeCard,
-        onNewClozeCard,
-        selectionGivesNewCard,
-      ]
-    ),
     onBackspace: useCallback(
       selection => {
+        console.log({ selection })
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end && selection.start !== 0) {
             const newCursor = selection.start - 1
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             const newRanges = removeRange(deletions[clozeIndex].ranges, {
               start: newCursor,
               end: selection.start,
@@ -250,6 +235,7 @@ export default function useClozeControls({
           } else {
             const newCursor = Math.min(selection.start, selection.end)
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             onEditClozeCard(
               clozeIndex,
               removeRange(deletions[clozeIndex].ranges, selection)
@@ -258,9 +244,10 @@ export default function useClozeControls({
         } else if (inputRef.current) {
           const newCursor = selection.end - 1
           setSelectionRange(inputRef.current, newCursor, newCursor)
+          setCursorPosition(newCursor)
         }
       },
-      [clozeIndex, deletions, editingCard, onEditClozeCard]
+      [clozeIndex, deletions, editingCard, onEditClozeCard, setCursorPosition]
     ),
     onPressDelete: useCallback(
       selection => {
@@ -268,6 +255,7 @@ export default function useClozeControls({
           if (selection.start === selection.end) {
             const newCursor = selection.end + 1
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             onEditClozeCard(
               clozeIndex,
               removeRange(deletions[clozeIndex].ranges, {
@@ -278,6 +266,7 @@ export default function useClozeControls({
           } else {
             const newCursor = Math.max(selection.start, selection.end)
             setSelectionRange(inputRef.current, newCursor, newCursor)
+            setCursorPosition(newCursor)
             onEditClozeCard(
               clozeIndex,
               removeRange(deletions[clozeIndex].ranges, selection)
@@ -285,7 +274,7 @@ export default function useClozeControls({
           }
         }
       },
-      [clozeIndex, deletions, editingCard, onEditClozeCard]
+      [clozeIndex, deletions, editingCard, onEditClozeCard, setCursorPosition]
     ),
   }
 
@@ -300,77 +289,7 @@ export default function useClozeControls({
     confirmSelection,
     clozeTextInputActions,
     getSelection,
-  }
-}
-
-export function getSelectionWithin(element: HTMLElement) {
-  var start = 0
-  var end = 0
-  var doc = element.ownerDocument as Document
-  var win = doc.defaultView as Window
-  var sel = win.getSelection() as Selection
-  if (sel.rangeCount > 0) {
-    var range = (win.getSelection() as Selection).getRangeAt(0)
-    var preCaretRange = range.cloneRange()
-    preCaretRange.selectNodeContents(element)
-    preCaretRange.setEnd(range.startContainer, range.startOffset)
-    start = preCaretRange.toString().length
-    preCaretRange.setEnd(range.endContainer, range.endOffset)
-    end = preCaretRange.toString().length
-  }
-
-  const innerText = element.innerText
-  const length = innerText.length
-
-  return {
-    start: Math.max(0, Math.min(start, length)),
-    end: Math.max(0, Math.min(end, length)),
-  }
-}
-
-function getTextNodesIn(node: Node) {
-  var textNodes: Text[] = []
-  if (node.nodeType === 3) {
-    const textNode = node as Text
-    textNodes.push(textNode)
-  } else {
-    var children = node.childNodes
-    for (var i = 0, len = children.length; i < len; ++i) {
-      textNodes.push.apply(textNodes, getTextNodesIn(children[i]))
-    }
-  }
-  return textNodes
-}
-
-export function setSelectionRange(el: HTMLElement, start: number, end: number) {
-  var range = document.createRange()
-  range.selectNodeContents(el)
-  var textNodes = getTextNodesIn(el)
-  var foundStart = false
-  var charCount = 0,
-    endCharCount
-
-  for (var i = 0, textNode; (textNode = textNodes[i++]); ) {
-    endCharCount = charCount + textNode.length
-    if (
-      !foundStart &&
-      start >= charCount &&
-      (start < endCharCount ||
-        (start === endCharCount && i <= textNodes.length))
-    ) {
-      range.setStart((textNode as unknown) as Node, start - charCount)
-      foundStart = true
-    }
-    if (foundStart && end <= endCharCount) {
-      range.setEnd(textNode, end - charCount)
-      break
-    }
-    charCount = endCharCount
-  }
-
-  var sel = window.getSelection()
-  if (sel) {
-    sel.removeAllRanges()
-    sel.addRange(range)
+    setCursorPosition,
+    cursorPosition,
   }
 }

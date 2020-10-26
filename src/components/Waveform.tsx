@@ -391,7 +391,7 @@ const SubtitlesTimelines = memo(
   }
 )
 
-const Waveform = ({ show }: { show: boolean }) => {
+const Waveform = () => {
   const {
     waveform,
     images,
@@ -410,9 +410,9 @@ const Waveform = ({ show }: { show: boolean }) => {
     pendingClip: r.getPendingClip(state),
     pendingStretch: r.getPendingStretch(state),
     highlightedClipId: r.getHighlightedClipId(state),
-    subtitles: r.getSubtitlesCardBases(state),
+    subtitles: r.getDisplayedSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
-    waveformItems: r.getWaveformItems(state),
+    waveformItems: r.getDisplayedWaveformItems(state),
     mediaIsLoaded: r.isMediaFileLoaded(state),
   }))
 
@@ -485,7 +485,7 @@ const Waveform = ({ show }: { show: boolean }) => {
       return images.map(({ path, x, file }) => (
         <image
           key={file.id}
-          xlinkHref={`file://${path}`}
+          xlinkHref={new URL(`file://${path}`).toString()}
           style={{ pointerEvents: 'none' }}
           x={x}
         />
@@ -494,7 +494,7 @@ const Waveform = ({ show }: { show: boolean }) => {
     [images]
   )
 
-  return show ? (
+  return (
     <svg
       ref={svgRef}
       id="waveform-svg"
@@ -544,8 +544,6 @@ const Waveform = ({ show }: { show: boolean }) => {
         <Cursor x={cursor.x} height={height} />
       </g>
     </svg>
-  ) : (
-    <div className={css.waveformPlaceholder} />
   )
 }
 

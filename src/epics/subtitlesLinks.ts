@@ -79,7 +79,7 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       const mediaFileId = action.update.id
       const [
         flashcardFieldName,
-        subtitlesTrackId,
+        _subtitlesTrackId,
         fieldToClear,
       ] = action.update.updatePayload
 

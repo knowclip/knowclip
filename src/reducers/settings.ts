@@ -11,7 +11,7 @@ export const initialState: SettingsState = {
 const settings: Reducer<SettingsState, Action> = (
   state = initialState,
   action
-) => {
+): SettingsState => {
   switch (action.type) {
     case A.SET_MEDIA_FOLDER_LOCATION:
       return {
@@ -49,6 +49,27 @@ const settings: Reducer<SettingsState, Action> = (
 
     case A.SET_VIEW_MODE:
       return { ...state, viewMode: action.viewMode }
+
+    case A.ADD_ACTIVE_DICTIONARY: {
+      const activeDictionaries = new Set([
+        ...(state.activeDictionaries || []).filter(
+          d => d.type === action.dictionaryType
+        ),
+        { id: action.id, type: action.dictionaryType },
+      ])
+      return {
+        ...state,
+        activeDictionaries: [...activeDictionaries],
+      }
+    }
+
+    case A.REMOVE_ACTIVE_DICTIONARY:
+      return {
+        ...state,
+        activeDictionaries: (state.activeDictionaries || []).filter(
+          d => d.id !== action.id
+        ),
+      }
 
     default:
       return state

@@ -6,14 +6,14 @@ import {
 import { FileEventHandlers } from './eventHandlers'
 import { extname } from 'path'
 
-const isVtt = (filePath: FilePath) => extname(filePath) === '.vtt'
+const isVtt = (filePath: FilePath) => extname(filePath).toLowerCase() === '.vtt'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     return await validateBeforeOpenFileAction(state, filePath, file)
   },
   openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => {
+    async (validatedFile, filePath, state, effects) => {
       if (isVtt(filePath)) {
         const chunks = await effects.getSubtitlesFromFile(state, filePath)
 
@@ -68,7 +68,7 @@ export default {
     },
   ],
 
-  locateRequest: async ({ file, message }, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     return [r.fileSelectionDialog(message, file)]
   },
 

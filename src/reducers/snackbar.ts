@@ -11,10 +11,17 @@ const snackbar: Reducer<SnackbarState, Action> = (
 ) => {
   switch (action.type) {
     case A.ENQUEUE_SNACKBAR:
-      return {
-        ...state,
-        queue: state.queue.concat(action.snackbar),
-      }
+      return state.queue.some(
+        snackbar =>
+          snackbar.type === action.snackbar.type &&
+          JSON.stringify(action.snackbar.props) ===
+            JSON.stringify(snackbar.props)
+      )
+        ? state
+        : {
+            ...state,
+            queue: state.queue.concat(action.snackbar),
+          }
 
     case A.CLOSE_SNACKBAR: {
       const [, ...queue] = state.queue

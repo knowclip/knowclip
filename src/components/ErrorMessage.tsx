@@ -9,7 +9,9 @@ import {
 } from '@material-ui/core'
 import { theme } from './App'
 
-const ErrorMessage = (error: any) => {
+const ErrorMessage = ({ reactError }: { reactError: any }) => {
+  console.log('crash:', { reactError })
+  console.error(reactError)
   return (
     <MuiThemeProvider theme={theme}>
       <Dialog open={true}>
@@ -19,9 +21,15 @@ const ErrorMessage = (error: any) => {
             <details>
               <summary>Details</summary>
               <pre>
-                {String(error) === '[object Object]'
-                  ? JSON.stringify(error, null, 2)
-                  : String(error)}
+                {reactError && reactError.message
+                  ? JSON.stringify(
+                      {
+                        message: reactError.message,
+                      },
+                      null,
+                      2
+                    )
+                  : String(reactError)}
               </pre>
             </details>
           </DialogContentText>

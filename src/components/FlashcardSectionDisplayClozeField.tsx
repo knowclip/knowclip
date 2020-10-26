@@ -1,26 +1,25 @@
 import React, {
   useCallback,
-  ReactNodeArray,
   useEffect,
   ReactNode,
   useMemo,
-  useState,
-  KeyboardEventHandler,
+  memo,
+  useRef,
 } from 'react'
 import os from 'os'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@material-ui/core'
-import { useSelector, useDispatch } from 'react-redux'
-import {
-  getSelectionWithin,
-  ClozeControls,
-  setSelectionRange,
-} from '../utils/useClozeUi'
+import { useSelector } from 'react-redux'
+import { ClozeControls } from '../utils/clozeField/useClozeControls'
 import * as r from '../redux'
-import { KeyId, KEYS } from '../utils/keyboard'
+import usePopover from '../utils/usePopover'
+import { DictionaryPopover } from './DictionaryPopover'
+import { useFieldPopoverDictionary } from '../utils/clozeField/useFieldPopoverDictionary'
 
+// check nico 38:53 einverstanden? gives no result
+// check tobira
 const ClozeField = ({
   className,
   fieldName,
@@ -28,14 +27,7 @@ const ClozeField = ({
   linkedTracks,
   mediaFileId,
   value,
-  onDoubleClick,
-  clozeControls: {
-    clozeIndex: currentClozeIndex = -1,
-    previewClozeIndex = -1,
-    deletions,
-    inputRef: ref,
-    clozeTextInputActions: { onSelect, onBackspace, onPressDelete },
-  },
+  clozeControls,
 }: {
   className?: string
   fieldName: FlashcardFieldName
@@ -43,78 +35,72 @@ const ClozeField = ({
   linkedTracks: SubtitlesFlashcardFieldsLinks
   mediaFileId: MediaFileId
   value: string
-  onDoubleClick?: ((fieldName: FlashcardFieldName) => void)
   clozeControls: ClozeControls
 }) => {
-  const linkedSubtitlesTrack = linkedTracks[fieldName] || null
-  const subtitlesMenu = Boolean(subtitles.length) && (
-    <FieldMenu
-      className={css.previewFieldMenuButton}
-      linkedSubtitlesTrack={linkedSubtitlesTrack}
-      mediaFileId={mediaFileId}
-      fieldName={fieldName as TransliterationFlashcardFieldName}
-    />
-  )
+  const {
+    clozeIndex: currentClozeIndex = -1,
+    previewClozeIndex = -1,
+    deletions,
+    inputRef: clozeInputRef,
+  } = clozeControls
 
   const currentClozeId = ClozeIds[currentClozeIndex]
   const selectionHue =
     ClozeHues[currentClozeId || ClozeIds[deletions.length]] || 200
+
+  const popover = usePopover()
+
   const handleDoubleClick = useCallback(
-    () => {
-      if (onDoubleClick) onDoubleClick(fieldName)
+    (e: any) => {
+      if (!clozeInputRef.current) return // dispatch(r.)
+
+      popover.open(e)
+      setTimeout(() => clozeInputRef.current && clozeInputRef.current.blur(), 0)
     },
-    [fieldName, onDoubleClick]
+    [clozeInputRef, popover]
   )
+
+  const handleMouseDown = useCallback(
+    (e: any) => {
+      if (popover.isOpen) {
+        // don't focus when closing popover
+        e.preventDefault()
+      }
+    },
+    [popover.isOpen]
+  )
+
   const editing = currentClozeIndex !== -1
 
   useEffect(
     () => {
-      if (ref.current && editing) {
+      if (clozeInputRef.current && editing) {
         const selection = window.getSelection()
         if (selection) selection.empty()
-        ref.current.blur()
-        ref.current.focus()
+        clozeInputRef.current.blur()
+        clozeInputRef.current.focus()
       }
     },
-    [currentClozeIndex, ref, editing]
+    [currentClozeIndex, clozeInputRef, editing]
   )
   const clozeId = ClozeIds[currentClozeIndex]
-  const { isMediaPlaying, loopIsOn, viewMode } = useSelector(
-    (state: AppState) => ({
-      isMediaPlaying: r.isMediaPlaying(state),
-      loopIsOn: r.isLoopOn(state),
-      viewMode: state.settings.viewMode,
-    })
-  )
-  const [cursorPosition, setCursorPosition] = useState<number | null>(null)
-  useEffect(
-    () => {
-      const onlyShowCursorWhenNoSelectionInClozeField = () => {
-        if (ref.current) {
-          if (document.activeElement !== ref.current)
-            return setCursorPosition(null)
+  const { viewMode, activeDictionaryType } = useSelector((state: AppState) => ({
+    viewMode: state.settings.viewMode,
+    activeDictionaryType: r.getActiveDictionaryType(state),
+  }))
 
-          const currentClozeSelection = getSelectionWithin(ref.current)
-
-          const clozeSelectionCurrentlyMade =
-            currentClozeSelection.end - currentClozeSelection.start !== 0
-          const newPosition = clozeSelectionCurrentlyMade
-            ? null
-            : currentClozeSelection.end
-          setCursorPosition(newPosition)
-        }
-      }
-      document.addEventListener(
-        'selectionchange',
-        onlyShowCursorWhenNoSelectionInClozeField
-      )
-      return () =>
-        document.removeEventListener(
-          'selectionchange',
-          onlyShowCursorWhenNoSelectionInClozeField
-        )
-    },
-    [ref]
+  const {
+    cursorPosition,
+    translationsAtCharacter,
+    onKeyDown: handleKeyDown,
+    handleFocus,
+    handleBlur,
+  } = useFieldPopoverDictionary(
+    popover,
+    activeDictionaryType,
+    clozeControls,
+    value,
+    editing
   )
 
   const rangesWithClozeIndexes = deletions
@@ -131,37 +117,43 @@ const ClozeField = ({
       if (!first || first.range.start > 0) {
         const startPaddingEnd = first ? first.range.start : value.length
         segments.push(
-          ...[...value.slice(0, startPaddingEnd)].map((c, i) =>
-            charSpan(
-              c,
-              i,
-              css.clozeValueChar,
-              0, // ?
-              newlineChar,
-              cursorPosition === i
-            )
-          )
+          ...[...value.slice(0, startPaddingEnd)].map((c, i) => (
+            <CharSpan
+              key={`${c}${i}`}
+              {...{
+                char: c,
+                index: i,
+                className: css.clozeValueChar,
+                clozeIndex: 0,
+                newlineChar,
+                hasCursor: cursorPosition === i,
+              }}
+            />
+          ))
         )
       }
 
       rangesWithClozeIndexes.forEach(
         ({ range: { start, end }, clozeIndex }, i) => {
           segments.push(
-            ...[...value.slice(start, end)].map((c, i) =>
-              charSpan(
-                c,
-                start + i,
-                cn(css.blank, {
-                  [css.previewBlank]:
-                    previewClozeIndex !== -1 &&
-                    previewClozeIndex === clozeIndex,
-                  [css.blankEditing]: clozeIndex === currentClozeIndex,
-                }),
-                clozeIndex,
-                newlineChar,
-                cursorPosition === start + i
-              )
-            )
+            ...[...value.slice(start, end)].map((c, i) => (
+              <CharSpan
+                key={`${c}${start + i}`}
+                {...{
+                  char: c,
+                  index: start + i,
+                  className: cn(css.blank, {
+                    [css.previewBlank]:
+                      previewClozeIndex !== -1 &&
+                      previewClozeIndex === clozeIndex,
+                    [css.blankEditing]: clozeIndex === currentClozeIndex,
+                  }),
+                  clozeIndex,
+                  newlineChar,
+                  hasCursor: cursorPosition === start + i,
+                }}
+              />
+            ))
           )
 
           const nextRange: {
@@ -174,16 +166,19 @@ const ClozeField = ({
 
           if (subsequentGapEnd - end > 0) {
             segments.push(
-              ...[...value.slice(end, subsequentGapEnd)].map((c, i) =>
-                charSpan(
-                  c,
-                  end + i,
-                  css.clozeValueChar,
-                  clozeIndex,
-                  newlineChar,
-                  cursorPosition === end + i
-                )
-              )
+              ...[...value.slice(end, subsequentGapEnd)].map((c, i) => (
+                <CharSpan
+                  key={`${c}${end + i}`}
+                  {...{
+                    char: c,
+                    index: end + i,
+                    className: css.clozeValueChar,
+                    clozeIndex,
+                    newlineChar,
+                    hasCursor: cursorPosition === end + i,
+                  }}
+                />
+              ))
             )
           }
         }
@@ -200,181 +195,70 @@ const ClozeField = ({
     ]
   )
 
-  const dispatch = useDispatch()
-
-  const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = useCallback(
-    e => {
-      if (!isEnabledKey(e)) return e.preventDefault()
-      switch (e.key) {
-        case KEYS.arrowLeft: {
-          const selection = getSelectionWithin(e.target as HTMLInputElement)
-          const selectionMade = selection.end - selection.start !== 0
-          if (selectionMade) {
-            if (e.shiftKey) {
-              break
-            } else {
-              setSelectionRange(
-                e.target as HTMLSpanElement,
-                selection.start,
-                selection.start
-              )
-
-              setCursorPosition(selection.start)
-              break
-            }
-          } else {
-            if (e.shiftKey) {
-              const start = cursorPosition == null ? 0 : cursorPosition - 1
-              const end = cursorPosition == null ? 0 : cursorPosition
-
-              setSelectionRange(e.target as HTMLSpanElement, start, end)
-              e.preventDefault()
-            } else
-              setCursorPosition(cursorPosition =>
-                cursorPosition == null
-                  ? cursorPosition
-                  : Math.max(cursorPosition - 1, 0)
-              )
-          }
-          break
-        }
-        case KEYS.arrowRight: {
-          const selection = getSelectionWithin(e.target as HTMLSpanElement)
-          const selectionMade = selection.end - selection.start !== 0
-          if (selectionMade) {
-            if (e.shiftKey) {
-              break
-            } else {
-              setSelectionRange(
-                e.target as HTMLSpanElement,
-                selection.end,
-                selection.end
-              )
-              setCursorPosition(selection.end)
-              e.preventDefault()
-              break
-            }
-          } else {
-            if (e.shiftKey) {
-              const start = cursorPosition == null ? 0 : cursorPosition
-              const end = cursorPosition == null ? 0 : cursorPosition + 1
-
-              console.log({ start, end })
-              ref.current && setSelectionRange(ref.current, start, end)
-              e.preventDefault()
-            } else {
-              setCursorPosition(cursorPosition =>
-                cursorPosition == null
-                  ? cursorPosition
-                  : Math.min(cursorPosition + 1, value.length)
-              )
-            }
-          }
-          break
-        }
-
-        case KEYS.delete: {
-          const selection = getSelectionWithin(e.target as HTMLInputElement)
-          onPressDelete(selection)
-          e.preventDefault()
-          break
-        }
-        case KEYS.backspace: {
-          const selection = getSelectionWithin(e.target as HTMLInputElement)
-          onBackspace(selection)
-          e.preventDefault()
-          break
-        }
-        case KEYS.escape:
-          ;(e.target as HTMLSpanElement).blur()
-          break
-        case KEYS.eLowercase:
-        case KEYS.eUppercase:
-          dispatch(r.startEditingCards())
-          e.preventDefault()
-          break
-        default:
-      }
-    },
-    [onBackspace, onPressDelete, dispatch, value, cursorPosition]
-  )
-
-  const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
-  const handleFocus = useCallback(
-    e => {
-      if (ref.current) {
-        const selection = getSelectionWithin(ref.current)
-        const currentlySelected = selection.end - selection.start !== 0
-        if (!currentlySelected) setCursorPosition(0)
-      }
-      if (!editing && isMediaPlaying) {
-        setWasLoopingBeforeFocus(loopIsOn)
-        dispatch(r.setLoop(true))
-      }
-    },
-    [loopIsOn, setWasLoopingBeforeFocus, isMediaPlaying, editing, dispatch]
-  )
-  const handleBlur = useCallback(
-    e => {
-      setCursorPosition(null)
-      if (!editing && wasLoopingBeforeFocus !== loopIsOn)
-        dispatch(r.setLoop(wasLoopingBeforeFocus))
-    },
-    [loopIsOn, wasLoopingBeforeFocus, editing, dispatch]
-  )
-
-  const content = (
-    <span
-      className={cn(css.clozeFieldValue, clozeId, {
-        [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
-      })}
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      ref={ref}
-    >
-      {segments}
-      {cursorPosition === value.length && <span className={css.clozeCursor} />}
-    </span>
-  )
-
   if (!value)
     return <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
+
+  const tooltipProps = editing
+    ? {
+        title: clozeHint,
+      }
+    : {
+        title:
+          deletions.length >= ClozeIds.length
+            ? "You've reached the maximum number of cloze deletions for this card."
+            : 'Select text and press C key to create a new cloze deletion card (a.k.a. fill-in-the blank).',
+        placement: 'top' as const,
+      }
 
   return (
     <div
       className={cn(css.previewField, className, {
         [css.previewFieldWithPopover]: Boolean(subtitles.length),
       })}
-      onDoubleClick={handleDoubleClick}
       style={{
         ['--cloze-selection-hue' as any]: selectionHue,
       }}
     >
-      {subtitlesMenu}
-      {editing ? (
-        <Tooltip title={clozeHint} key={value}>
-          {content}
-        </Tooltip>
-      ) : (
-        <Tooltip
-          title={
-            deletions.length >= ClozeIds.length
-              ? "You've reached the maximum number of cloze deletions for this card."
-              : 'Select text and press C key to create a new cloze deletion card (a.k.a. fill-in-the blank).'
-          }
-          placement="top"
-        >
-          {content}
-        </Tooltip>
+      {Boolean(subtitles.length) && (
+        <FieldMenu
+          className={css.previewFieldMenuButton}
+          linkedSubtitlesTrack={linkedTracks[fieldName]}
+          mediaFileId={mediaFileId}
+          fieldName={fieldName as TransliterationFlashcardFieldName}
+        />
       )}
+      <Tooltip
+        key={value}
+        {...tooltipProps}
+        title={popover.isOpen && activeDictionaryType ? '' : tooltipProps.title}
+      >
+        <span
+          className={cn(css.clozeFieldValue, clozeId, {
+            [css.clozePreviewFieldValue]: previewClozeIndex !== -1,
+          })}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onDoubleClick={handleDoubleClick}
+          onMouseDown={handleMouseDown}
+          ref={clozeInputRef}
+        >
+          {segments}
+          {cursorPosition === value.length && (
+            <span className={css.clozeCursor} />
+          )}
+          {popover.isOpen && (
+            <DictionaryPopover
+              activeDictionaryType={activeDictionaryType}
+              popover={popover}
+              translationsAtCharacter={translationsAtCharacter}
+            />
+          )}
+        </span>
+      </Tooltip>
     </div>
   )
-}
-
-type SelectState = {
-  position: number
 }
 
 export type ClozeId =
@@ -414,54 +298,44 @@ export const ClozeHues = {
   c10: 271,
 }
 
-const charSpan = (
-  char: string,
-  index: number,
-  className: string,
-  clozeIndex: number,
-  newlineChar: string,
-  hasCursor?: boolean
-) => {
-  const isNewline = char === '\n' || char === '\r'
-  const content = isNewline ? newlineChar : char
-  return (
-    <span
-      className={cn(className, {
-        [css.clozeNewlinePlaceholder]: isNewline,
-        [css.clozeCursor]: hasCursor,
-      })}
-      key={String(index + char)}
-      style={{
-        ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
-      }}
-    >
-      {content}
-    </span>
-  )
-}
+const CharSpan = memo(
+  ({
+    char,
+    index,
+    className,
+    clozeIndex,
+    newlineChar,
+    hasCursor,
+  }: {
+    char: string
+    index: number
+    className: string
+    clozeIndex: number
+    newlineChar: string
+    hasCursor?: boolean
+  }) => {
+    const isNewline = char === '\n' || char === '\r'
+    const content = isNewline ? newlineChar : char
+    const ref = useRef<HTMLSpanElement>(null)
 
-const clearNewlines = (
-  value: string,
-  viewMode: ViewMode,
-  className?: string
-) => {
-  const char = viewMode === 'VERTICAL' ? '\n' : '⏎'
-  const withoutNewlines: ReactNodeArray = []
-  const lines = value.split(/[\n\r]/)
-  lines.forEach((line, i) => {
-    if (i !== 0)
-      withoutNewlines.push(
-        <span
-          className={cn(css.clozeNewlinePlaceholder, className)}
-          key={String(i)}
-        >
-          {char}
-        </span>
-      )
-    withoutNewlines.push(<span className={className}>{line}</span>)
-  })
-  return withoutNewlines
-}
+    return (
+      <span
+        ref={ref}
+        data-character-index={index}
+        className={cn(className, {
+          [css.clozeNewlinePlaceholder]: isNewline,
+          [css.clozeCursor]: hasCursor,
+        })}
+        key={String(index + char)}
+        style={{
+          ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
+        }}
+      >
+        {content}
+      </span>
+    )
+  }
+)
 
 const clozeHint = (
   <div>
@@ -475,35 +349,9 @@ const clozeHint = (
   </div>
 )
 
-const ENABLED_KEYS = new Set<KeyId>([
-  KEYS.tab,
-  KEYS.shift,
-  KEYS.arrowLeft,
-  KEYS.arrowRight,
-  KEYS.escape,
-  KEYS.eLowercase,
-  KEYS.eUppercase,
-  KEYS.delete,
-  KEYS.backspace,
-  KEYS.backspace,
-])
-const ENABLED_META_CTRL_KEYS = new Set<KeyId>([
-  ...ENABLED_KEYS,
-  KEYS.cLowercase,
-  KEYS.cUppercase,
-  KEYS.aLowercase,
-  KEYS.aUppercase,
-])
 export const getMetaOrCtrlKey =
   os.platform() === 'darwin'
     ? (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.metaKey
     : (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.ctrlKey
-const isEnabledKey = (e: KeyboardEvent | React.KeyboardEvent<Element>) => {
-  const { key } = e
-  const metaOrCtrlKey = getMetaOrCtrlKey(e)
-  return metaOrCtrlKey
-    ? ENABLED_META_CTRL_KEYS.has(key as KeyId)
-    : ENABLED_KEYS.has(key as KeyId)
-}
 
 export default ClozeField

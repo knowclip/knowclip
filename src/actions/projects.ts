@@ -1,4 +1,5 @@
 import * as A from '../types/ActionType'
+import { updateFile } from './files'
 
 export const createProject = (
   id: string,
@@ -58,6 +59,7 @@ export const setProjectName = (
   type: A.UPDATE_FILE,
   update: {
     id,
+    fileType: 'ProjectFile',
     updateName: 'setProjectName',
     updatePayload: [name],
   },
@@ -75,14 +77,13 @@ export const addMediaToProjectRequest = (
 export const deleteMediaFromProject = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
-): UpdateFileWith<'deleteProjectMedia'> => ({
-  type: A.UPDATE_FILE,
-  update: {
-    updateName: 'deleteProjectMedia',
+) =>
+  updateFile({
+    fileType: 'ProjectFile',
     id: projectId,
+    updateName: 'deleteProjectMedia',
     updatePayload: [mediaFileId],
-  },
-})
+  })
 
 export const saveProjectRequest = (): Action => ({
   type: A.SAVE_PROJECT_REQUEST,

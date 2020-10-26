@@ -1,33 +1,16 @@
-import {
-  filter,
-  map,
-  flatMap,
-  switchMap,
-  takeUntil,
-  take,
-} from 'rxjs/operators'
-import { fromEvent, from, of, merge, OperatorFunction, empty } from 'rxjs'
+import { filter, map, flatMap, switchMap, takeUntil } from 'rxjs/operators'
+import { fromEvent, from, of, merge, empty } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
-
-const isTextFieldFocused = () => {
-  const { activeElement, body } = document
-  if (!activeElement || activeElement === body) return false
-  return (
-    activeElement instanceof HTMLInputElement ||
-    activeElement instanceof HTMLTextAreaElement ||
-    activeElement instanceof HTMLSelectElement
-  )
-}
+import { isTextFieldFocused } from '../utils/isTextFieldFocused'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap(event => {
-      const { ctrlKey, altKey, key } = event
-      const meta = getMetaOrCtrlKey(event)
+      const { shiftKey, ctrlKey, altKey, key } = event
 
       if (
         key.toLowerCase() === KEYS.lLowercase &&
@@ -47,10 +30,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return of(r.startEditingCards())
       }
 
-      if (
-        key.toLowerCase() === KEYS.pLowercase &&
-        (ctrlKey || !isTextFieldFocused())
-      ) {
+      if (key === KEYS.space && (shiftKey || !isTextFieldFocused())) {
         event.preventDefault()
         effects.toggleMediaPaused()
         return empty()
@@ -76,6 +56,10 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
             ...(r.isLoopOn(state$.value) ? [r.setLoop(false)] : []),
             r.stopEditingCards(),
           ])
+
+        if (state$.value.session.dictionaryPopoverIsOpen) {
+          return from([r.closeDictionaryPopover()])
+        }
 
         return of(
           effects.isMediaPlaying()

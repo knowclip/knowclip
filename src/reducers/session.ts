@@ -17,6 +17,7 @@ const initialState: SessionState = {
   mediaIsPlaying: false,
   progress: null,
   editingCards: false,
+  dictionaryPopoverIsOpen: false,
 }
 
 const session: Reducer<SessionState, Action> = (
@@ -225,6 +226,12 @@ const session: Reducer<SessionState, Action> = (
 
     case A.STOP_EDITING_CARDS:
       return { ...state, editingCards: false, loopMedia: false }
+
+    case A.OPEN_DICTIONARY_POPOVER:
+      return { ...state, dictionaryPopoverIsOpen: true }
+
+    case A.CLOSE_DICTIONARY_POPOVER:
+      return { ...state, dictionaryPopoverIsOpen: false }
 
     default:
       return state

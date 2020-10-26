@@ -3,9 +3,9 @@ import { FileEventHandlers } from './eventHandlers'
 import { getMidpoint } from '../utils/getVideoStill'
 
 export default {
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     const img = new Image()
-    img.src = `file:///${filePath}`
+    img.src = new URL(`file:///${filePath}`).toString()
     return await new Promise((res, rej) => {
       const onLoad = () => {
         res([r.openFileSuccess(file, filePath)])
@@ -20,11 +20,11 @@ export default {
     })
   },
   openSuccess: [
-    async ({ validatedFile, filePath }) => {
+    async (validatedFile, filePath) => {
       return []
     },
   ],
-  locateRequest: async ({ file }, availability, state, effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     try {
       const parentFile = r.getFile<MediaFile>(
         state,

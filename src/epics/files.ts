@@ -11,6 +11,7 @@ import externalSubtitles from '../files/externalSubtitlesFile'
 import waveformPng from '../files/waveformPngFile'
 import constantBitrateMp3 from '../files/constantBitrateMp3File'
 import videoStillImage from '../files/videoStillImageFile'
+import { dictionaryActions } from '../files/dictionaryFile'
 import {
   FileEventHandlers,
   OpenFileSuccessHandler,
@@ -28,13 +29,15 @@ const fileEventHandlers: Record<
   WaveformPng: waveformPng,
   ConstantBitrateMp3: constantBitrateMp3,
   VideoStillImage: videoStillImage,
+  Dictionary: dictionaryActions,
 }
 
 const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
     flatMap<OpenFileRequest, Observable<Action>>(action => {
-      const { file } = action
+      const file =
+        r.getFile(state$.value, action.file.type, action.file.id) || action.file
       const fileAvailability = r.getFileAvailability(state$.value, file)
 
       if (!fileAvailability.isLoading) return empty()
@@ -55,7 +58,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
       try {
         return from(
           fileEventHandlers[file.type].openRequest(
-            action,
+            file,
             filePath,
             state$.value,
             effects
@@ -77,9 +80,18 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
         typeof action.validatedFile
       >[] = fileEventHandlers[action.validatedFile.type].openSuccess
 
+      const file =
+        r.getFile(
+          state$.value,
+          action.validatedFile.type,
+          action.validatedFile.id
+        ) || action.validatedFile
+
       return from(
         openSuccessHandlers.map(handler =>
-          from(handler(action, state$.value, effects)).pipe(mergeAll())
+          from(handler(file, action.filePath, state$.value, effects)).pipe(
+            mergeAll()
+          )
         )
       )
     }),
@@ -95,10 +107,19 @@ const openFileFailure: AppEpic = (action$, state$, effects) =>
       console.error(action.errorMessage || 'Could not open file:')
       console.log(action)
 
+      const file =
+        r.getFile(state$.value, action.file.type, action.file.id) || action.file
+
       return openFailureHandler
-        ? from(openFailureHandler(action, state$.value, effects)).pipe(
-            mergeAll()
-          )
+        ? from(
+            openFailureHandler(
+              file,
+              action.filePath,
+              action.errorMessage,
+              state$.value,
+              effects
+            )
+          ).pipe(mergeAll())
         : from(
             action.errorMessage
               ? [r.simpleMessageSnackbar(action.errorMessage)]
@@ -113,16 +134,20 @@ const flatten = (asyncArray: Promise<Action[]>) =>
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileRequest>(A.LOCATE_FILE_REQUEST),
-    flatMap<LocateFileRequest, Observable<Action>>(action =>
-      flatten(
+    flatMap<LocateFileRequest, Observable<Action>>(action => {
+      const file =
+        r.getFile(state$.value, action.file.type, action.file.id) || action.file
+
+      return flatten(
         fileEventHandlers[action.file.type].locateRequest(
-          action,
+          file,
           r.getFileAvailability(state$.value, action.file),
+          action.message,
           state$.value,
           effects
         )
       )
-    )
+    })
   )
 
 const locateFileSuccess: AppEpic = (action$, state$, effects) =>

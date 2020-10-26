@@ -28,24 +28,32 @@ const newestToOldest = (
   if (!b) return -1
   return moment(b).valueOf() - moment(a).valueOf()
 }
+/** starts from availabilities
+ * because files were not originally persisted
+ */
 export const getProjects = createSelector(
   (state: AppState) => state.fileAvailabilities.ProjectFile,
-  (availabilities): Array<FileAvailability> =>
+  (state: AppState) => state.files.ProjectFile,
+  (availabilities, files) =>
     Object.entries(availabilities)
-      .map(
-        ([id, availability]): FileAvailability =>
-          availability || {
-            id,
-            name: 'Unknown project file',
-            parentId: null,
-            type: 'ProjectFile',
-            filePath: null,
-            status: 'NOT_FOUND',
-            isLoading: false,
-            lastOpened: null,
-          }
-      )
-      .sort(newestToOldest)
+      .map(([id, presentAvailability]) => {
+        const file = files[id]
+        const availability = presentAvailability || {
+          id,
+          name: 'Unknown project file',
+          parentId: null,
+          type: 'ProjectFile',
+          filePath: null,
+          status: 'NOT_FOUND',
+          isLoading: false,
+          lastOpened: null,
+        }
+        return {
+          file,
+          availability,
+        }
+      })
+      .sort((a, b) => newestToOldest(a.availability, b.availability))
 )
 
 export const getProjectIdByFilePath = (

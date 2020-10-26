@@ -7,7 +7,7 @@ import {
   ClozeIds,
   ClozeHues,
 } from './FlashcardSectionDisplayClozeField'
-import { ClozeControls } from '../utils/useClozeUi'
+import { ClozeControls } from '../utils/clozeField/useClozeControls'
 
 const empty: ClozeDeletion[] = []
 
@@ -95,7 +95,7 @@ const ClozeButton = ({
   index: number
   setClozeIndex: (index: number) => void
   setPreviewClozeIndex?: (index: number) => void
-  confirmSelection: ((clozeIndex: number, selection: ClozeRange) => void)
+  confirmSelection: (clozeIndex: number, selection: ClozeRange) => void
   getSelection: () => ClozeRange | null
   selection: MutableRefObject<ClozeRange | null>
 }) => {

@@ -10,13 +10,26 @@ import { snackbar$ } from '.'
 const SimpleMessageSnackbar = ({
   message,
   closeButtonId,
+  autoHideDuration = 15000,
 }: {
   message: string
   closeButtonId: string
+  autoHideDuration?: number | null
 }) => {
   const [open, setOpen] = useState(true)
 
-  const handleClose = useCallback(e => setOpen(false), [setOpen])
+  const handleClose = useCallback(
+    () => {
+      setOpen(false)
+    },
+    [setOpen]
+  )
+  const closeExceptOnClickaway = useCallback(
+    (e, reason) => {
+      if (reason !== 'clickaway') handleClose()
+    },
+    [handleClose]
+  )
 
   const dispatch = useDispatch()
   const handleExited = useCallback(e => dispatch(closeSnackbar()), [dispatch])
@@ -27,8 +40,8 @@ const SimpleMessageSnackbar = ({
       className={cn(snackbar$.container)}
       open={open}
       message={message}
-      autoHideDuration={15000}
-      onClose={handleClose}
+      autoHideDuration={autoHideDuration}
+      onClose={closeExceptOnClickaway}
       onExited={handleExited}
       action={
         <DarkTheme>

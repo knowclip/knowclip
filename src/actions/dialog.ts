@@ -88,3 +88,11 @@ export const linkSubtitlesDialog = (
     subtitles,
     mediaFileId,
   })
+
+export const dictionariesDialog = (): DialogAction =>
+  enqueueDialog(
+    {
+      type: 'Dictionaries',
+    },
+    true
+  )

@@ -38,10 +38,9 @@
 
 .clipsCount {
   position: absolute;
-  right: 4rem;
+  right: 0.5rem;
   padding: 1rem;
-  top: 1rem;
-  z-index: 1;
+  top: 3rem;
   opacity: 0.8;
   border-radius: 1em;
   background-color: white;
@@ -54,7 +53,6 @@
 .prevButton {
   composes: navButton;
   left: 1rem;
-  z-index: 1;
 }
 .nextButton {
   composes: navButton;

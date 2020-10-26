@@ -25,7 +25,8 @@ export default function App({ Component, pageProps }: { Component: React.Compone
     }
   }, [])
   useEffect(() => {
-    document.querySelector('html')?.classList.remove('noJs')
+    document.querySelector('html')
+      ?.classList.remove('noJs')
   }, [])
   
   return <Component {...pageProps} />

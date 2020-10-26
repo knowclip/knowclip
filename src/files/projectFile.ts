@@ -6,9 +6,10 @@ import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
 import { arrayToMapById } from '../utils/arrayToMapById'
 import { validateSubtitlesFromFilePath } from '../utils/subtitles'
+import { updaterGetter } from './updaterGetter'
 
 const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
-  openRequest: async ({ file }, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     try {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
@@ -58,7 +59,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     }
   },
   openSuccess: [
-    async ({ validatedFile, filePath }, state, effects) => {
+    async (validatedFile, filePath, state, effects) => {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
@@ -151,11 +152,11 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     },
   ],
 
-  openFailure: async ({ file, filePath, errorMessage }) => [
+  openFailure: async (file, filePath, errorMessage) => [
     r.errorDialog('Problem opening project file:', errorMessage || ''),
   ],
 
-  locateRequest: async ({ file }, availability, state, effects) => [
+  locateRequest: async (file, availability, state, effects) => [
     r.fileSelectionDialog(
       `Please locate this project file "${file.name}"`,
       file
@@ -168,31 +169,28 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
       r.deleteFileSuccess(availability, descendants),
     ],
   ],
-  deleteSuccess: [async (action, state) => [r.commitFileDeletions()]],
+  deleteSuccess: [
+    async (action, state) => [
+      r.commitFileDeletions('ProjectFile'),
+      ...Array.from(new Set(action.descendants.map(a => a.type))).map(type =>
+        r.commitFileDeletions(type)
+      ),
+    ],
+  ],
 }
 
 export default projectFileEventHandlers
 
+const updater = updaterGetter<ProjectFile>()
 export const updates = {
-  setProjectName: projectUpdate((file: ProjectFile, name: string) => {
+  setProjectName: updater((file: ProjectFile, name: string) => {
     return {
       ...file,
       name,
     }
   }),
-  deleteProjectMedia: projectUpdate(
-    (file: ProjectFile, mediaFileId: string) => ({
-      ...file,
-      mediaFileIds: file.mediaFileIds.filter(id => id !== mediaFileId),
-    })
-  ),
-}
-
-function projectUpdate<U extends any[]>(
-  update: (file: ProjectFile, ...args: U) => ProjectFile
-) {
-  return {
-    type: 'ProjectFile' as const,
-    update,
-  }
+  deleteProjectMedia: updater((file: ProjectFile, mediaFileId: string) => ({
+    ...file,
+    mediaFileIds: file.mediaFileIds.filter(id => id !== mediaFileId),
+  })),
 }

@@ -7,7 +7,7 @@ declare type SettingsState = {
   assetsDirectories: string[]
   checkForUpdatesAutomatically: boolean
   viewMode: ViewMode
-  // TODO: save recent `ProjectFile`s here?
+  activeDictionaries?: { id: FileId; type: DictionaryFileType }[]
 }
 
 declare type ViewMode = 'HORIZONTAL' | 'VERTICAL'

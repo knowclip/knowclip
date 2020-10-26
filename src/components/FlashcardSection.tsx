@@ -42,16 +42,21 @@ const FlashcardSection = ({
     fieldsToTracks,
     subtitles,
     viewMode,
-  } = useSelector((state: AppState) => ({
-    waveformSelection: r.getWaveformSelection(state),
-    waveformItems: r.getWaveformItems(state),
-    clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
-    editing: state.session.editingCards,
-    flashcard: r.getHighlightedFlashcard(state),
-    fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-    subtitles: r.getSubtitlesCardBases(state),
-    viewMode: state.settings.viewMode,
-  }))
+  } = useSelector((state: AppState) => {
+    const mediaIsEffectivelyLoading = r.isMediaEffectivelyLoading(state)
+    return {
+      waveformSelection: r.getWaveformSelection(state),
+      waveformItems: mediaIsEffectivelyLoading ? [] : r.getWaveformItems(state),
+      clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
+      editing: state.session.editingCards,
+      flashcard: r.getHighlightedFlashcard(state),
+      fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
+      subtitles: mediaIsEffectivelyLoading
+        ? null
+        : r.getSubtitlesCardBases(state),
+      viewMode: state.settings.viewMode,
+    }
+  })
 
   const highlightedClip =
     waveformSelection && waveformSelection.type === 'Clip'
@@ -122,6 +127,7 @@ const FlashcardSection = ({
         />
       )}
       {mediaFile &&
+        subtitles &&
         waveformSelection &&
         waveformSelection.type === 'Preview' && (
           <Preview
