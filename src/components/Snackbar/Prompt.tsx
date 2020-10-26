@@ -20,12 +20,9 @@ const PromptSnackbar = ({
 }) => {
   const [open, setOpen] = useState(true)
 
-  const handleClose = useCallback(
-    () => {
-      setOpen(false)
-    },
-    [setOpen]
-  )
+  const handleClose = useCallback(() => {
+    setOpen(false)
+  }, [setOpen])
   const closeExceptOnClickaway = useCallback(
     (e, reason) => {
       if (reason !== 'clickaway') handleClose()
@@ -34,14 +31,14 @@ const PromptSnackbar = ({
   )
   const dispatch = useDispatch()
   const dispatchAction = useCallback(
-    action => {
+    (action) => {
       dispatch(action)
       setOpen(false)
     },
     [dispatch]
   )
 
-  const handleExited = useCallback(e => dispatch(closeSnackbar()), [dispatch])
+  const handleExited = useCallback((e) => dispatch(closeSnackbar()), [dispatch])
 
   return (
     // TODO: distinguish error and success messages

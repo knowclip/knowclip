@@ -20,9 +20,7 @@ export default {
         if ('error' in chunks) {
           return [
             r.simpleMessageSnackbar(
-              `There was a problem reading subtitles from ${
-                validatedFile.name
-              }: ${chunks.error}`
+              `There was a problem reading subtitles from ${validatedFile.name}: ${chunks.error}`
             ),
           ]
         }
@@ -36,10 +34,10 @@ export default {
         if (r.getCurrentFileId(state) !== validatedFile.parentId) return []
 
         return [
-          ...(mediaFile && !mediaFile.subtitles.some(s => s.id === track.id)
+          ...(mediaFile && !mediaFile.subtitles.some((s) => s.id === track.id)
             ? [
                 r.addSubtitlesTrack(track, mediaFile.id),
-                ...(state.dialog.queue.some(d => d.type === 'SubtitlesClips')
+                ...(state.dialog.queue.some((d) => d.type === 'SubtitlesClips')
                   ? []
                   : [r.linkSubtitlesDialog(validatedFile, mediaFile.id)]),
               ]
@@ -83,7 +81,7 @@ export default {
   deleteSuccess: [
     async (action, state, effects) => {
       const mediaFile = Object.values(state.files.MediaFile).find(
-        m => m && m.subtitles.some(({ id }) => id === action.file.id)
+        (m) => m && m.subtitles.some(({ id }) => id === action.file.id)
       )
       return mediaFile
         ? [r.deleteSubtitlesTrackFromMedia(action.file.id, mediaFile.id)]

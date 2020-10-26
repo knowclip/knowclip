@@ -10,16 +10,10 @@ export default function formatTime(seconds: number) {
 export const formatDuration = (duration: moment.Duration) =>
   [
     ~~duration.asHours(),
-    duration
-      .minutes()
-      .toString()
-      .padStart(2, '0'),
-    duration
-      .seconds()
-      .toString()
-      .padStart(2, '0'),
+    duration.minutes().toString().padStart(2, '0'),
+    duration.seconds().toString().padStart(2, '0'),
   ]
-    .filter(v => v)
+    .filter((v) => v)
     .join(':')
 
 export const formatDurationWithMilliseconds = (duration: moment.Duration) => {
@@ -27,13 +21,10 @@ export const formatDurationWithMilliseconds = (duration: moment.Duration) => {
   return [
     formatDuration(duration),
     milliseconds
-      ? milliseconds
-          .toString()
-          .padStart(3, '0')
-          .replace(/0+$/, '')
+      ? milliseconds.toString().padStart(3, '0').replace(/0+$/, '')
       : '0',
   ]
-    .filter(v => v)
+    .filter((v) => v)
     .join('.')
 }
 

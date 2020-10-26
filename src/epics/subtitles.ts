@@ -71,7 +71,7 @@ const makeClipsFromSubtitles: AppEpic = (
                 concat(
                   action$.pipe(
                     ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
-                    filter(a => areSameFile(file, a.validatedFile)),
+                    filter((a) => areSameFile(file, a.validatedFile)),
                     take(1),
                     ignoreElements()
                   )
@@ -99,7 +99,7 @@ const makeClipsFromSubtitles: AppEpic = (
             r.getClipIdsByMediaFileId(state$.value, currentFile.id)
           ),
           r.setDefaultClipSpecs({ tags, includeStill }),
-          ...Object.keys(fieldNamesToTrackIds).map(badTypefieldName => {
+          ...Object.keys(fieldNamesToTrackIds).map((badTypefieldName) => {
             const fieldName = badTypefieldName as FlashcardFieldName
             const trackId = fieldNamesToTrackIds[fieldName] || null
             return r.linkFlashcardFieldToSubtitlesTrack(
@@ -193,7 +193,7 @@ function validateTracks(
     } {
   if (
     !Object.values(fieldNamesToTrackIds).find(
-      trackId => trackId && trackId.trim()
+      (trackId) => trackId && trackId.trim()
     )
   )
     return { status: 'NO_LINKS_GIVEN' }
@@ -217,14 +217,14 @@ function validateTracks(
     for (const fn in fieldNamesToTrackIds) {
       const fieldName = fn as TransliterationFlashcardFieldName
       const trackId = fieldNamesToTrackIds[fieldName]
-      const missingTrack = missingTracks.find(t => t.relation.id === trackId)
+      const missingTrack = missingTracks.find((t) => t.relation.id === trackId)
       if (missingTrack) fieldNamesToFiles[fieldName] = missingTrack.file
     }
     return { status: 'MISSING_TRACKS', fieldNamesToFiles }
   }
 
   const cueTrackFieldName = r.CUES_BASE_PRIORITY.find(
-    fieldName => fieldNamesToTrackIds[fieldName]
+    (fieldName) => fieldNamesToTrackIds[fieldName]
   ) as TransliterationFlashcardFieldName
 
   return {
@@ -265,20 +265,22 @@ function getClipsAndCardsFromSubtitles(
             notes: '',
             pronunciation: '',
           }
-    ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(fieldName => {
-      const trackId = fieldNamesToTrackIds[fieldName]
-      fields[fieldName] = trackId
-        ? r
-            .getSubtitlesChunksWithinRange(
-              state,
-              trackId,
-              chunk.start,
-              chunk.end
-            )
-            .map(chunk => chunk.text)
-            .join(' ')
-        : ''
-    })
+    ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(
+      (fieldName) => {
+        const trackId = fieldNamesToTrackIds[fieldName]
+        fields[fieldName] = trackId
+          ? r
+              .getSubtitlesChunksWithinRange(
+                state,
+                trackId,
+                chunk.start,
+                chunk.end
+              )
+              .map((chunk) => chunk.text)
+              .join(' ')
+          : ''
+      }
+    )
     return r.getNewClipAndCard(
       state,
       {

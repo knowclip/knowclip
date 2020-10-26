@@ -149,7 +149,7 @@ type OpenMediaFileSuccess = {
   timestamp: string
 }
 
-const seekingTrackerEpic: AppEpic = action$ =>
+const seekingTrackerEpic: AppEpic = (action$) =>
   action$.pipe(
     filter<Action, OpenMediaFileSuccess>(
       (action): action is OpenMediaFileSuccess =>

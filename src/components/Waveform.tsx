@@ -139,7 +139,7 @@ const Clips = React.memo(
     waveform: WaveformState
   }) => {
     const handleClick = useCallback(
-      e => {
+      (e) => {
         const { dataset } = e.target
         if (dataset && dataset.clipId) {
           if (!dataset.clipIsHighlighted) {
@@ -318,7 +318,7 @@ const SubtitlesTimelines = memo(
     highlightedChunkIndex: number | null
   }) => {
     const handleClick = useCallback(
-      e => {
+      (e) => {
         const { dataset } = e.target
 
         setCursorX(dataset.chunkStart)
@@ -338,11 +338,12 @@ const SubtitlesTimelines = memo(
     )
     const dispatch = useDispatch()
     const handleDoubleClick = useCallback(
-      e => {
+      (e) => {
         const { dataset } = e.target
         if (dataset && dataset.chunkIndex) {
           const item = waveformItems.find(
-            i => i.type === 'Preview' && i.cardBaseIndex === +dataset.chunkIndex
+            (i) =>
+              i.type === 'Preview' && i.cardBaseIndex === +dataset.chunkIndex
           )
           if (item) dispatch(r.newClipFromSubtitlesChunk(item))
         }
@@ -431,7 +432,7 @@ const Waveform = () => {
   const svgRef = useRef<SVGSVGElement>(null)
 
   const handleMouseUp = useCallback(
-    e => {
+    (e) => {
       const svg = svgRef.current
       if (!svg) return
 
@@ -458,7 +459,7 @@ const Waveform = () => {
   )
 
   const handleMouseDown = useCallback(
-    e => {
+    (e) => {
       const coords = toWaveformCoordinates(
         e,
         e.currentTarget,
@@ -480,19 +481,16 @@ const Waveform = () => {
     [waveform, handleMouseUp]
   )
 
-  const imageBitmaps = useMemo(
-    () => {
-      return images.map(({ path, x, file }) => (
-        <image
-          key={file.id}
-          xlinkHref={new URL(`file://${path}`).toString()}
-          style={{ pointerEvents: 'none' }}
-          x={x}
-        />
-      ))
-    },
-    [images]
-  )
+  const imageBitmaps = useMemo(() => {
+    return images.map(({ path, x, file }) => (
+      <image
+        key={file.id}
+        xlinkHref={new URL(`file://${path}`).toString()}
+        style={{ pointerEvents: 'none' }}
+        x={x}
+      />
+    ))
+  }, [images])
 
   return (
     <svg

@@ -10,13 +10,10 @@ const MediaFolderLocationFormDialog = ({
   data: { action },
 }: DialogProps<MediaFolderLocationFormDialogData>) => {
   const dispatch = useDispatch()
-  const dispatchAction = useCallback(
-    () => {
-      action && dispatch(action)
-      dispatch(closeDialog())
-    },
-    [dispatch, action]
-  )
+  const dispatchAction = useCallback(() => {
+    action && dispatch(action)
+    dispatch(closeDialog())
+  }, [dispatch, action])
 
   return (
     <Dialog open={open}>

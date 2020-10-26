@@ -50,7 +50,7 @@ const MediaFilesMenuItem = ({
   const submenu = usePopover()
   const closeSubmenu = submenu.close
   const closeMenu = useCallback(
-    e => {
+    (e) => {
       closeSubmenu(e)
       closeSupermenu(e)
     },
@@ -58,14 +58,14 @@ const MediaFilesMenuItem = ({
   )
 
   const loadAndClose = useCallback(
-    e => {
+    (e) => {
       dispatch(actions.openFileRequest(mediaFile))
       closeMenu(e)
     },
     [dispatch, mediaFile, closeMenu]
   )
   const deleteAndClose = useCallback(
-    e => {
+    (e) => {
       dispatch(
         actions.confirmationDialog(
           CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE,
@@ -77,7 +77,7 @@ const MediaFilesMenuItem = ({
     [dispatch, mediaFile, currentProjectId, closeMenu]
   )
   const locateAndClose = useCallback(
-    e => {
+    (e) => {
       dispatch(
         actions.fileSelectionDialog('Please locate this media file.', mediaFile)
       )
@@ -93,7 +93,7 @@ const MediaFilesMenuItem = ({
   const actionsButton = (
     <ListItemSecondaryAction>
       <IconButton
-        onClick={e => {
+        onClick={(e) => {
           e.stopPropagation()
           onClick && onClick(e)
           submenu.toggle(e)
@@ -106,14 +106,14 @@ const MediaFilesMenuItem = ({
   )
 
   const onCloseSubmenu = useCallback(
-    e => {
+    (e) => {
       e.stopPropagation()
       closeSubmenu(e)
     },
     [closeSubmenu]
   )
 
-  const stopPropagation = useCallback(e => {
+  const stopPropagation = useCallback((e) => {
     e.stopPropagation()
   }, [])
 

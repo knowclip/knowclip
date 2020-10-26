@@ -41,7 +41,7 @@ function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
   for (const entryWithInflection of translatedToken.candidates) {
     const { entry } = entryWithInflection
     const existingHead = results.find(
-      r => r.head === entry.head && r.pronunciation === entry.pronunciation
+      (r) => r.head === entry.head && r.pronunciation === entry.pronunciation
     )
     if (existingHead) {
       existingHead.entries.push(entryWithInflection)
@@ -78,7 +78,7 @@ const groupEntriesAndOrganizeVariantHeads = (
   }[] = []
 
   for (const entry of entries) {
-    const existing = result.find(e => doEntriesBelongTogether(e, entry))
+    const existing = result.find((e) => doEntriesBelongTogether(e, entry))
     if (existing) {
       existing.entries.push(entry.entry)
     } else {
@@ -125,29 +125,23 @@ export function DictionaryPopover({
   activeDictionaryType: DictionaryFileType | null
 }) {
   const { close: closePopover } = popover
-  const closeOnClickAway = useCallback(e => closePopover(e), [closePopover])
-  const stopPropagation = useCallback(e => e.stopPropagation(), [])
+  const closeOnClickAway = useCallback((e) => closePopover(e), [closePopover])
+  const stopPropagation = useCallback((e) => e.stopPropagation(), [])
 
   const ref = useRef<HTMLElement>()
   const textCharacterIndex =
     translationsAtCharacter && translationsAtCharacter.textCharacterIndex
-  useEffect(
-    () => {
-      const el = ref.current
-      if (el) {
-        el.scrollTo(0, 0)
-      }
-    },
-    [textCharacterIndex]
-  )
+  useEffect(() => {
+    const el = ref.current
+    if (el) {
+      el.scrollTo(0, 0)
+    }
+  }, [textCharacterIndex])
 
   const dispatch = useDispatch()
-  const openDictionarySettings = useCallback(
-    () => {
-      dispatch(actions.dictionariesDialog())
-    },
-    [dispatch]
-  )
+  const openDictionarySettings = useCallback(() => {
+    dispatch(actions.dictionariesDialog())
+  }, [dispatch])
 
   return (
     <ClickAwayListener onClickAway={closeOnClickAway}>
@@ -190,7 +184,7 @@ export function DictionaryPopover({
 
           {translationsAtCharacter &&
             activeDictionaryType &&
-            translationsAtCharacter.translatedTokens.map(translatedToken => {
+            translationsAtCharacter.translatedTokens.map((translatedToken) => {
               return groupIdenticalEntryHeads(translatedToken).map(
                 ({ entries, head, variant, pronunciation }, i) => {
                   return (
@@ -217,7 +211,7 @@ export function DictionaryPopover({
                                 )}
                               </p>
                               <p className={css.entryMeaningsList}>
-                                {entries.flatMap(e => e.meanings).join('; ')}
+                                {entries.flatMap((e) => e.meanings).join('; ')}
                               </p>
                             </Fragment>
                           )
@@ -325,7 +319,7 @@ const ChineseRuby = memo(
           {pronunciation &&
             pronunciation
               .split(/\s+/)
-              .map(p => numberToMark(p))
+              .map((p) => numberToMark(p))
               .join(' ')}
         </rt>
       </ruby>

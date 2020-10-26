@@ -76,8 +76,8 @@ export const readMediaFile = async (
     format: ffprobeMetadata.format.format_name || 'UNKNOWN_FORMAT',
 
     subtitlesTracksStreamIndexes: ffprobeMetadata.streams
-      .filter(stream => stream.codec_type === 'subtitle')
-      .map(stream => stream.index),
+      .filter((stream) => stream.codec_type === 'subtitle')
+      .map((stream) => stream.index),
   }
 
   const file: MediaFile =

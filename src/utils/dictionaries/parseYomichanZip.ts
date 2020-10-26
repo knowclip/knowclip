@@ -12,7 +12,7 @@ export async function parseYomichanZip(
 ) {
   let termBankMet = false
   const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
-    yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
+    yauzl.open(filePath, { lazyEntries: true }, function (err, zipfile) {
       if (err) return rej(err)
       if (!zipfile) return rej(new Error('problem reading zip file'))
 
@@ -26,7 +26,7 @@ export async function parseYomichanZip(
 
   const entriesObservable = fromEvent(zipfile, 'entry').pipe(
     takeUntil(fromEvent(zipfile, 'close')),
-    mergeMap(_entry => {
+    mergeMap((_entry) => {
       visitedEntries++
 
       const entry: yauzl.Entry = _entry as any
@@ -52,12 +52,12 @@ export async function parseYomichanZip(
       const { uncompressedSize: entryTotalBytes } = entry
       return concat(
         from(entryReadStreamPromise).pipe(
-          mergeMap(entryReadStream =>
+          mergeMap((entryReadStream) =>
             fromEvent(entryReadStream, 'data').pipe(
               takeUntil(fromEvent(entryReadStream, 'end'))
             )
           ),
-          tap(_data => {
+          tap((_data) => {
             const data: Buffer = _data as any
             rawJson += data.toString()
 
@@ -90,7 +90,7 @@ export async function parseYomichanZip(
       return from([100])
     })
   ).pipe(
-    catchError(err => {
+    catchError((err) => {
       zipfile.close()
       throw err
     })
@@ -137,7 +137,7 @@ async function importDictionaryEntries(
         ...new Set([
           ...tags.split(' '),
           ...rules.split(' '),
-          ...(termTags ? termTags.split(' ').map(t => `[${t}]`) : termTags),
+          ...(termTags ? termTags.split(' ').map((t) => `[${t}]`) : termTags),
         ]),
       ].join(' '),
       frequencyScore,
@@ -149,7 +149,5 @@ async function importDictionaryEntries(
     entries.push(dictEntry)
   }
 
-  await getDexieDb()
-    .table(getTableName(file.dictionaryType))
-    .bulkAdd(entries)
+  await getDexieDb().table(getTableName(file.dictionaryType)).bulkAdd(entries)
 }

@@ -33,13 +33,13 @@ function lemmatizeRecursive(
         text.endsWith(kanaIn) &&
         (!rulesIn.length ||
           !wordClasses.length ||
-          rulesIn.some(wc => wordClasses.includes(wc)))
+          rulesIn.some((wc) => wordClasses.includes(wc)))
       ) {
         const candidateText = text.replace(new RegExp(`${kanaIn}$`), kanaOut)
         if (
           candidateText &&
           !soFar.some(
-            l =>
+            (l) =>
               l.text === candidateText &&
               l.inferredInflections[l.inferredInflections.length - 1] ===
                 inflectionName
@@ -61,7 +61,7 @@ function lemmatizeRecursive(
 
   if (!newCandidates.length) return []
 
-  return newCandidates.flatMap(candidate => [
+  return newCandidates.flatMap((candidate) => [
     candidate,
     ...lemmatizeRecursive(
       candidate.text,

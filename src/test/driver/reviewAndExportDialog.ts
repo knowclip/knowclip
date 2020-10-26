@@ -7,5 +7,5 @@ export const checkboxesChecked = async (
   const elements = await Promise.all(
     await client.elements_(`${checkboxTestLabel} input`)
   )
-  return await Promise.all(elements.map(mediaFile => mediaFile.isSelected()))
+  return await Promise.all(elements.map((mediaFile) => mediaFile.isSelected()))
 }

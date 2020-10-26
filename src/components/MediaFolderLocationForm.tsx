@@ -16,36 +16,30 @@ const MediaFolderLocationForm = ({ onSubmit }: { onSubmit: () => void }) => {
   )
   const [errorText, setErrorText] = useState('')
   const setLocationText = useCallback(
-    text => {
+    (text) => {
       setJustLocationText(text)
       setErrorText('')
     },
     [setJustLocationText, setErrorText]
   )
 
-  const onLocationTextFocus = useCallback(
-    async () => {
-      const filePaths = await showOpenDirectoryDialog()
+  const onLocationTextFocus = useCallback(async () => {
+    const filePaths = await showOpenDirectoryDialog()
 
-      if (!filePaths) return
+    if (!filePaths) return
 
-      const [directory] = filePaths
-      setLocationText(directory)
-    },
-    [setLocationText]
-  )
+    const [directory] = filePaths
+    setLocationText(directory)
+  }, [setLocationText])
 
-  const handleSubmit = useCallback(
-    () => {
-      if (locationText) {
-        dispatch(actions.setMediaFolderLocation(locationText))
-        onSubmit()
-      } else {
-        setErrorText('Please choose a location to continue.')
-      }
-    },
-    [dispatch, locationText, onSubmit, setErrorText]
-  )
+  const handleSubmit = useCallback(() => {
+    if (locationText) {
+      dispatch(actions.setMediaFolderLocation(locationText))
+      onSubmit()
+    } else {
+      setErrorText('Please choose a location to continue.')
+    }
+  }, [dispatch, locationText, onSubmit, setErrorText])
 
   return (
     <section className={css.container}>

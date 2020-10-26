@@ -32,10 +32,10 @@ export const parseProjectJson = async <F extends FlashcardFields>(
       //       after user confirmation.
       maxAliasCount: -1,
     } as YAML.Options)
-    const errors = docs.flatMap(v => v.errors)
-    if (errors.length) return { errors: errors.map(e => e.message) }
+    const errors = docs.flatMap((v) => v.errors)
+    if (errors.length) return { errors: errors.map((e) => e.message) }
 
-    const [project, ...media] = docs.map(d => d.toJSON())
+    const [project, ...media] = docs.map((d) => d.toJSON())
 
     const validation = validateProject(project, media)
 
@@ -69,7 +69,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
     lastSaved: projectJson.timestamp,
     noteType: projectJson.noteType,
     name: projectJson.name,
-    mediaFileIds: mediaJson.map(m => m.id),
+    mediaFileIds: mediaJson.map((m) => m.id),
     type: 'ProjectFile',
     error: null,
   }
@@ -78,9 +78,9 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
     () => Clip[],
     () => Flashcard[],
     SubtitlesFile[]
-  ][] = mediaJson.map(m => {
+  ][] = mediaJson.map((m) => {
     const subtitles = m.subtitles
-      ? m.subtitles.map(s => toMediaSubtitlesRelation(s))
+      ? m.subtitles.map((s) => toMediaSubtitlesRelation(s))
       : []
     const subtitlesFiles: SubtitlesFile[] = (m.subtitles || []).map(
       (s): SubtitlesFile =>
@@ -114,7 +114,7 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
         m.flashcardFieldsToSubtitlesTracks || {},
       subtitlesTracksStreamIndexes: (m.subtitles || [])
         .filter((s): s is EmbeddedSubtitlesJson => s.type === 'Embedded')
-        .map(s => s.streamIndex),
+        .map((s) => s.streamIndex),
 
       isVideo: false,
     }

@@ -18,13 +18,13 @@ const stretchClipEpic: AppEpic = (
       const edge = r.getClipEdgeAt(state$.value, x)
       return edge ? of({ x, edge }) : empty()
     }),
-    switchMap(mousedownData => {
+    switchMap((mousedownData) => {
       const {
         edge: { key, id },
       } = mousedownData
       const pendingStretches = fromEvent<MouseEvent>(window, 'mousemove').pipe(
         takeUntil(fromEvent(window, 'mouseup')),
-        map(mousemove => {
+        map((mousemove) => {
           const svgElement = getWaveformSvgElement()
           if (!svgElement) throw new Error('Waveform disappeared')
           return r.setPendingStretch({
@@ -43,7 +43,7 @@ const stretchClipEpic: AppEpic = (
         pendingStretches,
         pendingStretches.pipe(
           takeLast(1),
-          switchMap(lastPendingStretch => {
+          switchMap((lastPendingStretch) => {
             const {
               stretch: { id, originKey, end },
             } = lastPendingStretch
@@ -53,7 +53,7 @@ const stretchClipEpic: AppEpic = (
             const stretchedClipItem =
               stretchedClip &&
               waveformItems.find(
-                item => item.type === 'Clip' && item.id === stretchedClip.id
+                (item) => item.type === 'Clip' && item.id === stretchedClip.id
               )
             // if pendingStretch.end is inside a clip separate from stretchedClip,
             // take the start from the earlier and the end from the later,
@@ -68,7 +68,7 @@ const stretchClipEpic: AppEpic = (
 
               return from([
                 r.clearPendingStretch(),
-                ...(stretchedClipItem && stretchedClipItem.type === 'Clip'
+                ...(stretchedClipItem?.type === 'Clip'
                   ? [
                       r.mergeClips([id, previousClipId], {
                         type: 'Clip',
@@ -90,7 +90,7 @@ const stretchClipEpic: AppEpic = (
 
               return from([
                 r.clearPendingStretch(),
-                ...(stretchedClipItem && stretchedClipItem.type === 'Clip'
+                ...(stretchedClipItem?.type === 'Clip'
                   ? [
                       r.mergeClips([id, nextClipId], {
                         type: 'Clip',

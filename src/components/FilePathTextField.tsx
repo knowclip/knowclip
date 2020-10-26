@@ -17,18 +17,15 @@ const FilePathTextField = ({
   placeholderText?: string
   onSetFilePath: (filePath: string) => void
 }) => {
-  const onLocationTextFocus = useCallback(
-    async () => {
-      const filePaths = await showOpenDirectoryDialog()
+  const onLocationTextFocus = useCallback(async () => {
+    const filePaths = await showOpenDirectoryDialog()
 
-      if (!filePaths) return
+    if (!filePaths) return
 
-      const [directory] = filePaths
+    const [directory] = filePaths
 
-      onSetFilePath(directory)
-    },
-    [onSetFilePath]
-  )
+    onSetFilePath(directory)
+  }, [onSetFilePath])
 
   return (
     <TextField

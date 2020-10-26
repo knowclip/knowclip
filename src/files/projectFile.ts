@@ -29,9 +29,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
           r.openFileFailure(
             file,
             filePath,
-            `This project file has a different ID than the "${
-              file.name
-            }" on record.`
+            `This project file has a different ID than the "${file.name}" on record.`
           ),
         ]
 
@@ -76,7 +74,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
       } = {}
 
       for (const mediaFile of media.filter(
-        m => !(r.getFileAvailability(state, m) || { filePath: null }).filePath
+        (m) => !(r.getFileAvailability(state, m) || { filePath: null }).filePath
       )) {
         // works while fileavailability names can't be changed...
         for (const directory of r.getAssetsDirectories(state)) {
@@ -97,7 +95,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
           | undefined
       } = {}
       for (const subtitlesFile of subtitles.filter(
-        s => !(r.getFileAvailability(state, s) || { filePath: null }).filePath
+        (s) => !(r.getFileAvailability(state, s) || { filePath: null }).filePath
       )) {
         if (subtitlesFile.type !== 'ExternalSubtitlesFile') continue
         // works while subtitles files names can't be changed...
@@ -121,8 +119,8 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
       }
 
       const addNewMediaFiles = media
-        .filter(mediaFile => !r.getFile(state, 'MediaFile', mediaFile.id))
-        .map(mediaFile => {
+        .filter((mediaFile) => !r.getFile(state, 'MediaFile', mediaFile.id))
+        .map((mediaFile) => {
           return r.addFile(
             mediaFile,
             newlyAutoFoundMediaFilePaths[mediaFile.id]
@@ -130,9 +128,9 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
         })
       const addNewSubtitlesFiles = subtitles
         .filter(
-          subtitlesFile => !r.getSubtitlesSourceFile(state, subtitlesFile.id)
+          (subtitlesFile) => !r.getSubtitlesSourceFile(state, subtitlesFile.id)
         )
-        .map(subtitlesFile => {
+        .map((subtitlesFile) => {
           const existingPath = newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
           return r.addFile(
             subtitlesFile,
@@ -172,9 +170,9 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   deleteSuccess: [
     async (action, state) => [
       r.commitFileDeletions('ProjectFile'),
-      ...Array.from(new Set(action.descendants.map(a => a.type))).map(type =>
-        r.commitFileDeletions(type)
-      ),
+      ...Array.from(
+        new Set(action.descendants.map((a) => a.type))
+      ).map((type) => r.commitFileDeletions(type)),
     ],
   ],
 }
@@ -191,6 +189,6 @@ export const updates = {
   }),
   deleteProjectMedia: updater((file: ProjectFile, mediaFileId: string) => ({
     ...file,
-    mediaFileIds: file.mediaFileIds.filter(id => id !== mediaFileId),
+    mediaFileIds: file.mediaFileIds.filter((id) => id !== mediaFileId),
   })),
 }

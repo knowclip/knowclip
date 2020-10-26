@@ -22,7 +22,7 @@ export const getVideoStill = async (
         .outputOptions('-vframes 1')
         .size(`?x${VIDEO_STILL_HEIGHT}`)
         .output(outputFilePath)
-        .on('end', function() {
+        .on('end', function () {
           res({ value: outputFilePath })
         })
         .on('error', (err: any) => {

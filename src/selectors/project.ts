@@ -61,7 +61,7 @@ export const getProjectIdByFilePath = (
   filePath: string
 ): ProjectId | null =>
   Object.keys(state.fileAvailabilities.ProjectFile).find(
-    id =>
+    (id) =>
       (state.fileAvailabilities.ProjectFile[id] as KnownFile).filePath ===
       filePath
   ) || null
@@ -107,7 +107,7 @@ export const getProjectJson = <F extends FlashcardFields>(
             }
           )
         const embeddedSubtitles = mediaFile.subtitlesTracksStreamIndexes
-          .map(streamIndex => {
+          .map((streamIndex) => {
             for (const s of mediaFile.subtitles) {
               if (s.type !== 'EmbeddedSubtitlesTrack') continue
 
@@ -193,20 +193,17 @@ function getProjectClips<F extends FlashcardFields>(
       }
 
       const newFields = {}
-      Object.keys(fieldsTemplate).reduce(
-        (all, fn) => {
-          const fieldName: keyof typeof fields = fn as any
-          if (fields[fieldName].trim()) {
-            all[fieldName] =
-              fieldName === 'transcription' && cloze.length
-                ? encodeClozeDeletions(fields[fieldName], cloze)
-                : fields[fieldName]
-          }
+      Object.keys(fieldsTemplate).reduce((all, fn) => {
+        const fieldName: keyof typeof fields = fn as any
+        if (fields[fieldName].trim()) {
+          all[fieldName] =
+            fieldName === 'transcription' && cloze.length
+              ? encodeClozeDeletions(fields[fieldName], cloze)
+              : fields[fieldName]
+        }
 
-          return all
-        },
-        newFields as F
-      )
+        return all
+      }, newFields as F)
       if (Object.keys(newFields).length) newClip.fields = newFields
 
       if (tags.length) newClip.tags = tags
@@ -230,7 +227,9 @@ const escapeClozeChars = (text: string) =>
   text.replace(/(<\/?c(10|[1-9])>)/g, `\\$1`)
 export const encodeClozeDeletions = (text: string, cloze: ClozeDeletion[]) => {
   const ranges = cloze
-    .flatMap((c, clozeIndex) => c.ranges.map(range => ({ range, clozeIndex })))
+    .flatMap((c, clozeIndex) =>
+      c.ranges.map((range) => ({ range, clozeIndex }))
+    )
     .sort((a, b) => a.range.start - b.range.start)
   if (!ranges.length) return escapeClozeChars(text)
   const firstRange = ranges[0].range
@@ -264,6 +263,6 @@ export const getProjectFileContents = (
   )
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
-    [project, ...media].map(o => YAML.stringify(o)).join('---\n')
+    [project, ...media].map((o) => YAML.stringify(o)).join('---\n')
   )
 }

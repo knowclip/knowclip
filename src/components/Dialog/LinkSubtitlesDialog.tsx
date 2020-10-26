@@ -57,16 +57,16 @@ const LinkSubtitlesDialog = ({
   const [fieldSelection, setFieldSelection] = useState(
     () =>
       (fieldNames.find(
-        fieldName =>
+        (fieldName) =>
           !fieldsToTracks[fieldName as TransliterationFlashcardFieldName]
       ) as TransliterationFlashcardFieldName) || ''
   )
-  const onChangeField = useCallback(e => {
+  const onChangeField = useCallback((e) => {
     setFieldSelection(e.target.value)
   }, [])
 
   const handleSubmit = useCallback(
-    e => {
+    (e) => {
       e.preventDefault()
       dispatch(
         linkFlashcardFieldToSubtitlesTrackRequest(
@@ -82,21 +82,18 @@ const LinkSubtitlesDialog = ({
 
   const close = useCallback(() => dispatch(closeDialog()), [dispatch])
 
-  const fieldNamesToTrackLabels = useMemo(
-    () => {
-      const fieldNamesToTrackLabels = {} as SubtitlesFlashcardFieldsLinks
-      for (const fn in fieldsToTracks) {
-        const fieldName = fn as TransliterationFlashcardFieldName
-        const linkedSubtitlesTrackId = fieldsToTracks[fieldName]
-        const track = mediaSubtitles.all.find(
-          ({ relation }) => relation.id === linkedSubtitlesTrackId
-        )
-        if (track) fieldNamesToTrackLabels[fieldName] = track.label
-      }
-      return fieldNamesToTrackLabels
-    },
-    [mediaSubtitles.all, fieldsToTracks]
-  )
+  const fieldNamesToTrackLabels = useMemo(() => {
+    const fieldNamesToTrackLabels = {} as SubtitlesFlashcardFieldsLinks
+    for (const fn in fieldsToTracks) {
+      const fieldName = fn as TransliterationFlashcardFieldName
+      const linkedSubtitlesTrackId = fieldsToTracks[fieldName]
+      const track = mediaSubtitles.all.find(
+        ({ relation }) => relation.id === linkedSubtitlesTrackId
+      )
+      if (track) fieldNamesToTrackLabels[fieldName] = track.label
+    }
+    return fieldNamesToTrackLabels
+  }, [mediaSubtitles.all, fieldsToTracks])
 
   if (!mediaFile) {
     dispatch(closeDialog())
@@ -133,7 +130,7 @@ const LinkSubtitlesDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="field">Field</InputLabel>
             <Select value={fieldSelection} onChange={onChangeField}>
-              {fieldNames.map(fieldName => {
+              {fieldNames.map((fieldName) => {
                 const label =
                   fieldNamesToTrackLabels[
                     fieldName as TransliterationFlashcardFieldName

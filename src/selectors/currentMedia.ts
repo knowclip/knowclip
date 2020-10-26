@@ -50,7 +50,7 @@ export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
   if (!currentFileId) return null
 
   const currentFile = getFileAvailabilityById(state, 'MediaFile', currentFileId)
-  return currentFile && currentFile.status === 'CURRENTLY_LOADED'
+  return currentFile?.status === 'CURRENTLY_LOADED'
     ? currentFile.filePath
     : null
 }
@@ -141,7 +141,7 @@ export const getCurrentProjectMediaFiles = (
   const projectMetadata = getCurrentProject(state)
   return projectMetadata
     ? projectMetadata.mediaFileIds
-        .map(id => getFile<MediaFile>(state, 'MediaFile', id))
+        .map((id) => getFile<MediaFile>(state, 'MediaFile', id))
         .filter((media): media is MediaFile => Boolean(media))
     : []
 }
@@ -154,20 +154,20 @@ export const getProjectMediaFiles = (
 
   return project
     ? project.mediaFileIds
-        .map(id => state.files.MediaFile[id])
+        .map((id) => state.files.MediaFile[id])
         .filter((m): m is MediaFile => Boolean(m))
     : []
 }
 
 export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
-  getCurrentFileClipsOrder(state).map(id => {
+  getCurrentFileClipsOrder(state).map((id) => {
     const flashcard = getFlashcard(state, id)
     if (!flashcard) throw new Error('flashcard not found ' + id)
     return flashcard
   })
 
 export const getClipIdAt = (state: AppState, x: number): ClipId | null =>
-  getCurrentFileClipsOrder(state).find(clipId => {
+  getCurrentFileClipsOrder(state).find((clipId) => {
     const clip = state.clips.byId[clipId]
     const { start, end } = clip
     return x >= start && x <= end
@@ -193,8 +193,8 @@ export const getCurrentFileClips = createSelector(
 
 export const getDisplayedCurrentFileClips = createSelector(
   getCurrentFileClips,
-  state => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems(clip => clip.start)
+  (state) => state.waveform.viewBox.xMin,
+  limitSelectorToDisplayedItems((clip) => clip.start)
 )
 
 export const getFlashcardIdBeforeCurrent = (state: AppState): ClipId | null => {

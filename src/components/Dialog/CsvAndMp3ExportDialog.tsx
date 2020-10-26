@@ -45,8 +45,8 @@ const CsvAndMp3ExportDialog = ({
   })
   const setField = useCallback(
     (key: keyof typeof fields, value: string) => {
-      setErrors(errors => ({ ...errors, [key]: null }))
-      setFields(fields => ({
+      setErrors((errors) => ({ ...errors, [key]: null }))
+      setFields((fields) => ({
         ...fields,
         [key]: value,
       }))
@@ -55,15 +55,12 @@ const CsvAndMp3ExportDialog = ({
   )
   const [errors, setErrors] = useState<ErrorsState>({})
   const [rememberLocation, setRememberLocation] = useState(true)
-  const toggleRememberLocation = useCallback(
-    () => {
-      setRememberLocation(l => !l)
-    },
-    [setRememberLocation]
-  )
+  const toggleRememberLocation = useCallback(() => {
+    setRememberLocation((l) => !l)
+  }, [setRememberLocation])
 
   const onSubmit = useCallback(
-    e => {
+    (e) => {
       const { csvFilePath, mediaFolderLocation } = fields
       if (csvFilePath && mediaFolderLocation) {
         dispatch(closeDialog())
@@ -89,7 +86,7 @@ const CsvAndMp3ExportDialog = ({
   )
 
   const onFocusMediaFolderLocation = useCallback(
-    async e => {
+    async (e) => {
       const directoryPath = await showOpenDirectoryDialog()
       if (directoryPath) setField('mediaFolderLocation', directoryPath)
     },
@@ -97,7 +94,7 @@ const CsvAndMp3ExportDialog = ({
   )
 
   const onFocusCsvFilePath = useCallback(
-    async e => {
+    async (e) => {
       const filePath = await showSaveDialog('Comma-separated values', ['csv'])
       if (filePath) setField('csvFilePath', filePath)
     },
@@ -109,7 +106,7 @@ const CsvAndMp3ExportDialog = ({
       <DialogContent>
         <form
           onSubmit={useCallback(
-            e => {
+            (e) => {
               e.preventDefault()
               onSubmit(e)
             },
@@ -121,7 +118,7 @@ const CsvAndMp3ExportDialog = ({
             label={'CSV file location'}
             value={fields.csvFilePath}
             onChange={useCallback(
-              e => setField('csvFilePath', e.target.value),
+              (e) => setField('csvFilePath', e.target.value),
               [setField]
             )}
             onClick={onFocusCsvFilePath}
@@ -148,7 +145,7 @@ const CsvAndMp3ExportDialog = ({
             onClick={onFocusMediaFolderLocation}
             onKeyPress={onFocusMediaFolderLocation}
             onChange={useCallback(
-              e => setField('mediaFolderLocation', e.target.value),
+              (e) => setField('mediaFolderLocation', e.target.value),
               [setField]
             )}
             error={Boolean(errors.mediaFolderLocation)}

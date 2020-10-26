@@ -35,7 +35,7 @@ const fileEventHandlers: Record<
 const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
-    flatMap<OpenFileRequest, Observable<Action>>(action => {
+    flatMap<OpenFileRequest, Observable<Action>>((action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
       const fileAvailability = r.getFileAvailability(state$.value, file)
@@ -75,7 +75,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 const openFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileSuccess>(A.OPEN_FILE_SUCCESS),
-    flatMap(action => {
+    flatMap((action) => {
       const openSuccessHandlers: OpenFileSuccessHandler<
         typeof action.validatedFile
       >[] = fileEventHandlers[action.validatedFile.type].openSuccess
@@ -88,7 +88,7 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
         ) || action.validatedFile
 
       return from(
-        openSuccessHandlers.map(handler =>
+        openSuccessHandlers.map((handler) =>
           from(handler(file, action.filePath, state$.value, effects)).pipe(
             mergeAll()
           )
@@ -101,7 +101,7 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
 const openFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileFailure>(A.OPEN_FILE_FAILURE),
-    flatMap<OpenFileFailure, Observable<Action>>(action => {
+    flatMap<OpenFileFailure, Observable<Action>>((action) => {
       const openFailureHandler = fileEventHandlers[action.file.type].openFailure
 
       console.error(action.errorMessage || 'Could not open file:')
@@ -134,7 +134,7 @@ const flatten = (asyncArray: Promise<Action[]>) =>
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileRequest>(A.LOCATE_FILE_REQUEST),
-    flatMap<LocateFileRequest, Observable<Action>>(action => {
+    flatMap<LocateFileRequest, Observable<Action>>((action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
 
@@ -166,7 +166,7 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
 
       return availability
         ? from(
-            fileEventHandlers[fileType].deleteRequest.flatMap(handler =>
+            fileEventHandlers[fileType].deleteRequest.flatMap((handler) =>
               from(
                 handler(
                   r.getFile(state$.value, fileType, id),
@@ -186,9 +186,9 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
 const deleteFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, DeleteFileSuccess>(A.DELETE_FILE_SUCCESS),
-    flatMap(action =>
+    flatMap((action) =>
       from(
-        fileEventHandlers[action.file.type].deleteSuccess.flatMap(handler =>
+        fileEventHandlers[action.file.type].deleteSuccess.flatMap((handler) =>
           from(handler(action, state$.value, effects)).pipe(mergeAll())
         )
       )

@@ -14,7 +14,7 @@ declare type FormAction =
 
 export const getFormState = (fieldKeys: Array<string>) => {
   const state: FormState = { fields: {}, errors: {} }
-  fieldKeys.forEach(key => {
+  fieldKeys.forEach((key) => {
     state.fields[key] = ''
   })
   return state

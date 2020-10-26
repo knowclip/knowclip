@@ -48,5 +48,5 @@ async function checkboxesChecked(client: ClientWrapper) {
     3
   )
 
-  return await Promise.all(checkboxInputs.map(cbi => cbi.isSelected()))
+  return await Promise.all(checkboxInputs.map((cbi) => cbi.isSelected()))
 }

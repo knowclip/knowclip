@@ -100,7 +100,7 @@ const ClozeButton = ({
   selection: MutableRefObject<ClozeRange | null>
 }) => {
   const handleMouseDown = useCallback(
-    e => {
+    (e) => {
       selection.current = getSelection() || null
       // don't focus yet so buttons won't expand and prevent click from firing
       e.preventDefault()
@@ -108,7 +108,7 @@ const ClozeButton = ({
     [getSelection, selection]
   )
   const handleClick = useCallback(
-    e => {
+    (e) => {
       const textSelected =
         selection.current && selection.current.start !== selection.current.end
       if (selection.current && textSelected) {
@@ -124,18 +124,12 @@ const ClozeButton = ({
     },
     [confirmSelection, index, isActive, selection, setClozeIndex]
   )
-  const handleMouseEnter = useCallback(
-    () => {
-      if (setPreviewClozeIndex) setPreviewClozeIndex(index)
-    },
-    [setPreviewClozeIndex, index]
-  )
-  const handleMouseLeave = useCallback(
-    () => {
-      if (setPreviewClozeIndex) setPreviewClozeIndex(-1)
-    },
-    [setPreviewClozeIndex]
-  )
+  const handleMouseEnter = useCallback(() => {
+    if (setPreviewClozeIndex) setPreviewClozeIndex(index)
+  }, [setPreviewClozeIndex, index])
+  const handleMouseLeave = useCallback(() => {
+    if (setPreviewClozeIndex) setPreviewClozeIndex(-1)
+  }, [setPreviewClozeIndex])
   return (
     <Tooltip title={hoverText}>
       <Button

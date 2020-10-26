@@ -43,49 +43,40 @@ const FlashcardSectionDisplayCard = memo(
     const fields = f as TransliterationFlashcardFields
 
     const handleDoubleClick = useCallback(
-      fieldName => {
+      (fieldName) => {
         if (onDoubleClickField) onDoubleClickField(fieldName)
       },
       [onDoubleClickField]
     )
 
     const dispatch = useDispatch()
-    const startEditing = useCallback(
-      () => {
-        dispatch(r.startEditingCards())
-      },
-      [dispatch]
-    )
+    const startEditing = useCallback(() => {
+      dispatch(r.startEditingCards())
+    }, [dispatch])
 
-    const toggleIncludeStill = useCallback(
-      () => {
-        dispatch(
-          r.editClip(flashcard.id, null, {
-            image: flashcard.image
-              ? null
-              : { type: 'VideoStillImage', id: flashcard.id },
-          })
-        )
-      },
-      [dispatch, flashcard.id, flashcard.image]
-    )
+    const toggleIncludeStill = useCallback(() => {
+      dispatch(
+        r.editClip(flashcard.id, null, {
+          image: flashcard.image
+            ? null
+            : { type: 'VideoStillImage', id: flashcard.id },
+        })
+      )
+    }, [dispatch, flashcard.id, flashcard.image])
 
-    const deleteClipAndCard = useCallback(
-      () => {
-        dispatch(
-          r.confirmationDialog(
-            'Are you sure you want to delete this clip and flashcard?',
-            r.deleteCard(flashcard.id)
-          )
+    const deleteClipAndCard = useCallback(() => {
+      dispatch(
+        r.confirmationDialog(
+          'Are you sure you want to delete this clip and flashcard?',
+          r.deleteCard(flashcard.id)
         )
-      },
-      [dispatch, flashcard.id]
-    )
+      )
+    }, [dispatch, flashcard.id])
 
     const clozeControls = useClozeControls({
       deletions: flashcard.cloze,
       onNewClozeCard: useCallback(
-        deletion => {
+        (deletion) => {
           dispatch(
             r.addClozeDeletion(flashcard.id, flashcard.cloze || [], deletion)
           )
@@ -106,7 +97,7 @@ const FlashcardSectionDisplayCard = memo(
         [dispatch, flashcard.cloze, flashcard.id]
       ),
       onDeleteClozeCard: useCallback(
-        clozeIndex => {
+        (clozeIndex) => {
           dispatch(
             r.removeClozeDeletion(flashcard.id, flashcard.cloze, clozeIndex)
           )

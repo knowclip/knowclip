@@ -21,7 +21,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
             <details>
               <summary>Details</summary>
               <pre>
-                {reactError && reactError.message
+                {reactError?.message
                   ? JSON.stringify(
                       {
                         message: reactError.message,

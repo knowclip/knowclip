@@ -69,15 +69,12 @@ const SubtitlesClipsDialog = ({
   })
 
   const currentFileId = currentFile ? currentFile.id : currentFile
-  useEffect(
-    () => {
-      if (!currentFileId) {
-        dispatch(MEDIA_FILE_MISSING_MESSAGE)
-        dispatch(r.closeDialog())
-      }
-    },
-    [currentFileId, dispatch]
-  )
+  useEffect(() => {
+    if (!currentFileId) {
+      dispatch(MEDIA_FILE_MISSING_MESSAGE)
+      dispatch(r.closeDialog())
+    }
+  }, [currentFileId, dispatch])
 
   const [state, setState] = useState(() => ({
     fields: fieldsToTracks,
@@ -88,27 +85,25 @@ const SubtitlesClipsDialog = ({
 
   const [useStills, setUseStills] = useState(defaultIncludeStill)
   const toggleUseStills = useCallback(
-    e => {
-      setUseStills(v => !v)
+    (e) => {
+      setUseStills((v) => !v)
     },
     [setUseStills]
   )
 
   const closeDialog = useCallback(() => dispatch(r.closeDialog()), [dispatch])
   const onSubmit = useCallback(
-    e => {
+    (e) => {
       if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
 
       const { fields } = state
-      if (!Object.values(fields).find(v => v && v.trim()))
-        return setState(state => ({
+      if (!Object.values(fields).find((v) => v && v.trim()))
+        return setState((state) => ({
           ...state,
           errorText: 'Please choose at least one subtitles track.',
         }))
 
-      const fieldsWithoutBlankValues: Partial<
-        TransliterationFlashcardFields
-      > = {}
+      const fieldsWithoutBlankValues: Partial<TransliterationFlashcardFields> = {}
       for (const fn in fields) {
         const fieldName = fn as TransliterationFlashcardFieldName
         const value = fields[fieldName]
@@ -129,7 +124,7 @@ const SubtitlesClipsDialog = ({
   )
   const setField = useCallback(
     (key: TransliterationFlashcardFieldName, value: SubtitlesTrackId) => {
-      setState(state => ({
+      setState((state) => ({
         ...state,
         fields: {
           ...state.fields,
@@ -141,39 +136,36 @@ const SubtitlesClipsDialog = ({
     [setState]
   )
 
-  const onClickLoadExternal = useCallback(
-    async () => {
-      if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
-      const filePaths = await showOpenDialog(
-        getFileFilters('ExternalSubtitlesFile')
-      )
-      if (!filePaths) return
+  const onClickLoadExternal = useCallback(async () => {
+    if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
+    const filePaths = await showOpenDialog(
+      getFileFilters('ExternalSubtitlesFile')
+    )
+    if (!filePaths) return
 
-      dispatch(loadNewSubtitlesFile(filePaths[0], currentFileId))
-    },
-    [dispatch, currentFileId]
-  )
+    dispatch(loadNewSubtitlesFile(filePaths[0], currentFileId))
+  }, [dispatch, currentFileId])
 
   const onChangeTranscription = useCallback(
-    e => {
+    (e) => {
       setField('transcription', e.target.value as string)
     },
     [setField]
   )
   const onChangePronunciation = useCallback(
-    e => {
+    (e) => {
       setField('pronunciation', e.target.value as string)
     },
     [setField]
   )
   const onChangeMeaning = useCallback(
-    e => {
+    (e) => {
       setField('meaning', e.target.value as string)
     },
     [setField]
   )
   const onChangeNotes = useCallback(
-    e => {
+    (e) => {
       setField('notes', e.target.value as string)
     },
     [setField]
@@ -186,7 +178,7 @@ const SubtitlesClipsDialog = ({
       <DialogContent>
         <form
           onSubmit={useCallback(
-            e => {
+            (e) => {
               e.preventDefault()
               onSubmit(e)
             },
@@ -313,11 +305,11 @@ function useTagsInput(defaultTags: string[]) {
   const [tags, setTags] = useState<Array<string>>(defaultTags)
   const onAddChip = useCallback(
     (text: string) =>
-      setTags(tags => (tags.includes(text) ? tags : tags.concat(text))),
+      setTags((tags) => (tags.includes(text) ? tags : tags.concat(text))),
     []
   )
   const onDeleteChip = useCallback(
-    (index: number) => setTags(tags => tags.filter((t, i) => i !== index)),
+    (index: number) => setTags((tags) => tags.filter((t, i) => i !== index)),
     []
   )
 

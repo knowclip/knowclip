@@ -50,7 +50,7 @@ export class ClientWrapper {
 
       if (!elementsSoFar) throw new Error('Elements were null')
 
-      return elementsSoFar.map(v => element(this._driver, v, selector))
+      return elementsSoFar.map((v) => element(this._driver, v, selector))
     } catch (err) {
       throw new Error(
         `Could not find ${count} elements with selector "${selector}". Instead found ${
@@ -161,7 +161,7 @@ export class ClientWrapper {
   async elementWithText(selector: string, text: string) {
     await this.waitForText('body', text)
     const elements = await this.elements(selector)
-    const elementsText = await Promise.all(elements.map(e => e.getText()))
+    const elementsText = await Promise.all(elements.map((e) => e.getText()))
     const elementWithText = elements.find((e, i) =>
       elementsText[i].includes(text)
     )

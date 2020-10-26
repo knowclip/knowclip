@@ -172,7 +172,7 @@ export async function deleteDictionary(
 
     if (record) {
       const allDictionariesOfType = allDictionaries.filter(
-        d => d.dictionaryType === type
+        (d) => d.dictionaryType === type
       )
       if (allDictionariesOfType.length <= 1)
         await db.table(getTableName(type)).clear()

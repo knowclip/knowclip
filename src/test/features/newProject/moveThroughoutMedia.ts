@@ -9,14 +9,14 @@ import { ClientWrapper } from '../../driver/ClientWrapper'
 export default async function moveThroughoutMedia({ app, client }: TestSetup) {
   const waveformClips = await client.elements_(waveform$.waveformClip)
   expect(
-    await Promise.all(waveformClips.map(c => c.isVisible()))
+    await Promise.all(waveformClips.map((c) => c.isVisible()))
   ).toMatchObject([true, true])
   await setVideoTime(client, 61)
 
   await client.waitUntil(async () => {
     const clips = await client.elements_(waveform$.waveformClip)
-    return (await Promise.all(clips.map(c => c.isVisible()))).every(
-      visible => !visible
+    return (await Promise.all(clips.map((c) => c.isVisible()))).every(
+      (visible) => !visible
     )
   })
 
@@ -50,7 +50,7 @@ export default async function moveThroughoutMedia({ app, client }: TestSetup) {
 
 async function clipsVisibility(wrapper: ClientWrapper) {
   return await Promise.all(
-    await (await wrapper.elements_(waveform$.waveformClip)).map(el =>
+    await (await wrapper.elements_(waveform$.waveformClip)).map((el) =>
       el.isVisible()
     )
   )

@@ -67,15 +67,12 @@ const ReviewAndExportMediaTable = memo(
         availability.status === 'PREVIOUSLY_LOADED'
     )
     const dispatch = useDispatch()
-    const toggleOpen = useCallback(
-      () => {
-        onClick(open ? -1 : mediaIndex)
-        if (!open)
-          dispatch(fileRemembered ? r.openFileRequest(media) : r.dismissMedia())
-      },
-      [onClick, open, mediaIndex, dispatch, fileRemembered, media]
-    )
-    const stopPropagation = useCallback(e => e.stopPropagation(), [])
+    const toggleOpen = useCallback(() => {
+      onClick(open ? -1 : mediaIndex)
+      if (!open)
+        dispatch(fileRemembered ? r.openFileRequest(media) : r.dismissMedia())
+    }, [onClick, open, mediaIndex, dispatch, fileRemembered, media])
+    const stopPropagation = useCallback((e) => e.stopPropagation(), [])
     const selectAll = useCallback(() => onSelectAll(media.id), [
       onSelectAll,
       media.id,

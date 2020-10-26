@@ -12,17 +12,17 @@ import { ofType } from 'redux-observable'
 import { from, of } from 'rxjs'
 import { areSameFile } from '../utils/files'
 
-const generateWaveformImages: AppEpic = action$ =>
+const generateWaveformImages: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, GenerateWaveformImages>(A.GENERATE_WAVEFORM_IMAGES),
-    switchMap(action => {
+    switchMap((action) => {
       return from(action.waveformPngs).pipe(
-        concatMap(file => {
+        concatMap((file) => {
           return of(r.openFileRequest(file)).pipe(
             concat(
               action$.pipe(
                 ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
-                filter(a => areSameFile(file, a.validatedFile)),
+                filter((a) => areSameFile(file, a.validatedFile)),
                 take(1),
                 ignoreElements()
               )

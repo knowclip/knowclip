@@ -50,7 +50,7 @@ const MediaFilesMenu = ({
 
   const dispatch = useDispatch()
   const chooseMediaFiles = useCallback(
-    async e => {
+    async (e) => {
       const filePaths = await showOpenDialog(getFileFilters('MediaFile'), true)
       if (filePaths) {
         dispatch(actions.addMediaToProjectRequest(currentProjectId, filePaths))
@@ -117,7 +117,7 @@ const MediaFilesMenu = ({
           >
             <MenuList>
               <div style={{ maxHeight: '30.5em', overflowY: 'auto' }}>
-                {projectMediaFiles.map(media => (
+                {projectMediaFiles.map((media) => (
                   <MediaFilesMenuItem
                     key={media.id}
                     closeMenu={popover.close}
@@ -150,43 +150,31 @@ const MediaFilesMenu = ({
 function usePlayButtonSync() {
   const playing = useSelector(r.isMediaPlaying)
   const dispatch = useDispatch()
-  const playMedia = useCallback(
-    () => {
-      startMovingCursor()
-      dispatch(r.playMedia())
-    },
-    [dispatch]
-  )
-  const pauseMedia = useCallback(
-    () => {
-      stopMovingCursor()
-      dispatch(r.pauseMedia())
-    },
-    [dispatch]
-  )
+  const playMedia = useCallback(() => {
+    startMovingCursor()
+    dispatch(r.playMedia())
+  }, [dispatch])
+  const pauseMedia = useCallback(() => {
+    stopMovingCursor()
+    dispatch(r.pauseMedia())
+  }, [dispatch])
 
-  useEffect(
-    () => {
-      const startPlaying = () => {
-        playMedia()
-      }
+  useEffect(() => {
+    const startPlaying = () => {
+      playMedia()
+    }
 
-      document.addEventListener('play', startPlaying, true)
+    document.addEventListener('play', startPlaying, true)
 
-      return () => document.removeEventListener('play', startPlaying, true)
-    },
-    [playMedia]
-  )
-  useEffect(
-    () => {
-      const stopPlaying = () => pauseMedia()
+    return () => document.removeEventListener('play', startPlaying, true)
+  }, [playMedia])
+  useEffect(() => {
+    const stopPlaying = () => pauseMedia()
 
-      document.addEventListener('pause', stopPlaying, true)
+    document.addEventListener('pause', stopPlaying, true)
 
-      return () => document.removeEventListener('pause', stopPlaying, true)
-    },
-    [pauseMedia]
-  )
+    return () => document.removeEventListener('pause', stopPlaying, true)
+  }, [pauseMedia])
 
   const playOrPauseAudio = useCallback(() => {
     const player = document.getElementById('mediaPlayer') as
@@ -197,17 +185,14 @@ function usePlayButtonSync() {
     player.paused ? player.play() : player.pause()
   }, [])
 
-  useEffect(
-    () => {
-      const resetPlayButton = () => {
-        pauseMedia()
-        setCursorX(0)
-      }
-      document.addEventListener('loadeddata', resetPlayButton, true)
-      return () => document.removeEventListener('loadeddata', resetPlayButton)
-    },
-    [pauseMedia]
-  )
+  useEffect(() => {
+    const resetPlayButton = () => {
+      pauseMedia()
+      setCursorX(0)
+    }
+    document.addEventListener('loadeddata', resetPlayButton, true)
+    return () => document.removeEventListener('loadeddata', resetPlayButton)
+  }, [pauseMedia])
 
   return { playOrPauseAudio, playing }
 }

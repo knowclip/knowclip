@@ -40,12 +40,10 @@ const exportCsv: AppEpic = (action$, state$) =>
         )
         if ('missingMediaFiles' in exportData) {
           return from(
-            [...exportData.missingMediaFiles].map(file =>
+            [...exportData.missingMediaFiles].map((file) =>
               r.locateFileRequest(
                 file,
-                `You can't make clips from this file until you've located it in the filesystem:\n${
-                  file.name
-                }`
+                `You can't make clips from this file until you've located it in the filesystem:\n${file.name}`
               )
             )
           )
@@ -76,9 +74,7 @@ const exportCsv: AppEpic = (action$, state$) =>
               const number = ++processed
               return r.setProgress({
                 percentage: (number / exportData.clips.length) * 100,
-                message: `${number} clips out of ${
-                  exportData.clips.length
-                } processed`,
+                message: `${number} clips out of ${exportData.clips.length} processed`,
               })
             })
         )
@@ -116,7 +112,7 @@ const exportCsv: AppEpic = (action$, state$) =>
                     r.exportApkgSuccess(
                       'Flashcards made in ' +
                         [csvFilePath, clozeCsvText && clozeCsvFilePath]
-                          .filter(s => s)
+                          .filter((s) => s)
                           .join(' and ')
                     )
                   ),
@@ -128,7 +124,7 @@ const exportCsv: AppEpic = (action$, state$) =>
         )
       }
     ),
-    catchError(err => {
+    catchError((err) => {
       console.error(err)
       return from([
         r.exportApkgFailure(err.message || err.toString()),

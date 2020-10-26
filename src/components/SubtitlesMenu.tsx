@@ -50,7 +50,7 @@ const SubtitlesMenu = () => {
 
   const dispatch = useDispatch()
   const loadExternalTrack = useCallback(
-    async e => {
+    async (e) => {
       if (!currentFileId)
         return dispatch(
           actions.simpleMessageSnackbar('Please open a media file first.')
@@ -68,7 +68,7 @@ const SubtitlesMenu = () => {
     [dispatch, currentFileId, close]
   )
   const subtitlesClipsDialogRequest = useCallback(
-    e => {
+    (e) => {
       dispatch(actions.subtitlesClipsDialogRequest())
       close(e)
     },
@@ -199,7 +199,7 @@ const ExternalTrackMenuItem = ({
   const dispatch = useDispatch()
 
   const deleteExternalSubtitles = useCallback(
-    e => {
+    (e) => {
       dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
       close(e)
     },
@@ -207,7 +207,7 @@ const ExternalTrackMenuItem = ({
   )
 
   const locateFileRequest = useCallback(
-    e => {
+    (e) => {
       if (file) {
         dispatch(
           actions.locateFileRequest(
@@ -224,7 +224,7 @@ const ExternalTrackMenuItem = ({
 
   const toggleVisible = useToggleVisible(track, id)
 
-  const stopPropagation = useCallback(e => {
+  const stopPropagation = useCallback((e) => {
     e.stopPropagation()
   }, [])
 
@@ -305,7 +305,7 @@ const ExternalTrackMenuItem = ({
 function useToggleVisible(track: SubtitlesTrack | null, id: string) {
   const dispatch = useDispatch()
   return useCallback(
-    e => {
+    (e) => {
       if (track)
         dispatch(
           track.mode === 'showing'

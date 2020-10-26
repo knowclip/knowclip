@@ -48,7 +48,7 @@ const ProjectMenuItem = ({
     [dispatch, availability.id]
   )
 
-  const stopPropagation = useCallback(e => {
+  const stopPropagation = useCallback((e) => {
     e.stopPropagation()
   }, [])
 
@@ -103,27 +103,21 @@ const ProjectsMenu = () => {
     currentProjectId: r.getCurrentProjectId(state),
   }))
   const dispatch = useDispatch()
-  const handleClickNewProject = useCallback(
-    () => {
-      dispatch(actions.newProjectFormDialog())
-    },
-    [dispatch]
-  )
-  const onClickOpenExisting = useCallback(
-    async () => {
-      const filePaths = await showOpenDialog([
-        {
-          name: 'Knowclip project file',
-          extensions: ['kyml'],
-        },
-      ])
+  const handleClickNewProject = useCallback(() => {
+    dispatch(actions.newProjectFormDialog())
+  }, [dispatch])
+  const onClickOpenExisting = useCallback(async () => {
+    const filePaths = await showOpenDialog([
+      {
+        name: 'Knowclip project file',
+        extensions: ['kyml'],
+      },
+    ])
 
-      if (filePaths) {
-        dispatch(actions.openProjectByFilePath(filePaths[0]))
-      }
-    },
-    [dispatch]
-  )
+    if (filePaths) {
+      dispatch(actions.openProjectByFilePath(filePaths[0]))
+    }
+  }, [dispatch])
 
   if (currentProjectId) return <Redirect to="/" />
 

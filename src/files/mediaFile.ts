@@ -24,9 +24,9 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         r.openFileFailure(
           file,
           filePath,
-          `Problem opening ${getHumanFileName(
-            file
-          )}: ${validationResult.errors.join(', ') || 'problem reading file.'}`
+          `Problem opening ${getHumanFileName(file)}: ${
+            validationResult.errors.join(', ') || 'problem reading file.'
+          }`
         ),
       ]
     }
@@ -152,8 +152,8 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   effects
 ) =>
   // TODO: clean up orphans?
-  subtitlesTracksStreamIndexes.map(streamIndex => {
-    const existing = subtitles.find(s => {
+  subtitlesTracksStreamIndexes.map((streamIndex) => {
+    const existing = subtitles.find((s) => {
       if (s.type !== 'EmbeddedSubtitlesTrack') return false
 
       const file = r.getSubtitlesSourceFile(state, s.id)
@@ -191,7 +191,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
 ) => {
   return await Promise.all([
     ...subtitles
-      .filter(s => s.type === 'ExternalSubtitlesTrack')
+      .filter((s) => s.type === 'ExternalSubtitlesTrack')
       .map(async ({ id }) => {
         const externalSubtitles = r.getFile<ExternalSubtitlesFile>(
           state,
@@ -291,23 +291,20 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
   }
 
   const commonTags = currentFileId
-    ? r.getFlashcards(state, currentFileId).reduce(
-        (tags, flashcard, i) => {
-          if (i === 0) return flashcard.tags
+    ? r.getFlashcards(state, currentFileId).reduce((tags, flashcard, i) => {
+        if (i === 0) return flashcard.tags
 
-          const tagsToDelete = []
-          for (const tag of tags) {
-            if (!flashcard.tags.includes(tag)) tagsToDelete.push(tag)
-          }
+        const tagsToDelete = []
+        for (const tag of tags) {
+          if (!flashcard.tags.includes(tag)) tagsToDelete.push(tag)
+        }
 
-          for (const tagToDelete of tagsToDelete) {
-            const index = tags.indexOf(tagToDelete)
-            tags.splice(index, 1)
-          }
-          return tags
-        },
-        [] as string[]
-      )
+        for (const tagToDelete of tagsToDelete) {
+          const index = tags.indexOf(tagToDelete)
+          tags.splice(index, 1)
+        }
+        return tags
+      }, [] as string[])
     : []
   if (commonTags.length) return [r.setDefaultClipSpecs({ tags: commonTags })]
 
@@ -320,7 +317,7 @@ export const updates = {
   addSubtitlesTrack: updater((file: MediaFile, track: SubtitlesTrack) => {
     return {
       ...file,
-      subtitles: file.subtitles.some(s => s.id === track.id) // should not happen... but just in case
+      subtitles: file.subtitles.some((s) => s.id === track.id) // should not happen... but just in case
         ? file.subtitles
         : [
             ...file.subtitles,
@@ -341,13 +338,10 @@ export const updates = {
         file.flashcardFieldsToSubtitlesTracks
       )
         .filter(([fieldName, givenTrackId]) => trackId !== givenTrackId)
-        .reduce(
-          (all, [fieldName, id]) => {
-            all[fieldName as TransliterationFlashcardFieldName] = id
-            return all
-          },
-          {} as Partial<Record<TransliterationFlashcardFieldName, string>>
-        ),
+        .reduce((all, [fieldName, id]) => {
+          all[fieldName as TransliterationFlashcardFieldName] = id
+          return all
+        }, {} as Partial<Record<TransliterationFlashcardFieldName, string>>),
     })
   ),
   linkFlashcardFieldToSubtitlesTrack: updater(

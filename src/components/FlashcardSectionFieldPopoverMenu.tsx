@@ -113,7 +113,7 @@ const FieldMenuItem = ({
 }) => {
   const dispatch = useDispatch()
   const handleClick = useCallback(
-    e => {
+    (e) => {
       dispatch(
         actions.linkFlashcardFieldToSubtitlesTrackRequest(
           fieldName,

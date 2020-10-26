@@ -30,8 +30,9 @@ export const getWaveformPng = async (
           [
             `[0:a]aformat=channel_layouts=mono,`,
             `compand=gain=-6,`,
-            `showwavespic=s=${width +
-              CORRECTION_OFFSET}x70:colors=${WAVE_COLOR},setpts=0[fg];`,
+            `showwavespic=s=${
+              width + CORRECTION_OFFSET
+            }x70:colors=${WAVE_COLOR},setpts=0[fg];`,
             `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
             `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
           ].join(''),
@@ -39,7 +40,7 @@ export const getWaveformPng = async (
         )
         .outputOptions('-frames:v 1')
         .output(outputFilename)
-        .on('end', function() {
+        .on('end', function () {
           res(outputFilename)
         })
         .on('error', (err: any) => {
@@ -96,7 +97,7 @@ function getWaveformId(mediaFileId: MediaFileId, i: number): string {
 export function getWaveformIds(mediaFile: MediaFile) {
   const { durationSeconds } = mediaFile
   const segmentsCount = Math.ceil(durationSeconds / WAVEFORM_SEGMENT_LENGTH)
-  return [...Array(segmentsCount).keys()].map(index =>
+  return [...Array(segmentsCount).keys()].map((index) =>
     getWaveformId(mediaFile.id, index)
   )
 }

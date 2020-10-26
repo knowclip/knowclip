@@ -43,24 +43,18 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   }))
 
   const { settings, dispatchLocal } = useLocalSettingsReducer()
-  const addAssetsDirectories = useCallback(
-    async () => {
-      const paths = await showOpenDirectoriesDialog()
-      if (!paths) return
+  const addAssetsDirectories = useCallback(async () => {
+    const paths = await showOpenDirectoriesDialog()
+    if (!paths) return
 
-      dispatchLocal(actions.addAssetsDirectories(paths))
-    },
-    [dispatchLocal]
-  )
+    dispatchLocal(actions.addAssetsDirectories(paths))
+  }, [dispatchLocal])
 
   const close = useCallback(() => dispatch(actions.closeDialog()), [dispatch])
-  const saveSettings = useCallback(
-    () => {
-      dispatch(actions.overrideSettings(settings))
-      close()
-    },
-    [close, dispatch, settings]
-  )
+  const saveSettings = useCallback(() => {
+    dispatch(actions.overrideSettings(settings))
+    close()
+  }, [close, dispatch, settings])
 
   return (
     <Dialog open={open} fullScreen>
@@ -70,14 +64,14 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
           <Paper className={css.settingsGroupBody}>
             <h3 className={css.heading}>Media import folders</h3>
             <List>
-              {settings.assetsDirectories.map(path => {
+              {settings.assetsDirectories.map((path) => {
                 return (
                   <ListItem key={path} dense>
                     <ListItemText primary={truncate(path, 100)} title={path} />
                     <ListItemSecondaryAction>
                       <RemoveAssetsDirectoryButton
                         path={path}
-                        removeAssetsDirectory={path =>
+                        removeAssetsDirectory={(path) =>
                           dispatchLocal(actions.removeAssetsDirectories([path]))
                         }
                       />
@@ -114,7 +108,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
               <FilePathTextField
                 value={settings.mediaFolderLocation || ''}
                 onSetFilePath={useCallback(
-                  filePath =>
+                  (filePath) =>
                     dispatchLocal(actions.setMediaFolderLocation(filePath)),
                   [dispatchLocal]
                 )}
@@ -148,7 +142,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                   <Checkbox
                     checked={settings.checkForUpdatesAutomatically}
                     onChange={useCallback(
-                      e =>
+                      (e) =>
                         dispatchLocal(
                           actions.setCheckForUpdatesAutomatically(
                             e.target.checked
@@ -188,7 +182,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                 const selected =
                   Boolean(activeDictionaries) &&
                   activeDictionaries.some(
-                    f => f.id === file.id && f.type === file.dictionaryType
+                    (f) => f.id === file.id && f.type === file.dictionaryType
                   )
                 return (
                   <ListItem value={file.id} selected={selected}>
@@ -197,7 +191,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                       <Checkbox
                         checked={selected}
                         tabIndex={-1}
-                        onChange={e =>
+                        onChange={(e) =>
                           dispatchLocal(
                             selected
                               ? actions.removeActiveDictionary(file.id)

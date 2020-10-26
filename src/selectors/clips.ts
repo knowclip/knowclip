@@ -12,7 +12,7 @@ export const getClipsByIds = (
   clipsOrder: Array<ClipId>,
   clips: Record<ClipId, Clip>
 ): Array<Clip> =>
-  clipsOrder.map(id => {
+  clipsOrder.map((id) => {
     const clip = clips[id]
     if (!clip) throw new Error('Could not find clip')
     return clip
@@ -34,14 +34,13 @@ export const getFlashcards = (
   mediaFileId: MediaFileId
 ): Array<Flashcard> => {
   const clipsOrder = state.clips.idsByMediaFileId[mediaFileId]
-  return clipsOrder ? clipsOrder.map(id => state.clips.flashcards[id]) : []
+  return clipsOrder ? clipsOrder.map((id) => state.clips.flashcards[id]) : []
 }
 
 export const getAllProjectClipsIds: (
   state: AppState
-) => Array<ClipId> = createSelector(
-  getClipsObject,
-  clipsObject => Object.keys(clipsObject)
+) => Array<ClipId> = createSelector(getClipsObject, (clipsObject) =>
+  Object.keys(clipsObject)
 )
 
 export const getClipTime = (state: AppState, id: ClipId): TimeSpan | null => {

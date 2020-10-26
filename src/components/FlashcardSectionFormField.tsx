@@ -37,18 +37,15 @@ const FlashcardSectionFormField = memo(
     className,
   }: Props) => {
     const handleChange = useCallback(
-      e => setFlashcardText(name, e.target.value, e.target.selectionEnd),
+      (e) => setFlashcardText(name, e.target.value, e.target.selectionEnd),
       [setFlashcardText, name]
     )
 
-    const label = useMemo(
-      () => {
-        const track = subtitles.all.find(s => s.id === linkedSubtitlesTrack)
+    const label = useMemo(() => {
+      const track = subtitles.all.find((s) => s.id === linkedSubtitlesTrack)
 
-        return track ? `${capitalize(name)} (${track.label})` : capitalize(name)
-      },
-      [subtitles.all, name, linkedSubtitlesTrack]
-    )
+      return track ? `${capitalize(name)} (${track.label})` : capitalize(name)
+    }, [subtitles.all, name, linkedSubtitlesTrack])
 
     return (
       <section className={cn(className, css.field)}>

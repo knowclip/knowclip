@@ -42,16 +42,13 @@ const FlashcardSectionPreview = ({
   }
 
   const dispatch = useDispatch()
-  const startEditing = useCallback(
-    () => {
-      dispatch(r.startEditingCards())
-    },
-    [dispatch]
-  )
+  const startEditing = useCallback(() => {
+    dispatch(r.startEditingCards())
+  }, [dispatch])
 
   const clozeControls = useClozeControls({
     onNewClozeCard: useCallback(
-      deletion => {
+      (deletion) => {
         dispatch(r.newClipFromSubtitlesChunk(cardPreviewSelection, deletion))
       },
       [cardPreviewSelection, dispatch]
@@ -63,12 +60,9 @@ const FlashcardSectionPreview = ({
     isLoopOn: r.isLoopOn(state),
   }))
 
-  const toggleIncludeStill = useCallback(
-    () => {
-      dispatch(r.setDefaultClipSpecs({ includeStill: !defaultIncludeStill }))
-    },
-    [defaultIncludeStill, dispatch]
-  )
+  const toggleIncludeStill = useCallback(() => {
+    dispatch(r.setDefaultClipSpecs({ includeStill: !defaultIncludeStill }))
+  }, [defaultIncludeStill, dispatch])
   const toggleLoop = useCallback(() => dispatch(r.toggleLoop()), [dispatch])
   return (
     <FlashcardSectionDisplay

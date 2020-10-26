@@ -36,10 +36,7 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
 ) => {
   if (file) {
     const dictionaryExistsInDb = Boolean(
-      await effects
-        .getDexieDb()
-        .table(DICTIONARIES_TABLE)
-        .get(file.key)
+      await effects.getDexieDb().table(DICTIONARIES_TABLE).get(file.key)
     )
     const entriesExistInDb = Boolean(
       await effects
@@ -98,7 +95,7 @@ export const dictionaryActions: FileEventHandlers<DictionaryFile> = {
 const updater = updaterGetter<DictionaryFile>()
 
 export const updates = {
-  finishDictionaryImport: updater(file => ({
+  finishDictionaryImport: updater((file) => ({
     ...file,
     importComplete: true,
   })),

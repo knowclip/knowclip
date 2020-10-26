@@ -14,8 +14,8 @@ const Shortcut = ({ keys, action }: { keys: string; action: string }) => (
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false)
   const handleMouseDown = useCallback(
-    e => {
-      setOpen(open => !open)
+    (e) => {
+      setOpen((open) => !open)
       if (!open) e.preventDefault()
     },
     [setOpen, open]

@@ -13,7 +13,7 @@ const writeFile = promisify(fs.writeFile)
 const exportMarkdown: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportMarkdown>(A.EXPORT_MARKDOWN),
-    flatMap<ExportMarkdown, Promise<Observable<Action>>>(async action => {
+    flatMap<ExportMarkdown, Promise<Observable<Action>>>(async (action) => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
         if (!filename)
@@ -41,7 +41,7 @@ const exportMarkdown: AppEpic = (action$, state$) =>
         )
       }
     }),
-    flatMap<Observable<Action>, Observable<Action>>(x => x)
+    flatMap<Observable<Action>, Observable<Action>>((x) => x)
   )
 
 export default exportMarkdown

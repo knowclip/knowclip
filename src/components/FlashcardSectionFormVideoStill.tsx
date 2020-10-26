@@ -31,25 +31,18 @@ const VideoStillDisplay = ({
 
   const dispatch = useDispatch()
 
-  useEffect(
-    () => {
-      if (preloadAdjacent)
-        dispatch(r.preloadVideoStills(videoFile, flashcard.id))
-    },
-    [flashcard.id, dispatch, videoFile, preloadAdjacent]
-  )
+  useEffect(() => {
+    if (preloadAdjacent) dispatch(r.preloadVideoStills(videoFile, flashcard.id))
+  }, [flashcard.id, dispatch, videoFile, preloadAdjacent])
   const { filePath } = videoStill.availability
 
-  const handleClick = useCallback(
-    () => {
-      dispatch(
-        flashcard.image
-          ? r.removeFlashcardImage(flashcard.id)
-          : r.addFlashcardImage(flashcard.id)
-      )
-    },
-    [flashcard.image, flashcard.id, dispatch]
-  )
+  const handleClick = useCallback(() => {
+    dispatch(
+      flashcard.image
+        ? r.removeFlashcardImage(flashcard.id)
+        : r.addFlashcardImage(flashcard.id)
+    )
+  }, [flashcard.image, flashcard.id, dispatch])
 
   const title = flashcard.image
     ? 'Click to leave out image'
