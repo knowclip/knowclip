@@ -16,7 +16,7 @@ function isRunning(statusUrl: string, callback: Function) {
     json: true,
     followAllRedirects: true,
   }
-  request(requestOptions, function(error, response, body) {
+  request(requestOptions, function (error, response, body) {
     if (error) return callback(cb)
     if (response.statusCode !== 200) return callback(cb)
     callback(body && body.value.ready)
@@ -28,9 +28,9 @@ function waitForChromeDriver(
   statusUrl: string,
   startTimeout: number
 ) {
-  return new Promise<boolean>(function(resolve, reject) {
+  return new Promise<boolean>(function (resolve, reject) {
     const startTime = Date.now()
-    const checkIfRunning = function() {
+    const checkIfRunning = function () {
       isRunning(statusUrl, (running: any) => {
         if (!driverProcess) {
           return reject(Error('ChromeDriver has been stopped'))
@@ -58,9 +58,9 @@ export function waitForChromeDriverToStop(
   statusUrl: string,
   stopTimeout: number
 ) {
-  return new Promise<boolean>(function(resolve, reject) {
+  return new Promise<boolean>(function (resolve, reject) {
     const startTime = Date.now()
-    const checkIfRunning = function() {
+    const checkIfRunning = function () {
       isRunning(statusUrl, (running: any) => {
         if (!driverProcess) {
           return resolve(true)
@@ -157,7 +157,7 @@ export class TestDriver {
     this._driver = driver
 
     this.isReady = this.sendToMainProcess({ type: 'isReady', args: [] }).catch(
-      err => {
+      (err) => {
         console.error('Application failed to start', err)
         this.stop()
         process.exit(1)
@@ -170,7 +170,7 @@ export class TestDriver {
   ): Promise<MessageResponse<MessageHandlerResult<T>>> {
     return this.client.executeAsync(async (message: MessageToMain<T>, done) => {
       const { ipcRenderer } = require('electron')
-      ipcRenderer.invoke('message', message).then(async result => {
+      ipcRenderer.invoke('message', message).then(async (result) => {
         done(await result)
       })
     }, message)

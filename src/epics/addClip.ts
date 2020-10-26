@@ -28,7 +28,7 @@ const addClipEpic: AppEpic = (
 ) =>
   fromEvent<WaveformMousedownEvent>(document, 'waveformMousedown').pipe(
     filter(
-      waveformMousedown =>
+      (waveformMousedown) =>
         !r.getClipEdgeAt(
           state$.value,
           r.getXAtMilliseconds(state$.value, waveformMousedown.milliseconds)
@@ -36,7 +36,7 @@ const addClipEpic: AppEpic = (
     ),
     // if mousedown falls on edge of clip
     // then start stretchy epic instead of clip epic
-    switchMap(waveformMousedown => {
+    switchMap((waveformMousedown) => {
       const mediaFile = r.getCurrentMediaFile(state$.value)
       if (!mediaFile) throw new Error('No current media metadata')
       const mouseups = fromEvent(window, 'mouseup').pipe(take(1))
@@ -47,7 +47,7 @@ const addClipEpic: AppEpic = (
         Math.max(0, Math.min(x, mediaFile.durationSeconds * factor))
 
       const pendingClips = fromEvent<MouseEvent>(window, 'mousemove').pipe(
-        map(mousemove => {
+        map((mousemove) => {
           mousemove.preventDefault()
           return r.setPendingClip({
             start: withinValidTime(
@@ -67,13 +67,13 @@ const addClipEpic: AppEpic = (
 
       const pendingClipEnds = pendingClips.pipe(
         takeLast(1),
-        flatMap(pendingClipAction => {
+        flatMap((pendingClipAction) => {
           const { clip: pendingClip } = pendingClipAction
           const clipsOrder = r.getCurrentFileClipsOrder(state$.value)
           const pendingClipOverlaps = [
             r.getClipIdAt(state$.value, pendingClip.start),
             r.getClipIdAt(state$.value, pendingClip.end),
-          ].some(id => id && clipsOrder.includes(id))
+          ].some((id) => id && clipsOrder.includes(id))
           const currentFileId = r.getCurrentFileId(state$.value)
           if (!currentFileId)
             throw new Error('Could not find current note type')
@@ -105,7 +105,7 @@ const addClipEpic: AppEpic = (
             r.addClip(
               clip,
               flashcard,
-              !Object.values(fields).some(fieldValue => fieldValue.trim())
+              !Object.values(fields).some((fieldValue) => fieldValue.trim())
             )
           )
         })

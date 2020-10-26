@@ -17,7 +17,10 @@ describe('unescapeClozeField', () => {
       clozeDeletions: [
         { ranges: [{ start: 2, end: 7 }] },
         {
-          ranges: [{ start: 0, end: 1 }, { start: 7, end: 14 }],
+          ranges: [
+            { start: 0, end: 1 },
+            { start: 7, end: 14 },
+          ],
         },
 
         { ranges: [{ start: 15, end: 17 }] },

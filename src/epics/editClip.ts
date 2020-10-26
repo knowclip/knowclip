@@ -34,7 +34,7 @@ const remakeStill: AppEpic = (action$, state$) =>
           concat(
             action$.pipe(
               filter(
-                a =>
+                (a) =>
                   a.type === 'DELETE_FILE_SUCCESS' &&
                   a.file.id === still.id &&
                   a.file.type === still.type
@@ -50,7 +50,7 @@ const remakeStill: AppEpic = (action$, state$) =>
     })
   )
 
-const setDefaultClipSpecs: AppEpic = action$ =>
+const setDefaultClipSpecs: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, EditClip>(A.EDIT_CLIP),
     flatMap(({ flashcardOverride }) => {

@@ -28,7 +28,7 @@ export function useClozeUiEffects(
   } = clozeControls
 
   const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = useCallback(
-    e => {
+    (e) => {
       switch (e.key) {
         case KEYS.arrowLeft: {
           const selection = getSelectionWithin(e.target as HTMLInputElement)
@@ -54,7 +54,7 @@ export function useClozeUiEffects(
               setSelectionRange(e.target as HTMLSpanElement, start, end)
               e.preventDefault()
             } else
-              setCursorPosition(cursorPosition =>
+              setCursorPosition((cursorPosition) =>
                 cursorPosition == null
                   ? cursorPosition
                   : Math.max(cursorPosition - 1, 0)
@@ -87,7 +87,7 @@ export function useClozeUiEffects(
               ref.current && setSelectionRange(ref.current, start, end)
               e.preventDefault()
             } else {
-              setCursorPosition(cursorPosition =>
+              setCursorPosition((cursorPosition) =>
                 cursorPosition == null
                   ? cursorPosition
                   : Math.min(cursorPosition + 1, value.length)
@@ -148,7 +148,7 @@ export function useClozeUiEffects(
   )
 
   const handleFocus = useCallback(
-    e => {
+    (e) => {
       if (!dictionaryPopoverIsShowing) {
         if (ref.current) {
           const selection = getSelectionWithin(ref.current)
@@ -173,7 +173,7 @@ export function useClozeUiEffects(
     ]
   )
   const handleBlur = useCallback(
-    e => {
+    (e) => {
       if (!dictionaryPopoverIsShowing) {
         setCursorPosition(null)
         if (!editing && wasLoopingBeforeFocus !== loopIsOn)
@@ -195,35 +195,32 @@ export function useClozeUiEffects(
 export function useClozeCursorPosition(ref: React.RefObject<HTMLSpanElement>) {
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
 
-  useEffect(
-    () => {
-      const onlyShowCursorWhenNoSelectionInClozeField = () => {
-        if (ref.current) {
-          if (document.activeElement !== ref.current)
-            return setCursorPosition(null)
+  useEffect(() => {
+    const onlyShowCursorWhenNoSelectionInClozeField = () => {
+      if (ref.current) {
+        if (document.activeElement !== ref.current)
+          return setCursorPosition(null)
 
-          const currentClozeSelection = getSelectionWithin(ref.current)
+        const currentClozeSelection = getSelectionWithin(ref.current)
 
-          const clozeSelectionCurrentlyMade =
-            currentClozeSelection.end - currentClozeSelection.start !== 0
-          const newPosition = clozeSelectionCurrentlyMade
-            ? null
-            : currentClozeSelection.end
-          setCursorPosition(newPosition)
-        }
+        const clozeSelectionCurrentlyMade =
+          currentClozeSelection.end - currentClozeSelection.start !== 0
+        const newPosition = clozeSelectionCurrentlyMade
+          ? null
+          : currentClozeSelection.end
+        setCursorPosition(newPosition)
       }
-      document.addEventListener(
+    }
+    document.addEventListener(
+      'selectionchange',
+      onlyShowCursorWhenNoSelectionInClozeField
+    )
+    return () =>
+      document.removeEventListener(
         'selectionchange',
         onlyShowCursorWhenNoSelectionInClozeField
       )
-      return () =>
-        document.removeEventListener(
-          'selectionchange',
-          onlyShowCursorWhenNoSelectionInClozeField
-        )
-    },
-    [ref]
-  )
+  }, [ref])
 
   return { cursorPosition, setCursorPosition }
 }

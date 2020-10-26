@@ -31,7 +31,7 @@ const createProject: AppEpic = (action$, state$) =>
         )
       )
     }),
-    catchError(err =>
+    catchError((err) =>
       of(
         r.simpleMessageSnackbar(
           'Error creating project file: ' + err.toString()
@@ -74,7 +74,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     ),
     switchMap(({ filePath }) =>
       from(parseProjectJson(filePath)).pipe(
-        flatMap(parse => {
+        flatMap((parse) => {
           if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
           const { project } = normalizeProjectJson(state$.value, parse.value)
@@ -83,7 +83,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
             r.openFileRequest(project, filePath),
           ])
         }),
-        catchError(err =>
+        catchError((err) =>
           of(r.errorDialog('Problem opening project file:', err.message))
         )
       )
@@ -163,7 +163,7 @@ const PROJECT_EDIT_UPDATE_FILE_ACTIONS: Set<keyof FileUpdates> = new Set([
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
   action$.pipe(
-    filter(action => {
+    filter((action) => {
       return (
         (PROJECT_EDIT_ACTIONS.has(action.type) ||
           (action.type === A.UPDATE_FILE &&
@@ -181,10 +181,16 @@ const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
         action.type === A.UPDATE_FILE &&
         action.update.updateName === 'deleteProjectMedia'
     ),
-    flatMap(({ update: { updatePayload: [mediaFileId] } }) => {
-      const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
-      return file ? of(r.deleteFileRequest(file.type, file.id)) : empty()
-    })
+    flatMap(
+      ({
+        update: {
+          updatePayload: [mediaFileId],
+        },
+      }) => {
+        const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
+        return file ? of(r.deleteFileRequest(file.type, file.id)) : empty()
+      }
+    )
   )
 
 const closeProjectRequest: AppEpic = (action$, state$, effects) =>

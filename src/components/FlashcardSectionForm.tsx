@@ -78,56 +78,38 @@ const FlashcardSectionForm = memo(
     // focus first field on highlight clip
     // and, while playing, trigger loop during further field/button interactions
     const [initialFocus, setInitialFocusComplete] = useState(false)
-    const loopOnInteract = useCallback(
-      () => {
-        if (mediaIsPlaying && !isLoopOn) dispatch(actions.setLoop(true))
-      },
-      [dispatch, isLoopOn, mediaIsPlaying]
-    )
+    const loopOnInteract = useCallback(() => {
+      if (mediaIsPlaying && !isLoopOn) dispatch(actions.setLoop(true))
+    }, [dispatch, isLoopOn, mediaIsPlaying])
 
-    useEffect(
-      () => {
-        setInitialFocusComplete(false)
-      },
-      [id]
-    )
-    useEffect(
-      () => {
-        if (!initialFocus) {
-          focusRef.current && focusRef.current.focus()
-          if (mediaIsPlaying) setInitialFocusComplete(true)
-        }
-      },
-      [mediaIsPlaying, initialFocus]
-    )
-    const handleFocus = useCallback(
-      () => {
-        if (!initialFocus) setInitialFocusComplete(true)
-        else loopOnInteract()
-      },
-      [initialFocus, loopOnInteract]
-    )
+    useEffect(() => {
+      setInitialFocusComplete(false)
+    }, [id])
+    useEffect(() => {
+      if (!initialFocus) {
+        focusRef.current && focusRef.current.focus()
+        if (mediaIsPlaying) setInitialFocusComplete(true)
+      }
+    }, [mediaIsPlaying, initialFocus])
+    const handleFocus = useCallback(() => {
+      if (!initialFocus) setInitialFocusComplete(true)
+      else loopOnInteract()
+    }, [initialFocus, loopOnInteract])
 
-    const handleClickDeleteButton = useCallback(
-      () => {
-        dispatch(
-          actions.confirmationDialog(
-            'Are you sure you want to delete this clip and flashcard?',
-            actions.deleteCard(id)
-          )
+    const handleClickDeleteButton = useCallback(() => {
+      dispatch(
+        actions.confirmationDialog(
+          'Are you sure you want to delete this clip and flashcard?',
+          actions.deleteCard(id)
         )
-        loopOnInteract()
-      },
-      [dispatch, id, loopOnInteract]
-    )
-    const handleClickPreviewButton = useCallback(
-      () => {
-        dispatch(actions.stopEditingCards())
-      },
-      [dispatch]
-    )
+      )
+      loopOnInteract()
+    }, [dispatch, id, loopOnInteract])
+    const handleClickPreviewButton = useCallback(() => {
+      dispatch(actions.stopEditingCards())
+    }, [dispatch])
 
-    const handleFlashcardSubmit = useCallback(e => {
+    const handleFlashcardSubmit = useCallback((e) => {
       e.preventDefault()
     }, [])
 

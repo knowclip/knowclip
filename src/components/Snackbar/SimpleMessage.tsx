@@ -18,12 +18,9 @@ const SimpleMessageSnackbar = ({
 }) => {
   const [open, setOpen] = useState(true)
 
-  const handleClose = useCallback(
-    () => {
-      setOpen(false)
-    },
-    [setOpen]
-  )
+  const handleClose = useCallback(() => {
+    setOpen(false)
+  }, [setOpen])
   const closeExceptOnClickaway = useCallback(
     (e, reason) => {
       if (reason !== 'clickaway') handleClose()
@@ -32,7 +29,7 @@ const SimpleMessageSnackbar = ({
   )
 
   const dispatch = useDispatch()
-  const handleExited = useCallback(e => dispatch(closeSnackbar()), [dispatch])
+  const handleExited = useCallback((e) => dispatch(closeSnackbar()), [dispatch])
 
   return (
     // TODO: distinguish error and success messages

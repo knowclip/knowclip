@@ -41,7 +41,7 @@ const centerSelectedClip: AppEpic = (
       })
     ),
     action$.ofType<EditClip>(A.EDIT_CLIP).pipe(
-      switchMap(action => {
+      switchMap((action) => {
         if (
           action.override &&
           ('start' in action.override || 'end' in action.override)
@@ -54,7 +54,7 @@ const centerSelectedClip: AppEpic = (
       })
     ),
     action$.ofType<MergeClips>(A.MERGE_CLIPS).pipe(
-      switchMap(action => {
+      switchMap((action) => {
         if (action.newSelection && action.newSelection.type === 'Clip') {
           const clip = r.getClip(state$.value, action.newSelection.id)
           return clip ? of(clip) : empty()
@@ -64,7 +64,7 @@ const centerSelectedClip: AppEpic = (
       })
     )
   ).pipe(
-    switchMap(clip => {
+    switchMap((clip) => {
       const svgElement = getWaveformSvgElement()
       if (!svgElement) return empty()
       const svgWidth = elementWidth(svgElement)
@@ -99,7 +99,7 @@ const centerSelectedClip: AppEpic = (
     })
   )
 
-const deselectOnOpenMediaFile: AppEpic = action$ =>
+const deselectOnOpenMediaFile: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
     filter(({ file }) => file.type === 'MediaFile'),

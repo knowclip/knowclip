@@ -74,7 +74,7 @@ export default {
         ]
 
       const seconds =
-        flashcard.image && typeof flashcard.image.seconds === 'number'
+        typeof flashcard.image?.seconds === 'number'
           ? flashcard.image.seconds
           : r.getSecondsAtX(state, getMidpoint(clip.start, clip.end))
 

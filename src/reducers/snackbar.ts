@@ -12,7 +12,7 @@ const snackbar: Reducer<SnackbarState, Action> = (
   switch (action.type) {
     case A.ENQUEUE_SNACKBAR:
       return state.queue.some(
-        snackbar =>
+        (snackbar) =>
           snackbar.type === action.snackbar.type &&
           JSON.stringify(action.snackbar.props) ===
             JSON.stringify(snackbar.props)

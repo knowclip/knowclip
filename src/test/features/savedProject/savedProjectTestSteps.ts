@@ -9,10 +9,10 @@ export const savedProjectTestSteps = ({
 }: {
   projectTitle: string
 }) => [
-  step('opens a previously saved project', setup => openSavedProject(setup)),
-  step('make some flashcards', setup => makeSomeFlashcards(setup)),
-  step('link subtitles to fields', setup => linkSubtitlesToFields(setup)),
-  step('save and closes project', setup =>
+  step('opens a previously saved project', (setup) => openSavedProject(setup)),
+  step('make some flashcards', (setup) => makeSomeFlashcards(setup)),
+  step('link subtitles to fields', (setup) => linkSubtitlesToFields(setup)),
+  step('save and closes project', (setup) =>
     saveAndCloseProject(setup, projectTitle)
   ),
 ]

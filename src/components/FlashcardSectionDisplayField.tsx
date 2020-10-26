@@ -25,12 +25,9 @@ const FlashcardDisplayField = ({
   title?: string
   fieldValueRef?: React.RefObject<HTMLSpanElement>
 }) => {
-  const handleDoubleClick = useCallback(
-    () => {
-      if (onDoubleClick) onDoubleClick(fieldName)
-    },
-    [fieldName, onDoubleClick]
-  )
+  const handleDoubleClick = useCallback(() => {
+    if (onDoubleClick) onDoubleClick(fieldName)
+  }, [fieldName, onDoubleClick])
 
   const linkedSubtitlesTrack = linkedTracks[fieldName] || null
   const subtitlesMenu = Boolean(subtitles.length) && (

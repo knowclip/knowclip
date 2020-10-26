@@ -74,7 +74,7 @@ const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
 
 const pauseAndChangeCursorOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
   action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
-    tap(action => {
+    tap((action) => {
       if (action.type === A.SET_PROGRESS) {
         document.body.style.cursor = action.progress ? 'progress' : 'default'
       }

@@ -72,17 +72,14 @@ const ClozeField = ({
 
   const editing = currentClozeIndex !== -1
 
-  useEffect(
-    () => {
-      if (clozeInputRef.current && editing) {
-        const selection = window.getSelection()
-        if (selection) selection.empty()
-        clozeInputRef.current.blur()
-        clozeInputRef.current.focus()
-      }
-    },
-    [currentClozeIndex, clozeInputRef, editing]
-  )
+  useEffect(() => {
+    if (clozeInputRef.current && editing) {
+      const selection = window.getSelection()
+      if (selection) selection.empty()
+      clozeInputRef.current.blur()
+      clozeInputRef.current.focus()
+    }
+  }, [currentClozeIndex, clozeInputRef, editing])
   const clozeId = ClozeIds[currentClozeIndex]
   const { viewMode, activeDictionaryType } = useSelector((state: AppState) => ({
     viewMode: state.settings.viewMode,
@@ -105,95 +102,92 @@ const ClozeField = ({
 
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
-      return ranges.map(range => ({ range, clozeIndex }))
+      return ranges.map((range) => ({ range, clozeIndex }))
     })
     .sort((a, b) => a.range.start - b.range.start)
-  const segments: ReactNode[] = useMemo(
-    () => {
-      const newlineChar = viewMode === 'HORIZONTAL' ? '⏎' : '\n'
-      const segments: ReactNode[] = []
+  const segments: ReactNode[] = useMemo(() => {
+    const newlineChar = viewMode === 'HORIZONTAL' ? '⏎' : '\n'
+    const segments: ReactNode[] = []
 
-      const first = rangesWithClozeIndexes[0]
-      if (!first || first.range.start > 0) {
-        const startPaddingEnd = first ? first.range.start : value.length
+    const first = rangesWithClozeIndexes[0]
+    if (!first || first.range.start > 0) {
+      const startPaddingEnd = first ? first.range.start : value.length
+      segments.push(
+        ...[...value.slice(0, startPaddingEnd)].map((c, i) => (
+          <CharSpan
+            key={`${c}${i}`}
+            {...{
+              char: c,
+              index: i,
+              className: css.clozeValueChar,
+              clozeIndex: 0,
+              newlineChar,
+              hasCursor: cursorPosition === i,
+            }}
+          />
+        ))
+      )
+    }
+
+    rangesWithClozeIndexes.forEach(
+      ({ range: { start, end }, clozeIndex }, i) => {
         segments.push(
-          ...[...value.slice(0, startPaddingEnd)].map((c, i) => (
+          ...[...value.slice(start, end)].map((c, i) => (
             <CharSpan
-              key={`${c}${i}`}
+              key={`${c}${start + i}`}
               {...{
                 char: c,
-                index: i,
-                className: css.clozeValueChar,
-                clozeIndex: 0,
+                index: start + i,
+                className: cn(css.blank, {
+                  [css.previewBlank]:
+                    previewClozeIndex !== -1 &&
+                    previewClozeIndex === clozeIndex,
+                  [css.blankEditing]: clozeIndex === currentClozeIndex,
+                }),
+                clozeIndex,
                 newlineChar,
-                hasCursor: cursorPosition === i,
+                hasCursor: cursorPosition === start + i,
               }}
             />
           ))
         )
-      }
 
-      rangesWithClozeIndexes.forEach(
-        ({ range: { start, end }, clozeIndex }, i) => {
+        const nextRange: {
+          range: ClozeRange
+          clozeIndex: number
+        } | null = rangesWithClozeIndexes[i + 1] || null
+        const subsequentGapEnd = nextRange
+          ? nextRange.range.start
+          : value.length
+
+        if (subsequentGapEnd - end > 0) {
           segments.push(
-            ...[...value.slice(start, end)].map((c, i) => (
+            ...[...value.slice(end, subsequentGapEnd)].map((c, i) => (
               <CharSpan
-                key={`${c}${start + i}`}
+                key={`${c}${end + i}`}
                 {...{
                   char: c,
-                  index: start + i,
-                  className: cn(css.blank, {
-                    [css.previewBlank]:
-                      previewClozeIndex !== -1 &&
-                      previewClozeIndex === clozeIndex,
-                    [css.blankEditing]: clozeIndex === currentClozeIndex,
-                  }),
+                  index: end + i,
+                  className: css.clozeValueChar,
                   clozeIndex,
                   newlineChar,
-                  hasCursor: cursorPosition === start + i,
+                  hasCursor: cursorPosition === end + i,
                 }}
               />
             ))
           )
-
-          const nextRange: {
-            range: ClozeRange
-            clozeIndex: number
-          } | null = rangesWithClozeIndexes[i + 1] || null
-          const subsequentGapEnd = nextRange
-            ? nextRange.range.start
-            : value.length
-
-          if (subsequentGapEnd - end > 0) {
-            segments.push(
-              ...[...value.slice(end, subsequentGapEnd)].map((c, i) => (
-                <CharSpan
-                  key={`${c}${end + i}`}
-                  {...{
-                    char: c,
-                    index: end + i,
-                    className: css.clozeValueChar,
-                    clozeIndex,
-                    newlineChar,
-                    hasCursor: cursorPosition === end + i,
-                  }}
-                />
-              ))
-            )
-          }
         }
-      )
-      return segments
-    },
-    [
-      currentClozeIndex,
-      previewClozeIndex,
-      rangesWithClozeIndexes,
-      value,
-      viewMode,
-      cursorPosition,
-    ]
-  )
+      }
+    )
+    return segments
+  }, [
+    currentClozeIndex,
+    previewClozeIndex,
+    rangesWithClozeIndexes,
+    value,
+    viewMode,
+    cursorPosition,
+  ])
 
   if (!value)
     return <span className={css.emptyFieldPlaceholder}>{fieldName}</span>

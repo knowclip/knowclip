@@ -26,7 +26,7 @@ import { areSameFile } from '../utils/files'
 import * as A from '../types/ActionType'
 import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 
-const exportApkgFailure: AppEpic = action$ =>
+const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, ExportApkgFailure>(A.EXPORT_APKG_FAILURE),
     tap(() => (document.body.style.cursor = 'default')),
@@ -40,7 +40,7 @@ const exportApkgFailure: AppEpic = action$ =>
         : empty()
     )
   )
-const exportApkgSuccess: AppEpic = action$ =>
+const exportApkgSuccess: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, ExportApkgSuccess>(A.EXPORT_APKG_SUCCESS),
     tap(() => (document.body.style.cursor = 'default')),
@@ -50,7 +50,7 @@ const exportApkgSuccess: AppEpic = action$ =>
 const exportApkg: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportApkgRequest>(A.EXPORT_APKG_REQUEST),
-    switchMap(exportApkgRequest => {
+    switchMap((exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
       const directory = tempy.directory()
 
@@ -79,7 +79,7 @@ const exportApkg: AppEpic = (action$, state$) =>
 function makeApkg(exportData: ApkgExportData, directory: string) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
-    flatMap(outputFilePath => {
+    flatMap((outputFilePath) => {
       document.body.style.cursor = 'progress'
       const pkg = new anki.Package()
       const deck = new anki.Deck(exportData.projectId, exportData.deckName)
@@ -103,9 +103,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
             const number = ++processed
             return r.setProgress({
               percentage: (number / exportData.clips.length) * 100,
-              message: `${number} clips out of ${
-                exportData.clips.length
-              } processed`,
+              message: `${number} clips out of ${exportData.clips.length} processed`,
             })
           })
         }
@@ -143,7 +141,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
         )
       )
     }),
-    catchError(err => {
+    catchError((err) => {
       console.error(err)
       return from([
         r.exportApkgFailure(err.message || err.toString()),
@@ -190,22 +188,22 @@ function getMissingMedia(
   action$: ActionsObservable<Action>,
   exportApkgRequest: ExportApkgRequest
 ) {
-  const missingMediaFileIds = missingMediaFiles.map(file => file.id)
+  const missingMediaFileIds = missingMediaFiles.map((file) => file.id)
   const openMissingMediaFailure = action$.pipe(
     ofType<Action, OpenFileFailure>('OPEN_FILE_FAILURE'),
     filter(
-      a =>
+      (a) =>
         a.file.type === 'MediaFile' && missingMediaFileIds.includes(a.file.id)
     ),
     take(1)
   )
   return from(missingMediaFiles).pipe(
-    concatMap(file =>
+    concatMap((file) =>
       of(r.openFileRequest(file)).pipe(
         concat(
           action$.pipe(
             ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
-            filter(a => areSameFile(file, a.validatedFile)),
+            filter((a) => areSameFile(file, a.validatedFile)),
             take(1),
             ignoreElements()
           )

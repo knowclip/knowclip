@@ -18,20 +18,20 @@ const projectToMarkdown = (
 
   return [
     `# ${projectMetadata.name}`,
-    ...media.flatMap(id => {
+    ...media.flatMap((id) => {
       const metadata = r.getFile<MediaFile>(state, 'MediaFile', id)
       if (!metadata) throw new Error('Could not find media file')
 
       const clips = mediaFileIdsToClipIds[id]
-        ? mediaFileIdsToClipIds[id].filter(
-            (c): c is string => Boolean(c && c.trim())
+        ? mediaFileIdsToClipIds[id].filter((c): c is string =>
+            Boolean(c && c.trim())
           )
         : []
       if (!clips.length) return []
 
       return [
         `\n## ${metadata.name}`,
-        ...clips.flatMap(clipId => {
+        ...clips.flatMap((clipId) => {
           const clip = r.getClip(state, clipId)
           const flashcard = r.getFlashcard(state, clipId)
 
@@ -43,7 +43,7 @@ const projectToMarkdown = (
             clipTime
               ? `\n**${formatTime(clipTime.start)} - ${formatTime(
                   clipTime.end
-                )}** ${flashcard.tags.map(tag => `_#${tag}_`).join(' ')}`
+                )}** ${flashcard.tags.map((tag) => `_#${tag}_`).join(' ')}`
               : '',
             ...(flashcard.type === 'Simple'
               ? [
@@ -57,7 +57,7 @@ const projectToMarkdown = (
                   `* ${flashcard.fields.meaning}`,
                   `* ${flashcard.fields.notes}`,
                 ]
-            ).map(rawString => rawString.replace(/[\n\r]/g, '<br>')),
+            ).map((rawString) => rawString.replace(/[\n\r]/g, '<br>')),
           ]
         }),
       ]

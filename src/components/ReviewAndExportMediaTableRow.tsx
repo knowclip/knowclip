@@ -55,26 +55,20 @@ const ReviewAndExportMediaTableRow = memo(
       dispatch,
     ])
 
-    const selectClip = useCallback(
-      () => {
-        if (currentMediaFile && !isHighlighted && clipTime) {
-          const mediaPlayer = document.getElementById(
-            'mediaPlayer'
-          ) as HTMLVideoElement | null
-          if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
-        }
-      },
-      [clipTime, currentMediaFile, isHighlighted]
-    )
+    const selectClip = useCallback(() => {
+      if (currentMediaFile && !isHighlighted && clipTime) {
+        const mediaPlayer = document.getElementById(
+          'mediaPlayer'
+        ) as HTMLVideoElement | null
+        if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
+      }
+    }, [clipTime, currentMediaFile, isHighlighted])
 
-    const startEditing = useCallback(
-      () => {
-        selectClip()
-        dispatch(actions.startEditingCards())
-        dispatch(actions.closeDialog())
-      },
-      [dispatch, selectClip]
-    )
+    const startEditing = useCallback(() => {
+      selectClip()
+      dispatch(actions.startEditingCards())
+      dispatch(actions.closeDialog())
+    }, [dispatch, selectClip])
 
     useEffect(() => measure(), [measure])
 
@@ -91,7 +85,7 @@ const ReviewAndExportMediaTableRow = memo(
         <section className={css.checkbox}>
           <Checkbox
             checked={isSelected}
-            onClick={useCallback(e => e.stopPropagation(), [])}
+            onClick={useCallback((e) => e.stopPropagation(), [])}
             onChange={useCallback(() => onSelect(id), [onSelect, id])}
             className={$.clipCheckboxes}
           />
@@ -134,7 +128,7 @@ const ReviewAndExportMediaTableRow = memo(
           )}
         </section>
         <section className={css.tags}>
-          {tags.map(t => (
+          {tags.map((t) => (
             <ShortTag key={t} title={t} />
           ))}
         </section>
@@ -161,47 +155,41 @@ const TranscriptionFieldPreview = ({
 }) => {
   const rangesWithClozeIndexes = clozeDeletions
     .flatMap(({ ranges }, clozeIndex) => {
-      return ranges.map(range => ({ range, clozeIndex }))
+      return ranges.map((range) => ({ range, clozeIndex }))
     })
     .sort((a, b) => a.range.start - b.range.start)
-  const segments: ReactNode[] = useMemo(
-    () => {
-      const segments: ReactNode[] = []
-      const clozeStart = rangesWithClozeIndexes[0]
-        ? rangesWithClozeIndexes[0].range.start
-        : value.length
-      if (clozeStart > 0) {
-        segments.push(value.slice(0, clozeStart))
-      }
+  const segments: ReactNode[] = useMemo(() => {
+    const segments: ReactNode[] = []
+    const clozeStart = rangesWithClozeIndexes[0]
+      ? rangesWithClozeIndexes[0].range.start
+      : value.length
+    if (clozeStart > 0) {
+      segments.push(value.slice(0, clozeStart))
+    }
 
-      rangesWithClozeIndexes.forEach(
-        ({ range: { start, end }, clozeIndex }, i) => {
-          segments.push(
-            <span
-              className={css.clozeDeletion}
-              key={String(start) + String(end)}
-            >
-              {value.slice(start, end)}
-            </span>
-          )
+    rangesWithClozeIndexes.forEach(
+      ({ range: { start, end }, clozeIndex }, i) => {
+        segments.push(
+          <span className={css.clozeDeletion} key={String(start) + String(end)}>
+            {value.slice(start, end)}
+          </span>
+        )
 
-          const nextRange: {
-            range: ClozeRange
-            clozeIndex: number
-          } | null = rangesWithClozeIndexes[i + 1] || null
-          const subsequentGapEnd = nextRange
-            ? nextRange.range.start
-            : value.length
+        const nextRange: {
+          range: ClozeRange
+          clozeIndex: number
+        } | null = rangesWithClozeIndexes[i + 1] || null
+        const subsequentGapEnd = nextRange
+          ? nextRange.range.start
+          : value.length
 
-          if (subsequentGapEnd - end > 0) {
-            segments.push(value.slice(end, subsequentGapEnd))
-          }
+        if (subsequentGapEnd - end > 0) {
+          segments.push(value.slice(end, subsequentGapEnd))
         }
-      )
-      return segments
-    },
-    [rangesWithClozeIndexes, value]
-  )
+      }
+    )
+    return segments
+  }, [rangesWithClozeIndexes, value])
 
   if (!value) return <>[no transcription given]</>
   return <>{segments}</>

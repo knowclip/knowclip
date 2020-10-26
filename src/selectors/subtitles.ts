@@ -297,18 +297,18 @@ export const getNewFlashcardForStretchedClip = (
         ).filter(newlyOverlapped)
       : []
 
-    const newText = chunks.map(chunk => chunk.text).join('\n')
+    const newText = chunks.map((chunk) => chunk.text).join('\n')
 
     newFields[fieldName] = (direction === 'PREPEND'
       ? [newText, originalText]
       : [originalText, newText]
     )
-      .filter(t => t.trim())
+      .filter((t) => t.trim())
       .join('\n')
 
     if (fieldName === 'transcription' && direction === 'PREPEND') {
       const difference = newFields[fieldName].length - originalText.length
-      flashcard.cloze = flashcard.cloze.map(c => ({
+      flashcard.cloze = flashcard.cloze.map((c) => ({
         ...c,
         ranges: c.ranges.map(({ start, end }) => ({
           start: start + difference,
@@ -320,7 +320,7 @@ export const getNewFlashcardForStretchedClip = (
 
   if (
     Object.keys(newFields).every(
-      k =>
+      (k) =>
         originalFields[k as TransliterationFlashcardFieldName] ===
         newFields[k as TransliterationFlashcardFieldName]
     )

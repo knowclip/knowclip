@@ -31,7 +31,7 @@ const settings: Reducer<SettingsState, Action> = (
       return {
         ...state,
         assetsDirectories: state.assetsDirectories.filter(
-          path => !action.directoryPaths.includes(path)
+          (path) => !action.directoryPaths.includes(path)
         ),
       }
 
@@ -53,7 +53,7 @@ const settings: Reducer<SettingsState, Action> = (
     case A.ADD_ACTIVE_DICTIONARY: {
       const activeDictionaries = new Set([
         ...(state.activeDictionaries || []).filter(
-          d => d.type === action.dictionaryType
+          (d) => d.type === action.dictionaryType
         ),
         { id: action.id, type: action.dictionaryType },
       ])
@@ -67,7 +67,7 @@ const settings: Reducer<SettingsState, Action> = (
       return {
         ...state,
         activeDictionaries: (state.activeDictionaries || []).filter(
-          d => d.id !== action.id
+          (d) => d.id !== action.id
         ),
       }
 

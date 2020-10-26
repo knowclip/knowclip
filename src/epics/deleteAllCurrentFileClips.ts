@@ -13,7 +13,7 @@ const deleteAllCurrentFileClips: AppEpic = (action$, state$) =>
       const currentFileId = r.getCurrentFileId(state$.value)
       return currentFileId ? of(currentFileId) : empty()
     }),
-    map(currentFileId =>
+    map((currentFileId) =>
       r.doesCurrentFileHaveClips(state$.value)
         ? r.confirmationDialog(
             'Are you sure you want to delete all your work for this file?',

@@ -17,7 +17,7 @@ const preloadVideoStills: AppEpic = (action$, state$) =>
       ]
 
       const actions = adjacentClipsIds
-        .map(id => {
+        .map((id) => {
           const still = r.getFileWithAvailability<VideoStillImageFile>(
             state$.value,
             'VideoStillImage',

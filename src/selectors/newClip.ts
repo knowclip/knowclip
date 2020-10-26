@@ -20,8 +20,9 @@ export const getNewClipAndCard = <F extends FlashcardFields>(
 ): { clip: Clip; flashcard: Flashcard } => {
   const tags = getDefaultTags(state)
   const mediaFile = state.files.MediaFile[mediaFileId]
-  const includeStill =
-    mediaFile && mediaFile.isVideo ? getDefaultIncludeStill(state) : false
+  const includeStill = mediaFile?.isVideo
+    ? getDefaultIncludeStill(state)
+    : false
 
   const [start, end] = sortClipPoints(pendingClip)
   return {

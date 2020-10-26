@@ -45,21 +45,16 @@ const Export = React.memo(
       }
     })
 
-    const closeDialog = useCallback(
-      () => {
-        const currentMediaId = currentMedia && currentMedia.id
-        const initialMediaId = mediaOpenPrior && mediaOpenPrior.id
-        if (currentMediaId !== initialMediaId)
-          dispatch(
-            mediaOpenPrior
-              ? r.openFileRequest(mediaOpenPrior)
-              : r.dismissMedia()
-          )
+    const closeDialog = useCallback(() => {
+      const currentMediaId = currentMedia && currentMedia.id
+      const initialMediaId = mediaOpenPrior && mediaOpenPrior.id
+      if (currentMediaId !== initialMediaId)
+        dispatch(
+          mediaOpenPrior ? r.openFileRequest(mediaOpenPrior) : r.dismissMedia()
+        )
 
-        dispatch(actions.closeDialog())
-      },
-      [currentMedia, dispatch, mediaOpenPrior]
-    )
+      dispatch(actions.closeDialog())
+    }, [currentMedia, dispatch, mediaOpenPrior])
 
     const [currentTabIndex, setCurrentTabIndex] = useState(0)
     const [selectionHasStarted, setSelectionHasStarted] = useState(false)
@@ -72,15 +67,13 @@ const Export = React.memo(
     ])
     const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
     const somethingSelected = useMemo(
-      () => Object.values(selectedIds).some(ids => ids.some(id => Boolean(id))),
+      () =>
+        Object.values(selectedIds).some((ids) => ids.some((id) => Boolean(id))),
       [selectedIds]
     )
-    const exportApkg = useCallback(
-      () => {
-        dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
-      },
-      [dispatch, selectedIds, mediaOpenPrior]
-    )
+    const exportApkg = useCallback(() => {
+      dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
+    }, [dispatch, selectedIds, mediaOpenPrior])
     const csvAndMp3ExportDialog = useCallback(
       () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
       [dispatch, selectedIds]
@@ -92,7 +85,7 @@ const Export = React.memo(
 
     const onSelect = useCallback(
       (mediaFileId: string, id: string) =>
-        setSelectedIds(mediaToClips => {
+        setSelectedIds((mediaToClips) => {
           const selectedIds = mediaToClips[mediaFileId]
           const newSelectedIds = [...selectedIds]
           const index = clipIdsByMediaFileId[mediaFileId].indexOf(id)
@@ -107,7 +100,7 @@ const Export = React.memo(
     )
     const onSelectAll = useCallback(
       (mediaFileId: string) => {
-        setSelectedIds(mediaToClips => {
+        setSelectedIds((mediaToClips) => {
           const selectedIds = mediaToClips[mediaFileId]
           const wasSelected = clipIdsByMediaFileId[mediaFileId].every(
             (id, i) => selectedIds[i] === id
@@ -124,7 +117,7 @@ const Export = React.memo(
       [clipIdsByMediaFileId]
     )
     const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
-      projectMedia.findIndex(metadata => metadata.id === currentFileId)
+      projectMedia.findIndex((metadata) => metadata.id === currentFileId)
     )
     const onClickTable = useCallback(
       (index: number) => {

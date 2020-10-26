@@ -8,7 +8,7 @@ import { getDexieDb } from '../dictionariesDatabase'
 export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
   let termBankMet = false
   const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
-    yauzl.open(filePath, { lazyEntries: true }, function(err, zipfile) {
+    yauzl.open(filePath, { lazyEntries: true }, function (err, zipfile) {
       if (err) return rej(err)
       if (!zipfile) return rej(new Error('problem reading zip file'))
 
@@ -22,7 +22,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
 
   const entriesObservable = fromEvent(zipfile, 'entry').pipe(
     takeUntil(fromEvent(zipfile, 'close')),
-    mergeMap(_entry => {
+    mergeMap((_entry) => {
       visitedEntries++
 
       const entry: yauzl.Entry = _entry as any
@@ -47,7 +47,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
       const { uncompressedSize: entryTotalBytes } = entry
       return concat(
         from(entryReadStreamPromise).pipe(
-          mergeMap(entryReadStream => {
+          mergeMap((entryReadStream) => {
             const context = {
               nextChunkStart: '',
               buffer: [] as LexiconEntry[],
@@ -55,7 +55,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
 
             const readEntryObservable = fromEvent(entryReadStream, 'data').pipe(
               takeUntil(fromEvent(entryReadStream, 'end')),
-              tap(async _data => {
+              tap(async (_data) => {
                 const data: Buffer = _data as any
 
                 entryBytesProcessed += data.length
@@ -104,7 +104,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
       return from([100])
     })
   ).pipe(
-    catchError(err => {
+    catchError((err) => {
       zipfile.close()
       throw err
     })

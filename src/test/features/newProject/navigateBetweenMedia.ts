@@ -17,8 +17,8 @@ export default async function navigateBetweenMedia({ client }: TestSetup) {
   const menuItems = await client.elements_(mediaFileMenuItem)
   expect(menuItems).toHaveLength(2)
 
-  const menuItemsText = await Promise.all(menuItems.map(mi => mi.getText()))
-  const otherVideoIndex = menuItemsText.findIndex(text =>
+  const menuItemsText = await Promise.all(menuItems.map((mi) => mi.getText()))
+  const otherVideoIndex = menuItemsText.findIndex((text) =>
     text.includes('polar_bear_cafe.mp4')
   )
 

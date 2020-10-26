@@ -33,7 +33,7 @@ const FileSelectionDialog = ({
   const dispatch = useDispatch()
 
   const onSubmit = useCallback(
-    path => {
+    (path) => {
       dispatch(actions.locateFileSuccess(file, path))
       dispatch(actions.closeDialog())
     },
@@ -53,29 +53,23 @@ const FileSelectionDialog = ({
     toggleCheckFolderAutomatically,
   } = useLocationForm(getFileFilters(file.type), onSubmit)
 
-  const cancel = useCallback(
-    () => {
-      if (availability.isLoading)
-        dispatch(
-          actions.openFileFailure(
-            file,
-            null,
-            `Could not locate ${getHumanFileName(
-              file
-            )}. Some features may be unavailable until it is located.`
-          )
+  const cancel = useCallback(() => {
+    if (availability.isLoading)
+      dispatch(
+        actions.openFileFailure(
+          file,
+          null,
+          `Could not locate ${getHumanFileName(
+            file
+          )}. Some features may be unavailable until it is located.`
         )
-      dispatch(actions.closeDialog())
-    },
-    [availability.isLoading, dispatch, file]
-  )
-  const closeAndGoToSettings = useCallback(
-    () => {
-      cancel()
-      dispatch(actions.settingsDialog())
-    },
-    [cancel, dispatch]
-  )
+      )
+    dispatch(actions.closeDialog())
+  }, [availability.isLoading, dispatch, file])
+  const closeAndGoToSettings = useCallback(() => {
+    cancel()
+    dispatch(actions.settingsDialog())
+  }, [cancel, dispatch])
   // TODO: check if file path exists due to recent change
   //       and close dialog in that case.
 
@@ -142,24 +136,21 @@ const useLocationForm = (
   const autoCheckFolders = useSelector(
     (state: AppState) => state.settings.assetsDirectories
   )
-  useEffect(
-    () => {
-      const trimmedLocation = locationText.trim()
-      setCheckFolderAutomatically(
-        Boolean(
-          trimmedLocation && autoCheckFolders.includes(dirname(trimmedLocation))
-        )
+  useEffect(() => {
+    const trimmedLocation = locationText.trim()
+    setCheckFolderAutomatically(
+      Boolean(
+        trimmedLocation && autoCheckFolders.includes(dirname(trimmedLocation))
       )
-    },
-    [autoCheckFolders, locationText]
-  )
+    )
+  }, [autoCheckFolders, locationText])
 
-  const fillInLocation = useCallback(text => {
+  const fillInLocation = useCallback((text) => {
     setLocationText(text)
     setErrorText('')
   }, [])
   const onLocationTextFocus = useCallback(
-    async e => {
+    async (e) => {
       const filePaths = await showOpenDialog(filters)
 
       if (!filePaths) return
@@ -170,7 +161,7 @@ const useLocationForm = (
     [fillInLocation, filters]
   )
   const handleSubmit = useCallback(
-    e => {
+    (e) => {
       if (locationText) {
         const directory = dirname(locationText.trim())
         if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
@@ -198,8 +189,8 @@ const useLocationForm = (
     onLocationTextFocus,
     handleSubmit,
     toggleCheckFolderAutomatically: useCallback(
-      e => {
-        setCheckFolderAutomatically(checked => !checked)
+      (e) => {
+        setCheckFolderAutomatically((checked) => !checked)
       },
       [setCheckFolderAutomatically]
     ),

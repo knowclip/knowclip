@@ -93,55 +93,48 @@ const NewProjectFormDialog = ({
 
   const dispatch = useDispatch()
 
-  const validate = useCallback(
-    () => {
-      const newErrors: typeof errors = {
-        name: '',
-        filePath: '',
-        noteType: '',
-      }
+  const validate = useCallback(() => {
+    const newErrors: typeof errors = {
+      name: '',
+      filePath: '',
+      noteType: '',
+    }
 
-      if (!fieldValues.name.trim())
-        newErrors.name = 'Please enter a name for your project.'
+    if (!fieldValues.name.trim())
+      newErrors.name = 'Please enter a name for your project.'
 
-      if (!fieldValues.filePath.trim())
-        newErrors.filePath =
-          'Please specify where you want to save your project.'
+    if (!fieldValues.filePath.trim())
+      newErrors.filePath = 'Please specify where you want to save your project.'
 
-      if (!fieldValues.noteType.trim())
-        newErrors.noteType = 'Please choose a note type.'
+    if (!fieldValues.noteType.trim())
+      newErrors.noteType = 'Please choose a note type.'
 
-      return newErrors
-    },
-    [errors, fieldValues]
-  )
+    return newErrors
+  }, [errors, fieldValues])
 
   const closeDialog = useCallback(() => dispatch(actions.closeDialog()), [
     dispatch,
   ])
 
-  const handleSubmit = useCallback(
-    () => {
-      const errors = validate()
-      if (Object.values(errors).filter(err => err).length)
-        return setState(state => ({ ...state, errors }))
+  const handleSubmit = useCallback(() => {
+    const errors = validate()
+    if (Object.values(errors).filter((err) => err).length)
+      return setState((state) => ({ ...state, errors }))
 
-      const { filePath, name } = fieldValues
-      dispatch(
-        actions.createProject(
-          uuid(),
-          name,
-          (fieldValues.noteType as unknown) as NoteType, // guaranteed after validation
-          filePath,
-          nowUtcTimestamp()
-        )
+    const { filePath, name } = fieldValues
+    dispatch(
+      actions.createProject(
+        uuid(),
+        name,
+        (fieldValues.noteType as unknown) as NoteType, // guaranteed after validation
+        filePath,
+        nowUtcTimestamp()
       )
-      dispatch(actions.closeDialog())
-    },
-    [dispatch, fieldValues, validate]
-  )
+    )
+    dispatch(actions.closeDialog())
+  }, [dispatch, fieldValues, validate])
   const setNameText = useCallback(
-    text =>
+    (text) =>
       setState(({ fieldValues, errors }) => ({
         fieldValues: { ...fieldValues, name: text },
         errors: { ...errors, name: '' },
@@ -159,12 +152,12 @@ const NewProjectFormDialog = ({
     [setState]
   )
 
-  const handleChangeNameText = useCallback(e => setNameText(e.target.value), [
+  const handleChangeNameText = useCallback((e) => setNameText(e.target.value), [
     setNameText,
   ])
 
   const handleChangeNoteType = useCallback(
-    e =>
+    (e) =>
       setState(({ fieldValues, errors }) => ({
         fieldValues: { ...fieldValues, noteType: e.target.value },
         errors: { ...errors, noteType: '' },
@@ -172,13 +165,10 @@ const NewProjectFormDialog = ({
     [setState]
   )
 
-  const showSaveAfcaDialog = useCallback(
-    async () => {
-      const filePath = await showSaveDialog('Knowclip project File', ['kyml'])
-      return filePath ? setFilePathText(filePath) : null
-    },
-    [setFilePathText]
-  )
+  const showSaveAfcaDialog = useCallback(async () => {
+    const filePath = await showSaveDialog('Knowclip project File', ['kyml'])
+    return filePath ? setFilePathText(filePath) : null
+  }, [setFilePathText])
 
   return (
     <Dialog open={open}>

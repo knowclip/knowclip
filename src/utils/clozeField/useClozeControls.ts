@@ -45,7 +45,7 @@ export default function useClozeControls({
       if (
         currentDeletion &&
         (currentDeletion.ranges.length === 0 ||
-          currentDeletion.ranges.every(r => r.start === r.end))
+          currentDeletion.ranges.every((r) => r.start === r.end))
       ) {
         if (onDeleteClozeCard) onDeleteClozeCard(clozeIndex)
         const nextIndex = newIndex <= clozeIndex ? newIndex : newIndex - 1
@@ -57,15 +57,12 @@ export default function useClozeControls({
     },
     [clozeIndex, deletions, dispatch, onDeleteClozeCard, playing]
   )
-  useEffect(
-    () => {
-      ;(window as any).cloze = clozeIndex !== -1
-      return () => {
-        ;(window as any).cloze = false
-      }
-    },
-    [clozeIndex]
-  )
+  useEffect(() => {
+    ;(window as any).cloze = clozeIndex !== -1
+    return () => {
+      ;(window as any).cloze = false
+    }
+  }, [clozeIndex])
 
   const getSelection = useCallback(() => {
     const el = inputRef.current
@@ -133,76 +130,65 @@ export default function useClozeControls({
     ]
   )
 
-  useEffect(
-    () => {
-      if (clozeIndex > deletions.length) setClozeIndex(deletions.length)
-    },
-    [clozeIndex, deletions.length, setClozeIndex]
-  )
-  useEffect(
-    () => {
-      const keyup = (e: KeyboardEvent) => {
-        const currentSelection = selection.current
-        selection.current = null
+  useEffect(() => {
+    if (clozeIndex > deletions.length) setClozeIndex(deletions.length)
+  }, [clozeIndex, deletions.length, setClozeIndex])
+  useEffect(() => {
+    const keyup = (e: KeyboardEvent) => {
+      const currentSelection = selection.current
+      selection.current = null
 
-        if (
-          (e.key === KEYS.enter ||
-            (e.key.toLowerCase() === KEYS.cLowercase &&
-              !e.metaKey &&
-              !e.ctrlKey)) &&
-          currentSelection &&
-          currentSelection.start !== currentSelection.end
-        ) {
-          // C key
-          // enter key
-          if (clozeIndex === -1) {
-            const newIndex = deletions.length
-            if (newIndex < ClozeIds.length)
-              return confirmSelection(newIndex, currentSelection)
-            else
-              return dispatch(
-                r.simpleMessageSnackbar(
-                  `You've already reached the maximum of ${
-                    ClozeIds.length
-                  } cloze deletions per card.`
-                )
+      if (
+        (e.key === KEYS.enter ||
+          (e.key.toLowerCase() === KEYS.cLowercase &&
+            !e.metaKey &&
+            !e.ctrlKey)) &&
+        currentSelection &&
+        currentSelection.start !== currentSelection.end
+      ) {
+        // C key
+        // enter key
+        if (clozeIndex === -1) {
+          const newIndex = deletions.length
+          if (newIndex < ClozeIds.length)
+            return confirmSelection(newIndex, currentSelection)
+          else
+            return dispatch(
+              r.simpleMessageSnackbar(
+                `You've already reached the maximum of ${ClozeIds.length} cloze deletions per card.`
               )
-          }
-          return confirmSelection(clozeIndex, currentSelection)
-        } else if (
-          e.key.toLowerCase() === KEYS.cLowercase &&
-          !e.metaKey &&
-          !e.ctrlKey
-        ) {
-          const potentialNewIndex = clozeIndex + 1
-          const newIndex =
-            potentialNewIndex > deletions.length ? -1 : potentialNewIndex
-          return setClozeIndex(newIndex)
-        } else if (e.key === KEYS.enter || e.key === KEYS.escape) {
-          if (clozeIndex !== -1) setClozeIndex(-1)
+            )
         }
+        return confirmSelection(clozeIndex, currentSelection)
+      } else if (
+        e.key.toLowerCase() === KEYS.cLowercase &&
+        !e.metaKey &&
+        !e.ctrlKey
+      ) {
+        const potentialNewIndex = clozeIndex + 1
+        const newIndex =
+          potentialNewIndex > deletions.length ? -1 : potentialNewIndex
+        return setClozeIndex(newIndex)
+      } else if (e.key === KEYS.enter || e.key === KEYS.escape) {
+        if (clozeIndex !== -1) setClozeIndex(-1)
       }
+    }
 
-      document.addEventListener('keyup', keyup)
+    document.addEventListener('keyup', keyup)
 
-      return () => document.removeEventListener('keyup', keyup)
-    },
-    [
-      clozeIndex,
-      confirmSelection,
-      deletions.length,
-      dispatch,
-      getSelection,
-      setClozeIndex,
-    ]
-  )
+    return () => document.removeEventListener('keyup', keyup)
+  }, [
+    clozeIndex,
+    confirmSelection,
+    deletions.length,
+    dispatch,
+    getSelection,
+    setClozeIndex,
+  ])
 
-  const registerSelection = useCallback(
-    () => {
-      selection.current = getSelection() || null
-    },
-    [getSelection, selection]
-  )
+  const registerSelection = useCallback(() => {
+    selection.current = getSelection() || null
+  }, [getSelection, selection])
 
   useEffect(() => {
     const keydown = (e: KeyboardEvent) => {
@@ -220,7 +206,7 @@ export default function useClozeControls({
 
   const clozeTextInputActions = {
     onBackspace: useCallback(
-      selection => {
+      (selection) => {
         console.log({ selection })
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end && selection.start !== 0) {
@@ -250,7 +236,7 @@ export default function useClozeControls({
       [clozeIndex, deletions, editingCard, onEditClozeCard, setCursorPosition]
     ),
     onPressDelete: useCallback(
-      selection => {
+      (selection) => {
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end) {
             const newCursor = selection.end + 1

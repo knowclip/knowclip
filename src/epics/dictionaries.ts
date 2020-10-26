@@ -15,8 +15,10 @@ import { RehydrateAction } from 'redux-persist'
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType('persist/REHYDRATE' as any),
-    filter(action => ((action as unknown) as RehydrateAction).key === 'files'),
-    mergeMap(_rehydrated => {
+    filter(
+      (action) => ((action as unknown) as RehydrateAction).key === 'files'
+    ),
+    mergeMap((_rehydrated) => {
       // TODO: investigate if it would be better to get these from indexed DB dictionaries table instead
       const dicts = Object.entries(state$.value.fileAvailabilities.Dictionary)
       const openFileActions = dicts.flatMap(
@@ -90,9 +92,9 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           actions.addFile(file, filePath),
         ]),
         from(effects.parseAndImportDictionary(file, filePath)).pipe(
-          mergeMap(obs =>
+          mergeMap((obs) =>
             obs.pipe(
-              mergeMap(decimal => {
+              mergeMap((decimal) => {
                 const newPercentage = Math.round(decimal * 100)
                 const { progress } = state$.value.session
                 if (progress && progress.percentage !== newPercentage)
@@ -119,7 +121,7 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           ),
         ])
       ).pipe(
-        catchError(err => {
+        catchError((err) => {
           console.error(err)
 
           return from([
@@ -138,7 +140,7 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
 
 const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
   action$.ofType<DeleteImportedDictionary>(A.DELETE_IMPORTED_DICTIONARY).pipe(
-    mergeMap(action => {
+    mergeMap((action) => {
       return concat(
         of(
           actions.setProgress({
@@ -149,7 +151,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
         from(
           deleteDictionary(
             effects,
-            s.getOpenDictionaryFiles(state$.value).map(d => d.file),
+            s.getOpenDictionaryFiles(state$.value).map((d) => d.file),
             action.file.key,
             action.file.dictionaryType
           )
@@ -163,7 +165,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
               ),
             ])
           }),
-          catchError(err => {
+          catchError((err) => {
             console.error(err)
 
             return from([
@@ -186,13 +188,13 @@ const deleteDatabaseEpic: AppEpic = (action$, state$, effects) =>
           return [
             ...s
               .getRememberedDictionaryFiles(state$.value)
-              .map(f => actions.deleteFileRequest(f.type, f.id)),
+              .map((f) => actions.deleteFileRequest(f.type, f.id)),
             actions.simpleMessageSnackbar(
               'Dictionaries database was successfully reset.'
             ),
           ]
         }),
-        catchError(err => {
+        catchError((err) => {
           return of(
             actions.simpleMessageSnackbar(
               `Problem deleting dictionaries database: ${err}`

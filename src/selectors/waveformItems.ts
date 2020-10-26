@@ -86,7 +86,7 @@ export const getWaveformItems = createSelector(
 export const getDisplayedWaveformItems = createSelector(
   getWaveformItems,
   (state: AppState) => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems(waveformItem => waveformItem.item.start)
+  limitSelectorToDisplayedItems((waveformItem) => waveformItem.item.start)
 )
 
 export const getWaveformSelection = createSelector(
@@ -196,7 +196,7 @@ export const getNewFieldsFromLinkedSubtitles = (
         const text = fields[fieldName]
 
         fields[fieldName] = [text.trim(), newText.trim()]
-          .filter(s => s)
+          .filter((s) => s)
           .join('\n')
       }
     } else if (cardBase.start >= end) break

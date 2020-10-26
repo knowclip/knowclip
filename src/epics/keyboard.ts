@@ -9,7 +9,7 @@ import { isTextFieldFocused } from '../utils/isTextFieldFocused'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    flatMap(event => {
+    flatMap((event) => {
       const { shiftKey, ctrlKey, altKey, key } = event
 
       if (
@@ -78,7 +78,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
 const saveKey = (window: Window) =>
   merge(
     fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-      filter(e => {
+      filter((e) => {
         const { key } = e
         return key.toLowerCase() === KEYS.sLowercase && getMetaOrCtrlKey(e)
       })

@@ -79,6 +79,6 @@ export function unescapeClozeField(jsonText: string) {
   }
 
   const deletions: ClozeDeletion[] = []
-  sparseDeletions.forEach(d => deletions.push(d))
+  sparseDeletions.forEach((d) => deletions.push(d))
   return { text: text, clozeDeletions: deletions }
 }

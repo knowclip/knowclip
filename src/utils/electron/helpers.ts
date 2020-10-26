@@ -27,7 +27,7 @@ const showSaveDialog = (
       const extension = extname(filePath).replace(/^\./, '')
       const withExtension =
         !extensions.length ||
-        extensions.some(ext => ext.toLowerCase() === extension.toLowerCase())
+        extensions.some((ext) => ext.toLowerCase() === extension.toLowerCase())
           ? filePath
           : filePath + '.' + extensions[0]
       return await res(withExtension)
@@ -53,7 +53,7 @@ const showOpenDialog = (
           filters,
         }
       )
-      return await res(filePaths && filePaths.length ? filePaths : null)
+      return await res(filePaths?.length ? filePaths : null)
     } catch (err) {
       return await rej(err)
     }
@@ -103,9 +103,7 @@ const showOpenDirectoriesDialog = (
           properties,
         }
       )
-      return await res(
-        directoryPaths && directoryPaths.length ? directoryPaths : null
-      )
+      return await res(directoryPaths?.length ? directoryPaths : null)
     } catch (err) {
       return await rej(err)
     }
@@ -119,7 +117,7 @@ const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 
 const showMessageBox: (
   options: MessageBoxOptions
-) => Promise<MessageBoxReturnValue | null> = options => {
+) => Promise<MessageBoxReturnValue | null> = (options) => {
   pauseMedia()
   return electron.remote.dialog.showMessageBox(
     electron.remote.getCurrentWindow(),

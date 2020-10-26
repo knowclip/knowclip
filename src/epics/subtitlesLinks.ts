@@ -18,7 +18,7 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
           const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
           const previouslyLinkedField = (Object.keys(
             previousLinks
-          ) as FlashcardFieldName[]).find(fn => {
+          ) as FlashcardFieldName[]).find((fn) => {
             const fieldName = fn as TransliterationFlashcardFieldName
             return previousLinks[fieldName] === subtitlesTrackId
           })
@@ -72,7 +72,7 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
         action.type === A.UPDATE_FILE &&
         isUpdateWith('linkFlashcardFieldToSubtitlesTrack', action)
     ),
-    flatMap(action => {
+    flatMap((action) => {
       const currentNoteType = r.getCurrentNoteType(state$.value)
       if (!currentNoteType) return empty()
 
@@ -125,7 +125,7 @@ export const newClipFromChunk: AppEpic = (
   action$
     .ofType<NewCardFromSubtitlesRequest>(A.NEW_CARD_FROM_SUBTITLES_REQUEST)
     .pipe(
-      flatMap(action => {
+      flatMap((action) => {
         const selection = action.linkedSubtitlesChunkSelection
 
         const mediaFileId = r.getCurrentFileId(state$.value)
@@ -178,7 +178,7 @@ const updateSelectionAfterLink: AppEpic = (
           )
         )
       ),
-      flatMap(selection => {
+      flatMap((selection) => {
         if (selection && selection.type === 'Preview') {
           const newSelection = r.getNewWaveformSelectionAt(
             state$.value,

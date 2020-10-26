@@ -12,8 +12,8 @@ export function trimClozeRangeOverlaps(
       if (newIndex === i) {
         return bottomRanges
       }
-      return bottomRanges.flatMap(bottomRange => {
-        const overlappingTopRanges = topRanges.filter(topRange =>
+      return bottomRanges.flatMap((bottomRange) => {
+        const overlappingTopRanges = topRanges.filter((topRange) =>
           overlaps(topRange, bottomRange)
         )
         if (!overlappingTopRanges.length) {
@@ -22,7 +22,7 @@ export function trimClozeRangeOverlaps(
 
         return overlappingTopRanges.reduce(
           (bottomRangeSegments, topRange) => {
-            return bottomRangeSegments.flatMap(bottomRangeSegment => {
+            return bottomRangeSegments.flatMap((bottomRangeSegment) => {
               const withoutOverlaps: ClozeRange[] = []
               const overlap = overlaps(topRange, bottomRangeSegment)
 
@@ -61,7 +61,7 @@ export function trimClozeRangeOverlaps(
   if (nothingAdded) return oldDeletions
 
   newDeletions[newIndex] = {
-    ranges: rangesWithoutOverlaps.filter(r => r.start !== r.end),
+    ranges: rangesWithoutOverlaps.filter((r) => r.start !== r.end),
   }
 
   return newDeletions

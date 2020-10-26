@@ -105,7 +105,7 @@ export function getGermanSearchTokens(
 
   return (lowerCase ? withoutAnnotations.toLowerCase() : withoutAnnotations)
     .split(NON_LETTERS_DIGITS_PLUS)
-    .filter(x => x && !trimmedFillerWords.has(x))
+    .filter((x) => x && !trimmedFillerWords.has(x))
 }
 
 export function trimAnnotations(text: string) {

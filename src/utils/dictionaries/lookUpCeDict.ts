@@ -16,16 +16,13 @@ export async function lookUpCeDict(
   const dexie = getDexieDb()
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
 
-  const allLookupTokens = Array.from(allTokens, token => [
+  const allLookupTokens = Array.from(allTokens, (token) => [
     token,
     // maybe memoize lemmatize in this function
-    ...lemmatize(token).map(t => t.text),
+    ...lemmatize(token).map((t) => t.text),
   ]).flat()
   const table = await dexie.table(getTableName('CEDictDictionary'))
-  const fromText = await table
-    .where(HEAD)
-    .anyOf(allLookupTokens)
-    .distinct()
+  const fromText = await table.where(HEAD).anyOf(allLookupTokens).distinct()
 
   const simplifiedFromText = await table
     .where(VARIANT)
@@ -47,7 +44,7 @@ export async function lookUpCeDict(
   })
 
   const tokensTranslations = potentialTokens.flatMap(({ tokens, index }) => {
-    const translatedTokens = tokens.flatMap(token => {
+    const translatedTokens = tokens.flatMap((token) => {
       const candidates = allQueries.flatMap((entry, i) => {
         if (entry.head === token || entry.variant === token)
           return [

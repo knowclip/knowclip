@@ -52,83 +52,71 @@ export function useFieldPopoverDictionary(
   const previousPopoverIsOpen = usePrevious(popover.isOpen)
   const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
 
-  useEffect(
-    () => {
-      dispatch(
-        popover.isOpen ? r.openDictionaryPopover() : r.closeDictionaryPopover()
-      )
-    },
-    [popover.isOpen, dispatch]
-  )
+  useEffect(() => {
+    dispatch(
+      popover.isOpen ? r.openDictionaryPopover() : r.closeDictionaryPopover()
+    )
+  }, [popover.isOpen, dispatch])
   const { close: closePopover } = popover
 
   // loop when using dictionary
-  useEffect(
-    () => {
-      if (
-        popover.isOpen &&
-        !previousPopoverIsOpen &&
-        !editing &&
-        isMediaPlaying
-      ) {
-        setWasLoopingBeforeFocus(loopIsOn)
-        dispatch(r.setLoop(true))
-      }
-    },
-    [
-      isMediaPlaying,
-      popover.isOpen,
-      editing,
-      previousPopoverIsOpen,
-      loopIsOn,
-      dispatch,
-      setWasLoopingBeforeFocus,
-    ]
-  )
+  useEffect(() => {
+    if (
+      popover.isOpen &&
+      !previousPopoverIsOpen &&
+      !editing &&
+      isMediaPlaying
+    ) {
+      setWasLoopingBeforeFocus(loopIsOn)
+      dispatch(r.setLoop(true))
+    }
+  }, [
+    isMediaPlaying,
+    popover.isOpen,
+    editing,
+    previousPopoverIsOpen,
+    loopIsOn,
+    dispatch,
+    setWasLoopingBeforeFocus,
+  ])
 
   const popoverWasOpen = usePrevious(popover.isOpen)
 
-  useEffect(
-    () => {
-      if (popoverWasOpen && !popover.isOpen) {
-        if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
-          dispatch(r.setLoop(wasLoopingBeforeFocus))
-        }
+  useEffect(() => {
+    if (popoverWasOpen && !popover.isOpen) {
+      if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
+        dispatch(r.setLoop(wasLoopingBeforeFocus))
       }
-    },
-    [
-      dispatch,
-      editing,
-      isMediaPlaying,
-      loopIsOn,
-      popover.isOpen,
-      popoverWasOpen,
-      wasLoopingBeforeFocus,
-    ]
-  )
+    }
+  }, [
+    dispatch,
+    editing,
+    isMediaPlaying,
+    loopIsOn,
+    popover.isOpen,
+    popoverWasOpen,
+    wasLoopingBeforeFocus,
+  ])
 
-  useEffect(
-    () => {
-      if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {
-        if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
-          dispatch(r.setLoop(wasLoopingBeforeFocus))
-        }
-
-        closePopover({} as SyntheticEvent)
+  useEffect(() => {
+    if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {
+      if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
+        dispatch(r.setLoop(wasLoopingBeforeFocus))
       }
-    },
-    [
-      popoverWasOpen,
-      popover.isOpen,
-      popoverIsOpenFromStore,
-      closePopover,
-      isMediaPlaying,
-      editing,
-      wasLoopingBeforeFocus,
-      loopIsOn,
-      dispatch,
-    ]
-  )
+
+      closePopover({} as SyntheticEvent)
+    }
+  }, [
+    popoverWasOpen,
+    popover.isOpen,
+    popoverIsOpenFromStore,
+    closePopover,
+    isMediaPlaying,
+    editing,
+    wasLoopingBeforeFocus,
+    loopIsOn,
+    dispatch,
+  ])
 
   const { anchorCallbackRef } = popover
 
@@ -157,111 +145,96 @@ export function useFieldPopoverDictionary(
     wasLoopingBeforeFocus
   )
 
-  useEffect(
-    () => {
-      if (activeDictionaryType) {
-        lookUpInDictionary(activeDictionaryType, value).then(
-          ({ tokensTranslations }) => {
-            setTokenTranslations(tokensTranslations)
-          }
-        )
-      } else {
-        setTokenTranslations([])
-      }
-    },
-    [value, activeDictionaryType]
-  )
+  useEffect(() => {
+    if (activeDictionaryType) {
+      lookUpInDictionary(activeDictionaryType, value).then(
+        ({ tokensTranslations }) => {
+          setTokenTranslations(tokensTranslations)
+        }
+      )
+    } else {
+      setTokenTranslations([])
+    }
+  }, [value, activeDictionaryType])
 
   const [mouseoverChar, setMouseoverChar] = useState<HTMLSpanElement | null>(
     null
   )
-  useEffect(
-    () => {
-      const mouseoverCharSpan = getMouseoverChar(getMousePosition())
+  useEffect(() => {
+    const mouseoverCharSpan = getMouseoverChar(getMousePosition())
 
-      setMouseoverChar(mouseoverCharSpan)
-      anchorCallbackRef(mouseoverCharSpan)
+    setMouseoverChar(mouseoverCharSpan)
+    anchorCallbackRef(mouseoverCharSpan)
 
-      const trackCursor = (e: MouseEvent) => {
-        const mouseoverCharSpan = getMouseoverChar([e.clientX, e.clientY])
-        if (mouseoverCharSpan) {
-          setMouseoverChar(mouseoverCharSpan)
-          anchorCallbackRef(mouseoverCharSpan)
-        }
+    const trackCursor = (e: MouseEvent) => {
+      const mouseoverCharSpan = getMouseoverChar([e.clientX, e.clientY])
+      if (mouseoverCharSpan) {
+        setMouseoverChar(mouseoverCharSpan)
+        anchorCallbackRef(mouseoverCharSpan)
       }
-      document.addEventListener('mousemove', trackCursor)
-      return () => document.removeEventListener('mousemove', trackCursor)
-    },
-    [anchorCallbackRef]
-  )
+    }
+    document.addEventListener('mousemove', trackCursor)
+    return () => document.removeEventListener('mousemove', trackCursor)
+  }, [anchorCallbackRef])
 
   // show popup on press D
-  useEffect(
-    () => {
-      const showDictionaryPopup = (e: KeyboardEvent) => {
-        const dKey =
-          ref.current &&
-          (e.key === KEYS.dLowercase || e.key === KEYS.dUppercase)
+  useEffect(() => {
+    const showDictionaryPopup = (e: KeyboardEvent) => {
+      const dKey =
+        ref.current && (e.key === KEYS.dLowercase || e.key === KEYS.dUppercase)
 
-        if (
-          dKey &&
-          (!isTextFieldFocused() || ref.current === document.activeElement)
-        ) {
-          if (mouseoverChar) {
-            popover.open(e as any)
-          } else if (!activeDictionaryType) {
-            return dispatch(r.activateDictionaryPromptSnackbar())
-          }
+      if (
+        dKey &&
+        (!isTextFieldFocused() || ref.current === document.activeElement)
+      ) {
+        if (mouseoverChar) {
+          popover.open(e as any)
+        } else if (!activeDictionaryType) {
+          return dispatch(r.activateDictionaryPromptSnackbar())
         }
       }
-      document.addEventListener('keydown', showDictionaryPopup)
-      return () => document.removeEventListener('keydown', showDictionaryPopup)
-    },
-    [
-      activeDictionaryType,
-      dispatch,
-      mouseoverChar,
-      popover,
-      ref,
-      tokenTranslations,
-      tokenTranslations.length,
-    ]
-  )
+    }
+    document.addEventListener('keydown', showDictionaryPopup)
+    return () => document.removeEventListener('keydown', showDictionaryPopup)
+  }, [
+    activeDictionaryType,
+    dispatch,
+    mouseoverChar,
+    popover,
+    ref,
+    tokenTranslations,
+    tokenTranslations.length,
+  ])
 
   // update popup dictionary contents
-  useEffect(
-    () => {
-      if (popover.isOpen && mouseoverChar && !editing) {
-        const mouseCharIndex =
-          mouseoverChar &&
-          mouseoverChar.dataset &&
-          !isNaN(+(mouseoverChar.dataset.characterIndex || ''))
-            ? +(mouseoverChar.dataset.characterIndex || '')
-            : -1
-        const translationsAtCharacter =
-          mouseoverChar && mouseoverChar.dataset
-            ? findTranslationsAtCharIndex(tokenTranslations, mouseCharIndex)
-            : null
+  useEffect(() => {
+    if (popover.isOpen && mouseoverChar && !editing) {
+      const mouseCharIndex =
+        mouseoverChar &&
+        mouseoverChar.dataset &&
+        !isNaN(+(mouseoverChar.dataset.characterIndex || ''))
+          ? +(mouseoverChar.dataset.characterIndex || '')
+          : -1
+      const translationsAtCharacter = mouseoverChar?.dataset
+        ? findTranslationsAtCharIndex(tokenTranslations, mouseCharIndex)
+        : null
 
-        const nonwordMouseenter =
-          !translationsAtCharacter &&
-          !LETTERS_DIGITS_PLUS.test(value[mouseCharIndex])
-        if (!nonwordMouseenter) {
-          setTranslationsAtCharacter(translationsAtCharacter)
-        }
-        if (translationsAtCharacter && mouseCharIndex !== -1) {
-          setSelectionRange(
-            ref.current as HTMLElement,
-            translationsAtCharacter.textCharacterIndex,
-            translationsAtCharacter.textCharacterIndex +
-              translationsAtCharacter.translatedTokens[0].matchedTokenText
-                .length
-          )
-        }
+      const nonwordMouseenter =
+        !translationsAtCharacter &&
+        !LETTERS_DIGITS_PLUS.test(value[mouseCharIndex])
+      if (!nonwordMouseenter) {
+        setTranslationsAtCharacter(translationsAtCharacter)
       }
-    },
-    [popover.isOpen, mouseoverChar, tokenTranslations, ref, editing, value]
-  )
+      if (translationsAtCharacter && mouseCharIndex !== -1) {
+        setSelectionRange(
+          ref.current as HTMLElement,
+          translationsAtCharacter.textCharacterIndex,
+          translationsAtCharacter.textCharacterIndex +
+            translationsAtCharacter.translatedTokens[0].matchedTokenText.length
+        )
+      }
+    }
+  }, [popover.isOpen, mouseoverChar, tokenTranslations, ref, editing, value])
 
   return {
     cursorPosition,

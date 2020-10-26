@@ -19,7 +19,7 @@ import { REHYDRATE } from 'redux-persist'
 
 const showSettingsDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
   fromEvent(ipcRenderer, 'show-settings-dialog').pipe(
-    filter(() => !state$.value.dialog.queue.some(d => d.type === 'Settings')),
+    filter(() => !state$.value.dialog.queue.some((d) => d.type === 'Settings')),
     map(() => r.settingsDialog())
   )
 
@@ -43,7 +43,7 @@ const showAboutDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
         buttons: ['OK', 'Go to website'],
       })
     ),
-    tap(messageBoxReturnValue => {
+    tap((messageBoxReturnValue) => {
       if (messageBoxReturnValue) {
         if (messageBoxReturnValue.response === 1)
           shell.openExternal('http://knowclip.com')
@@ -72,7 +72,7 @@ const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
         ])
     ),
 
-    flatMap(filePaths => {
+    flatMap((filePaths) => {
       if (!filePaths) return empty()
 
       const filePath = filePaths[0]

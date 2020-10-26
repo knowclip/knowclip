@@ -22,7 +22,7 @@ export const clipAudioStream = (
           console.log('done!', outputFilePath)
           res(outputFilePath)
         })
-        .on('error', err => {
+        .on('error', (err) => {
           console.error(err)
           rej(err)
         })
@@ -47,7 +47,7 @@ const clipAudio = async (
       .on('end', () => {
         res(outputFilePath)
       })
-      .on('error', err => {
+      .on('error', (err) => {
         console.error(err)
         console.log({
           sourceFilePath,

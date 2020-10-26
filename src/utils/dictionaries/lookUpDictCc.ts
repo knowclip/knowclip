@@ -26,10 +26,10 @@ export async function lookUpDictCc(
 
   const textTokens = getGermanSearchTokensFromText(text)
   const textPrefixes = new Set(
-    textTokens.filter(t => germanSeparablePrefixes.has(t.toLowerCase()))
+    textTokens.filter((t) => germanSeparablePrefixes.has(t.toLowerCase()))
   )
   const textStems = getGermanTextSearchStems(
-    textTokens.map(x => x.toLowerCase())
+    textTokens.map((x) => x.toLowerCase())
   )
 
   const table = dexie.table(getTableName('DictCCDictionary'))
@@ -72,11 +72,11 @@ export async function lookUpDictCc(
     const tokenCharacterIndex = text
       .toLowerCase()
       .indexOf(exactToken.toLowerCase(), indexingCursor)
-    const searchStemsAtIndex = stemCombinationsAtIndex.flatMap(stemCombo => {
+    const searchStemsAtIndex = stemCombinationsAtIndex.flatMap((stemCombo) => {
       const stemComboString = stemCombo.sort().join(' ')
       // perhaps can use entry.tokenCombos first value instead of calling getGermanSearchTokens each time here?
       // except here we're testing "raw" tokens, not stems
-      const exactMatches = exactStemsMatches.filter(entry => {
+      const exactMatches = exactStemsMatches.filter((entry) => {
         return (
           entry.tokenCombos[0] ===
           stemComboString + ` ${stemCombo.length.toString(16).padStart(2, '0')}`
@@ -90,7 +90,7 @@ export async function lookUpDictCc(
         translatedTokens: [
           {
             matchedTokenText: exactToken,
-            candidates: searchStemsAtIndex.map(entry => ({
+            candidates: searchStemsAtIndex.map((entry) => ({
               entry,
               inflections: [],
               variant: undefined,
@@ -170,7 +170,7 @@ export async function lookUpDictCc(
         lowercaseMatchedTokenText.match(prefixesRegex) || []
 
       const [aCandidatePrefix] = aSearchTokensLowercase.flatMap(
-        candidateToken => {
+        (candidateToken) => {
           const candidateTokenStem =
             getDifferingSearchStem(candidateToken) || candidateToken
           if (
@@ -187,7 +187,7 @@ export async function lookUpDictCc(
       const [, bMatchPrefix] =
         lowercaseMatchedTokenText.match(prefixesRegex) || []
       const [bCandidatePrefix] = bSearchTokensLowercase.flatMap(
-        candidateToken => {
+        (candidateToken) => {
           const candidateTokenStem =
             getDifferingSearchStem(candidateToken) || candidateToken
           if (
@@ -281,13 +281,13 @@ export function getGermanSearchTokensFromText(
     : withoutAnnotations
   )
     .split(NON_LETTERS_DIGITS_PLUS)
-    .filter(x => x)
+    .filter((x) => x)
   return tokens
 }
 function getGermanTextSearchTokensCombos(tokens: string[]) {
   return getTokenCombinations(
     tokens.slice(0, MAX_GERMAN_SEARCH_TOKENS_COUNT)
-  ).map(tokenCombo => {
+  ).map((tokenCombo) => {
     return getTokenComboWithLengthString(tokenCombo, tokenCombo.length)
   })
 }

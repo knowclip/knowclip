@@ -41,7 +41,7 @@ export const getSubtitlesFilePathFromMedia = async (
       .on('end', () => {
         res(outputFilePath)
       })
-      .on('error', err => {
+      .on('error', (err) => {
         console.error(err)
         rej(err)
       })
@@ -69,7 +69,7 @@ export const getExternalSubtitlesVttPath = async (
     await writeFile(
       vttFilePath,
       stringifyVtt(
-        chunks.map(chunk => ({
+        chunks.map((chunk) => ({
           start: Math.round(getMillisecondsAtX(state, chunk.start)),
           end: Math.round(getMillisecondsAtX(state, chunk.end)),
           text: chunk.text,
@@ -111,7 +111,7 @@ export const convertAssToVtt = (filePath: string, vttFilePath: string) =>
       .on('end', () => {
         res(vttFilePath)
       })
-      .on('error', err => {
+      .on('error', (err) => {
         console.error(err)
         rej(err)
       })
@@ -129,12 +129,12 @@ const parseSubtitles = (
         subsrt
           .parse(fileContents)
           .filter(({ type }) => type === 'caption')
-          .map(chunk => r.readSubsrtChunk(state, chunk))
+          .map((chunk) => r.readSubsrtChunk(state, chunk))
       )
     case '.vtt':
     case '.srt':
       return sanitizeSubtitles(
-        parse(fileContents).map(vttChunk =>
+        parse(fileContents).map((vttChunk) =>
           r.readVttChunk(state, vttChunk as SubtitlesChunk)
         )
       )

@@ -34,7 +34,7 @@ const getSubtitlesCardBaseFieldPriority = createSelector(
   getSubtitlesFlashcardFieldLinks,
   (state: AppState) => state.subtitles,
   (links, subtitles) => {
-    return CUES_BASE_PRIORITY.filter(fieldName => {
+    return CUES_BASE_PRIORITY.filter((fieldName) => {
       const trackId = links[fieldName]
       return Boolean(trackId && subtitles[trackId])
     })
@@ -83,7 +83,7 @@ export const getSubtitlesCardBases = createSelector(
       }
 
     const includedTracks = fieldsCuePriority.map(
-      fieldName => fieldsToTracks[fieldName]
+      (fieldName) => fieldsToTracks[fieldName]
     )
 
     const lastIndexes = fieldsCuePriority.map(() => 0)
@@ -93,44 +93,41 @@ export const getSubtitlesCardBases = createSelector(
           index,
           start: cueChunk.start,
           end: cueChunk.end,
-          fields: fieldsCuePriority.reduce(
-            (dict, fn, fieldPriority) => {
-              const overlappedIndexes: number[] = []
+          fields: fieldsCuePriority.reduce((dict, fn, fieldPriority) => {
+            const overlappedIndexes: number[] = []
 
-              const trackId = fieldsToTracks[fn]
-              const track = trackId && subtitles[trackId]
-              const chunks = track ? track.chunks : []
+            const trackId = fieldsToTracks[fn]
+            const track = trackId && subtitles[trackId]
+            const chunks = track ? track.chunks : []
 
-              for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
-                const chunk = chunks[i]
-                lastIndexes[fieldPriority] = i
+            for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
+              const chunk = chunks[i]
+              lastIndexes[fieldPriority] = i
 
-                if (!chunk) {
-                  console.log({ track, i })
-                  console.error(track)
-                  throw new Error('invalid chunk index')
-                }
-
-                if (chunk.start >= cueChunk.end) {
-                  break
-                }
-                if (
-                  overlapsSignificantly(
-                    cueChunk,
-                    chunk.start,
-                    chunk.end,
-                    halfSecond
-                  )
-                ) {
-                  overlappedIndexes.push(i)
-                }
+              if (!chunk) {
+                console.log({ track, i })
+                console.error(track)
+                throw new Error('invalid chunk index')
               }
 
-              if (trackId) dict[trackId] = overlappedIndexes
-              return dict
-            },
-            {} as Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
-          ),
+              if (chunk.start >= cueChunk.end) {
+                break
+              }
+              if (
+                overlapsSignificantly(
+                  cueChunk,
+                  chunk.start,
+                  chunk.end,
+                  halfSecond
+                )
+              ) {
+                overlappedIndexes.push(i)
+              }
+            }
+
+            if (trackId) dict[trackId] = overlappedIndexes
+            return dict
+          }, {} as Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>),
         }
       }
     )
@@ -140,16 +137,16 @@ export const getSubtitlesCardBases = createSelector(
       cards,
       fieldNames: fieldsCuePriority,
       linkedTrackIds: fieldsCuePriority
-        .map(f => fieldsToTracks[f])
+        .map((f) => fieldsToTracks[f])
         .filter((id): id is string => Boolean(id)),
       excludedTracks: Object.values(subtitles).filter(
-        track => !includedTracks.includes(track.id)
+        (track) => !includedTracks.includes(track.id)
       ),
       getFieldsPreviewFromCardsBase: (cardsBase: SubtitlesCardBase) => {
         const preview: Dict<string, string> = {}
         for (const trackId in cardsBase.fields) {
           preview[trackId] = (cardsBase.fields[trackId] || [])
-            .map(index => subtitles[trackId].chunks[index].text)
+            .map((index) => subtitles[trackId].chunks[index].text)
             .join('\n')
         }
         return preview

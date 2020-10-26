@@ -37,14 +37,14 @@ export function getTokenCombinations<T>(tokens: T[]) {
   return [
     ...getCombinations(tokens.slice(1))
       .sort((a, b) => b.length - a.length)
-      .map(ts => [tokens[0], ...ts]),
+      .map((ts) => [tokens[0], ...ts]),
     [tokens[0]],
   ]
 }
 
 function getCombinations<T>(items: T[]) {
   var result: T[][] = []
-  var f = function(prefix: T[], items: T[]) {
+  var f = function (prefix: T[], items: T[]) {
     for (var i = 0; i < items.length; i++) {
       result.push([...prefix, items[i]])
       f([...prefix, items[i]], items.slice(i + 1))

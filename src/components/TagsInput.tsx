@@ -18,7 +18,7 @@ enum $ {
   inputField = 'tags-input-field',
 }
 
-const getSuggestionValue: GetSuggestionValue<string> = a => a
+const getSuggestionValue: GetSuggestionValue<string> = (a) => a
 const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
   e.preventDefault()
 }
@@ -62,7 +62,7 @@ const TagsInput = ({
   )
 
   const handleAddChip = useCallback(
-    text => {
+    (text) => {
       setTextFieldInput('')
       onAddChip(text)
     },
@@ -94,12 +94,12 @@ const TagsInput = ({
   )
 
   const getSuggestions = useCallback(
-    value => {
+    (value) => {
       const inputValue = value.trim().toLowerCase()
 
       return inputValue.length === 0
         ? []
-        : allTags.filter(tag => tag.toLowerCase().startsWith(inputValue))
+        : allTags.filter((tag) => tag.toLowerCase().startsWith(inputValue))
     },
     [allTags]
   )
@@ -136,7 +136,7 @@ const TagsInput = ({
       renderSuggestion={renderSuggestion}
       focusInputOnSuggestionClick={false}
       shouldRenderSuggestions={useCallback(
-        value => value && value.trim().length > 0,
+        (value) => value && value.trim().length > 0,
         []
       )}
       inputProps={

@@ -12,7 +12,7 @@ export default async function runEvents(
 }
 
 function sleep(ms: number) {
-  return new Promise(res => {
+  return new Promise((res) => {
     setTimeout(res, ms)
   })
 }
@@ -29,9 +29,7 @@ export async function dragMouse(
     const [x1, y1] = start
     const [x2, y2] = end
     throw new Error(
-      `Could not drag mouse from [${x1}, ${y1}] to [${x2}, ${y2}]: ${
-        err.message
-      }`
+      `Could not drag mouse from [${x1}, ${y1}] to [${x2}, ${y2}]: ${err.message}`
     )
   }
 }

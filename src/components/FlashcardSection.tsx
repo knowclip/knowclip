@@ -59,9 +59,7 @@ const FlashcardSection = ({
   })
 
   const highlightedClip =
-    waveformSelection && waveformSelection.type === 'Clip'
-      ? waveformSelection.item
-      : null
+    waveformSelection?.type === 'Clip' ? waveformSelection.item : null
 
   const itemsLength = waveformItems.length
   const clipsLength = clipsIds.length
@@ -175,7 +173,7 @@ const Placeholder = ({
 }) => {
   const dispatch = useDispatch()
   const addMediaRequest = useCallback(
-    async e => {
+    async (e) => {
       e.preventDefault()
       const filePaths = await showOpenDialog(getFileFilters('MediaFile'), true)
 

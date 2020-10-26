@@ -28,13 +28,10 @@ import { useLocalSettingsReducer } from './SettingsDialog'
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
   const { settings, dispatchLocal } = useLocalSettingsReducer()
-  const closeAndSaveSettings = useCallback(
-    () => {
-      dispatch(r.closeDialog())
-      dispatch(r.overrideSettings(settings))
-    },
-    [dispatch, settings]
-  )
+  const closeAndSaveSettings = useCallback(() => {
+    dispatch(r.closeDialog())
+    dispatch(r.overrideSettings(settings))
+  }, [dispatch, settings])
   const { dictionaryFiles, progress } = useSelector((state: AppState) => ({
     dictionaryFiles: r.getOpenDictionaryFiles(state),
     progress: state.session.progress,
@@ -60,46 +57,40 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
     DictionaryFileType | ''
   >('')
 
-  const handleClickImportDictionaryFile = useCallback(
-    () => {
-      if (!newDictionaryType)
-        return dispatch(
-          r.simpleMessageSnackbar(
-            'Please select the type of dictionary you wish to import.'
-          )
-        )
-      dispatch(
-        r.confirmationDialog(
-          `Are you sure you want to import a dictionary right now? You won't be able to use the app while the import is in progress.`,
-          r.importDictionaryRequest(newDictionaryType),
-          null,
-          true
+  const handleClickImportDictionaryFile = useCallback(() => {
+    if (!newDictionaryType)
+      return dispatch(
+        r.simpleMessageSnackbar(
+          'Please select the type of dictionary you wish to import.'
         )
       )
-    },
-    [newDictionaryType, dispatch]
-  )
+    dispatch(
+      r.confirmationDialog(
+        `Are you sure you want to import a dictionary right now? You won't be able to use the app while the import is in progress.`,
+        r.importDictionaryRequest(newDictionaryType),
+        null,
+        true
+      )
+    )
+  }, [newDictionaryType, dispatch])
 
-  const handleClickDeleteDatabase = useCallback(
-    () => {
-      dispatch(
-        r.confirmationDialog(
-          `Are you sure you want to delete the entire dictionaries database? You will have to import any dictionaries you've added again.`,
-          r.resetDictionariesDatabase(),
-          null,
-          true
-        )
+  const handleClickDeleteDatabase = useCallback(() => {
+    dispatch(
+      r.confirmationDialog(
+        `Are you sure you want to delete the entire dictionaries database? You will have to import any dictionaries you've added again.`,
+        r.resetDictionariesDatabase(),
+        null,
+        true
       )
-    },
-    [dispatch]
-  )
+    )
+  }, [dispatch])
 
   const onChange = useCallback(
     (id: string, dictionaryType: DictionaryFileType) =>
       dispatchLocal(
         settings.activeDictionaries &&
           settings.activeDictionaries.some(
-            d => d.id === id && d.type === dictionaryType
+            (d) => d.id === id && d.type === dictionaryType
           )
           ? r.removeActiveDictionary(id)
           : r.addActiveDictionary(id, dictionaryType)
@@ -167,7 +158,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                         selected: Boolean(
                           settings.activeDictionaries &&
                             settings.activeDictionaries.some(
-                              d => d.id === file.id
+                              (d) => d.id === file.id
                             )
                         ),
                       }}
@@ -179,13 +170,13 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
               <p>
                 <Select
                   displayEmpty
-                  onChange={event => {
+                  onChange={(event) => {
                     setNewDictionaryType(event.target.value as any)
                   }}
                   value={newDictionaryType}
                 >
                   <MenuItem value={''}>Add a new dictionary of type:</MenuItem>
-                  {dictionaryTypes.map(type => {
+                  {dictionaryTypes.map((type) => {
                     return (
                       <MenuItem key={type} value={type}>
                         {displayDictionaryType(type)}
@@ -242,7 +233,7 @@ function DictionaryFileItem({
     onClickDelete,
   ])
   const handleChange = useCallback(
-    e => onChange(file.id, file.dictionaryType),
+    (e) => onChange(file.id, file.dictionaryType),
     [onChange, file.id, file.dictionaryType]
   )
   return (

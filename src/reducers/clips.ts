@@ -25,10 +25,10 @@ const addIdToIdsByMediaFileId = (
   clip: Clip
 ) => {
   return oldIdsByMediaFileId
-    .map(id => oldById[id])
+    .map((id) => oldById[id])
     .concat(clip)
     .sort((a, b) => a.start - b.start)
-    .map(clip => clip.id)
+    .map((clip) => clip.id)
 }
 
 const addIdstoIdsByMediaFileId = (
@@ -37,10 +37,10 @@ const addIdstoIdsByMediaFileId = (
   sortedClips: Array<Clip>
 ) => {
   const newIndex = oldIdsByMediaFileId.findIndex(
-    id => oldById[id].start > sortedClips[0].start
+    (id) => oldById[id].start > sortedClips[0].start
   )
   return (newIndex === -1 ? [] : oldIdsByMediaFileId.slice(0, newIndex))
-    .concat(sortedClips.map(clip => clip.id))
+    .concat(sortedClips.map((clip) => clip.id))
     .concat(oldIdsByMediaFileId.slice(newIndex))
 }
 
@@ -56,7 +56,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         flashcards: action.flashcards,
       }
       const { idsByMediaFileId, byId } = newState
-      action.project.mediaFileIds.forEach(id => {
+      action.project.mediaFileIds.forEach((id) => {
         idsByMediaFileId[id] = []
       })
 
@@ -153,13 +153,13 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       const [finalId, ...idsToBeDiscarded] = ids
       const clipsOrder = Object.values(state.byId)
         .sort((a, b) => a.start - b.start)
-        .map(s => s.id)
+        .map((s) => s.id)
       const newClipsOrder = clipsOrder.filter(
-        id => !idsToBeDiscarded.includes(id)
+        (id) => !idsToBeDiscarded.includes(id)
       )
       const newClips: Record<ClipId, Clip> = {}
       const newCards: Record<ClipId, Flashcard> = {}
-      newClipsOrder.forEach(id => {
+      newClipsOrder.forEach((id) => {
         const clip = state.byId[id]
         if (!clip) throw new Error('impossible')
         newClips[id] = clip
@@ -170,7 +170,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       })
       const sortedClipsToMerge = ids
         .sort(byStart(state.byId))
-        .map(id => state.byId[id])
+        .map((id) => state.byId[id])
 
       const { flashcards: cards } = state
       const flashcard = newFlashcard(
@@ -201,7 +201,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
               cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
           )
 
-          const value = values.filter(x => x.trim()).join('\n')
+          const value = values.filter((x) => x.trim()).join('\n')
           flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
         }
       }
@@ -219,7 +219,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         idsByMediaFileId: {
           ...state.idsByMediaFileId,
           [fileId]: state.idsByMediaFileId[fileId].filter(
-            id => !idsToBeDiscarded.includes(id)
+            (id) => !idsToBeDiscarded.includes(id)
           ),
         },
         flashcards: {
@@ -240,7 +240,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         idsByMediaFileId: {
           ...state.idsByMediaFileId,
           [fileId]: state.idsByMediaFileId[fileId].filter(
-            id => id !== action.id
+            (id) => id !== action.id
           ),
         },
       }
@@ -252,7 +252,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       if (!ids.length) return state
 
       const { fileId } = state.byId[ids[0]]
-      action.ids.forEach(id => {
+      action.ids.forEach((id) => {
         delete byId[id]
       })
       return {
@@ -261,7 +261,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         idsByMediaFileId: {
           ...state.idsByMediaFileId,
           [fileId]: state.idsByMediaFileId[fileId].filter(
-            id => !ids.includes(id)
+            (id) => !ids.includes(id)
           ),
         },
       }
@@ -342,7 +342,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
 
         const byId = { ...state.byId }
         const flashcards = { ...state.flashcards }
-        clipIds.forEach(id => {
+        clipIds.forEach((id) => {
           delete byId[id]
           delete flashcards[id]
         })
@@ -380,10 +380,10 @@ export function mergeClozeFields(
 
     clozeDeletions.push(
       /* eslint-disable no-loop-func */
-      ...mergingCard.cloze.map(c => ({
+      ...mergingCard.cloze.map((c) => ({
         /* eslint-enable no-loop-func */
         ...c,
-        ranges: c.ranges.map(r => ({
+        ranges: c.ranges.map((r) => ({
           start: r.start + mergedValueSoFar.length,
           end: r.end + mergedValueSoFar.length,
         })),
@@ -402,10 +402,10 @@ function adjustClozeRanges(
   editEnd: number
 ) {
   return card.cloze
-    .map(c => ({
+    .map((c) => ({
       ...c,
       ranges: c.ranges
-        .map(r => {
+        .map((r) => {
           if (editDifference < 0) {
             const deletion = {
               start: editStart,
@@ -430,10 +430,11 @@ function adjustClozeRanges(
           }
         })
         .filter(
-          r => r.start !== r.end && r.end > r.start && r.end > 0 && r.start >= 0
+          (r) =>
+            r.start !== r.end && r.end > r.start && r.end > 0 && r.start >= 0
         ),
     }))
-    .filter(c => c.ranges.length)
+    .filter((c) => c.ranges.length)
 }
 
 function editClip(

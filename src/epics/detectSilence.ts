@@ -21,7 +21,7 @@ const detectSilence = (
       .on(
         'end',
         //listener must be a function, so to return the callback wrapping it inside a function
-        function(_, string) {
+        function (_, string) {
           const preparedString = string.replace(/\s/g, ' ')
           const regex = /silence_start:\s(\d+\.\d+|\d+).+?silence_end:\s(\d+\.\d+|\d+)/g
           // window.preparedString = preparedString
@@ -39,7 +39,7 @@ const detectSilence = (
           res(matchData)
         }
       )
-      .on('error', err => {
+      .on('error', (err) => {
         rej(err)
         console.error(err)
       })
@@ -55,7 +55,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
       if (!currentMedia || !currentFilePath)
         throw new Error('Illegal: no media file loaded')
 
-      return detectSilence(currentFilePath).then(silences => {
+      return detectSilence(currentFilePath).then((silences) => {
         if (!silences.length)
           return [
             r.simpleMessageSnackbar(
@@ -117,7 +117,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         ]
       })
     }),
-    flatMap<Array<Action>, Observable<Action>>(val => from(val))
+    flatMap<Array<Action>, Observable<Action>>((val) => from(val))
   )
 
 const detectSilenceRequestEpic: AppEpic = (action$, state$) =>

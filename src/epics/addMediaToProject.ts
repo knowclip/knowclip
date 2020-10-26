@@ -11,7 +11,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
     flatMap<AddMediaToProjectRequest, Promise<Array<Action>>>(
       ({ projectId, filePaths }) =>
         Promise.all(
-          filePaths.map(async filePath => {
+          filePaths.map(async (filePath) => {
             const file = await readMediaFile(filePath, uuid(), projectId)
             if (file.errors) throw file.errors.join('; ')
             else return r.openFileRequest(file.value, filePath)
@@ -19,7 +19,7 @@ const addMediaToProject: AppEpic = (action$, state$) =>
         )
     ),
     mergeAll(),
-    catchError(err => {
+    catchError((err) => {
       console.log(err)
       return [r.simpleMessageSnackbar(`Error adding media file: ${err}`)]
     })

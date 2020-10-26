@@ -51,31 +51,21 @@ const ProjectMenu = ({ className }: { className: string }) => {
     }
   })
 
-  const clipsIdsForExport = useMemo(
-    () => {
-      const result: ReviewAndExportDialogData['mediaFileIdsToClipIds'] = {}
-      for (const mediaFileId of mediaFileIds) result[mediaFileId] = []
-      if (currentMediaFile)
-        result[currentMediaFile.id] = [...currentFileClipsIds]
+  const clipsIdsForExport = useMemo(() => {
+    const result: ReviewAndExportDialogData['mediaFileIdsToClipIds'] = {}
+    for (const mediaFileId of mediaFileIds) result[mediaFileId] = []
+    if (currentMediaFile) result[currentMediaFile.id] = [...currentFileClipsIds]
 
-      return result
-    },
-    [mediaFileIds, currentMediaFile, currentFileClipsIds]
-  )
+    return result
+  }, [mediaFileIds, currentMediaFile, currentFileClipsIds])
 
   const dispatch = useDispatch()
-  const closeProjectRequest = useCallback(
-    () => {
-      dispatch(actions.closeProjectRequest())
-    },
-    [dispatch]
-  )
-  const saveProjectRequest = useCallback(
-    () => {
-      dispatch(actions.saveProjectRequest())
-    },
-    [dispatch]
-  )
+  const closeProjectRequest = useCallback(() => {
+    dispatch(actions.closeProjectRequest())
+  }, [dispatch])
+  const saveProjectRequest = useCallback(() => {
+    dispatch(actions.saveProjectRequest())
+  }, [dispatch])
 
   const [state, setState] = useState({ editing: false, text: projectFile.name })
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -84,64 +74,46 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
   const titleRef = useRef<HTMLHeadingElement>(null)
 
-  const startEditing = useCallback(
-    () => {
-      setState({
-        text: projectFile.name,
-        editing: true,
-      })
-    },
-    [setState, projectFile]
-  )
-  useEffect(
-    () => {
-      if (state.editing && inputRef.current) inputRef.current.focus()
-    },
-    [state.editing]
-  )
-  useEffect(
-    () => {
-      titleRef.current &&
-        setInputWidth(titleRef.current.getBoundingClientRect().width)
-    },
-    [state.text]
-  )
+  const startEditing = useCallback(() => {
+    setState({
+      text: projectFile.name,
+      editing: true,
+    })
+  }, [setState, projectFile])
+  useEffect(() => {
+    if (state.editing && inputRef.current) inputRef.current.focus()
+  }, [state.editing])
+  useEffect(() => {
+    titleRef.current &&
+      setInputWidth(titleRef.current.getBoundingClientRect().width)
+  }, [state.text])
 
   const handleChangeText = useCallback(
-    e => setState({ editing: true, text: e.target.value }),
+    (e) => setState({ editing: true, text: e.target.value }),
     []
   )
 
-  const submit = useCallback(
-    () => {
-      const text = state.text.trim()
-      if (text && text !== projectFile.name)
-        dispatch(actions.setProjectName(projectFile.id, text))
-      setState(state => ({ ...state, editing: false }))
-    },
-    [dispatch, setState, state, projectFile]
-  )
+  const submit = useCallback(() => {
+    const text = state.text.trim()
+    if (text && text !== projectFile.name)
+      dispatch(actions.setProjectName(projectFile.id, text))
+    setState((state) => ({ ...state, editing: false }))
+  }, [dispatch, setState, state, projectFile])
   const handleSubmit = useCallback(
-    e => {
+    (e) => {
       e.preventDefault()
       submit()
     },
     [submit]
   )
 
-  const handleFocus = useCallback(
-    () => {
-      setState(state => ({ ...state, editing: true }))
-    },
-    [setState]
-  )
+  const handleFocus = useCallback(() => {
+    setState((state) => ({ ...state, editing: true }))
+  }, [setState])
 
-  const handleBlur = useCallback(
-    () => {
-      submit()
-    },
-    [submit]
-  )
+  const handleBlur = useCallback(() => {
+    submit()
+  }, [submit])
 
   const reviewAndExportDialog = useCallback(
     () =>

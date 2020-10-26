@@ -38,24 +38,24 @@ const Media = ({
 }: MediaProps) => {
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
 
-  const seekOn = useCallback(e => {
+  const seekOn = useCallback((e) => {
     ;(window as any).seeking = true
   }, [])
-  const seekOff = useCallback(e => {
+  const seekOff = useCallback((e) => {
     ;(window as any).seeking = false
   }, [])
 
-  const setUpBlur = useCallback(e => {
+  const setUpBlur = useCallback((e) => {
     setClicked(true)
     if (mediaRef.current) mediaRef.current.blur()
   }, [])
-  const blur = useCallback(e => {
+  const blur = useCallback((e) => {
     if (mediaRef.current && clicked) {
       mediaRef.current.blur()
       // setClicked(false)
     }
   }, [])
-  const stopBlur = useCallback(e => {
+  const stopBlur = useCallback((e) => {
     if (mediaRef.current && clicked) {
       setClicked(false)
     }
@@ -86,32 +86,26 @@ const Media = ({
     onVolumeChange: blur,
   }
 
-  useEffect(
-    () => {
-      if (props.src) {
-        setTimeout(() => {
-          const player = document.getElementById('mediaPlayer') as
-            | HTMLAudioElement
-            | HTMLVideoElement
-            | null
-          if (player) player.src = props.src || ''
-        }, 0)
-      }
-    },
-    [props.src]
-  )
+  useEffect(() => {
+    if (props.src) {
+      setTimeout(() => {
+        const player = document.getElementById('mediaPlayer') as
+          | HTMLAudioElement
+          | HTMLVideoElement
+          | null
+        if (player) player.src = props.src || ''
+      }, 0)
+    }
+  }, [props.src])
 
   useSyncSubtitlesVisibility(subtitles.all, mediaRef)
 
   const dispatch = useDispatch()
-  const toggleViewMode = useCallback(
-    () => {
-      dispatch(
-        r.setViewMode(viewMode === 'HORIZONTAL' ? 'VERTICAL' : 'HORIZONTAL')
-      )
-    },
-    [dispatch, viewMode]
-  )
+  const toggleViewMode = useCallback(() => {
+    dispatch(
+      r.setViewMode(viewMode === 'HORIZONTAL' ? 'VERTICAL' : 'HORIZONTAL')
+    )
+  }, [dispatch, viewMode])
 
   if (!metadata)
     return (
@@ -178,48 +172,42 @@ function useSyncSubtitlesVisibility(
 ) {
   const dispatch = useDispatch()
 
-  useEffect(
-    () => {
-      function syncReduxTracksToDom(event: Event) {
-        Array.from(event.target as TextTrackList).forEach((domTrack, i) => {
-          const track = subtitles.find(track => track.id === domTrack.id)
-          if (track && track.track && track.track.mode !== domTrack.mode)
-            dispatch(
-              domTrack.mode === 'showing'
-                ? r.showSubtitles(track.id)
-                : r.hideSubtitles(track.id)
-            )
-        })
-      }
-      if (mediaRef.current)
-        mediaRef.current.textTracks.addEventListener(
+  useEffect(() => {
+    function syncReduxTracksToDom(event: Event) {
+      Array.from(event.target as TextTrackList).forEach((domTrack, i) => {
+        const track = subtitles.find((track) => track.id === domTrack.id)
+        if (track && track.track && track.track.mode !== domTrack.mode)
+          dispatch(
+            domTrack.mode === 'showing'
+              ? r.showSubtitles(track.id)
+              : r.hideSubtitles(track.id)
+          )
+      })
+    }
+    if (mediaRef.current)
+      mediaRef.current.textTracks.addEventListener(
+        'change',
+        syncReduxTracksToDom
+      )
+    const currentMediaRef = mediaRef.current
+    return () => {
+      if (currentMediaRef)
+        currentMediaRef.textTracks.removeEventListener(
           'change',
           syncReduxTracksToDom
         )
-      const currentMediaRef = mediaRef.current
-      return () => {
-        if (currentMediaRef)
-          currentMediaRef.textTracks.removeEventListener(
-            'change',
-            syncReduxTracksToDom
-          )
-      }
-    },
-    [subtitles, dispatch, mediaRef]
-  )
-  useEffect(
-    () => {
-      if (!mediaRef.current) return
-      for (const track of subtitles) {
-        const domTrack = [...mediaRef.current.textTracks].find(
-          domTrack => domTrack.id === track.id
-        )
-        if (domTrack && track.track && domTrack.mode !== track.track.mode)
-          domTrack.mode = track.track.mode
-      }
-    },
-    [subtitles, mediaRef]
-  )
+    }
+  }, [subtitles, dispatch, mediaRef])
+  useEffect(() => {
+    if (!mediaRef.current) return
+    for (const track of subtitles) {
+      const domTrack = [...mediaRef.current.textTracks].find(
+        (domTrack) => domTrack.id === track.id
+      )
+      if (domTrack && track.track && domTrack.mode !== track.track.mode)
+        domTrack.mode = track.track.mode
+    }
+  }, [subtitles, mediaRef])
 }
 
 declare module 'react' {
