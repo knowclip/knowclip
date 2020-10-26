@@ -38,9 +38,9 @@
 
 .clipsCount {
   position: absolute;
-  right: 4rem;
+  right: 0.5rem;
   padding: 1rem;
-  top: 1rem;
+  top: 3rem;
   opacity: 0.8;
   border-radius: 1em;
   background-color: white;

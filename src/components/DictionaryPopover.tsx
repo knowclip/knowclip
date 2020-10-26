@@ -6,18 +6,27 @@ import React, {
   useEffect,
   useRef,
 } from 'react'
-import { ClickAwayListener, IconButton, Paper, Popper } from '@material-ui/core'
+import { useDispatch } from 'react-redux'
+import {
+  Button,
+  ClickAwayListener,
+  IconButton,
+  Paper,
+  Popper,
+} from '@material-ui/core'
+import { Close } from '@material-ui/icons'
+import { tokenize } from 'wanakana'
 import usePopover from '../utils/usePopover'
 import css from './DictionaryPopover.module.css'
-import { tokenize } from 'wanakana'
+import { numberToMark } from 'pinyin-utils'
 import { LexiconEntry } from '../files/dictionaryFile'
 import {
   TranslatedToken,
   TranslatedTokensAtCharacterIndex,
 } from '../utils/dictionariesDatabase'
-import { Close } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
-import { numberToMark } from 'pinyin-utils'
+import * as actions from '../actions'
+import { displayDictionaryType } from '../selectors'
 
 function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
   const results: {
@@ -113,7 +122,7 @@ export function DictionaryPopover({
 }: {
   popover: ReturnType<typeof usePopover>
   translationsAtCharacter: TranslatedTokensAtCharacterIndex | null
-  activeDictionaryType: DictionaryFileType
+  activeDictionaryType: DictionaryFileType | null
 }) {
   const { close: closePopover } = popover
   const closeOnClickAway = useCallback(e => closePopover(e), [closePopover])
@@ -130,6 +139,14 @@ export function DictionaryPopover({
       }
     },
     [textCharacterIndex]
+  )
+
+  const dispatch = useDispatch()
+  const openDictionarySettings = useCallback(
+    () => {
+      dispatch(actions.dictionariesDialog())
+    },
+    [dispatch]
   )
 
   return (
@@ -149,8 +166,30 @@ export function DictionaryPopover({
               <Close />
             </IconButton>
           </DarkTheme>
-          {!translationsAtCharacter && <>No results</>}
+          {!translationsAtCharacter && activeDictionaryType && (
+            <section style={{ textAlign: 'center' }}>
+              <p>No results found.</p>
+              <p>{displayDictionaryType(activeDictionaryType)}.</p>
+              <p>
+                <Button size="small" onClick={openDictionarySettings}>
+                  Dictionary settings
+                </Button>
+              </p>
+            </section>
+          )}
+          {!activeDictionaryType && (
+            <>
+              <p>Please activate a dictionary to look up words.</p>
+              <p style={{ textAlign: 'center' }}>
+                <Button size="small" onClick={openDictionarySettings}>
+                  Dictionary settings
+                </Button>
+              </p>
+            </>
+          )}
+
           {translationsAtCharacter &&
+            activeDictionaryType &&
             translationsAtCharacter.translatedTokens.map(translatedToken => {
               return groupIdenticalEntryHeads(translatedToken).map(
                 ({ entries, head, variant, pronunciation }, i) => {

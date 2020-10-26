@@ -38,20 +38,20 @@ enum $ {
 const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   const dispatch = useDispatch()
 
-  const { originalSettingsState, dictionaryFiles } = useSelector(
-    (state: AppState) => ({
-      originalSettingsState: state.settings,
-      dictionaryFiles: selectors.getOpenDictionaryFiles(state),
-    })
+  const { dictionaryFiles } = useSelector((state: AppState) => ({
+    dictionaryFiles: selectors.getOpenDictionaryFiles(state),
+  }))
+
+  const { settings, dispatchLocal } = useLocalSettingsReducer()
+  const addAssetsDirectories = useCallback(
+    async () => {
+      const paths = await showOpenDirectoriesDialog()
+      if (!paths) return
+
+      dispatchLocal(actions.addAssetsDirectories(paths))
+    },
+    [dispatchLocal]
   )
-
-  const [settings, dispatchLocal] = useReducer(reducer, originalSettingsState)
-  const addAssetsDirectories = useCallback(async () => {
-    const paths = await showOpenDirectoriesDialog()
-    if (!paths) return
-
-    dispatchLocal(actions.addAssetsDirectories(paths))
-  }, [])
 
   const close = useCallback(() => dispatch(actions.closeDialog()), [dispatch])
   const saveSettings = useCallback(
@@ -253,6 +253,18 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
       </DialogActions>
     </Dialog>
   )
+}
+
+export function useLocalSettingsReducer() {
+  const { originalSettingsState } = useSelector((state: AppState) => ({
+    originalSettingsState: state.settings,
+  }))
+
+  const [settings, dispatchLocal] = useReducer(reducer, originalSettingsState)
+  return {
+    settings,
+    dispatchLocal,
+  }
 }
 
 const RemoveAssetsDirectoryButton = ({

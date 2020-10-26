@@ -2,6 +2,7 @@ import React, { ReactNode, useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -22,10 +23,18 @@ import * as r from '../../redux'
 import { Delete, Warning } from '@material-ui/icons'
 import { dictionaryTypes, displayDictionaryType } from '../../redux'
 import { openInBrowser } from '../../utils/electron'
+import { useLocalSettingsReducer } from './SettingsDialog'
 
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
-  const close = useCallback(() => dispatch(r.closeDialog()), [dispatch])
+  const { settings, dispatchLocal } = useLocalSettingsReducer()
+  const closeAndSaveSettings = useCallback(
+    () => {
+      dispatch(r.closeDialog())
+      dispatch(r.overrideSettings(settings))
+    },
+    [dispatch, settings]
+  )
   const { dictionaryFiles, progress } = useSelector((state: AppState) => ({
     dictionaryFiles: r.getOpenDictionaryFiles(state),
     progress: state.session.progress,
@@ -85,6 +94,18 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
     [dispatch]
   )
 
+  const onChange = useCallback(
+    (id: string, dictionaryType: DictionaryFileType) =>
+      dispatchLocal(
+        settings.activeDictionaries &&
+          settings.activeDictionaries.some(
+            d => d.id === id && d.type === dictionaryType
+          )
+          ? r.removeActiveDictionary(id)
+          : r.addActiveDictionary(id, dictionaryType)
+      ),
+    [dispatchLocal, settings.activeDictionaries]
+  )
   return (
     <Dialog open={open}>
       <DialogContent>
@@ -138,7 +159,18 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                 {dictionaryFiles.map(({ file, availability }) => {
                   return (
                     <DictionaryFileItem
-                      {...{ availability, file, onClickDelete }}
+                      {...{
+                        availability,
+                        file,
+                        onClickDelete,
+                        onChange,
+                        selected: Boolean(
+                          settings.activeDictionaries &&
+                            settings.activeDictionaries.some(
+                              d => d.id === file.id
+                            )
+                        ),
+                      }}
                     />
                   )
                 })}
@@ -185,7 +217,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
       </DialogContent>
 
       <DialogActions>
-        {!isLoading && <Button onClick={close}>Close</Button>}
+        {!isLoading && <Button onClick={closeAndSaveSettings}>Close</Button>}
       </DialogActions>
     </Dialog>
   )
@@ -196,18 +228,29 @@ function DictionaryFileItem({
   availability,
   file,
   onClickDelete,
+  onChange,
+  selected,
 }: {
   availability: FileAvailability
   file: DictionaryFile
   onClickDelete: (id: string) => void
+  onChange: (id: string, dictionaryType: DictionaryFileType) => void
+  selected: boolean
 }) {
   const handleClickDelete = useCallback(() => onClickDelete(availability.id), [
     availability.id,
     onClickDelete,
   ])
+  const handleChange = useCallback(
+    e => onChange(file.id, file.dictionaryType),
+    [onChange, file.id, file.dictionaryType]
+  )
   return (
     <ListItem key={availability.id} value={file.id}>
       {!file.importComplete && <ImportInterruptedListIcon />}
+      <ListItemIcon>
+        <Checkbox checked={selected} onChange={handleChange} />
+      </ListItemIcon>
       <ListItemText
         primary={`${displayDictionaryType(file.dictionaryType)}`}
         secondary={file.name}

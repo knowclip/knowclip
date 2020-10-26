@@ -1,4 +1,5 @@
 import * as A from '../types/ActionType'
+import { dictionariesDialog } from './dialog'
 
 export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
   type: A.ENQUEUE_SNACKBAR,
@@ -27,3 +28,8 @@ export const promptSnackbar = (
 export const closeSnackbar = (): SnackbarAction => ({
   type: A.CLOSE_SNACKBAR,
 })
+
+export const activateDictionaryPromptSnackbar = () =>
+  promptSnackbar('Activate a dictionary in order to enable word lookup.', [
+    [`Dictionary settings`, dictionariesDialog()],
+  ])

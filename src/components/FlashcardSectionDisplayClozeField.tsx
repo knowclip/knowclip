@@ -17,7 +17,6 @@ import * as r from '../redux'
 import usePopover from '../utils/usePopover'
 import { DictionaryPopover } from './DictionaryPopover'
 import { useFieldPopoverDictionary } from '../utils/clozeField/useFieldPopoverDictionary'
-import { getSelectionWithin } from '../utils/clozeField/domSelection'
 
 // check nico 38:53 einverstanden? gives no result
 // check tobira
@@ -53,15 +52,12 @@ const ClozeField = ({
 
   const handleDoubleClick = useCallback(
     (e: any) => {
-      if (!clozeInputRef.current) return
+      if (!clozeInputRef.current) return // dispatch(r.)
 
-      const { start, end } = getSelectionWithin(clozeInputRef.current)
-      const selection = value.slice(start, end)
-      console.log(selection)
       popover.open(e)
-      clozeInputRef.current.blur()
+      setTimeout(() => clozeInputRef.current && clozeInputRef.current.blur(), 0)
     },
-    [clozeInputRef, popover, value]
+    [clozeInputRef, popover]
   )
 
   const handleMouseDown = useCallback(
@@ -252,7 +248,7 @@ const ClozeField = ({
           {cursorPosition === value.length && (
             <span className={css.clozeCursor} />
           )}
-          {popover.isOpen && activeDictionaryType && (
+          {popover.isOpen && (
             <DictionaryPopover
               activeDictionaryType={activeDictionaryType}
               popover={popover}

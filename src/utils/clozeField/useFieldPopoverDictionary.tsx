@@ -207,16 +207,10 @@ export function useFieldPopoverDictionary(
           dKey &&
           (!isTextFieldFocused() || ref.current === document.activeElement)
         ) {
-          if (!activeDictionaryType) {
-            return dispatch(
-              r.simpleMessageSnackbar(
-                'Select a dictionary in settings menu to enable word lookup.'
-              )
-            )
-          }
-
           if (mouseoverChar) {
             popover.open(e as any)
+          } else if (!activeDictionaryType) {
+            return dispatch(r.activateDictionaryPromptSnackbar())
           }
         }
       }
