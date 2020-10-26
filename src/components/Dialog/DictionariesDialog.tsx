@@ -323,7 +323,7 @@ export function DictionaryInstructions({
 
           <p>
             The MDBG data is updated frequently. As an alternative to the link
-            about, you can get the latest version of the MDBG dictionary data at
+            above, you can get the latest version of the MDBG dictionary data at
             the link below. Just be warned it may not have been tested with
             Knowclip.
           </p>

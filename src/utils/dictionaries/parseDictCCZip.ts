@@ -9,6 +9,7 @@ import {
 } from '../../utils/dictCc'
 import { getTokenCombinations } from '../../utils/tokenCombinations'
 import { getDexieDb } from '../dictionariesDatabase'
+import { MAX_GERMAN_SEARCH_TOKENS_COUNT } from './lookUpDictCc'
 
 export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
   let termBankMet = false
@@ -138,7 +139,7 @@ async function importDictionaryEntries(
         console.log({ searchStems, searchTokens })
       }
 
-      if (searchStems.length > 5) console.log(head, searchStems.join(' '))
+      // if (searchStems.length > MAX_GERMAN_SEARCH_TOKENS_COUNT) console.log(head, searchStems.join(' '))
 
       buffer.push({
         head,
@@ -155,7 +156,9 @@ async function importDictionaryEntries(
         searchTokensCount: searchTokens.length,
         tokenCombos:
           // TODO: should get chunks from all places, just doing the start for now
-          getTokenCombinations(searchStems.slice(0, 5)).map(tokenCombo => {
+          getTokenCombinations(
+            searchStems.slice(0, MAX_GERMAN_SEARCH_TOKENS_COUNT)
+          ).map(tokenCombo => {
             return [
               ...tokenCombo.sort(),
               searchStems.length.toString(16).padStart(2, '0'),

@@ -14,6 +14,7 @@ import createElectronStorage from 'redux-persist-electron-storage'
 import { resetFileAvailabilities } from '../utils/statePersistence'
 
 const storage = createElectronStorage()
+const whitelist: (keyof FilesState)[] = ['ProjectFile', 'Dictionary']
 const filesPersistConfig: PersistConfig<
   FilesState,
   FilesState,
@@ -22,12 +23,7 @@ const filesPersistConfig: PersistConfig<
 > = {
   key: 'files',
   storage,
-  whitelist: [
-    'ProjectFile',
-    'DictCCDictionary',
-    'CEDictDictionary',
-    'YomichanDictionary',
-  ] as (keyof FilesState)[],
+  whitelist,
 }
 
 const transform = createTransform(

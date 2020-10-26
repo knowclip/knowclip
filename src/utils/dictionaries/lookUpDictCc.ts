@@ -16,7 +16,7 @@ import {
   sortResult,
 } from '../dictionariesDatabase'
 
-const MAX_GERMAN_SEARCH_TOKENS_COUNT = 5
+export const MAX_GERMAN_SEARCH_TOKENS_COUNT = 5
 
 export async function lookUpDictCc(
   text: string,
