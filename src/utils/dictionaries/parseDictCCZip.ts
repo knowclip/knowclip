@@ -83,9 +83,11 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
 
             return concat(
               readEntryObservable,
-              defer(() => {
+              defer(async () => {
+                await null
+
                 zipfile.readEntry()
-                return of(visitedEntries / entryCount)
+                return visitedEntries / entryCount
               })
             )
           })
@@ -96,10 +98,12 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
 
   const progressObservable = concat(
     entriesObservable,
-    defer(() => {
+    defer(async () => {
+      await null
+
       if (!termBankMet) throw new Error(`Invalid dictionary file.`)
 
-      return from([100])
+      return 100
     })
   ).pipe(
     catchError((err) => {

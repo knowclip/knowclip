@@ -9,10 +9,10 @@ import {
   startWith,
   takeUntil,
   endWith,
-  concat,
   tap,
+  mergeMap,
 } from 'rxjs/operators'
-import { of, Observable, defer } from 'rxjs'
+import { of, Observable, defer, concat } from 'rxjs'
 import * as r from '../redux'
 import * as A from '../types/ActionType'
 import { from } from 'rxjs'
@@ -67,14 +67,13 @@ const makeClipsFromSubtitles: AppEpic = (
           )
           return from(missingTracks).pipe(
             concatMap(([, file]) =>
-              of(r.openFileRequest(file)).pipe(
-                concat(
-                  action$.pipe(
-                    ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
-                    filter((a) => areSameFile(file, a.validatedFile)),
-                    take(1),
-                    ignoreElements()
-                  )
+              concat(
+                of(r.openFileRequest(file)),
+                action$.pipe(
+                  ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
+                  filter((a) => areSameFile(file, a.validatedFile)),
+                  take(1),
+                  ignoreElements()
                 )
               )
             ),
@@ -94,41 +93,43 @@ const makeClipsFromSubtitles: AppEpic = (
             )
           )
 
-        return from([
-          r.deleteCards(
-            r.getClipIdsByMediaFileId(state$.value, currentFile.id)
-          ),
-          r.setDefaultClipSpecs({ tags, includeStill }),
-          ...Object.keys(fieldNamesToTrackIds).map((badTypefieldName) => {
-            const fieldName = badTypefieldName as FlashcardFieldName
-            const trackId = fieldNamesToTrackIds[fieldName] || null
-            return r.linkFlashcardFieldToSubtitlesTrack(
-              fieldName,
-              currentFile.id,
-              trackId
-            )
-          }),
-        ]).pipe(
-          concat(
-            defer(() => {
-              const clips: Clip[] = []
-              const cards: Flashcard[] = []
-              getClipsAndCardsFromSubtitles(
-                tracksValidation.cueTrackFieldName,
-                fieldNamesToTrackIds,
-                state$.value,
-                fileId
-              ).forEach(({ clip, flashcard }) => {
-                clips.push(clip)
-                cards.push(flashcard)
-              })
+        return concat(
+          from([
+            r.deleteCards(
+              r.getClipIdsByMediaFileId(state$.value, currentFile.id)
+            ),
+            r.setDefaultClipSpecs({ tags, includeStill }),
+            ...Object.keys(fieldNamesToTrackIds).map((badTypefieldName) => {
+              const fieldName = badTypefieldName as FlashcardFieldName
+              const trackId = fieldNamesToTrackIds[fieldName] || null
+              return r.linkFlashcardFieldToSubtitlesTrack(
+                fieldName,
+                currentFile.id,
+                trackId
+              )
+            }),
+          ]),
+          defer(async () => {
+            await null // wait for state update from previous actions
 
-              return from([
-                r.addClips(clips, cards, fileId),
-                r.highlightRightClipRequest(),
-              ])
+            const clips: Clip[] = []
+            const cards: Flashcard[] = []
+            console.log('state', state$.value)
+            getClipsAndCardsFromSubtitles(
+              tracksValidation.cueTrackFieldName,
+              fieldNamesToTrackIds,
+              state$.value,
+              fileId
+            ).forEach(({ clip, flashcard }) => {
+              clips.push(clip)
+              cards.push(flashcard)
             })
-          )
+
+            return from([
+              r.addClips(clips, cards, fileId),
+              r.highlightRightClipRequest(),
+            ])
+          }).pipe(mergeMap((x) => x))
         )
       }
     )

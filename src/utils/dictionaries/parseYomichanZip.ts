@@ -70,11 +70,11 @@ export async function parseYomichanZip(
           })
         ),
 
-        defer(() => {
-          return from(importDictionaryEntries(rawJson, file)).pipe(
-            tap(() => zipfile.readEntry()),
-            map(() => visitedEntries / entryCount)
-          )
+        defer(async () => {
+          await importDictionaryEntries(rawJson, file)
+
+          zipfile.readEntry()
+          return visitedEntries / entryCount
         })
       )
     })
@@ -82,12 +82,14 @@ export async function parseYomichanZip(
 
   const progressObservable = concat(
     entriesObservable,
-    defer(() => {
+    defer(async () => {
+      await null
+
       console.log('import complete!', new Date(Date.now()), Date.now())
 
       if (!termBankMet) throw new Error(`Invalid dictionary file.`)
 
-      return from([100])
+      return 100
     })
   ).pipe(
     catchError((err) => {
