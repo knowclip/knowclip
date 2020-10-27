@@ -13,6 +13,7 @@ import css from './Media.module.css'
 import { Tooltip, IconButton } from '@material-ui/core'
 import { VerticalSplitSharp, HorizontalSplitSharp } from '@material-ui/icons'
 import { SubtitlesFileWithTrack, MediaSubtitles } from '../redux'
+import { KEYS } from '../utils/keyboard'
 
 export const MEDIA_PLAYER_ID = 'mediaPlayer'
 
@@ -84,6 +85,13 @@ const Media = ({
     onPause: blur,
     onClick: blur,
     onVolumeChange: blur,
+
+    onKeyDown: useCallback((e) => {
+      if (e.key === KEYS.arrowLeft || e.key === KEYS.arrowRight) {
+        if (e.altKey) e.preventDefault()
+        else e.stopPropagation()
+      }
+    }, []),
   }
 
   useEffect(() => {

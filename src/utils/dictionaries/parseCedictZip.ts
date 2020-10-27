@@ -77,14 +77,17 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
 
             return concat(
               readEntryObservable,
-              defer(() => {
+              defer(async () => {
+                await null
                 console.log(
                   'import complete!!',
                   new Date(Date.now()),
                   Date.now()
                 )
+
                 zipfile.readEntry()
-                return of(visitedEntries / entryCount)
+
+                return visitedEntries / entryCount
               })
             )
           })
@@ -96,12 +99,13 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
 
   const progressObservable = concat(
     entriesObservable,
-    defer(() => {
+    defer(async () => {
+      await null
       console.log('import complete!', new Date(Date.now()), Date.now())
 
       if (!termBankMet) throw new Error(`Invalid dictionary file.`)
 
-      return from([100])
+      return 100
     })
   ).pipe(
     catchError((err) => {
