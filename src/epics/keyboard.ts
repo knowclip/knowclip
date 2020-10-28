@@ -16,7 +16,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         key.toLowerCase() === KEYS.lLowercase &&
         (ctrlKey || !isTextFieldFocused())
       )
-        return of(r.toggleLoop())
+        return of(r.toggleLoop('KEYBOARD'))
 
       if (
         key.toLowerCase() === KEYS.eLowercase &&
@@ -53,7 +53,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
           state$.value.session.editingCards
         )
           return from([
-            ...(r.isLoopOn(state$.value) ? [r.setLoop(false)] : []),
+            ...(r.getLoopState(state$.value) ? [r.setLoop(false)] : []),
             r.stopEditingCards(),
           ])
 

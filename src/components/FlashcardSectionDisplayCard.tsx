@@ -9,6 +9,7 @@ import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import { TransliterationFlashcardFields } from '../types/Project'
 import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
+import { getKeyboardShortcut } from './KeyboardShortcuts'
 
 enum $ {
   container = 'flashcard-display-container',
@@ -32,7 +33,7 @@ const FlashcardSectionDisplayCard = memo(
       (state: AppState) => ({
         allTags: r.getAllTags(state),
         currentNoteType: r.getCurrentNoteType(state),
-        isLoopOn: r.isLoopOn(state),
+        isLoopOn: r.getLoopState(state),
         fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
         mediaIsPlaying: r.isMediaPlaying(state),
         viewMode: state.settings.viewMode,
@@ -105,7 +106,9 @@ const FlashcardSectionDisplayCard = memo(
         [dispatch, flashcard.cloze, flashcard.id]
       ),
     })
-    const toggleLoop = useCallback(() => dispatch(r.toggleLoop()), [dispatch])
+    const toggleLoop = useCallback(() => dispatch(r.toggleLoop('BUTTON')), [
+      dispatch,
+    ])
 
     return (
       <FlashcardSectionDisplay
@@ -121,7 +124,11 @@ const FlashcardSectionDisplayCard = memo(
             {fields.transcription.trim() && (
               <ClozeButtons controls={clozeControls} />
             )}
-            <Tooltip title="Edit card (E key)">
+            <Tooltip
+              title={`Edit card (${getKeyboardShortcut(
+                'Start editing fields'
+              )} key)`}
+            >
               <IconButton
                 className={css.editCardButton}
                 onClick={startEditing}
@@ -134,7 +141,9 @@ const FlashcardSectionDisplayCard = memo(
         }
         secondaryMenuItems={
           <>
-            <Tooltip title="Loop selection (Ctrl + L)">
+            <Tooltip
+              title={`Loop selection (${getKeyboardShortcut('Toggle loop')})`}
+            >
               <IconButton
                 onClick={toggleLoop}
                 color={isLoopOn ? 'secondary' : 'default'}

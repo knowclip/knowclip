@@ -107,21 +107,25 @@ const session: Reducer<SessionState, Action> = (
         pendingClip: null,
       }
 
-    case A.SELECT_WAVEFORM_ITEM:
+    case A.SELECT_WAVEFORM_ITEM: {
+      let loopMedia: LoopState = state.loopMedia
+      if (
+        state.editingCards &&
+        action.selection &&
+        action.selection.type === 'Clip'
+      ) {
+        loopMedia = 'EDIT'
+      } else if (action.selection && action.selection.type === 'Preview') {
+        loopMedia = false
+      }
       return areSelectionsEqual(state.waveformSelection, action.selection)
         ? state
         : {
             ...state,
             waveformSelection: action.selection,
-            loopMedia:
-              (state.editingCards &&
-                action.selection &&
-                action.selection.type === 'Clip') ||
-              (action.selection && action.selection.type === 'Preview'
-                ? false
-                : state.loopMedia),
+            loopMedia,
           }
-
+    }
     case A.SET_PENDING_STRETCH:
       return {
         ...state,
@@ -198,15 +202,17 @@ const session: Reducer<SessionState, Action> = (
     case A.TOGGLE_LOOP:
       return {
         ...state,
-        loopMedia: !state.loopMedia,
+        loopMedia: state.loopMedia ? false : action.reason,
       }
 
-    case A.SET_LOOP:
-      return {
-        ...state,
-        loopMedia: action.loop,
-      }
-
+    case A.SET_LOOP: {
+      if (!action.loop || !state.loopMedia)
+        return {
+          ...state,
+          loopMedia: action.loop,
+        }
+      return state
+    }
     case A.PLAY_MEDIA:
       return { ...state, mediaIsPlaying: true }
     case A.PAUSE_MEDIA:
@@ -222,7 +228,7 @@ const session: Reducer<SessionState, Action> = (
       return { ...state, currentMediaFileId: null, waveformSelection: null }
 
     case A.START_EDITING_CARDS:
-      return { ...state, editingCards: true, loopMedia: true }
+      return { ...state, editingCards: true, loopMedia: 'EDIT' }
 
     case A.STOP_EDITING_CARDS:
       return { ...state, editingCards: false, loopMedia: false }
@@ -239,6 +245,3 @@ const session: Reducer<SessionState, Action> = (
 }
 
 export default session
-
-// don't loop when making selection on transcription field
-// even when not in cloze mode

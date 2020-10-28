@@ -283,8 +283,8 @@ declare type AddMediaToProjectRequest = {
   filePaths: Array<MediaFilePath>
 }
 declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
-declare type ToggleLoop = { type: 'TOGGLE_LOOP' }
-declare type SetLoop = { type: 'SET_LOOP'; loop: boolean }
+declare type ToggleLoop = { type: 'TOGGLE_LOOP'; reason: LoopReason }
+declare type SetLoop = { type: 'SET_LOOP'; loop: LoopState }
 declare type PlayMedia = { type: 'PLAY_MEDIA' }
 declare type PauseMedia = { type: 'PAUSE_MEDIA' }
 declare type SetViewMode = { type: 'SET_VIEW_MODE'; viewMode: ViewMode }

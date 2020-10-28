@@ -60,7 +60,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
 
           const loopImminent =
             !wasSeeking &&
-            r.isLoopOn(state) &&
+            r.getLoopState(state) &&
             effects.isMediaPlaying() &&
             selection &&
             newlyUpdatedTime >= r.getSecondsAtX(state, selection.item.end)

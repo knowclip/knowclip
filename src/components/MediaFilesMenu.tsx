@@ -25,6 +25,7 @@ import {
   setCursorX,
 } from '../utils/waveform'
 import { getFileFilters } from '../utils/files'
+import { getKeyboardShortcut } from './KeyboardShortcuts'
 
 enum $ {
   chooseFirstMediaFileButton = 'choose-media-file-button',
@@ -39,9 +40,9 @@ const MediaFilesMenu = ({
   className,
   currentProjectId,
 }: MediaFilesMenuProps) => {
-  const { currentFile, projectMediaFiles, loopIsOn } = useSelector(
+  const { currentFile, projectMediaFiles, loopIsOn: loopState } = useSelector(
     (state: AppState) => ({
-      loopIsOn: r.isLoopOn(state),
+      loopIsOn: r.getLoopState(state),
       currentFile: r.getCurrentMediaFile(state),
       projectMediaFiles: r.getCurrentProjectMediaFiles(state),
     })
@@ -62,7 +63,7 @@ const MediaFilesMenu = ({
 
   const { playing, playOrPauseAudio } = usePlayButtonSync()
 
-  const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
+  const toggleLoop = useCallback(() => dispatch(actions.toggleLoop('BUTTON')), [
     dispatch,
   ])
 
@@ -91,7 +92,11 @@ const MediaFilesMenu = ({
         )}
         {currentFile && (
           <Tooltip
-            title={playing ? 'Pause (Ctrl + space)' : 'Play (Ctrl + space)'}
+            title={
+              playing
+                ? `Pause (${getKeyboardShortcut('Play/pause')})`
+                : `Play (${getKeyboardShortcut('Play/pause')})`
+            }
           >
             <IconButton onClick={playOrPauseAudio}>
               {playing ? <Pause /> : <PlayArrow />}
@@ -100,10 +105,12 @@ const MediaFilesMenu = ({
         )}
 
         {currentFile && (
-          <Tooltip title="Loop selection (Ctrl + L)">
+          <Tooltip
+            title={`Loop selection (${getKeyboardShortcut('Toggle loop')})`}
+          >
             <IconButton
               onClick={toggleLoop}
-              color={loopIsOn ? 'secondary' : 'default'}
+              color={loopState ? 'secondary' : 'default'}
             >
               <Loop />
             </IconButton>

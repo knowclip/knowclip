@@ -11,7 +11,7 @@ import { createSelector } from 'reselect'
 import { SELECTION_BORDER_WIDTH } from './waveform'
 import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
 
-export const isLoopOn = (state: AppState) => state.session.loopMedia
+export const getLoopState = (state: AppState) => state.session.loopMedia
 
 export const isMediaPlaying = (state: AppState) => state.session.mediaIsPlaying
 

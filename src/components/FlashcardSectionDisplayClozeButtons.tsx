@@ -8,6 +8,7 @@ import {
   ClozeHues,
 } from './FlashcardSectionDisplayClozeField'
 import { ClozeControls } from '../utils/clozeField/useClozeControls'
+import { getKeyboardShortcut } from './KeyboardShortcuts'
 
 const empty: ClozeDeletion[] = []
 
@@ -53,10 +54,16 @@ const ClozeButtons = ({
         key={nextId}
         hoverText={
           currentClozeIndex === -1
-            ? 'Make cloze deletion (C key)'
+            ? `Make cloze deletion (${getKeyboardShortcut(
+                'Start making cloze deletion'
+              )} key)`
             : currentClozeIndex === deletions.length
-            ? 'Stop editing cloze deletions'
-            : 'Make a new cloze deletion card (C key)'
+            ? `Stop editing cloze deletions (${getKeyboardShortcut(
+                'Stop making cloze deletion'
+              )})`
+            : `Make a new cloze deletion card (${getKeyboardShortcut(
+                'Start making cloze deletion'
+              )} key)`
         }
         index={deletions.length}
         id={nextId}

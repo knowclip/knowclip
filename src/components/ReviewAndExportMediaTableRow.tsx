@@ -46,14 +46,15 @@ const ReviewAndExportMediaTableRow = memo(
       flashcard: r.getFlashcard(state, id) as Flashcard,
       clipTime: r.getClipTime(state, id),
       formattedClipTime: r.getFormattedClipTime(state, id),
-      isLoopOn: r.isLoopOn(state),
+      isLoopOn: r.getLoopState(state),
       currentMediaFile: r.getCurrentMediaFile(state),
     }))
 
     const dispatch = useDispatch()
-    const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
-      dispatch,
-    ])
+    const toggleLoop = useCallback(
+      () => dispatch(actions.toggleLoop('BUTTON')),
+      [dispatch]
+    )
 
     const selectClip = useCallback(() => {
       if (currentMediaFile && !isHighlighted && clipTime) {

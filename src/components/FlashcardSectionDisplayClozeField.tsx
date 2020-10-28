@@ -52,10 +52,9 @@ const ClozeField = ({
 
   const handleDoubleClick = useCallback(
     (e: any) => {
-      if (!clozeInputRef.current) return // dispatch(r.)
+      if (!clozeInputRef.current) return
 
       popover.open(e)
-      setTimeout(() => clozeInputRef.current && clozeInputRef.current.blur(), 0)
     },
     [clozeInputRef, popover]
   )

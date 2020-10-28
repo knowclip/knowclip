@@ -129,13 +129,19 @@ const parseSubtitles = (
         subsrt
           .parse(fileContents)
           .filter(({ type }) => type === 'caption')
-          .map((chunk) => r.readSubsrtChunk(state, chunk))
+          .map((chunk, index) => r.readSubsrtChunk(state, { ...chunk, index }))
       )
     case '.vtt':
     case '.srt':
       return sanitizeSubtitles(
-        parse(fileContents).map((vttChunk) =>
-          r.readVttChunk(state, vttChunk as SubtitlesChunk)
+        parse(fileContents).map(
+          (vttChunk, index) =>
+            r.readVttChunk(state, {
+              start: Number(vttChunk.start),
+              end: Number(vttChunk.end),
+              text: vttChunk.text,
+              index,
+            }) // TODO: handle failed number parse
         )
       )
     default:

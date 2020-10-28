@@ -3,10 +3,32 @@ import { Card, CardContent } from '@material-ui/core'
 import css from './KeyboardShortcuts.module.css'
 import os from 'os'
 
+const KEYBOARD_SHORTCUTS = {
+  'Play/pause': 'Shift + Space',
+  'Toggle loop': 'Ctrl + L',
+  'Stop looping': 'Esc',
+  'Select previous': '←',
+  'Select next': '→',
+  'Select previous (while editing)': 'Alt + ←',
+  'Select next (while editing)': 'Alt + →',
+  'Deselect current': 'Esc',
+  'Look up word at mouse cursor': 'D',
+  'Close dictionary popover': 'Esc',
+  'Start editing fields': 'E',
+  'Stop editing fields': 'Esc',
+  'Start making cloze deletion': 'C',
+  'Stop making cloze deletion': 'Esc',
+  'Save project': 'Cmd + S',
+} as const
+
+export function getKeyboardShortcut(action: keyof typeof KEYBOARD_SHORTCUTS) {
+  return KEYBOARD_SHORTCUTS[action].replace('Cmd', CtrlCmd)
+}
+
 const CtrlCmd = os.platform() === 'darwin' ? '⌘' : 'Ctrl'
-const Shortcut = ({ keys, action }: { keys: string; action: string }) => (
+const Shortcut = ({ action }: { action: keyof typeof KEYBOARD_SHORTCUTS }) => (
   <p className={css.shortcut}>
-    <span className={css.keyCombination}>{keys.replace('Cmd', CtrlCmd)}</span>
+    <span className={css.keyCombination}>{getKeyboardShortcut(action)}</span>
     <span className={css.action}>{action}</span>
   </p>
 )
@@ -35,40 +57,37 @@ const KeyboardShortcuts = () => {
           <CardContent className={css.card}>
             <h3 className={css.heading}>Media</h3>
             <section className={css.group}>
-              <Shortcut keys="Shift + Space" action="Play/pause" />
-              <Shortcut keys="Ctrl + L" action="Toggle loop" />
-              <Shortcut keys="Esc" action="Stop looping" />
+              <Shortcut action="Play/pause" />
+              <Shortcut action="Toggle loop" />
+              <Shortcut action="Stop looping" />
             </section>
 
             <section className={css.group}>
               <h3 className={css.heading}>Navigate between clips/subtitles</h3>
-              <Shortcut keys="←" action="Select previous" />
-              <Shortcut keys="→" action="Select next" />
-              <Shortcut
-                keys="Alt + ←"
-                action="Select previous (while editing)"
-              />
-              <Shortcut keys="Alt + →" action="Select next (while editing)" />
-              <Shortcut keys="Esc" action="Deselect current" />
+              <Shortcut action="Select previous" />
+              <Shortcut action="Select next" />
+              <Shortcut action="Select previous (while editing)" />
+              <Shortcut action="Select next (while editing)" />
+              <Shortcut action="Deselect current" />
             </section>
 
             <section className={css.group}>
               <h3 className={css.heading}>Dictionary</h3>
-              <Shortcut keys="D" action="Look up word at mouse cursor" />
-              <Shortcut keys="Esc" action="Close dictionary popover" />
+              <Shortcut action="Look up word at mouse cursor" />
+              <Shortcut action="Close dictionary popover" />
             </section>
 
             <section className={css.group}>
               <h3 className={css.heading}>Editing flashcards</h3>
-              <Shortcut keys="E" action="Start editing fields" />
-              <Shortcut keys="Esc" action="Stop editing fields" />
-              <Shortcut keys="C" action="Start making cloze deletion" />
-              <Shortcut keys="Esc" action="Stop making cloze deletion" />
+              <Shortcut action="Start editing fields" />
+              <Shortcut action="Stop editing fields" />
+              <Shortcut action="Start making cloze deletion" />
+              <Shortcut action="Stop making cloze deletion" />
             </section>
 
             <section className={css.group}>
               <h3 className={css.heading}>Project</h3>
-              <Shortcut keys="Cmd + S" action="Save project" />
+              <Shortcut action="Save project" />
             </section>
           </CardContent>
         </Card>
