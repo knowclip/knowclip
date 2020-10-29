@@ -21,13 +21,16 @@ declare type SessionState = {
   currentProjectId: ProjectId | null
   currentMediaFileId: MediaFileId | null
   workIsUnsaved: boolean
-  loopMedia: boolean
+  loopMedia: LoopState
   mediaIsPlaying: boolean
   editingCards: boolean
   dictionaryPopoverIsOpen: boolean
 
   progress: ProgressInfo | null
 }
+
+declare type LoopState = LoopReason | false
+declare type LoopReason = 'FOCUS' | 'EDIT' | 'KEYBOARD' | 'BUTTON'
 
 declare type ProgressInfo = {
   message: string

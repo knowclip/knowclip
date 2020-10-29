@@ -14,6 +14,7 @@ import TagsInput from './TagsInput'
 import VideoStillDisplay from './FlashcardSectionFormVideoStill'
 import * as actions from '../actions'
 import Field from './FlashcardSectionFormField'
+import { getKeyboardShortcut } from './KeyboardShortcuts'
 
 enum $ {
   container = 'flashcard-form-container',
@@ -60,7 +61,7 @@ const FlashcardSectionForm = memo(
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),
       currentNoteType: r.getCurrentNoteType(state),
-      isLoopOn: r.isLoopOn(state),
+      isLoopOn: r.getLoopState(state),
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
       subtitles: r.getSubtitlesFilesWithTracks(state),
       mediaIsPlaying: r.isMediaPlaying(state),
@@ -70,16 +71,17 @@ const FlashcardSectionForm = memo(
 
     const dispatch = useDispatch()
 
-    const toggleLoop = useCallback(() => dispatch(actions.toggleLoop()), [
-      dispatch,
-    ])
+    const toggleLoop = useCallback(
+      () => dispatch(actions.toggleLoop('BUTTON')),
+      [dispatch]
+    )
     const focusRef = useRef<HTMLInputElement>()
 
     // focus first field on highlight clip
     // and, while playing, trigger loop during further field/button interactions
     const [initialFocus, setInitialFocusComplete] = useState(false)
     const loopOnInteract = useCallback(() => {
-      if (mediaIsPlaying && !isLoopOn) dispatch(actions.setLoop(true))
+      if (mediaIsPlaying && !isLoopOn) dispatch(actions.setLoop('EDIT'))
     }, [dispatch, isLoopOn, mediaIsPlaying])
 
     useEffect(() => {
@@ -188,7 +190,11 @@ const FlashcardSectionForm = memo(
         </section>
 
         <section className={css.menu}>
-          <Tooltip title="Show card preview + cloze deletions (Esc)">
+          <Tooltip
+            title={`Show card preview + cloze deletions (${getKeyboardShortcut(
+              'Stop editing fields'
+            )})`}
+          >
             <IconButton onClick={handleClickPreviewButton}>
               <ShortTextTwoTone />
             </IconButton>
@@ -196,7 +202,9 @@ const FlashcardSectionForm = memo(
         </section>
 
         <section className={css.secondaryMenu}>
-          <Tooltip title="Loop selection (Ctrl + L)">
+          <Tooltip
+            title={`Loop selection (${getKeyboardShortcut('Toggle loop')})`}
+          >
             <IconButton
               onClick={toggleLoop}
               color={isLoopOn ? 'secondary' : 'default'}

@@ -181,15 +181,18 @@ export const readVttChunk = (
     start,
     end,
     text,
+    index,
   }: {
     start: number
     end: number
     text: string
+    index: number
   }
 ): SubtitlesChunk => ({
   start: getXAtMilliseconds(state, start),
   end: getXAtMilliseconds(state, end),
   text: (stripHtml(text) || '').trim(),
+  index,
 })
 export const readParseSrtChunk = (
   state: AppState,
@@ -197,15 +200,18 @@ export const readParseSrtChunk = (
     start,
     end,
     text,
+    index,
   }: {
     start: number
     end: number
     text: string
+    index: number
   }
 ): SubtitlesChunk => ({
   start: getXAtMilliseconds(state, start * 1000),
   end: getXAtMilliseconds(state, end * 1000),
   text: (stripHtml(text) || '').trim(),
+  index,
 })
 export const readSubsrtChunk = readVttChunk
 

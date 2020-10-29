@@ -23,6 +23,7 @@ declare type SubtitlesChunk = {
   start: WaveformX
   end: WaveformX
   text: string
+  index: number
 }
 
 declare type SubtitlesTrackId = string

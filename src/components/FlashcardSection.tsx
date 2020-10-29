@@ -17,6 +17,7 @@ import FlashcardDisplay from './FlashcardSectionDisplayCard'
 import Preview from './FlashcardSectionDisplayPreview'
 import { showOpenDialog } from '../utils/electron'
 import { getFileFilters } from '../utils/files'
+import { getKeyboardShortcut } from './KeyboardShortcuts'
 
 enum $ {
   container = 'flashcard-section-container',
@@ -93,7 +94,15 @@ const FlashcardSection = ({
         </div>
       ) : null}
 
-      <Tooltip title="Previous (← key)">
+      <Tooltip
+        title={
+          editing
+            ? `Previous (${getKeyboardShortcut(
+                'Select previous (while editing)'
+              )} key)`
+            : `Previous (${getKeyboardShortcut('Select previous')})`
+        }
+      >
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
           disabled={itemsLength < 2}
@@ -146,7 +155,13 @@ const FlashcardSection = ({
           currentProjectId={projectFile.id}
         />
       )}
-      <Tooltip title="Next (→ key)">
+      <Tooltip
+        title={
+          editing
+            ? `Next (${getKeyboardShortcut('Select next (while editing)')} key)`
+            : `Next (${getKeyboardShortcut('Select next')})`
+        }
+      >
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
           disabled={itemsLength < 2}

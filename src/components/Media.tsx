@@ -19,7 +19,7 @@ export const MEDIA_PLAYER_ID = 'mediaPlayer'
 
 type MediaProps = {
   constantBitrateFilePath: string | null
-  loop: boolean
+  loop: LoopState
   metadata: MediaFile | null
   subtitles: MediaSubtitles
   className?: string

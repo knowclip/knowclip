@@ -53,7 +53,7 @@ export default function useClozeControls({
       } else {
         _setClozeIndex(newIndex)
       }
-      if (playing) dispatch(r.setLoop(newIndex !== -1))
+      if (playing) dispatch(r.setLoop(newIndex !== -1 ? 'EDIT' : false))
     },
     [clozeIndex, deletions, dispatch, onDeleteClozeCard, playing]
   )
@@ -146,8 +146,6 @@ export default function useClozeControls({
         currentSelection &&
         currentSelection.start !== currentSelection.end
       ) {
-        // C key
-        // enter key
         if (clozeIndex === -1) {
           const newIndex = deletions.length
           if (newIndex < ClozeIds.length)

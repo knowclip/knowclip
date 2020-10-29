@@ -241,14 +241,12 @@ const SubtitlesChunk = React.memo(
 const LinkedSubtitlesChunk = React.memo(
   ({
     cardBase,
-    index,
     getFieldsPreview,
     linkedTrackIds,
     isSelected,
     tracksCount,
   }: {
     cardBase: r.SubtitlesCardBase
-    index: number
     getFieldsPreview: (base: r.SubtitlesCardBase) => Dict<string, string>
     linkedTrackIds: SubtitlesTrackId[]
     isSelected: boolean
@@ -268,7 +266,7 @@ const LinkedSubtitlesChunk = React.memo(
 
     const clickDataProps = {
       'data-track-id': linkedTrackIds[0],
-      'data-chunk-index': index,
+      'data-chunk-index': cardBase.index,
       'data-chunk-start': cardBase.start,
     }
 
@@ -357,16 +355,15 @@ const SubtitlesTimelines = memo(
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
       >
-        {subtitles.cards.map((c, i) => {
+        {subtitles.cards.map((c) => {
           return (
             <LinkedSubtitlesChunk
-              key={'linked' + i}
+              key={'linked' + c.index}
               cardBase={c}
-              index={i}
               tracksCount={subtitles.fieldNames.length}
               linkedTrackIds={subtitles.linkedTrackIds}
               getFieldsPreview={subtitles.getFieldsPreviewFromCardsBase}
-              isSelected={highlightedChunkIndex === i}
+              isSelected={highlightedChunkIndex === c.index}
             />
           )
         })}
@@ -375,13 +372,13 @@ const SubtitlesTimelines = memo(
             Object.keys(subtitles.fieldNames).length + trackIndex
           return (
             <g className={$.subtitlesTimelines} key={id}>
-              {chunks.map((chunk, index) => (
+              {chunks.map((chunk) => (
                 <SubtitlesChunk
                   key={`${chunk.start}_${chunk.text}`}
                   chunk={chunk}
                   trackOffsetY={trackOffsetY}
                   trackId={id}
-                  chunkIndex={index}
+                  chunkIndex={chunk.index}
                 />
               ))}
             </g>

@@ -2,11 +2,12 @@ import * as A from '../types/ActionType'
 
 export const dismissMedia = (): DismissMedia => ({ type: 'DISMISS_MEDIA' })
 
-export const toggleLoop = (): ToggleLoop => ({
+export const toggleLoop = (reason: LoopReason): ToggleLoop => ({
   type: A.TOGGLE_LOOP,
+  reason,
 })
 
-export const setLoop = (loop: boolean): SetLoop => ({
+export const setLoop = (loop: LoopState): SetLoop => ({
   type: A.SET_LOOP,
   loop,
 })

@@ -38,10 +38,10 @@ export function useFieldPopoverDictionary(
 ) {
   const { inputRef: ref } = clozeControls
   const dispatch = useDispatch()
-  const { isMediaPlaying, loopIsOn, popoverIsOpenFromStore } = useSelector(
+  const { isMediaPlaying, loopState, popoverIsOpenFromStore } = useSelector(
     (state: AppState) => ({
       isMediaPlaying: r.isMediaPlaying(state),
-      loopIsOn: r.isLoopOn(state),
+      loopState: r.getLoopState(state),
       popoverIsOpenFromStore: state.session.dictionaryPopoverIsOpen,
     })
   )
@@ -50,7 +50,6 @@ export function useFieldPopoverDictionary(
   )
 
   const previousPopoverIsOpen = usePrevious(popover.isOpen)
-  const [wasLoopingBeforeFocus, setWasLoopingBeforeFocus] = useState(false)
 
   useEffect(() => {
     dispatch(
@@ -61,49 +60,39 @@ export function useFieldPopoverDictionary(
 
   // loop when using dictionary
   useEffect(() => {
-    if (
-      popover.isOpen &&
-      !previousPopoverIsOpen &&
-      !editing &&
-      isMediaPlaying
-    ) {
-      setWasLoopingBeforeFocus(loopIsOn)
-      dispatch(r.setLoop(true))
+    const openingPopover = popover.isOpen && !previousPopoverIsOpen
+    if (openingPopover && !editing && isMediaPlaying) {
+      dispatch(r.setLoop('FOCUS'))
     }
   }, [
     isMediaPlaying,
     popover.isOpen,
     editing,
     previousPopoverIsOpen,
-    loopIsOn,
+    loopState,
     dispatch,
-    setWasLoopingBeforeFocus,
   ])
 
   const popoverWasOpen = usePrevious(popover.isOpen)
 
   useEffect(() => {
-    if (popoverWasOpen && !popover.isOpen) {
-      if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
-        dispatch(r.setLoop(wasLoopingBeforeFocus))
+    const closingPopover = popoverWasOpen && !popover.isOpen
+    if (closingPopover) {
+      if (isMediaPlaying && !editing && loopState === 'FOCUS') {
+        dispatch(r.setLoop(false))
       }
     }
   }, [
     dispatch,
     editing,
     isMediaPlaying,
-    loopIsOn,
+    loopState,
     popover.isOpen,
     popoverWasOpen,
-    wasLoopingBeforeFocus,
   ])
 
   useEffect(() => {
     if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {
-      if (isMediaPlaying && !editing && wasLoopingBeforeFocus !== loopIsOn) {
-        dispatch(r.setLoop(wasLoopingBeforeFocus))
-      }
-
       closePopover({} as SyntheticEvent)
     }
   }, [
@@ -113,8 +102,7 @@ export function useFieldPopoverDictionary(
     closePopover,
     isMediaPlaying,
     editing,
-    wasLoopingBeforeFocus,
-    loopIsOn,
+    loopState,
     dispatch,
   ])
 
@@ -140,9 +128,7 @@ export function useFieldPopoverDictionary(
     dictionaryPopoverIsShowing,
     editing,
     isMediaPlaying,
-    setWasLoopingBeforeFocus,
-    loopIsOn,
-    wasLoopingBeforeFocus
+    loopState
   )
 
   useEffect(() => {

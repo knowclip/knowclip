@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
+import { getKeyboardShortcut } from './KeyboardShortcuts'
 
 const FlashcardSectionPreview = ({
   cardBases,
@@ -57,13 +58,15 @@ const FlashcardSectionPreview = ({
 
   const { defaultIncludeStill, isLoopOn } = useSelector((state: AppState) => ({
     defaultIncludeStill: r.getDefaultIncludeStill(state),
-    isLoopOn: r.isLoopOn(state),
+    isLoopOn: r.getLoopState(state),
   }))
 
   const toggleIncludeStill = useCallback(() => {
     dispatch(r.setDefaultClipSpecs({ includeStill: !defaultIncludeStill }))
   }, [defaultIncludeStill, dispatch])
-  const toggleLoop = useCallback(() => dispatch(r.toggleLoop()), [dispatch])
+  const toggleLoop = useCallback(() => dispatch(r.toggleLoop('BUTTON')), [
+    dispatch,
+  ])
   return (
     <FlashcardSectionDisplay
       className={cn(className, css.preview)}
@@ -77,7 +80,11 @@ const FlashcardSectionPreview = ({
           {(fields.transcription || '').trim() && (
             <ClozeButtons controls={clozeControls} />
           )}
-          <Tooltip title="Create flashcard and start editing (E key)">
+          <Tooltip
+            title={`Create flashcard and start editing (${getKeyboardShortcut(
+              'Start editing fields'
+            )} key)`}
+          >
             <IconButton className={css.editCardButton} onClick={startEditing}>
               <LibraryAdd />
             </IconButton>
@@ -86,7 +93,9 @@ const FlashcardSectionPreview = ({
       }
       secondaryMenuItems={
         <>
-          <Tooltip title="Loop selection (Ctrl + L)">
+          <Tooltip
+            title={`Loop selection (${getKeyboardShortcut('Toggle loop')})`}
+          >
             <IconButton
               onClick={toggleLoop}
               color={isLoopOn ? 'secondary' : 'default'}

@@ -30,7 +30,7 @@ const Main = () => {
   } = useSelector((state: AppState) => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
-      loop: r.isLoopOn(state),
+      loop: r.getLoopState(state),
       mediaIsEffectivelyLoading: r.isMediaEffectivelyLoading(state),
       currentProject: r.getCurrentProject(state),
       constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),

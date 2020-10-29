@@ -16,9 +16,7 @@ export function useClozeUiEffects(
   dictionaryPopoverIsShowing: boolean,
   editing: boolean,
   isMediaPlaying: boolean,
-  setWasLoopingBeforeFocus: React.Dispatch<React.SetStateAction<boolean>>,
-  loopIsOn: boolean,
-  wasLoopingBeforeFocus: boolean
+  loopState: LoopState
 ) {
   const {
     clozeTextInputActions: { onBackspace, onPressDelete },
@@ -156,8 +154,7 @@ export function useClozeUiEffects(
           if (!currentlySelected) setCursorPosition(0)
         }
         if (!editing && isMediaPlaying) {
-          setWasLoopingBeforeFocus(loopIsOn)
-          dispatch(r.setLoop(true))
+          dispatch(r.setLoop('FOCUS'))
         }
       }
     },
@@ -167,8 +164,7 @@ export function useClozeUiEffects(
       editing,
       isMediaPlaying,
       setCursorPosition,
-      setWasLoopingBeforeFocus,
-      loopIsOn,
+      loopState,
       dispatch,
     ]
   )
@@ -176,16 +172,14 @@ export function useClozeUiEffects(
     (e) => {
       if (!dictionaryPopoverIsShowing) {
         setCursorPosition(null)
-        if (!editing && wasLoopingBeforeFocus !== loopIsOn)
-          dispatch(r.setLoop(wasLoopingBeforeFocus))
+        if (!editing && loopState === 'FOCUS') dispatch(r.setLoop(false))
       }
     },
     [
       dictionaryPopoverIsShowing,
       setCursorPosition,
       editing,
-      wasLoopingBeforeFocus,
-      loopIsOn,
+      loopState,
       dispatch,
     ]
   )
