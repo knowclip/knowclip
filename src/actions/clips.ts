@@ -3,7 +3,7 @@ import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 import A from '../types/ActionType'
 
 export const clipsActions = {
-  [A.addClip]: (
+  addClip: (
     clip: Clip,
     flashcard: Flashcard,
     startEditing: boolean = false
@@ -14,7 +14,7 @@ export const clipsActions = {
     startEditing,
   }),
 
-  [A.addClips]: (
+  addClips: (
     clips: Array<Clip>,
     flashcards: Array<Flashcard>,
     fileId: MediaFileId
@@ -25,20 +25,20 @@ export const clipsActions = {
     fileId,
   }),
 
-  [A.selectWaveformItem]: (selection: WaveformSelection | null) => ({
+  selectWaveformItem: (selection: WaveformSelection | null) => ({
     type: A.selectWaveformItem,
     selection,
   }),
 
-  [A.highlightLeftClipRequest]: () => ({
+  highlightLeftClipRequest: () => ({
     type: A.highlightLeftClipRequest,
   }),
 
-  [A.highlightRightClipRequest]: () => ({
+  highlightRightClipRequest: () => ({
     type: A.highlightRightClipRequest,
   }),
 
-  [A.editClip]: (
+  editClip: (
     id: ClipId,
     override: DeepPartial<Clip> | null,
     flashcardOverride: DeepPartial<Flashcard> | null
@@ -49,7 +49,7 @@ export const clipsActions = {
     flashcardOverride,
   }),
 
-  [A.editClips]: (
+  editClips: (
     edits: {
       id: ClipId
       override: DeepPartial<Clip> | null
@@ -60,13 +60,13 @@ export const clipsActions = {
     edits,
   }),
 
-  [A.mergeClips]: (ids: Array<ClipId>, newSelection: WaveformSelection) => ({
+  mergeClips: (ids: Array<ClipId>, newSelection: WaveformSelection) => ({
     type: A.mergeClips,
     ids,
     newSelection,
   }),
 
-  [A.setFlashcardField]: (
+  setFlashcardField: (
     id: ClipId,
     key: FlashcardFieldName,
     value: string,
@@ -79,25 +79,25 @@ export const clipsActions = {
     caretLocation,
   }),
 
-  [A.addFlashcardTag]: (id: ClipId, text: string) => ({
+  addFlashcardTag: (id: ClipId, text: string) => ({
     type: A.addFlashcardTag,
     id,
     text,
   }),
 
-  [A.deleteFlashcardTag]: (id: ClipId, index: number, tag: string) => ({
+  deleteFlashcardTag: (id: ClipId, index: number, tag: string) => ({
     type: A.deleteFlashcardTag,
     id,
     index,
     tag,
   }),
 
-  [A.deleteCard]: (id: ClipId) => ({
+  deleteCard: (id: ClipId) => ({
     type: A.deleteCard,
     id,
   }),
 
-  [A.deleteCards]: (ids: Array<ClipId>) => ({
+  deleteCards: (ids: Array<ClipId>) => ({
     type: A.deleteCards,
     ids,
   }),

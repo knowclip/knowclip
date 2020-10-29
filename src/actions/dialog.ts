@@ -1,13 +1,13 @@
 import A from '../types/ActionType'
 
 export const dialogActions = {
-  [A.enqueueDialog]: (dialog: DialogData, skipQueue: boolean = false) => ({
+  enqueueDialog: (dialog: DialogData, skipQueue: boolean = false) => ({
     type: A.enqueueDialog,
     dialog,
     skipQueue,
   }),
 
-  [A.closeDialog]: () => ({
+  closeDialog: () => ({
     type: A.closeDialog,
   }),
 }

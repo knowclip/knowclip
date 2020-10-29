@@ -2,12 +2,12 @@ import A from '../types/ActionType'
 import { compositeDialogActions } from './dialog'
 
 export const snackbarActions = {
-  [A.enqueueSnackbar]: (snackbar: SnackbarData) => ({
+  enqueueSnackbar: (snackbar: SnackbarData) => ({
     type: A.enqueueSnackbar,
     snackbar,
   }),
 
-  [A.closeSnackbar]: () => ({
+  closeSnackbar: () => ({
     type: A.closeSnackbar,
   }),
 }

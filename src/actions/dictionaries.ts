@@ -2,23 +2,23 @@ import A from '../types/ActionType'
 import { filesActions } from './files'
 
 export const dictionariesActions = {
-  [A.importDictionaryRequest]: (dictionaryType: DictionaryFileType) => ({
+  importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
     type: A.importDictionaryRequest,
     dictionaryType,
   }),
 
-  [A.startDictionaryImport]: (file: DictionaryFile, filePath: FilePath) => ({
+  startDictionaryImport: (file: DictionaryFile, filePath: FilePath) => ({
     type: A.startDictionaryImport,
     file,
     filePath,
   }),
 
-  [A.deleteImportedDictionary]: (file: DictionaryFile) => ({
+  deleteImportedDictionary: (file: DictionaryFile) => ({
     type: A.deleteImportedDictionary,
     file,
   }),
 
-  [A.resetDictionariesDatabase]: () => ({
+  resetDictionariesDatabase: () => ({
     type: A.resetDictionariesDatabase,
   }),
 }

@@ -1,36 +1,36 @@
 import A from '../types/ActionType'
 
 export const waveformActions = {
-  [A.setCursorPosition]: (x: number, newViewBox?: WaveformViewBox) => ({
+  setCursorPosition: (x: number, newViewBox?: WaveformViewBox) => ({
     type: A.setCursorPosition,
     x,
     newViewBox: newViewBox || null,
   }),
 
-  [A.setPendingClip]: (clip: PendingClip) => ({
+  setPendingClip: (clip: PendingClip) => ({
     type: A.setPendingClip,
     clip,
   }),
 
-  [A.clearPendingClip]: () => ({
+  clearPendingClip: () => ({
     type: A.clearPendingClip,
   }),
 
-  [A.setPendingStretch]: (stretch: PendingStretch) => ({
+  setPendingStretch: (stretch: PendingStretch) => ({
     type: A.setPendingStretch,
     stretch,
   }),
 
-  [A.clearPendingStretch]: () => ({
+  clearPendingStretch: () => ({
     type: A.clearPendingStretch,
   }),
 
-  [A.setWaveformViewBox]: (viewBox: WaveformViewBox) => ({
+  setWaveformViewBox: (viewBox: WaveformViewBox) => ({
     type: A.setWaveformViewBox,
     viewBox,
   }),
 
-  [A.generateWaveformImages]: (waveformPngs: WaveformPng[]) => ({
+  generateWaveformImages: (waveformPngs: WaveformPng[]) => ({
     type: A.generateWaveformImages,
     waveformPngs,
   }),

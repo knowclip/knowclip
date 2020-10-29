@@ -4,18 +4,18 @@ import { FileUpdates } from '../files/updates'
 
 export const filesActions = {
   /** Add file to records without opening or doing anything with it */
-  [A.addFile]: <F extends FileMetadata>(file: F, path?: string) => ({
+  addFile: <F extends FileMetadata>(file: F, path?: string) => ({
     type: A.addFile,
     file,
     path,
   }),
 
-  [A.deleteFileRequest]: (fileType: FileMetadata['type'], id: FileId) => ({
+  deleteFileRequest: (fileType: FileMetadata['type'], id: FileId) => ({
     type: A.deleteFileRequest,
     fileType,
     id,
   }),
-  [A.deleteFileSuccess]: (
+  deleteFileSuccess: (
     file: FileAvailability,
     descendants: Array<FileAvailability>
   ) => ({
@@ -24,15 +24,12 @@ export const filesActions = {
     descendants,
   }),
   /** Try to open a file, and add it to the state tree if it isn't there yet. */
-  [A.openFileRequest]: (
-    file: FileMetadata,
-    filePath: FilePath | null = null
-  ) => ({
+  openFileRequest: (file: FileMetadata, filePath: FilePath | null = null) => ({
     type: A.openFileRequest,
     file,
     filePath,
   }),
-  [A.openFileSuccess]: (
+  openFileSuccess: (
     file: FileMetadata,
     filePath: FilePath,
     timestamp: string = nowUtcTimestamp()
@@ -42,7 +39,7 @@ export const filesActions = {
     filePath,
     timestamp,
   }),
-  [A.openFileFailure]: (
+  openFileFailure: (
     file: FileMetadata,
     filePath: FilePath | null,
     errorMessage: string | null
@@ -53,7 +50,7 @@ export const filesActions = {
     errorMessage,
   }),
   /** Should only be dispatched with a stored file */
-  [A.locateFileRequest]: (
+  locateFileRequest: (
     /** This file should exist in the state already */
     file: FileMetadata,
     message: string
@@ -62,27 +59,27 @@ export const filesActions = {
     file,
     message,
   }),
-  [A.locateFileSuccess]: (file: FileMetadata, filePath: FilePath) => ({
+  locateFileSuccess: (file: FileMetadata, filePath: FilePath) => ({
     type: A.locateFileSuccess,
     file,
     filePath,
   }),
 
-  [A.commitFileDeletions]: (fileType?: FileMetadata['type']) => ({
+  commitFileDeletions: (fileType?: FileMetadata['type']) => ({
     type: A.commitFileDeletions,
     fileType,
   }),
 
-  [A.abortFileDeletions]: () => ({
+  abortFileDeletions: () => ({
     type: A.abortFileDeletions,
   }),
 
-  [A.updateFile]: <U extends keyof FileUpdates>(update: FileUpdate<U>) => ({
+  updateFile: <U extends keyof FileUpdates>(update: FileUpdate<U>) => ({
     type: A.updateFile,
     update: update as FileUpdate<any>,
   }),
 
-  [A.preloadVideoStills]: (file: FileMetadata, clipId: ClipId) => ({
+  preloadVideoStills: (file: FileMetadata, clipId: ClipId) => ({
     type: A.preloadVideoStills,
     clipId,
     file,

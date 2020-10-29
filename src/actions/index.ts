@@ -26,7 +26,7 @@ export type ActionOf<T extends ActionType> = ReturnType<
 export type Action = ActionOf<ActionType>
 
 const appActions = {
-  [A.initializeApp]: () => ({
+  initializeApp: () => ({
     type: A.initializeApp,
   }),
 
@@ -34,21 +34,21 @@ const appActions = {
   //   type: A['@@INIT']
   // }),
 
-  [A.setProjectError]: (error: string | null) => ({
+  setProjectError: (error: string | null) => ({
     type: A.setProjectError,
     error,
   }),
 
-  [A.quitApp]: () => ({
+  quitApp: () => ({
     type: A.quitApp,
   }),
 
-  [A.setCurrentFile]: (index: number) => ({
+  setCurrentFile: (index: number) => ({
     type: A.setCurrentFile,
     index,
   }),
 
-  [A.exportApkgRequest]: (
+  exportApkgRequest: (
     mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
     mediaOpenPrior: MediaFile | null
   ) => ({
@@ -57,17 +57,17 @@ const appActions = {
     mediaOpenPrior,
   }),
 
-  [A.exportApkgFailure]: (errorMessage?: string) => ({
+  exportApkgFailure: (errorMessage?: string) => ({
     type: A.exportApkgFailure,
     errorMessage: errorMessage || null,
   }),
 
-  [A.exportApkgSuccess]: (successMessage: string) => ({
+  exportApkgSuccess: (successMessage: string) => ({
     type: A.exportApkgSuccess,
     successMessage,
   }),
 
-  [A.exportCsv]: (
+  exportCsv: (
     mediaFileIdsToClipIds: Record<string, (string | undefined)[]>,
     csvFilePath: string,
     mediaFolderLocation: string,
@@ -80,30 +80,30 @@ const appActions = {
     rememberLocation,
   }),
 
-  [A.exportMarkdown]: (
+  exportMarkdown: (
     mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   ) => ({
     type: A.exportMarkdown,
     mediaFileIdsToClipIds,
   }),
 
-  [A.detectSilenceRequest]: () => ({
+  detectSilenceRequest: () => ({
     type: A.detectSilenceRequest,
   }),
-  [A.detectSilence]: () => ({
+  detectSilence: () => ({
     type: A.detectSilence,
   }),
 
-  [A.deleteAllCurrentFileClipsRequest]: () => ({
+  deleteAllCurrentFileClipsRequest: () => ({
     type: A.deleteAllCurrentFileClipsRequest,
   }),
 
-  [A.setAllTags]: (tagsToClipIds: { [tag: string]: Array<ClipId> }) => ({
+  setAllTags: (tagsToClipIds: { [tag: string]: Array<ClipId> }) => ({
     type: A.setAllTags,
     tagsToClipIds,
   }),
 
-  [A.setDefaultClipSpecs]: ({
+  setDefaultClipSpecs: ({
     tags,
     includeStill,
   }: {
@@ -115,28 +115,28 @@ const appActions = {
     includeStill,
   }),
 
-  [A.setProgress]: (progress: ProgressInfo | null) => ({
+  setProgress: (progress: ProgressInfo | null) => ({
     type: A.setProgress,
     progress,
   }),
 
-  [A.startEditingCards]: () => ({
+  startEditingCards: () => ({
     type: A.startEditingCards,
   }),
 
-  [A.stopEditingCards]: () => ({
+  stopEditingCards: () => ({
     type: A.stopEditingCards,
   }),
 
-  [A.openDictionaryPopover]: () => ({
+  openDictionaryPopover: () => ({
     type: A.openDictionaryPopover,
   }),
 
-  [A.closeDictionaryPopover]: () => ({
+  closeDictionaryPopover: () => ({
     type: A.closeDictionaryPopover,
   }),
 
-  [A.newCardFromSubtitlesRequest]: (
+  newCardFromSubtitlesRequest: (
     linkedSubtitlesChunkSelection: WaveformSelectionExpanded & {
       type: 'Preview'
     },

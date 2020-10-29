@@ -4,7 +4,7 @@ import { filesActions } from './files'
 const updateFile = filesActions.updateFile
 
 export const projectActions = {
-  [A.createProject]: (
+  createProject: (
     id: string,
     name: string,
     noteType: NoteType,
@@ -28,17 +28,17 @@ export const projectActions = {
       filePath,
     }
   },
-  [A.openProjectRequestByFilePath]: (filePath: string) => ({
+  openProjectRequestByFilePath: (filePath: string) => ({
     type: A.openProjectRequestByFilePath,
     filePath,
   }),
 
-  [A.openProjectRequestById]: (id: ProjectId) => ({
+  openProjectRequestById: (id: ProjectId) => ({
     type: A.openProjectRequestById,
     id,
   }),
 
-  [A.openProject]: (
+  openProject: (
     project: ProjectFile,
     clips: Clip[],
     now: string,
@@ -51,15 +51,15 @@ export const projectActions = {
     now,
   }),
 
-  [A.closeProject]: () => ({
+  closeProject: () => ({
     type: A.closeProject,
   }),
 
-  [A.closeProjectRequest]: () => ({
+  closeProjectRequest: () => ({
     type: A.closeProjectRequest,
   }),
 
-  [A.addMediaToProjectRequest]: (
+  addMediaToProjectRequest: (
     projectId: ProjectId,
     filePaths: Array<MediaFilePath>
   ) => ({
@@ -68,15 +68,15 @@ export const projectActions = {
     filePaths,
   }),
 
-  [A.saveProjectRequest]: () => ({
+  saveProjectRequest: () => ({
     type: A.saveProjectRequest,
   }),
 
-  [A.saveProjectAsRequest]: () => ({
+  saveProjectAsRequest: () => ({
     type: A.saveProjectAsRequest,
   }),
 
-  [A.setWorkIsUnsaved]: (workIsUnsaved: boolean) => ({
+  setWorkIsUnsaved: (workIsUnsaved: boolean) => ({
     type: A.setWorkIsUnsaved,
     workIsUnsaved,
   }),

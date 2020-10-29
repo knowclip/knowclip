@@ -1,5 +1,4 @@
 const ActionTypes = {
-  // '@@INIT': '@@INIT',
   setCurrentFile: 'setCurrentFile',
   toggleLoop: 'toggleLoop',
   setLoop: 'setLoop',

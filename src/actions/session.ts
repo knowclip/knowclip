@@ -1,22 +1,22 @@
 import A from '../types/ActionType'
 
 export const sessionActions = {
-  [A.dismissMedia]: () => ({ type: A.dismissMedia }),
+  dismissMedia: () => ({ type: A.dismissMedia }),
 
-  [A.toggleLoop]: (reason: LoopReason) => ({
+  toggleLoop: (reason: LoopReason) => ({
     type: A.toggleLoop,
     reason,
   }),
 
-  [A.setLoop]: (loop: LoopState) => ({
+  setLoop: (loop: LoopState) => ({
     type: A.setLoop,
     loop,
   }),
 
-  [A.playMedia]: () => ({ type: A.playMedia }),
-  [A.pauseMedia]: () => ({ type: A.pauseMedia }),
+  playMedia: () => ({ type: A.playMedia }),
+  pauseMedia: () => ({ type: A.pauseMedia }),
 
-  [A.setViewMode]: (viewMode: ViewMode) => ({
+  setViewMode: (viewMode: ViewMode) => ({
     type: A.setViewMode,
     viewMode,
   }),

@@ -7,20 +7,20 @@ import { TransliterationFlashcardFields } from '../types/Project'
 const openFileRequest = filesActions.openFileRequest
 
 export const subtitlesActions = {
-  [A.showSubtitles]: (id: SubtitlesTrackId) => ({
+  showSubtitles: (id: SubtitlesTrackId) => ({
     type: A.showSubtitles,
     id,
   }),
-  [A.hideSubtitles]: (id: SubtitlesTrackId) => ({
+  hideSubtitles: (id: SubtitlesTrackId) => ({
     type: A.hideSubtitles,
     id,
   }),
-  [A.mountSubtitlesTrack]: (track: SubtitlesTrack) => ({
+  mountSubtitlesTrack: (track: SubtitlesTrack) => ({
     type: A.mountSubtitlesTrack,
     track,
   }),
 
-  [A.makeClipsFromSubtitles]: (
+  makeClipsFromSubtitles: (
     fileId: MediaFileId,
     fieldNamesToTrackIds: Partial<TransliterationFlashcardFields>,
     tags: Array<string>,
@@ -32,10 +32,10 @@ export const subtitlesActions = {
     tags,
     includeStill,
   }),
-  [A.showSubtitlesClipsDialogRequest]: () => ({
+  showSubtitlesClipsDialogRequest: () => ({
     type: A.showSubtitlesClipsDialogRequest,
   }),
-  [A.linkFlashcardFieldToSubtitlesTrackRequest]: (
+  linkFlashcardFieldToSubtitlesTrackRequest: (
     flashcardFieldName: FlashcardFieldName,
     mediaFileId: MediaFileId,
     subtitlesTrackId: SubtitlesTrackId | null
@@ -45,7 +45,7 @@ export const subtitlesActions = {
     mediaFileId,
     subtitlesTrackId,
   }),
-  [A.goToSubtitlesChunk]: (
+  goToSubtitlesChunk: (
     subtitlesTrackId: SubtitlesTrackId,
     chunkIndex: number
   ) => ({
