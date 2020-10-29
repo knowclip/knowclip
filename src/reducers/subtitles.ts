@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 const initialState: SubtitlesState = {}
 
@@ -8,13 +8,13 @@ const subtitles: Reducer<SubtitlesState> = (
   action: Action
 ) => {
   switch (action.type) {
-    case A.MOUNT_SUBTITLES_TRACK:
+    case A.mountSubtitlesTrack:
       return { ...state, [action.track.id]: action.track }
 
-    case A.OPEN_FILE_REQUEST:
+    case A.openFileRequest:
       return action.file.type === 'MediaFile' ? initialState : state
 
-    case A.HIDE_SUBTITLES:
+    case A.hideSubtitles:
       return {
         ...state,
         [action.id]: {
@@ -23,7 +23,7 @@ const subtitles: Reducer<SubtitlesState> = (
         } as SubtitlesTrack,
       }
 
-    case A.SHOW_SUBTITLES:
+    case A.showSubtitles:
       return {
         ...state,
         [action.id]: {
@@ -31,7 +31,7 @@ const subtitles: Reducer<SubtitlesState> = (
           mode: 'showing',
         } as SubtitlesTrack,
       }
-    case A.UPDATE_FILE: {
+    case A.updateFile: {
       const { update } = action as UpdateFileWith<any>
       const updateName: keyof FileUpdates = update.updateName
 

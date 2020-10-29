@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
-import { closeDialog } from '../../actions'
+import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 
 enum $ {
@@ -18,7 +18,7 @@ const ConfirmationDialog = ({
   const dispatchAction = useCallback(
     (e) => {
       dispatch(action)
-      dispatch(closeDialog())
+      dispatch(actions.closeDialog())
     },
     [dispatch, action]
   )
@@ -26,7 +26,7 @@ const ConfirmationDialog = ({
   const cancel = useCallback(
     (e) => {
       onCancel && dispatch(onCancel)
-      dispatch(closeDialog())
+      dispatch(actions.closeDialog())
     },
     [dispatch, onCancel]
   )

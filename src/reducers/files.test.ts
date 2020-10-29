@@ -1,5 +1,5 @@
 import files from './files'
-import { linkFlashcardFieldToSubtitlesTrack } from '../actions'
+import { actions } from '../actions'
 describe('files reducer', () => {
   describe('UpdateFile<linkFlashcardFieldtoSubtitlesTrack>', () => {
     it('links flashcard field to subtitles track', () => {
@@ -16,7 +16,7 @@ describe('files reducer', () => {
             [mediaFile.id]: mediaFile,
           },
         },
-        linkFlashcardFieldToSubtitlesTrack(
+        actions.linkFlashcardFieldToSubtitlesTrack(
           'transcription',
           mediaFile.id,
           track1Id
@@ -46,7 +46,7 @@ describe('files reducer', () => {
             [mediaFile.id]: mediaFile,
           },
         },
-        linkFlashcardFieldToSubtitlesTrack(
+        actions.linkFlashcardFieldToSubtitlesTrack(
           'pronunciation',
           mediaFile.id,
           track1Id
@@ -76,7 +76,11 @@ describe('files reducer', () => {
             [mediaFile.id]: mediaFile,
           },
         },
-        linkFlashcardFieldToSubtitlesTrack('transcription', mediaFile.id, null)
+        actions.linkFlashcardFieldToSubtitlesTrack(
+          'transcription',
+          mediaFile.id,
+          null
+        )
       )
       expect(newState.MediaFile[mediaFile.id]).toHaveProperty(
         'flashcardFieldsToSubtitlesTracks',
@@ -110,4 +114,4 @@ const baseMediaFile: MediaFile = {
   subtitlesTracksStreamIndexes: [2],
 }
 
-const baseState: FilesState = files(undefined, { type: '@@INIT' })
+const baseState: FilesState = files(undefined, { type: 'initializeApp' })

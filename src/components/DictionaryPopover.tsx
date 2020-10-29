@@ -25,7 +25,7 @@ import {
   TranslatedTokensAtCharacterIndex,
 } from '../utils/dictionariesDatabase'
 import DarkTheme from './DarkTheme'
-import * as actions from '../actions'
+import { actions } from '../actions'
 import { displayDictionaryType } from '../selectors'
 
 function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {

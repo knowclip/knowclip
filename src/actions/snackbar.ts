@@ -1,35 +1,40 @@
-import * as A from '../types/ActionType'
-import { dictionariesDialog } from './dialog'
+import A from '../types/ActionType'
+import { compositeDialogActions } from './dialog'
 
-export const enqueueSnackbar = (snackbar: SnackbarData): SnackbarAction => ({
-  type: A.ENQUEUE_SNACKBAR,
-  snackbar,
-})
+export const snackbarActions = {
+  [A.enqueueSnackbar]: (snackbar: SnackbarData) => ({
+    type: A.enqueueSnackbar,
+    snackbar,
+  }),
 
-export const simpleMessageSnackbar = (
+  [A.closeSnackbar]: () => ({
+    type: A.closeSnackbar,
+  }),
+}
+const simpleMessageSnackbar = (
   message: string,
   autoHideDuration?: number | null
-): SnackbarAction =>
-  enqueueSnackbar({
+) =>
+  snackbarActions.enqueueSnackbar({
     type: 'SimpleMessage',
     props: { message, autoHideDuration },
   })
-
-export const promptSnackbar = (
+const promptSnackbar = (
   message: string,
   actions: [string, Action][],
   autoHideDuration?: number | null
-): SnackbarAction =>
-  enqueueSnackbar({
+) =>
+  snackbarActions.enqueueSnackbar({
     type: 'Prompt',
     props: { message, autoHideDuration, actions },
   })
-
-export const closeSnackbar = (): SnackbarAction => ({
-  type: A.CLOSE_SNACKBAR,
-})
-
-export const activateDictionaryPromptSnackbar = () =>
+const activateDictionaryPromptSnackbar = () =>
   promptSnackbar('Activate a dictionary in order to enable word lookup.', [
-    [`Dictionary settings`, dictionariesDialog()],
+    [`Dictionary settings`, compositeDialogActions.dictionariesDialog()],
   ])
+
+export const compositeSnackbarActions = {
+  simpleMessageSnackbar,
+  promptSnackbar,
+  activateDictionaryPromptSnackbar,
+}

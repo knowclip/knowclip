@@ -9,7 +9,7 @@ import {
 } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, empty, of } from 'rxjs'
-import * as r from '../redux'
+import r from '../redux'
 import { showMessageBox, showOpenDialog } from '../utils/electron'
 import electron, { shell } from 'electron'
 import rcompare from 'semver/functions/rcompare'
@@ -76,7 +76,7 @@ const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
       if (!filePaths) return empty()
 
       const filePath = filePaths[0]
-      return of(r.openProjectByFilePath(filePath))
+      return of(r.openProjectRequestByFilePath(filePath))
     })
   )
 

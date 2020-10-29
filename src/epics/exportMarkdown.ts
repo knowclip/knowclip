@@ -3,8 +3,8 @@ import { ofType } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
 import { promisify } from 'util'
 import fs from 'fs'
-import * as A from '../types/ActionType'
-import * as r from '../redux'
+import A from '../types/ActionType'
+import r from '../redux'
 import { showSaveDialog } from '../utils/electron'
 import projectToMarkdown from '../utils/projectToMarkdown'
 
@@ -12,7 +12,7 @@ const writeFile = promisify(fs.writeFile)
 
 const exportMarkdown: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ExportMarkdown>(A.EXPORT_MARKDOWN),
+    ofType<Action, ExportMarkdown>(A.exportMarkdown),
     flatMap<ExportMarkdown, Promise<Observable<Action>>>(async (action) => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])

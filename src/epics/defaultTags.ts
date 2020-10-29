@@ -1,13 +1,13 @@
 import { map } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import * as r from '../redux'
-import * as A from '../types/ActionType'
+import r from '../redux'
+import A from '../types/ActionType'
 
 const defaultTagsEpic: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, AddFlashcardTag | DeleteFlashcardTag>(
-      A.ADD_FLASHCARD_TAG,
-      A.DELETE_FLASHCARD_TAG
+      A.addFlashcardTag,
+      A.deleteFlashcardTag
     ),
     map(({ id }) => {
       const flashcard = r.getFlashcard(state$.value, id)

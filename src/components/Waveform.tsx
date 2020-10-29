@@ -1,7 +1,7 @@
 import React, { memo, useRef, useCallback, useMemo } from 'react'
 import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
-import * as r from '../redux'
+import r from '../redux'
 import css from './Waveform.module.css'
 import {
   toWaveformCoordinates,
@@ -9,7 +9,11 @@ import {
 } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { setCursorX } from '../utils/waveform'
-import { WaveformSelectionExpanded } from '../selectors'
+import {
+  SubtitlesCardBase,
+  SubtitlesCardBases,
+  WaveformSelectionExpanded,
+} from '../selectors'
 
 enum $ {
   container = 'waveform-container',
@@ -246,8 +250,8 @@ const LinkedSubtitlesChunk = React.memo(
     isSelected,
     tracksCount,
   }: {
-    cardBase: r.SubtitlesCardBase
-    getFieldsPreview: (base: r.SubtitlesCardBase) => Dict<string, string>
+    cardBase: SubtitlesCardBase
+    getFieldsPreview: (base: SubtitlesCardBase) => Dict<string, string>
     linkedTrackIds: SubtitlesTrackId[]
     isSelected: boolean
     tracksCount: number
@@ -310,7 +314,7 @@ const SubtitlesTimelines = memo(
     goToSubtitlesChunk,
     highlightedChunkIndex,
   }: {
-    subtitles: r.SubtitlesCardBases
+    subtitles: SubtitlesCardBases
     waveformItems: WaveformSelectionExpanded[]
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
     highlightedChunkIndex: number | null
@@ -340,10 +344,10 @@ const SubtitlesTimelines = memo(
         const { dataset } = e.target
         if (dataset && dataset.chunkIndex) {
           const item = waveformItems.find(
-            (i) =>
+            (i): i is WaveformSelectionExpanded & { type: 'Preview' } =>
               i.type === 'Preview' && i.cardBaseIndex === +dataset.chunkIndex
           )
-          if (item) dispatch(r.newClipFromSubtitlesChunk(item))
+          if (item) dispatch(r.newCardFromSubtitlesRequest(item))
         }
       },
       [dispatch, waveformItems]

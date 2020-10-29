@@ -1,4 +1,4 @@
-import * as r from '../redux'
+import r from '../redux'
 import { basename, join } from 'path'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'

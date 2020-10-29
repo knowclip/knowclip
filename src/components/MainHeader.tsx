@@ -6,7 +6,7 @@ import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'
 import ProjectMenu from '../components/ProjectMenu'
 import headerCss from '../components/MainHeader.module.css'
-import * as actions from '../actions'
+import { actions } from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 
 enum $ {

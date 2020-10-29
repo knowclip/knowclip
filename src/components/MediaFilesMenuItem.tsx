@@ -18,8 +18,8 @@ import {
 import cn from 'classnames'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
-import * as r from '../redux'
-import * as actions from '../actions'
+import r from '../redux'
+import { actions } from '../actions'
 import css from './MainHeader.module.css'
 
 const CONFIRM_DELETE_MEDIA_FROM_PROJECT_MESSAGE =

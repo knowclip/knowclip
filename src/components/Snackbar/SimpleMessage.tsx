@@ -4,7 +4,7 @@ import { Close } from '@material-ui/icons'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
-import { closeSnackbar } from '../../actions'
+import r from '../../redux'
 import { snackbar$ } from '.'
 
 const SimpleMessageSnackbar = ({
@@ -29,7 +29,9 @@ const SimpleMessageSnackbar = ({
   )
 
   const dispatch = useDispatch()
-  const handleExited = useCallback((e) => dispatch(closeSnackbar()), [dispatch])
+  const handleExited = useCallback((e) => dispatch(r.closeSnackbar()), [
+    dispatch,
+  ])
 
   return (
     // TODO: distinguish error and success messages

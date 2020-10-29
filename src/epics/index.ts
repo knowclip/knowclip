@@ -1,8 +1,8 @@
 import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
 import { fromEvent, of } from 'rxjs'
-import * as A from '../types/ActionType'
-import * as r from '../redux'
+import A from '../types/ActionType'
+import r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
 import addClip from './addClip'
 import stretchClip from './stretchClip'
@@ -65,7 +65,7 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 const initialize: AppEpic = () => of(r.initializeApp())
 
 const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
-  action$.ofType(A.QUIT_APP).pipe(
+  action$.ofType(A.quitApp).pipe(
     tap(() => {
       ipcRenderer.send('closed')
     }),
@@ -73,9 +73,9 @@ const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
   )
 
 const pauseAndChangeCursorOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
-  action$.ofType(A.SET_PROGRESS, A.ENQUEUE_DIALOG).pipe(
+  action$.ofType(A.setProgress, A.enqueueDialog).pipe(
     tap((action) => {
-      if (action.type === A.SET_PROGRESS) {
+      if (action.type === A.setProgress) {
         document.body.style.cursor = action.progress ? 'progress' : 'default'
       }
       pauseMedia()

@@ -9,8 +9,8 @@ import {
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { of, from, defer, empty } from 'rxjs'
-import * as r from '../redux'
-import * as A from '../types/ActionType'
+import r from '../redux'
+import A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
 import { processNoteMedia } from '../utils/ankiNote'
@@ -19,7 +19,7 @@ import { join, basename } from 'path'
 
 const exportCsv: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ExportCsv>(A.EXPORT_CSV),
+    ofType<Action, ExportCsv>(A.exportCsv),
     flatMap(
       ({
         mediaFileIdsToClipIds,

@@ -1,8 +1,8 @@
 import { filter, map, flatMap, switchMap, takeUntil } from 'rxjs/operators'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
 import { combineEpics } from 'redux-observable'
-import * as r from '../redux'
-import * as A from '../types/ActionType'
+import r from '../redux'
+import A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
@@ -86,13 +86,13 @@ const saveKey = (window: Window) =>
   )
 
 const saveEpic: AppEpic = (action$, state$, { window }) =>
-  action$.ofType(A.OPEN_PROJECT).pipe(
+  action$.ofType(A.openProject).pipe(
     switchMap(() =>
       saveKey(window).pipe(
         map(({ shiftKey }) =>
           shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
         ),
-        takeUntil(action$.ofType(A.CLOSE_PROJECT))
+        takeUntil(action$.ofType(A.closeProject))
       )
     )
   )

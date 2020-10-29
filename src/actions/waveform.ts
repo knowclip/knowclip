@@ -1,44 +1,37 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
-export const setWaveformCursor = (
-  x: number,
-  newViewBox?: WaveformViewBox
-): SetCursorPosition => ({
-  type: A.SET_CURSOR_POSITION,
-  x,
-  newViewBox: newViewBox || null,
-})
+export const waveformActions = {
+  [A.setCursorPosition]: (x: number, newViewBox?: WaveformViewBox) => ({
+    type: A.setCursorPosition,
+    x,
+    newViewBox: newViewBox || null,
+  }),
 
-export const setPendingClip = (clip: PendingClip): SetPendingClip => ({
-  type: A.SET_PENDING_CLIP,
-  clip,
-})
+  [A.setPendingClip]: (clip: PendingClip) => ({
+    type: A.setPendingClip,
+    clip,
+  }),
 
-export const clearPendingClip = (): ClearPendingClip => ({
-  type: A.CLEAR_PENDING_CLIP,
-})
+  [A.clearPendingClip]: () => ({
+    type: A.clearPendingClip,
+  }),
 
-export const setPendingStretch = (
-  stretch: PendingStretch
-): SetPendingStretch => ({
-  type: A.SET_PENDING_STRETCH,
-  stretch,
-})
+  [A.setPendingStretch]: (stretch: PendingStretch) => ({
+    type: A.setPendingStretch,
+    stretch,
+  }),
 
-export const clearPendingStretch = (): ClearPendingStretch => ({
-  type: A.CLEAR_PENDING_STRETCH,
-})
+  [A.clearPendingStretch]: () => ({
+    type: A.clearPendingStretch,
+  }),
 
-export const setWaveformViewBox = (
-  viewBox: WaveformViewBox
-): SetWaveformViewBox => ({
-  type: A.SET_WAVEFORM_VIEW_BOX,
-  viewBox,
-})
+  [A.setWaveformViewBox]: (viewBox: WaveformViewBox) => ({
+    type: A.setWaveformViewBox,
+    viewBox,
+  }),
 
-export const generateWaveformImages = (
-  waveformPngs: WaveformPng[]
-): GenerateWaveformImages => ({
-  type: A.GENERATE_WAVEFORM_IMAGES,
-  waveformPngs,
-})
+  [A.generateWaveformImages]: (waveformPngs: WaveformPng[]) => ({
+    type: A.generateWaveformImages,
+    waveformPngs,
+  }),
+}

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import cn from 'classnames'
-import * as r from '../redux'
+import r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { Tooltip, IconButton } from '@material-ui/core'
@@ -10,6 +10,7 @@ import FlashcardSectionDisplay from './FlashcardSectionDisplay'
 import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
+import { SubtitlesCardBase, SubtitlesCardBases } from '../selectors'
 
 const FlashcardSectionPreview = ({
   cardBases,
@@ -20,11 +21,11 @@ const FlashcardSectionPreview = ({
   className,
 }: {
   clipsIds: string[]
-  cardBases: r.SubtitlesCardBases
+  cardBases: SubtitlesCardBases
   cardPreviewSelection: {
     type: 'Preview'
     index: number
-    item: r.SubtitlesCardBase
+    item: SubtitlesCardBase
     cardBaseIndex: number
   }
   mediaFile: MediaFile
@@ -50,7 +51,7 @@ const FlashcardSectionPreview = ({
   const clozeControls = useClozeControls({
     onNewClozeCard: useCallback(
       (deletion) => {
-        dispatch(r.newClipFromSubtitlesChunk(cardPreviewSelection, deletion))
+        dispatch(r.newCardFromSubtitlesRequest(cardPreviewSelection, deletion))
       },
       [cardPreviewSelection, dispatch]
     ),

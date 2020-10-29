@@ -13,14 +13,12 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@material-ui/core'
-import * as r from '../../redux'
+import r from '../../redux'
 import { showOpenDialog } from '../../utils/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
 import { DialogProps } from './DialogProps'
-import { loadNewSubtitlesFile, makeClipsFromSubtitles } from '../../actions'
-import { SubtitlesFileWithTrack } from '../../redux'
-import { MediaSubtitles } from '../../selectors'
+import { MediaSubtitles, SubtitlesFileWithTrack } from '../../selectors'
 import { TransliterationFlashcardFields } from '../../types/Project'
 import { getFileFilters } from '../../utils/files'
 
@@ -112,7 +110,7 @@ const SubtitlesClipsDialog = ({
 
       dispatch(r.closeDialog())
       dispatch(
-        makeClipsFromSubtitles(
+        r.makeClipsFromSubtitles(
           currentFileId,
           fieldsWithoutBlankValues,
           tags,
@@ -143,7 +141,7 @@ const SubtitlesClipsDialog = ({
     )
     if (!filePaths) return
 
-    dispatch(loadNewSubtitlesFile(filePaths[0], currentFileId))
+    dispatch(r.loadNewSubtitlesFile(filePaths[0], currentFileId))
   }, [dispatch, currentFileId])
 
   const onChangeTranscription = useCallback(

@@ -1,7 +1,7 @@
 import { combineEpics, ofType } from 'redux-observable'
 import { catchError, filter, mergeMap } from 'rxjs/operators'
-import * as A from '../types/ActionType'
-import * as actions from '../actions'
+import A from '../types/ActionType'
+import { actions } from '../actions'
 import * as s from '../selectors'
 import {
   deleteDictionary,
@@ -47,7 +47,7 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
 
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, ImportDictionaryRequest>(A.IMPORT_DICTIONARY_REQUEST),
+    ofType<Action, ImportDictionaryRequest>(A.importDictionaryRequest),
     mergeMap(
       async (action): Promise<Action> => {
         try {
@@ -81,7 +81,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   )
 
 const startImportEpic: AppEpic = (action$, state$, effects) =>
-  action$.ofType<StartDictionaryImport>(A.START_DICTIONARY_IMPORT).pipe(
+  action$.ofType<StartDictionaryImport>(A.startDictionaryImport).pipe(
     mergeMap(({ file, filePath }) => {
       return concat(
         from([
@@ -139,7 +139,7 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
   )
 
 const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
-  action$.ofType<DeleteImportedDictionary>(A.DELETE_IMPORTED_DICTIONARY).pipe(
+  action$.ofType<DeleteImportedDictionary>(A.deleteImportedDictionary).pipe(
     mergeMap((action) => {
       return concat(
         of(
@@ -181,7 +181,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
   )
 
 const deleteDatabaseEpic: AppEpic = (action$, state$, effects) =>
-  action$.ofType(A.RESET_DICTIONARIES_DATABASE).pipe(
+  action$.ofType(A.resetDictionariesDatabase).pipe(
     mergeMap(() => {
       return from(resetDictionariesDatabase()).pipe(
         mergeMap(() => {

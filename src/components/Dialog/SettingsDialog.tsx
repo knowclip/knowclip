@@ -18,7 +18,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@material-ui/core'
-import * as actions from '../../actions'
+import { actions } from '../../actions'
 import * as selectors from '../../selectors'
 import { DialogProps } from './DialogProps'
 import reducer from '../../reducers/settings'

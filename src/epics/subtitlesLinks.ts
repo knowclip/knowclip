@@ -1,16 +1,16 @@
 import { combineEpics } from 'redux-observable'
 import { filter, flatMap, map, sample } from 'rxjs/operators'
-import { of, empty, from } from 'rxjs'
-import * as r from '../redux'
-import * as A from '../types/ActionType'
+import { of, empty, from, EMPTY } from 'rxjs'
+import r from '../redux'
+import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { uuid } from '../utils/sideEffects'
-import { isUpdateWith } from '../files/updates'
+import { getUpdateWith } from '../files/updates'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$
     .ofType<LinkFlashcardFieldToSubtitlesTrackRequest>(
-      A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST
+      A.linkFlashcardFieldToSubtitlesTrackRequest
     )
     .pipe(
       map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
@@ -65,23 +65,24 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
 
 const linkFieldToTrack: AppEpic = (action$, state$) =>
   action$.pipe(
-    filter(
-      (
-        action
-      ): action is UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> =>
-        action.type === A.UPDATE_FILE &&
-        isUpdateWith('linkFlashcardFieldToSubtitlesTrack', action)
-    ),
     flatMap((action) => {
-      const currentNoteType = r.getCurrentNoteType(state$.value)
-      if (!currentNoteType) return empty()
+      if (action.type !== 'updateFile') return EMPTY
 
-      const mediaFileId = action.update.id
+      const update = getUpdateWith(
+        action.update,
+        'linkFlashcardFieldToSubtitlesTrack'
+      )
+      if (!update) return EMPTY
+
+      const currentNoteType = r.getCurrentNoteType(state$.value)
+      if (!currentNoteType) return EMPTY
+
+      const mediaFileId = update.id
       const [
         flashcardFieldName,
         _subtitlesTrackId,
         fieldToClear,
-      ] = action.update.updatePayload
+      ] = update.updatePayload
 
       const edits: EditClips['edits'] = []
 
@@ -107,11 +108,11 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
   )
 
 export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
-  action$.ofType<StartEditingCards>(A.START_EDITING_CARDS).pipe(
+  action$.ofType<StartEditingCards>(A.startEditingCards).pipe(
     flatMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
-        return of(r.newClipFromSubtitlesChunk(selection, undefined, true))
+        return of(r.newCardFromSubtitlesRequest(selection, undefined, true))
       }
       return empty()
     })
@@ -123,7 +124,7 @@ export const newClipFromChunk: AppEpic = (
   { setCurrentTime }
 ) =>
   action$
-    .ofType<NewCardFromSubtitlesRequest>(A.NEW_CARD_FROM_SUBTITLES_REQUEST)
+    .ofType<NewCardFromSubtitlesRequest>(A.newCardFromSubtitlesRequest)
     .pipe(
       flatMap((action) => {
         const selection = action.linkedSubtitlesChunkSelection
@@ -161,7 +162,7 @@ const updateSelectionAfterLink: AppEpic = (
 ) =>
   action$
     .ofType<LinkFlashcardFieldToSubtitlesTrackRequest>(
-      A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST
+      A.linkFlashcardFieldToSubtitlesTrackRequest
     )
     .pipe(
       map(() => {
@@ -170,11 +171,14 @@ const updateSelectionAfterLink: AppEpic = (
       sample(
         action$.pipe(
           filter(
-            (
-              action
-            ): action is UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> =>
-              action.type === A.UPDATE_FILE &&
-              isUpdateWith('linkFlashcardFieldToSubtitlesTrack', action)
+            (action) =>
+              action.type === A.updateFile &&
+              Boolean(
+                getUpdateWith(
+                  action.update,
+                  'linkFlashcardFieldToSubtitlesTrack'
+                )
+              )
           )
         )
       ),

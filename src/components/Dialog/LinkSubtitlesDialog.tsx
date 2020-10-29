@@ -11,10 +11,7 @@ import {
   InputLabel,
 } from '@material-ui/core'
 import { DialogProps } from './DialogProps'
-import {
-  closeDialog,
-  linkFlashcardFieldToSubtitlesTrackRequest,
-} from '../../actions'
+import { actions } from '../../actions'
 import {
   getSubtitlesFlashcardFieldLinks,
   getCurrentNoteType,
@@ -69,18 +66,18 @@ const LinkSubtitlesDialog = ({
     (e) => {
       e.preventDefault()
       dispatch(
-        linkFlashcardFieldToSubtitlesTrackRequest(
+        actions.linkFlashcardFieldToSubtitlesTrackRequest(
           fieldSelection,
           mediaFileId,
           subtitles.id
         )
       )
-      dispatch(closeDialog())
+      dispatch(actions.closeDialog())
     },
     [dispatch, fieldSelection, mediaFileId, subtitles.id]
   )
 
-  const close = useCallback(() => dispatch(closeDialog()), [dispatch])
+  const close = useCallback(() => dispatch(actions.closeDialog()), [dispatch])
 
   const fieldNamesToTrackLabels = useMemo(() => {
     const fieldNamesToTrackLabels = {} as SubtitlesFlashcardFieldsLinks
@@ -96,7 +93,7 @@ const LinkSubtitlesDialog = ({
   }, [mediaSubtitles.all, fieldsToTracks])
 
   if (!mediaFile) {
-    dispatch(closeDialog())
+    dispatch(actions.closeDialog())
     return null
   }
 

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import cn from 'classnames'
-import * as r from '../redux'
+import r from '../redux'
 import css from './FlashcardSection.module.css'
 import {
   ChevronLeft,
@@ -11,7 +11,7 @@ import {
   Publish,
   ShortTextTwoTone,
 } from '@material-ui/icons'
-import * as actions from '../actions'
+import { actions } from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
 import FlashcardDisplay from './FlashcardSectionDisplayCard'
 import Preview from './FlashcardSectionDisplayPreview'

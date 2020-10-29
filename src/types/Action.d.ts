@@ -1,505 +1,201 @@
-declare type Action =
-  | { type: '@@INIT' }
-  | InitializeApp
-  | QuitApp
-  | SnackbarAction
-  | DialogAction
-  | WaveformAction
-  | ClipAction
-  | ProjectAction
-  | MediaAction
-  | SettingsAction
-  | SubtitlesAction
-  | FileAction
-  | DetectSilence
-  | DetectSilenceRequest
-  | DeleteAllCurrentFileClipsRequest
-  | SetAllTags
-  | SetProgress
-  | StartEditingCards
-  | StopEditingCards
-  | OpenDictionaryPopover
-  | CloseDictionaryPopover
-  | NewCardFromSubtitlesRequest
+declare type Action = import('../actions').Action
 
-declare type InitializeApp = { type: 'INITIALIZE_APP' }
-declare type QuitApp = { type: 'QUIT_APP' }
+declare type SetCurrentFile = import('../actions').ActionOf<'setCurrentFile'>
+declare type ToggleLoop = import('../actions').ActionOf<'toggleLoop'>
+declare type SetLoop = import('../actions').ActionOf<'setLoop'>
+declare type PlayMedia = import('../actions').ActionOf<'playMedia'>
+declare type PauseMedia = import('../actions').ActionOf<'pauseMedia'>
+declare type SetViewMode = import('../actions').ActionOf<'setViewMode'>
+declare type DismissMedia = import('../actions').ActionOf<'dismissMedia'>
+declare type InitializeApp = import('../actions').ActionOf<'initializeApp'>
+declare type QuitApp = import('../actions').ActionOf<'quitApp'>
+declare type SetMediaFolderLocation = import('../actions').ActionOf<
+  'setMediaFolderLocation'
+>
+declare type AddAssetsDirectories = import('../actions').ActionOf<
+  'addAssetsDirectories'
+>
+declare type RemoveAssetsDirectories = import('../actions').ActionOf<
+  'removeAssetsDirectories'
+>
+declare type SetCheckForUpdatesAutomatically = import('../actions').ActionOf<
+  'setCheckForUpdatesAutomatically'
+>
+declare type OverrideSettings = import('../actions').ActionOf<
+  'overrideSettings'
+>
+declare type AddActiveDictionary = import('../actions').ActionOf<
+  'addActiveDictionary'
+>
+declare type RemoveActiveDictionary = import('../actions').ActionOf<
+  'removeActiveDictionary'
+>
+declare type DetectSilence = import('../actions').ActionOf<'detectSilence'>
+declare type DetectSilenceRequest = import('../actions').ActionOf<
+  'detectSilenceRequest'
+>
+declare type DeleteAllCurrentFileClipsRequest = import('../actions').ActionOf<
+  'deleteAllCurrentFileClipsRequest'
+>
+declare type SetAllTags = import('../actions').ActionOf<'setAllTags'>
+declare type SetFlashcardField = import('../actions').ActionOf<
+  'setFlashcardField'
+>
+declare type AddFlashcardTag = import('../actions').ActionOf<'addFlashcardTag'>
+declare type DeleteFlashcardTag = import('../actions').ActionOf<
+  'deleteFlashcardTag'
+>
+declare type SetDefaultClipSpecs = import('../actions').ActionOf<
+  'setDefaultClipSpecs'
+>
+declare type AddClip = import('../actions').ActionOf<'addClip'>
+declare type AddClips = import('../actions').ActionOf<'addClips'>
+declare type EditClip = import('../actions').ActionOf<'editClip'>
+declare type EditClips = import('../actions').ActionOf<'editClips'>
+declare type MergeClips = import('../actions').ActionOf<'mergeClips'>
+declare type DeleteCard = import('../actions').ActionOf<'deleteCard'>
+declare type DeleteCards = import('../actions').ActionOf<'deleteCards'>
+declare type StartEditingCards = import('../actions').ActionOf<
+  'startEditingCards'
+>
+declare type StopEditingCards = import('../actions').ActionOf<
+  'stopEditingCards'
+>
+declare type OpenDictionaryPopover = import('../actions').ActionOf<
+  'openDictionaryPopover'
+>
+declare type CloseDictionaryPopover = import('../actions').ActionOf<
+  'closeDictionaryPopover'
+>
+declare type NewCardFromSubtitlesRequest = import('../actions').ActionOf<
+  'newCardFromSubtitlesRequest'
+>
+declare type SelectWaveformItem = import('../actions').ActionOf<
+  'selectWaveformItem'
+>
+declare type HighlightLeftClipRequest = import('../actions').ActionOf<
+  'highlightLeftClipRequest'
+>
+declare type HighlightRightClipRequest = import('../actions').ActionOf<
+  'highlightRightClipRequest'
+>
+declare type SetCursorPosition = import('../actions').ActionOf<
+  'setCursorPosition'
+>
+declare type SetWaveformViewBox = import('../actions').ActionOf<
+  'setWaveformViewBox'
+>
+declare type SetPendingClip = import('../actions').ActionOf<'setPendingClip'>
+declare type ClearPendingClip = import('../actions').ActionOf<
+  'clearPendingClip'
+>
+declare type SetPendingStretch = import('../actions').ActionOf<
+  'setPendingStretch'
+>
+declare type ClearPendingStretch = import('../actions').ActionOf<
+  'clearPendingStretch'
+>
+declare type GenerateWaveformImages = import('../actions').ActionOf<
+  'generateWaveformImages'
+>
+declare type EnqueueDialog = import('../actions').ActionOf<'enqueueDialog'>
+declare type CloseDialog = import('../actions').ActionOf<'closeDialog'>
+declare type EnqueueSnackbar = import('../actions').ActionOf<'enqueueSnackbar'>
+declare type CloseSnackbar = import('../actions').ActionOf<'closeSnackbar'>
+declare type CreateProject = import('../actions').ActionOf<'createProject'>
+declare type OpenProjectRequestById = import('../actions').ActionOf<
+  'openProjectRequestById'
+>
+declare type OpenProjectRequestByFilePath = import('../actions').ActionOf<
+  'openProjectRequestByFilePath'
+>
+declare type OpenProject = import('../actions').ActionOf<'openProject'>
+declare type SetProjectError = import('../actions').ActionOf<'setProjectError'>
+declare type CloseProject = import('../actions').ActionOf<'closeProject'>
+declare type CloseProjectRequest = import('../actions').ActionOf<
+  'closeProjectRequest'
+>
+declare type SaveProjectRequest = import('../actions').ActionOf<
+  'saveProjectRequest'
+>
+declare type SaveProjectAsRequest = import('../actions').ActionOf<
+  'saveProjectAsRequest'
+>
+declare type ExportApkgRequest = import('../actions').ActionOf<
+  'exportApkgRequest'
+>
+declare type ExportApkgFailure = import('../actions').ActionOf<
+  'exportApkgFailure'
+>
+declare type ExportApkgSuccess = import('../actions').ActionOf<
+  'exportApkgSuccess'
+>
+declare type ExportMarkdown = import('../actions').ActionOf<'exportMarkdown'>
+declare type ExportCsv = import('../actions').ActionOf<'exportCsv'>
+declare type AddMediaToProjectRequest = import('../actions').ActionOf<
+  'addMediaToProjectRequest'
+>
+declare type SetWorkIsUnsaved = import('../actions').ActionOf<
+  'setWorkIsUnsaved'
+>
+declare type MountSubtitlesTrack = import('../actions').ActionOf<
+  'mountSubtitlesTrack'
+>
+declare type ShowSubtitles = import('../actions').ActionOf<'showSubtitles'>
+declare type HideSubtitles = import('../actions').ActionOf<'hideSubtitles'>
+declare type MakeClipsFromSubtitles = import('../actions').ActionOf<
+  'makeClipsFromSubtitles'
+>
+declare type ShowSubtitlesClipsDialogRequest = import('../actions').ActionOf<
+  'showSubtitlesClipsDialogRequest'
+>
+declare type LinkFlashcardFieldToSubtitlesTrackRequest = import('../actions').ActionOf<
+  'linkFlashcardFieldToSubtitlesTrackRequest'
+>
+declare type AddFile = import('../actions').ActionOf<'addFile'>
+declare type GoToSubtitlesChunk = import('../actions').ActionOf<
+  'goToSubtitlesChunk'
+>
+declare type DeleteFileRequest = import('../actions').ActionOf<
+  'deleteFileRequest'
+>
+declare type DeleteFileSuccess = import('../actions').ActionOf<
+  'deleteFileSuccess'
+>
+declare type OpenFileRequest = import('../actions').ActionOf<'openFileRequest'>
+declare type OpenFileSuccess = import('../actions').ActionOf<'openFileSuccess'>
+declare type OpenFileFailure = import('../actions').ActionOf<'openFileFailure'>
+declare type LocateFileRequest = import('../actions').ActionOf<
+  'locateFileRequest'
+>
+declare type LocateFileSuccess = import('../actions').ActionOf<
+  'locateFileSuccess'
+>
+declare type UpdateFile = import('../actions').ActionOf<'updateFile'>
+declare type CommitFileDeletions = import('../actions').ActionOf<
+  'commitFileDeletions'
+>
+declare type AbortFileDeletions = import('../actions').ActionOf<
+  'abortFileDeletions'
+>
+declare type SetProgress = import('../actions').ActionOf<'setProgress'>
+declare type PreloadVideoStills = import('../actions').ActionOf<
+  'preloadVideoStills'
+>
+declare type DeleteImportedDictionary = import('../actions').ActionOf<
+  'deleteImportedDictionary'
+>
+declare type ResetDictionariesDatabase = import('../actions').ActionOf<
+  'resetDictionariesDatabase'
+>
+declare type ImportDictionaryRequest = import('../actions').ActionOf<
+  'importDictionaryRequest'
+>
+declare type StartDictionaryImport = import('../actions').ActionOf<
+  'startDictionaryImport'
+>
 
-declare type DetectSilence = { type: 'DETECT_SILENCE' }
-declare type DetectSilenceRequest = { type: 'DETECT_SILENCE_REQUEST' }
-declare type DeleteAllCurrentFileClipsRequest = {
-  type: 'DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST'
-}
-declare type SetAllTags = {
-  type: 'SET_ALL_TAGS'
-  tagsToClipIds: { [tag: string]: Array<ClipId> }
-}
-declare type SetProgress = {
-  type: 'SET_PROGRESS'
-  progress: ProgressInfo | null
-}
-declare type StartEditingCards = {
-  type: 'START_EDITING_CARDS'
-}
-declare type StopEditingCards = {
-  type: 'STOP_EDITING_CARDS'
-}
-declare type OpenDictionaryPopover = {
-  type: 'OPEN_DICTIONARY_POPOVER'
-}
-declare type CloseDictionaryPopover = {
-  type: 'CLOSE_DICTIONARY_POPOVER'
-}
-
-declare type NewCardFromSubtitlesRequest = {
-  type: 'NEW_CARD_FROM_SUBTITLES_REQUEST'
-  linkedSubtitlesChunkSelection: WaveformSelectionExpanded
-  clozeDeletion?: ClozeDeletion
-  startEditing: boolean
-}
-
-declare type ClipAction =
-  | DeleteCard
-  | DeleteCards
-  | SetFlashcardField
-  | AddFlashcardTag
-  | DeleteFlashcardTag
-  | SetDefaultClipSpecs
-  | AddClip
-  | AddClips
-  | EditClip
-  | EditClips
-  | MergeClips
-  | SelectWaveformItem
-  | HighlightLeftClipRequest
-  | HighlightRightClipRequest
-
-declare type DeleteCard = { type: 'DELETE_CARD'; id: ClipId }
-declare type DeleteCards = { type: 'DELETE_CARDS'; ids: Array<ClipId> }
-declare type SetFlashcardField = {
-  type: 'SET_FLASHCARD_FIELD'
-  id: ClipId
-  key: FlashcardFieldName
-  value: string
-  caretLocation: number
-}
-declare type AddFlashcardTag = {
-  type: 'ADD_FLASHCARD_TAG'
-  id: ClipId
-  text: string
-}
-declare type DeleteFlashcardTag = {
-  type: 'DELETE_FLASHCARD_TAG'
-  id: ClipId
-  index: number
-  tag: string
-}
-// declare type AddClozeDeletion = {
-//   type: 'ADD_CLOZE_DELETION'
-// }
-declare type SetDefaultClipSpecs = {
-  type: 'SET_DEFAULT_CLIP_SPECS'
-  tags?: Array<string>
-  includeStill?: boolean
-}
-declare type AddClip = {
-  type: 'ADD_CLIP'
-  clip: Clip
-  flashcard: Flashcard
-  startEditing: boolean
-}
-declare type AddClips = {
-  type: 'ADD_CLIPS'
-  clips: Array<Clip>
-  flashcards: Array<Flashcard>
-  fileId: MediaFileId
-}
-declare type EditClip = {
-  type: 'EDIT_CLIP'
-  id: ClipId
-  override: import('redux').DeepPartial<Clip> | null
-  flashcardOverride: import('redux').DeepPartial<Flashcard> | null
-}
-declare type EditClips = {
-  type: 'EDIT_CLIPS'
-  edits: {
-    id: ClipId
-    override: DeepPartial<Clip> | null
-    flashcardOverride: DeepPartial<Flashcard> | null
-  }[]
-}
-declare type MergeClips = {
-  type: 'MERGE_CLIPS'
-  ids: Array<ClipId>
-  newSelection: WaveformSelection
-}
-declare type SelectWaveformItem = {
-  type: 'SELECT_WAVEFORM_ITEM'
-  selection: WaveformSelection | null
-}
-declare type HighlightLeftClipRequest = { type: 'HIGHLIGHT_LEFT_CLIP_REQUEST' }
-declare type HighlightRightClipRequest = {
-  type: 'HIGHLIGHT_RIGHT_CLIP_REQUEST'
-}
-declare type WaveformAction =
-  | SetCursorPosition
-  | SetWaveformViewBox
-  | SetPendingClip
-  | ClearPendingClip
-  | SetPendingStretch
-  | ClearPendingStretch
-  | GenerateWaveformImages
-declare type SetCursorPosition = {
-  type: 'SET_CURSOR_POSITION'
-  x: number
-  newViewBox: WaveformViewBox | null
-}
-declare type SetWaveformViewBox = {
-  type: 'SET_WAVEFORM_VIEW_BOX'
-  viewBox: WaveformViewBox
-}
-declare type SetPendingClip = { type: 'SET_PENDING_CLIP'; clip: PendingClip }
-declare type ClearPendingClip = {
-  type: 'CLEAR_PENDING_CLIP'
-}
-declare type SetPendingStretch = {
-  type: 'SET_PENDING_STRETCH'
-  stretch: PendingStretch
-}
-declare type ClearPendingStretch = {
-  type: 'CLEAR_PENDING_STRETCH'
-}
-declare type GenerateWaveformImages = {
-  type: 'GENERATE_WAVEFORM_IMAGES'
-  waveformPngs: WaveformPng[]
-}
-
-declare type DialogAction = EnqueueDialog | CloseDialog
-type EnqueueDialog = {
-  type: 'ENQUEUE_DIALOG'
-  dialog: DialogData
-  skipQueue: boolean
-}
-type CloseDialog = { type: 'CLOSE_DIALOG' }
-
-declare type SnackbarAction = EnqueueSnackbar | CloseSnackbar
-type EnqueueSnackbar = {
-  type: 'ENQUEUE_SNACKBAR'
-  snackbar: SnackbarData
-}
-type CloseSnackbar = { type: 'CLOSE_SNACKBAR' }
-
-declare type ProjectAction =
-  | CreateProject
-  | OpenProjectRequestById
-  | OpenProjectRequestByFilePath
-  | OpenProject
-  | SetProjectError
-  | SetProjectName
-  | CloseProject
-  | CloseProjectRequest
-  | SaveProjectRequest
-  | SaveProjectAsRequest
-  | ExportApkgRequest
-  | ExportApkgFailure
-  | ExportApkgSuccess
-  | ExportMarkdown
-  | ExportCsv
-  | SetWorkIsUnsaved
-declare type CreateProject = {
-  type: 'CREATE_PROJECT'
-  project: ProjectFile
-  filePath: FilePath
-}
-declare type OpenProjectRequestById = {
-  type: 'OPEN_PROJECT_REQUEST_BY_ID'
-  id: ProjectId
-}
-declare type OpenProjectRequestByFilePath = {
-  type: 'OPEN_PROJECT_REQUEST_BY_FILE_PATH'
-  filePath: string
-}
-declare type OpenProject = {
-  type: 'OPEN_PROJECT'
-  project: ProjectFile
-  clips: Clip[]
-  flashcards: FlashcardsState
-  now: string
-}
-declare type SetProjectError = {
-  type: 'SET_PROJECT_ERROR'
-  error: string | null
-}
-declare type SetProjectName = {
-  type: 'SET_PROJECT_NAME'
-  id: ProjectId
-  name: string
-}
-declare type CloseProject = { type: 'CLOSE_PROJECT' }
-declare type CloseProjectRequest = { type: 'CLOSE_PROJECT_REQUEST' }
-declare type SaveProjectRequest = { type: 'SAVE_PROJECT_REQUEST' }
-declare type SaveProjectAsRequest = { type: 'SAVE_PROJECT_AS_REQUEST' }
-declare type ExportApkgRequest = {
-  type: 'EXPORT_APKG_REQUEST'
-  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
-  mediaOpenPrior: MediaFile | null
-}
-declare type ExportApkgFailure = {
-  type: 'EXPORT_APKG_FAILURE'
-  errorMessage: string | null
-}
-declare type ExportApkgSuccess = {
-  type: 'EXPORT_APKG_SUCCESS'
-  successMessage: string
-}
-declare type ExportMarkdown = {
-  type: 'EXPORT_MARKDOWN'
-  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
-}
-declare type ExportCsv = {
-  type: 'EXPORT_CSV'
-  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
-  csvFilePath: string
-  mediaFolderLocation: string
-  rememberLocation: boolean
-}
-declare type SetWorkIsUnsaved = {
-  type: 'SET_WORK_IS_UNSAVED'
-  workIsUnsaved: boolean
-}
-
-declare type MediaAction =
-  | AddMediaToProjectRequest
-  | SetCurrentFile
-  | ToggleLoop
-  | SetLoop
-  | PlayMedia
-  | PauseMedia
-  | DismissMedia
-  | SetViewMode
-declare type AddMediaToProjectRequest = {
-  type: 'ADD_MEDIA_TO_PROJECT_REQUEST'
-  projectId: ProjectId
-  filePaths: Array<MediaFilePath>
-}
-declare type SetCurrentFile = { type: 'SET_CURRENT_FILE'; index: number }
-declare type ToggleLoop = { type: 'TOGGLE_LOOP'; reason: LoopReason }
-declare type SetLoop = { type: 'SET_LOOP'; loop: LoopState }
-declare type PlayMedia = { type: 'PLAY_MEDIA' }
-declare type PauseMedia = { type: 'PAUSE_MEDIA' }
-declare type SetViewMode = { type: 'SET_VIEW_MODE'; viewMode: ViewMode }
-
-declare type SettingsAction =
-  | SetMediaFolderLocation
-  | AddAssetsDirectories
-  | RemoveAssetsDirectories
-  | SetCheckForUpdatesAutomatically
-  | OverrideSettings
-  | AddActiveDictionary
-  | RemoveActiveDictionary
-
-declare type SetMediaFolderLocation = {
-  type: 'SET_MEDIA_FOLDER_LOCATION'
-  directoryPath: string | null
-}
-declare type AddAssetsDirectories = {
-  type: 'ADD_ASSETS_DIRECTORIES'
-  directoryPaths: strings[]
-}
-declare type RemoveAssetsDirectories = {
-  type: 'REMOVE_ASSETS_DIRECTORIES'
-  directoryPaths: strings[]
-}
-declare type SetCheckForUpdatesAutomatically = {
-  type: 'SET_CHECK_FOR_UPDATES_AUTOMATICALLY'
-  check: boolean
-}
-declare type OverrideSettings = {
-  type: 'OVERRIDE_SETTINGS'
-  settings: PartialSettings<SettingsState>
-}
-declare type AddActiveDictionary = {
-  type: 'ADD_ACTIVE_DICTIONARY'
-  id: FileId
-  dictionaryType: DictionaryFileType
-}
-declare type RemoveActiveDictionary = {
-  type: 'REMOVE_ACTIVE_DICTIONARY'
-  id: FileId
-}
-
-declare type DismissMedia = { type: 'DISMISS_MEDIA' }
-
-declare type SubtitlesAction =
-  // | AddSubtitlesTrack
-  | MountSubtitlesTrack
-  // | DeleteSubtitlesTrack
-  | ShowSubtitles
-  | HideSubtitles
-  | MakeClipsFromSubtitles
-  | ShowSubtitlesClipsDialogRequest
-  | LinkFlashcardFieldToSubtitlesTrackRequest
-  | LinkFlashcardFieldToSubtitlesTrack
-  | GoToSubtitlesChunk
-
-declare type LoadSubtitlesFailure = {
-  type: 'LOAD_SUBTITLES_FAILURE'
-  error: string
-}
-declare type MountSubtitlesTrack = {
-  type: 'MOUNT_SUBTITLES_TRACK'
-  track: SubtitlesTrack
-}
-declare type ShowSubtitles = {
-  type: 'SHOW_SUBTITLES'
-  id: SubtitlesTrackId
-}
-declare type HideSubtitles = {
-  type: 'HIDE_SUBTITLES'
-  id: SubtitlesTrackId
-}
-declare type MakeClipsFromSubtitles = {
-  type: 'MAKE_CLIPS_FROM_SUBTITLES'
-  fileId: MediaFileId
-  fieldNamesToTrackIds: Partial<
-    import('./Project').TransliterationFlashcardFields
-  >
-  tags: Array<string>
-  includeStill: boolean
-}
-declare type ShowSubtitlesClipsDialogRequest = {
-  type: 'SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST'
-}
-declare type LinkFlashcardFieldToSubtitlesTrack = {
-  type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK'
-  mediaFileId: MediaFileId
-  flashcardFieldName: FlashcardFieldName
-  subtitlesTrackId: SubtitlesTrackId | null
-  fieldToClear: FlashcardFieldName | null
-}
-declare type LinkFlashcardFieldToSubtitlesTrackRequest = {
-  type: 'LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST'
-  mediaFileId: MediaFileId
-  flashcardFieldName: FlashcardFieldName
-  subtitlesTrackId: SubtitlesTrackId | null
-}
-
-declare type GoToSubtitlesChunk = {
-  type: 'GO_TO_SUBTITLES_CHUNK'
-  subtitlesTrackId: SubtitlesTrackId
-  chunkIndex: number
-}
-
-declare type FileAction =
-  | AddFile
-  | DeleteFileRequest
-  | DeleteFileSuccess
-  | OpenFileRequest
-  | OpenFileSuccess
-  | OpenFileFailure
-  | LocateFileRequest
-  | LocateFileSuccess
-  | CommitFileDeletions
-  | AbortFileDeletions
-  | UpdateFile
-  | PreloadVideoStills
-  | ImportDictionaryRequest
-  | StartDictionaryImport
-  | DeleteImportedDictionary
-  | ResetDictionariesDatabase
-declare type AddFile = {
-  type: 'ADD_FILE'
-  file: FileMetadata
-  path?: string
-}
-declare type DeleteFileRequest = {
-  type: 'DELETE_FILE_REQUEST'
-  fileType: FileMetadata['type']
-  id: FileId
-}
-declare type DeleteFileSuccess = {
-  type: 'DELETE_FILE_SUCCESS'
-  file: FileAvailability
-  descendants: Array<FileAvailability>
-}
-declare type CommitFileDeletions = {
-  type: 'COMMIT_FILE_DELETIONS'
-  fileType?: FileMetadata['type']
-}
-declare type AbortFileDeletions = {
-  type: 'ABORT_FILE_DELETIONS'
-}
-declare type OpenFileRequest = {
-  type: 'OPEN_FILE_REQUEST'
-  file: FileMetadata
-  filePath: FilePath | null
-}
-declare type OpenFileSuccess = {
-  type: 'OPEN_FILE_SUCCESS'
-  validatedFile: FileMetadata
-  filePath: FilePath
-  timestamp: string
-}
-declare interface OpenFileSuccessWith<T extends FileMetadata>
-  extends OpenFileSuccess {
-  validatedFile: T
-}
-declare type OpenFileFailure = {
-  type: 'OPEN_FILE_FAILURE'
-  file: FileMetadata
-  filePath: FilePath | null
-  errorMessage: string | null
-}
-/** Should only be dispatched with a stored file */
-declare type LocateFileRequest = {
-  type: 'LOCATE_FILE_REQUEST'
-  /** This file should exist in the state already */
-  file: FileMetadata
-  message: string
-}
-declare type LocateFileSuccess = {
-  type: 'LOCATE_FILE_SUCCESS'
-  file: FileMetadata
-  filePath: FilePath
-}
-
-declare type UpdateFile = {
-  type: 'UPDATE_FILE'
-  update: FileUpdate<any>
-}
-declare interface UpdateFileWith<T extends keyof FileUpdates>
-  extends UpdateFile {
+declare interface UpdateFileWith<T extends keyof FileUpdates> {
+  type: 'updateFile'
   update: FileUpdate<T>
-}
-
-declare type PreloadVideoStills = {
-  type: 'PRELOAD_VIDEO_STILLS'
-  file: FileMetadata
-  clipId: ClipId
-}
-
-declare type ResetDictionariesDatabase = {
-  type: 'RESET_DICTIONARIES_DATABASE'
-}
-
-declare type ImportDictionaryRequest = {
-  type: 'IMPORT_DICTIONARY_REQUEST'
-  dictionaryType: DictionaryFileType
-}
-declare type StartDictionaryImport = {
-  type: 'START_DICTIONARY_IMPORT'
-  file: DictionaryFile
-  filePath: FilePath
-}
-declare type DeleteImportedDictionary = {
-  type: 'DELETE_IMPORTED_DICTIONARY'
-  file: DictionaryFile
-}
-
-interface WithRecordType<F extends FileMetadata> {
-  file: F
-}
-
-type OpenFileSuccessWith<F extends FileMetadata> = OpenFileSuccess & {
-  validatedFile: F
 }

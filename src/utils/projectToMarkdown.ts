@@ -1,4 +1,4 @@
-import * as r from '../redux'
+import r from '../redux'
 import formatTime from '../utils/formatTime'
 
 const projectToMarkdown = (

@@ -8,12 +8,12 @@ import React, {
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cn from 'classnames'
-import * as r from '../redux'
+import r from '../redux'
 import css from './Media.module.css'
 import { Tooltip, IconButton } from '@material-ui/core'
 import { VerticalSplitSharp, HorizontalSplitSharp } from '@material-ui/icons'
-import { SubtitlesFileWithTrack, MediaSubtitles } from '../redux'
 import { KEYS } from '../utils/keyboard'
+import { MediaSubtitles, SubtitlesFileWithTrack } from '../selectors'
 
 export const MEDIA_PLAYER_ID = 'mediaPlayer'
 

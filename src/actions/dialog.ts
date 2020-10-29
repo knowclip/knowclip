@@ -1,21 +1,24 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
-export const enqueueDialog = (
-  dialog: DialogData,
-  skipQueue: boolean = false
-): EnqueueDialog => ({
-  type: A.ENQUEUE_DIALOG,
-  dialog,
-  skipQueue,
-})
+export const dialogActions = {
+  [A.enqueueDialog]: (dialog: DialogData, skipQueue: boolean = false) => ({
+    type: A.enqueueDialog,
+    dialog,
+    skipQueue,
+  }),
 
-export const confirmationDialog = (
+  [A.closeDialog]: () => ({
+    type: A.closeDialog,
+  }),
+}
+
+const confirmationDialog = (
   message: string,
   action: Action,
   onCancel: Action | null = null,
   skipQueue: boolean = false
 ) =>
-  enqueueDialog(
+  dialogActions.enqueueDialog(
     {
       type: 'Confirmation',
       message,
@@ -24,8 +27,8 @@ export const confirmationDialog = (
     },
     skipQueue
   )
-export const errorDialog = (message: string, log: string) =>
-  enqueueDialog(
+const errorDialog = (message: string, log: string) =>
+  dialogActions.enqueueDialog(
     {
       type: 'Error',
       message,
@@ -34,11 +37,11 @@ export const errorDialog = (message: string, log: string) =>
     true
   )
 
-export const mediaFolderLocationFormDialog = (
+const mediaFolderLocationFormDialog = (
   action: Action | null,
   skipQueue: boolean
-): DialogAction =>
-  enqueueDialog(
+) =>
+  dialogActions.enqueueDialog(
     {
       type: 'MediaFolderLocationForm',
       action,
@@ -46,53 +49,64 @@ export const mediaFolderLocationFormDialog = (
     skipQueue
   )
 
-export const reviewAndExportDialog = (
+const reviewAndExportDialog = (
   mediaOpenPrior: MediaFile | null,
   mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
 ) =>
-  enqueueDialog({
+  dialogActions.enqueueDialog({
     type: 'ReviewAndExport',
     mediaOpenPrior,
     mediaFileIdsToClipIds: mediaFileIdsToClipIds,
   })
 
-export const newProjectFormDialog = () =>
-  enqueueDialog({ type: 'NewProjectForm' })
+const newProjectFormDialog = () =>
+  dialogActions.enqueueDialog({ type: 'NewProjectForm' })
 
-export const fileSelectionDialog = (
-  message: string,
-  file: FileMetadata
-): DialogAction => enqueueDialog({ type: 'FileSelection', message, file })
+const fileSelectionDialog = (message: string, file: FileMetadata) =>
+  dialogActions.enqueueDialog({ type: 'FileSelection', message, file })
 
-export const closeDialog = (): DialogAction => ({
-  type: A.CLOSE_DIALOG,
-})
-
-export const csvAndMp3ExportDialog = (
+const csvAndMp3ExportDialog = (
   mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
-): DialogAction =>
-  enqueueDialog({ type: 'CsvAndMp3Export', mediaFileIdsToClipIds }, true)
+) =>
+  dialogActions.enqueueDialog(
+    { type: 'CsvAndMp3Export', mediaFileIdsToClipIds },
+    true
+  )
 
-export const subtitlesClipDialog = (): DialogAction =>
-  enqueueDialog({ type: 'SubtitlesClips' })
+const subtitlesClipDialog = () =>
+  dialogActions.enqueueDialog({ type: 'SubtitlesClips' })
 
-export const settingsDialog = (): DialogAction =>
-  enqueueDialog({ type: 'Settings' }, true)
+const settingsDialog = () =>
+  dialogActions.enqueueDialog({ type: 'Settings' }, true)
 
-export const linkSubtitlesDialog = (
+const linkSubtitlesDialog = (
   subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles,
   mediaFileId: MediaFileId
-): DialogAction =>
-  enqueueDialog({
+) =>
+  dialogActions.enqueueDialog({
     type: 'LinkSubtitles',
     subtitles,
     mediaFileId,
   })
 
-export const dictionariesDialog = (): DialogAction =>
-  enqueueDialog(
+const dictionariesDialog = () =>
+  dialogActions.enqueueDialog(
     {
       type: 'Dictionaries',
     },
     true
   )
+
+export const compositeDialogActions = {
+  confirmationDialog,
+  errorDialog,
+  mediaFolderLocationFormDialog,
+  reviewAndExportDialog,
+  newProjectFormDialog,
+  fileSelectionDialog,
+  csvAndMp3ExportDialog,
+  subtitlesClipDialog,
+  settingsDialog,
+  linkSubtitlesDialog,
+  dictionariesDialog,
+}

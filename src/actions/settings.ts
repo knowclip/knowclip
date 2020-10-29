@@ -1,47 +1,42 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
-export const setMediaFolderLocation = (
-  directoryPath: string
-): SetMediaFolderLocation => ({
-  type: A.SET_MEDIA_FOLDER_LOCATION,
-  directoryPath,
-})
+export const settingsActions = {
+  [A.setMediaFolderLocation]: (directoryPath: string) => ({
+    type: A.setMediaFolderLocation,
+    directoryPath,
+  }),
 
-export const addAssetsDirectories = (
-  directoryPaths: string[]
-): AddAssetsDirectories => ({ type: A.ADD_ASSETS_DIRECTORIES, directoryPaths })
+  [A.addAssetsDirectories]: (directoryPaths: string[]) => ({
+    type: A.addAssetsDirectories,
+    directoryPaths,
+  }),
 
-export const removeAssetsDirectories = (
-  directoryPaths: string[]
-): RemoveAssetsDirectories => ({
-  type: A.REMOVE_ASSETS_DIRECTORIES,
-  directoryPaths,
-})
+  [A.removeAssetsDirectories]: (directoryPaths: string[]) => ({
+    type: A.removeAssetsDirectories,
+    directoryPaths,
+  }),
 
-export const setCheckForUpdatesAutomatically = (
-  check: boolean
-): SetCheckForUpdatesAutomatically => ({
-  type: A.SET_CHECK_FOR_UPDATES_AUTOMATICALLY,
-  check,
-})
+  [A.setCheckForUpdatesAutomatically]: (check: boolean) => ({
+    type: A.setCheckForUpdatesAutomatically,
+    check,
+  }),
 
-export const overrideSettings = (
-  settings: Partial<SettingsState>
-): OverrideSettings => ({
-  type: A.OVERRIDE_SETTINGS,
-  settings,
-})
+  [A.overrideSettings]: (settings: Partial<SettingsState>) => ({
+    type: A.overrideSettings,
+    settings,
+  }),
 
-export const addActiveDictionary = (
-  id: string,
-  dictionaryType: DictionaryFileType
-): AddActiveDictionary => ({
-  type: A.ADD_ACTIVE_DICTIONARY,
-  id,
-  dictionaryType,
-})
+  [A.addActiveDictionary]: (
+    id: string,
+    dictionaryType: DictionaryFileType
+  ) => ({
+    type: A.addActiveDictionary,
+    id,
+    dictionaryType,
+  }),
 
-export const removeActiveDictionary = (id: string): RemoveActiveDictionary => ({
-  type: A.REMOVE_ACTIVE_DICTIONARY,
-  id,
-})
+  [A.removeActiveDictionary]: (id: string) => ({
+    type: A.removeActiveDictionary,
+    id,
+  }),
+}

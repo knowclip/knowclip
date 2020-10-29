@@ -2,7 +2,7 @@ import { SyntheticEvent, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ClozeControls } from './useClozeControls'
 import { setSelectionRange } from './domSelection'
-import * as r from '../../redux'
+import r from '../../redux'
 import { KEYS } from '../keyboard'
 import {
   lookUpInDictionary,

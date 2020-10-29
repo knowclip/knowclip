@@ -10,14 +10,14 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@material-ui/core'
-import * as r from '../../redux'
+import r from '../../redux'
 import {
   showOpenDirectoryDialog,
   showSaveDialog,
   openInBrowser,
 } from '../../utils/electron'
 
-import { exportCsv, closeDialog } from '../../actions'
+import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 
 type ErrorsState = {
@@ -63,9 +63,9 @@ const CsvAndMp3ExportDialog = ({
     (e) => {
       const { csvFilePath, mediaFolderLocation } = fields
       if (csvFilePath && mediaFolderLocation) {
-        dispatch(closeDialog())
+        dispatch(actions.closeDialog())
         return dispatch(
-          exportCsv(
+          actions.exportCsv(
             mediaFileIdsToClipIds,
             csvFilePath,
             mediaFolderLocation,
@@ -166,7 +166,7 @@ const CsvAndMp3ExportDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog} color="primary">
+        <Button onClick={(e) => dispatch(actions.closeDialog)} color="primary">
           Cancel
         </Button>
         <Button onClick={onSubmit} color="primary">

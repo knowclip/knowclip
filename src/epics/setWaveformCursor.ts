@@ -7,19 +7,19 @@ import {
   ignoreElements,
   flatMap,
 } from 'rxjs/operators'
-import { setWaveformCursor } from '../actions'
-import * as r from '../redux'
+import { actions } from '../actions'
+import r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
 import { overlapsSignificantly } from '../selectors'
 
 let seeking = false
 
-const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
+const setCursorPositionEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     filter<Action, OpenMediaFileSuccess>(
       (action): action is OpenMediaFileSuccess =>
-        action.type === 'OPEN_FILE_SUCCESS' &&
+        action.type === 'openFileSuccess' &&
         action.validatedFile.type === 'MediaFile'
     ),
     switchMap<OpenMediaFileSuccess, Observable<Action>>(() =>
@@ -70,7 +70,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
               selection.item.start
             )
             effects.setCurrentTime(selectionStartTime)
-            return of(setWaveformCursor(selection.item.start))
+            return of(actions.setCursorPosition(selection.item.start))
           }
 
           const setViewboxAction = setViewBox(
@@ -95,7 +95,7 @@ const setWaveformCursorEpic: AppEpic = (action$, state$, effects) =>
 
           return from(setViewboxAction)
         }),
-        startWith(setWaveformCursor(0, { xMin: 0 }))
+        startWith(actions.setCursorPosition(0, { xMin: 0 }))
       )
     )
   )
@@ -116,7 +116,7 @@ const setViewBox = (
 
   if (newX < viewBox.xMin) {
     return [
-      setWaveformCursor(
+      actions.setCursorPosition(
         newX,
         pendingMousedownItem
           ? undefined
@@ -133,17 +133,17 @@ const setViewBox = (
       Math.max(state.waveform.length - svgWidth, 0)
     )
     return [
-      setWaveformCursor(
+      actions.setCursorPosition(
         newX,
         pendingMousedownItem ? undefined : { ...viewBox, xMin }
       ),
     ]
   }
-  return seeking ? [setWaveformCursor(newX)] : []
+  return seeking ? [actions.setCursorPosition(newX)] : []
 }
 
 type OpenMediaFileSuccess = {
-  type: 'OPEN_FILE_SUCCESS'
+  type: 'openFileSuccess'
   filePath: string
   validatedFile: MediaFile
   timestamp: string
@@ -153,7 +153,7 @@ const seekingTrackerEpic: AppEpic = (action$) =>
   action$.pipe(
     filter<Action, OpenMediaFileSuccess>(
       (action): action is OpenMediaFileSuccess =>
-        action.type === 'OPEN_FILE_SUCCESS' &&
+        action.type === 'openFileSuccess' &&
         action.validatedFile.type === 'MediaFile'
     ),
     switchMap<OpenMediaFileSuccess, Observable<Action>>(() =>
@@ -170,4 +170,4 @@ const seekingTrackerEpic: AppEpic = (action$) =>
     )
   )
 
-export default combineEpics(setWaveformCursorEpic, seekingTrackerEpic)
+export default combineEpics(setCursorPositionEpic, seekingTrackerEpic)

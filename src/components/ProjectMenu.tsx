@@ -6,8 +6,8 @@ import {
   Save as SaveIcon,
   Publish,
 } from '@material-ui/icons'
-import * as r from '../redux'
-import * as actions from '../actions'
+import r from '../redux'
+import { actions } from '../actions'
 import DarkTheme from './DarkTheme'
 import css from './MainHeader.module.css'
 import cn from 'classnames'

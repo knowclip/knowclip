@@ -1,6 +1,6 @@
 import { map, switchMap, takeUntil, takeLast } from 'rxjs/operators'
 import { fromEvent, from, of, merge, empty } from 'rxjs'
-import * as r from '../redux'
+import r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 

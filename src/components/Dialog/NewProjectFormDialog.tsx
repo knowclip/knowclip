@@ -17,7 +17,7 @@ import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'classnames'
 import { DialogProps } from './DialogProps'
-import * as actions from '../../actions'
+import { actions } from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
 enum $ {

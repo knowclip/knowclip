@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 export const initialState: SettingsState = {
   mediaFolderLocation: null,
@@ -13,13 +13,13 @@ const settings: Reducer<SettingsState, Action> = (
   action
 ): SettingsState => {
   switch (action.type) {
-    case A.SET_MEDIA_FOLDER_LOCATION:
+    case A.setMediaFolderLocation:
       return {
         ...state,
         mediaFolderLocation: action.directoryPath,
       }
 
-    case A.ADD_ASSETS_DIRECTORIES:
+    case A.addAssetsDirectories:
       return {
         ...state,
         assetsDirectories: [
@@ -27,7 +27,7 @@ const settings: Reducer<SettingsState, Action> = (
         ],
       }
 
-    case A.REMOVE_ASSETS_DIRECTORIES:
+    case A.removeAssetsDirectories:
       return {
         ...state,
         assetsDirectories: state.assetsDirectories.filter(
@@ -35,22 +35,22 @@ const settings: Reducer<SettingsState, Action> = (
         ),
       }
 
-    case A.SET_CHECK_FOR_UPDATES_AUTOMATICALLY:
+    case A.setCheckForUpdatesAutomatically:
       return {
         ...state,
         checkForUpdatesAutomatically: action.check,
       }
 
-    case A.OVERRIDE_SETTINGS:
+    case A.overrideSettings:
       return {
         ...state,
         ...action.settings,
       }
 
-    case A.SET_VIEW_MODE:
+    case A.setViewMode:
       return { ...state, viewMode: action.viewMode }
 
-    case A.ADD_ACTIVE_DICTIONARY: {
+    case A.addActiveDictionary: {
       const activeDictionaries = new Set([
         ...(state.activeDictionaries || []).filter(
           (d) => d.type === action.dictionaryType
@@ -63,7 +63,7 @@ const settings: Reducer<SettingsState, Action> = (
       }
     }
 
-    case A.REMOVE_ACTIVE_DICTIONARY:
+    case A.removeActiveDictionary:
       return {
         ...state,
         activeDictionaries: (state.activeDictionaries || []).filter(

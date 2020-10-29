@@ -9,9 +9,9 @@ import {
   Tab,
   LinearProgress,
 } from '@material-ui/core'
-import * as r from '../redux'
+import r from '../redux'
 import css from './Export.module.css'
-import * as actions from '../actions'
+import { actions } from '../actions'
 import { DialogProps } from './Dialog/DialogProps'
 import MediaTable from './ReviewAndExportMediaTable'
 

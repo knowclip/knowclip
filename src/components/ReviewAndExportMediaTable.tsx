@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from '@material-ui/core'
 import { ExpandLess, ExpandMore, FolderSpecial } from '@material-ui/icons'
-import * as r from '../redux'
+import r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'
 import moment from 'moment'

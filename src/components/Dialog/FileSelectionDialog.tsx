@@ -11,12 +11,11 @@ import {
   Button,
 } from '@material-ui/core'
 import { getHumanFileName, getFileFilters } from '../../utils/files'
-import * as actions from '../../actions'
+import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 import css from './FileSelectionForm.module.css'
 import { dirname } from 'path'
 import { showOpenDialog } from '../../utils/electron'
-import { removeAssetsDirectories, addAssetsDirectories } from '../../actions'
 import { getFileAvailability } from '../../selectors'
 
 enum $ {
@@ -165,9 +164,9 @@ const useLocationForm = (
       if (locationText) {
         const directory = dirname(locationText.trim())
         if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
-          dispatch(removeAssetsDirectories([directory]))
+          dispatch(actions.removeAssetsDirectories([directory]))
         if (!autoCheckFolders.includes(directory) && checkFolderAutomatically)
-          dispatch(addAssetsDirectories([directory]))
+          dispatch(actions.addAssetsDirectories([directory]))
         onSubmit(locationText)
       } else {
         setErrorText('Please choose a location to continue.')

@@ -1,80 +1,101 @@
-import * as A from '../types/ActionType'
-import { updateFile } from './files'
+import A from '../types/ActionType'
+import { filesActions } from './files'
 
-export const createProject = (
-  id: string,
-  name: string,
-  noteType: NoteType,
-  filePath: string,
-  now: string
-): CreateProject => ({
-  type: 'CREATE_PROJECT',
-  project: {
-    type: 'ProjectFile',
-    id,
-    name,
-    noteType,
-    mediaFileIds: [],
-    error: null,
-    createdAt: now,
-    lastSaved: now,
+const updateFile = filesActions.updateFile
+
+export const projectActions = {
+  [A.createProject]: (
+    id: string,
+    name: string,
+    noteType: NoteType,
+    filePath: string,
+    now: string
+  ) => {
+    const project: ProjectFile = {
+      type: 'ProjectFile',
+      id,
+      name,
+      noteType,
+      mediaFileIds: [],
+      error: null,
+      createdAt: now,
+      lastSaved: now,
+    }
+
+    return {
+      type: A.createProject,
+      project,
+      filePath,
+    }
   },
-  filePath,
-})
-export const openProjectByFilePath = (filePath: string): Action => ({
-  type: A.OPEN_PROJECT_REQUEST_BY_FILE_PATH,
-  filePath,
-})
+  [A.openProjectRequestByFilePath]: (filePath: string) => ({
+    type: A.openProjectRequestByFilePath,
+    filePath,
+  }),
 
-export const openProjectById = (id: ProjectId): Action => ({
-  type: A.OPEN_PROJECT_REQUEST_BY_ID,
-  id,
-})
-
-export const openProject = (
-  project: ProjectFile,
-  clips: Clip[],
-  now: string,
-  flashcards: FlashcardsState
-): OpenProject => ({
-  type: A.OPEN_PROJECT,
-  project,
-  clips,
-  flashcards,
-  now,
-})
-
-export const closeProject = (): Action => ({
-  type: A.CLOSE_PROJECT,
-})
-
-export const closeProjectRequest = (): Action => ({
-  type: A.CLOSE_PROJECT_REQUEST,
-})
-
-export const setProjectName = (
-  id: ProjectId,
-  name: string
-): UpdateFileWith<'setProjectName'> => ({
-  type: A.UPDATE_FILE,
-  update: {
+  [A.openProjectRequestById]: (id: ProjectId) => ({
+    type: A.openProjectRequestById,
     id,
-    fileType: 'ProjectFile',
-    updateName: 'setProjectName',
-    updatePayload: [name],
-  },
-})
+  }),
 
-export const addMediaToProjectRequest = (
-  projectId: ProjectId,
-  filePaths: Array<MediaFilePath>
-) => ({
-  type: A.ADD_MEDIA_TO_PROJECT_REQUEST,
-  projectId,
-  filePaths,
-})
+  [A.openProject]: (
+    project: ProjectFile,
+    clips: Clip[],
+    now: string,
+    flashcards: FlashcardsState
+  ) => ({
+    type: A.openProject,
+    project,
+    clips,
+    flashcards,
+    now,
+  }),
 
-export const deleteMediaFromProject = (
+  [A.closeProject]: () => ({
+    type: A.closeProject,
+  }),
+
+  [A.closeProjectRequest]: () => ({
+    type: A.closeProjectRequest,
+  }),
+
+  [A.addMediaToProjectRequest]: (
+    projectId: ProjectId,
+    filePaths: Array<MediaFilePath>
+  ) => ({
+    type: A.addMediaToProjectRequest,
+    projectId,
+    filePaths,
+  }),
+
+  [A.saveProjectRequest]: () => ({
+    type: A.saveProjectRequest,
+  }),
+
+  [A.saveProjectAsRequest]: () => ({
+    type: A.saveProjectAsRequest,
+  }),
+
+  [A.setWorkIsUnsaved]: (workIsUnsaved: boolean) => ({
+    type: A.setWorkIsUnsaved,
+    workIsUnsaved,
+  }),
+}
+
+function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
+  return (u as any) as FileUpdate<keyof FileUpdates>
+}
+
+const setProjectName = (id: ProjectId, name: string) =>
+  updateFile(
+    update({
+      id,
+      fileType: 'ProjectFile',
+      updateName: 'setProjectName',
+      updatePayload: [name],
+    })
+  )
+const deleteMediaFromProject = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
 ) =>
@@ -85,15 +106,7 @@ export const deleteMediaFromProject = (
     updatePayload: [mediaFileId],
   })
 
-export const saveProjectRequest = (): Action => ({
-  type: A.SAVE_PROJECT_REQUEST,
-})
-
-export const saveProjectAsRequest = (): Action => ({
-  type: A.SAVE_PROJECT_AS_REQUEST,
-})
-
-export const setWorkIsUnsaved = (workIsUnsaved: boolean): Action => ({
-  type: A.SET_WORK_IS_UNSAVED,
-  workIsUnsaved,
-})
+export const compositeProjectActions = {
+  setProjectName,
+  deleteMediaFromProject,
+}

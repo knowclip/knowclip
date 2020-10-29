@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 const initialState: DialogState = {
   queue: [],
@@ -7,7 +7,7 @@ const initialState: DialogState = {
 
 const dialog: Reducer<DialogState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case A.ENQUEUE_DIALOG:
+    case A.enqueueDialog:
       return {
         ...state,
         queue: action.skipQueue
@@ -15,7 +15,7 @@ const dialog: Reducer<DialogState, Action> = (state = initialState, action) => {
           : state.queue.concat(action.dialog),
       }
 
-    case A.CLOSE_DIALOG: {
+    case A.closeDialog: {
       const [, ...queue] = state.queue
       return {
         ...state,

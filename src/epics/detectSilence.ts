@@ -1,10 +1,11 @@
 import { flatMap, map } from 'rxjs/operators'
 import { from, Observable } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
-import * as A from '../types/ActionType'
-import * as r from '../redux'
+import A from '../types/ActionType'
+import r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
+import { ActionOf } from '../actions'
 
 const detectSilence = (
   path: string,
@@ -48,8 +49,8 @@ const detectSilence = (
 
 const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DetectSilence>(A.DETECT_SILENCE),
-    flatMap<DetectSilence, Promise<Action[]>>(() => {
+    ofType<Action, ActionOf<'detectSilence'>>(A.detectSilence),
+    flatMap<ActionOf<'detectSilence'>, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMedia = r.getCurrentMediaFile(state$.value)
       if (!currentMedia || !currentFilePath)
@@ -122,7 +123,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
 
 const detectSilenceRequestEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DetectSilenceRequest>(A.DETECT_SILENCE_REQUEST),
+    ofType<Action, ActionOf<'detectSilenceRequest'>>(A.detectSilenceRequest),
     map(() =>
       r.doesCurrentFileHaveClips(state$.value)
         ? r.confirmationDialog(

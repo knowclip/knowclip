@@ -7,12 +7,12 @@ import {
   ShortTextTwoTone,
 } from '@material-ui/icons'
 import cn from 'classnames'
-import * as r from '../redux'
+import r from '../redux'
 import css from './FlashcardSection.module.css'
 import { getNoteTypeFields } from '../utils/noteType'
 import TagsInput from './TagsInput'
 import VideoStillDisplay from './FlashcardSectionFormVideoStill'
-import * as actions from '../actions'
+import { actions } from '../actions'
 import Field from './FlashcardSectionFormField'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 

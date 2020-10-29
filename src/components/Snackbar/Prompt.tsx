@@ -4,8 +4,8 @@ import { Close } from '@material-ui/icons'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
-import { closeSnackbar } from '../../actions'
 import { snackbar$ } from '.'
+import r from '../../redux'
 
 const PromptSnackbar = ({
   message,
@@ -38,7 +38,9 @@ const PromptSnackbar = ({
     [dispatch]
   )
 
-  const handleExited = useCallback((e) => dispatch(closeSnackbar()), [dispatch])
+  const handleExited = useCallback((e) => dispatch(r.closeSnackbar()), [
+    dispatch,
+  ])
 
   return (
     // TODO: distinguish error and success messages
@@ -57,9 +59,7 @@ const PromptSnackbar = ({
                 {label}
               </Button>
             ))}
-            {!actions.some(
-              ([, action]) => action.type === 'CLOSE_SNACKBAR'
-            ) && (
+            {!actions.some(([, action]) => action.type === 'closeSnackbar') && (
               <IconButton onClick={handleClose}>
                 <Close />
               </IconButton>

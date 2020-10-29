@@ -19,9 +19,8 @@ import {
   Tooltip,
 } from '@material-ui/core'
 import { DialogProps } from './DialogProps'
-import * as r from '../../redux'
+import r from '../../redux'
 import { Delete, Warning } from '@material-ui/icons'
-import { dictionaryTypes, displayDictionaryType } from '../../redux'
 import { openInBrowser } from '../../utils/electron'
 import { useLocalSettingsReducer } from './SettingsDialog'
 
@@ -176,10 +175,10 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                   value={newDictionaryType}
                 >
                   <MenuItem value={''}>Add a new dictionary of type:</MenuItem>
-                  {dictionaryTypes.map((type) => {
+                  {r.dictionaryTypes.map((type) => {
                     return (
                       <MenuItem key={type} value={type}>
-                        {displayDictionaryType(type)}
+                        {r.displayDictionaryType(type)}
                       </MenuItem>
                     )
                   })}
@@ -243,7 +242,7 @@ function DictionaryFileItem({
         <Checkbox checked={selected} onChange={handleChange} />
       </ListItemIcon>
       <ListItemText
-        primary={`${displayDictionaryType(file.dictionaryType)}`}
+        primary={`${r.displayDictionaryType(file.dictionaryType)}`}
         secondary={file.name}
         title={availability.filePath || ''}
       />

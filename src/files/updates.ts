@@ -10,11 +10,11 @@ export const fileUpdates = {
 
 export type FileUpdates = typeof fileUpdates
 
-export function isUpdateWith<U extends keyof FileUpdates>(
-  updateName: U,
-  action: UpdateFileWith<any>
-): action is UpdateFileWith<U> {
-  return action.update.updateName === updateName
+export function getUpdateWith<U extends keyof FileUpdates>(
+  update: FileUpdate<any>,
+  updateName: U
+): FileUpdate<U> | null {
+  if (update.updateName === updateName) return update as FileUpdate<U>
+  return null
 }
-
 export type ProjectFileUpdates = typeof project
