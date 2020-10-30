@@ -10,7 +10,7 @@ import r from '../../redux'
 const PromptSnackbar = ({
   message,
   actions,
-  closeButtonId,
+  closeButtonId: _closeButtonId,
   autoHideDuration = 15000,
 }: {
   message: string
@@ -38,7 +38,7 @@ const PromptSnackbar = ({
     [dispatch]
   )
 
-  const handleExited = useCallback((e) => dispatch(r.closeSnackbar()), [
+  const handleExited = useCallback((_e) => dispatch(r.closeSnackbar()), [
     dispatch,
   ])
 

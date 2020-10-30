@@ -45,7 +45,7 @@ export async function lookUpCeDict(
 
   const tokensTranslations = potentialTokens.flatMap(({ tokens, index }) => {
     const translatedTokens = tokens.flatMap((token) => {
-      const candidates = allQueries.flatMap((entry, i) => {
+      const candidates = allQueries.flatMap((entry) => {
         if (entry.head === token || entry.variant === token)
           return [
             {

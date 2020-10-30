@@ -9,7 +9,7 @@ import { extname } from 'path'
 const isVtt = (filePath: FilePath) => extname(filePath).toLowerCase() === '.vtt'
 
 export default {
-  openRequest: async (file, filePath, state, effects) => {
+  openRequest: async (file, filePath, state, _effects) => {
     return await validateBeforeOpenFileAction(state, filePath, file)
   },
   openSuccess: [
@@ -66,20 +66,20 @@ export default {
     },
   ],
 
-  locateRequest: async (file, availability, message, state, effects) => {
+  locateRequest: async (file, _availability, message, _state, _effects) => {
     return [r.fileSelectionDialog(message, file)]
   },
 
   locateSuccess: null,
 
   deleteRequest: [
-    async (file, availability, descendants, state, effects) => [
+    async (_file, availability, descendants, _state, _effects) => [
       r.deleteFileSuccess(availability, descendants),
     ],
   ],
 
   deleteSuccess: [
-    async (action, state, effects) => {
+    async (action, state, _effects) => {
       const mediaFile = Object.values(state.files.MediaFile).find(
         (m) => m && m.subtitles.some(({ id }) => id === action.file.id)
       )

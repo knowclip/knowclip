@@ -109,7 +109,7 @@ export function parseFlat(text: string, maxWordLength = 8) {
 
   const textSegments = wordIndexes(text)
   for (let { index: startIndex, string: sentence } of textSegments.filter(
-    ({ index, string }) => string.length
+    ({ string }) => string.length
   )) {
     for (let start = 0; start < sentence.length; ++start) {
       const tokensAtIndex: string[] = []
@@ -135,7 +135,7 @@ export function parseFlat(text: string, maxWordLength = 8) {
 function wordIndexes(s: string) {
   const rx = LETTERS_DIGITS_PLUS
   const match = [...s.matchAll(rx)]
-  return match.map((v, i) => ({
+  return match.map((v) => ({
     string: v[0] as string,
     index: v.index as number,
   }))

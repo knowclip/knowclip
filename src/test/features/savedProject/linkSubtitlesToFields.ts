@@ -5,10 +5,7 @@ import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function linkSubtitlesToFields({
-  app,
-  client,
-}: TestSetup) {
+export default async function linkSubtitlesToFields({ client }: TestSetup) {
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
   await client.waitForText_(
     mediaFilesMenu$.mediaFileMenuItem,

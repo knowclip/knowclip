@@ -70,7 +70,8 @@ const FlashcardSection = ({
   )
   const dispatch = useDispatch()
 
-  const [autofocusFieldName, setAutofocusFieldName] = useState<
+  // TODO: restore autofocus
+  const [autofocusFieldName, _setAutofocusFieldName] = useState<
     TransliterationFlashcardFieldName
   >('transcription')
 
@@ -216,8 +217,7 @@ const Placeholder = ({
         </p>
       )}
       <p className={css.introText}>
-        To make a new clip, <strong>click and drag</strong> on the waveform
-        below.
+        To make a new clip, <strong>ick and drag</strong> on the waveform below.
       </p>
       <p className={css.introText}>
         After you've filled in your flashcard fields, you can see a{' '}

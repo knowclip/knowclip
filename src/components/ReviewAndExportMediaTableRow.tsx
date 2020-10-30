@@ -168,27 +168,23 @@ const TranscriptionFieldPreview = ({
       segments.push(value.slice(0, clozeStart))
     }
 
-    rangesWithClozeIndexes.forEach(
-      ({ range: { start, end }, clozeIndex }, i) => {
-        segments.push(
-          <span className={css.clozeDeletion} key={String(start) + String(end)}>
-            {value.slice(start, end)}
-          </span>
-        )
+    rangesWithClozeIndexes.forEach(({ range: { start, end } }, i) => {
+      segments.push(
+        <span className={css.clozeDeletion} key={String(start) + String(end)}>
+          {value.slice(start, end)}
+        </span>
+      )
 
-        const nextRange: {
-          range: ClozeRange
-          clozeIndex: number
-        } | null = rangesWithClozeIndexes[i + 1] || null
-        const subsequentGapEnd = nextRange
-          ? nextRange.range.start
-          : value.length
+      const nextRange: {
+        range: ClozeRange
+        clozeIndex: number
+      } | null = rangesWithClozeIndexes[i + 1] || null
+      const subsequentGapEnd = nextRange ? nextRange.range.start : value.length
 
-        if (subsequentGapEnd - end > 0) {
-          segments.push(value.slice(end, subsequentGapEnd))
-        }
+      if (subsequentGapEnd - end > 0) {
+        segments.push(value.slice(end, subsequentGapEnd))
       }
-    )
+    })
     return segments
   }, [rangesWithClozeIndexes, value])
 

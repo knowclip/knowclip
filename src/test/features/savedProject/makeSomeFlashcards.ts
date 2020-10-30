@@ -7,7 +7,7 @@ import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function makeSomeFlashcards({ app, client }: TestSetup) {
+export default async function makeSomeFlashcards({ client }: TestSetup) {
   const { deleteButton } = flashcardForm$
 
   await waveformMouseDrag(client, 351, 438)

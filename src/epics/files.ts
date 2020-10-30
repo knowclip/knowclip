@@ -150,12 +150,10 @@ const locateFileRequest: AppEpic = (action$, state$, effects) =>
     })
   )
 
-const locateFileSuccess: AppEpic = (action$, state$, effects) =>
+const locateFileSuccess: AppEpic = (action$, _state$, _effects) =>
   action$.pipe(
     ofType<Action, LocateFileSuccess>(A.locateFileSuccess),
-    map<LocateFileSuccess, Action>(({ file, filePath }) =>
-      r.openFileRequest(file)
-    )
+    map<LocateFileSuccess, Action>(({ file }) => r.openFileRequest(file))
   )
 
 const deleteFileRequest: AppEpic = (action$, state$, effects) =>

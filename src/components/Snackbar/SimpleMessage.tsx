@@ -29,7 +29,7 @@ const SimpleMessageSnackbar = ({
   )
 
   const dispatch = useDispatch()
-  const handleExited = useCallback((e) => dispatch(r.closeSnackbar()), [
+  const handleExited = useCallback((_e) => dispatch(r.closeSnackbar()), [
     dispatch,
   ])
 

@@ -150,7 +150,7 @@ const removeClozeDeletion = (
   clozeIndex: number
 ) =>
   clipsActions.editClip(id, null, {
-    cloze: currentCloze.filter((c, i) => i !== clozeIndex),
+    cloze: currentCloze.filter((_c, i) => i !== clozeIndex),
   })
 
 export const compositeClipsActions = {

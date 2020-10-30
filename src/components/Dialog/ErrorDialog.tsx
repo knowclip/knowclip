@@ -12,7 +12,7 @@ const ErrorDialog = ({
   const dispatch = useDispatch()
 
   const close = useCallback(
-    (e) => {
+    (_e) => {
       dispatch(actions.closeDialog())
     },
     [dispatch]

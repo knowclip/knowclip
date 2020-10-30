@@ -147,7 +147,7 @@ export default {
 
   locateSuccess: null,
   deleteRequest: [
-    async (file, availability, descendants, state) => [
+    async (file, availability, descendants, _state) => [
       r.deleteFileSuccess(availability, descendants),
     ],
   ],

@@ -22,7 +22,7 @@ const pendingClipIsBigEnough = (state: AppState) => {
 }
 
 const addClipEpic: AppEpic = (
-  action$,
+  _action$,
   state$,
   { window, setCurrentTime, document }
 ) =>

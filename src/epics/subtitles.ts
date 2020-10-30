@@ -19,7 +19,6 @@ import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
 import { SubtitlesFileWithTrack } from '../selectors'
-import { ActionOf } from '../actions'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,

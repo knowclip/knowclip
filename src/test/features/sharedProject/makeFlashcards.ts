@@ -4,7 +4,7 @@ import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function makeFlashcards({ app, client }: TestSetup) {
+export default async function makeFlashcards({ client }: TestSetup) {
   await client.elements_(waveform$.waveformClip, 3)
   await client.clickElement_(waveform$.waveformClip)
   await client.waitForText_(flashcardSection$.container, '1 / 3')

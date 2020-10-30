@@ -83,7 +83,7 @@ const SubtitlesClipsDialog = ({
 
   const [useStills, setUseStills] = useState(defaultIncludeStill)
   const toggleUseStills = useCallback(
-    (e) => {
+    (_e) => {
       setUseStills((v) => !v)
     },
     [setUseStills]
@@ -91,7 +91,7 @@ const SubtitlesClipsDialog = ({
 
   const closeDialog = useCallback(() => dispatch(r.closeDialog()), [dispatch])
   const onSubmit = useCallback(
-    (e) => {
+    (_e) => {
       if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
 
       const { fields } = state

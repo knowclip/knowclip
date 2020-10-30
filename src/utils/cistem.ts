@@ -65,7 +65,7 @@ const stripesn = /[esn]$/
  * @returns {String}
  */
 export function stem(word: string, case_insensitive = false) {
-  if (word.length == 0) return word
+  if (word.length == 0) return word // eslint-disable-line eqeqeq
 
   const upper = word[0] === word[0].toUpperCase()
   word = word.toLowerCase()
@@ -134,7 +134,7 @@ export function stem(word: string, case_insensitive = false) {
  * @returns {Array<String>}
  */
 export function segment(word: string, case_insensitive = false) {
-  if (word.length == 0) return ['', '']
+  if (word.length == 0) return ['', ''] // eslint-disable-line eqeqeq
 
   let rest_length = 0
   const upper = word[0] === word[0].toUpperCase()

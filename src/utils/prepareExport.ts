@@ -57,7 +57,7 @@ export const CLOZE_ANSWER_FORMAT = [
   TAGS,
 ].join('\n\n')
 
-const getCards = (noteType: NoteType) => [LISTENING_CARD]
+const getCards = (_noteType: NoteType) => [LISTENING_CARD]
 
 export const TEMPLATE_CSS = `.card {
   font-family: Helvetica, Arial;

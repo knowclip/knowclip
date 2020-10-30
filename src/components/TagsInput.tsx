@@ -25,7 +25,7 @@ const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
 
 const renderSuggestion: RenderSuggestion<string> = (
   suggestion,
-  { query, isHighlighted, ...other }
+  { isHighlighted, ...other }
 ) => (
   // prevent the click causing the input to be blurred
   <MenuItem
@@ -57,7 +57,7 @@ const TagsInput = ({
   const [suggestions, setSuggestions] = useState<string[]>([])
 
   const handletextFieldInputChange = useCallback(
-    (e, { newValue }) => setTextFieldInput(newValue),
+    (_e, { newValue }) => setTextFieldInput(newValue),
     [setTextFieldInput]
   )
 
@@ -150,7 +150,7 @@ const TagsInput = ({
         } as InputProps<string>
       }
       renderInputComponent={useCallback(
-        ({ value, onChange, chips, ref, ...other }) => (
+        ({ onChange, chips, ref, ...other }) => (
           <ChipInput
             margin="dense"
             label="Tags"

@@ -379,9 +379,8 @@ export function mergeClozeFields(
     const mergingCard = mergingCards[mergingCardIndex]
 
     clozeDeletions.push(
-      /* eslint-disable no-loop-func */
+      /* eslint-disable @typescript-eslint/no-loop-func */
       ...mergingCard.cloze.map((c) => ({
-        /* eslint-enable no-loop-func */
         ...c,
         ranges: c.ranges.map((r) => ({
           start: r.start + mergedValueSoFar.length,
@@ -389,6 +388,7 @@ export function mergeClozeFields(
         })),
       }))
     )
+    /* eslint-enable @typescript-eslint/no-loop-func */
     mergedValueSoFar += trimmed
     mergingCardIndex++
   }

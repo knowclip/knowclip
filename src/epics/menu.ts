@@ -80,11 +80,7 @@ const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
     })
   )
 
-const startupCheckForUpdates: AppEpic = (
-  action$,
-  state$,
-  { ipcRenderer, window }
-) =>
+const startupCheckForUpdates: AppEpic = (action$, state$, { window }) =>
   action$.ofType<any>(REHYDRATE).pipe(
     take(1),
     flatMap(async () => {
