@@ -4,9 +4,6 @@ jobs:
     osx_image: xcode10.2
     language: node_js
     node_js: '12'
-    env:
-    - ELECTRON_CACHE=$HOME/.cache/electron
-    - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
     deploy: &deploy_base
       skip_cleanup: true
       provider: releases

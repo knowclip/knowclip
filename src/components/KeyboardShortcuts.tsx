@@ -4,7 +4,7 @@ import css from './KeyboardShortcuts.module.css'
 import os from 'os'
 
 const KEYBOARD_SHORTCUTS = {
-  'Play/pause': 'Shift + Space',
+  'Play/pause': `${os.platform() === 'win32' ? 'Ctrl' : 'Shift'} + Space`,
   'Toggle loop': 'Ctrl + L',
   'Stop looping': 'Esc',
   'Select previous': '←',
