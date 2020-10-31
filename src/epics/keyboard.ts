@@ -6,6 +6,7 @@ import * as A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
+import { KEY } from '../utils/dictionariesDatabase'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
@@ -30,7 +31,10 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return of(r.startEditingCards())
       }
 
-      if (key === KEYS.space && (shiftKey || !isTextFieldFocused())) {
+      if (
+        (key === KEYS.space || key === KEYS.process) &&
+        (shiftKey || !isTextFieldFocused())
+      ) {
         event.preventDefault()
         effects.toggleMediaPaused()
         return empty()
