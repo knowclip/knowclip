@@ -6,12 +6,14 @@ import * as A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
-import { KEY } from '../utils/dictionariesDatabase'
+import os from 'os'
+
+const playPauseForceKey = os.platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     flatMap((event) => {
-      const { shiftKey, ctrlKey, altKey, key } = event
+      const { ctrlKey, altKey, key } = event
 
       if (
         key.toLowerCase() === KEYS.lLowercase &&
@@ -33,7 +35,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
 
       if (
         (key === KEYS.space || key === KEYS.process) &&
-        (shiftKey || !isTextFieldFocused())
+        (event[playPauseForceKey] || !isTextFieldFocused())
       ) {
         event.preventDefault()
         effects.toggleMediaPaused()
