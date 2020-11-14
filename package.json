@@ -57,7 +57,7 @@
     "subsrt": "^1.0.0",
     "subtitle": "^2.0.3",
     "tempy": "^0.3.0",
-    "ts-json-schema-generator": "^0.58.1",
+    "ts-json-schema-generator": "^0.78",
     "uuid": "^3.3.2",
     "wanakana": "^4.0.2",
     "webdriverio": "^6.5.2",

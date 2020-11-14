@@ -20,7 +20,7 @@
     "jsx": "react",
     "downlevelIteration": true,
     "isolatedModules": true,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src",
