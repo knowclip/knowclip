@@ -43,9 +43,7 @@
               "type": "string"
             },
             "type": {
-              "enum": [
-                "VideoStill"
-              ],
+              "const": "VideoStill",
               "type": "string"
             }
           },
@@ -106,9 +104,7 @@
               "type": "string"
             },
             "type": {
-              "enum": [
-                "VideoStill"
-              ],
+              "const": "VideoStill",
               "type": "string"
             }
           },
@@ -168,9 +164,7 @@
           "type": "number"
         },
         "type": {
-          "enum": [
-            "Embedded"
-          ],
+          "const": "Embedded",
           "type": "string"
         }
       },
@@ -215,9 +209,7 @@
           "type": "string"
         },
         "type": {
-          "enum": [
-            "External"
-          ],
+          "const": "External",
           "type": "string"
         }
       },

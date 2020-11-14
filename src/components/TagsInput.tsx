@@ -151,6 +151,7 @@ const TagsInput = ({
       }
       renderInputComponent={useCallback(
         ({ onChange, chips, ref, ...other }) => (
+          <>
           <ChipInput
             margin="dense"
             label="Tags"
@@ -162,14 +163,15 @@ const TagsInput = ({
             dataSource={allTags}
             newChipKeyCodes={[13, 9, 32] /* enter tab space */}
             onUpdateInput={onChange}
-            value={chips}
             clearInputValueOnChange
             inputRef={ref}
             chipRenderer={chipRenderer}
             onFocus={onFocus}
             blurBehavior="add"
             {...other}
+            value={chips}
           />
+          </>
         ),
         [handleAddChip, handleDeleteChip, allTags, onFocus]
       )}

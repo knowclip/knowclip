@@ -135,7 +135,6 @@ const ProjectsMenu = () => {
       <section className={css.main}>
         <section className={css.menu}>
           <Paper className={css.recentProjectsPaper}>
-            booooooski
             <MenuList>
               {projects.length ? null : (
                 <MenuItem disabled>No recent projects.</MenuItem>
