@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import * as r from '../../redux'
+import r from '../../redux'
 import { useSelector, useDispatch } from 'react-redux'
 import { ClozeIds } from '../../components/FlashcardSectionDisplayClozeField'
 import {

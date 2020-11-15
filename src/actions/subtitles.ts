@@ -1,43 +1,69 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import { basename } from 'path'
-import { openFileRequest } from './files'
+import { filesActions } from './files'
 import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
 
-export const showSubtitles = (id: SubtitlesTrackId): ShowSubtitles => ({
-  type: A.SHOW_SUBTITLES,
-  id,
-})
+const openFileRequest = filesActions.openFileRequest
 
-export const hideSubtitles = (id: SubtitlesTrackId): HideSubtitles => ({
-  type: A.HIDE_SUBTITLES,
-  id,
-})
+export const subtitlesActions = {
+  showSubtitles: (id: SubtitlesTrackId) => ({
+    type: A.showSubtitles,
+    id,
+  }),
+  hideSubtitles: (id: SubtitlesTrackId) => ({
+    type: A.hideSubtitles,
+    id,
+  }),
+  mountSubtitlesTrack: (track: SubtitlesTrack) => ({
+    type: A.mountSubtitlesTrack,
+    track,
+  }),
 
-export const mountSubtitlesTrack = (
-  track: SubtitlesTrack
-): MountSubtitlesTrack => ({
-  type: A.MOUNT_SUBTITLES_TRACK,
-  track,
-})
+  makeClipsFromSubtitles: (
+    fileId: MediaFileId,
+    fieldNamesToTrackIds: Partial<TransliterationFlashcardFields>,
+    tags: Array<string>,
+    includeStill: boolean
+  ) => ({
+    type: A.makeClipsFromSubtitles,
+    fileId,
+    fieldNamesToTrackIds,
+    tags,
+    includeStill,
+  }),
+  showSubtitlesClipsDialogRequest: () => ({
+    type: A.showSubtitlesClipsDialogRequest,
+  }),
+  linkFlashcardFieldToSubtitlesTrackRequest: (
+    flashcardFieldName: FlashcardFieldName,
+    mediaFileId: MediaFileId,
+    subtitlesTrackId: SubtitlesTrackId | null
+  ) => ({
+    type: A.linkFlashcardFieldToSubtitlesTrackRequest,
+    flashcardFieldName,
+    mediaFileId,
+    subtitlesTrackId,
+  }),
+  goToSubtitlesChunk: (
+    subtitlesTrackId: SubtitlesTrackId,
+    chunkIndex: number
+  ) => ({
+    type: A.goToSubtitlesChunk,
+    subtitlesTrackId,
+    chunkIndex,
+  }),
+}
 
-export const addSubtitlesTrack = (
-  track: SubtitlesTrack,
-  mediaFileId: MediaFileId
-): UpdateFileWith<'addSubtitlesTrack'> => ({
-  type: A.UPDATE_FILE,
-  update: {
+const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
+  filesActions.updateFile({
     fileType: 'MediaFile',
     updateName: 'addSubtitlesTrack',
     id: mediaFileId,
     updatePayload: [track],
-  },
-})
+  })
 
-export const loadNewSubtitlesFile = (
-  filePath: string,
-  mediaFileId: MediaFileId
-): OpenFileRequest =>
+const loadNewSubtitlesFile = (filePath: string, mediaFileId: MediaFileId) =>
   openFileRequest(
     {
       type: 'ExternalSubtitlesFile',
@@ -49,67 +75,36 @@ export const loadNewSubtitlesFile = (
     filePath
   )
 
-export const deleteSubtitlesTrackFromMedia = (
+const deleteSubtitlesTrackFromMedia = (
   id: SubtitlesTrackId,
   mediaFileId: MediaFileId
-): UpdateFileWith<'deleteSubtitlesTrack'> => ({
-  type: A.UPDATE_FILE,
-  update: {
+) =>
+  filesActions.updateFile({
     fileType: 'MediaFile',
     updateName: 'deleteSubtitlesTrack',
     id: mediaFileId,
     updatePayload: [id],
-  },
-})
+  })
 
-export const makeClipsFromSubtitles = (
-  fileId: MediaFileId,
-  fieldNamesToTrackIds: Partial<TransliterationFlashcardFields>,
-  tags: Array<string>,
-  includeStill: boolean
-): MakeClipsFromSubtitles => ({
-  type: A.MAKE_CLIPS_FROM_SUBTITLES,
-  fileId,
-  fieldNamesToTrackIds,
-  tags,
-  includeStill,
-})
-
-export const subtitlesClipsDialogRequest = (): ShowSubtitlesClipsDialogRequest => ({
-  type: A.SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST,
-})
-
-export const linkFlashcardFieldToSubtitlesTrackRequest = (
-  flashcardFieldName: FlashcardFieldName,
-  mediaFileId: MediaFileId,
-  subtitlesTrackId: SubtitlesTrackId | null
-): LinkFlashcardFieldToSubtitlesTrackRequest => ({
-  type: A.LINK_FLASHCARD_FIELD_TO_SUBTITLES_TRACK_REQUEST,
-  flashcardFieldName,
-  mediaFileId,
-  subtitlesTrackId,
-})
-
-export const linkFlashcardFieldToSubtitlesTrack = (
+const linkFlashcardFieldToSubtitlesTrack = (
   flashcardFieldName: FlashcardFieldName,
   mediaFileId: MediaFileId,
   subtitlesTrackId: SubtitlesTrackId | null,
   fieldToClear?: FlashcardFieldName
-): UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> => ({
-  type: A.UPDATE_FILE,
-  update: {
+) =>
+  filesActions.updateFile({
+    // ): UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> => filesActions.updateFile({
     fileType: 'MediaFile',
     updateName: 'linkFlashcardFieldToSubtitlesTrack',
     id: mediaFileId,
     updatePayload: [flashcardFieldName, subtitlesTrackId, fieldToClear || null],
-  },
-})
+  })
 
-export const goToSubtitlesChunk = (
-  subtitlesTrackId: SubtitlesTrackId,
-  chunkIndex: number
-): GoToSubtitlesChunk => ({
-  type: A.GO_TO_SUBTITLES_CHUNK,
-  subtitlesTrackId,
-  chunkIndex,
-})
+export const compositeSubtitlesActions = {
+  addSubtitlesTrack,
+  loadNewSubtitlesFile,
+  deleteSubtitlesTrackFromMedia,
+  linkFlashcardFieldToSubtitlesTrack,
+}
+
+// type X = MediaFile extends FileMetadata ? string : number

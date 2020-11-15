@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import { getHumanFileName } from '../utils/files'
 
 export const initialState: FileAvailabilitiesState = {
@@ -18,7 +18,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.OPEN_FILE_REQUEST: {
+    case A.openFileRequest: {
       const type = action.file.type
       const byType = state[type]
       const base = byType[action.file.id]
@@ -49,7 +49,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
     }
 
-    case A.OPEN_FILE_SUCCESS: {
+    case A.openFileSuccess: {
       const fileAvailability: FileAvailability = {
         type: action.validatedFile.type,
         id: action.validatedFile.id,
@@ -75,7 +75,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
     }
 
-    case A.OPEN_FILE_FAILURE: {
+    case A.openFileFailure: {
       const base = state[action.file.type][action.file.id]
       const newAvailability: KnownFile = base
         ? {
@@ -107,7 +107,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
     }
 
-    case A.ADD_FILE: {
+    case A.addFile: {
       const base = state[action.file.type][action.file.id]
       if (!action.path && base) return state
 
@@ -132,7 +132,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
         },
       }
     }
-    case A.LOCATE_FILE_SUCCESS: {
+    case A.locateFileSuccess: {
       const base = state[action.file.type][action.file.id]
       if (!base) return state // really shouldn't happen
 
@@ -150,7 +150,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       }
     }
 
-    case A.DELETE_FILE_SUCCESS: {
+    case A.deleteFileSuccess: {
       const newState = {} as typeof state
       for (const t in state) {
         const type = t as keyof typeof state
@@ -165,7 +165,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       return newState
     }
 
-    case A.COMMIT_FILE_DELETIONS: {
+    case A.commitFileDeletions: {
       const newState = { ...state }
 
       for (const t of 'fileType' in action
@@ -186,7 +186,7 @@ const fileAvailabilities: Reducer<FileAvailabilitiesState, Action> = (
       return newState
     }
 
-    case A.ABORT_FILE_DELETIONS: {
+    case A.abortFileDeletions: {
       const newState = {} as typeof state
 
       for (const t in state) {

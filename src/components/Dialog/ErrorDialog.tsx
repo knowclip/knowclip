@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
-import { closeDialog } from '../../actions'
 import { DialogProps } from './DialogProps'
 import css from './ErrorDialog.module.css'
+import { actions } from '../../actions'
 
 const ErrorDialog = ({
   open,
@@ -13,7 +13,7 @@ const ErrorDialog = ({
 
   const close = useCallback(
     (e) => {
-      dispatch(closeDialog())
+      dispatch(actions.closeDialog())
     },
     [dispatch]
   )

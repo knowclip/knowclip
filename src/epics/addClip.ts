@@ -8,7 +8,7 @@ import {
   flatMap,
 } from 'rxjs/operators'
 import { fromEvent, merge, of } from 'rxjs'
-import * as r from '../redux'
+import r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { uuid } from '../utils/sideEffects'

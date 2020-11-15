@@ -1,7 +1,7 @@
 import tempy from 'tempy'
 import { promises } from 'fs'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
-import * as r from '../redux'
+import r from '../redux'
 import { extname, basename, join } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'

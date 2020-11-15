@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 const initialState: SnackbarState = {
   queue: [],
@@ -10,7 +10,7 @@ const snackbar: Reducer<SnackbarState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.ENQUEUE_SNACKBAR:
+    case A.enqueueSnackbar:
       return state.queue.some(
         (snackbar) =>
           snackbar.type === action.snackbar.type &&
@@ -23,7 +23,7 @@ const snackbar: Reducer<SnackbarState, Action> = (
             queue: state.queue.concat(action.snackbar),
           }
 
-    case A.CLOSE_SNACKBAR: {
+    case A.closeSnackbar: {
       const [, ...queue] = state.queue
       return {
         ...state,

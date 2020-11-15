@@ -1,4 +1,4 @@
-import * as r from '../redux'
+import r from '../redux'
 import { toTimestamp } from '../utils/ffmpeg'
 import { extname, basename } from 'path'
 import { unparse } from 'papaparse'

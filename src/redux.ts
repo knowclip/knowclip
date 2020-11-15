@@ -1,4 +1,9 @@
+import { actions } from './actions'
+import * as selectors from './selectors'
+
 export * from './types/ActionType'
 
-export * from './selectors'
-export * from './actions'
+export default {
+  ...actions,
+  ...selectors
+}

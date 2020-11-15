@@ -1,21 +1,23 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
-export const dismissMedia = (): DismissMedia => ({ type: 'DISMISS_MEDIA' })
+export const sessionActions = {
+  dismissMedia: () => ({ type: A.dismissMedia }),
 
-export const toggleLoop = (reason: LoopReason): ToggleLoop => ({
-  type: A.TOGGLE_LOOP,
-  reason,
-})
+  toggleLoop: (reason: LoopReason) => ({
+    type: A.toggleLoop,
+    reason,
+  }),
 
-export const setLoop = (loop: LoopState): SetLoop => ({
-  type: A.SET_LOOP,
-  loop,
-})
+  setLoop: (loop: LoopState) => ({
+    type: A.setLoop,
+    loop,
+  }),
 
-export const playMedia = (): PlayMedia => ({ type: A.PLAY_MEDIA })
-export const pauseMedia = (): PauseMedia => ({ type: A.PAUSE_MEDIA })
+  playMedia: () => ({ type: A.playMedia }),
+  pauseMedia: () => ({ type: A.pauseMedia }),
 
-export const setViewMode = (viewMode: ViewMode): SetViewMode => ({
-  type: A.SET_VIEW_MODE,
-  viewMode,
-})
+  setViewMode: (viewMode: ViewMode) => ({
+    type: A.setViewMode,
+    viewMode,
+  }),
+}

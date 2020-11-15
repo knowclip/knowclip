@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import * as r from '../../redux'
+import r from '../../redux'
 import SimpleMessage from './SimpleMessage'
 import Prompt from './Prompt'
 

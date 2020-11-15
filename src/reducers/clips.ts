@@ -3,7 +3,7 @@ import newFlashcard from '../utils/newFlashcard'
 import { getNoteTypeFields } from '../utils/noteType'
 import { arrayToMapById } from '../utils/arrayToMapById'
 import { TransliterationFlashcardFields } from '../types/Project'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 const initialState: ClipsState = {
   byId: {},
@@ -46,10 +46,10 @@ const addIdstoIdsByMediaFileId = (
 
 const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case A.CLOSE_PROJECT:
+    case A.closeProject:
       return initialState
 
-    case A.OPEN_PROJECT: {
+    case A.openProject: {
       const newState: ClipsState = {
         byId: {},
         idsByMediaFileId: {},
@@ -72,8 +72,8 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.ADD_FILE:
-    case A.OPEN_FILE_REQUEST:
+    case A.addFile:
+    case A.openFileRequest:
       if (action.file.type === 'MediaFile')
         return state.idsByMediaFileId[action.file.id]
           ? state
@@ -86,7 +86,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
             }
       return state
 
-    case A.ADD_CLIP: {
+    case A.addClip: {
       const { clip, flashcard } = action
       const { fileId } = clip
       return {
@@ -110,7 +110,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.ADD_CLIPS: {
+    case A.addClips: {
       const { clips, flashcards, fileId } = action
       return {
         ...state,
@@ -133,12 +133,12 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.EDIT_CLIP: {
+    case A.editClip: {
       const { id, override, flashcardOverride } = action
       return editClip(state, id, override, flashcardOverride)
     }
 
-    case A.EDIT_CLIPS: {
+    case A.editClips: {
       let newState = state
       for (const { id, override, flashcardOverride } of action.edits) {
         const updated = editClip(newState, id, override, flashcardOverride)
@@ -147,7 +147,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.MERGE_CLIPS: {
+    case A.mergeClips: {
       const { ids } = action // should all have same filepath
       const { fileId } = state.byId[ids[0]]
       const [finalId, ...idsToBeDiscarded] = ids
@@ -229,7 +229,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.DELETE_CARD: {
+    case A.deleteCard: {
       const { id } = action
       const { fileId } = state.byId[id]
       const byId = { ...state.byId }
@@ -246,7 +246,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.DELETE_CARDS: {
+    case A.deleteCards: {
       const { ids } = action
       const byId = { ...state.byId }
       if (!ids.length) return state
@@ -267,7 +267,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.SET_FLASHCARD_FIELD: {
+    case A.setFlashcardField: {
       const { id, key, value, caretLocation } = action
       const card: Flashcard = state.flashcards[id]
       const editDifference = value.length - card.fields.transcription.length
@@ -298,7 +298,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.ADD_FLASHCARD_TAG: {
+    case A.addFlashcardTag: {
       const { id, text } = action
 
       return {
@@ -318,7 +318,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.DELETE_FLASHCARD_TAG: {
+    case A.deleteFlashcardTag: {
       const { id, index } = action
       const newTags = [...state.flashcards[id].tags]
       newTags.splice(index, 1)
@@ -336,7 +336,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
-    case A.DELETE_FILE_SUCCESS: {
+    case A.deleteFileSuccess: {
       if (action.file.type === 'MediaFile') {
         const clipIds = state.idsByMediaFileId[action.file.id] || []
 

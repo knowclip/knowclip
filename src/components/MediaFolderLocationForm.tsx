@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { TextField, Button } from '@material-ui/core'
-import * as r from '../redux'
+import r from '../redux'
 import css from './MediaFolderLocationForm.module.css'
 import { showOpenDirectoryDialog, openInBrowser } from '../utils/electron'
-import * as actions from '../actions'
+import { actions } from '../actions'
 
 const MediaFolderLocationForm = ({ onSubmit }: { onSubmit: () => void }) => {
   const dispatch = useDispatch()

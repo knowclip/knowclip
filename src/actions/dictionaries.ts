@@ -1,37 +1,36 @@
-import * as A from '../types/ActionType'
-import { updateFile } from './files'
+import A from '../types/ActionType'
+import { filesActions } from './files'
 
-export const importDictionaryRequest = (
-  dictionaryType: DictionaryFileType
-): ImportDictionaryRequest => ({
-  type: A.IMPORT_DICTIONARY_REQUEST,
-  dictionaryType,
-})
+export const dictionariesActions = {
+  importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
+    type: A.importDictionaryRequest,
+    dictionaryType,
+  }),
 
-export const startDictionaryImport = (
-  file: DictionaryFile,
-  filePath: FilePath
-): StartDictionaryImport => ({
-  type: A.START_DICTIONARY_IMPORT,
-  file,
-  filePath,
-})
+  startDictionaryImport: (file: DictionaryFile, filePath: FilePath) => ({
+    type: A.startDictionaryImport,
+    file,
+    filePath,
+  }),
 
-export const finishDictionaryImport = (id: FileId): UpdateFile =>
-  updateFile({
+  deleteImportedDictionary: (file: DictionaryFile) => ({
+    type: A.deleteImportedDictionary,
+    file,
+  }),
+
+  resetDictionariesDatabase: () => ({
+    type: A.resetDictionariesDatabase,
+  }),
+}
+
+const finishDictionaryImport = (id: FileId) =>
+  filesActions.updateFile({
     updateName: 'finishDictionaryImport',
     updatePayload: [],
     id,
     fileType: 'Dictionary',
   })
 
-export const deleteImportedDictionary = (
-  file: DictionaryFile
-): DeleteImportedDictionary => ({
-  type: A.DELETE_IMPORTED_DICTIONARY,
-  file,
-})
-
-export const resetDictionariesDatabase = (): ResetDictionariesDatabase => ({
-  type: A.RESET_DICTIONARIES_DATABASE,
-})
+export const compositeDictionariesActions = {
+  finishDictionaryImport,
+}

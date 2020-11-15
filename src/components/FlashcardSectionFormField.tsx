@@ -5,14 +5,14 @@ import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { flashcardSectionForm$, capitalize } from './FlashcardSectionForm'
 import cn from 'classnames'
-import * as r from '../redux'
+import { MediaSubtitles } from '../selectors/subtitles'
 
 type Props = {
   name: FlashcardFieldName
   mediaFileId: MediaFileId
   currentFlashcard: Flashcard
   setFlashcardText: (id: string, text: string, caretLocation: number) => void
-  subtitles: r.MediaSubtitles
+  subtitles: MediaSubtitles
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
   onKeyPress: () => void

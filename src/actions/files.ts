@@ -1,102 +1,87 @@
 import { nowUtcTimestamp } from '../utils/sideEffects'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import { FileUpdates } from '../files/updates'
 
-/** Add file to records without opening or doing anything with it */
-export const addFile = <F extends FileMetadata>(
-  file: F,
-  path?: string
-): AddFile => ({
-  type: A.ADD_FILE,
-  file,
-  path,
-})
+export const filesActions = {
+  /** Add file to records without opening or doing anything with it */
+  addFile: <F extends FileMetadata>(file: F, path?: string) => ({
+    type: A.addFile,
+    file,
+    path,
+  }),
 
-export const deleteFileRequest = (
-  fileType: FileMetadata['type'],
-  id: FileId
-): DeleteFileRequest => ({
-  type: A.DELETE_FILE_REQUEST,
-  fileType,
-  id,
-})
-export const deleteFileSuccess = (
-  file: FileAvailability,
-  descendants: Array<FileAvailability>
-): DeleteFileSuccess => ({
-  type: A.DELETE_FILE_SUCCESS,
-  file,
-  descendants,
-})
-/** Try to open a file, and add it to the state tree if it isn't there yet. */
-export const openFileRequest = (
-  file: FileMetadata,
-  filePath: FilePath | null = null
-): OpenFileRequest => ({
-  type: A.OPEN_FILE_REQUEST,
-  file,
-  filePath,
-})
-export const openFileSuccess = (
-  file: FileMetadata,
-  filePath: FilePath,
-  timestamp: string = nowUtcTimestamp()
-): OpenFileSuccess => ({
-  type: A.OPEN_FILE_SUCCESS,
-  validatedFile: file,
-  filePath,
-  timestamp,
-})
-export const openFileFailure = (
-  file: FileMetadata,
-  filePath: FilePath | null,
-  errorMessage: string | null
-): OpenFileFailure => ({
-  type: A.OPEN_FILE_FAILURE,
-  file,
-  filePath,
-  errorMessage,
-})
-export const locateFileRequest = (
-  file: FileMetadata,
-  message: string
-): LocateFileRequest => ({
-  type: A.LOCATE_FILE_REQUEST,
-  file,
-  message,
-})
-export const locateFileSuccess = (
-  file: FileMetadata,
-  filePath: FilePath
-): LocateFileSuccess => ({
-  type: A.LOCATE_FILE_SUCCESS,
-  file,
-  filePath,
-})
+  deleteFileRequest: (fileType: FileMetadata['type'], id: FileId) => ({
+    type: A.deleteFileRequest,
+    fileType,
+    id,
+  }),
+  deleteFileSuccess: (
+    file: FileAvailability,
+    descendants: Array<FileAvailability>
+  ) => ({
+    type: A.deleteFileSuccess,
+    file,
+    descendants,
+  }),
+  /** Try to open a file, and add it to the state tree if it isn't there yet. */
+  openFileRequest: (file: FileMetadata, filePath: FilePath | null = null) => ({
+    type: A.openFileRequest,
+    file,
+    filePath,
+  }),
+  openFileSuccess: (
+    file: FileMetadata,
+    filePath: FilePath,
+    timestamp: string = nowUtcTimestamp()
+  ) => ({
+    type: A.openFileSuccess,
+    validatedFile: file,
+    filePath,
+    timestamp,
+  }),
+  openFileFailure: (
+    file: FileMetadata,
+    filePath: FilePath | null,
+    errorMessage: string | null
+  ) => ({
+    type: A.openFileFailure,
+    file,
+    filePath,
+    errorMessage,
+  }),
+  /** Should only be dispatched with a stored file */
+  locateFileRequest: (
+    /** This file should exist in the state already */
+    file: FileMetadata,
+    message: string
+  ) => ({
+    type: A.locateFileRequest,
+    file,
+    message,
+  }),
+  locateFileSuccess: (file: FileMetadata, filePath: FilePath) => ({
+    type: A.locateFileSuccess,
+    file,
+    filePath,
+  }),
 
-export const commitFileDeletions = (
-  fileType?: FileMetadata['type']
-): CommitFileDeletions => ({
-  type: A.COMMIT_FILE_DELETIONS,
-  fileType,
-})
+  commitFileDeletions: (fileType?: FileMetadata['type']) => ({
+    type: A.commitFileDeletions,
+    fileType,
+  }),
 
-export const abortFileDeletions = (): AbortFileDeletions => ({
-  type: A.ABORT_FILE_DELETIONS,
-})
+  abortFileDeletions: () => ({
+    type: A.abortFileDeletions,
+  }),
 
-export const updateFile = <U extends keyof FileUpdates>(
-  update: FileUpdate<U>
-): UpdateFile => ({
-  type: A.UPDATE_FILE,
-  update,
-})
+  updateFile: <U extends keyof FileUpdates>(update: FileUpdate<U>) => ({
+    type: A.updateFile,
+    update: update as FileUpdate<any>,
+  }),
 
-export const preloadVideoStills = (
-  file: FileMetadata,
-  clipId: ClipId
-): PreloadVideoStills => ({
-  type: A.PRELOAD_VIDEO_STILLS,
-  clipId,
-  file,
-})
+  preloadVideoStills: (file: FileMetadata, clipId: ClipId) => ({
+    type: A.preloadVideoStills,
+    clipId,
+    file,
+  }),
+}

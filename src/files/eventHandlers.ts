@@ -1,9 +1,9 @@
 export type FileEventHandlers<F extends FileMetadata> = {
-  /** should eventually result in OPEN_FILE_SUCCESS or OPEN_FILE_FAILURE ? */
+  /** should eventually result in openFileSuccess or openFileFailure ? */
   openRequest: OpenFileRequestHandler<F>
   openSuccess: OpenFileSuccessHandler<F>[]
   openFailure?: OpenFileFailureHandler<F>
-  /** should eventually result in OPEN_FILE_SUCCESS or OPEN_FILE_FAILURE ? */
+  /** should eventually result in openFileSuccess or openFileFailure ? */
   locateRequest: LocateFileRequestHandler<F>
   locateSuccess: LocateFileSuccessHandler<F> | null
   deleteRequest: DeleteFileRequestHandler<F>[]

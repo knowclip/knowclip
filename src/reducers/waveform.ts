@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 const initialState: WaveformState = {
   stepsPerSecond: 25,
@@ -14,7 +14,7 @@ const waveform: Reducer<WaveformState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.SET_CURSOR_POSITION: {
+    case A.setCursorPosition: {
       return {
         ...state,
         cursor: {
@@ -25,13 +25,13 @@ const waveform: Reducer<WaveformState, Action> = (
       }
     }
 
-    case A.SET_WAVEFORM_VIEW_BOX:
+    case A.setWaveformViewBox:
       return {
         ...state,
         viewBox: action.viewBox,
       }
 
-    case A.OPEN_FILE_SUCCESS:
+    case A.openFileSuccess:
       return action.validatedFile.type === 'MediaFile'
         ? {
             ...state,
@@ -42,13 +42,13 @@ const waveform: Reducer<WaveformState, Action> = (
           }
         : state
 
-    case A.DISMISS_MEDIA:
+    case A.dismissMedia:
       return {
         ...state,
         length: 0,
       }
 
-    case A.OPEN_FILE_REQUEST:
+    case A.openFileRequest:
       return action.file.type === 'MediaFile'
         ? {
             ...state,

@@ -13,11 +13,13 @@ import {
   tap,
 } from 'rxjs/operators'
 import { of, Observable, defer } from 'rxjs'
-import * as r from '../redux'
-import * as A from '../types/ActionType'
+import r from '../redux'
+import A from '../types/ActionType'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
+import { SubtitlesFileWithTrack } from '../selectors'
+import { ActionOf } from '../actions'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -25,7 +27,7 @@ const makeClipsFromSubtitles: AppEpic = (
   { pauseMedia, setCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, MakeClipsFromSubtitles>(A.MAKE_CLIPS_FROM_SUBTITLES),
+    ofType<Action, MakeClipsFromSubtitles>(A.makeClipsFromSubtitles),
     flatMap<MakeClipsFromSubtitles, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags, includeStill }) => {
         const tracksValidation = validateTracks(
@@ -41,7 +43,7 @@ const makeClipsFromSubtitles: AppEpic = (
             r.simpleMessageSnackbar(
               'Please choose a subtitles track to make cards from before proceeding.'
             ),
-            r.subtitlesClipsDialogRequest()
+            r.showSubtitlesClipsDialogRequest()
           )
 
         if (tracksValidation.status === 'MISSING_FILE_RECORDS')
@@ -51,7 +53,7 @@ const makeClipsFromSubtitles: AppEpic = (
                 .map(({ label }) => label)
                 .join(', ')}`
             ),
-            r.subtitlesClipsDialogRequest(),
+            r.showSubtitlesClipsDialogRequest(),
           ])
 
         if (tracksValidation.status === 'MISSING_TRACKS') {
@@ -59,7 +61,7 @@ const makeClipsFromSubtitles: AppEpic = (
             tracksValidation.fieldNamesToFiles
           ) as [TransliterationFlashcardFieldName, SubtitlesFile][]
           const openMissingSubtitlesFailure = action$.pipe(
-            ofType<Action, OpenFileFailure>('OPEN_FILE_FAILURE'),
+            ofType<Action, OpenFileFailure>('openFileFailure'),
             filter(({ file }) =>
               missingTracks.some(([, t]) => t.id === file.id)
             ),
@@ -70,7 +72,7 @@ const makeClipsFromSubtitles: AppEpic = (
               of(r.openFileRequest(file)).pipe(
                 concat(
                   action$.pipe(
-                    ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
+                    ofType<Action, OpenFileSuccess>('openFileSuccess'),
                     filter((a) => areSameFile(file, a.validatedFile)),
                     take(1),
                     ignoreElements()
@@ -102,11 +104,12 @@ const makeClipsFromSubtitles: AppEpic = (
           ...Object.keys(fieldNamesToTrackIds).map((badTypefieldName) => {
             const fieldName = badTypefieldName as FlashcardFieldName
             const trackId = fieldNamesToTrackIds[fieldName] || null
-            return r.linkFlashcardFieldToSubtitlesTrack(
+            const action = r.linkFlashcardFieldToSubtitlesTrack(
               fieldName,
               currentFile.id,
               trackId
             )
+            return action
           }),
         ]).pipe(
           concat(
@@ -134,10 +137,10 @@ const makeClipsFromSubtitles: AppEpic = (
     )
   )
 
-const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
+const showSubtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ShowSubtitlesClipsDialogRequest>(
-      A.SHOW_SUBTITLES_CLIPS_DIALOG_REQUEST
+      A.showSubtitlesClipsDialogRequest
     ),
     map(() => {
       const tracks = r.getSubtitlesTracks(state$.value)
@@ -161,7 +164,7 @@ const subtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
 
 const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
   action$.pipe(
-    ofType<Action, GoToSubtitlesChunk>(A.GO_TO_SUBTITLES_CHUNK),
+    ofType<Action, GoToSubtitlesChunk>(A.goToSubtitlesChunk),
     tap(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
       if (!track) {
@@ -180,7 +183,7 @@ function validateTracks(
   fieldNamesToTrackIds: SubtitlesFlashcardFieldsLinks
 ):
   | { status: 'NO_LINKS_GIVEN' }
-  | { status: 'MISSING_FILE_RECORDS'; result: r.SubtitlesFileWithTrack[] }
+  | { status: 'MISSING_FILE_RECORDS'; result: SubtitlesFileWithTrack[] }
   | {
       status: 'MISSING_TRACKS'
       fieldNamesToFiles: {
@@ -206,7 +209,7 @@ function validateTracks(
     return { status: 'MISSING_FILE_RECORDS', result: missingFileRecords }
 
   const missingTracks = allMediaSubtitles.all.filter(
-    (s): s is r.SubtitlesFileWithTrack & { file: SubtitlesFile; track: null } =>
+    (s): s is SubtitlesFileWithTrack & { file: SubtitlesFile; track: null } =>
       !s.track
   )
 
@@ -300,6 +303,6 @@ function getClipsAndCardsFromSubtitles(
 
 export default combineEpics(
   makeClipsFromSubtitles,
-  subtitlesClipsDialogRequest,
+  showSubtitlesClipsDialogRequest,
   goToSubtitlesChunk
 )

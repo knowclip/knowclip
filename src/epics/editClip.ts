@@ -8,13 +8,13 @@ import {
   concat,
 } from 'rxjs/operators'
 import { empty, of } from 'rxjs'
-import * as actions from '../actions'
-import * as A from '../types/ActionType'
+import { actions } from '../actions'
+import A from '../types/ActionType'
 import { getClip, getCurrentMediaFile, getFile } from '../selectors'
 
 const remakeStill: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, EditClip>(A.EDIT_CLIP),
+    ofType<Action, EditClip>(A.editClip),
     flatMap(({ flashcardOverride, id }) => {
       const clip = getClip(state$.value, id) as Clip
       const mediaFile = getCurrentMediaFile(state$.value)
@@ -35,7 +35,7 @@ const remakeStill: AppEpic = (action$, state$) =>
             action$.pipe(
               filter(
                 (a) =>
-                  a.type === 'DELETE_FILE_SUCCESS' &&
+                  a.type === 'deleteFileSuccess' &&
                   a.file.id === still.id &&
                   a.file.type === still.type
               ),
@@ -52,7 +52,7 @@ const remakeStill: AppEpic = (action$, state$) =>
 
 const setDefaultClipSpecs: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, EditClip>(A.EDIT_CLIP),
+    ofType<Action, EditClip>(A.editClip),
     flatMap(({ flashcardOverride }) => {
       if (!flashcardOverride) return empty()
 

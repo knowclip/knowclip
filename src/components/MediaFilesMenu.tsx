@@ -16,8 +16,8 @@ import MediaFilesMenuItem from './MediaFilesMenuItem'
 import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
-import * as r from '../redux'
-import * as actions from '../actions'
+import r from '../redux'
+import { actions } from '../actions'
 import css from './MainHeader.module.css'
 import {
   startMovingCursor,

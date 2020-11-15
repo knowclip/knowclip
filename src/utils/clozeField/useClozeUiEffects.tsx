@@ -5,7 +5,7 @@ import React, {
   useState,
 } from 'react'
 import { getSelectionWithin, setSelectionRange } from './domSelection'
-import * as r from '../../redux'
+import r from '../../redux'
 import { KEYS } from '../keyboard'
 import { ClozeControls } from './useClozeControls'
 

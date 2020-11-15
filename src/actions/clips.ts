@@ -1,72 +1,111 @@
 import { DeepPartial } from 'redux'
 import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
-export const addClip = (
-  clip: Clip,
-  flashcard: Flashcard,
-  startEditing: boolean = false
-): AddClip => ({
-  type: A.ADD_CLIP,
-  clip,
-  flashcard,
-  startEditing,
-})
+export const clipsActions = {
+  addClip: (
+    clip: Clip,
+    flashcard: Flashcard,
+    startEditing: boolean = false
+  ) => ({
+    type: A.addClip,
+    clip,
+    flashcard,
+    startEditing,
+  }),
 
-export const addClips = (
-  clips: Array<Clip>,
-  flashcards: Array<Flashcard>,
-  fileId: MediaFileId
-): ClipAction => ({
-  type: A.ADD_CLIPS,
-  clips,
-  flashcards,
-  fileId,
-})
+  addClips: (
+    clips: Array<Clip>,
+    flashcards: Array<Flashcard>,
+    fileId: MediaFileId
+  ) => ({
+    type: A.addClips,
+    clips,
+    flashcards,
+    fileId,
+  }),
 
-export const selectWaveformItem = (
-  selection: WaveformSelection
-): SelectWaveformItem => ({
-  type: A.SELECT_WAVEFORM_ITEM,
-  selection,
-})
+  selectWaveformItem: (selection: WaveformSelection | null) => ({
+    type: A.selectWaveformItem,
+    selection,
+  }),
 
-export const clearWaveformSelection = (): SelectWaveformItem => ({
-  type: A.SELECT_WAVEFORM_ITEM,
-  selection: null,
-})
+  highlightLeftClipRequest: () => ({
+    type: A.highlightLeftClipRequest,
+  }),
 
-export const highlightLeftClipRequest = (): HighlightLeftClipRequest => ({
-  type: A.HIGHLIGHT_LEFT_CLIP_REQUEST,
-})
+  highlightRightClipRequest: () => ({
+    type: A.highlightRightClipRequest,
+  }),
 
-export const highlightRightClipRequest = (): HighlightRightClipRequest => ({
-  type: A.HIGHLIGHT_RIGHT_CLIP_REQUEST,
-})
-
-export const editClip = (
-  id: ClipId,
-  override: DeepPartial<Clip> | null,
-  flashcardOverride: DeepPartial<Flashcard> | null
-): EditClip => ({
-  type: A.EDIT_CLIP,
-  id,
-  override,
-  flashcardOverride,
-})
-
-export const editClips = (
-  edits: {
-    id: ClipId
-    override: DeepPartial<Clip> | null
+  editClip: (
+    id: ClipId,
+    override: DeepPartial<Clip> | null,
     flashcardOverride: DeepPartial<Flashcard> | null
-  }[]
-): EditClips => ({
-  type: A.EDIT_CLIPS,
-  edits,
-})
+  ) => ({
+    type: A.editClip,
+    id,
+    override,
+    flashcardOverride,
+  }),
 
-export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
+  editClips: (
+    edits: {
+      id: ClipId
+      override: DeepPartial<Clip> | null
+      flashcardOverride: DeepPartial<Flashcard> | null
+    }[]
+  ) => ({
+    type: A.editClips,
+    edits,
+  }),
+
+  mergeClips: (ids: Array<ClipId>, newSelection: WaveformSelection) => ({
+    type: A.mergeClips,
+    ids,
+    newSelection,
+  }),
+
+  setFlashcardField: (
+    id: ClipId,
+    key: FlashcardFieldName,
+    value: string,
+    caretLocation: number
+  ) => ({
+    type: A.setFlashcardField,
+    id,
+    key,
+    value,
+    caretLocation,
+  }),
+
+  addFlashcardTag: (id: ClipId, text: string) => ({
+    type: A.addFlashcardTag,
+    id,
+    text,
+  }),
+
+  deleteFlashcardTag: (id: ClipId, index: number, tag: string) => ({
+    type: A.deleteFlashcardTag,
+    id,
+    index,
+    tag,
+  }),
+
+  deleteCard: (id: ClipId) => ({
+    type: A.deleteCard,
+    id,
+  }),
+
+  deleteCards: (ids: Array<ClipId>) => ({
+    type: A.deleteCards,
+    ids,
+  }),
+}
+
+const clearWaveformSelection = () => clipsActions.selectWaveformItem(null)
+
+const addFlashcardImage = (id: ClipId, seconds?: number) => {
   const image: FlashcardImage = seconds
     ? {
         id,
@@ -74,78 +113,20 @@ export const addFlashcardImage = (id: ClipId, seconds?: number): EditClip => {
         seconds,
       }
     : { id, type: 'VideoStillImage' }
-  return {
-    type: A.EDIT_CLIP,
-    id,
-    override: null,
-    flashcardOverride: {
-      image,
-    },
-  }
+  return clipsActions.editClip(id, null, {
+    image,
+  })
 }
 
-export const removeFlashcardImage = (id: ClipId): EditClip => ({
-  type: A.EDIT_CLIP,
-  id,
-  flashcardOverride: { image: null },
-  override: null,
-})
+const removeFlashcardImage = (id: ClipId) =>
+  clipsActions.editClip(id, null, { image: null })
 
-export const mergeClips = (
-  ids: Array<ClipId>,
-  newSelection: WaveformSelection
-): ClipAction => ({
-  type: A.MERGE_CLIPS,
-  ids,
-  newSelection,
-})
-
-export const setFlashcardField = (
-  id: ClipId,
-  key: FlashcardFieldName,
-  value: string,
-  caretLocation: number
-): SetFlashcardField => ({
-  type: A.SET_FLASHCARD_FIELD,
-  id,
-  key,
-  value,
-  caretLocation,
-})
-
-export const addFlashcardTag = (id: ClipId, text: string): Action => ({
-  type: A.ADD_FLASHCARD_TAG,
-  id,
-  text,
-})
-
-export const deleteFlashcardTag = (
-  id: ClipId,
-  index: number,
-  tag: string
-): Action => ({
-  type: A.DELETE_FLASHCARD_TAG,
-  id,
-  index,
-  tag,
-})
-
-export const deleteCard = (id: ClipId): Action => ({
-  type: A.DELETE_CARD,
-  id,
-})
-
-export const deleteCards = (ids: Array<ClipId>): DeleteCards => ({
-  type: A.DELETE_CARDS,
-  ids,
-})
-
-export const addClozeDeletion = (
+const addClozeDeletion = (
   id: ClipId,
   currentCloze: ClozeDeletion[],
   deletion: ClozeDeletion
-): EditClip =>
-  editClip(id, null, {
+) =>
+  clipsActions.editClip(id, null, {
     cloze: trimClozeRangeOverlaps(
       currentCloze,
       deletion,
@@ -153,21 +134,30 @@ export const addClozeDeletion = (
     ).filter(({ ranges }) => ranges.length),
   })
 
-export const editClozeDeletion = (
+const editClozeDeletion = (
   id: ClipId,
   currentCloze: ClozeDeletion[],
   clozeIndex: number,
   ranges: ClozeDeletion['ranges']
-): EditClip =>
-  editClip(id, null, {
+) =>
+  clipsActions.editClip(id, null, {
     cloze: trimClozeRangeOverlaps(currentCloze, { ranges }, clozeIndex),
   })
 
-export const removeClozeDeletion = (
+const removeClozeDeletion = (
   id: ClipId,
   currentCloze: ClozeDeletion[],
   clozeIndex: number
-): EditClip =>
-  editClip(id, null, {
+) =>
+  clipsActions.editClip(id, null, {
     cloze: currentCloze.filter((c, i) => i !== clozeIndex),
   })
+
+export const compositeClipsActions = {
+  clearWaveformSelection,
+  addFlashcardImage,
+  removeFlashcardImage,
+  addClozeDeletion,
+  editClozeDeletion,
+  removeClozeDeletion,
+}

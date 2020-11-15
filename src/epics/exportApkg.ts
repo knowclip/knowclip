@@ -16,19 +16,19 @@ import {
 } from 'rxjs/operators'
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
 import { of, empty, defer, from } from 'rxjs'
-import * as r from '../redux'
+import r from '../redux'
 import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
 import sql from 'better-sqlite3'
 import { getApkgExportData } from '../utils/prepareExport'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, ExportApkgFailure>(A.EXPORT_APKG_FAILURE),
+    ofType<Action, ExportApkgFailure>(A.exportApkgFailure),
     tap(() => (document.body.style.cursor = 'default')),
     flatMap(({ errorMessage }) =>
       errorMessage
@@ -42,14 +42,14 @@ const exportApkgFailure: AppEpic = (action$) =>
   )
 const exportApkgSuccess: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, ExportApkgSuccess>(A.EXPORT_APKG_SUCCESS),
+    ofType<Action, ExportApkgSuccess>(A.exportApkgSuccess),
     tap(() => (document.body.style.cursor = 'default')),
     map(({ successMessage }) => r.simpleMessageSnackbar(successMessage))
   )
 
 const exportApkg: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ExportApkgRequest>(A.EXPORT_APKG_REQUEST),
+    ofType<Action, ExportApkgRequest>(A.exportApkgRequest),
     switchMap((exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
       const directory = tempy.directory()
@@ -190,7 +190,7 @@ function getMissingMedia(
 ) {
   const missingMediaFileIds = missingMediaFiles.map((file) => file.id)
   const openMissingMediaFailure = action$.pipe(
-    ofType<Action, OpenFileFailure>('OPEN_FILE_FAILURE'),
+    ofType<Action, OpenFileFailure>('openFileFailure'),
     filter(
       (a) =>
         a.file.type === 'MediaFile' && missingMediaFileIds.includes(a.file.id)
@@ -202,7 +202,7 @@ function getMissingMedia(
       of(r.openFileRequest(file)).pipe(
         concat(
           action$.pipe(
-            ofType<Action, OpenFileSuccess>('OPEN_FILE_SUCCESS'),
+            ofType<Action, OpenFileSuccess>('openFileSuccess'),
             filter((a) => areSameFile(file, a.validatedFile)),
             take(1),
             ignoreElements()

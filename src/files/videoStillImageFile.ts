@@ -1,4 +1,4 @@
-import * as r from '../redux'
+import r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 import { getMidpoint } from '../utils/getVideoStill'
 

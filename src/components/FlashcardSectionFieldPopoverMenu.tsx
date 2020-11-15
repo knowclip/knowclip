@@ -10,7 +10,7 @@ import { MoreVert } from '@material-ui/icons'
 import { useDispatch, useSelector } from 'react-redux'
 import cn from 'classnames'
 import usePopover from '../utils/usePopover'
-import * as actions from '../actions'
+import { actions } from '../actions'
 import css from './FlashcardSection.module.css'
 import { getSubtitlesFilesWithTracks } from '../selectors'
 

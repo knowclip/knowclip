@@ -1,14 +1,17 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import { catchError, mergeAll, flatMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
-import * as r from '../redux'
+import r from '../redux'
 import { readMediaFile } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
+import { ActionOf } from '../actions'
 
 const addMediaToProject: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, AddMediaToProjectRequest>(A.ADD_MEDIA_TO_PROJECT_REQUEST),
-    flatMap<AddMediaToProjectRequest, Promise<Array<Action>>>(
+    ofType<Action, ActionOf<'addMediaToProjectRequest'>>(
+      A.addMediaToProjectRequest
+    ),
+    flatMap<ActionOf<'addMediaToProjectRequest'>, Promise<Array<Action>>>(
       ({ projectId, filePaths }) =>
         Promise.all(
           filePaths.map(async (filePath) => {

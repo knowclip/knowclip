@@ -15,8 +15,8 @@ import {
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { basename, join, dirname } from 'path'
 import electron from 'electron'
-import * as r from '../redux'
-import * as actions from '../actions'
+import r from '../redux'
+import { actions } from '../actions'
 import css from './ProjectsMenu.module.css'
 import mainCss from './Main.module.css'
 import { showOpenDialog } from '../utils/electron'
@@ -44,7 +44,7 @@ const ProjectMenuItem = ({
     [dispatch, availability.id]
   )
   const openProjectById = useCallback(
-    () => dispatch(actions.openProjectById(availability.id)),
+    () => dispatch(actions.openProjectRequestById(availability.id)),
     [dispatch, availability.id]
   )
 
@@ -115,7 +115,7 @@ const ProjectsMenu = () => {
     ])
 
     if (filePaths) {
-      dispatch(actions.openProjectByFilePath(filePaths[0]))
+      dispatch(actions.openProjectRequestByFilePath(filePaths[0]))
     }
   }, [dispatch])
 

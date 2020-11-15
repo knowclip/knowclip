@@ -1,8 +1,8 @@
 import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 import { empty, of, merge } from 'rxjs'
-import * as A from '../types/ActionType'
-import * as r from '../redux'
+import A from '../types/ActionType'
+import r from '../redux'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -11,7 +11,7 @@ const elementWidth = (element: Element) => {
 
 const selectClipOnStretch: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, EditClip>(A.EDIT_CLIP),
+    ofType<Action, EditClip>(A.editClip),
     filter(({ override }) => {
       const isStretch =
         override && (override.start !== undefined || override.end !== undefined)
@@ -33,14 +33,14 @@ const centerSelectedClip: AppEpic = (
 ) =>
   merge(
     action$.pipe(
-      ofType<Action, SelectWaveformItem>(A.SELECT_WAVEFORM_ITEM),
+      ofType<Action, SelectWaveformItem>(A.selectWaveformItem),
       switchMap(() => {
         const selection = r.getWaveformSelection(state$.value)
         const clip = selection && selection.item
         return clip && (window as any).seeking ? of(clip) : empty()
       })
     ),
-    action$.ofType<EditClip>(A.EDIT_CLIP).pipe(
+    action$.ofType<EditClip>(A.editClip).pipe(
       switchMap((action) => {
         if (
           action.override &&
@@ -53,7 +53,7 @@ const centerSelectedClip: AppEpic = (
         return empty()
       })
     ),
-    action$.ofType<MergeClips>(A.MERGE_CLIPS).pipe(
+    action$.ofType<MergeClips>(A.mergeClips).pipe(
       switchMap((action) => {
         if (action.newSelection && action.newSelection.type === 'Clip') {
           const clip = r.getClip(state$.value, action.newSelection.id)
@@ -101,7 +101,7 @@ const centerSelectedClip: AppEpic = (
 
 const deselectOnOpenMediaFile: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, OpenFileRequest>(A.OPEN_FILE_REQUEST),
+    ofType<Action, OpenFileRequest>(A.openFileRequest),
     filter(({ file }) => file.type === 'MediaFile'),
     map(() => r.clearWaveformSelection())
   )
@@ -112,7 +112,7 @@ const highlightRightEpic: AppEpic = (
   { getCurrentTime, setCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, HighlightRightClipRequest>(A.HIGHLIGHT_RIGHT_CLIP_REQUEST),
+    ofType<Action, HighlightRightClipRequest>(A.highlightRightClipRequest),
     switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
@@ -167,7 +167,7 @@ const highlightLeftEpic: AppEpic = (
   { getCurrentTime, setCurrentTime }
 ) =>
   action$.pipe(
-    ofType<Action, HighlightLeftClipRequest>(A.HIGHLIGHT_LEFT_CLIP_REQUEST),
+    ofType<Action, HighlightLeftClipRequest>(A.highlightLeftClipRequest),
     switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)

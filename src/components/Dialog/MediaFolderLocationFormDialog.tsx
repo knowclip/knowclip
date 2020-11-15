@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { Dialog, DialogContent } from '@material-ui/core'
 import MediaFolderLocationForm from '../MediaFolderLocationForm'
 import { DialogProps } from './DialogProps'
-import { closeDialog } from '../../actions'
+import { actions } from '../../actions'
 
 const MediaFolderLocationFormDialog = ({
   open,
@@ -12,7 +12,7 @@ const MediaFolderLocationFormDialog = ({
   const dispatch = useDispatch()
   const dispatchAction = useCallback(() => {
     action && dispatch(action)
-    dispatch(closeDialog())
+    dispatch(actions.closeDialog())
   }, [dispatch, action])
 
   return (

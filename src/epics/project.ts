@@ -6,19 +6,20 @@ import {
   switchMap,
   catchError,
 } from 'rxjs/operators'
-import { of, from, empty } from 'rxjs'
+import { of, from, EMPTY } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
-import * as A from '../types/ActionType'
-import * as r from '../redux'
+import A from '../types/ActionType'
+import r from '../redux'
 import { promisify } from 'util'
 import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import './setYamlOptions'
+import { getUpdateWith } from '../files/updates'
 
 const writeFile = promisify(fs.writeFile)
 
 const createProject: AppEpic = (action$, state$) =>
-  action$.ofType<CreateProject>(A.CREATE_PROJECT).pipe(
+  action$.ofType<CreateProject>(A.createProject).pipe(
     switchMap(({ project, filePath }) => {
       return from(
         writeFile(filePath, r.getProjectFileContents(state$.value, project))
@@ -42,7 +43,7 @@ const createProject: AppEpic = (action$, state$) =>
 
 const openProjectById: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, OpenProjectRequestById>(A.OPEN_PROJECT_REQUEST_BY_ID),
+    ofType<Action, OpenProjectRequestById>(A.openProjectRequestById),
     map(({ id }) => {
       const project = r.getFileAvailabilityById<ProjectFile>(
         state$.value,
@@ -63,14 +64,14 @@ const openProjectById: AppEpic = (action$, state$) =>
             )
           : r.simpleMessageSnackbar(`Could not open project.`)
       }
-      return r.openProjectByFilePath(project.filePath)
+      return r.openProjectRequestByFilePath(project.filePath)
     })
   )
 
 const openProjectByFilePath: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestByFilePath>(
-      A.OPEN_PROJECT_REQUEST_BY_FILE_PATH
+      A.openProjectRequestByFilePath
     ),
     switchMap(({ filePath }) =>
       from(parseProjectJson(filePath)).pipe(
@@ -92,7 +93,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
 
 const saveProject: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, SaveProjectRequest>(A.SAVE_PROJECT_REQUEST),
+    ofType<Action, SaveProjectRequest>(A.saveProjectRequest),
     filter(() => {
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
@@ -142,18 +143,18 @@ const saveProject: AppEpic = (action$, state$) =>
     mergeAll()
   )
 
-const PROJECT_EDIT_ACTIONS = new Set([
-  A.DELETE_CARD,
-  A.MAKE_CLIPS_FROM_SUBTITLES,
-  A.DELETE_CARDS,
-  A.SET_FLASHCARD_FIELD,
-  A.ADD_FLASHCARD_TAG,
-  A.DELETE_FLASHCARD_TAG,
-  A.EDIT_CLIP,
-  A.ADD_CLIP,
-  A.ADD_CLIPS,
-  A.MERGE_CLIPS,
-  A.ADD_MEDIA_TO_PROJECT_REQUEST,
+const PROJECT_EDIT_ACTIONS = new Set<Action['type']>([
+  A.deleteCard,
+  A.makeClipsFromSubtitles,
+  A.deleteCards,
+  A.setFlashcardField,
+  A.addFlashcardTag,
+  A.deleteFlashcardTag,
+  A.editClip,
+  A.addClip,
+  A.addClips,
+  A.mergeClips,
+  A.addMediaToProjectRequest,
 ])
 const PROJECT_EDIT_UPDATE_FILE_ACTIONS: Set<keyof FileUpdates> = new Set([
   'deleteProjectMedia',
@@ -166,7 +167,7 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
     filter((action) => {
       return (
         (PROJECT_EDIT_ACTIONS.has(action.type) ||
-          (action.type === A.UPDATE_FILE &&
+          (action.type === A.updateFile &&
             PROJECT_EDIT_UPDATE_FILE_ACTIONS.has(action.update.updateName))) &&
         Boolean(r.getCurrentProjectId(state$.value))
       )
@@ -176,26 +177,22 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
 
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
-    filter(
-      (action): action is UpdateFileWith<'deleteProjectMedia'> =>
-        action.type === A.UPDATE_FILE &&
-        action.update.updateName === 'deleteProjectMedia'
-    ),
-    flatMap(
-      ({
-        update: {
-          updatePayload: [mediaFileId],
-        },
-      }) => {
-        const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
-        return file ? of(r.deleteFileRequest(file.type, file.id)) : empty()
-      }
-    )
+    flatMap((action) => {
+      if (action.type !== 'updateFile') return EMPTY
+      const update = getUpdateWith(action.update, 'deleteProjectMedia')
+      if (!update) return EMPTY
+
+      const {
+        updatePayload: [mediaFileId],
+      } = update
+      const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
+      return file ? of(r.deleteFileRequest(file.type, file.id)) : EMPTY
+    })
   )
 
 const closeProjectRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.CLOSE_PROJECT_REQUEST),
+    ofType(A.closeProjectRequest),
     map(() => {
       if (r.isWorkUnsaved(state$.value))
         return r.confirmationDialog(

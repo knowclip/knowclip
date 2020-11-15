@@ -8,8 +8,8 @@ import {
   Delete as DeleteIcon,
 } from '@material-ui/icons'
 import { useDispatch, useSelector } from 'react-redux'
-import * as r from '../redux'
-import * as actions from '../actions'
+import r from '../redux'
+import { actions } from '../actions'
 import {
   IconButton,
   Icon,
@@ -69,7 +69,7 @@ const SubtitlesMenu = () => {
   )
   const subtitlesClipsDialogRequest = useCallback(
     (e) => {
-      dispatch(actions.subtitlesClipsDialogRequest())
+      dispatch(actions.showSubtitlesClipsDialogRequest())
       close(e)
     },
     [dispatch, close]

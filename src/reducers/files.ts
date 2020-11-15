@@ -1,6 +1,6 @@
 import { Reducer } from 'redux'
 import { fileUpdates } from '../files/updates'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 
 export const initialState: FilesState = {
   ProjectFile: {},
@@ -39,7 +39,7 @@ const edit = <T extends FileMetadata['type']>(
 
 const files: Reducer<FilesState, Action> = (state = initialState, action) => {
   switch (action.type) {
-    case A.OPEN_FILE_SUCCESS:
+    case A.openFileSuccess:
       return {
         ...state,
         [action.validatedFile.type]: {
@@ -47,8 +47,8 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
           [action.validatedFile.id]: action.validatedFile,
         },
       }
-    case A.ADD_FILE:
-    case A.OPEN_FILE_REQUEST: {
+    case A.addFile:
+    case A.openFileRequest: {
       const newState = {
         ...state,
         [action.file.type]: {
@@ -92,10 +92,10 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       return newState
     }
 
-    case A.UPDATE_FILE:
+    case A.updateFile:
       return updateFile(state, action.update, action)
 
-    case A.DELETE_FILE_SUCCESS: {
+    case A.deleteFileSuccess: {
       const newState = {} as typeof state
       for (const t in state) {
         const type = t as keyof typeof state

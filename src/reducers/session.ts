@@ -1,5 +1,5 @@
 import { Reducer } from 'redux'
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import deleteKey from '../utils/deleteKey'
 import { areSelectionsEqual } from '../utils/waveformSelection'
 
@@ -25,21 +25,21 @@ const session: Reducer<SessionState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case A.DELETE_CARD:
+    case A.deleteCard:
       return state.waveformSelection &&
         state.waveformSelection.type === 'Clip' &&
         action.id === state.waveformSelection.id
         ? { ...state, waveformSelection: null, loopMedia: false }
         : state
 
-    case A.DELETE_CARDS:
+    case A.deleteCards:
       return state.waveformSelection &&
         state.waveformSelection.type === 'Clip' &&
         action.ids.includes(state.waveformSelection.id)
         ? { ...state, waveformSelection: null, loopMedia: false }
         : state
 
-    case A.UPDATE_FILE: {
+    case A.updateFile: {
       const { update } = action as UpdateFileWith<any>
       const updateName: keyof FileUpdates = update.updateName
 
@@ -70,16 +70,16 @@ const session: Reducer<SessionState, Action> = (
       }
     }
 
-    case A.OPEN_PROJECT:
+    case A.openProject:
       return {
         ...state,
         currentProjectId: action.project.id,
       }
 
-    case A.CLOSE_PROJECT:
+    case A.closeProject:
       return initialState
 
-    case A.OPEN_FILE_REQUEST:
+    case A.openFileRequest:
       if (action.file.type === 'MediaFile')
         return {
           ...state,
@@ -88,26 +88,26 @@ const session: Reducer<SessionState, Action> = (
 
       return state
 
-    case A.ADD_CLIP:
+    case A.addClip:
       return {
         ...state,
         pendingClip: null,
         editingCards: action.startEditing,
       }
 
-    case A.SET_PENDING_CLIP:
+    case A.setPendingClip:
       return {
         ...state,
         pendingClip: action.clip,
       }
 
-    case A.CLEAR_PENDING_CLIP:
+    case A.clearPendingClip:
       return {
         ...state,
         pendingClip: null,
       }
 
-    case A.SELECT_WAVEFORM_ITEM: {
+    case A.selectWaveformItem: {
       let loopMedia: LoopState = state.loopMedia
       if (
         state.editingCards &&
@@ -126,25 +126,25 @@ const session: Reducer<SessionState, Action> = (
             loopMedia,
           }
     }
-    case A.SET_PENDING_STRETCH:
+    case A.setPendingStretch:
       return {
         ...state,
         pendingStretch: action.stretch,
       }
 
-    case A.CLEAR_PENDING_STRETCH:
+    case A.clearPendingStretch:
       return {
         ...state,
         pendingStretch: null,
       }
 
-    case A.MERGE_CLIPS:
+    case A.mergeClips:
       return {
         ...state,
         waveformSelection: action.newSelection,
       }
 
-    case A.SET_DEFAULT_CLIP_SPECS:
+    case A.setDefaultClipSpecs:
       return {
         ...state,
         defaultTags: action.tags || state.defaultTags,
@@ -154,13 +154,13 @@ const session: Reducer<SessionState, Action> = (
             : state.defaultIncludeStill,
       }
 
-    case A.SET_ALL_TAGS:
+    case A.setAllTags:
       return {
         ...state,
         tagsToClipIds: action.tagsToClipIds,
       }
 
-    case A.ADD_FLASHCARD_TAG: {
+    case A.addFlashcardTag: {
       const { text, id } = action
       const ids = state.tagsToClipIds[text] || []
 
@@ -175,7 +175,7 @@ const session: Reducer<SessionState, Action> = (
       }
     }
 
-    case A.DELETE_FLASHCARD_TAG: {
+    case A.deleteFlashcardTag: {
       const { tag } = action
       const newIds = (state.tagsToClipIds[tag] || []).filter(
         (id: String) => id !== action.id
@@ -193,19 +193,19 @@ const session: Reducer<SessionState, Action> = (
       }
     }
 
-    case A.SET_WORK_IS_UNSAVED:
+    case A.setWorkIsUnsaved:
       return {
         ...state,
         workIsUnsaved: action.workIsUnsaved,
       }
 
-    case A.TOGGLE_LOOP:
+    case A.toggleLoop:
       return {
         ...state,
         loopMedia: state.loopMedia ? false : action.reason,
       }
 
-    case A.SET_LOOP: {
+    case A.setLoop: {
       if (!action.loop || !state.loopMedia)
         return {
           ...state,
@@ -213,30 +213,30 @@ const session: Reducer<SessionState, Action> = (
         }
       return state
     }
-    case A.PLAY_MEDIA:
+    case A.playMedia:
       return { ...state, mediaIsPlaying: true }
-    case A.PAUSE_MEDIA:
+    case A.pauseMedia:
       return { ...state, mediaIsPlaying: false }
 
-    case A.SET_PROGRESS:
+    case A.setProgress:
       return {
         ...state,
         progress: action.progress,
       }
 
-    case A.DISMISS_MEDIA:
+    case A.dismissMedia:
       return { ...state, currentMediaFileId: null, waveformSelection: null }
 
-    case A.START_EDITING_CARDS:
+    case A.startEditingCards:
       return { ...state, editingCards: true, loopMedia: 'EDIT' }
 
-    case A.STOP_EDITING_CARDS:
+    case A.stopEditingCards:
       return { ...state, editingCards: false, loopMedia: false }
 
-    case A.OPEN_DICTIONARY_POPOVER:
+    case A.openDictionaryPopover:
       return { ...state, dictionaryPopoverIsOpen: true }
 
-    case A.CLOSE_DICTIONARY_POPOVER:
+    case A.closeDictionaryPopover:
       return { ...state, dictionaryPopoverIsOpen: false }
 
     default:

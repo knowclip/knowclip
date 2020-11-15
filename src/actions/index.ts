@@ -1,127 +1,186 @@
-import * as A from '../types/ActionType'
+import A from '../types/ActionType'
 import { WaveformSelectionExpanded } from '../selectors/cardPreview'
 
-export * from './clips'
-export * from './waveform'
-export * from './snackbar'
-export * from './dialog'
-export * from './projects'
-export * from './subtitles'
-export * from './files'
-export * from './dictionaries'
-export * from './session'
-export * from './settings'
+import { clipsActions, compositeClipsActions } from './clips'
+import { waveformActions } from './waveform'
+import { snackbarActions, compositeSnackbarActions } from './snackbar'
+import { dialogActions, compositeDialogActions } from './dialog'
+import { projectActions, compositeProjectActions } from './projects'
+import { subtitlesActions, compositeSubtitlesActions } from './subtitles'
+import { filesActions } from './files'
+import {
+  dictionariesActions,
+  compositeDictionariesActions,
+} from './dictionaries'
+import { sessionActions } from './session'
+import { settingsActions } from './settings'
 
-export const initializeApp = (): InitializeApp => ({
-  type: A.INITIALIZE_APP,
-})
+type ValueOf<T> = T[keyof T]
 
-export const quitApp = (): QuitApp => ({
-  type: A.QUIT_APP,
-})
+type ActionType = keyof typeof A
+export type ActionOf<T extends ActionType> = ReturnType<
+  typeof baseActions[T]
+> extends { type: T }
+  ? ReturnType<typeof baseActions[T]>
+  : never
+export type Action = ActionOf<ActionType>
 
-export const setCurrentFile = (index: number): SetCurrentFile => ({
-  type: A.SET_CURRENT_FILE,
-  index,
-})
+const appActions = {
+  initializeApp: () => ({
+    type: A.initializeApp,
+  }),
 
-export const exportApkgRequest = (
-  mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
-  mediaOpenPrior: MediaFile | null
-): ExportApkgRequest => ({
-  type: A.EXPORT_APKG_REQUEST,
-  mediaFileIdsToClipIds,
-  mediaOpenPrior,
-})
+  // [A['@@INIT']]: () => ({
+  //   type: A['@@INIT']
+  // }),
 
-export const exportApkgFailure = (errorMessage?: string): Action => ({
-  type: A.EXPORT_APKG_FAILURE,
-  errorMessage: errorMessage || null,
-})
+  setProjectError: (error: string | null) => ({
+    type: A.setProjectError,
+    error,
+  }),
 
-export const exportApkgSuccess = (successMessage: string): Action => ({
-  type: A.EXPORT_APKG_SUCCESS,
-  successMessage,
-})
+  quitApp: () => ({
+    type: A.quitApp,
+  }),
 
-export const exportCsv = (
-  mediaFileIdsToClipIds: Record<string, (string | undefined)[]>,
-  csvFilePath: string,
-  mediaFolderLocation: string,
-  rememberLocation: boolean
-): ExportCsv => ({
-  type: A.EXPORT_CSV,
-  mediaFileIdsToClipIds,
-  csvFilePath,
-  mediaFolderLocation,
-  rememberLocation,
-})
+  setCurrentFile: (index: number) => ({
+    type: A.setCurrentFile,
+    index,
+  }),
 
-export const exportMarkdown = (
-  mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
-): ExportMarkdown => ({
-  type: A.EXPORT_MARKDOWN,
-  mediaFileIdsToClipIds,
-})
+  exportApkgRequest: (
+    mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
+    mediaOpenPrior: MediaFile | null
+  ) => ({
+    type: A.exportApkgRequest,
+    mediaFileIdsToClipIds,
+    mediaOpenPrior,
+  }),
 
-export const detectSilenceRequest = (): Action => ({
-  type: A.DETECT_SILENCE_REQUEST,
-})
-export const detectSilence = (): Action => ({
-  type: A.DETECT_SILENCE,
-})
+  exportApkgFailure: (errorMessage?: string) => ({
+    type: A.exportApkgFailure,
+    errorMessage: errorMessage || null,
+  }),
 
-export const deleteAllCurrentFileClipsRequest = (): DeleteAllCurrentFileClipsRequest => ({
-  type: A.DELETE_ALL_CURRENT_FILE_CLIPS_REQUEST,
-})
+  exportApkgSuccess: (successMessage: string) => ({
+    type: A.exportApkgSuccess,
+    successMessage,
+  }),
 
-export const setAllTags = (tagsToClipIds: {
-  [tag: string]: Array<ClipId>
-}): SetAllTags => ({
-  type: A.SET_ALL_TAGS,
-  tagsToClipIds,
-})
+  exportCsv: (
+    mediaFileIdsToClipIds: Record<string, (string | undefined)[]>,
+    csvFilePath: string,
+    mediaFolderLocation: string,
+    rememberLocation: boolean
+  ) => ({
+    type: A.exportCsv,
+    mediaFileIdsToClipIds,
+    csvFilePath,
+    mediaFolderLocation,
+    rememberLocation,
+  }),
 
-export const setDefaultClipSpecs = ({
-  tags,
-  includeStill,
-}: {
-  tags?: string[]
-  includeStill?: boolean
-}): SetDefaultClipSpecs => ({
-  type: A.SET_DEFAULT_CLIP_SPECS,
-  tags,
-  includeStill,
-})
+  exportMarkdown: (
+    mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
+  ) => ({
+    type: A.exportMarkdown,
+    mediaFileIdsToClipIds,
+  }),
 
-export const setProgress = (progress: ProgressInfo | null): SetProgress => ({
-  type: A.SET_PROGRESS,
-  progress,
-})
+  detectSilenceRequest: () => ({
+    type: A.detectSilenceRequest,
+  }),
+  detectSilence: () => ({
+    type: A.detectSilence,
+  }),
 
-export const startEditingCards = (): StartEditingCards => ({
-  type: A.START_EDITING_CARDS,
-})
+  deleteAllCurrentFileClipsRequest: () => ({
+    type: A.deleteAllCurrentFileClipsRequest,
+  }),
 
-export const stopEditingCards = (): StopEditingCards => ({
-  type: A.STOP_EDITING_CARDS,
-})
+  setAllTags: (tagsToClipIds: { [tag: string]: Array<ClipId> }) => ({
+    type: A.setAllTags,
+    tagsToClipIds,
+  }),
 
-export const openDictionaryPopover = (): OpenDictionaryPopover => ({
-  type: A.OPEN_DICTIONARY_POPOVER,
-})
+  setDefaultClipSpecs: ({
+    tags,
+    includeStill,
+  }: {
+    tags?: string[]
+    includeStill?: boolean
+  }) => ({
+    type: A.setDefaultClipSpecs,
+    tags,
+    includeStill,
+  }),
 
-export const closeDictionaryPopover = (): CloseDictionaryPopover => ({
-  type: A.CLOSE_DICTIONARY_POPOVER,
-})
+  setProgress: (progress: ProgressInfo | null) => ({
+    type: A.setProgress,
+    progress,
+  }),
 
-export const newClipFromSubtitlesChunk = (
-  linkedSubtitlesChunkSelection: WaveformSelectionExpanded,
-  clozeDeletion?: ClozeDeletion,
-  startEditing: boolean = false
-): NewCardFromSubtitlesRequest => ({
-  type: A.NEW_CARD_FROM_SUBTITLES_REQUEST,
-  linkedSubtitlesChunkSelection,
-  clozeDeletion,
-  startEditing,
-})
+  startEditingCards: () => ({
+    type: A.startEditingCards,
+  }),
+
+  stopEditingCards: () => ({
+    type: A.stopEditingCards,
+  }),
+
+  openDictionaryPopover: () => ({
+    type: A.openDictionaryPopover,
+  }),
+
+  closeDictionaryPopover: () => ({
+    type: A.closeDictionaryPopover,
+  }),
+
+  newCardFromSubtitlesRequest: (
+    linkedSubtitlesChunkSelection: WaveformSelectionExpanded & {
+      type: 'Preview'
+    },
+    clozeDeletion?: ClozeDeletion,
+    startEditing: boolean = false
+  ) => ({
+    type: A.newCardFromSubtitlesRequest,
+    linkedSubtitlesChunkSelection,
+    clozeDeletion,
+    startEditing,
+  }),
+}
+
+const baseActions = {
+  ...appActions,
+  ...clipsActions,
+  ...waveformActions,
+  ...snackbarActions,
+  ...projectActions,
+  ...dialogActions,
+  ...subtitlesActions,
+  ...filesActions,
+  ...dictionariesActions,
+  ...sessionActions,
+  ...settingsActions,
+}
+const compositeActions = {
+  ...compositeClipsActions,
+  ...compositeSnackbarActions,
+  ...compositeDialogActions,
+  ...compositeProjectActions,
+  ...compositeSubtitlesActions,
+  ...compositeDictionariesActions,
+}
+
+export const actions = {
+  ...baseActions,
+  ...compositeActions,
+}
+
+type Actions = {
+  [T in ActionType]: (...args: any[]) => ActionOf<T>
+}
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+const _validateActions: Actions = actions
+/* eslint-enable @typescript-eslint/no-unused-vars */

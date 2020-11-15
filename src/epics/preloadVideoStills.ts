@@ -1,12 +1,12 @@
 import { switchMap } from 'rxjs/operators'
-import * as r from '../redux'
-import * as A from '../types/ActionType'
+import r from '../redux'
+import A from '../types/ActionType'
 import { ofType } from 'redux-observable'
 import { from } from 'rxjs'
 
 const preloadVideoStills: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, PreloadVideoStills>(A.PRELOAD_VIDEO_STILLS),
+    ofType<Action, PreloadVideoStills>(A.preloadVideoStills),
     switchMap(({ file: mediaFile, clipId }) => {
       const mediaClipIds = r.getClipIdsByMediaFileId(state$.value, mediaFile.id)
       const index = mediaClipIds.indexOf(clipId)
