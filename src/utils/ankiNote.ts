@@ -59,7 +59,7 @@ export async function processNoteMedia(
   if (imageResult && imageResult.errors)
     return {
       errors: [
-        `Could not make clip from ${sourceFilePath}`,
+        `Could not make still from ${sourceFilePath}`,
         ...imageResult.errors,
       ],
     }
