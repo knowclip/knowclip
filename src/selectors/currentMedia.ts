@@ -194,7 +194,10 @@ export const getCurrentFileClips = createSelector(
 export const getDisplayedCurrentFileClips = createSelector(
   getCurrentFileClips,
   (state) => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems((clip) => clip.start)
+  limitSelectorToDisplayedItems(
+    (clip) => clip.start,
+    (clip) => clip.end
+  )
 )
 
 export const getFlashcardIdBeforeCurrent = (state: AppState): ClipId | null => {

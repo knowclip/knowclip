@@ -156,7 +156,8 @@ export const getSubtitlesCardBases = createSelector(
 )
 
 const limitSubtitlesCardsBasesCardsToDisplayed = limitSelectorToDisplayedItems(
-  (cb: SubtitlesCardBase) => cb.start
+  (cb: SubtitlesCardBase) => cb.start,
+  (cb: SubtitlesCardBase) => cb.end
 )
 
 export const getDisplayedSubtitlesCardBases = createSelector(
