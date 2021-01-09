@@ -176,7 +176,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                   You haven't imported any dictionaries yet.
                 </ListItem>
               )}
-              {dictionaryFiles.map(({ file, availability }) => {
+              {dictionaryFiles.map(({ file }) => {
                 const activeDictionaries = settings.activeDictionaries || []
                 console.log({ activeDictionaries, settings })
                 const selected =
@@ -191,7 +191,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                       <Checkbox
                         checked={selected}
                         tabIndex={-1}
-                        onChange={(e) =>
+                        onChange={(_e) =>
                           dispatchLocal(
                             selected
                               ? actions.removeActiveDictionary(file.id)

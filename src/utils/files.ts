@@ -12,6 +12,7 @@ const fileFilters = {
         'wav',
         'ogg',
         'm4a',
+        'm4v',
         'mkv',
         'flac',
         'avi',

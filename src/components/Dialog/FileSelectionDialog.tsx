@@ -149,7 +149,7 @@ const useLocationForm = (
     setErrorText('')
   }, [])
   const onLocationTextFocus = useCallback(
-    async (e) => {
+    async (_e) => {
       const filePaths = await showOpenDialog(filters)
 
       if (!filePaths) return
@@ -160,7 +160,7 @@ const useLocationForm = (
     [fillInLocation, filters]
   )
   const handleSubmit = useCallback(
-    (e) => {
+    (_e) => {
       if (locationText) {
         const directory = dirname(locationText.trim())
         if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
@@ -188,7 +188,7 @@ const useLocationForm = (
     onLocationTextFocus,
     handleSubmit,
     toggleCheckFolderAutomatically: useCallback(
-      (e) => {
+      (_e) => {
         setCheckFolderAutomatically((checked) => !checked)
       },
       [setCheckFolderAutomatically]

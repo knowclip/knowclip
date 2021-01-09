@@ -3,7 +3,7 @@ import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { waveform$ } from '../../../components/Waveform'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 
-export default async function openSavedProject({ app, client }: TestSetup) {
+export default async function openSavedProject({ client }: TestSetup) {
   await client.clickElement_(projectsMenu$.recentProjectsListItem)
   await client.waitForText_(
     mediaFilesMenu$.openMediaFilesMenuButton,

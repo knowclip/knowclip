@@ -180,7 +180,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
     })
   )
 
-const deleteDatabaseEpic: AppEpic = (action$, state$, effects) =>
+const deleteDatabaseEpic: AppEpic = (action$, state$, _effects) =>
   action$.ofType(A.resetDictionariesDatabase).pipe(
     mergeMap(() => {
       return from(resetDictionariesDatabase()).pipe(

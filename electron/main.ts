@@ -1,12 +1,13 @@
 import { BrowserWindow , screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
-const { isPackaged } = app
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
 import { getStartUrl, WINDOW_START_DIMENSIONS } from './window'
 import { handleMessages } from '../src/messages'
+
+const { isPackaged } = app
 
 app.allowRendererProcessReuse = false
 

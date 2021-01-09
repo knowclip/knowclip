@@ -4,6 +4,8 @@ jobs:
     osx_image: xcode10.2
     language: node_js
     node_js: '12'
+    env:
+    - SPECTRON_LOG_FAILURES=true
     deploy: &deploy_base
       skip_cleanup: true
       provider: releases

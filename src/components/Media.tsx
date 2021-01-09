@@ -31,7 +31,6 @@ const setClicked = (c: boolean) => {
 }
 const Media = ({
   constantBitrateFilePath,
-  loop,
   metadata,
   subtitles,
   className,
@@ -39,24 +38,24 @@ const Media = ({
 }: MediaProps) => {
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
 
-  const seekOn = useCallback((e) => {
+  const seekOn = useCallback((_e) => {
     ;(window as any).seeking = true
   }, [])
-  const seekOff = useCallback((e) => {
+  const seekOff = useCallback((_e) => {
     ;(window as any).seeking = false
   }, [])
 
-  const setUpBlur = useCallback((e) => {
+  const setUpBlur = useCallback((_e) => {
     setClicked(true)
     if (mediaRef.current) mediaRef.current.blur()
   }, [])
-  const blur = useCallback((e) => {
+  const blur = useCallback((_e) => {
     if (mediaRef.current && clicked) {
       mediaRef.current.blur()
       // setClicked(false)
     }
   }, [])
-  const stopBlur = useCallback((e) => {
+  const stopBlur = useCallback((_e) => {
     if (mediaRef.current && clicked) {
       setClicked(false)
     }
@@ -182,7 +181,7 @@ function useSyncSubtitlesVisibility(
 
   useEffect(() => {
     function syncReduxTracksToDom(event: Event) {
-      Array.from(event.target as TextTrackList).forEach((domTrack, i) => {
+      Array.from(event.target as TextTrackList).forEach((domTrack) => {
         const track = subtitles.find((track) => track.id === domTrack.id)
         if (track && track.track && track.track.mode !== domTrack.mode)
           dispatch(

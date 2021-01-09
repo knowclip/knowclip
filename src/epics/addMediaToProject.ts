@@ -6,7 +6,7 @@ import { readMediaFile } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { ActionOf } from '../actions'
 
-const addMediaToProject: AppEpic = (action$, state$) =>
+const addMediaToProject: AppEpic = (action$, _state$) =>
   action$.pipe(
     ofType<Action, ActionOf<'addMediaToProjectRequest'>>(
       A.addMediaToProjectRequest

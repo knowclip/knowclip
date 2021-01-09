@@ -30,8 +30,8 @@ export const getTableName = (type: DictionaryFileType) => `${type}`
 const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
   file,
   availability,
-  descendants,
-  state,
+  _descendants,
+  _state,
   effects
 ) => {
   if (file) {
@@ -61,14 +61,14 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
 }
 const deleteSuccess: DeleteFileSuccessHandler = async (
   { file },
-  state,
-  effects
+  _state,
+  _effects
 ) => {
   return [r.commitFileDeletions(file.type)]
 }
 
 export const dictionaryActions: FileEventHandlers<DictionaryFile> = {
-  openRequest: async (file, filePath, state, effects) => {
+  openRequest: async (file, filePath, _state, _effects) => {
     if (file.importComplete) return [r.openFileSuccess(file, filePath)]
 
     return [
@@ -83,7 +83,7 @@ export const dictionaryActions: FileEventHandlers<DictionaryFile> = {
   },
   openSuccess: [],
 
-  locateRequest: async (file, availability, message, state, effects) => {
+  locateRequest: async (_file, _availability, _message, _state, _effects) => {
     return []
   },
 

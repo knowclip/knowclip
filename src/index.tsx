@@ -3,6 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import App from './components/App'
+
 import store from './store'
 import './index.css'
 import * as Sentry from '@sentry/electron'
@@ -23,12 +24,11 @@ window.addEventListener('error', e => {
   ReactDOM.render(<ErrorMessage reactError={e} />, errorRoot)
 })
 
-const render = (Component: typeof App.constructor) =>
-  ReactDOM.render(
+ReactDOM.render(
+  <React.StrictMode>
     <Provider store={store}>
-      <Component sentryDsn={sentryDsn} />
-    </Provider>,
-    document.getElementById('root')
-  )
-
-render(App)
+      <App sentryDsn={sentryDsn} />
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
+)

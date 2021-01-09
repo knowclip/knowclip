@@ -15,7 +15,7 @@ import {
   switchMap,
 } from 'rxjs/operators'
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
-import { of, empty, defer, from } from 'rxjs'
+import { of, empty, defer, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
@@ -23,6 +23,7 @@ import sql from 'better-sqlite3'
 import { getApkgExportData } from '../utils/prepareExport'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
+import { afterUpdates } from '../utils/afterUpdates'
 import A from '../types/ActionType'
 import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 
@@ -125,12 +126,13 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
             concatMap(() => {
               pkg.addDeck(deck)
               const tmpFilename = tempy.file()
-              return defer(() =>
-                pkg.writeToFile(outputFilePath, {
+              return defer(async () => {
+                await pkg.writeToFile(outputFilePath, {
                   db: sql(tmpFilename),
                   tmpFilename,
                 })
-              ).pipe(
+                return {}
+              }).pipe(
                 map(() =>
                   r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
                 ),

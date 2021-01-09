@@ -25,10 +25,6 @@ type ErrorsState = {
   mediaFolderLocation?: string
 }
 
-type Props = {
-  open: boolean
-}
-
 const CsvAndMp3ExportDialog = ({
   open,
   data: { mediaFileIdsToClipIds },
@@ -60,7 +56,7 @@ const CsvAndMp3ExportDialog = ({
   }, [setRememberLocation])
 
   const onSubmit = useCallback(
-    (e) => {
+    (_e) => {
       const { csvFilePath, mediaFolderLocation } = fields
       if (csvFilePath && mediaFolderLocation) {
         dispatch(actions.closeDialog())
@@ -86,7 +82,7 @@ const CsvAndMp3ExportDialog = ({
   )
 
   const onFocusMediaFolderLocation = useCallback(
-    async (e) => {
+    async (_e) => {
       const directoryPath = await showOpenDirectoryDialog()
       if (directoryPath) setField('mediaFolderLocation', directoryPath)
     },
@@ -94,7 +90,7 @@ const CsvAndMp3ExportDialog = ({
   )
 
   const onFocusCsvFilePath = useCallback(
-    async (e) => {
+    async (_e) => {
       const filePath = await showSaveDialog('Comma-separated values', ['csv'])
       if (filePath) setField('csvFilePath', filePath)
     },
@@ -166,7 +162,7 @@ const CsvAndMp3ExportDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={(e) => dispatch(actions.closeDialog)} color="primary">
+        <Button onClick={(_e) => dispatch(actions.closeDialog)} color="primary">
           Cancel
         </Button>
         <Button onClick={onSubmit} color="primary">

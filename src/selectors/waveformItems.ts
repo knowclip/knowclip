@@ -86,7 +86,10 @@ export const getWaveformItems = createSelector(
 export const getDisplayedWaveformItems = createSelector(
   getWaveformItems,
   (state: AppState) => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems((waveformItem) => waveformItem.item.start)
+  limitSelectorToDisplayedItems(
+    (waveformItem) => waveformItem.item.start,
+    (waveformItem) => waveformItem.item.end
+  )
 )
 
 export const getWaveformSelection = createSelector(

@@ -70,7 +70,8 @@ const FlashcardSection = ({
   )
   const dispatch = useDispatch()
 
-  const [autofocusFieldName, setAutofocusFieldName] = useState<
+  // TODO: restore autofocus
+  const [autofocusFieldName, _setAutofocusFieldName] = useState<
     TransliterationFlashcardFieldName
   >('transcription')
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare type Action = import('../actions').Action
 
 declare type SetCurrentFile = import('../actions').ActionOf<'setCurrentFile'>

@@ -14,7 +14,7 @@ import { updaterGetter } from './updaterGetter'
 const updater = updaterGetter<MediaFile>()
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
-  openRequest: async (file, filePath, state, effects) => {
+  openRequest: async (file, filePath, _state, effects) => {
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
@@ -56,7 +56,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     getWaveform,
     setDefaultClipSpecs,
   ],
-  locateRequest: async (file, availability, message, state, effects) => {
+  locateRequest: async (file, availability, message, state, _effects) => {
     const autoSearchDirectories = r.getAssetsDirectories(state)
 
     // works while fileavailability names can't be changed...
@@ -75,7 +75,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
   },
   locateSuccess: null,
   deleteRequest: [
-    async (file, availability, descendants, state) => [
+    async (_file, availability, descendants, _state) => [
       r.deleteFileSuccess(availability, descendants),
     ],
   ],
@@ -147,9 +147,9 @@ export const validateMediaFile = async (
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { subtitlesTracksStreamIndexes, id, subtitles },
-  filePath,
+  _filePath,
   state,
-  effects
+  _effects
 ) =>
   // TODO: clean up orphans?
   subtitlesTracksStreamIndexes.map((streamIndex) => {
@@ -184,10 +184,10 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   })
 
 const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { subtitles, name, id: mediaFileId },
-  filePath,
+  { subtitles, id: mediaFileId },
+  _filePath,
   state,
-  effects
+  _effects
 ) => {
   return await Promise.all([
     ...subtitles
@@ -240,18 +240,18 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
 }
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   validatedFile,
-  filePath,
-  state,
-  effects
+  _filePath,
+  _state,
+  _effects
 ) => {
   return [r.generateWaveformImages(getWaveformPngs(validatedFile))]
 }
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (
   validatedFile,
-  filePath,
+  _filePath,
   state,
-  effects
+  _effects
 ) => {
   if (validatedFile.format.toLowerCase().includes('mp3')) {
     const cbr = r.getFile(state, 'ConstantBitrateMp3', validatedFile.id)
@@ -271,9 +271,9 @@ const getCbr: OpenFileSuccessHandler<MediaFile> = async (
 
 const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
   validatedFile,
-  filePath,
+  _filePath,
   state,
-  effects
+  _effects
 ) => {
   const currentFileName = r.getCurrentFileName(state)
   const currentFileId = r.getCurrentFileId(state)
@@ -337,7 +337,7 @@ export const updates = {
       flashcardFieldsToSubtitlesTracks: Object.entries(
         file.flashcardFieldsToSubtitlesTracks
       )
-        .filter(([fieldName, givenTrackId]) => trackId !== givenTrackId)
+        .filter(([_fieldName, givenTrackId]) => trackId !== givenTrackId)
         .reduce((all, [fieldName, id]) => {
           all[fieldName as TransliterationFlashcardFieldName] = id
           return all
@@ -349,7 +349,7 @@ export const updates = {
       file: MediaFile,
       flashcardFieldName: FlashcardFieldName,
       subtitlesTrackId: SubtitlesTrackId | null,
-      fieldToClear: FlashcardFieldName | null
+      _fieldToClear: FlashcardFieldName | null // TODO: check if needed
     ) => {
       const flashcardFieldsToSubtitlesTracks = {
         ...file.flashcardFieldsToSubtitlesTracks,

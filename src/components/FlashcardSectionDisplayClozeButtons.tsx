@@ -26,7 +26,7 @@ const ClozeButtons = ({
   controls: ClozeControls
 }) => {
   const nextId = ClozeIds[deletions.length]
-  const buttons = deletions.map((cloze, index) => {
+  const buttons = deletions.map((_cloze, index) => {
     const clozeId = ClozeIds[index]
     return (
       <ClozeButton

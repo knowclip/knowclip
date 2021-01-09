@@ -12,14 +12,14 @@ import {
   concat,
   tap,
 } from 'rxjs/operators'
-import { of, Observable, defer } from 'rxjs'
+import { of, Observable } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
 import { SubtitlesFileWithTrack } from '../selectors'
-import { ActionOf } from '../actions'
+import { afterUpdates } from '../utils/afterUpdates'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -113,9 +113,10 @@ const makeClipsFromSubtitles: AppEpic = (
           }),
         ]).pipe(
           concat(
-            defer(() => {
+            afterUpdates(async () => {
               const clips: Clip[] = []
               const cards: Flashcard[] = []
+
               getClipsAndCardsFromSubtitles(
                 tracksValidation.cueTrackFieldName,
                 fieldNamesToTrackIds,
@@ -125,7 +126,6 @@ const makeClipsFromSubtitles: AppEpic = (
                 clips.push(clip)
                 cards.push(flashcard)
               })
-
               return from([
                 r.addClips(clips, cards, fileId),
                 r.highlightRightClipRequest(),

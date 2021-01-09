@@ -7,7 +7,7 @@ import {
   Button,
   Dialog,
 } from '@material-ui/core'
-import { theme } from './App'
+import { theme } from './theme'
 
 const ErrorMessage = ({ reactError }: { reactError: any }) => {
   console.log('crash:', { reactError })

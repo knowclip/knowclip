@@ -1,8 +1,5 @@
 import A from '../types/ActionType'
 import { filesActions } from './files'
-
-const updateFile = filesActions.updateFile
-
 export const projectActions = {
   createProject: (
     id: string,
@@ -87,7 +84,7 @@ function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
 }
 
 const setProjectName = (id: ProjectId, name: string) =>
-  updateFile(
+  filesActions.updateFile(
     update({
       id,
       fileType: 'ProjectFile',
@@ -99,7 +96,7 @@ const deleteMediaFromProject = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
 ) =>
-  updateFile({
+  filesActions.updateFile({
     fileType: 'ProjectFile',
     id: projectId,
     updateName: 'deleteProjectMedia',

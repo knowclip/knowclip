@@ -29,8 +29,6 @@ export async function lookUpYomichanJMDict(
     .distinct()
     .toArray()
 
-  console.log(allQueries.length + ' total results!')
-
   const tokensTranslations = potentialTokens.flatMap(({ tokens, index }) => {
     const translatedTokens = tokens.flatMap((token) => {
       const candidates = allQueries.flatMap((entry) => {

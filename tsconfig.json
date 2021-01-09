@@ -19,7 +19,8 @@
     "noEmit": true,
     "jsx": "react",
     "downlevelIteration": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src",

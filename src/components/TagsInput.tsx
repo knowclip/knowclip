@@ -25,7 +25,7 @@ const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
 
 const renderSuggestion: RenderSuggestion<string> = (
   suggestion,
-  { query, isHighlighted, ...other }
+  { isHighlighted, ...other }
 ) => (
   // prevent the click causing the input to be blurred
   <MenuItem
@@ -57,7 +57,7 @@ const TagsInput = ({
   const [suggestions, setSuggestions] = useState<string[]>([])
 
   const handletextFieldInputChange = useCallback(
-    (e, { newValue }) => setTextFieldInput(newValue),
+    (_e, { newValue }) => setTextFieldInput(newValue),
     [setTextFieldInput]
   )
 
@@ -150,26 +150,28 @@ const TagsInput = ({
         } as InputProps<string>
       }
       renderInputComponent={useCallback(
-        ({ value, onChange, chips, ref, ...other }) => (
-          <ChipInput
-            margin="dense"
-            label="Tags"
-            placeholder="Type your tag and press 'enter'"
-            className={cn(css.tagsField, $.container)}
-            fullWidth
-            onAdd={handleAddChip}
-            onDelete={handleDeleteChip}
-            dataSource={allTags}
-            newChipKeyCodes={[13, 9, 32] /* enter tab space */}
-            onUpdateInput={onChange}
-            value={chips}
-            clearInputValueOnChange
-            inputRef={ref}
-            chipRenderer={chipRenderer}
-            onFocus={onFocus}
-            blurBehavior="add"
-            {...other}
-          />
+        ({ onChange, chips, ref, ...other }) => (
+          <>
+            <ChipInput
+              margin="dense"
+              label="Tags"
+              placeholder="Type your tag and press 'enter'"
+              className={cn(css.tagsField, $.container)}
+              fullWidth
+              onAdd={handleAddChip}
+              onDelete={handleDeleteChip}
+              dataSource={allTags}
+              newChipKeyCodes={[13, 9, 32] /* enter tab space */}
+              onUpdateInput={onChange}
+              clearInputValueOnChange
+              inputRef={ref}
+              chipRenderer={chipRenderer}
+              onFocus={onFocus}
+              blurBehavior="add"
+              {...other}
+              value={chips}
+            />
+          </>
         ),
         [handleAddChip, handleDeleteChip, allTags, onFocus]
       )}

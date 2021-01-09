@@ -27,3 +27,5 @@ release-builds
 .vscode
 
 build-main
+
+.eslintcache

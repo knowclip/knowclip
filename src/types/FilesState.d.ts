@@ -14,8 +14,6 @@ declare type FilePath = string
 
 declare type ParentFileId = string
 
-declare type FilePath = string
-
 declare type FileMetadata =
   | ProjectFile
   | MediaFile

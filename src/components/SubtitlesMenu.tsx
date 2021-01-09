@@ -154,7 +154,6 @@ const VisibilityIcon = ({ visible }: { visible: boolean }) => (
 
 const EmbeddedTrackMenuItem = ({
   id,
-  file,
   track,
   title,
 }: {
@@ -305,7 +304,7 @@ const ExternalTrackMenuItem = ({
 function useToggleVisible(track: SubtitlesTrack | null, id: string) {
   const dispatch = useDispatch()
   return useCallback(
-    (e) => {
+    (_e) => {
       if (track)
         dispatch(
           track.mode === 'showing'

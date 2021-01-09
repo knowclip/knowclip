@@ -7,7 +7,6 @@ import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeFlashcardsWithSubtitles({
-  app,
   client,
 }: TestSetup) {
   await client.waitForText_(flashcardSection$.container, '3 / 4')

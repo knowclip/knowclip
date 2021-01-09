@@ -146,7 +146,7 @@ export function useClozeUiEffects(
   )
 
   const handleFocus = useCallback(
-    (e) => {
+    (_e) => {
       if (!dictionaryPopoverIsShowing) {
         if (ref.current) {
           const selection = getSelectionWithin(ref.current)
@@ -169,7 +169,7 @@ export function useClozeUiEffects(
     ]
   )
   const handleBlur = useCallback(
-    (e) => {
+    (_e) => {
       if (!dictionaryPopoverIsShowing) {
         setCursorPosition(null)
         if (!editing && loopState === 'FOCUS') dispatch(r.setLoop(false))

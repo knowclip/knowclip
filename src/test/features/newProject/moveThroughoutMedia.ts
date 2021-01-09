@@ -3,10 +3,9 @@ import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { waveform$ } from '../../../components/Waveform'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
-import { TestDriver } from '../../driver/TestDriver'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 
-export default async function moveThroughoutMedia({ app, client }: TestSetup) {
+export default async function moveThroughoutMedia({ client }: TestSetup) {
   const waveformClips = await client.elements_(waveform$.waveformClip)
   expect(
     await Promise.all(waveformClips.map((c) => c.isVisible()))

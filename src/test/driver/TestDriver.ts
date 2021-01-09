@@ -200,7 +200,7 @@ export class TestDriver {
     // await browser.deleteSession();
 
     const isRunningNow = () =>
-      new Promise((res, rej) => {
+      new Promise((res, _rej) => {
         try {
           isRunning('http://localhost:9515/status', (running: any) => {
             if (running) res(true)

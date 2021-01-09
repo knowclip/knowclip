@@ -7,7 +7,7 @@ export const setCursorX = (x: number) => {
   }
 }
 
-export const syncCursor = (increment: number) => {
+export const syncCursor = (_increment: number) => {
   const cursor: SVGLineElement | null = document.querySelector('.cursor')
   if (cursor) {
     const player = document.getElementById('mediaPlayer') as

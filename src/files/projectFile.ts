@@ -57,7 +57,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     }
   },
   openSuccess: [
-    async (validatedFile, filePath, state, effects) => {
+    async (_validatedFile, filePath, state, _effects) => {
       const parse = await parseProjectJson(filePath)
       if (parse.errors) throw new Error(parse.errors.join('; '))
 
@@ -150,25 +150,25 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     },
   ],
 
-  openFailure: async (file, filePath, errorMessage) => [
+  openFailure: async (_file, _filePath, errorMessage) => [
     r.errorDialog('Problem opening project file:', errorMessage || ''),
   ],
 
-  locateRequest: async (file, availability, state, effects) => [
+  locateRequest: async (file, _availability, _state, _effects) => [
     r.fileSelectionDialog(
       `Please locate this project file "${file.name}"`,
       file
     ),
   ],
 
-  locateSuccess: async (action, state) => [],
+  locateSuccess: async (_action, _state) => [],
   deleteRequest: [
-    async (file, availability, descendants, state) => [
+    async (_file, availability, descendants, _state) => [
       r.deleteFileSuccess(availability, descendants),
     ],
   ],
   deleteSuccess: [
-    async (action, state) => [
+    async (action, _state) => [
       r.commitFileDeletions('ProjectFile'),
       ...Array.from(
         new Set(action.descendants.map((a) => a.type))

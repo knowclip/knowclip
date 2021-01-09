@@ -29,7 +29,7 @@ const HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER = 100
 const centerSelectedClip: AppEpic = (
   action$,
   state$,
-  { getWaveformSvgElement, getCurrentTime }
+  { getWaveformSvgElement }
 ) =>
   merge(
     action$.pipe(

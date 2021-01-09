@@ -15,8 +15,6 @@ import {
 import { sessionActions } from './session'
 import { settingsActions } from './settings'
 
-type ValueOf<T> = T[keyof T]
-
 type ActionType = keyof typeof A
 export type ActionOf<T extends ActionType> = ReturnType<
   typeof baseActions[T]

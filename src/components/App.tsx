@@ -5,12 +5,10 @@ import Snackbar from './Snackbar'
 import Main from './Main'
 import Dialog from './Dialog'
 import ProjectsMenu from './ProjectsMenu'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import themeSpecs from '../themeSpecs'
-import { CssBaseline } from '@material-ui/core'
+import { MuiThemeProvider } from '@material-ui/core/styles'
 import ErrorMessage from './ErrorMessage'
-
-export const theme = createMuiTheme(themeSpecs)
+import { theme } from './theme'
+import { CssBaseline } from '@material-ui/core'
 
 class App extends Component<
   { sentryDsn: string },

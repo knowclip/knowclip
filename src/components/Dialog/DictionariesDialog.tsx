@@ -232,7 +232,7 @@ function DictionaryFileItem({
     onClickDelete,
   ])
   const handleChange = useCallback(
-    (e) => onChange(file.id, file.dictionaryType),
+    (_e) => onChange(file.id, file.dictionaryType),
     [onChange, file.id, file.dictionaryType]
   )
   return (
