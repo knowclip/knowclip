@@ -79,7 +79,11 @@ export default function spectronMocks<M extends ModuleLike>(
     })
 
     ipcRenderer.on(mockMessageName, (event, functionName, newReturnValue) => {
-      console.log(`Function ${functionName} mocked with: ${newReturnValue}`)
+      console.log(
+        `Function ${functionName} mocked with: ${JSON.stringify(
+          newReturnValue
+        )}`
+      )
       returnValues[functionName].push(deserializeReturnValue(newReturnValue))
       if (process.env.INTEGRATION_DEV)
         sendToMainProcess({

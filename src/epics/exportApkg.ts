@@ -126,12 +126,12 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
             concatMap(() => {
               pkg.addDeck(deck)
               const tmpFilename = tempy.file()
-              return afterUpdates(async () => {
+              return defer(async () => {
                 await pkg.writeToFile(outputFilePath, {
                   db: sql(tmpFilename),
                   tmpFilename,
                 })
-                return EMPTY
+                return {}
               }).pipe(
                 map(() =>
                   r.exportApkgSuccess('Flashcards made in ' + outputFilePath)

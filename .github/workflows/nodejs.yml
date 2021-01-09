@@ -22,6 +22,7 @@ jobs:
         yarn integration:win -t "shared project"
       env:
         REACT_APP_SPECTRON: true
+        SPECTRON_LOG_FAILURES: true
         APPVEYOR: true
   build:
     runs-on: ubuntu-latest
