@@ -3,8 +3,6 @@ import css from "../pages/index.module.css"
 import A from "./Link"
 import cn from "classnames"
 
-import packageJson from "../../package.json"
-
 const WINDOWS = "win"
 const MAC = "mac"
 const LINUX = "linux"
@@ -15,14 +13,16 @@ const getOs = ({ userAgent }: Navigator) => {
   return WINDOWS
 }
 
+const LATEST_VERSION = '0.8.1-beta'
+
 const getFileName = (osCode: string, ext: string, arch?: string) =>
-  `Knowclip_${[packageJson.version, osCode, arch]
+  `Knowclip_${[LATEST_VERSION, osCode, arch]
     .filter(s => s)
     .join("_")}.${ext}`
 
 const getDownloadUrl = (osCode: string, ext: string, arch?: string) =>
   `https://github.com/knowclip/knowclip/releases/download/v${
-    packageJson.version
+    LATEST_VERSION
   }/${getFileName(osCode, ext, arch)}`
 
 const DownloadSection = () => {
@@ -266,7 +266,7 @@ const DownloadOsSection = ({
             <div className={css.downloadName}>
               Knowclip{" "}
               <strong className={css.versionNumber}>
-                {packageJson.version}
+                {LATEST_VERSION}
               </strong>{" "}
               <div> {buttonText}</div>
             </div>

@@ -4,6 +4,7 @@ export const KEYS = {
   enter: 'Enter',
   escape: 'Escape',
   space: ' ',
+  process: 'Process',
   tab: 'Tab',
   shift: 'Shift',
   aLowercase: 'a',

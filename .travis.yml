@@ -5,8 +5,6 @@ jobs:
     language: node_js
     node_js: '12'
     env:
-    - ELECTRON_CACHE=$HOME/.cache/electron
-    - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
     - SPECTRON_LOG_FAILURES=true
     deploy: &deploy_base
       skip_cleanup: true
