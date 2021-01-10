@@ -76,7 +76,7 @@
     "start:integration": "REACT_APP_SPECTRON=true yarn start",
     "start:integration-win": "set REACT_APP_SPECTRON=true&& yarn start",
     "build-main": "yarn tsc ./electron/main.ts --outDir ./build-main",
-    "webpack": "yarn build-schemas && REACT_APP_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER react-scripts build",
+    "webpack": "yarn build-schemas && REACT_APP_BUILD_NUMBER=$GITHUB_RUN_NUMBER react-scripts build",
     "webpack:win": "react-scripts build",
     "webpack:win-COMMENT": "# skipping schemas build because of backslashes in script",
     "webpack:ci": "CI=false yarn webpack",
