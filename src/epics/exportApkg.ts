@@ -130,10 +130,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
               pkg.addDeck(deck)
               const tmpFilename = tempy.file()
               return defer(async () => {
-                const archive = writeToFile(pkg, outputFilePath, {
-                  db: sql(tmpFilename),
-                  tmpFilename,
-                })
+                const archive = archiver('zip')
 
                 return new Promise((res, rej) => {
                   archive.on('error', (err) => {
@@ -146,7 +143,11 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
                   archive.on('end', res)
                   archive.on('finish', res)
 
-                  archive.finalize()
+                  writeToFile(pkg, outputFilePath, {
+                    db: sql(tmpFilename),
+                    tmpFilename,
+                    archive,
+                  })
                 })
               }).pipe(
                 map(() =>
@@ -250,13 +251,19 @@ interface AnkiPackage {
 function writeToFile(
   ankiPackage: AnkiPackage,
   filename: string,
-  { db, tmpFilename }: { db: Database; tmpFilename: string }
+  {
+    db,
+    tmpFilename,
+    archive,
+  }: { db: Database; tmpFilename: string; archive: archiver.Archiver }
 ) {
   ankiPackage.write(db)
   db.close()
   const out = fs.createWriteStream(filename)
-  const archive = archiver('zip')
   archive.pipe(out)
+
+  if (!fs.existsSync(tmpFilename)) throw new Error('Problem creating db')
+
   archive.file(tmpFilename, { name: 'collection.anki2' })
   const media_info: { [i: string]: string } = {}
   ankiPackage.media.forEach((m, i) => {
@@ -265,7 +272,7 @@ function writeToFile(
     media_info[i] = m.name
   })
   archive.append(JSON.stringify(media_info), { name: 'media' })
-  return archive
+  archive.finalize()
 }
 
 export default combineEpics(exportApkg, exportApkgSuccess, exportApkgFailure)
