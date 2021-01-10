@@ -87,6 +87,7 @@ jobs:
       run: |
         yarn && yarn integration
     - name: build
+      run: |
         yarn && yarn dist --mac
       env:
         CI: true
