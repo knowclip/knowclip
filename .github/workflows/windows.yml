@@ -34,5 +34,6 @@ jobs:
         yarn dist:appveyor --win
       env:
         APPVEYOR: true
+        CI: false
 
 
