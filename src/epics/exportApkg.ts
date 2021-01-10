@@ -134,12 +134,20 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
                   db: sql(tmpFilename),
                   tmpFilename,
                 })
-                archive.on('error', (err) => {
-                  console.error(`Problem with archive!`)
-                  console.error(err)
+
+                return new Promise((res, rej) => {
+                  archive.on('error', (err) => {
+                    console.error(`Problem with archive!`)
+                    console.error(err)
+                    rej(err)
+                  })
+
+                  archive.on('close', res)
+                  archive.on('end', res)
+                  archive.on('finish', res)
+
+                  archive.finalize()
                 })
-                await archive.finalize()
-                return {}
               }).pipe(
                 map(() =>
                   r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
