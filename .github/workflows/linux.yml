@@ -26,8 +26,6 @@ jobs:
         (cd homepage && yarn install --frozen-lockfile)
     - name: integration tests
       run: yarn integration
-      env:
-        CI: true
     - name: build
       run: yarn dist --linux
       env:
