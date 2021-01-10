@@ -26,6 +26,9 @@ import { areSameFile } from '../utils/files'
 import { afterUpdates } from '../utils/afterUpdates'
 import A from '../types/ActionType'
 import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
+import { Database } from 'better-sqlite3'
+import * as fs from 'fs'
+import archiver from 'archiver'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
@@ -127,10 +130,15 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
               pkg.addDeck(deck)
               const tmpFilename = tempy.file()
               return defer(async () => {
-                await pkg.writeToFile(outputFilePath, {
+                const archive = writeToFile(pkg, outputFilePath, {
                   db: sql(tmpFilename),
                   tmpFilename,
                 })
+                archive.on('error', (err) => {
+                  console.error(`Problem with archive!`)
+                  console.error(err)
+                })
+                await archive.finalize()
                 return {}
               }).pipe(
                 map(() =>
@@ -221,6 +229,35 @@ function getMissingMedia(
       )
     )
   )
+}
+
+interface AnkiPackage {
+  write(db: Database): void
+  media: Array<{
+    filename: string
+    name: string
+    data: Buffer
+  }>
+}
+function writeToFile(
+  ankiPackage: AnkiPackage,
+  filename: string,
+  { db, tmpFilename }: { db: Database; tmpFilename: string }
+) {
+  ankiPackage.write(db)
+  db.close()
+  const out = fs.createWriteStream(filename)
+  const archive = archiver('zip')
+  archive.pipe(out)
+  archive.file(tmpFilename, { name: 'collection.anki2' })
+  const media_info: { [i: string]: string } = {}
+  ankiPackage.media.forEach((m, i) => {
+    if (m.filename != null) archive.file(m.filename, { name: i.toString() })
+    else archive.append(m.data, { name: i.toString() })
+    media_info[i] = m.name
+  })
+  archive.append(JSON.stringify(media_info), { name: 'media' })
+  return archive
 }
 
 export default combineEpics(exportApkg, exportApkgSuccess, exportApkgFailure)

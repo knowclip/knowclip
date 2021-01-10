@@ -20,6 +20,7 @@
     "@material-ui/icons": "^4.5.1",
     "@sentry/electron": "^1.3.0",
     "@silvestre/mkanki": "^3.0.1",
+    "@types/archiver": "^5.1.0",
     "@types/react-virtualized": "^9.21.10",
     "@types/wanakana": "^4.0.0",
     "ajv": "^6.11.0",
@@ -119,7 +120,7 @@
     "electron >= 10.1.2"
   ],
   "devDependencies": {
-    "@types/better-sqlite3": "^5.4.0",
+    "@types/better-sqlite3": "^5.4.3",
     "@types/chromedriver": "^81.0.0",
     "@types/classnames": "^2.2.9",
     "@types/fluent-ffmpeg": "^2.1.11",
