@@ -7,11 +7,15 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 import { mainHeader$ } from '../../../components/MainHeader'
+import * as yauzl from 'yauzl'
+import * as fs from 'fs'
 
 export default async function exportWithMissingMedia({
   client,
   app,
 }: TestSetup) {
+  const apkgFilePath = join(TMP_DIRECTORY, 'deck_from_shared_project.apkg')
+
   const initialText = await client.getText_(dialog$.container)
   expect(await checkboxesChecked(client, mediaTables$.checkbox)).toEqual([
     true,
@@ -39,9 +43,7 @@ export default async function exportWithMissingMedia({
   expect(initialText).toEqual(await client.getText_(dialog$.container))
 
   await mockElectronHelpers(app, {
-    showSaveDialog: [
-      Promise.resolve(join(TMP_DIRECTORY, 'deck_from_shared_project.apkg')),
-    ],
+    showSaveDialog: [Promise.resolve(apkgFilePath)],
   })
   await client.clickElement_(dialog$.exportApkgButton)
 
@@ -53,4 +55,33 @@ export default async function exportWithMissingMedia({
   await client.waitUntilGone_(dialog$.exitButton)
 
   await client.waitForText_(mainHeader$.container, 'polar_bear_cafe.mp4')
+
+  const files: string[] = []
+  const outPath = join(TMP_DIRECTORY, 'zipout')
+  if (!fs.existsSync(outPath)) fs.mkdirSync(outPath)
+  await new Promise((res, rej) => {
+    yauzl.open(apkgFilePath, (err, zipfile) => {
+      zipfile?.on('end', res)
+      if (err) return rej(err)
+      if (!zipfile) return rej(err)
+      zipfile.on('error', function (err) {
+        throw err
+      })
+      zipfile.on('entry', function (entry) {
+        console.log(entry)
+        console.log(entry.getLastModDate())
+        files.push(entry.fileName)
+        zipfile.openReadStream(entry, function (err, readStream) {
+          if (err) throw err
+          readStream?.pipe(fs.createWriteStream(join(outPath, entry.fileName)))
+        })
+      })
+    })
+  })
+
+  expect(files).toMatchObject([
+    ...[...Array(12).keys()].map((k) => k.toString()),
+    'media',
+    'collection.anki2',
+  ])
 }
