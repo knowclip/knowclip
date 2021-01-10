@@ -3,7 +3,7 @@ name: Node CI
 on: [push]
 
 jobs:
-  mac_build_and_test:
+  mac_build:
     runs-on: macos-latest
 
     strategy:
@@ -23,11 +23,7 @@ jobs:
         yarn lint
         yarn tsc
         yarn test
-    - name: integration tests
-      run: |
-        yarn && yarn integration
     - name: build
-      run: |
-        yarn && yarn dist --mac
+      run: yarn dist --mac
       env:
         CI: true

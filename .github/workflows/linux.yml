@@ -16,7 +16,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install, build, and test
+    - name: yarn install and test
       run: |
         yarn install --frozen-lockfile
         yarn format --list-different
@@ -24,10 +24,9 @@ jobs:
         yarn tsc
         yarn test
         (cd homepage && yarn install --frozen-lockfile)
-        yarn dist --linux
     - name: integration tests
-      run: |
-        yarn && yarn integration
+      run: yarn integration
       env:
         CI: true
-        
+    - name: build
+      run: yarn dist --linux

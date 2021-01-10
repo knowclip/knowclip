@@ -31,7 +31,8 @@ jobs:
         path: tmp-test
     - name: build
       run: |
-        yarn install --network-timeout 1000000
-        yarn dist --win
+        yarn dist:appveyor --win
       env:
         APPVEYOR: true
+
+
