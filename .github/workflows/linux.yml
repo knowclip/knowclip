@@ -33,3 +33,8 @@ jobs:
       run: yarn dist --linux
       env:
         CI: false
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist
