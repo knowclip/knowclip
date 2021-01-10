@@ -3,9 +3,12 @@ import { useState, useCallback, SyntheticEvent } from 'react'
 const usePopover = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const anchorCallbackRef = (el: HTMLElement | null) => {
-    if (el !== anchorEl) setAnchorEl(el)
-  }
+  const anchorCallbackRef = useCallback(
+    (el: HTMLElement | null) => {
+      if (el !== anchorEl) setAnchorEl(el)
+    },
+    [setAnchorEl, anchorEl]
+  )
   const open = useCallback((event: SyntheticEvent) => {
     event.stopPropagation()
     setIsOpen(true)
