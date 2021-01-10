@@ -1,0 +1,33 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  mac_build_and_test:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: yarn install and test
+      run: |
+        yarn install --frozen-lockfile
+        yarn format --list-different
+        yarn lint
+        yarn tsc
+        yarn test
+    - name: integration tests
+      run: |
+        yarn && yarn integration
+    - name: build
+      run: |
+        yarn && yarn dist --mac
+      env:
+        CI: true

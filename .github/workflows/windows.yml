@@ -1,0 +1,37 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  win_build_and_test:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: integration test
+      run: |
+        yarn install --network-timeout 1000000
+        yarn integration:win -t "shared project"
+      env:
+        REACT_APP_SPECTRON: true
+        SPECTRON_LOG_FAILURES: true
+        APPVEYOR: true
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: tmp-test
+        path: tmp-test
+    - name: build
+      run: |
+        yarn install --network-timeout 1000000
+        yarn dist --win
+      env:
+        APPVEYOR: true
