@@ -24,6 +24,11 @@ jobs:
         REACT_APP_SPECTRON: true
         SPECTRON_LOG_FAILURES: true
         APPVEYOR: true
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: tmp-test
+        path: tmp-test
   build:
     runs-on: ubuntu-latest
 
