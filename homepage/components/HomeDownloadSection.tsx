@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, PropsWithChildren, ReactNode } from "react"
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  PropsWithChildren,
+  ReactNode,
+} from "react"
 import css from "../pages/index.module.css"
 import A from "./Link"
 import cn from "classnames"
@@ -13,17 +19,10 @@ const getOs = ({ userAgent }: Navigator) => {
   return WINDOWS
 }
 
-const LATEST_VERSION = '0.8.1-beta'
+const LATEST_VERSION = "0.8.2-beta"
 
 const getFileName = (osCode: string, ext: string, arch?: string) =>
-  `Knowclip_${[LATEST_VERSION, osCode, arch]
-    .filter(s => s)
-    .join("_")}.${ext}`
-
-const getDownloadUrl = (osCode: string, ext: string, arch?: string) =>
-  `https://github.com/knowclip/knowclip/releases/download/v${
-    LATEST_VERSION
-  }/${getFileName(osCode, ext, arch)}`
+  `Knowclip_${[LATEST_VERSION, osCode, arch].filter((s) => s).join("_")}.${ext}`
 
 const DownloadSection = () => {
   const [os, setOs] = useState<string>()
@@ -44,10 +43,34 @@ const DownloadSection = () => {
   }, [firstOs])
 
   const [macInstallVideoIsOpen, setMacInstallVideoIsOpen] = useState(false)
-  const openMacInstallVideo = useCallback(e => {
+  const openMacInstallVideo = useCallback((e) => {
     e.preventDefault()
     setMacInstallVideoIsOpen(true)
   }, [])
+
+  const [downloadVersion, setDownloadVersion] = useState(LATEST_VERSION)
+
+  const getDownloadUrl = useCallback(
+    (osCode: string, ext: string, arch?: string) =>
+      `https://github.com/knowclip/knowclip/releases/download/v${
+        downloadVersion || LATEST_VERSION
+      }/${getFileName(osCode, ext, arch)}`,
+    [downloadVersion]
+  )
+  useEffect(() => {
+    fetch("https://api.github.com/repos/knowclip/knowclip/releases/latest", {
+      method: "GET",
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+      },
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.name !== LATEST_VERSION) {
+          setDownloadVersion(json.name)
+        }
+      })
+  }, [setDownloadVersion])
 
   return (
     <section className={css.download}>
@@ -58,6 +81,8 @@ const DownloadSection = () => {
         defaultExt={"exe"}
         osName="Windows"
         buttonText="for Windows 7+"
+        downloadVersion={downloadVersion}
+        getDownloadUrl={getDownloadUrl}
       >
         {(showPostDownloadMessage) => (
           <>
@@ -98,6 +123,8 @@ const DownloadSection = () => {
         osName="Mac"
         buttonText="for Mac OS X 10.10+"
         defaultExt="dmg"
+        downloadVersion={downloadVersion}
+        getDownloadUrl={getDownloadUrl}
       >
         {(showPostDownloadMessage) => (
           <>
@@ -155,6 +182,8 @@ const DownloadSection = () => {
         osName="Linux"
         buttonText="Debian archive (amd64)"
         defaultExt="deb"
+        downloadVersion={downloadVersion}
+        getDownloadUrl={getDownloadUrl}
       >
         {(showPostDownloadMessage) => (
           <>
@@ -214,6 +243,8 @@ const DownloadOsSection = ({
   setOs,
   children,
   buttonText,
+  downloadVersion,
+  getDownloadUrl,
 }: {
   os: string
   defaultExt: string
@@ -222,6 +253,8 @@ const DownloadOsSection = ({
   setOs: (os: string) => void
   children: (showPostDownloadMessage: () => void) => ReactNode
   buttonText: string
+  downloadVersion: string
+  getDownloadUrl: (osCode: string, ext: string, arch?: string) => string
 }) => {
   const isCurrent = current === os
 
@@ -262,12 +295,10 @@ const DownloadOsSection = ({
             onClick={showPostDownloadMessage}
           >
             <div className={css.callToAction}>Download latest</div>
-            <img className={css.downloadIcon} alt="" src='/icon.png' />
+            <img className={css.downloadIcon} alt="" src="/icon.png" />
             <div className={css.downloadName}>
               Knowclip{" "}
-              <strong className={css.versionNumber}>
-                {LATEST_VERSION}
-              </strong>{" "}
+              <strong className={css.versionNumber}>{downloadVersion}</strong>{" "}
               <div> {buttonText}</div>
             </div>
           </A>

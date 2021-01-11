@@ -3,7 +3,7 @@ name: Node CI
 on: [push]
 
 jobs:
-  windows_test:
+  win_build_and_test:
     runs-on: windows-latest
 
     strategy:
@@ -24,26 +24,21 @@ jobs:
         REACT_APP_SPECTRON: true
         SPECTRON_LOG_FAILURES: true
         APPVEYOR: true
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [12.x]
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v2
       with:
-        node-version: ${{ matrix.node-version }}
-    - name: yarn install, build, and test
+        name: tmp-test
+        path: tmp-test
+    - name: build
       run: |
-        yarn install --frozen-lockfile
-        yarn format --list-different
-        yarn lint
-        yarn tsc
-        yarn test
-        (cd homepage && yarn install --frozen-lockfile && yarn build)
+        yarn dist:appveyor --win
       env:
-        CI: true
+        APPVEYOR: true
+        CI: false
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist/Knowclip_*
+
+

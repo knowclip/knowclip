@@ -1,0 +1,34 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  mac_build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: yarn install and test
+      run: |
+        yarn install --frozen-lockfile
+        yarn format --list-different
+        yarn lint
+        yarn tsc
+        yarn test
+    - name: build
+      run: yarn dist --mac
+      env:
+        CI: true
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist/Knowclip_*
