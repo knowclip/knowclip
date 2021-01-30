@@ -1,6 +1,5 @@
 # Knowclip
 ![GitHub](https://img.shields.io/github/license/knowclip/knowclip)
-[![Build Status](https://travis-ci.com/knowclip/knowclip.svg?branch=master)](https://travis-ci.com/knowclip/knowclip)
 
 A cross-platform desktop application for turning audio and video files into flashcards.
 
