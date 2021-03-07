@@ -78,7 +78,7 @@ export async function sendToMainProcess<T extends MessageToMainType>(
   return await ipcRenderer.invoke('message', message)
 }
 
-type AppState = any;
+type AppState = any
 
 const getMessageResponders = (mainWindow: BrowserWindow) => ({
   isReady: () => true,
@@ -114,10 +114,7 @@ const getMessageResponders = (mainWindow: BrowserWindow) => ({
     if (!mainWindow) console.error('Main window reference lost')
     else mainWindow.webContents.sendInputEvent(inputEvent)
   },
-  showOpenDialog: (
-    filters: Array<FileFilter>,
-    multiSelections: boolean
-  ) =>
+  showOpenDialog: (filters: Array<FileFilter>, multiSelections: boolean) =>
     dialog.showOpenDialog(mainWindow, {
       properties: multiSelections
         ? ['openFile', 'multiSelections']
@@ -173,12 +170,15 @@ const getMessageResponders = (mainWindow: BrowserWindow) => ({
   },
   setAppMenuProjectSubmenuPermissions(projectOpened: boolean) {
     const menu = Menu.getApplicationMenu()
-    const submenu = menu && menu.getMenuItemById('File').submenu
+    const submenu = menu ? menu.getMenuItemById('File')?.submenu : null
     if (!submenu) return
 
-    submenu.getMenuItemById('Save project').enabled = projectOpened
-    submenu.getMenuItemById('Close project').enabled = projectOpened
+    const saveProject = submenu.getMenuItemById('Save project')
+    const closeProject = submenu.getMenuItemById('Close project')
+    if (saveProject) saveProject.enabled = projectOpened
+    if (closeProject) closeProject.enabled = projectOpened
 
-    submenu.getMenuItemById('Open project').enabled = !projectOpened
+    const openProject = submenu.getMenuItemById('Open project')
+    if (openProject) openProject.enabled = !projectOpened
   },
 })

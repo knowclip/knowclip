@@ -118,7 +118,7 @@
     }
   },
   "browserslist": [
-    "electron >= 10.1.2"
+    "electron >= 11.3.0"
   ],
   "devDependencies": {
     "@types/better-sqlite3": "^5.4.1",
@@ -142,8 +142,8 @@
     "@types/yaml": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
-    "chromedriver": "^85.0.1",
-    "electron": "^10.1.2",
+    "chromedriver": "^87.0.7",
+    "electron": "^11.3.0",
     "electron-builder": "^22.8.1",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-react-app": "^6.0.0",

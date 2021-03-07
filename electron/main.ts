@@ -9,8 +9,6 @@ import { handleMessages } from '../src/messages'
 
 const { isPackaged } = app
 
-app.allowRendererProcessReuse = false
-
 const Sentry = require('@sentry/electron')
 
 Sentry.init({
@@ -50,7 +48,7 @@ async function createWindow() {
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,
-      devTools: true, // useDevTools,
+      devTools: useDevtools,
       enableRemoteModule: true,
     },
   })
