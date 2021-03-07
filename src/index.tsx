@@ -4,10 +4,11 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import App from './components/App'
 
-import store from './store'
+import getStore from './store'
 import './index.css'
 import * as Sentry from '@sentry/electron'
 import ErrorMessage from './components/ErrorMessage'
+import { sendToMainProcess } from './messages'
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'
@@ -16,7 +17,7 @@ Sentry.init({
   ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
 })
 
-window.addEventListener('error', e => {
+window.addEventListener('error', (e) => {
   if (e && e.message && e.message.includes(RESIZE_OBSERVER_ERROR_MESSAGE))
     return
   const errorRoot = document.getElementById('errorRoot') as HTMLDivElement
@@ -24,11 +25,18 @@ window.addEventListener('error', e => {
   ReactDOM.render(<ErrorMessage reactError={e} />, errorRoot)
 })
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App sentryDsn={sentryDsn} />
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+sendToMainProcess({
+  type: 'getPersistedTestState',
+  args: [],
+}).then(({ result: initialState }) => {
+  console.log({ initialState })
+  const { store } = getStore(initialState as Partial<AppState>)
+  ReactDOM.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <App sentryDsn={sentryDsn} />
+      </Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
+  )
+})

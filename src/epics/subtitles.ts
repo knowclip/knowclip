@@ -1,6 +1,6 @@
 import { ofType, combineEpics } from 'redux-observable'
 import {
-  flatMap,
+  mergeMap,
   map,
   filter,
   take,
@@ -28,7 +28,7 @@ const makeClipsFromSubtitles: AppEpic = (
 ) =>
   action$.pipe(
     ofType<Action, MakeClipsFromSubtitles>(A.makeClipsFromSubtitles),
-    flatMap<MakeClipsFromSubtitles, Observable<Action>>(
+    mergeMap<MakeClipsFromSubtitles, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags, includeStill }) => {
         const tracksValidation = validateTracks(
           state$.value,

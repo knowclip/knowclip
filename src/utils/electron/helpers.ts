@@ -1,4 +1,4 @@
-import electron, {
+import {
   FileFilter,
   shell,
   MessageBoxOptions,
@@ -6,21 +6,30 @@ import electron, {
 } from 'electron'
 import { extname } from 'path'
 import { pauseMedia } from '../../epicsDependencies'
+import { MessageResponse, sendToMainProcess } from '../../messages'
+
+const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
+  if (messageResponse.error) {
+    console.error(messageResponse.error)
+    throw new Error('Problem reaching main process.')
+  }
+
+  return messageResponse.result
+}
 
 const showSaveDialog = (
   name: string,
   extensions: Array<string>
-): Promise<string | null> =>
+): Promise<string | null | undefined> =>
   new Promise(async (res, rej) => {
     pauseMedia()
 
     try {
-      const { filePath } = await electron.remote.dialog.showSaveDialog(
-        electron.remote.getCurrentWindow(),
-        {
-          filters: [{ name, extensions }],
-        }
-      )
+      const saveDialog = await sendToMainProcess({
+        type: 'showSaveDialog',
+        args: [name, extensions],
+      })
+      const { filePath } = ipcResult(saveDialog)
 
       if (!filePath) return await res(filePath)
 
@@ -44,15 +53,11 @@ const showOpenDialog = (
     pauseMedia()
 
     try {
-      const { filePaths } = await electron.remote.dialog.showOpenDialog(
-        electron.remote.getCurrentWindow(),
-        {
-          properties: multiSelections
-            ? ['openFile', 'multiSelections']
-            : ['openFile'],
-          filters,
-        }
-      )
+      const openDialog = await sendToMainProcess({
+        type: 'showOpenDialog',
+        args: [filters, multiSelections],
+      })
+      const { filePaths } = ipcResult(openDialog)
       return await res(filePaths?.length ? filePaths : null)
     } catch (err) {
       return await rej(err)
@@ -66,18 +71,12 @@ const showOpenDirectoryDialog = (
     pauseMedia()
 
     try {
-      const properties = [
-        'openDirectory' as const,
-        ...(showHiddenFiles ? (['showHiddenFiles'] as const) : []),
-      ]
-      const {
-        filePaths: directoryPaths,
-      } = await electron.remote.dialog.showOpenDialog(
-        electron.remote.getCurrentWindow(),
-        {
-          properties,
-        }
-      )
+      const openDirectoryDialog = await sendToMainProcess({
+        type: 'showOpenDirectoryDialog',
+        args: [showHiddenFiles],
+      })
+      const { filePaths: directoryPaths } = ipcResult(openDirectoryDialog)
+
       return await res(directoryPaths ? directoryPaths[0] : null)
     } catch (err) {
       return await rej(err)
@@ -90,19 +89,11 @@ const showOpenDirectoriesDialog = (
     pauseMedia()
 
     try {
-      const properties = [
-        'openDirectory' as const,
-        'multiSelections' as const,
-        ...(showHiddenFiles ? (['showHiddenFiles'] as const) : []),
-      ]
-      const {
-        filePaths: directoryPaths,
-      } = await electron.remote.dialog.showOpenDialog(
-        electron.remote.getCurrentWindow(),
-        {
-          properties,
-        }
-      )
+      const openDirectoriesDialog = await sendToMainProcess({
+        type: 'showOpenDirectoriesDialog',
+        args: [showHiddenFiles],
+      })
+      const { filePaths: directoryPaths } = ipcResult(openDirectoriesDialog)
       return await res(directoryPaths?.length ? directoryPaths : null)
     } catch (err) {
       return await rej(err)
@@ -116,15 +107,26 @@ const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 }
 
 const showMessageBox: (
-  options: MessageBoxOptions
-) => Promise<MessageBoxReturnValue | null> = (options) => {
+  options: Pick<
+    MessageBoxOptions,
+    | 'type'
+    | 'title'
+    | 'message'
+    | 'checkboxChecked'
+    | 'checkboxLabel'
+    | 'buttons'
+    | 'cancelId'
+  >
+) => Promise<MessageBoxReturnValue | null> = async (options) => {
   pauseMedia()
-  return electron.remote.dialog.showMessageBox(
-    electron.remote.getCurrentWindow(),
-    options
-  )
+  const messageBox = await sendToMainProcess({
+    type: 'showMessageBox',
+    args: [options],
+  })
+  const result = ipcResult(messageBox)
+  return result
 }
-export default {
+const helpers = {
   showSaveDialog,
   showOpenDialog,
   showOpenDirectoryDialog,
@@ -132,3 +134,5 @@ export default {
   openInBrowser,
   showMessageBox,
 }
+
+export default helpers

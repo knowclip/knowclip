@@ -3,12 +3,12 @@ import {
   map,
   ignoreElements,
   tap,
-  flatMap,
+  mergeMap,
   mergeAll,
   take,
 } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
-import { fromEvent, empty, of } from 'rxjs'
+import { EMPTY, of } from 'rxjs'
 import r from '../redux'
 import { showMessageBox, showOpenDialog } from '../utils/electron'
 import electron, { shell } from 'electron'
@@ -16,54 +16,55 @@ import rcompare from 'semver/functions/rcompare'
 import gt from 'semver/functions/gt'
 import { join } from 'path'
 import { REHYDRATE } from 'redux-persist'
+import packageJson from '../../package.json'
 
-const showSettingsDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'show-settings-dialog').pipe(
+const showSettingsDialog: AppEpic = (
+  action$,
+  state$,
+  { fromIpcRendererEvent }
+) =>
+  fromIpcRendererEvent('show-settings-dialog').pipe(
     filter(() => !state$.value.dialog.queue.some((d) => d.type === 'Settings')),
     map(() => r.settingsDialog())
   )
 
 const aboutMessage = [
-  `Version ${electron.remote.app.getVersion()}`,
+  `Version ${packageJson.version}`,
   `Build #${process.env.REACT_APP_BUILD_NUMBER || '[DEV BUILD]'}`,
   'Distributed under GNU Affero General Public License 3.0.',
   'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Juan Antonio Tubío',
   '© 2020 Justin Silvestre',
 ].join('\n\n')
 
-const showAboutDialog: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'show-about-dialog').pipe(
-    flatMap(() =>
-      showMessageBox({
-        type: 'info',
-        icon: electron.remote.nativeImage.createFromPath(
-          join(electron.remote.process.cwd(), 'icons', 'icon.png')
-        ),
-        title: 'Knowclip v' + electron.remote.app.getVersion(),
-        message: aboutMessage,
-        buttons: ['OK', 'Go to website'],
+const showAboutDialog: AppEpic = (
+  action$,
+  state$,
+  { fromIpcRendererEvent, pauseMedia, sendToMainProcess }
+) =>
+  fromIpcRendererEvent('show-about-dialog').pipe(
+    mergeMap(() => {
+      pauseMedia()
+      return sendToMainProcess({
+        type: 'showAboutDialog',
+        args: [aboutMessage],
       })
-    ),
-    tap((messageBoxReturnValue) => {
-      if (messageBoxReturnValue) {
-        if (messageBoxReturnValue.response === 1)
-          shell.openExternal('http://knowclip.com')
-      }
     }),
     ignoreElements()
   )
 
-const saveProject: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'save-project').pipe(map(() => r.saveProjectRequest()))
+const saveProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
+  fromIpcRendererEvent('save-project-request').pipe(
+    map(() => r.saveProjectRequest())
+  )
 
-const closeProject: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'close-project').pipe(
+const closeProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
+  fromIpcRendererEvent('close-project-request').pipe(
     map(() => r.closeProjectRequest())
   )
 
-const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'open-project').pipe(
-    flatMap(
+const openProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
+  fromIpcRendererEvent('open-project').pipe(
+    mergeMap(
       async () =>
         await showOpenDialog([
           {
@@ -73,8 +74,8 @@ const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
         ])
     ),
 
-    flatMap((filePaths) => {
-      if (!filePaths) return empty()
+    mergeMap((filePaths) => {
+      if (!filePaths) return EMPTY
 
       const filePath = filePaths[0]
       return of(r.openProjectRequestByFilePath(filePath))
@@ -84,11 +85,11 @@ const openProject: AppEpic = (action$, state$, { ipcRenderer }) =>
 const startupCheckForUpdates: AppEpic = (action$, state$, { window }) =>
   action$.ofType<any>(REHYDRATE).pipe(
     take(1),
-    flatMap(async () => {
+    mergeMap(async () => {
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
-      if (!checkAtStartup) return empty()
+      if (!checkAtStartup) return EMPTY
 
-      if (!window.navigator.onLine) return empty()
+      if (!window.navigator.onLine) return EMPTY
 
       const { errors, value: newestRelease } = await checkForUpdates()
 
@@ -111,7 +112,7 @@ const startupCheckForUpdates: AppEpic = (action$, state$, { window }) =>
         newestRelease &&
         (await showDownloadPrompt(checkAtStartup, newestRelease.tag_name))
 
-      return newSettings ? of(r.overrideSettings(newSettings)) : empty()
+      return newSettings ? of(r.overrideSettings(newSettings)) : EMPTY
     }),
     mergeAll()
   )
@@ -119,10 +120,10 @@ const startupCheckForUpdates: AppEpic = (action$, state$, { window }) =>
 const menuCheckForUpdates: AppEpic = (
   action$,
   state$,
-  { ipcRenderer, window }
+  { window, fromIpcRendererEvent }
 ) =>
-  fromEvent(ipcRenderer, 'check-for-updates').pipe(
-    flatMap(async () => {
+  fromIpcRendererEvent('check-for-updates').pipe(
+    mergeMap(async () => {
       if (!window.navigator.onLine) {
         const messageBoxResult = await showMessageBox({
           title: 'Check for updates',
@@ -137,14 +138,14 @@ const menuCheckForUpdates: AppEpic = (
             'https://github.com/knowclip/knowclip/releases'
           )
 
-        return empty()
+        return EMPTY
       }
 
       const { errors, value: newestRelease } = await checkForUpdates()
 
       if (errors) {
         console.error(errors.join('; '))
-        return empty()
+        return EMPTY
       }
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
 
@@ -152,12 +153,12 @@ const menuCheckForUpdates: AppEpic = (
         ? await showDownloadPrompt(checkAtStartup, newestRelease.tag_name)
         : await showUpToDateMessageBox(checkAtStartup)
 
-      return newSettings ? of(r.overrideSettings(newSettings)) : empty()
+      return newSettings ? of(r.overrideSettings(newSettings)) : EMPTY
     }),
     mergeAll()
   )
 
-const checkForUpdates = process.env.REACT_APP_SPECTRON
+const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
   ? async (): Promise<Result<{ tag_name: string } | null>> => ({
       value: null,
     })
@@ -175,9 +176,7 @@ const checkForUpdates = process.env.REACT_APP_SPECTRON
         const newestRelease = releases
 
           .sort((r1, r2) => rcompare(r1.tag_name, r2.tag_name))
-          .find(({ tag_name: tagName }) =>
-            gt(tagName, electron.remote.app.getVersion())
-          )
+          .find(({ tag_name: tagName }) => gt(tagName, packageJson.version))
 
         return { value: newestRelease || null }
       } catch (err) {
@@ -217,7 +216,7 @@ Would you like to go to the download page now for details?\n`,
 async function showUpToDateMessageBox(checkAtStartup: boolean) {
   const messageBoxResult = await showMessageBox({
     title: `You're up to date!`,
-    message: `You're already running the latest version of Knowclip (${electron.remote.app.getVersion()}).`,
+    message: `You're already running the latest version of Knowclip (${packageJson.version}).`,
     checkboxLabel: 'Check for updates again next time I open Knowclip',
     checkboxChecked: checkAtStartup,
     buttons: ['OK'],

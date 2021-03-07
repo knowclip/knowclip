@@ -1,5 +1,5 @@
 import {
-  flatMap,
+  mergeMap,
   tap,
   map,
   catchError,
@@ -15,7 +15,7 @@ import {
   switchMap,
 } from 'rxjs/operators'
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
-import { of, empty, defer, from, EMPTY } from 'rxjs'
+import { of, EMPTY, defer, from } from 'rxjs'
 import r from '../redux'
 import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
@@ -23,7 +23,6 @@ import sql from 'better-sqlite3'
 import { getApkgExportData } from '../utils/prepareExport'
 import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
-import { afterUpdates } from '../utils/afterUpdates'
 import A from '../types/ActionType'
 import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 import { Database } from 'better-sqlite3'
@@ -34,14 +33,14 @@ const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, ExportApkgFailure>(A.exportApkgFailure),
     tap(() => (document.body.style.cursor = 'default')),
-    flatMap(({ errorMessage }) =>
+    mergeMap(({ errorMessage }) =>
       errorMessage
         ? of(
             r.simpleMessageSnackbar(
               `There was a problem making clips: ${errorMessage}`
             )
           )
-        : empty()
+        : EMPTY
     )
   )
 const exportApkgSuccess: AppEpic = (action$) =>
@@ -83,7 +82,7 @@ const exportApkg: AppEpic = (action$, state$) =>
 function makeApkg(exportData: ApkgExportData, directory: string) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
-    flatMap((outputFilePath) => {
+    mergeMap((outputFilePath) => {
       document.body.style.cursor = 'progress'
       const pkg = new anki.Package()
       const deck = new anki.Deck(exportData.projectId, exportData.deckName)

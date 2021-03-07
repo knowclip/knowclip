@@ -8,14 +8,6 @@ import { persistStore } from 'redux-persist'
 import electron from 'electron'
 import { readFileSync } from 'fs-extra'
 
-let initialState: Partial<AppState> | undefined
-if (process.env.REACT_APP_SPECTRON)
-  initialState = electron.remote.process.env.PERSISTED_STATE_PATH
-    ? JSON.parse(
-        readFileSync(electron.remote.process.env.PERSISTED_STATE_PATH, 'utf8')
-      )
-    : undefined
-
 const getDevToolsCompose = () => {
   const devToolsCompose = ((window as unknown) as {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
@@ -26,7 +18,7 @@ const getDevToolsCompose = () => {
 const composeEnhancers =
   process.env.NODE_ENV === 'development' ? getDevToolsCompose() : compose
 
-function getStore() {
+function getStore(initialState: Partial<AppState> | undefined) {
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
   })
@@ -46,8 +38,5 @@ function getStore() {
   return { store, persistor }
 }
 
-const { store, persistor } = getStore()
+export default getStore
 
-export default store
-
-export { persistor }

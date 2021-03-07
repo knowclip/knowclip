@@ -1,5 +1,9 @@
 import { BrowserWindow, app, Menu } from 'electron'
 
+const SAVE_PROJECT = 'Save project'
+const CLOSE_PROJECT = 'Close project'
+const OPEN_PROJECT = 'Open project'
+
 const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => [
   {
     label: 'Application',
@@ -24,20 +28,20 @@ const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.Me
     id: 'File',
     submenu: [
       {
-        id: 'Save project',
+        id: SAVE_PROJECT,
         label: 'Save project',
         accelerator: 'CmdOrCtrl+S',
         enabled: false,
-        click: () => mainWindow.webContents.send('save-project'),
+        click: () => mainWindow.webContents.send('save-project-request'),
       },
       {
-        id: 'Close project',
+        id: CLOSE_PROJECT,
         label: 'Close project',
         enabled: false,
-        click: () => mainWindow.webContents.send('close-project'),
+        click: () => mainWindow.webContents.send('close-project-request'),
       },
       {
-        id: 'Open project',
+        id: OPEN_PROJECT,
         label: 'Open project',
         enabled: true,
         click: () => mainWindow.webContents.send('open-project'),
@@ -93,8 +97,19 @@ const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.Me
   },
 ]
 
-export default function(mainWindow: BrowserWindow, useDevTools: boolean = false) {
+export default function appMenu(mainWindow: BrowserWindow, useDevTools: boolean = false) {
   return Menu.setApplicationMenu(
     Menu.buildFromTemplate(template(mainWindow, useDevTools))
   )
+}
+
+export function setAppMenuProjectSubmenuPermissions(projectOpened: boolean) {
+  const menu = Menu.getApplicationMenu()
+  const submenu = menu && menu.getMenuItemById('File').submenu
+  if (!submenu) return
+
+  submenu.getMenuItemById(SAVE_PROJECT).enabled = projectOpened
+  submenu.getMenuItemById(CLOSE_PROJECT).enabled = projectOpened
+
+  submenu.getMenuItemById(OPEN_PROJECT).enabled = !projectOpened
 }

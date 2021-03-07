@@ -10,7 +10,7 @@ const {
 export { mockSideEffects, logSideEffectsMocks }
 
 const { uuid, nowUtcTimestamp } =
-  process.env.REACT_APP_SPECTRON || process.env.NODE_ENV === 'test'
+  process.env.REACT_APP_CHROMEDRIVER || process.env.NODE_ENV === 'test'
     ? mocked
     : sideEffects
 

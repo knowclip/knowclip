@@ -1,15 +1,15 @@
+import {  ipcRenderer } from 'electron'
+import { fromEvent } from 'rxjs'
 import { getMediaMetadata } from './utils/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
-import { existsSync } from 'fs'
 import { getWaveformPng } from './utils/getWaveform'
 import { getVideoStill } from './utils/getVideoStill'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
-import { remote, ipcRenderer } from 'electron'
 import { nowUtcTimestamp } from './utils/sideEffects'
-import { setAppMenuProjectSubmenuPermissions } from './utils/appMenu'
 import { getDexieDb } from './utils/dictionariesDatabase'
-import * as electron from './utils/electron'
 import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDictionary'
+import * as electron from './utils/electron'
+import { sendToMainProcess } from './messages'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -34,7 +34,6 @@ export const pauseMedia = () => {
 const dependencies = {
   document,
   window,
-  getCurrentWindow: () => remote.getCurrentWindow(),
   getWaveformSvgElement,
   getWaveformSvgWidth: () => {
     const el = getWaveformSvgElement()
@@ -74,13 +73,14 @@ const dependencies = {
   getWaveformPng,
   getVideoStill,
   getConstantBitrateMediaPath,
-  existsSync,
-  ipcRenderer,
-  setAppMenuProjectSubmenuPermissions,
   nowUtcTimestamp,
   getDexieDb,
   electron,
   parseAndImportDictionary,
+  fromIpcRendererEvent: (eventName: string) =>
+    fromEvent(ipcRenderer, eventName),
+  sendToMainProcess,
+  quitApp: () => ipcRenderer.send('closed'),
 }
 
 export default dependencies

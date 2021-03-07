@@ -14,7 +14,7 @@ import {
 } from '@material-ui/core'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { basename, join, dirname } from 'path'
-import electron from 'electron'
+import packageJson from '../../package.json'
 import r from '../redux'
 import { actions } from '../actions'
 import css from './ProjectsMenu.module.css'
@@ -128,7 +128,7 @@ const ProjectsMenu = () => {
           <img className={css.icon} src={icon} alt="Knowclip icon" /> Knowclip
           <small className={css.versionNumber}>
             {' '}
-            {electron.remote.app.getVersion().split('-')[0]}
+            {packageJson.version.split('-')[0]}
           </small>
         </h1>
       </header>

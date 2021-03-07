@@ -1,4 +1,4 @@
-import { flatMap, map } from 'rxjs/operators'
+import { mergeMap, map } from 'rxjs/operators'
 import { from, Observable } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
@@ -50,7 +50,7 @@ const detectSilence = (
 const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ActionOf<'detectSilence'>>(A.detectSilence),
-    flatMap<ActionOf<'detectSilence'>, Promise<Action[]>>(() => {
+    mergeMap<ActionOf<'detectSilence'>, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMedia = r.getCurrentMediaFile(state$.value)
       if (!currentMedia || !currentFilePath)
@@ -118,7 +118,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         ]
       })
     }),
-    flatMap<Array<Action>, Observable<Action>>((val) => from(val))
+    mergeMap<Array<Action>, Observable<Action>>((val) => from(val))
   )
 
 const detectSilenceRequestEpic: AppEpic = (action$, state$) =>

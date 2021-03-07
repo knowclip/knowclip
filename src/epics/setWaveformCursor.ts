@@ -5,7 +5,7 @@ import {
   switchMap,
   tap,
   ignoreElements,
-  flatMap,
+  mergeMap,
 } from 'rxjs/operators'
 import { actions } from '../actions'
 import r from '../redux'
@@ -29,7 +29,7 @@ const setCursorPositionEpic: AppEpic = (action$, state$, effects) =>
         // @ts-ignore
         true
       ).pipe(
-        flatMap(() => {
+        mergeMap(() => {
           const state = state$.value
           const newlyUpdatedTime = effects.getCurrentTime()
           const newMilliseconds = newlyUpdatedTime * 1000

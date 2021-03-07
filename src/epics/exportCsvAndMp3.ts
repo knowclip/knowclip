@@ -1,5 +1,5 @@
 import {
-  flatMap,
+  mergeMap,
   mergeAll,
   concat,
   concatMap,
@@ -8,7 +8,7 @@ import {
   catchError,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, from, defer, empty } from 'rxjs'
+import { of, from, defer, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
@@ -20,7 +20,7 @@ import { join, basename } from 'path'
 const exportCsv: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportCsv>(A.exportCsv),
-    flatMap(
+    mergeMap(
       ({
         mediaFileIdsToClipIds,
         csvFilePath,
@@ -89,7 +89,7 @@ const exportCsv: AppEpic = (action$, state$) =>
             rememberLocation &&
               mediaFolderLocation !== r.getMediaFolderLocation(state$.value)
               ? of(r.setMediaFolderLocation(mediaFolderLocation))
-              : empty()
+              : EMPTY
           ),
           concat(from(processClipsObservables).pipe(mergeAll(20))),
           concat(

@@ -5,7 +5,7 @@ import {
   takeLast,
   take,
   switchMap,
-  flatMap,
+  mergeMap,
 } from 'rxjs/operators'
 import { fromEvent, merge, of } from 'rxjs'
 import r from '../redux'
@@ -67,7 +67,7 @@ const addClipEpic: AppEpic = (
 
       const pendingClipEnds = pendingClips.pipe(
         takeLast(1),
-        flatMap((pendingClipAction) => {
+        mergeMap((pendingClipAction) => {
           const { clip: pendingClip } = pendingClipAction
           const clipsOrder = r.getCurrentFileClipsOrder(state$.value)
           const pendingClipOverlaps = [

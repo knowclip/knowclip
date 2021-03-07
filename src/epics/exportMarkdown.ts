@@ -1,19 +1,16 @@
-import { flatMap } from 'rxjs/operators'
+import { mergeMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
-import { promisify } from 'util'
 import fs from 'fs'
 import A from '../types/ActionType'
 import r from '../redux'
 import { showSaveDialog } from '../utils/electron'
 import projectToMarkdown from '../utils/projectToMarkdown'
 
-const writeFile = promisify(fs.writeFile)
-
 const exportMarkdown: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ExportMarkdown>(A.exportMarkdown),
-    flatMap<ExportMarkdown, Promise<Observable<Action>>>(async (action) => {
+    mergeMap<ExportMarkdown, Promise<Observable<Action>>>(async (action) => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
         if (!filename)
@@ -29,7 +26,7 @@ const exportMarkdown: AppEpic = (action$, state$) =>
           currentNoteType,
           action.mediaFileIdsToClipIds
         )
-        await writeFile(filename, markdown, 'utf8')
+        await fs.promises.writeFile(filename, markdown, 'utf8')
         return from([
           r.simpleMessageSnackbar(`Markdown file saved in ${filename}`),
         ])
@@ -41,7 +38,7 @@ const exportMarkdown: AppEpic = (action$, state$) =>
         )
       }
     }),
-    flatMap<Observable<Action>, Observable<Action>>((x) => x)
+    mergeMap<Observable<Action>, Observable<Action>>((x) => x)
   )
 
 export default exportMarkdown
