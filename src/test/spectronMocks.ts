@@ -9,18 +9,45 @@ type ModuleLike = { [name: string]: (...args: any) => any }
 
 type MockedModule<M extends ModuleLike> = { -readonly [K in keyof M]: M[K] }
 
-export default function spectronMocks<M extends ModuleLike>(
-  moduleId: string,
-  actualModule: MockedModule<M>
-): {
-  mocked: MockedModule<M>
+const mockedModules: Record<string, SpectronMocks<ModuleLike>> = {}
+
+type SpectronMocks<M extends ModuleLike> = {
+  module: MockedModule<M>
   resetMocks: () => void
   mockFunctions: (
     app: TestDriver,
-    mocks: Partial<{ [K in keyof M]: ReturnType<M[K]>[] }>
+    mocks: Partial<
+      {
+        [K in keyof M]: ReturnType<M[K]>[]
+      }
+    >
   ) => Promise<void>
   logMocks: (app: TestDriver) => Promise<void>
-} {
+}
+
+export default function spectronMocks<M extends ModuleLike>(
+  moduleId: string,
+  actualModule: MockedModule<M>
+): SpectronMocks<M> {
+  const mocking =
+    process.env.REACT_APP_CHROMEDRIVER || process.env.NODE_ENV === 'test'
+  if (!mocking)
+    return {
+      module: actualModule,
+      resetMocks,
+      mockFunctions: async (_app, _mocks) => {
+        throw new Error(
+          `Can't mock in production environment. chromedriver: "${process.env.REACT_APP_CHROMEDRIVER}" node env: "${process.env.NODE_ENV}"`
+        )
+      },
+      logMocks,
+    }
+
+  if (mockedModules[moduleId]) {
+    console.log('Previously mocked: ' + moduleId)
+    return mockedModules[moduleId] as SpectronMocks<M>
+  }
+
   const now = moment.utc().format()
   let currentTestId = ''
   const logFilePath = () =>
@@ -66,7 +93,7 @@ export default function spectronMocks<M extends ModuleLike>(
     }
   }
 
-  const resetMocks = () => {
+  function resetMocks() {
     for (const k in returnValues) returnValues[k] = []
   }
 
@@ -140,7 +167,7 @@ export default function spectronMocks<M extends ModuleLike>(
     await null
   }
 
-  return { mocked, resetMocks, mockFunctions, logMocks }
+  return { module: mocked, resetMocks, mockFunctions, logMocks }
 }
 
 const serializeReturnValue = async (returnValue: any) =>

@@ -17,16 +17,13 @@ import {
 import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
 import { of, EMPTY, defer, from } from 'rxjs'
 import r from '../redux'
-import tempy from 'tempy'
 import * as anki from '@silvestre/mkanki'
 import sql from 'better-sqlite3'
 import { getApkgExportData } from '../utils/prepareExport'
-import { showSaveDialog } from '../utils/electron'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
 import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
 import { Database } from 'better-sqlite3'
-import * as fs from 'fs'
 import archiver from 'archiver'
 
 const exportApkgFailure: AppEpic = (action$) =>
@@ -50,12 +47,12 @@ const exportApkgSuccess: AppEpic = (action$) =>
     map(({ successMessage }) => r.simpleMessageSnackbar(successMessage))
   )
 
-const exportApkg: AppEpic = (action$, state$) =>
+const exportApkg: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, ExportApkgRequest>(A.exportApkgRequest),
     switchMap((exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
-      const directory = tempy.directory()
+      const directory = effects.tmpDirectory()
 
       const currentProject = r.getCurrentProject(state$.value)
       if (!currentProject)
@@ -64,7 +61,8 @@ const exportApkg: AppEpic = (action$, state$) =>
       const exportData = getApkgExportData(
         state$.value,
         currentProject,
-        mediaFileIdsToClipIds
+        mediaFileIdsToClipIds,
+        effects.existsSync
       )
 
       if ('missingMediaFiles' in exportData) {
@@ -75,11 +73,20 @@ const exportApkg: AppEpic = (action$, state$) =>
         )
       }
 
-      return makeApkg(exportData, directory)
+      return makeApkg(exportData, directory, effects)
     })
   )
 
-function makeApkg(exportData: ApkgExportData, directory: string) {
+function makeApkg(
+  exportData: ApkgExportData,
+  directory: string,
+  {
+    showSaveDialog,
+    createWriteStream,
+    existsSync,
+    tmpFilename,
+  }: EpicsDependencies
+) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
     mergeMap((outputFilePath) => {
@@ -127,7 +134,7 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
           ).pipe(
             concatMap(() => {
               pkg.addDeck(deck)
-              const tmpFilename = tempy.file()
+              const tempFilename = tmpFilename()
               return defer(async () => {
                 const archive = archiver('zip')
 
@@ -142,11 +149,16 @@ function makeApkg(exportData: ApkgExportData, directory: string) {
                   archive.on('end', res)
                   archive.on('finish', res)
 
-                  writeToFile(pkg, outputFilePath, {
-                    db: sql(tmpFilename),
-                    tmpFilename,
-                    archive,
-                  })
+                  writeToFile(
+                    pkg,
+                    outputFilePath,
+                    {
+                      db: sql(tempFilename),
+                      tmpFilename: tempFilename,
+                      archive,
+                    },
+                    { createWriteStream, existsSync }
+                  )
                 })
               }).pipe(
                 map(() =>
@@ -254,14 +266,18 @@ function writeToFile(
     db,
     tmpFilename,
     archive,
-  }: { db: Database; tmpFilename: string; archive: archiver.Archiver }
+  }: { db: Database; tmpFilename: string; archive: archiver.Archiver },
+  {
+    createWriteStream,
+    existsSync,
+  }: Pick<EpicsDependencies, 'createWriteStream' | 'existsSync'>
 ) {
   ankiPackage.write(db)
   db.close()
-  const out = fs.createWriteStream(filename)
+  const out = createWriteStream(filename)
   archive.pipe(out)
 
-  if (!fs.existsSync(tmpFilename)) throw new Error('Problem creating db')
+  if (!existsSync(tmpFilename)) throw new Error('Problem creating db')
 
   archive.file(tmpFilename, { name: 'collection.anki2' })
   const media_info: { [i: string]: string } = {}

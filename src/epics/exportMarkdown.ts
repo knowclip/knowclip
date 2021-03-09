@@ -1,13 +1,15 @@
 import { mergeMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { of, from, Observable } from 'rxjs'
-import fs from 'fs'
 import A from '../types/ActionType'
 import r from '../redux'
-import { showSaveDialog } from '../utils/electron'
 import projectToMarkdown from '../utils/projectToMarkdown'
 
-const exportMarkdown: AppEpic = (action$, state$) =>
+const exportMarkdown: AppEpic = (
+  action$,
+  state$,
+  { showSaveDialog, writeFile }
+) =>
   action$.pipe(
     ofType<Action, ExportMarkdown>(A.exportMarkdown),
     mergeMap<ExportMarkdown, Promise<Observable<Action>>>(async (action) => {
@@ -26,7 +28,7 @@ const exportMarkdown: AppEpic = (action$, state$) =>
           currentNoteType,
           action.mediaFileIdsToClipIds
         )
-        await fs.promises.writeFile(filename, markdown, 'utf8')
+        await writeFile(filename, markdown, 'utf8')
         return from([
           r.simpleMessageSnackbar(`Markdown file saved in ${filename}`),
         ])

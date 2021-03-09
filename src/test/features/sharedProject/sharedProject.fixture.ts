@@ -5,7 +5,7 @@ import {
   TMP_DIRECTORY,
   FIXTURES_DIRECTORY,
 } from '../../setUpDriver'
-import { mockSideEffects } from '../../../utils/sideEffects'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll } from '../step'
 import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'

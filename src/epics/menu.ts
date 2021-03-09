@@ -2,7 +2,6 @@ import {
   filter,
   map,
   ignoreElements,
-  tap,
   mergeMap,
   mergeAll,
   take,
@@ -10,11 +9,8 @@ import {
 import { combineEpics } from 'redux-observable'
 import { EMPTY, of } from 'rxjs'
 import r from '../redux'
-import { showMessageBox, showOpenDialog } from '../utils/electron'
-import electron, { shell } from 'electron'
 import rcompare from 'semver/functions/rcompare'
 import gt from 'semver/functions/gt'
-import { join } from 'path'
 import { REHYDRATE } from 'redux-persist'
 import packageJson from '../../package.json'
 
@@ -62,7 +58,11 @@ const closeProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
     map(() => r.closeProjectRequest())
   )
 
-const openProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
+const openProject: AppEpic = (
+  action$,
+  state$,
+  { fromIpcRendererEvent, showOpenDialog }
+) =>
   fromIpcRendererEvent('open-project').pipe(
     mergeMap(
       async () =>
@@ -82,10 +82,11 @@ const openProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
     })
   )
 
-const startupCheckForUpdates: AppEpic = (action$, state$, { window }) =>
+const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
   action$.ofType<any>(REHYDRATE).pipe(
     take(1),
     mergeMap(async () => {
+      const { window, showMessageBox, openExternal } = effects
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
       if (!checkAtStartup) return EMPTY
 
@@ -103,27 +104,26 @@ const startupCheckForUpdates: AppEpic = (action$, state$, { window }) =>
         })
 
         if (messageBoxResult && messageBoxResult.response === 0)
-          electron.shell.openExternal(
-            'https://github.com/knowclip/knowclip/releases'
-          )
+          openExternal('https://github.com/knowclip/knowclip/releases')
       }
 
       const newSettings =
         newestRelease &&
-        (await showDownloadPrompt(checkAtStartup, newestRelease.tag_name))
+        (await showDownloadPrompt(
+          checkAtStartup,
+          newestRelease.tag_name,
+          effects
+        ))
 
       return newSettings ? of(r.overrideSettings(newSettings)) : EMPTY
     }),
     mergeAll()
   )
 
-const menuCheckForUpdates: AppEpic = (
-  action$,
-  state$,
-  { window, fromIpcRendererEvent }
-) =>
-  fromIpcRendererEvent('check-for-updates').pipe(
+const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
+  effects.fromIpcRendererEvent('check-for-updates').pipe(
     mergeMap(async () => {
+      const { window, showMessageBox, openExternal } = effects
       if (!window.navigator.onLine) {
         const messageBoxResult = await showMessageBox({
           title: 'Check for updates',
@@ -134,9 +134,7 @@ const menuCheckForUpdates: AppEpic = (
         })
 
         if (messageBoxResult && messageBoxResult.response === 0)
-          electron.shell.openExternal(
-            'https://github.com/knowclip/knowclip/releases'
-          )
+          openExternal('https://github.com/knowclip/knowclip/releases')
 
         return EMPTY
       }
@@ -150,8 +148,12 @@ const menuCheckForUpdates: AppEpic = (
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
 
       const newSettings = newestRelease
-        ? await showDownloadPrompt(checkAtStartup, newestRelease.tag_name)
-        : await showUpToDateMessageBox(checkAtStartup)
+        ? await showDownloadPrompt(
+            checkAtStartup,
+            newestRelease.tag_name,
+            effects
+          )
+        : await showUpToDateMessageBox(checkAtStartup, effects)
 
       return newSettings ? of(r.overrideSettings(newSettings)) : EMPTY
     }),
@@ -186,9 +188,10 @@ const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
 
 async function showDownloadPrompt(
   checkAtStartup: boolean,
-  tagName: string
+  tagName: string,
+  effects: EpicsDependencies
 ): Promise<Partial<SettingsState> | null> {
-  const messageBoxResult = await showMessageBox({
+  const messageBoxResult = await effects.showMessageBox({
     title: 'An update is available!',
     message: `An newer version of Knowclip (${tagName}) is currently available for download.\n
 Would you like to go to the download page now for details?\n`,
@@ -199,9 +202,7 @@ Would you like to go to the download page now for details?\n`,
   })
   if (messageBoxResult) {
     if (messageBoxResult.response === 0)
-      electron.shell.openExternal(
-        'https://github.com/knowclip/knowclip/releases'
-      )
+      effects.openExternal('https://github.com/knowclip/knowclip/releases')
 
     const checkAtStartupChanged =
       messageBoxResult && messageBoxResult.checkboxChecked !== checkAtStartup
@@ -213,8 +214,11 @@ Would you like to go to the download page now for details?\n`,
   return null
 }
 
-async function showUpToDateMessageBox(checkAtStartup: boolean) {
-  const messageBoxResult = await showMessageBox({
+async function showUpToDateMessageBox(
+  checkAtStartup: boolean,
+  effects: EpicsDependencies
+) {
+  const messageBoxResult = await effects.showMessageBox({
     title: `You're up to date!`,
     message: `You're already running the latest version of Knowclip (${packageJson.version}).`,
     checkboxLabel: 'Check for updates again next time I open Knowclip',

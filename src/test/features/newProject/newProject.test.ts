@@ -1,5 +1,5 @@
 import { startApp, stopApp, TestSetup, TMP_DIRECTORY } from '../../setUpDriver'
-import { mockSideEffects } from '../../../utils/sideEffects'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll } from '../step'
 import { newProjectTestSteps } from './newProjectTestSteps'
 import { join } from 'path'

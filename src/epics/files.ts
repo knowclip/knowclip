@@ -2,7 +2,6 @@ import { mergeMap, map, mergeAll } from 'rxjs/operators'
 import { of, Observable, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
-import { existsSync } from 'fs'
 import { combineEpics, ofType } from 'redux-observable'
 import project from '../files/projectFile'
 import media from '../files/mediaFile'
@@ -44,7 +43,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 
       const filePath = action.filePath || fileAvailability.filePath
 
-      if (!filePath || !existsSync(filePath)) {
+      if (!filePath || !effects.existsSync(filePath)) {
         const fileTypeAndName = getHumanFileName(file)
         const fileVerb = file.type === 'MediaFile' ? 'make clips with' : 'use'
         const message = filePath

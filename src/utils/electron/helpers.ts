@@ -5,8 +5,8 @@ import {
   MessageBoxReturnValue,
 } from 'electron'
 import { extname } from 'path'
-import { pauseMedia } from '../../epicsDependencies'
 import { MessageResponse, sendToMainProcess } from '../../messages'
+import { pauseMedia } from '../media'
 
 const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
   if (messageResponse.error) {
@@ -126,6 +126,9 @@ const showMessageBox: (
   const result = ipcResult(messageBox)
   return result
 }
+
+const openExternal = (url: string) => shell.openExternal(url)
+
 const helpers = {
   showSaveDialog,
   showOpenDialog,
@@ -133,6 +136,7 @@ const helpers = {
   showOpenDirectoriesDialog,
   openInBrowser,
   showMessageBox,
+  openExternal,
 }
 
 export default helpers

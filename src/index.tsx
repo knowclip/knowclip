@@ -29,7 +29,8 @@ sendToMainProcess({
   type: 'getPersistedTestState',
   args: [],
 }).then(({ result: initialState }) => {
-  console.log({ initialState })
+  if (initialState) console.log({ initialState })
+  
   const { store } = getStore(initialState as Partial<AppState>)
   ReactDOM.render(
     <React.StrictMode>

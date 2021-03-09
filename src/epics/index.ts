@@ -25,12 +25,11 @@ import preloadVideoStills from './preloadVideoStills'
 import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import dictionaries from './dictionaries'
-import { showMessageBox } from '../utils/electron'
 
 const closeEpic: AppEpic = (
   action$,
   state$,
-  { fromIpcRendererEvent, quitApp }
+  { fromIpcRendererEvent, quitApp, showMessageBox }
 ) =>
   fromIpcRendererEvent('app-close').pipe(
     mergeMap(async () => {

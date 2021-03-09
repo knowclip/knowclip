@@ -5,8 +5,6 @@ import epic from './epics'
 import { listenForPersistedDataLogMessage } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
 import { persistStore } from 'redux-persist'
-import electron from 'electron'
-import { readFileSync } from 'fs-extra'
 
 const getDevToolsCompose = () => {
   const devToolsCompose = ((window as unknown) as {

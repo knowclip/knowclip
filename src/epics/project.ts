@@ -10,15 +10,11 @@ import { of, from, EMPTY } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
-import { promisify } from 'util'
-import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import './setYamlOptions'
 import { getUpdateWith } from '../files/updates'
 
-const writeFile = promisify(fs.writeFile)
-
-const createProject: AppEpic = (action$, state$) =>
+const createProject: AppEpic = (action$, state$, { writeFile }) =>
   action$.ofType<CreateProject>(A.createProject).pipe(
     switchMap(({ project, filePath }) => {
       return from(
@@ -41,7 +37,7 @@ const createProject: AppEpic = (action$, state$) =>
     )
   )
 
-const openProjectById: AppEpic = (action$, state$) =>
+const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.openProjectRequestById),
     map(({ id }) => {
@@ -91,7 +87,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     )
   )
 
-const saveProject: AppEpic = (action$, state$) =>
+const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
   action$.pipe(
     ofType<Action, SaveProjectRequest>(A.saveProjectRequest),
     filter(() => {
@@ -104,9 +100,7 @@ const saveProject: AppEpic = (action$, state$) =>
         projectMetadata.id
       )
       return Boolean(
-        projectFile &&
-          projectFile.filePath &&
-          fs.existsSync(projectFile.filePath)
+        projectFile && projectFile.filePath && existsSync(projectFile.filePath)
       )
     }), // while can't find project file path in storage, or file doesn't exist
     mergeMap(async () => {
