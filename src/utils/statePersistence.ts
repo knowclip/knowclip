@@ -31,7 +31,7 @@ const mapFileState = <F, G>(
 export const listenForPersistedDataLogMessage = (getState: () => AppState) => {
   if (
     process.env.NODE_ENV === 'development' &&
-    process.env.REACT_APP_SPECTRON
+    process.env.REACT_APP_CHROMEDRIVER
   ) {
     console.log('will listen for log message')
     window.document.addEventListener('DOMContentLoaded', () => {

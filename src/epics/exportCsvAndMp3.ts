@@ -1,5 +1,5 @@
 import {
-  flatMap,
+  mergeMap,
   mergeAll,
   concat,
   concatMap,
@@ -8,19 +8,22 @@ import {
   catchError,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, from, defer, empty } from 'rxjs'
+import { of, from, defer, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
-import { processNoteMedia } from '../utils/ankiNote'
 import { writeFile } from 'fs-extra'
 import { join, basename } from 'path'
 
-const exportCsv: AppEpic = (action$, state$) =>
+const exportCsv: AppEpic = (
+  action$,
+  state$,
+  { existsSync, processNoteMedia }
+) =>
   action$.pipe(
     ofType<Action, ExportCsv>(A.exportCsv),
-    flatMap(
+    mergeMap(
       ({
         mediaFileIdsToClipIds,
         csvFilePath,
@@ -36,7 +39,8 @@ const exportCsv: AppEpic = (action$, state$) =>
         const exportData = getApkgExportData(
           state$.value,
           currentProject,
-          mediaFileIdsToClipIds
+          mediaFileIdsToClipIds,
+          existsSync
         )
         if ('missingMediaFiles' in exportData) {
           return from(
@@ -89,7 +93,7 @@ const exportCsv: AppEpic = (action$, state$) =>
             rememberLocation &&
               mediaFolderLocation !== r.getMediaFolderLocation(state$.value)
               ? of(r.setMediaFolderLocation(mediaFolderLocation))
-              : empty()
+              : EMPTY
           ),
           concat(from(processClipsObservables).pipe(mergeAll(20))),
           concat(

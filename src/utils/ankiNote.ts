@@ -2,7 +2,6 @@ import { join, basename } from 'path'
 import { promises } from 'fs'
 import clipAudio from '../utils/clipAudio'
 import { getVideoStill } from '../utils/getVideoStill'
-const { readFile } = promises
 
 export type AnkiNoteMedia = {
   soundData: {
@@ -48,7 +47,7 @@ export async function processNoteMedia(
       ],
     }
   const soundData = {
-    data: () => readFile(clipOutputFilePath),
+    data: () => promises.readFile(clipOutputFilePath),
     fileName: outputFilename,
     filePath: clipOutputFilePath,
   }
@@ -66,7 +65,7 @@ export async function processNoteMedia(
 
   const imageData = imageResult
     ? {
-        data: () => readFile(imageResult.value),
+        data: () => promises.readFile(imageResult.value),
         fileName: basename(imageResult.value),
         filePath: imageResult.value,
       }

@@ -5,7 +5,7 @@ const themeSpecs = {
         fontSize: '.8rem',
       },
     },
-    ...(process.env.REACT_APP_SPECTRON
+    ...(process.env.REACT_APP_CHROMEDRIVER
       ? {
           MuiCssBaseline: {
             '@global': {

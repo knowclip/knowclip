@@ -51,7 +51,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
     mergeMap(
       async (action): Promise<Action> => {
         try {
-          const files = await effects.electron.showOpenDialog(
+          const files = await effects.showOpenDialog(
             getFileFilters('Dictionary')
           )
 

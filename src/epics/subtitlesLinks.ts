@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable'
-import { filter, flatMap, map, sample } from 'rxjs/operators'
-import { of, empty, from, EMPTY } from 'rxjs'
+import { filter, mergeMap, map, sample } from 'rxjs/operators'
+import { of, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
@@ -65,7 +65,7 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
 
 const linkFieldToTrack: AppEpic = (action$, state$) =>
   action$.pipe(
-    flatMap((action) => {
+    mergeMap((action) => {
       if (action.type !== 'updateFile') return EMPTY
 
       const update = getUpdateWith(
@@ -109,12 +109,12 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
 
 export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
   action$.ofType<StartEditingCards>(A.startEditingCards).pipe(
-    flatMap(() => {
+    mergeMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
         return of(r.newCardFromSubtitlesRequest(selection, undefined, true))
       }
-      return empty()
+      return EMPTY
     })
   )
 
@@ -126,11 +126,11 @@ export const newClipFromChunk: AppEpic = (
   action$
     .ofType<NewCardFromSubtitlesRequest>(A.newCardFromSubtitlesRequest)
     .pipe(
-      flatMap((action) => {
+      mergeMap((action) => {
         const selection = action.linkedSubtitlesChunkSelection
 
         const mediaFileId = r.getCurrentFileId(state$.value)
-        if (!mediaFileId) return empty()
+        if (!mediaFileId) return EMPTY
         const cardBases = r.getSubtitlesCardBases(state$.value)
 
         const fields = r.getNewFieldsFromLinkedSubtitles(
@@ -182,7 +182,7 @@ const updateSelectionAfterLink: AppEpic = (
           )
         )
       ),
-      flatMap((selection) => {
+      mergeMap((selection) => {
         if (selection && selection.type === 'Preview') {
           const newSelection = r.getNewWaveformSelectionAt(
             state$.value,
@@ -204,7 +204,7 @@ const updateSelectionAfterLink: AppEpic = (
           )
         }
 
-        return empty()
+        return EMPTY
       })
     )
 

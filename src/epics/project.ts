@@ -1,5 +1,5 @@
 import {
-  flatMap,
+  mergeMap,
   map,
   filter,
   mergeAll,
@@ -10,21 +10,17 @@ import { of, from, EMPTY } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
-import { promisify } from 'util'
-import fs, { existsSync } from 'fs'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
 import './setYamlOptions'
 import { getUpdateWith } from '../files/updates'
 
-const writeFile = promisify(fs.writeFile)
-
-const createProject: AppEpic = (action$, state$) =>
+const createProject: AppEpic = (action$, state$, { writeFile }) =>
   action$.ofType<CreateProject>(A.createProject).pipe(
     switchMap(({ project, filePath }) => {
       return from(
         writeFile(filePath, r.getProjectFileContents(state$.value, project))
       ).pipe(
-        flatMap(() =>
+        mergeMap(() =>
           from([
             r.openFileRequest(project, filePath),
             r.setWorkIsUnsaved(false),
@@ -41,7 +37,7 @@ const createProject: AppEpic = (action$, state$) =>
     )
   )
 
-const openProjectById: AppEpic = (action$, state$) =>
+const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
   action$.pipe(
     ofType<Action, OpenProjectRequestById>(A.openProjectRequestById),
     map(({ id }) => {
@@ -75,7 +71,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     ),
     switchMap(({ filePath }) =>
       from(parseProjectJson(filePath)).pipe(
-        flatMap((parse) => {
+        mergeMap((parse) => {
           if (parse.errors) throw new Error(parse.errors.join('\n\n'))
 
           const { project } = normalizeProjectJson(state$.value, parse.value)
@@ -91,7 +87,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     )
   )
 
-const saveProject: AppEpic = (action$, state$) =>
+const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
   action$.pipe(
     ofType<Action, SaveProjectRequest>(A.saveProjectRequest),
     filter(() => {
@@ -104,12 +100,10 @@ const saveProject: AppEpic = (action$, state$) =>
         projectMetadata.id
       )
       return Boolean(
-        projectFile &&
-          projectFile.filePath &&
-          fs.existsSync(projectFile.filePath)
+        projectFile && projectFile.filePath && existsSync(projectFile.filePath)
       )
     }), // while can't find project file path in storage, or file doesn't exist
-    flatMap(async () => {
+    mergeMap(async () => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
         if (!projectMetadata) throw new Error('Could not find project metadata')
@@ -177,7 +171,7 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
 
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
-    flatMap((action) => {
+    mergeMap((action) => {
       if (action.type !== 'updateFile') return EMPTY
       const update = getUpdateWith(action.update, 'deleteProjectMedia')
       if (!update) return EMPTY
@@ -200,7 +194,10 @@ const closeProjectRequest: AppEpic = (action$, state$, effects) =>
           r.closeProject()
         )
       else {
-        effects.setAppMenuProjectSubmenuPermissions(false)
+        effects.sendToMainProcess({
+          type: 'setAppMenuProjectSubmenuPermissions',
+          args: [false],
+        })
 
         return r.closeProject()
       }

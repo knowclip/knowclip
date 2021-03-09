@@ -4,7 +4,6 @@ import { extname, basename } from 'path'
 import { unparse } from 'papaparse'
 import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability, encodeClozeDeletions } from '../selectors'
-import { existsSync } from 'fs'
 import { getVideoStillPngPath, getMidpoint } from './getVideoStill'
 import { sanitizeFileName } from './sanitizeFilename'
 import moment from 'moment'
@@ -102,7 +101,8 @@ export const TEMPLATE_CSS = `.card {
 export const getApkgExportData = (
   state: AppState,
   project: ProjectFile,
-  mediaIdToClipsIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
+  mediaIdToClipsIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
+  existsSync: (filePath: string) => boolean
 ) => {
   const fieldNames = getNoteTypeFields(project.noteType)
   const mediaFiles = r.getProjectMediaFiles(state, project.id)

@@ -80,7 +80,7 @@ const DownloadSection = () => {
         os={WINDOWS}
         defaultExt={"exe"}
         osName="Windows"
-        buttonText="for Windows 7+"
+        buttonText="for Windows 8+"
         downloadVersion={downloadVersion}
         getDownloadUrl={getDownloadUrl}
       >

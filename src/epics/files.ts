@@ -1,8 +1,7 @@
-import { flatMap, map, mergeAll } from 'rxjs/operators'
-import { of, Observable, from, empty } from 'rxjs'
+import { mergeMap, map, mergeAll } from 'rxjs/operators'
+import { of, Observable, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
-import { existsSync } from 'fs'
 import { combineEpics, ofType } from 'redux-observable'
 import project from '../files/projectFile'
 import media from '../files/mediaFile'
@@ -35,16 +34,16 @@ const fileEventHandlers: Record<
 const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.openFileRequest),
-    flatMap<OpenFileRequest, Observable<Action>>((action) => {
+    mergeMap<OpenFileRequest, Observable<Action>>((action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
       const fileAvailability = r.getFileAvailability(state$.value, file)
 
-      if (!fileAvailability.isLoading) return empty()
+      if (!fileAvailability.isLoading) return EMPTY
 
       const filePath = action.filePath || fileAvailability.filePath
 
-      if (!filePath || !existsSync(filePath)) {
+      if (!filePath || !effects.existsSync(filePath)) {
         const fileTypeAndName = getHumanFileName(file)
         const fileVerb = file.type === 'MediaFile' ? 'make clips with' : 'use'
         const message = filePath
@@ -75,7 +74,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 const openFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileSuccess>(A.openFileSuccess),
-    flatMap((action) => {
+    mergeMap((action) => {
       const openSuccessHandlers: OpenFileSuccessHandler<
         typeof action.validatedFile
       >[] = fileEventHandlers[action.validatedFile.type].openSuccess
@@ -101,7 +100,7 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
 const openFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, OpenFileFailure>(A.openFileFailure),
-    flatMap<OpenFileFailure, Observable<Action>>((action) => {
+    mergeMap<OpenFileFailure, Observable<Action>>((action) => {
       const openFailureHandler = fileEventHandlers[action.file.type].openFailure
 
       console.error(action.errorMessage || 'Could not open file:')
@@ -134,7 +133,7 @@ const flatten = (asyncArray: Promise<Action[]>) =>
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, LocateFileRequest>(A.locateFileRequest),
-    flatMap<LocateFileRequest, Observable<Action>>((action) => {
+    mergeMap<LocateFileRequest, Observable<Action>>((action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
 
@@ -159,7 +158,7 @@ const locateFileSuccess: AppEpic = (action$, _state$, _effects) =>
 const deleteFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, DeleteFileRequest>(A.deleteFileRequest),
-    flatMap(({ fileType, id }) => {
+    mergeMap(({ fileType, id }) => {
       const availability = r.getFileAvailabilityById(state$.value, fileType, id)
 
       return availability
@@ -176,7 +175,7 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
               ).pipe(mergeAll())
             )
           )
-        : empty()
+        : EMPTY
     }),
     mergeAll()
   )
@@ -184,7 +183,7 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
 const deleteFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType<Action, DeleteFileSuccess>(A.deleteFileSuccess),
-    flatMap((action) =>
+    mergeMap((action) =>
       from(
         fileEventHandlers[action.file.type].deleteSuccess.flatMap((handler) =>
           from(handler(action, state$.value, effects)).pipe(mergeAll())

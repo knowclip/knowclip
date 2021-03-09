@@ -55,7 +55,7 @@ export type DeleteFileRequestHandler<F extends FileMetadata> = (
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
 
-// DESCENDANTS' DELETE HOOKS ARE NOT TRIGGERED
+// TODO: DESCENDANTS' DELETE HOOKS ARE NOT TRIGGERED
 export type DeleteFileSuccessHandler = (
   action: DeleteFileSuccess,
   state: AppState,

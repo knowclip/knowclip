@@ -6,7 +6,7 @@ import {
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
 } from '../../setUpDriver'
-import { mockSideEffects } from '../../../utils/sideEffects'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { join } from 'path'
 import { runAll } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'

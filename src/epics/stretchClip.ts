@@ -1,5 +1,5 @@
 import { map, switchMap, takeUntil, takeLast } from 'rxjs/operators'
-import { fromEvent, from, of, merge, empty } from 'rxjs'
+import { fromEvent, from, of, merge, EMPTY } from 'rxjs'
 import r from '../redux'
 import { toWaveformX } from '../utils/waveformCoordinates'
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
@@ -16,7 +16,7 @@ const stretchClipEpic: AppEpic = (
     switchMap(({ milliseconds }) => {
       const x = r.getXAtMilliseconds(state$.value, milliseconds)
       const edge = r.getClipEdgeAt(state$.value, x)
-      return edge ? of({ x, edge }) : empty()
+      return edge ? of({ x, edge }) : EMPTY
     }),
     switchMap((mousedownData) => {
       const {

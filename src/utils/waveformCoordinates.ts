@@ -5,7 +5,7 @@ const toWaveformXRaw = (
 ) => mouseEvent.clientX - svgElement.getBoundingClientRect().left + xMin
 
 export const toWaveformX =
-  process.env.NODE_ENV === 'development' && process.env.REACT_APP_SPECTRON
+  process.env.NODE_ENV === 'development' && process.env.REACT_APP_CHROMEDRIVER
     ? (mouseEvent: MouseEvent, svgElement: SVGElement, xMin = 0) => {
         const x = toWaveformXRaw(mouseEvent, svgElement, xMin)
         console.log(mouseEvent.type, mouseEvent.pageX, mouseEvent)

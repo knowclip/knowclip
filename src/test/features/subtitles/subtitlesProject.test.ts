@@ -9,7 +9,7 @@ import {
 import makeCardsFromSubtitles from './makeCardsFromSubtitles'
 import saveAndCloseProject from './saveAndCloseProject'
 import { join } from 'path'
-import { mockSideEffects } from '../../../utils/sideEffects'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { TestDriver } from '../../driver/TestDriver'
 
 jest.setTimeout(60000)

@@ -21,7 +21,7 @@ jobs:
         yarn install --network-timeout 1000000
         yarn integration:win -t "shared project"
       env:
-        REACT_APP_SPECTRON: true
+        REACT_APP_CHROMEDRIVER: true
         SPECTRON_LOG_FAILURES: true
         APPVEYOR: true
     - name: Upload test artifacts

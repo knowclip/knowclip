@@ -1,6 +1,6 @@
 import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import { combineEpics } from 'redux-observable'
-import { fromEvent, of } from 'rxjs'
+import { of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
@@ -25,10 +25,13 @@ import preloadVideoStills from './preloadVideoStills'
 import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import dictionaries from './dictionaries'
-import { showMessageBox } from '../utils/electron'
 
-const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
-  fromEvent(ipcRenderer, 'app-close').pipe(
+const closeEpic: AppEpic = (
+  action$,
+  state$,
+  { fromIpcRendererEvent, quitApp, showMessageBox }
+) =>
+  fromIpcRendererEvent('app-close').pipe(
     mergeMap(async () => {
       if (state$.value.session.progress) {
         return await r.promptSnackbar(
@@ -56,7 +59,7 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
       if (!choice || choice.response === 0) {
         return ((await { type: "DON'T QUIT ON ME!!" }) as unknown) as Action
       } else {
-        ipcRenderer.send('closed')
+        quitApp()
         return await r.quitApp()
       }
     })
@@ -64,10 +67,10 @@ const closeEpic: AppEpic = (action$, state$, { ipcRenderer }) =>
 
 const initialize: AppEpic = () => of(r.initializeApp())
 
-const quit: AppEpic = (action$, state$, { ipcRenderer }) =>
+const quit: AppEpic = (action$, state$, { quitApp }) =>
   action$.ofType(A.quitApp).pipe(
     tap(() => {
-      ipcRenderer.send('closed')
+      quitApp()
     }),
     ignoreElements()
   )

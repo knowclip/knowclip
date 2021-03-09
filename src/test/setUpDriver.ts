@@ -56,7 +56,7 @@ export async function startApp(
     env: {
       PUBLIC_URL: process.env.PUBLIC_URL,
       NODE_ENV: 'test',
-      REACT_APP_SPECTRON: Boolean(process.env.REACT_APP_SPECTRON)
+      REACT_APP_CHROMEDRIVER: Boolean(process.env.REACT_APP_CHROMEDRIVER)
         ? 'true'
         : undefined,
       INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV)

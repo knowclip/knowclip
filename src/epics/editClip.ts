@@ -1,13 +1,13 @@
 import { ofType, combineEpics } from 'redux-observable'
 import {
   filter,
-  flatMap,
+  mergeMap,
   take,
   ignoreElements,
   endWith,
   concat,
 } from 'rxjs/operators'
-import { empty, of } from 'rxjs'
+import { EMPTY, of } from 'rxjs'
 import { actions } from '../actions'
 import A from '../types/ActionType'
 import { getClip, getCurrentMediaFile, getFile } from '../selectors'
@@ -15,10 +15,10 @@ import { getClip, getCurrentMediaFile, getFile } from '../selectors'
 const remakeStill: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, EditClip>(A.editClip),
-    flatMap(({ flashcardOverride, id }) => {
+    mergeMap(({ flashcardOverride, id }) => {
       const clip = getClip(state$.value, id) as Clip
       const mediaFile = getCurrentMediaFile(state$.value)
-      if (!(clip && mediaFile && mediaFile.isVideo)) return empty()
+      if (!(clip && mediaFile && mediaFile.isVideo)) return EMPTY
 
       const still = getFile<VideoStillImageFile>(
         state$.value,
@@ -46,18 +46,18 @@ const remakeStill: AppEpic = (action$, state$) =>
           endWith(actions.openFileRequest(still))
         )
 
-      return empty()
+      return EMPTY
     })
   )
 
 const setDefaultClipSpecs: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, EditClip>(A.editClip),
-    flatMap(({ flashcardOverride }) => {
-      if (!flashcardOverride) return empty()
+    mergeMap(({ flashcardOverride }) => {
+      if (!flashcardOverride) return EMPTY
 
       const { image } = flashcardOverride
-      if (image === undefined) return empty()
+      if (image === undefined) return EMPTY
 
       return of(
         actions.setDefaultClipSpecs({

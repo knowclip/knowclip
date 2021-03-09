@@ -1,5 +1,5 @@
-import { filter, map, flatMap, switchMap, takeUntil } from 'rxjs/operators'
-import { fromEvent, from, of, merge, empty } from 'rxjs'
+import { filter, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators'
+import { fromEvent, from, of, merge, EMPTY } from 'rxjs'
 import { combineEpics } from 'redux-observable'
 import r from '../redux'
 import A from '../types/ActionType'
@@ -12,7 +12,7 @@ const playPauseForceKey = os.platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
-    flatMap((event) => {
+    mergeMap((event) => {
       const { ctrlKey, altKey, key } = event
 
       if (
@@ -39,7 +39,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
       ) {
         event.preventDefault()
         effects.toggleMediaPaused()
-        return empty()
+        return EMPTY
       }
 
       if (key === KEYS.arrowRight && (altKey || !isTextFieldFocused())) {
@@ -77,7 +77,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         )
       }
 
-      return empty()
+      return EMPTY
     })
   )
 

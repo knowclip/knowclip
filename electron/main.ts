@@ -9,8 +9,6 @@ import { handleMessages } from '../src/messages'
 
 const { isPackaged } = app
 
-app.allowRendererProcessReuse = false
-
 const Sentry = require('@sentry/electron')
 
 Sentry.init({
@@ -99,6 +97,11 @@ async function createWindow() {
   mainWindow.on('close', e => {
     if (context.mainWindow) {
       e.preventDefault()
+
+      // properly, should make sure SOME kind of response went through
+      // so if there is no response at all,
+      // user won't have to force-quit.
+
       mainWindow.webContents.send('app-close')
     }
   })

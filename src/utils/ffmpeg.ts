@@ -1,19 +1,22 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
+import { sendToMainProcess } from '../messages'
 
 const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
-const setFfmpegAndFfprobePath = () => {
-  if (process.env.JEST_WORKER_ID) return
-
-  // have to do it this way cause of webpack
-  const ffmpegPath = require('electron').remote.getGlobal('ffmpegpath')
-  ffmpeg.setFfmpegPath(ffmpegPath)
-  const ffprobePath = require('electron').remote.getGlobal('ffprobepath')
-  ffmpeg.setFfprobePath(ffprobePath)
-}
-setFfmpegAndFfprobePath()
+if (!process.env.JEST_WORKER_ID)
+  sendToMainProcess({
+    type: 'getFfmpegAndFfprobePath',
+    args: [],
+  }).then((getPaths) => {
+    if (getPaths.error) {
+      console.error(getPaths.error)
+      throw new Error('Problem finding ffmpeg and ffprobe paths.')
+    }
+    ffmpeg.setFfmpegPath(getPaths.result.ffmpegpath)
+    ffmpeg.setFfprobePath(getPaths.result.ffprobepath)
+  })
 
 export default ffmpeg
 

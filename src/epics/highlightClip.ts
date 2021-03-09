@@ -1,6 +1,6 @@
 import { map, ignoreElements, filter, tap, switchMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { empty, of, merge } from 'rxjs'
+import { EMPTY, of, merge } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
 
@@ -37,7 +37,7 @@ const centerSelectedClip: AppEpic = (
       switchMap(() => {
         const selection = r.getWaveformSelection(state$.value)
         const clip = selection && selection.item
-        return clip && (window as any).seeking ? of(clip) : empty()
+        return clip && (window as any).seeking ? of(clip) : EMPTY
       })
     ),
     action$.ofType<EditClip>(A.editClip).pipe(
@@ -47,30 +47,30 @@ const centerSelectedClip: AppEpic = (
           ('start' in action.override || 'end' in action.override)
         ) {
           const clip = r.getHighlightedClip(state$.value)
-          return clip ? of(clip) : empty()
+          return clip ? of(clip) : EMPTY
         }
 
-        return empty()
+        return EMPTY
       })
     ),
     action$.ofType<MergeClips>(A.mergeClips).pipe(
       switchMap((action) => {
         if (action.newSelection && action.newSelection.type === 'Clip') {
           const clip = r.getClip(state$.value, action.newSelection.id)
-          return clip ? of(clip) : empty()
+          return clip ? of(clip) : EMPTY
         }
 
-        return empty()
+        return EMPTY
       })
     )
   ).pipe(
     switchMap((clip) => {
       const svgElement = getWaveformSvgElement()
-      if (!svgElement) return empty()
+      if (!svgElement) return EMPTY
       const svgWidth = elementWidth(svgElement)
 
       const svgFits = clip.end - clip.start <= svgWidth
-      if (!svgFits) return empty()
+      if (!svgFits) return EMPTY
 
       const { waveform } = state$.value
       const { xMin } = waveform.viewBox
@@ -95,7 +95,7 @@ const centerSelectedClip: AppEpic = (
           })
         )
 
-      return empty()
+      return EMPTY
     })
   )
 
@@ -116,7 +116,7 @@ const highlightRightEpic: AppEpic = (
     switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return empty()
+      if (!currentFileId) return EMPTY
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
       const currentIndex = selection ? selection.index : -1
@@ -133,7 +133,7 @@ const highlightRightEpic: AppEpic = (
             )
           )
           return r.isMediaFileLoaded(state)
-            ? empty()
+            ? EMPTY
             : of(r.selectWaveformItem(next))
         }
       }
@@ -145,11 +145,11 @@ const highlightRightEpic: AppEpic = (
       if (next) {
         setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
         return r.isMediaFileLoaded(state)
-          ? empty()
+          ? EMPTY
           : of(r.selectWaveformItem(next))
       }
 
-      return empty()
+      return EMPTY
     })
   )
 
@@ -171,7 +171,7 @@ const highlightLeftEpic: AppEpic = (
     switchMap(() => {
       const state = state$.value
       const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return empty()
+      if (!currentFileId) return EMPTY
 
       const waveformItems = r.getWaveformItems(state)
       const selection = r.getWaveformSelection(state)
@@ -188,7 +188,7 @@ const highlightLeftEpic: AppEpic = (
         if (prev) {
           setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
           return r.isMediaFileLoaded(state)
-            ? empty()
+            ? EMPTY
             : of(r.selectWaveformItem(prev))
         }
       }
@@ -201,11 +201,11 @@ const highlightLeftEpic: AppEpic = (
       if (prev) {
         setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
         return r.isMediaFileLoaded(state)
-          ? empty()
+          ? EMPTY
           : of(r.selectWaveformItem(prev))
       }
 
-      return empty()
+      return EMPTY
     })
   )
 

@@ -3,4 +3,6 @@ import moment from 'moment'
 
 const nowUtcTimestamp = () => moment.utc().format()
 
-export default { uuid, nowUtcTimestamp }
+const sideEffectsHelpers = { uuid, nowUtcTimestamp }
+
+export default sideEffectsHelpers
