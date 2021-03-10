@@ -113,7 +113,12 @@ const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
 
       const newSettings =
         Boolean(newerReleases.length) &&
-        (await showDownloadPrompt(checkAtStartup, newerReleases, effects))
+        (await showDownloadPrompt(
+          checkAtStartup,
+          newerReleases[0],
+          newerReleases,
+          effects
+        ))
 
       return newSettings ? of(r.overrideSettings(newSettings)) : EMPTY
     }),
@@ -149,7 +154,12 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
 
       const { value: newerReleases } = updatesCheck
       const newSettings = Boolean(newerReleases.length)
-        ? await showDownloadPrompt(checkAtStartup, newerReleases, effects)
+        ? await showDownloadPrompt(
+            checkAtStartup,
+            newerReleases[0],
+            newerReleases,
+            effects
+          )
         : await showUpToDateMessageBox(checkAtStartup, effects)
 
       return newSettings ? of(r.overrideSettings(newSettings)) : EMPTY
@@ -188,13 +198,14 @@ const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
 
 async function showDownloadPrompt(
   checkAtStartup: boolean,
+  newestRelease: { tag_name: string; body: string },
   newerReleases: { tag_name: string; body: string }[],
   effects: EpicsDependencies
 ): Promise<Partial<SettingsState> | null> {
   const messageBoxResult = await effects.showMessageBox({
     title: 'An update is available!',
     message:
-      `An newer version of Knowclip (${newerReleases[0].tag_name}) is currently available for download.\n\n` +
+      `An newer version of Knowclip (${newestRelease.tag_name}) is currently available for download.\n\n` +
       `Updates include:\n${[
         ...new Set(
           newerReleases.flatMap((r) =>
