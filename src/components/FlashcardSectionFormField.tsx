@@ -79,6 +79,7 @@ const FlashcardSectionFormField = memo(
     useEffect(() => {
       if (
         inputRef?.current &&
+        text !== previousText &&
         registeredCaretLocation !== null &&
         registeredCaretLocation !== caretLocation.current
       ) {

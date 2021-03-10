@@ -79,7 +79,6 @@ const HISTORY_CLEARING_ACTIONS = new Set<Action['type']>([
 const MAX_HISTORY_STACK_SIZE = 50
 
 // TODO: group text editing actions?
-// undo should work via menu too, not just keyboard shortcuts.
 
 function undoable<S extends AppState>(
   reducer: (s: S | undefined, a: Action) => S
