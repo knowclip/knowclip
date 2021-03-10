@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useRef,
 } from 'react'
-import { TextField, TextFieldProps } from '@material-ui/core'
+import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
@@ -75,10 +75,8 @@ const FlashcardSectionFormField = memo(
 
       return null
     })
-    console.log(name, registeredCaretLocation)
     const previousText = usePrevious(text)
     useEffect(() => {
-      console.log(name, Boolean(inputRef?.current))
       if (
         inputRef?.current &&
         registeredCaretLocation !== null &&
