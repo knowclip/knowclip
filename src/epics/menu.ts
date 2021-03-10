@@ -185,7 +185,7 @@ const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
           tag_name: string
           body: string
         }[] = await response.json()
-        console.log({ releases })
+
         const newerReleases = releases
           .sort((r1, r2) => rcompare(r1.tag_name, r2.tag_name))
           .filter(({ tag_name: tagName }) => gt(tagName, packageJson.version))
