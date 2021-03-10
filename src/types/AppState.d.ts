@@ -9,3 +9,14 @@ declare type AppState = {
   session: SessionState
   settings: SettingsState
 }
+
+declare type HistoryEntry<S extends AppState> = {
+  state: S
+  triggerAction: Action | null
+}
+
+declare type WithHistory<S extends AppState> = S & {
+  lastHistoryAction: Action | null
+  previous: HistoryEntry<S>[]
+  next: HistoryEntry<S>[]
+}

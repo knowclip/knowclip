@@ -21,6 +21,8 @@ export const KEYS = {
   pUppercase: 'P',
   sLowercase: 's',
   sUppercase: 'S',
+  zLowercase: 'z',
+  zUppercase: 'Z',
   arrowLeft: 'ArrowLeft',
   arrowRight: 'ArrowRight',
   cmd: 'Meta',

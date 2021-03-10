@@ -1,4 +1,6 @@
 const ActionTypes = {
+  undo: 'undo',
+  redo: 'redo',
   setCurrentFile: 'setCurrentFile',
   toggleLoop: 'toggleLoop',
   setLoop: 'setLoop',

@@ -99,14 +99,8 @@ const FlashcardSectionForm = memo(
     }, [initialFocus, loopOnInteract])
 
     const handleClickDeleteButton = useCallback(() => {
-      dispatch(
-        actions.confirmationDialog(
-          'Are you sure you want to delete this clip and flashcard?',
-          actions.deleteCard(id)
-        )
-      )
-      loopOnInteract()
-    }, [dispatch, id, loopOnInteract])
+      dispatch(actions.deleteCard(id))
+    }, [dispatch, id])
     const handleClickPreviewButton = useCallback(() => {
       dispatch(actions.stopEditingCards())
     }, [dispatch])
@@ -168,9 +162,6 @@ const FlashcardSectionForm = memo(
               return (
                 <Field
                   key={`${fieldName}_${flashcard.id}`}
-                  inputRef={
-                    fieldName === autofocusFieldName ? focusRef : undefined
-                  }
                   name={fieldName}
                   subtitles={subtitles}
                   linkedSubtitlesTrack={linkedTrackId}

@@ -58,6 +58,12 @@ const closeProject: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
     map(() => r.closeProjectRequest())
   )
 
+const undo: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
+  fromIpcRendererEvent('undo').pipe(map(() => r.undo()))
+
+const redo: AppEpic = (action$, state$, { fromIpcRendererEvent }) =>
+  fromIpcRendererEvent('redo').pipe(map(() => r.redo()))
+
 const openProject: AppEpic = (
   action$,
   state$,
@@ -243,6 +249,8 @@ export default combineEpics(
   saveProject,
   closeProject,
   openProject,
+  undo,
+  redo,
   startupCheckForUpdates,
   menuCheckForUpdates
 )

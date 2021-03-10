@@ -28,6 +28,14 @@ const appActions = {
     type: A.initializeApp,
   }),
 
+  undo: () => ({
+    type: A.undo,
+  }),
+
+  redo: () => ({
+    type: A.redo,
+  }),
+
   // [A['@@INIT']]: () => ({
   //   type: A['@@INIT']
   // }),

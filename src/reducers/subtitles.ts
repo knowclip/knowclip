@@ -3,10 +3,7 @@ import A from '../types/ActionType'
 
 const initialState: SubtitlesState = {}
 
-const subtitles: Reducer<SubtitlesState> = (
-  state: SubtitlesState = initialState,
-  action: Action
-) => {
+const subtitles: Reducer<SubtitlesState> = (state = initialState, action) => {
   switch (action.type) {
     case A.mountSubtitlesTrack:
       return { ...state, [action.track.id]: action.track }

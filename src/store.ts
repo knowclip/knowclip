@@ -1,20 +1,14 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-import persistedReducer from './reducers'
+import persistedUndoableReducer from './reducers'
 import epic from './epics'
 import { listenForPersistedDataLogMessage } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
 import { persistStore } from 'redux-persist'
 
-const getDevToolsCompose = () => {
-  const devToolsCompose = ((window as unknown) as {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose
-  }).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-
-  return devToolsCompose || compose
-}
-const composeEnhancers =
-  process.env.NODE_ENV === 'development' ? getDevToolsCompose() : compose
+const reduxDevtoolsExtension = ((window as unknown) as {
+  __REDUX_DEVTOOLS_EXTENSION__: any
+}).__REDUX_DEVTOOLS_EXTENSION__
 
 function getStore(initialState: Partial<AppState> | undefined) {
   const epicMiddleware = createEpicMiddleware({
@@ -22,9 +16,22 @@ function getStore(initialState: Partial<AppState> | undefined) {
   })
 
   const store = createStore(
-    persistedReducer,
+    persistedUndoableReducer,
     initialState as any,
-    composeEnhancers(applyMiddleware(epicMiddleware))
+    compose(
+      applyMiddleware(epicMiddleware),
+      ...(process.env.NODE_ENV === 'development' && reduxDevtoolsExtension
+        ? [
+            reduxDevtoolsExtension({
+              stateSanitizer: ({ previous, next, ...state }: any) => ({
+                ...state,
+                previous: `${previous.length} items`,
+                next: `${next.length} items`,
+              }),
+            }),
+          ]
+        : [])
+    )
   )
 
   listenForPersistedDataLogMessage(store.getState)
@@ -37,4 +44,3 @@ function getStore(initialState: Partial<AppState> | undefined) {
 }
 
 export default getStore
-
