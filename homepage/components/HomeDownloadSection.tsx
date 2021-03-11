@@ -207,7 +207,7 @@ const DownloadSection = () => {
                 Install it in your preferred manner, or via
                 <pre>
                   cd /your/download/folder/ # replace this!
-                  {"\n"}sudo dpkg -i {getFileName("linux", "deb")}
+                  {"\n"}sudo dpkg -i {getFileName(downloadVersion, "linux", "deb")}
                 </pre>
               </li>
               <li>
