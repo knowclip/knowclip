@@ -19,10 +19,10 @@ const getOs = ({ userAgent }: Navigator) => {
   return WINDOWS
 }
 
-const LATEST_VERSION = "v0.9.0-beta"
+const LATEST_VERSION = "0.9.0-beta"
 
-const getFileName = (version: string, osCode: string, ext: string, arch?: string) =>
-  `Knowclip_${[version, osCode, arch].filter((s) => s).join("_")}.${ext}`
+const getFileName = (versionWithoutV: string, osCode: string, ext: string, arch?: string) =>
+  `Knowclip_${[versionWithoutV, osCode, arch].filter((s) => s).join("_")}.${ext}`
 
 const DownloadSection = () => {
   const [os, setOs] = useState<string>()
@@ -52,9 +52,9 @@ const DownloadSection = () => {
 
   const getDownloadUrl = useCallback(
     (osCode: string, ext: string, arch?: string) =>
-      `https://github.com/knowclip/knowclip/releases/download/${
-        downloadVersion || LATEST_VERSION
-      }/${getFileName(downloadVersion || LATEST_VERSION, osCode, ext, arch)}`,
+      `https://github.com/knowclip/knowclip/releases/download/v${
+        (downloadVersion || LATEST_VERSION)
+      }/${getFileName((downloadVersion || LATEST_VERSION), osCode, ext, arch)}`,
     [downloadVersion]
   )
   useEffect(() => {
@@ -66,8 +66,9 @@ const DownloadSection = () => {
     })
       .then((res) => res.json())
       .then((json) => {
-        if (json.name !== LATEST_VERSION) {
-          setDownloadVersion(json.name)
+        const withoutV = json.name.replace(/^v/, '')
+        if (withoutV !== LATEST_VERSION) {
+          setDownloadVersion(withoutV)
         }
       })
   }, [setDownloadVersion])
