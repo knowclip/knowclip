@@ -19,10 +19,10 @@ const getOs = ({ userAgent }: Navigator) => {
   return WINDOWS
 }
 
-const LATEST_VERSION = "0.8.2-beta"
+const LATEST_VERSION = "0.9.0-beta"
 
-const getFileName = (osCode: string, ext: string, arch?: string) =>
-  `Knowclip_${[LATEST_VERSION, osCode, arch].filter((s) => s).join("_")}.${ext}`
+const getFileName = (version: string, osCode: string, ext: string, arch?: string) =>
+  `Knowclip_${[version, osCode, arch].filter((s) => s).join("_")}.${ext}`
 
 const DownloadSection = () => {
   const [os, setOs] = useState<string>()
@@ -52,9 +52,9 @@ const DownloadSection = () => {
 
   const getDownloadUrl = useCallback(
     (osCode: string, ext: string, arch?: string) =>
-      `https://github.com/knowclip/knowclip/releases/download/v${
+      `https://github.com/knowclip/knowclip/releases/download/${
         downloadVersion || LATEST_VERSION
-      }/${getFileName(osCode, ext, arch)}`,
+      }/${getFileName(downloadVersion || LATEST_VERSION, osCode, ext, arch)}`,
     [downloadVersion]
   )
   useEffect(() => {
