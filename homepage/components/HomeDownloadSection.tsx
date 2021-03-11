@@ -19,7 +19,7 @@ const getOs = ({ userAgent }: Navigator) => {
   return WINDOWS
 }
 
-const LATEST_VERSION = "0.9.0-beta"
+const LATEST_VERSION = "v0.9.0-beta"
 
 const getFileName = (version: string, osCode: string, ext: string, arch?: string) =>
   `Knowclip_${[version, osCode, arch].filter((s) => s).join("_")}.${ext}`
