@@ -165,7 +165,7 @@ function moveClip({
 }): AppEpic {
   return (action$, state$, { window, getWaveformSvgElement }) => {
     const mousemoves = fromEvent<MouseEvent>(window, 'mousemove').pipe(
-      tap(mousemove => {
+      tap((mousemove) => {
         mousemove.preventDefault()
       }),
       takeUntil(fromEvent(window, 'mouseup'))
@@ -193,7 +193,9 @@ function moveClip({
           deltaX,
         })
       }),
-      distinctUntilChanged(({ action: { deltaX: a } }, { action: { deltaX: b } }) => a === b)
+      distinctUntilChanged(
+        ({ action: { deltaX: a } }, { action: { deltaX: b } }) => a === b
+      )
     )
 
     return merge(

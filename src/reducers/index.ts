@@ -190,7 +190,10 @@ function undoable<S extends AppState>(
   }
 }
 
-function sessionAfterHistoryAction(base: SessionState, override: SessionState): SessionState {
+function sessionAfterHistoryAction(
+  base: SessionState,
+  override: SessionState
+): SessionState {
   return {
     ...base,
     loopMedia: override.loopMedia,
