@@ -7,6 +7,8 @@ import {
   take,
   mergeMap,
   skipUntil,
+  distinctUntilChanged,
+  tap,
 } from 'rxjs/operators'
 import { fromEvent, from, of, merge, timer, EMPTY } from 'rxjs'
 import r from '../redux'
@@ -163,6 +165,9 @@ function moveClip({
 }): AppEpic {
   return (action$, state$, { window, getWaveformSvgElement }) => {
     const mousemoves = fromEvent<MouseEvent>(window, 'mousemove').pipe(
+      tap(mousemove => {
+        mousemove.preventDefault()
+      }),
       takeUntil(fromEvent(window, 'mouseup'))
     )
 
@@ -173,7 +178,6 @@ function moveClip({
     )
     const pendingMoves = delayedMousemoves.pipe(
       map((mousemove) => {
-        mousemove.preventDefault()
         const svgElement = getWaveformSvgElement()
         if (!svgElement) throw new Error('Waveform disappeared')
 
@@ -183,13 +187,13 @@ function moveClip({
           state$.value.waveform.viewBox.xMin
         )
         const deltaX = mousedownCoords.x - mousemoveCoords.x
-        const move = {
+        return r.setPendingMove({
           start: clipHit.start - deltaX,
           end: clipHit.end - deltaX,
           deltaX,
-        }
-        return r.setPendingMove(move)
-      })
+        })
+      }),
+      distinctUntilChanged(({ action: { deltaX: a } }, { action: { deltaX: b } }) => a === b)
     )
 
     return merge(
