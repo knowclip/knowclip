@@ -52,8 +52,8 @@ const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.Me
   {
     label: '&Edit',
     submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
+      { label: 'Undo', accelerator: 'CmdOrCtrl+Z', click: () => mainWindow.webContents.send('undo') },
+      { label: 'Redo', accelerator: 'CmdOrCtrl+Shift+Z', click: () => mainWindow.webContents.send('redo') },
       { type: 'separator' },
       { role: 'cut' },
       { role: 'copy' },

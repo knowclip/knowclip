@@ -1,4 +1,11 @@
-import React, { useCallback, useMemo, memo, MutableRefObject } from 'react'
+import React, {
+  useCallback,
+  useMemo,
+  memo,
+  MutableRefObject,
+  useEffect,
+  useRef,
+} from 'react'
 import { TextField } from '@material-ui/core'
 import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
 import css from './FlashcardSection.module.css'
@@ -6,6 +13,8 @@ import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { flashcardSectionForm$, capitalize } from './FlashcardSectionForm'
 import cn from 'classnames'
 import { MediaSubtitles } from '../selectors/subtitles'
+import { useSelector } from 'react-redux'
+import { usePrevious } from '../utils/usePrevious'
 
 type Props = {
   name: FlashcardFieldName
@@ -33,11 +42,15 @@ const FlashcardSectionFormField = memo(
     onKeyPress,
     autoFocus = false,
     onFocus,
-    inputRef,
     className,
   }: Props) => {
+    const inputRef = useRef<HTMLInputElement>()
+    const caretLocation = useRef<number>()
     const handleChange = useCallback(
-      (e) => setFlashcardText(name, e.target.value, e.target.selectionEnd),
+      (e) => {
+        caretLocation.current = e.target.selectionEnd
+        setFlashcardText(name, e.target.value, e.target.selectionEnd)
+      },
       [setFlashcardText, name]
     )
 
@@ -46,6 +59,35 @@ const FlashcardSectionFormField = memo(
 
       return track ? `${capitalize(name)} (${track.label})` : capitalize(name)
     }, [subtitles.all, name, linkedSubtitlesTrack])
+
+    const text =
+      name in currentFlashcard.fields
+        ? (currentFlashcard.fields as Record<
+            TransliterationFlashcardFieldName,
+            string
+          >)[name]
+        : ''
+
+    const registeredCaretLocation = useSelector((s: WithHistory<AppState>) => {
+      const action = s.lastHistoryAction
+      if (action && action.type === 'setFlashcardField' && action.key === name)
+        return action.caretLocation
+
+      return null
+    })
+    const previousText = usePrevious(text)
+    useEffect(() => {
+      if (
+        inputRef?.current &&
+        text !== previousText &&
+        registeredCaretLocation !== null &&
+        registeredCaretLocation !== caretLocation.current
+      ) {
+        inputRef.current.focus()
+        inputRef.current.selectionStart = registeredCaretLocation
+        inputRef.current.selectionEnd = registeredCaretLocation
+      }
+    }, [text, previousText, registeredCaretLocation, inputRef])
 
     return (
       <section className={cn(className, css.field)}>
@@ -66,14 +108,7 @@ const FlashcardSectionFormField = memo(
           onFocus={onFocus}
           name={name}
           inputRef={inputRef}
-          value={
-            name in currentFlashcard.fields
-              ? (currentFlashcard.fields as Record<
-                  TransliterationFlashcardFieldName,
-                  string
-                >)[name]
-              : ''
-          }
+          value={text}
           fullWidth
           multiline
           margin="dense"

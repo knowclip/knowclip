@@ -33,7 +33,6 @@ export default async function makeSomeFlashcards({ client }: TestSetup) {
   await client.waitForText_(flashcardSection$.container, '3 / 3')
 
   await client.clickElement_(deleteButton)
-  await client.clickElement_(confirmationDialog$.okButton)
 
   await client.elements_(waveform$.waveformClip, 2)
 

@@ -66,12 +66,7 @@ const FlashcardSectionDisplayCard = memo(
     }, [dispatch, flashcard.id, flashcard.image])
 
     const deleteClipAndCard = useCallback(() => {
-      dispatch(
-        r.confirmationDialog(
-          'Are you sure you want to delete this clip and flashcard?',
-          r.deleteCard(flashcard.id)
-        )
-      )
+      dispatch(r.deleteCard(flashcard.id))
     }, [dispatch, flashcard.id])
 
     const clozeControls = useClozeControls({

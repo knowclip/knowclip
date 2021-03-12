@@ -156,7 +156,7 @@ const showSubtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
       if (!r.getCurrentFileClips(state$.value).length)
         return r.subtitlesClipDialog()
       return r.confirmationDialog(
-        'This action will delete any clips and cards you made for this current file. Are you sure you want to continue?',
+        'This action will PERMANENTLY delete any clips and cards you made for this current file. Are you sure you want to continue?',
         r.subtitlesClipDialog()
       )
     })
