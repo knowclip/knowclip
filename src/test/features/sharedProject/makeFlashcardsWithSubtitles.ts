@@ -19,7 +19,6 @@ export default async function makeFlashcardsWithSubtitles({
   await client.clickElement_(confirmationDialog$.okButton)
 
   await client.clickElement_(flashcardForm$.deleteButton)
-  await client.clickElement_(confirmationDialog$.okButton)
 
   await client.elements_(waveform$.waveformClip, 3)
 

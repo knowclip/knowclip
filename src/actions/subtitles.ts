@@ -93,7 +93,6 @@ const linkFlashcardFieldToSubtitlesTrack = (
   fieldToClear?: FlashcardFieldName
 ) =>
   filesActions.updateFile({
-    // ): UpdateFileWith<'linkFlashcardFieldToSubtitlesTrack'> => filesActions.updateFile({
     fileType: 'MediaFile',
     updateName: 'linkFlashcardFieldToSubtitlesTrack',
     id: mediaFileId,
@@ -106,5 +105,3 @@ export const compositeSubtitlesActions = {
   deleteSubtitlesTrackFromMedia,
   linkFlashcardFieldToSubtitlesTrack,
 }
-
-// type X = MediaFile extends FileMetadata ? string : number
