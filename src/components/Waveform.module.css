@@ -34,6 +34,21 @@
   pointer-events: none;
 }
 
+.waveformPendingClipMove {
+  animation: flashIn .2s;
+  stroke: rgba(255, 255, 0, 0.2);
+  fill: rgba(255, 255, 0, .2);
+}
+
+@keyframes flashIn {
+  0% {
+    stroke: rgba(255, 255, 0, .8);
+  }
+  100% {
+    stroke: rgba(255, 255, 0, 0.2);
+  }
+}
+
 .waveformPendingStretch {
   stroke: rgba(0, 255, 255, 0.4);
   fill: rgba(0, 255, 255, 0.4);

@@ -139,7 +139,11 @@ export const newClipFromChunk: AppEpic = (
         )
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,
-          { start: selection.item.start, end: selection.item.end },
+          {
+            type: 'PendingClip',
+            start: selection.item.start,
+            end: selection.item.end,
+          },
           mediaFileId,
           uuid(),
           fields

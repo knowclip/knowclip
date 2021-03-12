@@ -90,6 +90,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
             {
+              type: 'PendingClip',
               start: r.getXAtMilliseconds(state$.value, start),
               end: r.getXAtMilliseconds(state$.value, end),
             },

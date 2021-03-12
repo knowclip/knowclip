@@ -4,8 +4,7 @@ import { of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
 import setWaveformCursorEpic from './setWaveformCursor'
-import addClip from './addClip'
-import stretchClip from './stretchClip'
+import stretchClip from './clipMousedown'
 import editClip from './editClip'
 import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
@@ -92,7 +91,7 @@ const rootEpic: AppEpic = combineEpics(
   addMediaToProject,
   setWaveformCursorEpic,
   loopMedia,
-  addClip,
+  // addClip,
   editClip,
   stretchClip,
   detectSilenceEpic,

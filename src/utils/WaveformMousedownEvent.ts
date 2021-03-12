@@ -1,10 +1,14 @@
+import { MouseEvent } from 'react'
+
 export default class WaveformMousedownEvent extends Event {
   seconds: number
+  browserMousedown: MouseEvent<SVGElement>
   svg: SVGElement
 
-  constructor(svg: SVGElement, seconds: number) {
+  constructor(browserMousedown: MouseEvent<SVGElement>, seconds: number) {
     super('waveformMousedown')
-    this.svg = svg
+    this.browserMousedown = browserMousedown
+    this.svg = browserMousedown.currentTarget
     this.seconds = seconds
   }
 

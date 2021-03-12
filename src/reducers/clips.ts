@@ -133,6 +133,29 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
       }
     }
 
+    case A.moveClip: {
+      const existingClip = state.byId[action.id]
+      const { deltaX } = action
+      const movedState = {
+        ...state,
+        byId: {
+          ...state.byId,
+          [action.id]: {
+            ...existingClip,
+            start: existingClip.start - deltaX,
+            end: existingClip.end - deltaX,
+          },
+        },
+      }
+      return action.overlapIds
+        ? mergeClips(
+            [action.id, ...action.overlapIds],
+            movedState.byId,
+            movedState
+          )
+        : movedState
+    }
+
     case A.editClip: {
       const { id, override, flashcardOverride } = action
       return editClip(state, id, override, flashcardOverride)
@@ -148,85 +171,7 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     }
 
     case A.mergeClips: {
-      const { ids } = action // should all have same filepath
-      const { fileId } = state.byId[ids[0]]
-      const [finalId, ...idsToBeDiscarded] = ids
-      const clipsOrder = Object.values(state.byId)
-        .sort((a, b) => a.start - b.start)
-        .map((s) => s.id)
-      const newClipsOrder = clipsOrder.filter(
-        (id) => !idsToBeDiscarded.includes(id)
-      )
-      const newClips: Record<ClipId, Clip> = {}
-      const newCards: Record<ClipId, Flashcard> = {}
-      newClipsOrder.forEach((id) => {
-        const clip = state.byId[id]
-        if (!clip) throw new Error('impossible')
-        newClips[id] = clip
-
-        const card = state.flashcards[id]
-        if (!card) throw new Error('impossible')
-        newCards[id] = card
-      })
-      const sortedClipsToMerge = ids
-        .sort(byStart(state.byId))
-        .map((id) => state.byId[id])
-
-      const { flashcards: cards } = state
-      const flashcard = newFlashcard(
-        finalId,
-        cards[finalId].fields,
-        [
-          ...sortedClipsToMerge.reduce((all, { id }) => {
-            cards[id].tags.forEach((tag: string) => all.add(tag))
-            return all
-          }, new Set<string>()),
-        ],
-        cards[finalId].image
-      )
-      const fieldNames = getNoteTypeFields(flashcard.type)
-
-      for (const fieldName of fieldNames) {
-        if (fieldName === 'transcription') {
-          const mergingCards = sortedClipsToMerge.map(({ id }) => cards[id])
-          const { clozeDeletions, text } = mergeClozeFields(
-            mergingCards,
-            fieldName
-          )
-          flashcard.fields[fieldName as SimpleFlashcardFieldName] = text
-          flashcard.cloze = clozeDeletions
-        } else {
-          const values = sortedClipsToMerge.map(
-            ({ id }) =>
-              cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
-          )
-
-          const value = values.filter((x) => x.trim()).join('\n')
-          flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
-        }
-      }
-
-      if (flashcard.cloze.length > 10) console.error(flashcard.cloze.splice(10))
-
-      newClips[finalId] = {
-        ...state.byId[finalId],
-        start: sortedClipsToMerge[0].start,
-        end: sortedClipsToMerge[sortedClipsToMerge.length - 1].end,
-      }
-      return {
-        ...state,
-        byId: newClips,
-        idsByMediaFileId: {
-          ...state.idsByMediaFileId,
-          [fileId]: state.idsByMediaFileId[fileId].filter(
-            (id) => !idsToBeDiscarded.includes(id)
-          ),
-        },
-        flashcards: {
-          ...newCards,
-          [finalId]: flashcard,
-        },
-      }
+      return mergeClips(action.ids, state.byId, state)
     }
 
     case A.deleteCard: {
@@ -360,6 +305,88 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
     }
     default:
       return state
+  }
+}
+
+function mergeClips(
+  /** should all have same filepath */
+  unsortedIds: ClipId[],
+  byId: ClipsState['byId'],
+  state: ClipsState
+) {
+  const ids = unsortedIds.sort(byStart(byId))
+  const { fileId } = byId[ids[0]]
+  const [finalId, ...idsToBeDiscarded] = ids
+  const clipsOrder = Object.values(byId)
+    .sort((a, b) => a.start - b.start)
+    .map((s) => s.id)
+  const newClipsOrder = clipsOrder.filter(
+    (id) => !idsToBeDiscarded.includes(id)
+  )
+  const newClips: Record<ClipId, Clip> = {}
+  const newCards: Record<ClipId, Flashcard> = {}
+  newClipsOrder.forEach((id) => {
+    const clip = byId[id]
+    if (!clip) throw new Error('impossible')
+    newClips[id] = clip
+
+    const card = state.flashcards[id]
+    if (!card) throw new Error('impossible')
+    newCards[id] = card
+  })
+  const sortedClipsToMerge = ids.map((id) => byId[id])
+
+  const { flashcards: cards } = state
+  const flashcard = newFlashcard(
+    finalId,
+    cards[finalId].fields,
+    [
+      ...sortedClipsToMerge.reduce((all, { id }) => {
+        cards[id].tags.forEach((tag: string) => all.add(tag))
+        return all
+      }, new Set<string>()),
+    ],
+    cards[finalId].image
+  )
+  const fieldNames = getNoteTypeFields(flashcard.type)
+
+  for (const fieldName of fieldNames) {
+    if (fieldName === 'transcription') {
+      const mergingCards = sortedClipsToMerge.map(({ id }) => cards[id])
+      const { clozeDeletions, text } = mergeClozeFields(mergingCards, fieldName)
+      flashcard.fields[fieldName as SimpleFlashcardFieldName] = text
+      flashcard.cloze = clozeDeletions
+    } else {
+      const values = sortedClipsToMerge.map(
+        ({ id }) =>
+          cards[id].fields[fieldName as SimpleFlashcardFieldName] || ''
+      )
+
+      const value = values.filter((x) => x.trim()).join('\n')
+      flashcard.fields[fieldName as SimpleFlashcardFieldName] = value
+    }
+  }
+
+  if (flashcard.cloze.length > 10) console.error(flashcard.cloze.splice(10))
+
+  newClips[finalId] = {
+    ...byId[finalId],
+    start: sortedClipsToMerge[0].start,
+    end: Math.max(...sortedClipsToMerge.map((c) => c.end)),
+  }
+  return {
+    ...state,
+    byId: newClips,
+    idsByMediaFileId: {
+      ...state.idsByMediaFileId,
+      [fileId]: state.idsByMediaFileId[fileId].filter(
+        (id) => !idsToBeDiscarded.includes(id)
+      ),
+    },
+    flashcards: {
+      ...newCards,
+      [finalId]: flashcard,
+    },
   }
 }
 

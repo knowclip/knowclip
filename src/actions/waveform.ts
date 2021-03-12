@@ -7,22 +7,13 @@ export const waveformActions = {
     newViewBox: newViewBox || null,
   }),
 
-  setPendingClip: (clip: PendingClip) => ({
-    type: A.setPendingClip,
-    clip,
+  setPendingWaveformAction: (action: PendingWaveformAction) => ({
+    type: A.setPendingWaveformAction,
+    action,
   }),
 
-  clearPendingClip: () => ({
-    type: A.clearPendingClip,
-  }),
-
-  setPendingStretch: (stretch: PendingStretch) => ({
-    type: A.setPendingStretch,
-    stretch,
-  }),
-
-  clearPendingStretch: () => ({
-    type: A.clearPendingStretch,
+  clearPendingWaveformAction: () => ({
+    type: A.clearPendingWaveformAction,
   }),
 
   setWaveformViewBox: (viewBox: WaveformViewBox) => ({
@@ -34,4 +25,38 @@ export const waveformActions = {
     type: A.generateWaveformImages,
     waveformPngs,
   }),
+}
+
+export const compositeWaveformActions = {
+  setPendingClip: (clip: Omit<PendingClip, 'type'>) => {
+    const action: PendingWaveformAction = {
+      type: 'PendingClip',
+      ...clip,
+    }
+    return {
+      type: A.setPendingWaveformAction,
+      action,
+    }
+  },
+  setPendingMove: (move: Omit<PendingClipMove, 'type'>) => {
+    const action: PendingWaveformAction = {
+      type: 'PendingClipMove',
+      ...move,
+    }
+    return {
+      type: A.setPendingWaveformAction,
+      action,
+    }
+  },
+
+  setPendingStretch: (stretch: Omit<PendingStretch, 'type'>) => {
+    const action: PendingWaveformAction = {
+      type: 'PendingStretch',
+      ...stretch,
+    }
+    return {
+      type: A.setPendingWaveformAction,
+      action,
+    }
+  },
 }

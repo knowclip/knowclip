@@ -1,12 +1,18 @@
+import * as React from 'react'
+
 const toWaveformXRaw = (
-  mouseEvent: MouseEvent,
+  mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
   svgElement: SVGElement,
   xMin = 0
 ) => mouseEvent.clientX - svgElement.getBoundingClientRect().left + xMin
 
 export const toWaveformX =
   process.env.NODE_ENV === 'development' && process.env.REACT_APP_CHROMEDRIVER
-    ? (mouseEvent: MouseEvent, svgElement: SVGElement, xMin = 0) => {
+    ? (
+        mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
+        svgElement: SVGElement,
+        xMin = 0
+      ) => {
         const x = toWaveformXRaw(mouseEvent, svgElement, xMin)
         console.log(mouseEvent.type, mouseEvent.pageX, mouseEvent)
         return x
@@ -14,7 +20,7 @@ export const toWaveformX =
     : toWaveformXRaw
 
 export const toWaveformCoordinates = (
-  mouseEvent: MouseEvent,
+  mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
   svgElement: SVGElement,
   xMin = 0
 ) => {

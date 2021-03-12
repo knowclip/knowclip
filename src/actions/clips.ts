@@ -66,6 +66,13 @@ export const clipsActions = {
     newSelection,
   }),
 
+  moveClip: (id: ClipId, deltaX: number, overlapIds: Array<ClipId>) => ({
+    type: A.moveClip,
+    id,
+    deltaX,
+    overlapIds,
+  }),
+
   setFlashcardField: (
     id: ClipId,
     key: FlashcardFieldName,

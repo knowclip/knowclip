@@ -1,4 +1,4 @@
-import React, { memo, useRef, useCallback, useMemo } from 'react'
+import React, { memo, useRef, useCallback, useMemo, EventHandler } from 'react'
 import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
 import r from '../redux'
@@ -10,6 +10,7 @@ import {
 import WaveformMousedownEvent from '../utils/WaveformMousedownEvent'
 import { setCursorX } from '../utils/waveform'
 import {
+  ExpandedPendingStretch,
   SubtitlesCardBase,
   SubtitlesCardBases,
   WaveformSelectionExpanded,
@@ -113,16 +114,27 @@ type ChunkProps = {
   height: number
 }
 
-const PendingClip = ({ start, end, height }: ChunkProps) => (
-  <rect
-    className={css.waveformPendingClip}
-    {...getClipRectProps(start, end, height)}
-  />
-)
+const WAVEFORM_ACTION_TYPE_TO_CLASSNAMES: Record<
+  PendingWaveformAction['type'],
+  string
+> = {
+  PendingClip: css.waveformPendingClip,
+  PendingClipMove: css.waveformPendingClipMove,
+  PendingStretch: css.waveformPendingStretch,
+}
 
-const PendingStretch = ({ start, end, height }: ChunkProps) => (
+type WaveformPendingAction = Exclude<
+  ReturnType<typeof r.getPendingWaveformAction>,
+  null
+>
+const PendingWaveformItem = ({
+  start,
+  end,
+  height,
+  type,
+}: ChunkProps & Pick<WaveformPendingAction, 'type'>) => (
   <rect
-    className={css.waveformPendingStretch}
+    className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[type]}
     {...getClipRectProps(start, end, height)}
   />
 )
@@ -398,8 +410,7 @@ const Waveform = () => {
     waveform,
     images,
     clips,
-    pendingClip,
-    pendingStretch,
+    pendingWaveformAction,
     highlightedClipId,
     subtitles,
     highlightedChunkIndex,
@@ -409,8 +420,11 @@ const Waveform = () => {
     waveform: r.getWaveform(state),
     images: r.getWaveformImages(state),
     clips: r.getCurrentFileClips(state),
-    pendingClip: r.getPendingClip(state),
-    pendingStretch: r.getPendingStretch(state),
+    pendingWaveformAction: r.getPendingWaveformAction(state) as
+      | PendingClip
+      | ExpandedPendingStretch
+      | PendingClipMove
+      | null,
     highlightedClipId: r.getHighlightedClipId(state),
     subtitles: r.getDisplayedSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
@@ -459,7 +473,9 @@ const Waveform = () => {
     [waveform]
   )
 
-  const handleMouseDown = useCallback(
+  const handleMouseDown: EventHandler<React.MouseEvent<
+    SVGElement
+  >> = useCallback(
     (e) => {
       const coords = toWaveformCoordinates(
         e,
@@ -468,7 +484,7 @@ const Waveform = () => {
       )
       const x = Math.min(waveform.length, coords.x)
       const waveformMousedown = new WaveformMousedownEvent(
-        e.currentTarget,
+        e,
         getSecondsAtXFromWaveform(waveform, x)
       )
       document.dispatchEvent(waveformMousedown)
@@ -516,16 +532,10 @@ const Waveform = () => {
         <Clips
           {...{ clips, highlightedClipId, stepsPerSecond, height, waveform }}
         />
-        {pendingClip && (
-          <PendingClip
-            {...pendingClip}
-            stepsPerSecond={stepsPerSecond}
-            height={height}
-          />
-        )}
-        {pendingStretch && (
-          <PendingStretch
-            {...pendingStretch}
+        {pendingWaveformAction && (
+          <PendingWaveformItem
+            {...pendingWaveformAction}
+            type={pendingWaveformAction.type}
             stepsPerSecond={stepsPerSecond}
             height={height}
           />

@@ -11,7 +11,7 @@ import { actions } from '../actions'
 import r from '../redux'
 import { combineEpics } from 'redux-observable'
 import { areSelectionsEqual } from '../utils/waveformSelection'
-import { overlapsSignificantly } from '../selectors'
+import { ExpandedPendingStretch, overlapsSignificantly } from '../selectors'
 
 let seeking = false
 
@@ -79,7 +79,7 @@ const setCursorPositionEpic: AppEpic = (action$, state$, effects) =>
             effects.getWaveformSvgWidth(),
             newSelection,
             wasSeeking,
-            pendingMousedownItem
+            r.getPendingWaveformAction(state$.value)
           )
 
           if (newSelection && !areSelectionsEqual(selection, newSelection)) {
@@ -106,7 +106,11 @@ const setViewBox = (
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean,
-  pendingMousedownItem: PendingClip | PendingStretch | null
+  pendingMousedownItem:
+    | PendingClip
+    | ExpandedPendingStretch
+    | PendingClipMove
+    | null
 ) => {
   const viewBox = state.waveform.viewBox
 

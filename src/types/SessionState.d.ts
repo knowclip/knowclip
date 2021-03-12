@@ -1,17 +1,30 @@
+declare type PendingWaveformAction =
+  | PendingClip
+  | PendingStretch
+  | PendingClipMove
+
 declare type PendingClip = {
+  type: 'PendingClip'
   start: WaveformX
   end: WaveformX
 }
 
 declare type PendingStretch = {
+  type: 'PendingStretch'
   originKey: 'start' | 'end'
   id: ClipId
   end: WaveformX
 }
 
+declare type PendingClipMove = {
+  type: 'PendingClipMove'
+  start: WaveformX
+  end: WaveformX
+  deltaX: number
+}
+
 declare type SessionState = {
-  pendingClip: PendingClip | null
-  pendingStretch: PendingStretch | null
+  pendingWaveformAction: PendingWaveformAction | null
   waveformSelection: WaveformSelection | null
   defaultTags: Array<string>
   defaultIncludeStill: boolean
