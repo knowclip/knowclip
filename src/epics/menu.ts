@@ -98,9 +98,9 @@ const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
 
       if (!window.navigator.onLine) return EMPTY
 
-      const { errors, value: newestRelease } = await checkForUpdates()
+      const updatesCheck = await checkForUpdates()
 
-      if (errors) {
+      if (updatesCheck.errors) {
         const messageBoxResult = await showMessageBox({
           title: 'Check for updates',
           message:
@@ -110,14 +110,19 @@ const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
         })
 
         if (messageBoxResult && messageBoxResult.response === 0)
-          openExternal('https://github.com/knowclip/knowclip/releases')
+          openExternal('https://knowclip.com/#download')
+
+        return EMPTY
       }
 
+      const newerReleases = updatesCheck.value
+
       const newSettings =
-        newestRelease &&
+        Boolean(newerReleases.length) &&
         (await showDownloadPrompt(
           checkAtStartup,
-          newestRelease.tag_name,
+          newerReleases[0],
+          newerReleases,
           effects
         ))
 
@@ -140,23 +145,25 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
         })
 
         if (messageBoxResult && messageBoxResult.response === 0)
-          openExternal('https://github.com/knowclip/knowclip/releases')
+          openExternal('https://knowclip.com/#download')
 
         return EMPTY
       }
 
-      const { errors, value: newestRelease } = await checkForUpdates()
+      const updatesCheck = await checkForUpdates()
 
-      if (errors) {
-        console.error(errors.join('; '))
+      if (updatesCheck.errors) {
+        console.error(updatesCheck.errors.join('; '))
         return EMPTY
       }
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
 
-      const newSettings = newestRelease
+      const { value: newerReleases } = updatesCheck
+      const newSettings = Boolean(newerReleases.length)
         ? await showDownloadPrompt(
             checkAtStartup,
-            newestRelease.tag_name,
+            newerReleases[0],
+            newerReleases,
             effects
           )
         : await showUpToDateMessageBox(checkAtStartup, effects)
@@ -167,10 +174,10 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
   )
 
 const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
-  ? async (): Promise<Result<{ tag_name: string } | null>> => ({
-      value: null,
+  ? async (): Promise<Result<{ tag_name: string; body: string }[]>> => ({
+      value: [],
     })
-  : async (): Promise<Result<{ tag_name: string } | null>> => {
+  : async (): Promise<Result<{ tag_name: string; body: string }[]>> => {
       try {
         const response = await fetch(
           'https://api.github.com/repos/knowclip/knowclip/releases',
@@ -180,13 +187,16 @@ const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
             },
           }
         )
-        const releases: { tag_name: string }[] = await response.json()
-        const newestRelease = releases
+        const releases: {
+          tag_name: string
+          body: string
+        }[] = await response.json()
 
+        const newerReleases = releases
           .sort((r1, r2) => rcompare(r1.tag_name, r2.tag_name))
-          .find(({ tag_name: tagName }) => gt(tagName, packageJson.version))
+          .filter(({ tag_name: tagName }) => gt(tagName, packageJson.version))
 
-        return { value: newestRelease || null }
+        return { value: newerReleases }
       } catch (err) {
         return { errors: [`${err}`] }
       }
@@ -194,21 +204,33 @@ const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
 
 async function showDownloadPrompt(
   checkAtStartup: boolean,
-  tagName: string,
+  newestRelease: { tag_name: string; body: string },
+  newerReleases: { tag_name: string; body: string }[],
   effects: EpicsDependencies
 ): Promise<Partial<SettingsState> | null> {
   const messageBoxResult = await effects.showMessageBox({
     title: 'An update is available!',
-    message: `An newer version of Knowclip (${tagName}) is currently available for download.\n
-Would you like to go to the download page now for details?\n`,
+    message:
+      `An newer version of Knowclip (${newestRelease.tag_name}) is currently available for download.\n\n` +
+      `Updates include:\n${[
+        ...new Set(
+          newerReleases.flatMap((r) =>
+            r.body
+              .split(/\n+/)
+              .filter((s) => s.trim())
+              .map((line) => ` ${line}`)
+          )
+        ),
+      ].join('\n')}\n\n` +
+      `Would you like to go to the download page now?\n`,
     checkboxChecked: checkAtStartup,
     checkboxLabel: 'Check for updates again next time I open Knowclip',
-    buttons: ['Yes', 'No thanks'],
+    buttons: ['Visit download page', 'No thanks'],
     cancelId: 1,
   })
   if (messageBoxResult) {
     if (messageBoxResult.response === 0)
-      effects.openExternal('https://github.com/knowclip/knowclip/releases')
+      effects.openExternal('https://knowclip.com/#download')
 
     const checkAtStartupChanged =
       messageBoxResult && messageBoxResult.checkboxChecked !== checkAtStartup
