@@ -72,13 +72,15 @@ const setCursorPositionEpic: AppEpic = (action$, state$, effects) =>
             return of(actions.setCursorPosition(selection.item.start))
           }
 
+          const waveform = r.getWaveform(state$.value)
           const setViewboxAction = setViewBox(
             state,
             newlyUpdatedTime,
             effects.getWaveformSvgWidth(),
             newSelection,
             wasSeeking,
-            { temp: 'TEMP ' }
+            waveform.stepLength * waveform.stepsPerSecond,
+            null
           )
 
           if (newSelection && !areSelectionsEqual(selection, newSelection)) {
@@ -105,11 +107,12 @@ const setViewBox = (
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean,
-  pendingMousedownItem: { temp: 'TEMP ' }
+  factor: number,
+  pendingMousedownItem: null
 ) => {
   const viewBox = state.waveform.viewBox
 
-  const newX = Math.round(newlySetTime * 50)
+  const newX = Math.round(newlySetTime * factor)
 
   const buffer = Math.round(svgWidth * 0.1)
 

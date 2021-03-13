@@ -7,25 +7,25 @@ export const setCursorX = (x: number) => {
   }
 }
 
-export const syncCursor = (_increment: number) => {
+export const syncCursor = (stepLength: number) => (_increment: number) => {
   const cursor: SVGLineElement | null = document.querySelector('.cursor')
   if (cursor) {
     const player = document.getElementById('mediaPlayer') as
       | HTMLVideoElement
       | HTMLAudioElement
       | null
-    const string = player ? String(player.currentTime * 50) : '0'
+    const string = player ? String(player.currentTime * stepLength) : '0'
     cursor.setAttribute('x1', string)
     cursor.setAttribute('x2', string)
   }
 
-  animationFrame = requestAnimationFrame(syncCursor)
+  animationFrame = requestAnimationFrame(syncCursor(stepLength))
 }
 
 let animationFrame: number
 
-export const startMovingCursor = () => {
-  animationFrame = requestAnimationFrame(syncCursor)
+export const startMovingCursor = (stepLength: number) => {
+  animationFrame = requestAnimationFrame(syncCursor(stepLength))
 }
 
 export const stopMovingCursor = () => {

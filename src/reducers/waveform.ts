@@ -3,7 +3,7 @@ import A from '../types/ActionType'
 
 const initialState: WaveformState = {
   stepsPerSecond: 25,
-  stepLength: 2,
+  stepLength: 1,
   cursor: { x: 0, y: 0 },
   viewBox: { xMin: 0 },
   length: 0,

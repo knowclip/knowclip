@@ -20,6 +20,10 @@ const clipCreateEpic: AppEpic = (
     switchMap(({ action: pendingClip }) => {
       const clipsOrder = r.getCurrentFileClipsOrder(state$.value)
       const clips = r.getCurrentFileClips(state$.value)
+
+      const left = Math.min(pendingClip.start, pendingClip.end)
+      const right = Math.max(pendingClip.start, pendingClip.end)
+
       const pendingClipOverlaps =
         [
           r.getClipIdAt(state$.value, pendingClip.start),
@@ -27,7 +31,7 @@ const clipCreateEpic: AppEpic = (
         ].some((id) => id && clipsOrder.includes(id)) ||
         // TODO: optimize
         clips.some(
-          (c) => c.start <= pendingClip.end && c.end >= pendingClip.start
+          (c) => c.start <= right && c.end >= left
         )
 
       const currentFileId = r.getCurrentFileId(state$.value)
@@ -37,8 +41,7 @@ const clipCreateEpic: AppEpic = (
         pendingClipOverlaps ||
         !(Math.abs(pendingClip.end - pendingClip.start) >= r.CLIP_THRESHOLD)
 
-      const left = Math.min(pendingClip.start, pendingClip.end)
-      const right = Math.max(pendingClip.start, pendingClip.end)
+
 
       console.log({ tooSmall })
 

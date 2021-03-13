@@ -36,7 +36,7 @@ export enum $ {
   waveformClip = 'waveform-clip',
 }
 
-const Cursor = ({ x, height }: { x: number; height: number }) => (
+const Cursor = ({ x, height, strokeWidth }: { x: number; height: number, strokeWidth: number }) => (
   <line
     className="cursor"
     stroke="white"
@@ -45,6 +45,7 @@ const Cursor = ({ x, height }: { x: number; height: number }) => (
     x2={x}
     y2={height}
     shapeRendering="crispEdges"
+    strokeWidth={strokeWidth}
     style={{ pointerEvents: 'none' }}
   />
 )
@@ -101,8 +102,8 @@ const PendingWaveformItem = ({
   )
 }
 
-const getViewBoxString = (xMin: number, height: number) =>
-  `${xMin} 0 3000 ${height}`
+const getViewBoxString = (xMin: number, height: number, factor: number) =>
+  `${xMin} 0 ${factor * 60} ${height}`
 
 const Waveform = ({
   playerRef,
@@ -137,10 +138,11 @@ const Waveform = ({
     [dispatch]
   )
 
-  const { viewBox, cursor, stepsPerSecond } = waveform
+  const { viewBox, cursor, stepsPerSecond, stepLength } = waveform
+  const factor = stepsPerSecond * stepLength
   const height =
     WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
-  const viewBoxString = getViewBoxString(viewBox.xMin, height)
+  const viewBoxString = getViewBoxString(viewBox.xMin, height, factor)
   const svgRef = useRef<SVGSVGElement>(null)
 
   // handleStartClip
@@ -156,6 +158,7 @@ const Waveform = ({
 
   const handleMouseMoves = useCallback(
     (e: MouseEvent) => {
+      e.preventDefault()
       const pendingActionDisplay = pendingActionRef.current
       const svg = svgRef.current
       if (pendingActionDisplay && svg) {
@@ -218,10 +221,8 @@ const Waveform = ({
       else setPendingAction({ type: 'CREATE', start: x, end: x })
 
       const handleNextMouseUp = (e: MouseEvent) => {
-        // document.removeEventListener('mouseup', handleNextMouseUp)
+        document.removeEventListener('mouseup', handleNextMouseUp)
         document.removeEventListener('mousemove', handleMouseMoves)
-
-        // setPendingAction(null)
       }
 
       document.addEventListener('mouseup', handleNextMouseUp)
@@ -332,7 +333,7 @@ const Waveform = ({
             waveformItems={waveformItems}
           />
         )}
-        <Cursor x={cursor.x} height={height} />
+        <Cursor x={cursor.x} height={height} strokeWidth={waveform.stepLength} />
       </g>
     </svg>
   )

@@ -26,6 +26,7 @@ import {
 } from '../utils/waveform'
 import { getFileFilters } from '../utils/files'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
+import { usePrevious } from '../utils/usePrevious'
 
 enum $ {
   chooseFirstMediaFileButton = 'choose-media-file-button',
@@ -156,15 +157,26 @@ const MediaFilesMenu = ({
 
 function usePlayButtonSync() {
   const playing = useSelector(r.isMediaPlaying)
+  const waveform = useSelector(r.getWaveform)
+  const stepLength = waveform.stepLength * waveform.stepsPerSecond
   const dispatch = useDispatch()
   const playMedia = useCallback(() => {
-    startMovingCursor()
+    startMovingCursor(stepLength)
     dispatch(r.playMedia())
-  }, [dispatch])
+  }, [dispatch, stepLength])
   const pauseMedia = useCallback(() => {
     stopMovingCursor()
     dispatch(r.pauseMedia())
   }, [dispatch])
+
+  const previousStepLength = usePrevious(stepLength)
+  useEffect(() => {
+    if (!playing) return
+    if (stepLength !== previousStepLength) {
+      stopMovingCursor()
+      startMovingCursor(stepLength)
+    }
+  }, [playing, previousStepLength, stepLength])
 
   useEffect(() => {
     const startPlaying = () => {
