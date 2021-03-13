@@ -86,16 +86,7 @@ declare type SetCursorPosition = import('../actions').ActionOf<
 declare type SetWaveformViewBox = import('../actions').ActionOf<
   'setWaveformViewBox'
 >
-declare type SetPendingClip = import('../actions').ActionOf<'setPendingClip'>
-declare type ClearPendingClip = import('../actions').ActionOf<
-  'clearPendingClip'
->
-declare type SetPendingStretch = import('../actions').ActionOf<
-  'setPendingStretch'
->
-declare type ClearPendingStretch = import('../actions').ActionOf<
-  'clearPendingStretch'
->
+
 declare type GenerateWaveformImages = import('../actions').ActionOf<
   'generateWaveformImages'
 >

@@ -24,6 +24,7 @@ type MediaProps = {
   subtitles: MediaSubtitles
   className?: string
   viewMode: ViewMode
+  playerRef: MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
 }
 let clicked = false
 const setClicked = (c: boolean) => {
@@ -35,9 +36,8 @@ const Media = ({
   subtitles,
   className,
   viewMode,
+  playerRef,
 }: MediaProps) => {
-  const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement | null>(null)
-
   const seekOn = useCallback((_e) => {
     ;(window as any).seeking = true
   }, [])
@@ -45,21 +45,30 @@ const Media = ({
     ;(window as any).seeking = false
   }, [])
 
-  const setUpBlur = useCallback((_e) => {
-    setClicked(true)
-    if (mediaRef.current) mediaRef.current.blur()
-  }, [])
-  const blur = useCallback((_e) => {
-    if (mediaRef.current && clicked) {
-      mediaRef.current.blur()
-      // setClicked(false)
-    }
-  }, [])
-  const stopBlur = useCallback((_e) => {
-    if (mediaRef.current && clicked) {
-      setClicked(false)
-    }
-  }, [])
+  const setUpBlur = useCallback(
+    (_e) => {
+      setClicked(true)
+      if (playerRef.current) playerRef.current.blur()
+    },
+    [playerRef]
+  )
+  const blur = useCallback(
+    (_e) => {
+      if (playerRef.current && clicked) {
+        playerRef.current.blur()
+        // setClicked(false)
+      }
+    },
+    [playerRef]
+  )
+  const stopBlur = useCallback(
+    (_e) => {
+      if (playerRef.current && clicked) {
+        setClicked(false)
+      }
+    },
+    [playerRef]
+  )
   const props:
     | AudioHTMLAttributes<HTMLAudioElement>
     | VideoHTMLAttributes<HTMLVideoElement> = {
@@ -105,7 +114,7 @@ const Media = ({
     }
   }, [props.src])
 
-  useSyncSubtitlesVisibility(subtitles.all, mediaRef)
+  useSyncSubtitlesVisibility(subtitles.all, playerRef)
 
   const dispatch = useDispatch()
   const toggleViewMode = useCallback(() => {
@@ -146,7 +155,7 @@ const Media = ({
       {metadata.isVideo ? (
         <video
           {...props}
-          ref={mediaRef as MutableRefObject<HTMLVideoElement>}
+          ref={playerRef as MutableRefObject<HTMLVideoElement>}
           className={cn(css.video, css.mediaPlayer)}
         >
           {subtitles.all.map((track, index) => {
@@ -165,7 +174,7 @@ const Media = ({
       ) : (
         <audio
           {...props}
-          ref={mediaRef as MutableRefObject<HTMLAudioElement>}
+          ref={playerRef as MutableRefObject<HTMLAudioElement>}
           className={cn(css.audio, css.mediaPlayer)}
         />
       )}
@@ -175,7 +184,7 @@ const Media = ({
 
 function useSyncSubtitlesVisibility(
   subtitles: SubtitlesFileWithTrack[],
-  mediaRef: React.MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
+  playerRef: React.MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
 ) {
   const dispatch = useDispatch()
 
@@ -191,12 +200,12 @@ function useSyncSubtitlesVisibility(
           )
       })
     }
-    if (mediaRef.current)
-      mediaRef.current.textTracks.addEventListener(
+    if (playerRef.current)
+      playerRef.current.textTracks.addEventListener(
         'change',
         syncReduxTracksToDom
       )
-    const currentMediaRef = mediaRef.current
+    const currentMediaRef = playerRef.current
     return () => {
       if (currentMediaRef)
         currentMediaRef.textTracks.removeEventListener(
@@ -204,17 +213,17 @@ function useSyncSubtitlesVisibility(
           syncReduxTracksToDom
         )
     }
-  }, [subtitles, dispatch, mediaRef])
+  }, [subtitles, dispatch, playerRef])
   useEffect(() => {
-    if (!mediaRef.current) return
+    if (!playerRef.current) return
     for (const track of subtitles) {
-      const domTrack = [...mediaRef.current.textTracks].find(
+      const domTrack = [...playerRef.current.textTracks].find(
         (domTrack) => domTrack.id === track.id
       )
       if (domTrack && track.track && domTrack.mode !== track.track.mode)
         domTrack.mode = track.track.mode
     }
-  }, [subtitles, mediaRef])
+  }, [subtitles, playerRef])
 }
 
 declare module 'react' {

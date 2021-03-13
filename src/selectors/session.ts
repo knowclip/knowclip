@@ -1,28 +1,5 @@
 import { getClip } from './clips'
 
-export type ExpandedPendingStretch = {
-  type: 'PendingStretch'
-  id: ClipId
-  start: WaveformX
-  end: WaveformX
-}
-
-export const getPendingStretch = (
-  state: AppState
-): ExpandedPendingStretch | null => {
-  if (!state.clips) return null
-  const { pendingWaveformAction: pendingStretch } = state.session
-  if (!pendingStretch || pendingStretch.type !== 'PendingStretch') return null
-
-  const stretchedClip = getClip(state, pendingStretch.id)
-  if (!stretchedClip)
-    throw new Error('Impossible: no stretched clip ' + pendingStretch.id)
-
-  const { originKey } = pendingStretch
-  const [start, end] = [pendingStretch.end, stretchedClip[originKey]].sort()
-  return { id: pendingStretch.id, start, end, type: 'PendingStretch' }
-}
-
 export const getHighlightedClipId = (state: AppState): ClipId | null =>
   state.session.waveformSelection &&
   state.session.waveformSelection.type === 'Clip'
@@ -43,21 +20,6 @@ export const getHighlightedChunkIndex = (state: AppState): number | null =>
   state.session.waveformSelection &&
   state.session.waveformSelection.type === 'Preview'
     ? state.session.waveformSelection.cardBaseIndex
-    : null
-
-export const getPendingWaveformAction = (
-  state: AppState
-): PendingClip | PendingClipMove | ExpandedPendingStretch | null =>
-  state.session.pendingWaveformAction?.type === 'PendingStretch'
-    ? getPendingStretch(state)
-    : (state.session.pendingWaveformAction as
-        | PendingClip
-        | PendingClipMove
-        | null)
-
-export const getPendingClip = (state: AppState): PendingClip | null =>
-  state.session.pendingWaveformAction?.type === 'PendingClip'
-    ? state.session.pendingWaveformAction
     : null
 
 export const getAllTags = (state: AppState): Array<string> => {

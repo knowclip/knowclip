@@ -35,17 +35,27 @@
 }
 
 .waveformPendingClipMove {
-  animation: flashIn .2s;
-  stroke: rgba(255, 255, 0, 0.2);
+  animation: flashIn 1s;
   fill: rgba(255, 255, 0, .2);
+  stroke: rgba(255, 255, 0, 0.8);
 }
 
 @keyframes flashIn {
   0% {
-    stroke: rgba(255, 255, 0, .8);
+    fill: rgba(255, 255, 0, .1);
+    stroke: rgba(255, 255, 0, .1);
+  }
+  40% {
+    fill: rgba(255, 255, 0, .1);
+    stroke: rgba(255, 255, 0, .1);
+  }
+  41% {
+    fill: rgba(255, 255, 0, .2);
+    stroke: rgba(255, 255, 0, 1);
   }
   100% {
-    stroke: rgba(255, 255, 0, 0.2);
+    fill: rgba(255, 255, 0, .2);
+    stroke: rgba(255, 255, 0, .8);
   }
 }
 

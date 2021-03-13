@@ -2,7 +2,7 @@ import A from '../types/ActionType'
 import { WaveformSelectionExpanded } from '../selectors/cardPreview'
 
 import { clipsActions, compositeClipsActions } from './clips'
-import { waveformActions, compositeWaveformActions } from './waveform'
+import { waveformActions } from './waveform'
 import { snackbarActions, compositeSnackbarActions } from './snackbar'
 import { dialogActions, compositeDialogActions } from './dialog'
 import { projectActions, compositeProjectActions } from './projects'
@@ -171,7 +171,6 @@ const baseActions = {
 }
 const compositeActions = {
   ...compositeClipsActions,
-  ...compositeWaveformActions,
   ...compositeSnackbarActions,
   ...compositeDialogActions,
   ...compositeProjectActions,

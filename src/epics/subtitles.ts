@@ -287,7 +287,7 @@ function getClipsAndCardsFromSubtitles(
     return r.getNewClipAndCard(
       state,
       {
-        type: 'PendingClip',
+        type: 'CREATE',
         start: chunk.start,
         end:
           sortedChunks[chunkIndex + 1] &&

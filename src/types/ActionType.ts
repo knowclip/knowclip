@@ -43,8 +43,6 @@ const ActionTypes = {
   highlightRightClipRequest: 'highlightRightClipRequest',
   setCursorPosition: 'setCursorPosition',
   setWaveformViewBox: 'setWaveformViewBox',
-  setPendingWaveformAction: 'setPendingWaveformAction',
-  clearPendingWaveformAction: 'clearPendingWaveformAction',
   generateWaveformImages: 'generateWaveformImages',
   enqueueDialog: 'enqueueDialog',
   closeDialog: 'closeDialog',

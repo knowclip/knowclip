@@ -38,7 +38,13 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         (event[playPauseForceKey] || !isTextFieldFocused())
       ) {
         event.preventDefault()
-        effects.toggleMediaPaused()
+        if (
+          !(
+            document.activeElement &&
+            document.activeElement === effects.getMediaPlayer()
+          )
+        )
+          effects.toggleMediaPaused()
         return EMPTY
       }
 

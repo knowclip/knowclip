@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { CircularProgress } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
@@ -51,6 +51,8 @@ const Main = () => {
     return () => document.removeEventListener('mousemove', trackCursor)
   }, [])
 
+  const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
+
   if (!currentProject) return <Redirect to="/projects" />
 
   return (
@@ -83,6 +85,7 @@ const Main = () => {
             metadata={currentMediaFile}
             subtitles={subtitles}
             viewMode={viewMode}
+            playerRef={playerRef}
           />
         )}
 
@@ -94,7 +97,7 @@ const Main = () => {
       </section>
 
       {Boolean(currentMediaFile && !mediaIsEffectivelyLoading) ? (
-        <Waveform />
+        <Waveform playerRef={playerRef} />
       ) : (
         <div className={waveformCss.waveformPlaceholder} />
       )}

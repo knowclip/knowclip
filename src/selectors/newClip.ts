@@ -1,4 +1,5 @@
 import newFlashcard from '../utils/newFlashcard'
+import { WaveformDragCreate } from '../utils/WaveformMousedownEvent'
 import { getDefaultTags, getDefaultIncludeStill } from './session'
 
 const ascending = (a: number, b: number) => a - b
@@ -13,7 +14,7 @@ const sortClipPoints = ({ start, end }: ClipPoints) =>
 
 export const getNewClipAndCard = <F extends FlashcardFields>(
   state: AppState,
-  pendingClip: PendingClip,
+  pendingClip: WaveformDragCreate,
   mediaFileId: string,
   id: ClipId,
   fields: F
