@@ -6,6 +6,7 @@ import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { uuid } from '../utils/sideEffects'
 import { getUpdateWith } from '../files/updates'
+import { msToSeconds } from '../selectors'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$
@@ -152,7 +153,7 @@ export const newClipFromChunk: AppEpic = (
           flashcard.cloze = [action.clozeDeletion]
         }
 
-        setCurrentTime(r.getSecondsAtX(selection.item.start))
+        setCurrentTime(msToSeconds(selection.item.start))
 
         return from([r.addClip(clip, flashcard, action.startEditing || false)])
       })
@@ -193,9 +194,9 @@ const updateSelectionAfterLink: AppEpic = (
           )
           if (
             newSelection &&
-            r.getSecondsAtX(newSelection.item.start) !== getCurrentTime()
+            msToSeconds(newSelection.item.start) !== getCurrentTime()
           ) {
-            setCurrentTime(r.getSecondsAtX(newSelection.item.start))
+            setCurrentTime(msToSeconds(newSelection.item.start))
           }
           return of(
             newSelection

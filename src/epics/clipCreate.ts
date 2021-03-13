@@ -6,6 +6,7 @@ import {
   WaveformDragCreate,
 } from '../utils/WaveformMousedownEvent'
 import uuid from 'uuid'
+import { msToSeconds, pixelsToMs } from '../selectors'
 
 const clipCreateEpic: AppEpic = (
   action$,
@@ -37,11 +38,12 @@ const clipCreateEpic: AppEpic = (
 
       const tooSmall =
         pendingClipOverlaps ||
-        !(Math.abs(pendingClip.end - pendingClip.start) >= r.CLIP_THRESHOLD)
+        !(
+          Math.abs(pendingClip.end - pendingClip.start) >=
+          pixelsToMs(r.CLIP_THRESHOLD)
+        )
 
-      console.log({ tooSmall })
-
-      const newTime = r.getSecondsAtX(tooSmall ? right : left)
+      const newTime = msToSeconds(tooSmall ? right : left)
       if (!tooSmall) setCurrentTime(newTime)
 
       // maybe later, do stretch + merge for overlaps.

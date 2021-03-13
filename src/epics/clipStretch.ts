@@ -5,6 +5,7 @@ import {
   WaveformDragEvent,
   WaveformDragStretch,
 } from '../utils/WaveformMousedownEvent'
+import { msToSeconds } from '../selectors'
 
 const clipStretchEpic: AppEpic = (
   action$,
@@ -45,7 +46,7 @@ const clipStretchEpic: AppEpic = (
       const previousClip =
         previousClipId && r.getClip(state$.value, previousClipId)
       if (previousClip && previousClipId && end <= previousClip.end) {
-        setCurrentTime(r.getSecondsAtX(previousClip.start))
+        setCurrentTime(msToSeconds(previousClip.start))
 
         return from([
           ...(stretchedClipItem?.type === 'Clip'
@@ -63,7 +64,7 @@ const clipStretchEpic: AppEpic = (
       const nextClipId = r.getNextClipId(state$.value, id)
       const nextClip = nextClipId && r.getClip(state$.value, nextClipId)
       if (nextClip && nextClipId && end >= nextClip.start) {
-        if (stretchedClip) setCurrentTime(r.getSecondsAtX(stretchedClip.start))
+        if (stretchedClip) setCurrentTime(stretchedClip.start / 1000)
 
         return from([
           ...(stretchedClipItem?.type === 'Clip'
@@ -90,7 +91,7 @@ const clipStretchEpic: AppEpic = (
           { start, end: stretchedClip.end },
           'PREPEND'
         )
-        setCurrentTime(r.getSecondsAtX(start))
+        setCurrentTime(start / 1000)
         return from([
           r.editClip(
             id,

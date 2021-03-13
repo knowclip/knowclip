@@ -18,7 +18,7 @@ import A from '../types/ActionType'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
-import { SubtitlesFileWithTrack } from '../selectors'
+import { msToSeconds, SubtitlesFileWithTrack } from '../selectors'
 import { afterUpdates } from '../utils/afterUpdates'
 
 const makeClipsFromSubtitles: AppEpic = (
@@ -172,7 +172,7 @@ const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
         return
       }
       const { start } = track.chunks[chunkIndex]
-      setCurrentTime(r.getSecondsAtX(start))
+      setCurrentTime(msToSeconds(start))
       return
     }),
     ignoreElements()

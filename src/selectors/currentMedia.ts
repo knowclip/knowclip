@@ -165,11 +165,11 @@ export const getFlashcardsByTime = (state: AppState): Array<Flashcard> =>
     return flashcard
   })
 
-export const getClipIdAt = (state: AppState, x: number): ClipId | null =>
+export const getClipIdAt = (state: AppState, ms: number): ClipId | null =>
   getCurrentFileClipsOrder(state).find((clipId) => {
     const clip = state.clips.byId[clipId]
     const { start, end } = clip
-    return x >= start && x <= end
+    return ms >= start && ms <= end
   }) || null
 
 export const getPreviousClipId = (
@@ -204,17 +204,17 @@ export const getFlashcardIdAfterCurrent = (state: AppState): ClipId | null => {
 
 export const getClipEdgeAt = (
   state: AppState,
-  x: WaveformX
+  milliseconds: number
 ): { key: 'start' | 'end'; id: ClipId } | null => {
-  const clipIdAtX = getClipIdAt(state, x)
-  if (!clipIdAtX) return null
-  const clip = getClip(state, clipIdAtX)
+  const clipIdAtMs = getClipIdAt(state, milliseconds)
+  if (!clipIdAtMs) return null
+  const clip = getClip(state, clipIdAtMs)
   if (!clip) throw new Error('Impossible')
   const { start, end } = clip
-  if (x >= start && x <= start + SELECTION_BORDER_WIDTH)
-    return { key: 'start', id: clipIdAtX }
-  if (x >= end - SELECTION_BORDER_WIDTH && x <= end)
-    return { key: 'end', id: clipIdAtX }
+  if (milliseconds >= start && milliseconds <= start + SELECTION_BORDER_WIDTH)
+    return { key: 'start', id: clipIdAtMs }
+  if (milliseconds >= end - SELECTION_BORDER_WIDTH && milliseconds <= end)
+    return { key: 'end', id: clipIdAtMs }
 
   return null
 }

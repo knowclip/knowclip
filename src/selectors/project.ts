@@ -4,7 +4,6 @@ import { getProjectMediaFiles } from './currentMedia'
 import { getSubtitlesSourceFile } from './subtitles'
 import { getClipIdsByMediaFileId, getClip, getFlashcard } from './clips'
 import { nowUtcTimestamp } from '../utils/sideEffects'
-import { getSecondsAtX } from './waveformTime'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import {
   blankSimpleFields,
@@ -19,6 +18,7 @@ import {
   ClipJson,
   ProjectJson,
 } from '../types/Project'
+import { msToSeconds } from './waveform'
 
 const newestToOldest = (
   { lastOpened: a }: FileAvailability,
@@ -182,12 +182,12 @@ function getProjectClips<F extends FlashcardFields>(
         id,
         start: formatDurationWithMilliseconds(
           moment.duration({
-            seconds: getSecondsAtX(start),
+            seconds: start / 1000,
           })
         ),
         end: formatDurationWithMilliseconds(
           moment.duration({
-            seconds: getSecondsAtX(end),
+            seconds: msToSeconds(end),
           })
         ),
       }

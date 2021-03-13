@@ -1,5 +1,4 @@
 import stripHtml from '../utils/stripHtml'
-import { getXAtMilliseconds } from './waveformTime'
 import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
@@ -188,8 +187,8 @@ export const readVttChunk = (
     index: number
   }
 ): SubtitlesChunk => ({
-  start: getXAtMilliseconds(start),
-  end: getXAtMilliseconds(end),
+  start: start,
+  end: end,
   text: (stripHtml(text) || '').trim(),
   index,
 })
@@ -207,8 +206,8 @@ export const readParseSrtChunk = (
     index: number
   }
 ): SubtitlesChunk => ({
-  start: getXAtMilliseconds(start * 1000),
-  end: getXAtMilliseconds(end * 1000),
+  start: start * 1000,
+  end: end * 1000,
   text: (stripHtml(text) || '').trim(),
   index,
 })

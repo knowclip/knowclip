@@ -1,7 +1,7 @@
 import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 import tempy from 'tempy'
 import { existsSync } from 'fs'
-import { getFileAvailabilityById, getXAtMilliseconds } from '../selectors'
+import { getFileAvailabilityById } from '../selectors'
 import { basename, join } from 'path'
 
 const WAVE_COLOR = '#b7cee0'
@@ -14,8 +14,8 @@ export const getWaveformPng = async (
   mediaFilePath: string
 ): AsyncResult<string> => {
   try {
-    const startX = getXAtMilliseconds(file.startSeconds * 1000)
-    const endX = getXAtMilliseconds(file.endSeconds * 1000)
+    const startX = file.startSeconds * 1000
+    const endX = file.endSeconds * 1000
     const width = ~~(endX - startX)
     const outputFilename = getWaveformPngPath(state, mediaFilePath, file)
     if (outputFilename && existsSync(outputFilename))

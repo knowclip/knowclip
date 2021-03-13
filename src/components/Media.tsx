@@ -25,6 +25,7 @@ type MediaProps = {
   className?: string
   viewMode: ViewMode
   playerRef: MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
+  onMediaLoaded: (mediael: HTMLAudioElement | HTMLVideoElement | null) => void
   onTimeUpdate: (
     mediaEl: HTMLVideoElement | HTMLAudioElement,
     seeking: MutableRefObject<boolean>,
@@ -41,15 +42,17 @@ const Media = ({
   subtitles,
   className,
   viewMode,
-  playerRef,
   onTimeUpdate,
+  playerRef,
+  onMediaLoaded,
   loop,
 }: MediaProps) => {
+  const seeking = useRef(false)
   const seekOn = useCallback((_e) => {
-    ;(window as any).seeking = true
+    seeking.current = true
   }, [])
   const seekOff = useCallback((_e) => {
-    ;(window as any).seeking = false
+    seeking.current = false
   }, [])
 
   const setUpBlur = useCallback(
@@ -76,14 +79,6 @@ const Media = ({
     },
     [playerRef]
   )
-  const seeking = useRef(false)
-  useEffect(() => {
-    const handleSeek = () => {
-      seeking.current = true
-    }
-    document.addEventListener('seeking', handleSeek, true)
-    return () => document.removeEventListener('seeking', handleSeek, true)
-  })
 
   const looping = Boolean(loop)
   const props:
@@ -102,6 +97,13 @@ const Media = ({
 
     onSeeking: seekOn,
     onSeeked: seekOff,
+
+    onLoadedMetadata: useCallback(
+      (e) => {
+        onMediaLoaded(e.target)
+      },
+      [onMediaLoaded]
+    ),
 
     // prevent accidental scrub after play/pause with mouse
     onMouseEnter: setUpBlur,

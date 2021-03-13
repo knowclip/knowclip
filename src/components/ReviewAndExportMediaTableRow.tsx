@@ -44,7 +44,7 @@ const ReviewAndExportMediaTableRow = memo(
       currentMediaFile,
     } = useSelector((state: AppState) => ({
       flashcard: r.getFlashcard(state, id) as Flashcard,
-      clipTime: r.getClipTime(state, id),
+      clipTime: r.getClipTimeInSeconds(state, id),
       formattedClipTime: r.getFormattedClipTime(state, id),
       isLoopOn: r.getLoopState(state),
       currentMediaFile: r.getCurrentMediaFile(state),

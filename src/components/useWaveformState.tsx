@@ -1,24 +1,22 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react'
+import { useCallback, useMemo, useReducer, useRef } from 'react'
 import r from '../redux'
-import { WaveformSelectionExpanded } from '../selectors'
+import { pixelsToMs, WaveformSelectionExpanded } from '../selectors'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
 import { elementWidth } from '../utils/media'
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
 import { areSelectionsEqual } from '../utils/waveformSelection'
 
-const initialState = {
-  cursorX: 0,
-  xMin: 0,
+const initialState: ViewState = {
+  cursorMs: 0,
+  durationSeconds: 0,
+  viewBoxStartMs: 0,
   stepsPerSecond: 25,
   stepLength: 1,
   selection: null,
   pendingAction: null,
 }
 
-export function useWaveformState(
-  mediaEl: HTMLVideoElement | HTMLAudioElement | null,
-  waveformItems: WaveformSelectionExpanded[]
-) {
+export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
   const limitWaveformItemsToDisplayed = limitSelectorToDisplayedItems(
     (waveformItem: WaveformSelectionExpanded) => waveformItem.item.start,
     (waveformItem: WaveformSelectionExpanded) => waveformItem.item.end
@@ -26,47 +24,44 @@ export function useWaveformState(
 
   const svgRef = useRef<SVGSVGElement>(null)
   const [state, dispatch] = useReducer(updateViewState, initialState)
-  const { stepsPerSecond, stepLength } = state
-  const factor = stepsPerSecond * stepLength
-  const durationSeconds = mediaEl?.duration || 0
-  useEffect(() => {
-    const reload = () => {
-      dispatch({ type: 'reset' })
-    }
-    mediaEl?.addEventListener('load', reload)
-    return () => mediaEl?.removeEventListener('load', reload)
-  })
-  console.log({ stepsPerSecond, stepLength, factor, durationSeconds })
-  const waveformLength = durationSeconds * factor
+  const onMediaLoaded = useCallback(
+    (media: HTMLVideoElement | HTMLAudioElement | null) => {
+      dispatch({ type: 'reset', durationSeconds: media?.duration || 0 })
+    },
+    [dispatch]
+  )
   return {
     svgRef,
     state,
     dispatch,
     doWaveformUpdate,
-    waveformLength,
+    onMediaLoaded,
     waveformItems: useMemo(
-      () => limitWaveformItemsToDisplayed(waveformItems, state.xMin),
-      [limitWaveformItemsToDisplayed, waveformItems, state.xMin]
+      () => limitWaveformItemsToDisplayed(waveformItems, state.viewBoxStartMs),
+      [limitWaveformItemsToDisplayed, waveformItems, state.viewBoxStartMs]
     ),
   }
 }
 
 export type WaveformAction =
-  | ElementOf<ReturnType<typeof doWaveformUpdate>>
   | {
-      type: 'setCursorPosition'
-      x: number
-      xMin: number | undefined
+      type: 'selectWaveformItem'
+      selection: WaveformSelection | null
+    }
+  | {
+      type: 'SET_CURSOR_POSITION'
+      ms: number
+      newViewBoxStartMs?: number | undefined
+      newSelection?: WaveformSelection | null | undefined
     }
   | { type: 'setPendingAction'; action: WaveformDragAction | null }
-  | { type: 'continuePendingAction'; x: number }
-  | { type: 'reset' }
+  | { type: 'continuePendingAction'; ms: number }
+  | { type: 'reset'; durationSeconds: number }
 
-type ElementOf<X> = X extends Array<infer E> ? E : never
 function updateViewState(state: ViewState, action: WaveformAction): ViewState {
   switch (action.type) {
     case 'reset':
-      return initialState
+      return { ...initialState, durationSeconds: action.durationSeconds }
     case 'setPendingAction':
       return {
         ...state,
@@ -78,7 +73,7 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
         pendingAction: state.pendingAction
           ? {
               ...state.pendingAction,
-              end: action.x,
+              end: action.ms,
             }
           : null,
       }
@@ -87,12 +82,27 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
         ...state,
         selection: action.selection,
       }
-    case 'setCursorPosition':
+    case 'SET_CURSOR_POSITION': {
+      const newViewBoxStartMs =
+        typeof action.newViewBoxStartMs === 'number'
+          ? action.newViewBoxStartMs
+          : state.viewBoxStartMs
+      console.log(
+        'cursorMs:',
+        `${action.ms}`.padStart(10, ' '),
+        'newViewBoxStartMs',
+        newViewBoxStartMs
+      )
       return {
         ...state,
-        cursorX: action.x,
-        xMin: typeof action.xMin === 'number' ? action.xMin : state.xMin,
+        cursorMs: action.ms,
+        viewBoxStartMs: newViewBoxStartMs,
+        selection:
+          typeof action.newSelection === 'undefined'
+            ? state.selection
+            : action.newSelection,
       }
+    }
     default:
       return state
   }
@@ -100,63 +110,93 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
 
 function doWaveformUpdate(
   viewState: ViewState,
-  waveformLength: number,
-  newlyUpdatedTime: number,
+  newlyUpdatedMs: number,
   svg: SVGSVGElement,
   newSelection: WaveformSelectionExpanded | null,
   wasSeeking: boolean,
   selection: WaveformSelectionExpanded | null
 ) {
-  const waveform = viewState
   const setViewboxAction = setViewBox(
-    waveformLength,
-    viewState.xMin,
-    newlyUpdatedTime,
+    viewState,
+    newlyUpdatedMs,
     elementWidth(svg),
     newSelection,
-    wasSeeking,
-    waveform.stepLength * waveform.stepsPerSecond
+    wasSeeking
   )
 
   if (newSelection && !areSelectionsEqual(selection, newSelection)) {
-    return [...setViewboxAction, r.selectWaveformItem(newSelection)]
+    console.log(' ~~~ a')
+    return setViewboxAction
+      ? {
+          ...setViewboxAction,
+          newSelection,
+        }
+      : r.selectWaveformItem(newSelection)
   }
 
   if (!newSelection && wasSeeking) {
-    return [...setViewboxAction, r.clearWaveformSelection()]
+    console.log(' ~~~ b')
+    return setViewboxAction
+      ? {
+          ...setViewboxAction,
+          newSelection,
+        }
+      : r.selectWaveformItem(null)
   }
 
-  return [...setViewboxAction]
+  console.log(' ~~~ c')
+
+  return setViewboxAction
 }
 
 function setViewBox(
-  waveformLength: number,
-  viewBoxXMin: number,
-  newlySetTime: number,
+  viewState: ViewState,
+  newlySetMs: number,
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
-  seeking: boolean,
-  factor: number
+  seeking: boolean
 ) {
-  const newX = Math.round(newlySetTime * factor)
+  const visibleTimeSpan = pixelsToMs(svgWidth)
+  const buffer = Math.round(visibleTimeSpan * 0.1)
 
-  const buffer = Math.round(svgWidth * 0.1)
+  const ms = newlySetMs
 
-  if (newX < viewBoxXMin) {
-    return [setCursorPosition(newX, Math.max(0, newX - buffer))]
-  }
-  if (newX >= svgWidth + viewBoxXMin) {
-    const xMin = Math.min(
-      newSelection ? newSelection.item.end + buffer : newX,
-      Math.max(waveformLength - svgWidth, 0)
+  const { viewBoxStartMs, durationSeconds } = viewState
+  const durationMs = durationSeconds * 1000
+
+  if (newlySetMs < viewBoxStartMs) {
+    console.log('                     xxx 1')
+    console.log(
+      '                     newlySetMs < viewBoxStartMs',
+      newlySetMs,
+      viewBoxStartMs
     )
-    return [setCursorPosition(newX, xMin)]
+    return {
+      type: 'SET_CURSOR_POSITION' as const,
+      ms,
+      newViewBoxStartMs: Math.max(0, newlySetMs - buffer),
+    }
   }
-  return seeking ? [setCursorPosition(newX)] : []
-}
+  if (newlySetMs >= visibleTimeSpan + viewBoxStartMs) {
+    console.log('                     xxx 2')
+    const newViewBoxStartMs = Math.min(
+      newSelection ? newSelection.item.end + buffer : newlySetMs,
+      Math.max(durationMs - visibleTimeSpan, 0)
+    )
+    return {
+      type: 'SET_CURSOR_POSITION' as const,
+      ms,
+      newViewBoxStartMs,
+    }
+  }
 
-const setCursorPosition = (x: number, xMin?: number) => ({
-  type: 'setCursorPosition' as const,
-  x,
-  xMin,
-})
+  if (seeking) console.log('                     xxx 3')
+
+  return seeking
+    ? {
+        type: 'SET_CURSOR_POSITION' as const,
+        ms,
+        newViewBoxStartMs: undefined,
+      }
+    : undefined
+}

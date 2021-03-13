@@ -1,6 +1,7 @@
 type ViewState = {
-  cursorX: number
-  xMin: number
+  durationSeconds: number
+  cursorMs: number
+  viewBoxStartMs: number
   stepsPerSecond: number
   stepLength: number
   selection: WaveformSelection | null

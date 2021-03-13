@@ -3,6 +3,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import { EMPTY, of, merge } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
+import { msToSeconds } from '../selectors'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -19,7 +20,7 @@ const selectClipOnStretch: AppEpic = (action$, state$, effects) =>
     }),
     tap(({ id }) => {
       const clip = r.getClip(state$.value, id)
-      if (clip) effects.setCurrentTime(r.getSecondsAtX(clip.start))
+      if (clip) effects.setCurrentTime(msToSeconds(clip.start))
     }),
     ignoreElements()
   )
@@ -126,7 +127,7 @@ const highlightRightEpic: AppEpic = (
 
         if (next) {
           setCurrentTime(
-            r.getSecondsAtX(Math.max(next.item.start, selection.item.end + 1))
+            Math.max(next.item.start, selection.item.end + 1) * 1000
           )
           return r.isMediaFileLoaded(state)
             ? EMPTY
@@ -134,12 +135,12 @@ const highlightRightEpic: AppEpic = (
         }
       }
 
-      const x = r.getXAtMilliseconds(getCurrentTime() * 1000)
+      const x = getCurrentTime() * 1000
 
       const next =
         waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
       if (next) {
-        setCurrentTime(r.getSecondsAtX(next.item.start))
+        setCurrentTime(next.item.start * 1000)
         return r.isMediaFileLoaded(state)
           ? EMPTY
           : of(r.selectWaveformItem(next))
@@ -182,20 +183,20 @@ const highlightLeftEpic: AppEpic = (
           ]
 
         if (prev) {
-          setCurrentTime(r.getSecondsAtX(prev.item.start))
+          setCurrentTime(msToSeconds(prev.item.start))
           return r.isMediaFileLoaded(state)
             ? EMPTY
             : of(r.selectWaveformItem(prev))
         }
       }
-      const x = r.getXAtMilliseconds(getCurrentTime() * 1000)
+      const ms = getCurrentTime() * 1000
 
       const prev =
-        findLast(waveformItems, ({ item }) => item.end <= x) ||
+        findLast(waveformItems, ({ item }) => item.end <= ms) ||
         waveformItems[waveformItems.length - 1]
 
       if (prev) {
-        setCurrentTime(r.getSecondsAtX(prev.item.start))
+        setCurrentTime(msToSeconds(prev.item.start))
         return r.isMediaFileLoaded(state)
           ? EMPTY
           : of(r.selectWaveformItem(prev))

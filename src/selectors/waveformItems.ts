@@ -115,15 +115,15 @@ export const getNewWaveformSelectionAt = (
 export const getNewWaveformSelectionAtFromSubset = (
   selection: WaveformSelectionExpanded | null,
   waveformItems: WaveformSelectionExpanded[],
-  newX: number
+  newMs: number
 ): WaveformSelectionExpanded | null => {
   const updatedSelection =
     selection &&
     getUpdatedSameSelection(selection, waveformItems[selection.index] || null)
   if (
     updatedSelection &&
-    newX >= updatedSelection.item.start &&
-    newX <= updatedSelection.item.end
+    newMs >= updatedSelection.item.start &&
+    newMs <= updatedSelection.item.end
   )
     return updatedSelection
 
@@ -131,9 +131,10 @@ export const getNewWaveformSelectionAtFromSubset = (
 
   for (const clipOrPreview of waveformItems) {
     const { item } = clipOrPreview
-    if (item.start > newX) break
+    if (item.start > newMs) break
 
-    if (newX >= item.start && newX <= item.end) overlapping.push(clipOrPreview)
+    if (newMs >= item.start && newMs <= item.end)
+      overlapping.push(clipOrPreview)
   }
 
   if (overlapping.length <= 1) return overlapping[0] || null

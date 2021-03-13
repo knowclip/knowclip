@@ -57,11 +57,13 @@ const Main = () => {
   }, [])
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
+  const waveform = useWaveformState(waveformItems)
+  const { svgRef, onMediaLoaded } = waveform
 
-  const waveform = useWaveformState(playerRef.current, waveformItems)
-  const { svgRef } = waveform
-
-  const handleTimeUpdate = useWaveformMediaTimeUpdate(svgRef, waveform)
+  const { onTimeUpdate: handleTimeUpdate } = useWaveformMediaTimeUpdate(
+    svgRef,
+    waveform
+  )
 
   if (!currentProject) return <Redirect to="/projects" />
 
@@ -96,6 +98,7 @@ const Main = () => {
             subtitles={subtitles}
             viewMode={viewMode}
             playerRef={playerRef}
+            onMediaLoaded={onMediaLoaded}
             onTimeUpdate={handleTimeUpdate}
           />
         )}

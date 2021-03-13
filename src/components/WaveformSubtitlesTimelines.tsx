@@ -5,6 +5,7 @@ import r from '../redux'
 import css from './Waveform.module.css'
 import { setCursorX } from '../utils/waveform'
 import {
+  msToPixels,
   SubtitlesCardBases,
   SUBTITLES_CHUNK_HEIGHT,
   WaveformSelectionExpanded,
@@ -29,7 +30,7 @@ export const SubtitlesTimelines = memo(
       (e) => {
         const { dataset } = e.target
 
-        setCursorX(dataset.chunkStart)
+        setCursorX(msToPixels(dataset.chunkStart))
 
         goToSubtitlesChunk(dataset.trackId, dataset.chunkIndex)
 
@@ -112,10 +113,13 @@ const SubtitlesChunk = React.memo(
     trackId: string
   }) => {
     const clipPathId = `${trackId}__${chunkIndex}`
-    const width = chunk.end - chunk.start
+
+    const chunkDisplayStart = msToPixels(chunk.start)
+    const chunkDisplayEnd = msToPixels(chunk.end)
+    const width = chunkDisplayEnd - chunkDisplayStart
 
     const rect = {
-      x: chunk.start,
+      x: chunkDisplayStart,
       y: WAVEFORM_HEIGHT + trackOffsetY * SUBTITLES_CHUNK_HEIGHT,
       width: width,
       height: SUBTITLES_CHUNK_HEIGHT,
@@ -142,7 +146,7 @@ const SubtitlesChunk = React.memo(
           clipPath={`url(#${clipPathId})`}
           {...clickDataProps}
           className={css.subtitlesText}
-          x={chunk.start + 6}
+          x={chunkDisplayStart + 6}
           y={(trackOffsetY + 1) * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
         >
           {chunk.text}
@@ -167,12 +171,14 @@ const LinkedSubtitlesChunk = React.memo(
     tracksCount: number
   }) => {
     const clipPathId = `linkedSubtitles_${cardBase.start}`
-    const width = cardBase.end - cardBase.start
+    const displayStart = msToPixels(cardBase.start)
+    const displayEnd = msToPixels(cardBase.end)
+    const width = displayEnd - displayStart
 
     const fieldsPreview = getFieldsPreview(cardBase)
 
     const rect = {
-      x: cardBase.start,
+      x: displayStart,
       y: WAVEFORM_HEIGHT,
       width: width,
       height: SUBTITLES_CHUNK_HEIGHT * tracksCount,
@@ -204,7 +210,7 @@ const LinkedSubtitlesChunk = React.memo(
               key={id + i}
               clipPath={`url(#${clipPathId})`}
               className={css.subtitlesText}
-              x={cardBase.start + 6}
+              x={displayStart + 6}
               y={i1 * SUBTITLES_CHUNK_HEIGHT - 4 + WAVEFORM_HEIGHT}
               {...clickDataProps}
             >

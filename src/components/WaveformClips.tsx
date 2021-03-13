@@ -2,9 +2,8 @@ import React, { MutableRefObject, useCallback } from 'react'
 import cn from 'classnames'
 import css from './Waveform.module.css'
 import { $ } from './Waveform'
-import { SELECTION_BORDER_WIDTH } from '../selectors'
+import { SELECTION_BORDER_WIDTH, msToPixels } from '../selectors'
 import { setCursorX } from '../utils/waveform'
-import { getSecondsAtXFromWaveform } from '../utils/waveformCoordinates'
 
 type ClipProps = {
   id: string
@@ -47,7 +46,7 @@ const Clip = React.memo(
             { [css.highlightedClip]: isHighlighted },
             $.waveformClip
           )}
-          {...getClipRectProps(start, end, height)}
+          {...getClipRectProps(msToPixels(start), msToPixels(end), height)}
           {...clickDataProps}
         />
 
@@ -63,7 +62,7 @@ const Clip = React.memo(
           className={cn(css.waveformClipBorder, {
             [css.highlightedClipBorder]: isHighlighted,
           })}
-          x={end - SELECTION_BORDER_WIDTH}
+          x={msToPixels(end) - SELECTION_BORDER_WIDTH}
           y="0"
           width={SELECTION_BORDER_WIDTH}
           height={height}
@@ -79,13 +78,11 @@ export const Clips = React.memo(
     clips,
     highlightedClipId,
     height,
-    waveform,
     playerRef,
   }: {
     clips: Clip[]
     highlightedClipId: string | null
     height: number
-    waveform: ViewState
     playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
   }) => {
     const handleClick = useCallback(
@@ -95,10 +92,8 @@ export const Clips = React.memo(
           if (!dataset.clipIsHighlighted) {
             const player = playerRef.current
             if (player)
-              player.currentTime = getSecondsAtXFromWaveform(
-                clips[dataset.clipIndex].start
-              )
-            setCursorX(clips[dataset.clipIndex].start)
+              player.currentTime = clips[dataset.clipIndex].start * 1000
+            setCursorX(msToPixels(clips[dataset.clipIndex].start))
           }
           const currentSelected = document.querySelector(
             '.' + css.highlightedClip
@@ -111,7 +106,7 @@ export const Clips = React.memo(
           if (newSelected) newSelected.classList.add(css.highlightedClip)
         }
       },
-      [clips, playerRef, waveform]
+      [clips, playerRef]
     )
 
     return (

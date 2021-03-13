@@ -1,6 +1,5 @@
 import { useCallback, MutableRefObject, useEffect } from 'react'
 import r from '../redux'
-import { getXAtMillisecondsFromWaveform } from '../utils/waveformCoordinates'
 import { overlapsSignificantly } from '../selectors'
 import { useWaveformState } from './useWaveformState'
 import { usePrevious } from '../utils/usePrevious'
@@ -12,7 +11,6 @@ export function useWaveformMediaTimeUpdate(
 ) {
   const {
     doWaveformUpdate,
-    waveformLength,
     dispatch: dispatchViewState,
     waveformItems,
   } = waveform
@@ -29,11 +27,13 @@ export function useWaveformMediaTimeUpdate(
     const localChange = waveform.state.selection !== previousLocalSelection
     const remoteChange = remoteSelection !== previousRemoteSelection
     const notSyncedWithRemote = remoteSelection !== waveform.state.selection
-    // console.log({ localChange, remoteChange, notSyncedWithRemote})
+    console.log({ localChange, remoteChange, notSyncedWithRemote })
     if (localChange && notSyncedWithRemote) {
+      console.log('            selecting remote')
       dispatch(r.selectWaveformItem(waveform.state.selection))
     }
     if (remoteChange && notSyncedWithRemote) {
+      console.log('            selecting local')
       dispatchViewState(r.selectWaveformItem(remoteSelection))
     }
   }, [
@@ -45,7 +45,7 @@ export function useWaveformMediaTimeUpdate(
     waveform.state.selection,
   ])
 
-  return useCallback(
+  const onTimeUpdate = useCallback(
     (
       media: HTMLVideoElement | HTMLAudioElement,
       seeking: MutableRefObject<boolean>,
@@ -54,17 +54,15 @@ export function useWaveformMediaTimeUpdate(
       const svg = svgRef.current
       if (!svg) return console.error('Svg disappeared')
 
-      const newlyUpdatedTime = media.currentTime
-      const newMilliseconds = newlyUpdatedTime * 1000
-      const newXAtMilliseconds = getXAtMillisecondsFromWaveform(newMilliseconds)
+      const newMilliseconds = media.currentTime * 1000
 
+      // const remoteSelection = waveformItems.find(item => item.)
       const possibleNewSelection = r.getNewWaveformSelectionAtFromSubset(
         remoteSelection,
         waveform.waveformItems,
-        newXAtMilliseconds
+        newMilliseconds
       )
-      const factor = waveform.state.stepLength * waveform.state.stepsPerSecond
-      const halfSecond = factor / 2
+
       const newSelection =
         remoteSelection &&
         remoteSelection.type === 'Clip' &&
@@ -93,27 +91,26 @@ export function useWaveformMediaTimeUpdate(
         !media.paused &&
         selection &&
         selectionItem &&
-        newlyUpdatedTime >= r.getSecondsAtX(selectionItem.end)
+        newMilliseconds >= selectionItem.end
       if (loopImminent && selection && selectionItem) {
-        const selectionStartTime = r.getSecondsAtX(selectionItem.start)
+        const selectionStartTime = selectionItem.start * 1000
         media.currentTime = selectionStartTime
         return dispatchViewState({
-          type: 'setCursorPosition',
-          x: selectionItem.start,
-          xMin: undefined,
+          type: 'SET_CURSOR_POSITION',
+          ms: selectionItem.start,
+          newViewBoxStartMs: undefined,
         })
       }
 
-      const x = doWaveformUpdate(
+      const waveformupdate = doWaveformUpdate(
         waveform.state,
-        waveformLength,
-        newlyUpdatedTime,
+        newMilliseconds,
         svg,
         newSelection,
         wasSeeking,
         remoteSelection
       )
-      x.forEach((a) => dispatchViewState(a))
+      if (waveformupdate) dispatchViewState(waveformupdate)
     },
     [
       dispatchViewState,
@@ -123,7 +120,8 @@ export function useWaveformMediaTimeUpdate(
       waveform.state,
       waveform.waveformItems,
       waveformItems,
-      waveformLength,
     ]
   )
+
+  return { onTimeUpdate }
 }

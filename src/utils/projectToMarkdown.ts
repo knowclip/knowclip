@@ -38,7 +38,7 @@ const projectToMarkdown = (
           if (!(clip && flashcard))
             throw new Error('Could not find clip/flashcard')
 
-          const clipTime = r.getClipTime(state, flashcard.id)
+          const clipTime = r.getClipTimeInSeconds(state, flashcard.id)
           return [
             clipTime
               ? `\n**${formatTime(clipTime.start)} - ${formatTime(
