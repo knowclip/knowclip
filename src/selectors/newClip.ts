@@ -14,7 +14,7 @@ const sortClipPoints = ({ start, end }: ClipPoints) =>
 
 export const getNewClipAndCard = <F extends FlashcardFields>(
   state: AppState,
-  pendingClip: WaveformDragCreate,
+  pendingClip: ClipPoints,
   mediaFileId: string,
   id: ClipId,
   fields: F

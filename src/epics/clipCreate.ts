@@ -30,9 +30,7 @@ const clipCreateEpic: AppEpic = (
           r.getClipIdAt(state$.value, pendingClip.end),
         ].some((id) => id && clipsOrder.includes(id)) ||
         // TODO: optimize
-        clips.some(
-          (c) => c.start <= right && c.end >= left
-        )
+        clips.some((c) => c.start <= right && c.end >= left)
 
       const currentFileId = r.getCurrentFileId(state$.value)
       if (!currentFileId) throw new Error('Could not find current note type')
@@ -41,11 +39,9 @@ const clipCreateEpic: AppEpic = (
         pendingClipOverlaps ||
         !(Math.abs(pendingClip.end - pendingClip.start) >= r.CLIP_THRESHOLD)
 
-
-
       console.log({ tooSmall })
 
-      const newTime = r.getSecondsAtX(state$.value, tooSmall ? right : left)
+      const newTime = r.getSecondsAtX(tooSmall ? right : left)
       if (!tooSmall) setCurrentTime(newTime)
 
       // maybe later, do stretch + merge for overlaps.

@@ -4,7 +4,6 @@ import {
   overlapsSignificantly,
 } from './subtitles'
 import { getCurrentMediaFile } from './currentMedia'
-import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
 
 export type SubtitlesCardBase = {
   fields: Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
@@ -52,17 +51,12 @@ export type SubtitlesCardBases = {
   ) => Dict<SubtitlesTrackId, string>
 }
 
-const getHalfSecond = ({ waveform }: AppState) =>
-  (waveform.stepsPerSecond * waveform.stepLength) / 2
-
 export const getSubtitlesCardBases = createSelector(
-  getHalfSecond,
   (state: AppState) => state.subtitles,
   getCurrentMediaFile,
   getSubtitlesFlashcardFieldLinks,
   getSubtitlesCardBaseFieldPriority,
   (
-    halfSecond,
     subtitles,
     currentFile,
     fieldsToTracks,
@@ -113,14 +107,7 @@ export const getSubtitlesCardBases = createSelector(
               if (chunk.start >= cueChunk.end) {
                 break
               }
-              if (
-                overlapsSignificantly(
-                  cueChunk,
-                  chunk.start,
-                  chunk.end,
-                  halfSecond
-                )
-              ) {
+              if (overlapsSignificantly(cueChunk, chunk.start, chunk.end)) {
                 overlappedIndexes.push(i)
               }
             }
@@ -152,22 +139,5 @@ export const getSubtitlesCardBases = createSelector(
         return preview
       },
     }
-  }
-)
-
-const limitSubtitlesCardsBasesCardsToDisplayed = limitSelectorToDisplayedItems(
-  (cb: SubtitlesCardBase) => cb.start,
-  (cb: SubtitlesCardBase) => cb.end
-)
-
-export const getDisplayedSubtitlesCardBases = createSelector(
-  getSubtitlesCardBases,
-  (state: AppState) => state.waveform.viewBox.xMin,
-  (bases, xMin) => {
-    const subtitlesCardBases: SubtitlesCardBases = {
-      ...bases,
-      cards: limitSubtitlesCardsBasesCardsToDisplayed(bases.cards, xMin),
-    }
-    return subtitlesCardBases
   }
 )

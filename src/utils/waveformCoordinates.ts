@@ -33,13 +33,10 @@ export const toWaveformCoordinates = (
     y: clientY - top,
   }
 }
+const TEMP_FACTOR = 25
 
-export const getSecondsAtXFromWaveform = (
-  { stepsPerSecond, stepLength }: Pick<WaveformState, 'stepLength' | 'stepsPerSecond'>,
-  x: number
-): number => +(x / (stepsPerSecond * stepLength)).toFixed(5)
+export const getSecondsAtXFromWaveform = (x: number): number =>
+  +(x / TEMP_FACTOR).toFixed(5)
 
-export const getXAtMillisecondsFromWaveform = (
-  { stepsPerSecond, stepLength }: Pick<WaveformState, 'stepsPerSecond' | 'stepLength'>,
-  milliseconds: number
-): number => +((milliseconds / 1000) * (stepsPerSecond * stepLength)).toFixed(2)
+export const getXAtMillisecondsFromWaveform = (milliseconds: number): number =>
+  +((milliseconds / 1000) * TEMP_FACTOR).toFixed(2)

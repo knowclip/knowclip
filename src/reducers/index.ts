@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux'
 
-import waveform from './waveform'
 import clips from './clips'
 import session from './session'
 import snackbar from './snackbar'
@@ -44,7 +43,6 @@ const rootConfig: PersistConfig<AppState> = {
 }
 
 const root = combineReducers<AppState>({
-  waveform,
   clips,
   session,
   snackbar,

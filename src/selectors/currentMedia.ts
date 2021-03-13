@@ -9,7 +9,6 @@ import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_WIDTH } from './waveform'
-import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
 
 export const getLoopState = (state: AppState) => state.session.loopMedia
 
@@ -189,15 +188,6 @@ export const getCurrentFileClips = createSelector(
   getCurrentFileClipsOrder,
   getClipsObject,
   getClipsByIds
-)
-
-export const getDisplayedCurrentFileClips = createSelector(
-  getCurrentFileClips,
-  (state) => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems(
-    (clip) => clip.start,
-    (clip) => clip.end
-  )
 )
 
 export const getFlashcardIdBeforeCurrent = (state: AppState): ClipId | null => {

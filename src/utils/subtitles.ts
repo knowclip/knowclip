@@ -70,8 +70,8 @@ export const getExternalSubtitlesVttPath = async (
       vttFilePath,
       stringifyVtt(
         chunks.map((chunk) => ({
-          start: Math.round(getMillisecondsAtX(state, chunk.start)),
-          end: Math.round(getMillisecondsAtX(state, chunk.end)),
+          start: Math.round(getMillisecondsAtX(chunk.start)),
+          end: Math.round(getMillisecondsAtX(chunk.end)),
           text: chunk.text,
         }))
       ),

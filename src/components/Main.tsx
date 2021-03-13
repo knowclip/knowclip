@@ -30,6 +30,7 @@ const Main = () => {
     currentMediaFile,
     subtitles,
     viewMode,
+    waveformItems,
   } = useSelector((state: AppState) => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
@@ -43,6 +44,7 @@ const Main = () => {
         : EMPTY,
       subtitles: r.getSubtitlesFilesWithTracks(state),
       viewMode: state.settings.viewMode,
+      waveformItems: r.getWaveformItems(state),
     }
   })
 
@@ -56,7 +58,7 @@ const Main = () => {
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
 
-  const waveform = useWaveformState(playerRef.current)
+  const waveform = useWaveformState(playerRef.current, waveformItems)
   const { svgRef } = waveform
 
   const handleTimeUpdate = useWaveformMediaTimeUpdate(svgRef, waveform)

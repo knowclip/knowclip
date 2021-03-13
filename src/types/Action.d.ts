@@ -83,10 +83,6 @@ declare type HighlightRightClipRequest = import('../actions').ActionOf<
 declare type SetCursorPosition = import('../actions').ActionOf<
   'setCursorPosition'
 >
-declare type SetWaveformViewBox = import('../actions').ActionOf<
-  'setWaveformViewBox'
->
-
 declare type GenerateWaveformImages = import('../actions').ActionOf<
   'generateWaveformImages'
 >

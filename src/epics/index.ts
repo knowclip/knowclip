@@ -3,7 +3,6 @@ import { combineEpics } from 'redux-observable'
 import { of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
-import setWaveformCursorEpic from './setWaveformCursor'
 import clipCreate from './clipCreate'
 import clipMove from './clipMove'
 import clipStretch from './clipStretch'
@@ -91,7 +90,6 @@ const rootEpic: AppEpic = combineEpics(
   initialize,
   quit,
   addMediaToProject,
-  // setWaveformCursorEpic,
   loopMedia,
   editClip,
   clipCreate,

@@ -15,13 +15,11 @@ import {
   blankTransliterationFields,
 } from '../utils/newFlashcard'
 import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
-import { getHalfSecond } from './waveform'
 
 export const getWaveformItems = createSelector(
   getCurrentFileClips,
-  getHalfSecond,
   getSubtitlesCardBases,
-  (clips, halfSecond, subtitles): Array<WaveformSelectionExpanded> => {
+  (clips, subtitles): Array<WaveformSelectionExpanded> => {
     const result: Array<WaveformSelectionExpanded> = []
 
     let clipIndex = 0
@@ -33,12 +31,7 @@ export const getWaveformItems = createSelector(
       const clip = clips[clipIndex]
       while (
         chunkIndex < chunks.length &&
-        overlapsSignificantly(
-          chunks[chunkIndex],
-          clip.start,
-          clip.end,
-          halfSecond
-        )
+        overlapsSignificantly(chunks[chunkIndex], clip.start, clip.end)
       ) {
         chunkIndex++
       }
@@ -81,15 +74,6 @@ export const getWaveformItems = createSelector(
 
     return result
   }
-)
-
-export const getDisplayedWaveformItems = createSelector(
-  getWaveformItems,
-  (state: AppState) => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems(
-    (waveformItem) => waveformItem.item.start,
-    (waveformItem) => waveformItem.item.end
-  )
 )
 
 export const getWaveformSelection = createSelector(
@@ -187,7 +171,7 @@ export const getNewFieldsFromLinkedSubtitles = (
   const fields = { ...getBlankFields(state) } as TransliterationFlashcardFields
 
   for (const cardBase of subs.cards) {
-    if (overlapsSignificantly(cardBase, start, end, getHalfSecond(state))) {
+    if (overlapsSignificantly(cardBase, start, end)) {
       const tracksToFieldsText = cardBase
         ? subs.getFieldsPreviewFromCardsBase(cardBase)
         : null

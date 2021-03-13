@@ -21,13 +21,15 @@ import WaveformMousedownEvent, {
 import { setCursorX } from '../utils/waveform'
 import {
   SELECTION_BORDER_WIDTH,
+  SubtitlesCardBase,
   SUBTITLES_CHUNK_HEIGHT,
+  WaveformSelectionExpanded,
   WAVEFORM_HEIGHT,
 } from '../selectors'
 import { SubtitlesTimelines } from './WaveformSubtitlesTimelines'
 import { Clips } from './WaveformClips'
 import { useWaveformState, WaveformAction } from './useWaveformState'
-import { dispatch } from 'rxjs/internal/observable/range'
+import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
 
 export enum $ {
   container = 'waveform-container',
@@ -61,6 +63,11 @@ const Cursor = ({
 const getViewBoxString = (xMin: number, height: number, factor: number) =>
   `${xMin} 0 ${factor * 60} ${height}`
 
+const limitSubtitlesCardsBasesCardsToDisplayed = limitSelectorToDisplayedItems(
+  (cb: SubtitlesCardBase) => cb.start,
+  (cb: SubtitlesCardBase) => cb.end
+)
+
 const Waveform = ({
   playerRef,
   waveformState,
@@ -72,17 +79,15 @@ const Waveform = ({
     images,
     clips,
     highlightedClipId,
-    subtitles,
+    allSubtitles,
     highlightedChunkIndex,
-    waveformItems,
     mediaIsLoaded,
   } = useSelector((state: AppState) => ({
     images: r.getWaveformImages(state),
     clips: r.getCurrentFileClips(state),
     highlightedClipId: r.getHighlightedClipId(state),
-    subtitles: r.getDisplayedSubtitlesCardBases(state),
+    allSubtitles: r.getSubtitlesCardBases(state),
     highlightedChunkIndex: r.getHighlightedChunkIndex(state),
-    waveformItems: r.getDisplayedWaveformItems(state),
     mediaIsLoaded: r.isMediaFileLoaded(state),
   }))
 
@@ -91,6 +96,7 @@ const Waveform = ({
     dispatch: dispatchViewState,
     waveformLength,
     svgRef,
+    waveformItems,
   } = waveformState
 
   const dispatch = useDispatch()
@@ -102,6 +108,12 @@ const Waveform = ({
   )
 
   const { stepsPerSecond, stepLength, xMin } = viewState
+  const subtitles = useMemo(() => {
+    return {
+      ...allSubtitles,
+      cards: limitSubtitlesCardsBasesCardsToDisplayed(allSubtitles.cards, xMin),
+    }
+  }, [allSubtitles, xMin])
 
   const height =
     WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
@@ -192,7 +204,6 @@ const Waveform = ({
   )
 }
 
-
 const WAVEFORM_ACTION_TYPE_TO_CLASSNAMES: Record<
   WaveformDragAction['type'],
   string
@@ -231,7 +242,8 @@ function PendingWaveformItem({
           clipToMove.start - deltaX,
           clipToMove.end - deltaX,
           height
-        )} />
+        )}
+      />
     )
   }
 
@@ -239,10 +251,10 @@ function PendingWaveformItem({
     <rect
       ref={rectRef}
       className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[action.type]}
-      {...getClipRectProps(action.start, action.end, height)} />
+      {...getClipRectProps(action.start, action.end, height)}
+    />
   )
 }
-
 
 const setPendingAction = (action: WaveformDragAction | null) => ({
   type: 'setPendingAction' as const,
@@ -287,7 +299,7 @@ function useWaveformMouseActions(
       const x = Math.min(waveformLength, coords.x)
       const waveformMousedown = new WaveformMousedownEvent(
         e,
-        getSecondsAtXFromWaveform(waveform, x)
+        getSecondsAtXFromWaveform(x)
       )
       document.dispatchEvent(waveformMousedown)
       const { dataset } = e.target as SVGGElement | SVGRectElement
@@ -309,6 +321,7 @@ function useWaveformMouseActions(
               start: Number(dataset.clipStart),
               end: Number(dataset.clipEnd),
             },
+            viewState: waveform,
           })
         )
       } else if (dataset && dataset.clipId)
@@ -322,9 +335,18 @@ function useWaveformMouseActions(
               start: Number(dataset.clipStart),
               end: Number(dataset.clipEnd),
             },
+            viewState: waveform,
           })
         )
-      else dispatch(setPendingAction({ type: 'CREATE', start: x, end: x }))
+      else
+        dispatch(
+          setPendingAction({
+            type: 'CREATE',
+            start: x,
+            end: x,
+            viewState: waveform,
+          })
+        )
 
       mouseIsDown.current = true
     },
@@ -369,7 +391,7 @@ function useWaveformMouseActions(
       }
 
       if (playerRef.current) {
-        const seconds = getSecondsAtXFromWaveform(waveform, x)
+        const seconds = getSecondsAtXFromWaveform(x)
         playerRef.current.currentTime = seconds
 
         setCursorX(x)
@@ -378,6 +400,7 @@ function useWaveformMouseActions(
         const finalAction = {
           ...pendingAction,
           end: x,
+          viewState: waveform,
         }
         console.log('dispatching!!', finalAction)
         document.dispatchEvent(new WaveformDragEvent(finalAction))
@@ -397,3 +420,9 @@ function useWaveformMouseActions(
 export default Waveform
 
 export { $ as waveform$ }
+function limitWaveformItemsToDisplayed(
+  allWaveformItems: WaveformSelectionExpanded[],
+  xMin: number
+): any {
+  throw new Error('Function not implemented.')
+}

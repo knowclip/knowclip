@@ -14,8 +14,8 @@ export const getWaveformPng = async (
   mediaFilePath: string
 ): AsyncResult<string> => {
   try {
-    const startX = getXAtMilliseconds(state, file.startSeconds * 1000)
-    const endX = getXAtMilliseconds(state, file.endSeconds * 1000)
+    const startX = getXAtMilliseconds(file.startSeconds * 1000)
+    const endX = getXAtMilliseconds(file.endSeconds * 1000)
     const width = ~~(endX - startX)
     const outputFilename = getWaveformPngPath(state, mediaFilePath, file)
     if (outputFilename && existsSync(outputFilename))

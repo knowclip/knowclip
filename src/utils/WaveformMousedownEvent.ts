@@ -31,16 +31,23 @@ export type WaveformDragAction =
   | WaveformDragMove
   | WaveformDragStretch
 
-export type WaveformDragCreate = { type: 'CREATE'; start: number; end: number }
+export type WaveformDragCreate = {
+  type: 'CREATE'
+  start: number
+  end: number
+  viewState: ViewState
+}
 export type WaveformDragMove = {
   type: 'MOVE'
   start: number
   end: number
   clipToMove: { id: ClipId; start: number; end: number }
+  viewState: ViewState
 }
 export type WaveformDragStretch = {
   type: 'STRETCH'
   start: number
   end: number
   clipToStretch: { id: ClipId; start: number; end: number }
+  viewState: ViewState
 }

@@ -50,7 +50,7 @@ const detectSilence = (
 const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ActionOf<'detectSilence'>>(A.detectSilence),
-    mergeMap<ActionOf<'detectSilence'>, Promise<Action[]>>(() => {
+    mergeMap<ActionOf<typeof A.detectSilence>, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMedia = r.getCurrentMediaFile(state$.value)
       if (!currentMedia || !currentFilePath)
@@ -90,9 +90,8 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
             {
-              type: 'CREATE',
-              start: r.getXAtMilliseconds(state$.value, start),
-              end: r.getXAtMilliseconds(state$.value, end),
+              start: r.getXAtMilliseconds(start),
+              end: r.getXAtMilliseconds(end),
             },
             fileId,
             uuid(),

@@ -172,7 +172,7 @@ const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
         return
       }
       const { start } = track.chunks[chunkIndex]
-      setCurrentTime(r.getSecondsAtX(state$.value, start))
+      setCurrentTime(r.getSecondsAtX(start))
       return
     }),
     ignoreElements()
@@ -287,7 +287,6 @@ function getClipsAndCardsFromSubtitles(
     return r.getNewClipAndCard(
       state,
       {
-        type: 'CREATE',
         start: chunk.start,
         end:
           sortedChunks[chunkIndex + 1] &&

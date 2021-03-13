@@ -76,7 +76,7 @@ export default {
       const seconds =
         typeof flashcard.image?.seconds === 'number'
           ? flashcard.image.seconds
-          : r.getSecondsAtX(state, getMidpoint(clip.start, clip.end))
+          : r.getSecondsAtX(getMidpoint(clip.start, clip.end))
 
       const pngPath = await effects.getVideoStill(
         file.id,

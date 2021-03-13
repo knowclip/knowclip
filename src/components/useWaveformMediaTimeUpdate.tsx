@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 export function useWaveformMediaTimeUpdate(
   svgRef: any,
-  waveform: ReturnType<typeof useWaveformState>,
+  waveform: ReturnType<typeof useWaveformState>
 ) {
   const {
     doWaveformUpdate,
@@ -16,11 +16,7 @@ export function useWaveformMediaTimeUpdate(
     dispatch: dispatchViewState,
   } = waveform
 
-  const {
-    waveformItems,
-    remoteSelection
-  } = useSelector((state: AppState) => ({
-    waveformItems: r.getDisplayedWaveformItems(state),
+  const { remoteSelection } = useSelector((state: AppState) => ({
     remoteSelection: r.getWaveformSelection(state),
   }))
 
@@ -31,7 +27,7 @@ export function useWaveformMediaTimeUpdate(
   useEffect(() => {
     const localChange = waveform.state.selection !== previousLocalSelection
     const remoteChange = remoteSelection !== previousRemoteSelection
-    const notSyncedWithRemote =  remoteSelection !== waveform.state.selection
+    const notSyncedWithRemote = remoteSelection !== waveform.state.selection
     // console.log({ localChange, remoteChange, notSyncedWithRemote})
     if (localChange && notSyncedWithRemote) {
       dispatch(r.selectWaveformItem(waveform.state.selection))
@@ -39,7 +35,14 @@ export function useWaveformMediaTimeUpdate(
     if (remoteChange && notSyncedWithRemote) {
       dispatchViewState(r.selectWaveformItem(remoteSelection))
     }
-  }, [dispatch, dispatchViewState, previousLocalSelection, previousRemoteSelection, remoteSelection, waveform.state.selection])
+  }, [
+    dispatch,
+    dispatchViewState,
+    previousLocalSelection,
+    previousRemoteSelection,
+    remoteSelection,
+    waveform.state.selection,
+  ])
 
   return useCallback(
     (
@@ -51,15 +54,11 @@ export function useWaveformMediaTimeUpdate(
 
       const newlyUpdatedTime = media.currentTime
       const newMilliseconds = newlyUpdatedTime * 1000
-      const newXAtMilliseconds = getXAtMillisecondsFromWaveform(
-        waveform.state,
-        newMilliseconds
-      )
-
+      const newXAtMilliseconds = getXAtMillisecondsFromWaveform(newMilliseconds)
 
       const possibleNewSelection = r.getNewWaveformSelectionAtFromSubset(
         remoteSelection,
-        waveformItems,
+        waveform.waveformItems,
         newXAtMilliseconds
       )
       const factor = waveform.state.stepLength * waveform.state.stepsPerSecond
@@ -72,8 +71,7 @@ export function useWaveformMediaTimeUpdate(
           ? overlapsSignificantly(
               possibleNewSelection.item,
               remoteSelection.item.start,
-              remoteSelection.item.end,
-              halfSecond
+              remoteSelection.item.end
             )
             ? null
             : possibleNewSelection
@@ -94,6 +92,14 @@ export function useWaveformMediaTimeUpdate(
       )
       x.forEach((a) => dispatchViewState(a))
     },
-    [dispatchViewState, doWaveformUpdate, remoteSelection, svgRef, waveform.state, waveformLength]
+    [
+      dispatchViewState,
+      doWaveformUpdate,
+      remoteSelection,
+      svgRef,
+      waveform.state,
+      waveform.waveformItems,
+      waveformLength,
+    ]
   )
 }

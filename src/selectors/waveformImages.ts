@@ -7,12 +7,10 @@ export const getWaveformImages = createSelector(
   getCurrentMediaFile,
   (state: AppState) => state.files.WaveformPng,
   (state: AppState) => state.fileAvailabilities.WaveformPng,
-  (state: AppState) => state.waveform,
   (
     currentMediaFile,
     files,
-    fileAvailabilities,
-    waveform
+    fileAvailabilities
   ): { file: WaveformPng; path: string; x: number }[] => {
     if (!currentMediaFile) return []
     const result: { file: WaveformPng; path: string; x: number }[] = []
@@ -24,7 +22,7 @@ export const getWaveformImages = createSelector(
         result.push({
           file,
           path: availability.filePath,
-          x: getXAtMillisecondsFromWaveform(waveform, file.startSeconds * 1000),
+          x: getXAtMillisecondsFromWaveform(file.startSeconds * 1000),
         })
       }
     }

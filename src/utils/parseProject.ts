@@ -180,13 +180,9 @@ function getMediaClips<F extends FlashcardFields>(
       return {
         id: c.id,
         start: getXAtMilliseconds(
-          state,
           parseFormattedDuration(c.start).asMilliseconds()
         ),
-        end: getXAtMilliseconds(
-          state,
-          parseFormattedDuration(c.end).asMilliseconds()
-        ),
+        end: getXAtMilliseconds(parseFormattedDuration(c.end).asMilliseconds()),
         fileId: media.id,
       }
     }

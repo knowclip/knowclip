@@ -45,7 +45,7 @@ const clipStretchEpic: AppEpic = (
       const previousClip =
         previousClipId && r.getClip(state$.value, previousClipId)
       if (previousClip && previousClipId && end <= previousClip.end) {
-        setCurrentTime(r.getSecondsAtX(state$.value, previousClip.start))
+        setCurrentTime(r.getSecondsAtX(previousClip.start))
 
         return from([
           ...(stretchedClipItem?.type === 'Clip'
@@ -63,8 +63,7 @@ const clipStretchEpic: AppEpic = (
       const nextClipId = r.getNextClipId(state$.value, id)
       const nextClip = nextClipId && r.getClip(state$.value, nextClipId)
       if (nextClip && nextClipId && end >= nextClip.start) {
-        if (stretchedClip)
-          setCurrentTime(r.getSecondsAtX(state$.value, stretchedClip.start))
+        if (stretchedClip) setCurrentTime(r.getSecondsAtX(stretchedClip.start))
 
         return from([
           ...(stretchedClipItem?.type === 'Clip'
@@ -84,13 +83,14 @@ const clipStretchEpic: AppEpic = (
 
         const newCard = r.getNewFlashcardForStretchedClip(
           state$.value,
+          action.viewState,
           r.getCurrentNoteType(state$.value) as NoteType,
           stretchedClip,
           r.getFlashcard(state$.value, stretchedClip.id) as Flashcard,
           { start, end: stretchedClip.end },
           'PREPEND'
         )
-        setCurrentTime(r.getSecondsAtX(state$.value, start))
+        setCurrentTime(r.getSecondsAtX(start))
         return from([
           r.editClip(
             id,
@@ -108,6 +108,7 @@ const clipStretchEpic: AppEpic = (
       if (originKey === 'end' && stretchedClip && end > stretchedClip.start) {
         const newCard = r.getNewFlashcardForStretchedClip(
           state$.value,
+          action.viewState,
           r.getCurrentNoteType(state$.value) as NoteType,
           stretchedClip,
           r.getFlashcard(state$.value, stretchedClip.id) as Flashcard,

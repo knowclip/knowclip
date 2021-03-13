@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux'
 
-import waveform from '../reducers/waveform'
 import clips from '../reducers/clips'
 import session from '../reducers/session'
 import snackbar from '../reducers/snackbar'
@@ -15,7 +14,6 @@ import projectToMarkdown from './projectToMarkdown'
 import { initialState } from '../reducers/files'
 
 export const reducer = combineReducers<AppState>({
-  waveform,
   clips,
   session,
   snackbar,

@@ -1,5 +1,7 @@
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useMemo, useReducer, useRef } from 'react'
 import r from '../redux'
+import { WaveformSelectionExpanded } from '../selectors'
+import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
 import { elementWidth } from '../utils/media'
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
 import { areSelectionsEqual } from '../utils/waveformSelection'
@@ -14,8 +16,14 @@ const initialState = {
 }
 
 export function useWaveformState(
-  mediaEl: HTMLVideoElement | HTMLAudioElement | null
+  mediaEl: HTMLVideoElement | HTMLAudioElement | null,
+  waveformItems: WaveformSelectionExpanded[]
 ) {
+  const limitWaveformItemsToDisplayed = limitSelectorToDisplayedItems(
+    (waveformItem: WaveformSelectionExpanded) => waveformItem.item.start,
+    (waveformItem: WaveformSelectionExpanded) => waveformItem.item.end
+  )
+
   const svgRef = useRef<SVGSVGElement>(null)
   const [state, dispatch] = useReducer(updateViewState, initialState)
   const { stepsPerSecond, stepLength } = state
@@ -36,11 +44,20 @@ export function useWaveformState(
     dispatch,
     doWaveformUpdate,
     waveformLength,
+    waveformItems: useMemo(
+      () => limitWaveformItemsToDisplayed(waveformItems, state.xMin),
+      [limitWaveformItemsToDisplayed, waveformItems, state.xMin]
+    ),
   }
 }
 
 export type WaveformAction =
   | ElementOf<ReturnType<typeof doWaveformUpdate>>
+  | {
+      type: 'setCursorPosition'
+      x: number
+      xMin: number | undefined
+    }
   | { type: 'setPendingAction'; action: WaveformDragAction | null }
   | { type: 'continuePendingAction'; x: number }
   | { type: 'reset' }
@@ -74,7 +91,7 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
       return {
         ...state,
         cursorX: action.x,
-        xMin: action.newViewBox?.xMin || state.xMin,
+        xMin: typeof action.xMin === 'number' ? action.xMin : state.xMin,
       }
     default:
       return state
@@ -130,18 +147,20 @@ function setViewBox(
   const buffer = Math.round(svgWidth * 0.1)
 
   if (newX < viewBoxXMin) {
-    return [
-      r.setCursorPosition(newX, {
-        xMin: Math.max(0, newX - buffer),
-      }),
-    ]
+    return [setCursorPosition(newX, Math.max(0, newX - buffer))]
   }
   if (newX >= svgWidth + viewBoxXMin) {
     const xMin = Math.min(
       newSelection ? newSelection.item.end + buffer : newX,
       Math.max(waveformLength - svgWidth, 0)
     )
-    return [r.setCursorPosition(newX, { xMin })]
+    return [setCursorPosition(newX, xMin)]
   }
-  return seeking ? [r.setCursorPosition(newX)] : []
+  return seeking ? [setCursorPosition(newX)] : []
 }
+
+const setCursorPosition = (x: number, xMin?: number) => ({
+  type: 'setCursorPosition' as const,
+  x,
+  xMin,
+})

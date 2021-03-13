@@ -85,7 +85,7 @@ export const Clips = React.memo(
     clips: Clip[]
     highlightedClipId: string | null
     height: number
-    waveform: ViewState,
+    waveform: ViewState
     playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
   }) => {
     const handleClick = useCallback(
@@ -96,7 +96,6 @@ export const Clips = React.memo(
             const player = playerRef.current
             if (player)
               player.currentTime = getSecondsAtXFromWaveform(
-                waveform,
                 clips[dataset.clipIndex].start
               )
             setCursorX(clips[dataset.clipIndex].start)

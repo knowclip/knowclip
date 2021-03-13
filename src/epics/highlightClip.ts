@@ -19,8 +19,7 @@ const selectClipOnStretch: AppEpic = (action$, state$, effects) =>
     }),
     tap(({ id }) => {
       const clip = r.getClip(state$.value, id)
-      if (clip)
-        effects.setCurrentTime(r.getSecondsAtX(state$.value, clip.start))
+      if (clip) effects.setCurrentTime(r.getSecondsAtX(clip.start))
     }),
     ignoreElements()
   )
@@ -72,28 +71,28 @@ const centerSelectedClip: AppEpic = (
       const svgFits = clip.end - clip.start <= svgWidth
       if (!svgFits) return EMPTY
 
-      const { waveform } = state$.value
-      const { xMin } = waveform.viewBox
+      // const { waveform } = state$.value
+      // const { xMin } = waveform.viewBox
 
-      if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
-        return of(
-          r.setWaveformViewBox({
-            xMin: Math.max(
-              0,
-              clip.start - HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER
-            ),
-          })
-        )
+      // if (clip.start - xMin < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
+      //   return of(
+      //     r.setWaveformViewBox({
+      //       xMin: Math.max(
+      //         0,
+      //         clip.start - HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER
+      //       ),
+      //     })
+      //   )
 
-      if (xMin + svgWidth - clip.end < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
-        return of(
-          r.setWaveformViewBox({
-            xMin: Math.min(
-              clip.end + HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER - svgWidth,
-              waveform.length - svgWidth
-            ),
-          })
-        )
+      // if (xMin + svgWidth - clip.end < HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER)
+      //   return of(
+      //     r.setWaveformViewBox({
+      //       xMin: Math.min(
+      //         clip.end + HIGHLIGHTED_CLIP_TO_WAVEFORM_EDGE_BUFFER - svgWidth,
+      //         waveform.length - svgWidth
+      //       ),
+      //     })
+      //   )
 
       return EMPTY
     })
@@ -127,10 +126,7 @@ const highlightRightEpic: AppEpic = (
 
         if (next) {
           setCurrentTime(
-            r.getSecondsAtX(
-              state$.value,
-              Math.max(next.item.start, selection.item.end + 1)
-            )
+            r.getSecondsAtX(Math.max(next.item.start, selection.item.end + 1))
           )
           return r.isMediaFileLoaded(state)
             ? EMPTY
@@ -138,12 +134,12 @@ const highlightRightEpic: AppEpic = (
         }
       }
 
-      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
+      const x = r.getXAtMilliseconds(getCurrentTime() * 1000)
 
       const next =
         waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
       if (next) {
-        setCurrentTime(r.getSecondsAtX(state$.value, next.item.start))
+        setCurrentTime(r.getSecondsAtX(next.item.start))
         return r.isMediaFileLoaded(state)
           ? EMPTY
           : of(r.selectWaveformItem(next))
@@ -186,20 +182,20 @@ const highlightLeftEpic: AppEpic = (
           ]
 
         if (prev) {
-          setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+          setCurrentTime(r.getSecondsAtX(prev.item.start))
           return r.isMediaFileLoaded(state)
             ? EMPTY
             : of(r.selectWaveformItem(prev))
         }
       }
-      const x = r.getXAtMilliseconds(state$.value, getCurrentTime() * 1000)
+      const x = r.getXAtMilliseconds(getCurrentTime() * 1000)
 
       const prev =
         findLast(waveformItems, ({ item }) => item.end <= x) ||
         waveformItems[waveformItems.length - 1]
 
       if (prev) {
-        setCurrentTime(r.getSecondsAtX(state$.value, prev.item.start))
+        setCurrentTime(r.getSecondsAtX(prev.item.start))
         return r.isMediaFileLoaded(state)
           ? EMPTY
           : of(r.selectWaveformItem(prev))

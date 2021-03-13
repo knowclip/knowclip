@@ -35,7 +35,12 @@ enum $ {
   addNewAdditionalMediaButton = 'add-new-additional-media-button',
 }
 
-type MediaFilesMenuProps = { className: string; currentProjectId: ProjectId }
+type MediaFilesMenuProps = {
+  className: string
+  currentProjectId: ProjectId
+}
+
+const TEMP_WAVEFORM_FACTOR = 25
 
 const MediaFilesMenu = ({
   className,
@@ -62,7 +67,7 @@ const MediaFilesMenu = ({
     [dispatch, currentProjectId, popover]
   )
 
-  const { playing, playOrPauseAudio } = usePlayButtonSync()
+  const { playing, playOrPauseAudio } = usePlayButtonSync(TEMP_WAVEFORM_FACTOR)
 
   const toggleLoop = useCallback(() => dispatch(actions.toggleLoop('BUTTON')), [
     dispatch,
@@ -155,28 +160,26 @@ const MediaFilesMenu = ({
   )
 }
 
-function usePlayButtonSync() {
+function usePlayButtonSync(waveformFactor: number) {
   const playing = useSelector(r.isMediaPlaying)
-  const waveform = useSelector(r.getWaveform)
-  const stepLength = waveform.stepLength * waveform.stepsPerSecond
   const dispatch = useDispatch()
   const playMedia = useCallback(() => {
-    startMovingCursor(stepLength)
+    startMovingCursor(waveformFactor)
     dispatch(r.playMedia())
-  }, [dispatch, stepLength])
+  }, [dispatch, waveformFactor])
   const pauseMedia = useCallback(() => {
     stopMovingCursor()
     dispatch(r.pauseMedia())
   }, [dispatch])
 
-  const previousStepLength = usePrevious(stepLength)
+  const previousStepLength = usePrevious(waveformFactor)
   useEffect(() => {
     if (!playing) return
-    if (stepLength !== previousStepLength) {
+    if (waveformFactor !== previousStepLength) {
       stopMovingCursor()
-      startMovingCursor(stepLength)
+      startMovingCursor(waveformFactor)
     }
-  }, [playing, previousStepLength, stepLength])
+  }, [playing, previousStepLength, waveformFactor])
 
   useEffect(() => {
     const startPlaying = () => {

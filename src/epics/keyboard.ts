@@ -80,7 +80,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
           mediaIsPlaying &&
           r.getClipIdAt(
             state$.value,
-            r.getXAtMilliseconds(state$.value, currentTime * 1000)
+            r.getXAtMilliseconds(currentTime * 1000)
           ) === r.getHighlightedClipId(state$.value)
         )
           return of(r.setLoop(false))

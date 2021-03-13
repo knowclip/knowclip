@@ -140,7 +140,6 @@ export const newClipFromChunk: AppEpic = (
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,
           {
-            type: 'CREATE',
             start: selection.item.start,
             end: selection.item.end,
           },
@@ -153,7 +152,7 @@ export const newClipFromChunk: AppEpic = (
           flashcard.cloze = [action.clozeDeletion]
         }
 
-        setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
+        setCurrentTime(r.getSecondsAtX(selection.item.start))
 
         return from([r.addClip(clip, flashcard, action.startEditing || false)])
       })
@@ -194,12 +193,9 @@ const updateSelectionAfterLink: AppEpic = (
           )
           if (
             newSelection &&
-            r.getSecondsAtX(state$.value, newSelection.item.start) !==
-              getCurrentTime()
+            r.getSecondsAtX(newSelection.item.start) !== getCurrentTime()
           ) {
-            setCurrentTime(
-              r.getSecondsAtX(state$.value, newSelection.item.start)
-            )
+            setCurrentTime(r.getSecondsAtX(newSelection.item.start))
           }
           return of(
             newSelection

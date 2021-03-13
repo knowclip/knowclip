@@ -182,12 +182,12 @@ function getProjectClips<F extends FlashcardFields>(
         id,
         start: formatDurationWithMilliseconds(
           moment.duration({
-            seconds: getSecondsAtX(state, start),
+            seconds: getSecondsAtX(start),
           })
         ),
         end: formatDurationWithMilliseconds(
           moment.duration({
-            seconds: getSecondsAtX(state, end),
+            seconds: getSecondsAtX(end),
           })
         ),
       }
