@@ -14,6 +14,7 @@ export function useWaveformMediaTimeUpdate(
     doWaveformUpdate,
     waveformLength,
     dispatch: dispatchViewState,
+    waveformItems,
   } = waveform
 
   const { remoteSelection } = useSelector((state: AppState) => ({
@@ -47,7 +48,8 @@ export function useWaveformMediaTimeUpdate(
   return useCallback(
     (
       media: HTMLVideoElement | HTMLAudioElement,
-      seeking: MutableRefObject<boolean>
+      seeking: MutableRefObject<boolean>,
+      looping: boolean
     ) => {
       const svg = svgRef.current
       if (!svg) return console.error('Svg disappeared')
@@ -80,7 +82,28 @@ export function useWaveformMediaTimeUpdate(
       const wasSeeking = seeking.current
       seeking.current = false
 
-      // loop stuff here
+      const selection = waveform.state.selection
+      // tODO: optimize
+      const selectionItem = waveformItems.find(
+        (item) => item.index === selection?.index
+      )?.item
+      const loopImminent =
+        !wasSeeking &&
+        looping &&
+        !media.paused &&
+        selection &&
+        selectionItem &&
+        newlyUpdatedTime >= r.getSecondsAtX(selectionItem.end)
+      if (loopImminent && selection && selectionItem) {
+        const selectionStartTime = r.getSecondsAtX(selectionItem.start)
+        media.currentTime = selectionStartTime
+        return dispatchViewState({
+          type: 'setCursorPosition',
+          x: selectionItem.start,
+          xMin: undefined,
+        })
+      }
+
       const x = doWaveformUpdate(
         waveform.state,
         waveformLength,
@@ -99,6 +122,7 @@ export function useWaveformMediaTimeUpdate(
       svgRef,
       waveform.state,
       waveform.waveformItems,
+      waveformItems,
       waveformLength,
     ]
   )

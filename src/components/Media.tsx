@@ -27,7 +27,8 @@ type MediaProps = {
   playerRef: MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
   onTimeUpdate: (
     mediaEl: HTMLVideoElement | HTMLAudioElement,
-    seeking: MutableRefObject<boolean>
+    seeking: MutableRefObject<boolean>,
+    looping: boolean
   ) => void
 }
 let clicked = false
@@ -42,6 +43,7 @@ const Media = ({
   viewMode,
   playerRef,
   onTimeUpdate,
+  loop,
 }: MediaProps) => {
   const seekOn = useCallback((_e) => {
     ;(window as any).seeking = true
@@ -83,6 +85,7 @@ const Media = ({
     return () => document.removeEventListener('seeking', handleSeek, true)
   })
 
+  const looping = Boolean(loop)
   const props:
     | AudioHTMLAttributes<HTMLAudioElement>
     | VideoHTMLAttributes<HTMLVideoElement> = {
@@ -110,9 +113,9 @@ const Media = ({
     onTimeUpdate: useCallback(
       (e) => {
         const media = e.target as HTMLVideoElement | HTMLAudioElement
-        onTimeUpdate(media, seeking)
+        onTimeUpdate(media, seeking, looping)
       },
-      [onTimeUpdate]
+      [onTimeUpdate, looping]
     ),
 
     onKeyDown: useCallback((e) => {
