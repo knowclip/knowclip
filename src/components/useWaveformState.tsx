@@ -103,13 +103,9 @@ function doWaveformUpdate(
   waveformLength: number,
   newlyUpdatedTime: number,
   svg: SVGSVGElement,
-  newSelection:
-    | import('/Users/justin.silvestre/code/knowclip/src/selectors/cardPreview').WaveformSelectionExpanded
-    | null,
+  newSelection: WaveformSelectionExpanded | null,
   wasSeeking: boolean,
-  selection:
-    | import('/Users/justin.silvestre/code/knowclip/src/selectors/cardPreview').WaveformSelectionExpanded
-    | null
+  selection: WaveformSelectionExpanded | null
 ) {
   const waveform = viewState
   const setViewboxAction = setViewBox(
