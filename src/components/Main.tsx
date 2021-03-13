@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
+import { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { CircularProgress } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
@@ -13,6 +14,8 @@ import css from '../components/Main.module.css'
 import waveformCss from '../components/Waveform.module.css'
 import * as r from '../selectors'
 import { setMousePosition } from '../utils/mousePosition'
+import { useWaveformState } from './useWaveformState'
+import { useWaveformMediaTimeUpdate } from './useWaveformMediaTimeUpdate'
 
 enum $ {
   container = 'main-screen-container',
@@ -53,6 +56,11 @@ const Main = () => {
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
 
+  const waveform = useWaveformState(playerRef.current)
+  const { svgRef } = waveform
+
+  const handleTimeUpdate = useWaveformMediaTimeUpdate(svgRef, waveform)
+
   if (!currentProject) return <Redirect to="/projects" />
 
   return (
@@ -86,6 +94,7 @@ const Main = () => {
             subtitles={subtitles}
             viewMode={viewMode}
             playerRef={playerRef}
+            onTimeUpdate={handleTimeUpdate}
           />
         )}
 
@@ -96,8 +105,12 @@ const Main = () => {
         />
       </section>
 
-      {Boolean(currentMediaFile && !mediaIsEffectivelyLoading) ? (
-        <Waveform playerRef={playerRef} />
+      {currentMediaFile && !mediaIsEffectivelyLoading ? (
+        <Waveform
+          waveformState={waveform}
+          playerRef={playerRef}
+          key={currentMediaFile.id}
+        />
       ) : (
         <div className={waveformCss.waveformPlaceholder} />
       )}

@@ -91,7 +91,7 @@ const rootEpic: AppEpic = combineEpics(
   initialize,
   quit,
   addMediaToProject,
-  setWaveformCursorEpic,
+  // setWaveformCursorEpic,
   loopMedia,
   editClip,
   clipCreate,

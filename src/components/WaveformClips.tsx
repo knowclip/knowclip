@@ -85,7 +85,7 @@ export const Clips = React.memo(
     clips: Clip[]
     highlightedClipId: string | null
     height: number
-    waveform: WaveformState
+    waveform: ViewState,
     playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
   }) => {
     const handleClick = useCallback(

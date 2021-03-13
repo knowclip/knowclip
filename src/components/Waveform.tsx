@@ -3,7 +3,6 @@ import React, {
   useCallback,
   useMemo,
   EventHandler,
-  useState,
   MutableRefObject,
   useEffect,
 } from 'react'
@@ -27,6 +26,8 @@ import {
 } from '../selectors'
 import { SubtitlesTimelines } from './WaveformSubtitlesTimelines'
 import { Clips } from './WaveformClips'
+import { useWaveformState, WaveformAction } from './useWaveformState'
+import { dispatch } from 'rxjs/internal/observable/range'
 
 export enum $ {
   container = 'waveform-container',
@@ -36,7 +37,15 @@ export enum $ {
   waveformClip = 'waveform-clip',
 }
 
-const Cursor = ({ x, height, strokeWidth }: { x: number; height: number, strokeWidth: number }) => (
+const Cursor = ({
+  x,
+  height,
+  strokeWidth,
+}: {
+  x: number
+  height: number
+  strokeWidth: number
+}) => (
   <line
     className="cursor"
     stroke="white"
@@ -49,69 +58,17 @@ const Cursor = ({ x, height, strokeWidth }: { x: number; height: number, strokeW
     style={{ pointerEvents: 'none' }}
   />
 )
-
-const WAVEFORM_ACTION_TYPE_TO_CLASSNAMES: Record<
-  WaveformDragAction['type'],
-  string
-> = {
-  CREATE: css.waveformPendingClip,
-  MOVE: css.waveformPendingClipMove,
-  STRETCH: css.waveformPendingStretch,
-}
-
-const getClipRectProps = (start: number, end: number, height: number) => ({
-  x: Math.min(start, end),
-  y: 0,
-  width: Math.abs(start - end),
-  height,
-})
-
-const PendingWaveformItem = ({
-  action,
-  height,
-  rectRef,
-}: {
-  action: WaveformDragAction
-  stepsPerSecond: number
-  height: number
-  rectRef: MutableRefObject<SVGRectElement | null>
-}) => {
-  if (action.type === 'MOVE') {
-    const { start, end, clipToMove } = action
-    const deltaX = start - end
-
-    return (
-      <rect
-        ref={rectRef}
-        className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[action.type]}
-        {...getClipRectProps(
-          clipToMove.start - deltaX,
-          clipToMove.end - deltaX,
-          height
-        )}
-      />
-    )
-  }
-
-  return (
-    <rect
-      ref={rectRef}
-      className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[action.type]}
-      {...getClipRectProps(action.start, action.end, height)}
-    />
-  )
-}
-
 const getViewBoxString = (xMin: number, height: number, factor: number) =>
   `${xMin} 0 ${factor * 60} ${height}`
 
 const Waveform = ({
   playerRef,
+  waveformState,
 }: {
   playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
+  waveformState: ReturnType<typeof useWaveformState>
 }) => {
   const {
-    waveform,
     images,
     clips,
     highlightedClipId,
@@ -120,7 +77,6 @@ const Waveform = ({
     waveformItems,
     mediaIsLoaded,
   } = useSelector((state: AppState) => ({
-    waveform: r.getWaveform(state),
     images: r.getWaveformImages(state),
     clips: r.getCurrentFileClips(state),
     highlightedClipId: r.getHighlightedClipId(state),
@@ -130,6 +86,13 @@ const Waveform = ({
     mediaIsLoaded: r.isMediaFileLoaded(state),
   }))
 
+  const {
+    state: viewState,
+    dispatch: dispatchViewState,
+    waveformLength,
+    svgRef,
+  } = waveformState
+
   const dispatch = useDispatch()
   const goToSubtitlesChunk = useCallback(
     (trackId: string, chunkIndex: number) => {
@@ -138,12 +101,12 @@ const Waveform = ({
     [dispatch]
   )
 
-  const { viewBox, cursor, stepsPerSecond, stepLength } = waveform
-  const factor = stepsPerSecond * stepLength
+  const { stepsPerSecond, stepLength, xMin } = viewState
+
   const height =
     WAVEFORM_HEIGHT + subtitles.totalTracksCount * SUBTITLES_CHUNK_HEIGHT
-  const viewBoxString = getViewBoxString(viewBox.xMin, height, factor)
-  const svgRef = useRef<SVGSVGElement>(null)
+  const factor = stepsPerSecond * stepLength
+  const viewBoxString = getViewBoxString(xMin, height, factor)
 
   // handleStartClip
   // handleEndClip
@@ -151,128 +114,14 @@ const Waveform = ({
   // handleEndMove
   // handleSTartStretch
   // handleEndStretch
-  const [pendingAction, setPendingAction] = useState<WaveformDragAction | null>(
-    null
+
+  const { handleMouseDown, pendingActionRef } = useWaveformMouseActions(
+    svgRef,
+    viewState,
+    waveformLength,
+    playerRef,
+    dispatchViewState
   )
-  const pendingActionRef = useRef<SVGRectElement | null>(null)
-
-  const handleMouseMoves = useCallback(
-    (e: MouseEvent) => {
-      e.preventDefault()
-      const pendingActionDisplay = pendingActionRef.current
-      const svg = svgRef.current
-      if (pendingActionDisplay && svg) {
-        const coords = toWaveformCoordinates(e, svg, waveform.viewBox.xMin)
-        const x = Math.min(waveform.length, coords.x)
-        // pendingActionDisplay.setAttribute('x1', String(x))
-        setPendingAction((action) => {
-          return action ? { ...action, end: x } : null
-        })
-      }
-    },
-    [waveform.length, waveform.viewBox.xMin]
-  )
-
-  const handleMouseDown: EventHandler<React.MouseEvent<
-    SVGElement
-  >> = useCallback(
-    (e) => {
-      e.preventDefault()
-      const coords = toWaveformCoordinates(
-        e,
-        e.currentTarget,
-        waveform.viewBox.xMin
-      )
-      const x = Math.min(waveform.length, coords.x)
-      const waveformMousedown = new WaveformMousedownEvent(
-        e,
-        getSecondsAtXFromWaveform(waveform, x)
-      )
-      document.dispatchEvent(waveformMousedown)
-      const { dataset } = e.target as SVGGElement | SVGRectElement
-      if (
-        dataset &&
-        dataset.clipId &&
-        (Math.abs(Number(dataset.clipStart) - x) <= SELECTION_BORDER_WIDTH ||
-          Math.abs(Number(dataset.clipEnd) - x) <= SELECTION_BORDER_WIDTH)
-      ) {
-        console.log('strootchie')
-        setPendingAction({
-          type: 'STRETCH',
-          start: x,
-          end: x,
-          clipToStretch: {
-            id: dataset.clipId,
-            start: Number(dataset.clipStart),
-            end: Number(dataset.clipEnd),
-          },
-        })
-      } else if (dataset && dataset.clipId)
-        setPendingAction({
-          type: 'MOVE',
-          start: x,
-          end: x,
-          clipToMove: {
-            id: dataset.clipId,
-            start: Number(dataset.clipStart),
-            end: Number(dataset.clipEnd),
-          },
-        })
-      else setPendingAction({ type: 'CREATE', start: x, end: x })
-
-      const handleNextMouseUp = (e: MouseEvent) => {
-        document.removeEventListener('mouseup', handleNextMouseUp)
-        document.removeEventListener('mousemove', handleMouseMoves)
-      }
-
-      document.addEventListener('mouseup', handleNextMouseUp)
-      document.addEventListener('mousemove', handleMouseMoves)
-    },
-    [waveform, handleMouseMoves]
-  )
-
-  useEffect(() => {
-    const handleMouseUps = (e: MouseEvent) => {
-      console.log('mouseup!')
-      if (!pendingAction) return console.log('NO PENDING ACTION')
-      if (pendingAction) {
-        setPendingAction(null)
-      }
-
-      const svg = svgRef.current
-      if (!svg) return
-
-      const coords = toWaveformCoordinates(e, svg, waveform.viewBox.xMin)
-      const x = Math.min(waveform.length, coords.x)
-      const { dataset } = e.target as SVGGElement | SVGRectElement
-
-      if (
-        dataset &&
-        ((dataset.clipId && !dataset.clipIsHighlighted) || dataset.chunkIndex)
-      ) {
-        return
-      }
-
-      if (playerRef.current) {
-        const seconds = getSecondsAtXFromWaveform(waveform, x)
-        playerRef.current.currentTime = seconds
-
-        setCursorX(x)
-      }
-      if (pendingAction) {
-        const finalAction = {
-          ...pendingAction,
-          end: x,
-        }
-        console.log('dispatching!!', finalAction)
-        document.dispatchEvent(new WaveformDragEvent(finalAction))
-        setPendingAction(null)
-      }
-      // if (!pendingAction) throw new Error('Problem with waveform drag event--no drag start registered')
-    }
-    document.addEventListener('mouseup', handleMouseUps)
-    return () => document.removeEventListener('mouseup', handleMouseUps)
-  }, [pendingAction, playerRef, waveform])
 
   const imageBitmaps = useMemo(() => {
     return images.map(({ path, x, file }) => (
@@ -302,7 +151,7 @@ const Waveform = ({
           fill="#222222"
           x={0}
           y={0}
-          width={waveform.length}
+          width={waveformLength}
           height={height}
         />
         <Clips
@@ -311,13 +160,13 @@ const Waveform = ({
             highlightedClipId,
             stepsPerSecond,
             height,
-            waveform,
+            waveform: viewState,
             playerRef,
           }}
         />
-        {pendingAction && (
+        {viewState.pendingAction && (
           <PendingWaveformItem
-            action={pendingAction}
+            action={viewState.pendingAction}
             stepsPerSecond={stepsPerSecond}
             height={height}
             rectRef={pendingActionRef}
@@ -333,10 +182,216 @@ const Waveform = ({
             waveformItems={waveformItems}
           />
         )}
-        <Cursor x={cursor.x} height={height} strokeWidth={waveform.stepLength} />
+        <Cursor
+          x={viewState.cursorX}
+          height={height}
+          strokeWidth={stepLength}
+        />
       </g>
     </svg>
   )
+}
+
+
+const WAVEFORM_ACTION_TYPE_TO_CLASSNAMES: Record<
+  WaveformDragAction['type'],
+  string
+> = {
+  CREATE: css.waveformPendingClip,
+  MOVE: css.waveformPendingClipMove,
+  STRETCH: css.waveformPendingStretch,
+}
+
+const getClipRectProps = (start: number, end: number, height: number) => ({
+  x: Math.min(start, end),
+  y: 0,
+  width: Math.abs(start - end),
+  height,
+})
+
+function PendingWaveformItem({
+  action,
+  height,
+  rectRef,
+}: {
+  action: WaveformDragAction
+  stepsPerSecond: number
+  height: number
+  rectRef: MutableRefObject<SVGRectElement | null>
+}) {
+  if (action.type === 'MOVE') {
+    const { start, end, clipToMove } = action
+    const deltaX = start - end
+
+    return (
+      <rect
+        ref={rectRef}
+        className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[action.type]}
+        {...getClipRectProps(
+          clipToMove.start - deltaX,
+          clipToMove.end - deltaX,
+          height
+        )} />
+    )
+  }
+
+  return (
+    <rect
+      ref={rectRef}
+      className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[action.type]}
+      {...getClipRectProps(action.start, action.end, height)} />
+  )
+}
+
+
+const setPendingAction = (action: WaveformDragAction | null) => ({
+  type: 'setPendingAction' as const,
+  action,
+})
+function useWaveformMouseActions(
+  svgRef: React.RefObject<SVGSVGElement>,
+  waveform: ViewState,
+  waveformLength: number,
+  playerRef: React.MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>,
+  dispatch: (action: WaveformAction) => void
+) {
+  const { pendingAction } = waveform
+  const pendingActionRef = useRef<SVGRectElement | null>(null)
+
+  const mouseIsDown = useRef(false)
+
+  useEffect(() => {
+    const handleMouseMoves = (e: MouseEvent) => {
+      console.log('down?', mouseIsDown.current)
+      if (!mouseIsDown.current) return
+
+      e.preventDefault()
+      const svg = svgRef.current
+      if (svg) {
+        const coords = toWaveformCoordinates(e, svg, waveform.xMin)
+        const x = Math.min(waveformLength, coords.x)
+        console.log('x: ', x)
+        dispatch({ type: 'continuePendingAction', x })
+      }
+    }
+    document.addEventListener('mousemove', handleMouseMoves)
+    return () => document.removeEventListener('mousemove', handleMouseMoves)
+  }, [dispatch, svgRef, waveform.xMin, waveformLength])
+
+  const handleMouseDown: EventHandler<React.MouseEvent<
+    SVGElement
+  >> = useCallback(
+    (e) => {
+      e.preventDefault()
+      const coords = toWaveformCoordinates(e, e.currentTarget, waveform.xMin)
+      const x = Math.min(waveformLength, coords.x)
+      const waveformMousedown = new WaveformMousedownEvent(
+        e,
+        getSecondsAtXFromWaveform(waveform, x)
+      )
+      document.dispatchEvent(waveformMousedown)
+      const { dataset } = e.target as SVGGElement | SVGRectElement
+
+      if (
+        dataset &&
+        dataset.clipId &&
+        (Math.abs(Number(dataset.clipStart) - x) <= SELECTION_BORDER_WIDTH ||
+          Math.abs(Number(dataset.clipEnd) - x) <= SELECTION_BORDER_WIDTH)
+      ) {
+        console.log('strootchie')
+        dispatch(
+          setPendingAction({
+            type: 'STRETCH',
+            start: x,
+            end: x,
+            clipToStretch: {
+              id: dataset.clipId,
+              start: Number(dataset.clipStart),
+              end: Number(dataset.clipEnd),
+            },
+          })
+        )
+      } else if (dataset && dataset.clipId)
+        dispatch(
+          setPendingAction({
+            type: 'MOVE',
+            start: x,
+            end: x,
+            clipToMove: {
+              id: dataset.clipId,
+              start: Number(dataset.clipStart),
+              end: Number(dataset.clipEnd),
+            },
+          })
+        )
+      else dispatch(setPendingAction({ type: 'CREATE', start: x, end: x }))
+
+      mouseIsDown.current = true
+    },
+    [waveform, waveformLength, dispatch]
+  )
+
+  useEffect(() => {
+    const handleMouseUps = (e: MouseEvent) => {
+      console.log('mouseup!')
+      mouseIsDown.current = false
+      dispatch(setPendingAction(null))
+
+      if (!pendingAction) return console.log('NO PENDING ACTION')
+
+      const svg = svgRef.current
+      if (!svg) return
+
+      const coords = toWaveformCoordinates(e, svg, waveform.xMin)
+      const x = Math.min(waveformLength, coords.x)
+      const { dataset } = e.target as SVGGElement | SVGRectElement
+
+      if (
+        dataset &&
+        ((dataset.clipId && !dataset.clipIsHighlighted) || dataset.chunkIndex)
+      ) {
+        return
+        //  dispatch(
+        //   r.selectWaveformItem(
+        //     dataset.clipId
+        //       ? {
+        //           type: 'Clip',
+        //           id: dataset.clipId,
+        //           index: Number(dataset.index),
+        //         }
+        //       : {
+        //           type: 'Preview',
+        //           index: Number(dataset.chunkIndex),
+        //           cardBaseIndex: Number(dataset.index),
+        //         }
+        //   )
+        // )
+      }
+
+      if (playerRef.current) {
+        const seconds = getSecondsAtXFromWaveform(waveform, x)
+        playerRef.current.currentTime = seconds
+
+        setCursorX(x)
+      }
+      if (pendingAction) {
+        const finalAction = {
+          ...pendingAction,
+          end: x,
+        }
+        console.log('dispatching!!', finalAction)
+        document.dispatchEvent(new WaveformDragEvent(finalAction))
+      }
+      // if (!pendingAction) throw new Error('Problem with waveform drag event--no drag start registered')
+    }
+    document.addEventListener('mouseup', handleMouseUps)
+    return () => document.removeEventListener('mouseup', handleMouseUps)
+  }, [dispatch, pendingAction, playerRef, svgRef, waveform, waveformLength])
+
+  return {
+    handleMouseDown,
+    pendingActionRef,
+  }
 }
 
 export default Waveform

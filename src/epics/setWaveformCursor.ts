@@ -151,25 +151,4 @@ type OpenMediaFileSuccess = {
   timestamp: string
 }
 
-const seekingTrackerEpic: AppEpic = (action$) =>
-  action$.pipe(
-    filter<Action, OpenMediaFileSuccess>(
-      (action): action is OpenMediaFileSuccess =>
-        action.type === 'openFileSuccess' &&
-        action.validatedFile.type === 'MediaFile'
-    ),
-    switchMap<OpenMediaFileSuccess, Observable<Action>>(() =>
-      fromEvent<Event>(
-        document,
-        'seeking',
-        // @ts-ignore
-        true
-      ).pipe(
-        tap(() => (seeking = true)),
-        startWith(() => of(null).pipe(tap(() => (seeking = false)))),
-        ignoreElements()
-      )
-    )
-  )
-
-export default combineEpics(setCursorPositionEpic, seekingTrackerEpic)
+export default combineEpics(setCursorPositionEpic)

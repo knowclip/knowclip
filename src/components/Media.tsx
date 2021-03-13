@@ -25,6 +25,7 @@ type MediaProps = {
   className?: string
   viewMode: ViewMode
   playerRef: MutableRefObject<HTMLAudioElement | HTMLVideoElement | null>
+  onTimeUpdate: (mediaEl: HTMLVideoElement | HTMLAudioElement, seeking: MutableRefObject<boolean>) => void
 }
 let clicked = false
 const setClicked = (c: boolean) => {
@@ -37,6 +38,7 @@ const Media = ({
   className,
   viewMode,
   playerRef,
+  onTimeUpdate
 }: MediaProps) => {
   const seekOn = useCallback((_e) => {
     ;(window as any).seeking = true
@@ -69,6 +71,15 @@ const Media = ({
     },
     [playerRef]
   )
+  const seeking = useRef(false)
+  useEffect(() => {
+    const handleSeek = () => {
+      seeking.current = true
+    }
+    document.addEventListener('seeking', handleSeek, true)
+    return () => document.removeEventListener('seeking', handleSeek, true)
+  })
+  
   const props:
     | AudioHTMLAttributes<HTMLAudioElement>
     | VideoHTMLAttributes<HTMLVideoElement> = {
@@ -93,6 +104,10 @@ const Media = ({
     onPause: blur,
     onClick: blur,
     onVolumeChange: blur,
+    onTimeUpdate: useCallback((e) => {
+      const media = e.target as HTMLVideoElement | HTMLAudioElement
+      onTimeUpdate(media, seeking)
+    }, [onTimeUpdate]),
 
     onKeyDown: useCallback((e) => {
       if (e.key === KEYS.arrowLeft || e.key === KEYS.arrowRight) {

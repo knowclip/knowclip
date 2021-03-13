@@ -35,11 +35,11 @@ export const toWaveformCoordinates = (
 }
 
 export const getSecondsAtXFromWaveform = (
-  { stepsPerSecond, stepLength }: WaveformState,
+  { stepsPerSecond, stepLength }: Pick<WaveformState, 'stepLength' | 'stepsPerSecond'>,
   x: number
 ): number => +(x / (stepsPerSecond * stepLength)).toFixed(5)
 
 export const getXAtMillisecondsFromWaveform = (
-  { stepsPerSecond, stepLength }: WaveformState,
+  { stepsPerSecond, stepLength }: Pick<WaveformState, 'stepsPerSecond' | 'stepLength'>,
   milliseconds: number
 ): number => +((milliseconds / 1000) * (stepsPerSecond * stepLength)).toFixed(2)

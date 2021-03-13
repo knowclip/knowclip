@@ -73,14 +73,19 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
           return from([r.closeDictionaryPopover()])
         }
 
-        return of(
-          effects.isMediaPlaying()
-            ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
-              r.getHighlightedClipId(state$.value)
-              ? r.setLoop(false)
-              : r.clearWaveformSelection()
-            : r.clearWaveformSelection()
+        const mediaIsPlaying = effects.isMediaPlaying()
+        const currentTime = effects.getCurrentTime()
+
+        if (
+          mediaIsPlaying &&
+          r.getClipIdAt(
+            state$.value,
+            r.getXAtMilliseconds(state$.value, currentTime * 1000)
+          ) === r.getHighlightedClipId(state$.value)
         )
+          return of(r.setLoop(false))
+
+        return of(r.clearWaveformSelection())
       }
 
       return EMPTY
