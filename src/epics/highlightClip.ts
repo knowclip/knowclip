@@ -138,7 +138,8 @@ const highlightRightEpic: AppEpic = (
       const currentMs = secondsToMs(getCurrentTime())
 
       const next =
-        waveformItems.find(({ item }) => item.start >= currentMs) || waveformItems[0]
+        waveformItems.find(({ item }) => item.start >= currentMs) ||
+        waveformItems[0]
       if (next) {
         setCurrentTime(msToSeconds(next.item.start))
         return r.isMediaFileLoaded(state)
@@ -189,13 +190,14 @@ const highlightLeftEpic: AppEpic = (
             : of(r.selectWaveformItem(prev))
         }
       }
-      const ms = getCurrentTime() * 1000
+      const ms = msToSeconds(getCurrentTime())
 
       const prev =
         findLast(waveformItems, ({ item }) => item.end <= ms) ||
         waveformItems[waveformItems.length - 1]
 
       if (prev) {
+        const x = prev
         setCurrentTime(msToSeconds(prev.item.start))
         return r.isMediaFileLoaded(state)
           ? EMPTY

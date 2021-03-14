@@ -1,21 +1,10 @@
-import { TestSetup } from '../../setUpDriver'
+import { testBlock, TestSetup } from '../../setUpDriver'
 import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/Waveform'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-async function testBlock(name: string, cb: () => Promise<void>) {
-  try {
-    process.stdout.write('\n' + name)
-
-    await cb()
-
-    process.stdout.write('\n' + name + ' ✅\n')
-  } catch (err) {
-    throw err
-  }
-}
 
 export default async function makeTwoFlashcards({ client }: TestSetup) {
   await testBlock('create first card', async () => {
@@ -46,7 +35,7 @@ export default async function makeTwoFlashcards({ client }: TestSetup) {
     await client.waitForText_(flashcardSection$.container, '2 / 2')
   })
 
-  await testBlock('x', async () => {
+  await testBlock('select and edit card', async () => {
     await waveformMouseDrag(client, 917, 888)
 
     await client.elements_(tagsInput$.tagChip, 1)

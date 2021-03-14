@@ -65,7 +65,7 @@ Object {
           Object {
             "chunksMetadata": Object {
               "count": 26,
-              "endCue": 4321.5,
+              "endCue": 86430,
             },
             "id": "d680807d-3a5f-4a25-967f-71871b7d5057",
             "streamIndex": 2,
@@ -74,7 +74,7 @@ Object {
           Object {
             "chunksMetadata": Object {
               "count": 15,
-              "endCue": 4336.5,
+              "endCue": 86730,
             },
             "id": "b3347257-97c4-4c9a-8eae-9bf88a8edc23",
             "name": "pbc_jp.ass",

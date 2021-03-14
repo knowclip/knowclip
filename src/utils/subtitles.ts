@@ -248,8 +248,8 @@ export const validateSubtitlesFromFilePath = async (
       if (chunksMetadata.count !== parsed.length)
         differences.push({ attribute: 'count', name: 'number of cues' })
 
-      if (chunksMetadata.endCue !== endCue)
-        differences.push({ attribute: 'endCue', name: 'timing' })
+      // if (chunksMetadata.endCue !== endCue)
+      //   differences.push({ attribute: 'endCue', name: 'timing' })
 
       if (differences.length) {
         console.log({ differences })

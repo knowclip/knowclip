@@ -5,8 +5,8 @@ import {
   WaveformDragEvent,
   WaveformDragCreate,
 } from '../utils/WaveformMousedownEvent'
-import uuid from 'uuid'
-import { msToSeconds, pixelsToMs } from '../selectors'
+import { msToSeconds } from '../selectors'
+import { uuid } from '../utils/sideEffects'
 
 const clipCreateEpic: AppEpic = (
   action$,

@@ -96,7 +96,7 @@ const Waveform = ({
     state: viewState,
     dispatch: dispatchViewState,
     svgRef,
-    waveformItems,
+    visibleWaveformItems,
   } = waveformState
 
   const dispatch = useDispatch()
@@ -207,7 +207,7 @@ const Waveform = ({
             subtitles={subtitles}
             goToSubtitlesChunk={goToSubtitlesChunk}
             highlightedChunkIndex={highlightedChunkIndex}
-            waveformItems={waveformItems}
+            waveformItems={visibleWaveformItems}
           />
         )}
         <Cursor

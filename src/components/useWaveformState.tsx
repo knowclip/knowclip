@@ -34,10 +34,11 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
     state,
     dispatch,
     resetWaveformState,
-    waveformItems: useMemo(
+    visibleWaveformItems: useMemo(
       () => limitWaveformItemsToDisplayed(waveformItems, state.viewBoxStartMs, state.pixelsPerSecond),
       [limitWaveformItemsToDisplayed, waveformItems, state.viewBoxStartMs, state.pixelsPerSecond]
     ),
+    waveformItems: waveformItems,
   }
 }
 
