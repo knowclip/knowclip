@@ -1,20 +1,18 @@
 import { useCallback, useMemo, useReducer, useRef } from 'react'
-import r from '../redux'
-import { pixelsToMs, WaveformSelectionExpanded } from '../selectors'
+import { WaveformSelectionExpanded } from '../selectors'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
-import { elementWidth } from '../utils/media'
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
-import { areSelectionsEqual } from '../utils/waveformSelection'
 
 const initialState: ViewState = {
   cursorMs: 0,
   durationSeconds: 0,
   viewBoxStartMs: 0,
-  stepsPerSecond: 25,
-  stepLength: 1,
+  pixelsPerSecond: 50,
   selection: null,
   pendingAction: null,
 }
+
+export type WaveformInterface = ReturnType<typeof useWaveformState>
 
 export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
   const limitWaveformItemsToDisplayed = limitSelectorToDisplayedItems(
@@ -24,20 +22,21 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
 
   const svgRef = useRef<SVGSVGElement>(null)
   const [state, dispatch] = useReducer(updateViewState, initialState)
-  const onMediaLoaded = useCallback(
+  const resetWaveformState = useCallback(
     (media: HTMLVideoElement | HTMLAudioElement | null) => {
       dispatch({ type: 'reset', durationSeconds: media?.duration || 0 })
     },
     [dispatch]
   )
+
   return {
     svgRef,
     state,
     dispatch,
-    onMediaLoaded,
+    resetWaveformState,
     waveformItems: useMemo(
-      () => limitWaveformItemsToDisplayed(waveformItems, state.viewBoxStartMs),
-      [limitWaveformItemsToDisplayed, waveformItems, state.viewBoxStartMs]
+      () => limitWaveformItemsToDisplayed(waveformItems, state.viewBoxStartMs, state.pixelsPerSecond),
+      [limitWaveformItemsToDisplayed, waveformItems, state.viewBoxStartMs, state.pixelsPerSecond]
     ),
   }
 }
@@ -56,6 +55,7 @@ export type WaveformAction =
   | { type: 'setPendingAction'; action: WaveformDragAction | null }
   | { type: 'continuePendingAction'; ms: number }
   | { type: 'reset'; durationSeconds: number }
+  | { type: 'zoom'; delta: number }
 
 function updateViewState(state: ViewState, action: WaveformAction): ViewState {
   switch (action.type) {
@@ -102,6 +102,10 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
             : action.newSelection,
       }
     }
+  case 'zoom': return {
+    ...state,
+    pixelsPerSecond: Math.min(200, Math.max(10, state.pixelsPerSecond + action.delta))
+  }
     default:
       return state
   }
