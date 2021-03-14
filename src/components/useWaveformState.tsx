@@ -35,8 +35,18 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
     dispatch,
     resetWaveformState,
     visibleWaveformItems: useMemo(
-      () => limitWaveformItemsToDisplayed(waveformItems, state.viewBoxStartMs, state.pixelsPerSecond),
-      [limitWaveformItemsToDisplayed, waveformItems, state.viewBoxStartMs, state.pixelsPerSecond]
+      () =>
+        limitWaveformItemsToDisplayed(
+          waveformItems,
+          state.viewBoxStartMs,
+          state.pixelsPerSecond
+        ),
+      [
+        limitWaveformItemsToDisplayed,
+        waveformItems,
+        state.viewBoxStartMs,
+        state.pixelsPerSecond,
+      ]
     ),
     waveformItems: waveformItems,
   }
@@ -103,10 +113,14 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
             : action.newSelection,
       }
     }
-  case 'zoom': return {
-    ...state,
-    pixelsPerSecond: Math.max(10, Math.min(200, state.pixelsPerSecond + action.delta))
-  }
+    case 'zoom':
+      return {
+        ...state,
+        pixelsPerSecond: Math.max(
+          10,
+          Math.min(200, state.pixelsPerSecond + action.delta)
+        ),
+      }
     default:
       return state
   }

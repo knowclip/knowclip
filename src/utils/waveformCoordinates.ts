@@ -26,7 +26,7 @@ export const waveformTimeAtMousePosition = (
   svgElement: SVGElement,
 
   viewBoxStartMs: number,
-  pixelsPerSecond: number,
+  pixelsPerSecond: number
 ) => {
   const { clientX } = mouseEvent
   const { left } = svgElement.getBoundingClientRect()

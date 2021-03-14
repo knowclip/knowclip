@@ -2,7 +2,11 @@ import React, { MutableRefObject, useCallback } from 'react'
 import cn from 'classnames'
 import css from './Waveform.module.css'
 import { $ } from './Waveform'
-import { SELECTION_BORDER_MILLISECONDS, msToPixels, msToSeconds } from '../selectors'
+import {
+  SELECTION_BORDER_MILLISECONDS,
+  msToPixels,
+  msToSeconds,
+} from '../selectors'
 import { setCursorX } from '../utils/waveform'
 
 type ClipProps = {
@@ -97,7 +101,7 @@ export const Clips = React.memo(
     clips: Clip[]
     highlightedClipId: string | null
     height: number
-    playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>,
+    playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
     pixelsPerSecond: number
   }) => {
     const handleClick = useCallback(

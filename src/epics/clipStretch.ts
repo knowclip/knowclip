@@ -27,15 +27,13 @@ const clipStretchEpic: AppEpic = (
       if (!stretchedClip)
         throw new Error('Illegal state: clip being stretched is gone')
 
-
       const originKey =
         Math.abs(start - stretchedClip.start) <
         Math.abs(start - stretchedClip.end)
           ? 'start'
           : 'end'
 
-          const end = stretchedClip[originKey] + (dragEnd - start)
-
+      const end = stretchedClip[originKey] + (dragEnd - start)
 
       const waveformItems = r.getWaveformItems(state$.value)
       const stretchedClipItem =
@@ -85,7 +83,10 @@ const clipStretchEpic: AppEpic = (
       }
 
       if (originKey === 'start' && stretchedClip && stretchedClip.end > end) {
-        const start = Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD_MILLSECONDS)
+        const start = Math.min(
+          end,
+          stretchedClip.end - r.CLIP_THRESHOLD_MILLSECONDS
+        )
 
         const newCard = r.getNewFlashcardForStretchedClip(
           state$.value,
@@ -126,7 +127,10 @@ const clipStretchEpic: AppEpic = (
           r.editClip(
             id,
             {
-              end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD_MILLSECONDS),
+              end: Math.max(
+                end,
+                stretchedClip.start + r.CLIP_THRESHOLD_MILLSECONDS
+              ),
             },
             newCard !==
               (r.getFlashcard(state$.value, stretchedClip.id) as Flashcard)

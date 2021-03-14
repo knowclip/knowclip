@@ -59,10 +59,7 @@ const Main = () => {
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
   const waveform = useWaveformState(waveformItems)
   const { svgRef, resetWaveformState } = waveform
-  const { onTimeUpdate } = useWaveformMediaTimeUpdate(
-    svgRef,
-    waveform
-  )
+  const { onTimeUpdate } = useWaveformMediaTimeUpdate(svgRef, waveform)
 
   if (!currentProject) return <Redirect to="/projects" />
 

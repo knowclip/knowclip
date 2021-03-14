@@ -5,7 +5,6 @@ import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-
 export default async function makeTwoFlashcards({ client }: TestSetup) {
   await testBlock('create first card', async () => {
     await waveformMouseDrag(client, 402, 625)

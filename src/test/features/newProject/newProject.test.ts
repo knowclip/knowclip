@@ -51,7 +51,7 @@ const sideEffectsMocks = {
     '8e92ca1d-8d29-486b-81d1-0a44d2da8366',
     'a1eb3142-ce18-4595-a3c3-8c867e1058f4',
     '3eb212dd-8f04-4c63-b36a-06a0bb6957aa',
-    '906db000-f3d2-46c9-9ec9-0a1069304e41'
+    '906db000-f3d2-46c9-9ec9-0a1069304e41',
   ],
   nowUtcTimestamp: [
     '2020-01-28T12:35:20Z',

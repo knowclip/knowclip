@@ -264,15 +264,14 @@ function PendingWaveformItem({
     )
   }
 
-
   if (action.type === 'STRETCH') {
     const { start, end, clipToStretch } = action
     const originKey =
-    Math.abs(start - clipToStretch.start) <
-    Math.abs(start - clipToStretch.end)
-      ? 'start'
-      : 'end'
-      const edge = clipToStretch[originKey]
+      Math.abs(start - clipToStretch.start) <
+      Math.abs(start - clipToStretch.end)
+        ? 'start'
+        : 'end'
+    const edge = clipToStretch[originKey]
 
     const deltaX = start - end
 

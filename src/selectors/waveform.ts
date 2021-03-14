@@ -8,7 +8,8 @@ export const msToSeconds = (ms: number) => +(ms / 1000).toFixed(5)
 export const secondsToMs = (s: number) => Math.round(s * 1000)
 
 export const msToPixels = (ms: number, pps: number) => (ms / 1000) * pps
-export const secondsToPixels = (s: number, pps: number) => msToPixels(s * 1000, pps)
+export const secondsToPixels = (s: number, pps: number) =>
+  msToPixels(s * 1000, pps)
 export const pixelsToMs = (pixels: number, pps: number) =>
   Math.round((pixels / pps) * 1000)
 export const pixelsToSeconds = (pixels: number, pps: number) =>

@@ -18,7 +18,7 @@ enum $ {
 const MainHeader = ({
   currentProjectId,
   currentMediaFile,
-  waveform
+  waveform,
 }: {
   currentProjectId: string
   currentMediaFile: MediaFile | null

@@ -114,7 +114,6 @@ async function copyFixtures() {
   await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
 }
 
-
 export async function testBlock(name: string, cb: () => Promise<void>) {
   try {
     process.stdout.write('\n     ' + name)

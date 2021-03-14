@@ -28,19 +28,25 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
       'Could not locate media file "piggeldy_cat.mp4". Some features may be unavailable until it is located.'
     )
   })
-  await testBlock('close snackbar after cancelling location attempt', async () => {
-    await client.clickElement_(snackbar$.closeButton)
-    await client.waitUntilGone_(snackbar$.closeButton)
-  })
+  await testBlock(
+    'close snackbar after cancelling location attempt',
+    async () => {
+      await client.clickElement_(snackbar$.closeButton)
+      await client.waitUntilGone_(snackbar$.closeButton)
+    }
+  )
 
   await testBlock('open first item in media files menu', async () => {
-      await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
+    await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
     const [firstMediaFile] = await client.elements_(
       mediaFilesMenu$.mediaFileMenuItem
     )
     await firstMediaFile.click()
 
-    await client.waitForText_(fileSelectionForm$.container, 'polar_bear_cafe.mp4')
+    await client.waitForText_(
+      fileSelectionForm$.container,
+      'polar_bear_cafe.mp4'
+    )
   })
 
   await testBlock('locate missing media file', async () => {

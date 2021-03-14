@@ -21,7 +21,7 @@ export const getWaveformPng = async (
     const width = ~~(endX - startX)
     const outputFilename = getWaveformPngPath(state, mediaFilePath, file)
     if (outputFilename && existsSync(outputFilename))
-    return { value: outputFilename }
+      return { value: outputFilename }
 
     const newFileName: string = await new Promise((res, rej) => {
       return ffmpeg(mediaFilePath)

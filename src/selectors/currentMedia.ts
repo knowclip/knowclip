@@ -211,9 +211,15 @@ export const getClipEdgeAt = (
   const clip = getClip(state, clipIdAtMs)
   if (!clip) throw new Error('Impossible')
   const { start, end } = clip
-  if (milliseconds >= start && milliseconds <= start + SELECTION_BORDER_MILLISECONDS)
+  if (
+    milliseconds >= start &&
+    milliseconds <= start + SELECTION_BORDER_MILLISECONDS
+  )
     return { key: 'start', id: clipIdAtMs }
-  if (milliseconds >= end - SELECTION_BORDER_MILLISECONDS && milliseconds <= end)
+  if (
+    milliseconds >= end - SELECTION_BORDER_MILLISECONDS &&
+    milliseconds <= end
+  )
     return { key: 'end', id: clipIdAtMs }
 
   return null
