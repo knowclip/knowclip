@@ -70,9 +70,9 @@ const getWaveformPngPath = (
     'WaveformPng',
     file.id
   )
-  // if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
-  //   return fileAvailability.filePath
-  // }
+  if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
+    return fileAvailability.filePath
+  }
   return join(tempy.root, basename(mediaFilePath) + '_' + file.id + '.png')
 }
 
