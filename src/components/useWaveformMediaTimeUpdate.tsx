@@ -1,19 +1,23 @@
 import { useCallback, MutableRefObject, useEffect } from 'react'
 import r from '../redux'
-import { overlapsSignificantly } from '../selectors'
+import {
+  msToSeconds,
+  overlapsSignificantly,
+  pixelsToMs,
+  secondsToMs,
+  WaveformSelectionExpanded,
+} from '../selectors'
 import { useWaveformState } from './useWaveformState'
 import { usePrevious } from '../utils/usePrevious'
 import { useDispatch, useSelector } from 'react-redux'
+import { areSelectionsEqual } from '../utils/waveformSelection'
+import { elementWidth } from '../utils/media'
 
 export function useWaveformMediaTimeUpdate(
   svgRef: any,
   waveform: ReturnType<typeof useWaveformState>
 ) {
-  const {
-    doWaveformUpdate,
-    dispatch: dispatchViewState,
-    waveformItems,
-  } = waveform
+  const { dispatch: dispatchViewState, waveformItems } = waveform
 
   const { remoteSelection } = useSelector((state: AppState) => ({
     remoteSelection: r.getWaveformSelection(state),
@@ -24,16 +28,39 @@ export function useWaveformMediaTimeUpdate(
   const previousRemoteSelection = usePrevious(remoteSelection)
   const previousLocalSelection = usePrevious(waveform.state.selection)
   useEffect(() => {
-    const localChange = waveform.state.selection !== previousLocalSelection
-    const remoteChange = remoteSelection !== previousRemoteSelection
-    const notSyncedWithRemote = remoteSelection !== waveform.state.selection
-    console.log({ localChange, remoteChange, notSyncedWithRemote })
+    const localChange = !areSelectionsEqual(
+      waveform.state.selection,
+      previousLocalSelection || null
+    )
+    const remoteChange = !areSelectionsEqual(
+      remoteSelection,
+      previousRemoteSelection || null
+    )
+    const notSyncedWithRemote = !areSelectionsEqual(
+      remoteSelection,
+      waveform.state.selection
+    )
+
     if (localChange && notSyncedWithRemote) {
       console.log('            selecting remote')
+      console.log({
+        localChange,
+        remoteChange,
+        notSyncedWithRemote,
+        remoteSelection,
+        selection: waveform.state.selection,
+      })
       dispatch(r.selectWaveformItem(waveform.state.selection))
     }
     if (remoteChange && notSyncedWithRemote) {
       console.log('            selecting local')
+      console.log({
+        localChange,
+        remoteChange,
+        notSyncedWithRemote,
+        remoteSelection,
+        selection: waveform.state.selection,
+      })
       dispatchViewState(r.selectWaveformItem(remoteSelection))
     }
   }, [
@@ -54,29 +81,31 @@ export function useWaveformMediaTimeUpdate(
       const svg = svgRef.current
       if (!svg) return console.error('Svg disappeared')
 
-      const newMilliseconds = media.currentTime * 1000
+      const newMilliseconds = secondsToMs(media.currentTime)
 
-      // const remoteSelection = waveformItems.find(item => item.)
       const possibleNewSelection = r.getNewWaveformSelectionAtFromSubset(
         remoteSelection,
         waveform.waveformItems,
         newMilliseconds
       )
 
-      const newSelection =
-        remoteSelection &&
-        remoteSelection.type === 'Clip' &&
-        possibleNewSelection &&
-        possibleNewSelection.type === 'Preview'
-          ? overlapsSignificantly(
-              possibleNewSelection.item,
-              remoteSelection.item.start,
-              remoteSelection.item.end
-            )
-            ? null
-            : possibleNewSelection
-          : possibleNewSelection
-
+      const newSelection = getNewSelection(
+        remoteSelection,
+        possibleNewSelection
+      )
+      console.log(
+        'NEW SELECTION?',
+        newSelection,
+        { remoteSelection, possibleNewSelection },
+        'waveformitems',
+        {
+          waveformItems: waveform.waveformItems,
+          match: waveform.waveformItems.find(
+            (item) =>
+              item.type === 'Clip' && item.id === (remoteSelection as any)?.id
+          ),
+        }
+      )
       const wasSeeking = seeking.current
       seeking.current = false
 
@@ -93,8 +122,7 @@ export function useWaveformMediaTimeUpdate(
         selectionItem &&
         newMilliseconds >= selectionItem.end
       if (loopImminent && selection && selectionItem) {
-        const selectionStartTime = selectionItem.start * 1000
-        media.currentTime = selectionStartTime
+        media.currentTime = msToSeconds(selectionItem.start)
         return dispatchViewState({
           type: 'SET_CURSOR_POSITION',
           ms: selectionItem.start,
@@ -102,7 +130,7 @@ export function useWaveformMediaTimeUpdate(
         })
       }
 
-      const waveformupdate = doWaveformUpdate(
+      const waveformupdate = updateWaveformAfterTimeUpdateEvent(
         waveform.state,
         newMilliseconds,
         svg,
@@ -114,7 +142,6 @@ export function useWaveformMediaTimeUpdate(
     },
     [
       dispatchViewState,
-      doWaveformUpdate,
       remoteSelection,
       svgRef,
       waveform.state,
@@ -124,4 +151,120 @@ export function useWaveformMediaTimeUpdate(
   )
 
   return { onTimeUpdate }
+}
+
+function getNewSelection(
+  remoteSelection: WaveformSelectionExpanded | null,
+  possibleNewSelection: WaveformSelectionExpanded | null
+) {
+  if (
+    remoteSelection &&
+    remoteSelection.type === 'Clip' &&
+    possibleNewSelection &&
+    possibleNewSelection.type === 'Preview'
+  ) {
+    return overlapsSignificantly(
+      possibleNewSelection.item,
+      remoteSelection.item.start,
+      remoteSelection.item.end
+    )
+      ? null
+      : possibleNewSelection
+  }
+
+  return possibleNewSelection
+}
+
+function updateWaveformAfterTimeUpdateEvent(
+  viewState: ViewState,
+  newlyUpdatedMs: number,
+  svg: SVGSVGElement,
+  newSelection: WaveformSelectionExpanded | null,
+  wasSeeking: boolean,
+  selection: WaveformSelectionExpanded | null
+) {
+  const setViewboxAction = setViewBox(
+    viewState,
+    newlyUpdatedMs,
+    elementWidth(svg),
+    newSelection,
+    wasSeeking
+  )
+
+  if (newSelection && !areSelectionsEqual(selection, newSelection)) {
+    console.log(' ~~~ a')
+    return setViewboxAction
+      ? {
+          ...setViewboxAction,
+          newSelection,
+        }
+      : r.selectWaveformItem(newSelection)
+  }
+
+  if (!newSelection && wasSeeking) {
+    console.log(' ~~~ b', { newSelection })
+    return setViewboxAction
+      ? {
+          ...setViewboxAction,
+          newSelection,
+        }
+      : // : r.selectWaveformItem(null)
+        null
+  }
+
+  console.log(' ~~~ c')
+
+  return setViewboxAction
+}
+
+function setViewBox(
+  viewState: ViewState,
+  newlySetMs: number,
+  svgWidth: number,
+  newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
+  seeking: boolean
+) {
+  const visibleTimeSpan = pixelsToMs(svgWidth)
+  const buffer = Math.round(visibleTimeSpan * 0.1)
+
+  const ms = newlySetMs
+
+  const { viewBoxStartMs, durationSeconds } = viewState
+  const durationMs = secondsToMs(durationSeconds)
+
+  if (newlySetMs < viewBoxStartMs) {
+    console.log('                     xxx 1')
+    console.log(
+      '                     newlySetMs < viewBoxStartMs',
+      newlySetMs,
+      viewBoxStartMs
+    )
+    return {
+      type: 'SET_CURSOR_POSITION' as const,
+      ms,
+      newViewBoxStartMs: Math.max(0, newlySetMs - buffer),
+    }
+  }
+  if (newlySetMs >= visibleTimeSpan + viewBoxStartMs) {
+    console.log('                     xxx 2')
+    const newViewBoxStartMs = Math.min(
+      newSelection ? newSelection.item.end + buffer : newlySetMs,
+      Math.max(durationMs - visibleTimeSpan, 0)
+    )
+    return {
+      type: 'SET_CURSOR_POSITION' as const,
+      ms,
+      newViewBoxStartMs,
+    }
+  }
+
+  if (seeking) console.log('                     xxx 3')
+
+  return seeking
+    ? {
+        type: 'SET_CURSOR_POSITION' as const,
+        ms,
+        newViewBoxStartMs: undefined,
+      }
+    : undefined
 }

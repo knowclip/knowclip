@@ -3,7 +3,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import { EMPTY, of, merge } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
-import { msToSeconds } from '../selectors'
+import { msToSeconds, secondsToMs } from '../selectors'
 
 const elementWidth = (element: Element) => {
   const boundingClientRect = element.getBoundingClientRect()
@@ -127,7 +127,7 @@ const highlightRightEpic: AppEpic = (
 
         if (next) {
           setCurrentTime(
-            Math.max(next.item.start, selection.item.end + 1) * 1000
+            msToSeconds(Math.max(next.item.start, selection.item.end + 1))
           )
           return r.isMediaFileLoaded(state)
             ? EMPTY
@@ -135,12 +135,12 @@ const highlightRightEpic: AppEpic = (
         }
       }
 
-      const x = getCurrentTime() * 1000
+      const currentMs = secondsToMs(getCurrentTime())
 
       const next =
-        waveformItems.find(({ item }) => item.start >= x) || waveformItems[0]
+        waveformItems.find(({ item }) => item.start >= currentMs) || waveformItems[0]
       if (next) {
-        setCurrentTime(next.item.start * 1000)
+        setCurrentTime(msToSeconds(next.item.start))
         return r.isMediaFileLoaded(state)
           ? EMPTY
           : of(r.selectWaveformItem(next))

@@ -6,6 +6,7 @@ import r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { ActionOf } from '../actions'
+import { secondsToMs } from '../selectors'
 
 const detectSilence = (
   path: string,
@@ -33,8 +34,8 @@ const detectSilence = (
             // eslint-disable-line no-cond-assign
             const [, startStr, endStr] = addition
             matchData.push({
-              start: Number(startStr) * 1000,
-              end: Number(endStr) * 1000,
+              start: secondsToMs(Number(startStr)),
+              end: secondsToMs(Number(endStr)),
             })
           }
           res(matchData)
@@ -72,7 +73,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
           if (nextSilence) {
             chunks.push({ start: silenceEnd, end: nextSilence.start })
           } else {
-            const durationMs = currentMedia.durationSeconds * 1000
+            const durationMs = secondsToMs(currentMedia.durationSeconds)
             if (silenceEnd !== durationMs)
               chunks.push({ start: silenceEnd, end: durationMs })
           }

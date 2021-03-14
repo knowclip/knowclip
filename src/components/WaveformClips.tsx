@@ -2,7 +2,7 @@ import React, { MutableRefObject, useCallback } from 'react'
 import cn from 'classnames'
 import css from './Waveform.module.css'
 import { $ } from './Waveform'
-import { SELECTION_BORDER_WIDTH, msToPixels } from '../selectors'
+import { SELECTION_BORDER_WIDTH, msToPixels, msToSeconds } from '../selectors'
 import { setCursorX } from '../utils/waveform'
 
 type ClipProps = {
@@ -92,7 +92,7 @@ export const Clips = React.memo(
           if (!dataset.clipIsHighlighted) {
             const player = playerRef.current
             if (player)
-              player.currentTime = clips[dataset.clipIndex].start * 1000
+              player.currentTime = msToSeconds(clips[dataset.clipIndex].start)
             setCursorX(msToPixels(clips[dataset.clipIndex].start))
           }
           const currentSelected = document.querySelector(

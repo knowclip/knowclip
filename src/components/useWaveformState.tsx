@@ -34,7 +34,6 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
     svgRef,
     state,
     dispatch,
-    doWaveformUpdate,
     onMediaLoaded,
     waveformItems: useMemo(
       () => limitWaveformItemsToDisplayed(waveformItems, state.viewBoxStartMs),
@@ -106,97 +105,4 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
     default:
       return state
   }
-}
-
-function doWaveformUpdate(
-  viewState: ViewState,
-  newlyUpdatedMs: number,
-  svg: SVGSVGElement,
-  newSelection: WaveformSelectionExpanded | null,
-  wasSeeking: boolean,
-  selection: WaveformSelectionExpanded | null
-) {
-  const setViewboxAction = setViewBox(
-    viewState,
-    newlyUpdatedMs,
-    elementWidth(svg),
-    newSelection,
-    wasSeeking
-  )
-
-  if (newSelection && !areSelectionsEqual(selection, newSelection)) {
-    console.log(' ~~~ a')
-    return setViewboxAction
-      ? {
-          ...setViewboxAction,
-          newSelection,
-        }
-      : r.selectWaveformItem(newSelection)
-  }
-
-  if (!newSelection && wasSeeking) {
-    console.log(' ~~~ b')
-    return setViewboxAction
-      ? {
-          ...setViewboxAction,
-          newSelection,
-        }
-      : r.selectWaveformItem(null)
-  }
-
-  console.log(' ~~~ c')
-
-  return setViewboxAction
-}
-
-function setViewBox(
-  viewState: ViewState,
-  newlySetMs: number,
-  svgWidth: number,
-  newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
-  seeking: boolean
-) {
-  const visibleTimeSpan = pixelsToMs(svgWidth)
-  const buffer = Math.round(visibleTimeSpan * 0.1)
-
-  const ms = newlySetMs
-
-  const { viewBoxStartMs, durationSeconds } = viewState
-  const durationMs = durationSeconds * 1000
-
-  if (newlySetMs < viewBoxStartMs) {
-    console.log('                     xxx 1')
-    console.log(
-      '                     newlySetMs < viewBoxStartMs',
-      newlySetMs,
-      viewBoxStartMs
-    )
-    return {
-      type: 'SET_CURSOR_POSITION' as const,
-      ms,
-      newViewBoxStartMs: Math.max(0, newlySetMs - buffer),
-    }
-  }
-  if (newlySetMs >= visibleTimeSpan + viewBoxStartMs) {
-    console.log('                     xxx 2')
-    const newViewBoxStartMs = Math.min(
-      newSelection ? newSelection.item.end + buffer : newlySetMs,
-      Math.max(durationMs - visibleTimeSpan, 0)
-    )
-    return {
-      type: 'SET_CURSOR_POSITION' as const,
-      ms,
-      newViewBoxStartMs,
-    }
-  }
-
-  if (seeking) console.log('                     xxx 3')
-
-  return seeking
-    ? {
-        type: 'SET_CURSOR_POSITION' as const,
-        ms,
-        newViewBoxStartMs: undefined,
-      }
-    : undefined
 }

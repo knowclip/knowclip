@@ -18,6 +18,9 @@ import WaveformMousedownEvent, {
 import { setCursorX } from '../utils/waveform'
 import {
   msToPixels,
+  msToSeconds,
+  secondsToMs,
+  secondsToPixels,
   SELECTION_BORDER_WIDTH,
   SubtitlesCardBase,
   SUBTITLES_CHUNK_HEIGHT,
@@ -165,7 +168,7 @@ const Waveform = ({
           fill="#222222"
           x={0}
           y={0}
-          width={msToPixels(viewState.durationSeconds * 1000)}
+          width={secondsToPixels(viewState.durationSeconds)}
           height={height}
         />
         <Clips
@@ -273,6 +276,8 @@ function useWaveformMouseActions(
 
   const mouseIsDown = useRef(false)
 
+  const durationMilliseconds = secondsToMs(waveform.durationSeconds)
+
   useEffect(() => {
     const handleMouseMoves = (e: MouseEvent) => {
       if (!mouseIsDown.current) return
@@ -281,13 +286,13 @@ function useWaveformMouseActions(
       const svg = svgRef.current
       if (svg) {
         const coords = toWaveformCoordinates(e, svg, waveform.viewBoxStartMs)
-        const x = Math.min(waveform.durationSeconds * 1000, coords.ms)
+        const x = Math.min(durationMilliseconds, coords.ms)
         dispatch({ type: 'continuePendingAction', ms: x })
       }
     }
     document.addEventListener('mousemove', handleMouseMoves)
     return () => document.removeEventListener('mousemove', handleMouseMoves)
-  }, [dispatch, svgRef, waveform.viewBoxStartMs, waveform.durationSeconds])
+  }, [dispatch, svgRef, waveform.viewBoxStartMs, waveform.durationSeconds, durationMilliseconds])
 
   const handleMouseDown: EventHandler<React.MouseEvent<
     SVGElement
@@ -299,7 +304,7 @@ function useWaveformMouseActions(
         e.currentTarget,
         waveform.viewBoxStartMs
       )
-      const ms = Math.min(waveform.durationSeconds * 1000, coords.ms)
+      const ms = Math.min(durationMilliseconds , coords.ms)
       const waveformMousedown = new WaveformMousedownEvent(e, ms / 1000)
       document.dispatchEvent(waveformMousedown)
       const { dataset } = e.target as SVGGElement | SVGRectElement
@@ -351,7 +356,7 @@ function useWaveformMouseActions(
 
       mouseIsDown.current = true
     },
-    [waveform, dispatch]
+    [waveform, durationMilliseconds, dispatch]
   )
 
   useEffect(() => {
@@ -367,7 +372,7 @@ function useWaveformMouseActions(
 
       const coords = toWaveformCoordinates(e, svg, waveform.viewBoxStartMs)
       // not right, first below should be X and not MS
-      const ms = Math.min(waveform.durationSeconds * 1000, coords.ms)
+      const ms = Math.min(durationMilliseconds, coords.ms)
       const { dataset } = e.target as SVGGElement | SVGRectElement
 
       if (
@@ -393,8 +398,7 @@ function useWaveformMouseActions(
       }
 
       if (playerRef.current) {
-        const seconds = ms / 1000
-        playerRef.current.currentTime = seconds
+        playerRef.current.currentTime = msToSeconds(ms)
 
         setCursorX(msToPixels(ms))
       }
@@ -410,14 +414,7 @@ function useWaveformMouseActions(
     }
     document.addEventListener('mouseup', handleMouseUps)
     return () => document.removeEventListener('mouseup', handleMouseUps)
-  }, [
-    dispatch,
-    pendingAction,
-    playerRef,
-    svgRef,
-    waveform,
-    waveform.durationSeconds,
-  ])
+  }, [dispatch, durationMilliseconds, pendingAction, playerRef, svgRef, waveform, waveform.durationSeconds])
 
   return {
     handleMouseDown,
