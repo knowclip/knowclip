@@ -12,6 +12,7 @@ import files from '../reducers/files'
 import projectToMarkdown from './projectToMarkdown'
 
 import { initialState } from '../reducers/files'
+import { pixelsToMs } from '../selectors'
 
 export const reducer = combineReducers<AppState>({
   clips,
@@ -41,7 +42,12 @@ describe('projectToMarkdown', () => {
     ],
     tags: string[]
   ): { clip: Clip; flashcard: Flashcard } => ({
-    clip: { start, end, fileId: mediaFileId, id },
+    clip: {
+      start: pixelsToMs(start, 50),
+      end: pixelsToMs(end, 50),
+      fileId: mediaFileId,
+      id,
+    },
     flashcard: {
       id,
       type: 'Transliteration',
