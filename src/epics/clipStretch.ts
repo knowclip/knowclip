@@ -20,17 +20,22 @@ const clipStretchEpic: AppEpic = (
     mergeMap(({ action }) => {
       const {
         start,
-        end,
+        end: dragEnd,
         clipToStretch: { id },
       } = action
       const stretchedClip = r.getClip(state$.value, id)
       if (!stretchedClip)
         throw new Error('Illegal state: clip being stretched is gone')
+
+
       const originKey =
         Math.abs(start - stretchedClip.start) <
         Math.abs(start - stretchedClip.end)
           ? 'start'
           : 'end'
+
+          const end = stretchedClip[originKey] + (dragEnd - start)
+
 
       const waveformItems = r.getWaveformItems(state$.value)
       const stretchedClipItem =

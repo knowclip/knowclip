@@ -104,7 +104,7 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
     }
   case 'zoom': return {
     ...state,
-    pixelsPerSecond: Math.min(200, Math.max(10, state.pixelsPerSecond + action.delta))
+    pixelsPerSecond: Math.max(10, Math.min(200, state.pixelsPerSecond + action.delta))
   }
     default:
       return state

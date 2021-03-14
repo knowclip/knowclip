@@ -61,10 +61,8 @@ const Cursor = ({
     style={{ pointerEvents: 'none' }}
   />
 )
-const getViewBoxString = (
-  xMin: number,
-  height: number,
-) => `${xMin} 0 ${3000} ${height}`
+const getViewBoxString = (xMin: number, height: number) =>
+  `${xMin} 0 ${3000} ${height}`
 
 const limitSubtitlesCardsBasesCardsToDisplayed = limitSelectorToDisplayedItems(
   (cb: SubtitlesCardBase) => cb.start,
@@ -151,15 +149,20 @@ const Waveform = ({
         style={{ pointerEvents: 'none' }}
         x={msToPixels(x, pixelsPerSecond)}
         origin="0 0"
-        transform={`scale(${1 * (pixelsPerSecond / WAVEFORM_PNG_PIXELS_PER_SECOND)}, 1)`}
+        transform={`scale(${
+          1 * (pixelsPerSecond / WAVEFORM_PNG_PIXELS_PER_SECOND)
+        }, 1)`}
         height={WAVEFORM_HEIGHT}
       />
     ))
   }, [images, pixelsPerSecond])
 
-  const handleMouseWheel: React.WheelEventHandler = useCallback((e) => {
-    dispatchViewState({ type: 'zoom', delta: e.deltaY })
-  }, [dispatchViewState])
+  const handleMouseWheel: React.WheelEventHandler = useCallback(
+    (e) => {
+      dispatchViewState({ type: 'zoom', delta: e.deltaY })
+    },
+    [dispatchViewState]
+  )
 
   return (
     <svg
@@ -261,6 +264,30 @@ function PendingWaveformItem({
     )
   }
 
+
+  if (action.type === 'STRETCH') {
+    const { start, end, clipToStretch } = action
+    const originKey =
+    Math.abs(start - clipToStretch.start) <
+    Math.abs(start - clipToStretch.end)
+      ? 'start'
+      : 'end'
+      const edge = clipToStretch[originKey]
+
+    const deltaX = start - end
+
+    return (
+      <rect
+        ref={rectRef}
+        className={WAVEFORM_ACTION_TYPE_TO_CLASSNAMES[action.type]}
+        {...getClipRectProps(
+          msToPixels(edge, pixelsPerSecond),
+          msToPixels(edge - deltaX, pixelsPerSecond),
+          height
+        )}
+      />
+    )
+  }
   return (
     <rect
       ref={rectRef}
@@ -339,11 +366,9 @@ function useWaveformMouseActions(
       if (
         dataset &&
         dataset.clipId &&
-        (msToPixels(
-          Math.abs(Number(dataset.clipStart) - ms),
-          pixelsPerSecond
-        ) <= SELECTION_BORDER_MILLISECONDS ||
-          msToPixels(Math.abs(Number(dataset.clipEnd) - ms), pixelsPerSecond) <=
+        (Math.abs(Number(dataset.clipStart) - ms) <=
+          SELECTION_BORDER_MILLISECONDS ||
+          Math.abs(Number(dataset.clipEnd) - ms) <=
             SELECTION_BORDER_MILLISECONDS)
       ) {
         dispatch(
@@ -442,6 +467,7 @@ function useWaveformMouseActions(
           end: ms,
           viewState: waveform,
         }
+        console.log('DRAGEEVENT', { finalAction })
         document.dispatchEvent(new WaveformDragEvent(finalAction))
       }
       // if (!pendingAction) throw new Error('Problem with waveform drag event--no drag start registered')

@@ -1,6 +1,6 @@
 export const WAVEFORM_HEIGHT = 70
 export const SELECTION_BORDER_MILLISECONDS = 100
-export const CLIP_THRESHOLD_MILLSECONDS = 8000 // should be in ms
+export const CLIP_THRESHOLD_MILLSECONDS = 800 // should be in ms
 export const SUBTITLES_CHUNK_HEIGHT = 14
 export const DEFAULT_PIXELS_PER_SECOND = 50
 
