@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Button,
@@ -19,14 +19,9 @@ import truncate from '../utils/truncate'
 import r from '../redux'
 import { actions } from '../actions'
 import css from './MainHeader.module.css'
-import {
-  startMovingCursor,
-  stopMovingCursor,
-  setCursorX,
-} from '../utils/waveform'
 import { getFileFilters } from '../utils/files'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
-import { usePrevious } from '../utils/usePrevious'
+import { PlayButtonSync } from './usePlayButtonSync'
 
 enum $ {
   chooseFirstMediaFileButton = 'choose-media-file-button',
@@ -38,13 +33,13 @@ enum $ {
 type MediaFilesMenuProps = {
   className: string
   currentProjectId: ProjectId
+  playButtonSync: PlayButtonSync
 }
-
-const TEMP_WAVEFORM_FACTOR = 25
 
 const MediaFilesMenu = ({
   className,
   currentProjectId,
+  playButtonSync: { playOrPauseAudio, playing },
 }: MediaFilesMenuProps) => {
   const { currentFile, projectMediaFiles, loopIsOn: loopState } = useSelector(
     (state: AppState) => ({
@@ -66,8 +61,6 @@ const MediaFilesMenu = ({
     },
     [dispatch, currentProjectId, popover]
   )
-
-  const { playing, playOrPauseAudio } = usePlayButtonSync(TEMP_WAVEFORM_FACTOR)
 
   const toggleLoop = useCallback(() => dispatch(actions.toggleLoop('BUTTON')), [
     dispatch,
@@ -158,65 +151,6 @@ const MediaFilesMenu = ({
       </section>
     </DarkTheme>
   )
-}
-
-function usePlayButtonSync(waveformFactor: number) {
-  const playing = useSelector(r.isMediaPlaying)
-  const dispatch = useDispatch()
-  const playMedia = useCallback(() => {
-    startMovingCursor(waveformFactor)
-    dispatch(r.playMedia())
-  }, [dispatch, waveformFactor])
-  const pauseMedia = useCallback(() => {
-    stopMovingCursor()
-    dispatch(r.pauseMedia())
-  }, [dispatch])
-
-  const previousStepLength = usePrevious(waveformFactor)
-  useEffect(() => {
-    if (!playing) return
-    if (waveformFactor !== previousStepLength) {
-      stopMovingCursor()
-      startMovingCursor(waveformFactor)
-    }
-  }, [playing, previousStepLength, waveformFactor])
-
-  useEffect(() => {
-    const startPlaying = () => {
-      playMedia()
-    }
-
-    document.addEventListener('play', startPlaying, true)
-
-    return () => document.removeEventListener('play', startPlaying, true)
-  }, [playMedia])
-  useEffect(() => {
-    const stopPlaying = () => pauseMedia()
-
-    document.addEventListener('pause', stopPlaying, true)
-
-    return () => document.removeEventListener('pause', stopPlaying, true)
-  }, [pauseMedia])
-
-  const playOrPauseAudio = useCallback(() => {
-    const player = document.getElementById('mediaPlayer') as
-      | HTMLAudioElement
-      | HTMLVideoElement
-      | null
-    if (!player) return
-    player.paused ? player.play() : player.pause()
-  }, [])
-
-  useEffect(() => {
-    const resetPlayButton = () => {
-      pauseMedia()
-      setCursorX(0)
-    }
-    document.addEventListener('loadeddata', resetPlayButton, true)
-    return () => document.removeEventListener('loadeddata', resetPlayButton)
-  }, [pauseMedia])
-
-  return { playOrPauseAudio, playing }
 }
 
 export default MediaFilesMenu

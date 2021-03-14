@@ -8,7 +8,7 @@ import {
 import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
 import { createSelector } from 'reselect'
-import { SELECTION_BORDER_WIDTH } from './waveform'
+import { SELECTION_BORDER_MILLISECONDS } from './waveform'
 
 export const getLoopState = (state: AppState) => state.session.loopMedia
 
@@ -211,9 +211,9 @@ export const getClipEdgeAt = (
   const clip = getClip(state, clipIdAtMs)
   if (!clip) throw new Error('Impossible')
   const { start, end } = clip
-  if (milliseconds >= start && milliseconds <= start + SELECTION_BORDER_WIDTH)
+  if (milliseconds >= start && milliseconds <= start + SELECTION_BORDER_MILLISECONDS)
     return { key: 'start', id: clipIdAtMs }
-  if (milliseconds >= end - SELECTION_BORDER_WIDTH && milliseconds <= end)
+  if (milliseconds >= end - SELECTION_BORDER_MILLISECONDS && milliseconds <= end)
     return { key: 'end', id: clipIdAtMs }
 
   return null

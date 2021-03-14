@@ -80,7 +80,7 @@ const clipStretchEpic: AppEpic = (
       }
 
       if (originKey === 'start' && stretchedClip && stretchedClip.end > end) {
-        const start = Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD)
+        const start = Math.min(end, stretchedClip.end - r.CLIP_THRESHOLD_MILLSECONDS)
 
         const newCard = r.getNewFlashcardForStretchedClip(
           state$.value,
@@ -121,7 +121,7 @@ const clipStretchEpic: AppEpic = (
           r.editClip(
             id,
             {
-              end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD),
+              end: Math.max(end, stretchedClip.start + r.CLIP_THRESHOLD_MILLSECONDS),
             },
             newCard !==
               (r.getFlashcard(state$.value, stretchedClip.id) as Flashcard)

@@ -224,7 +224,7 @@ function setViewBox(
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean
 ) {
-  const visibleTimeSpan = pixelsToMs(svgWidth)
+  const visibleTimeSpan = pixelsToMs(svgWidth, viewState.pixelsPerSecond)
   const buffer = Math.round(visibleTimeSpan * 0.1)
 
   const ms = newlySetMs

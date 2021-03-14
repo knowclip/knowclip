@@ -40,7 +40,7 @@ const clipCreateEpic: AppEpic = (
         pendingClipOverlaps ||
         !(
           Math.abs(pendingClip.end - pendingClip.start) >=
-          pixelsToMs(r.CLIP_THRESHOLD)
+          r.CLIP_THRESHOLD_MILLSECONDS
         )
 
       const newTime = msToSeconds(tooSmall ? right : left)

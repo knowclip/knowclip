@@ -115,9 +115,11 @@ const Media = ({
     onTimeUpdate: useCallback(
       (e) => {
         const media = e.target as HTMLVideoElement | HTMLAudioElement
+        const wasSeeking = seeking.current
         onTimeUpdate(media, seeking, looping)
+        if (wasSeeking) blur(e)
       },
-      [onTimeUpdate, looping]
+      [onTimeUpdate, looping, blur, seeking]
     ),
 
     onKeyDown: useCallback((e) => {

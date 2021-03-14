@@ -1,15 +1,15 @@
 export const WAVEFORM_HEIGHT = 70
-export const SELECTION_BORDER_WIDTH = 5
-export const CLIP_THRESHOLD = 40 // should be in ms
+export const SELECTION_BORDER_MILLISECONDS = 100
+export const CLIP_THRESHOLD_MILLSECONDS = 8000 // should be in ms
 export const SUBTITLES_CHUNK_HEIGHT = 14
-export const PIXELS_PER_SECOND = 25
+export const DEFAULT_PIXELS_PER_SECOND = 50
 
 export const msToSeconds = (ms: number) => +(ms / 1000).toFixed(5)
 export const secondsToMs = (s: number) => Math.round(s * 1000)
 
-export const msToPixels = (ms: number) => (ms / 1000) * PIXELS_PER_SECOND
-export const secondsToPixels = (s: number) => msToPixels(s * 1000)
-export const pixelsToMs = (pixels: number) =>
-  Math.round((pixels / PIXELS_PER_SECOND) * 1000)
-export const pixelsToSeconds = (pixels: number) =>
-  msToSeconds(pixelsToMs(pixels))
+export const msToPixels = (ms: number, pps: number) => (ms / 1000) * pps
+export const secondsToPixels = (s: number, pps: number) => msToPixels(s * 1000, pps)
+export const pixelsToMs = (pixels: number, pps: number) =>
+  Math.round((pixels / pps) * 1000)
+export const pixelsToSeconds = (pixels: number, pps: number) =>
+  msToSeconds(pixelsToMs(pixels, pps))

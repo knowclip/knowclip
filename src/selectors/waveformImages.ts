@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
 import { getWaveformIds } from '../utils/getWaveform'
+import { secondsToMs } from './waveform'
 
 export const getWaveformImages = createSelector(
   getCurrentMediaFile,
@@ -22,7 +23,7 @@ export const getWaveformImages = createSelector(
         result.push({
           file,
           path: availability.filePath,
-          x: file.startSeconds * 1000,
+          x: secondsToMs(file.startSeconds),
         })
       }
     }

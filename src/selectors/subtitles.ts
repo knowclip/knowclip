@@ -6,7 +6,7 @@ import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
-import { pixelsToMs, secondsToMs } from './waveform'
+import { secondsToMs } from './waveform'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,
@@ -214,14 +214,14 @@ export const readParseSrtChunk = (
 })
 export const readSubsrtChunk = readVttChunk
 
-const TEMP_HALFSECOND = pixelsToMs(25)
+const HALF_SECOND = 500
 
 export const overlapsSignificantly = (
   chunk: { start: number; end: number },
   start: number,
   end: number
 ): boolean =>
-  start <= chunk.end - TEMP_HALFSECOND && end >= chunk.start + TEMP_HALFSECOND
+  start <= chunk.end - HALF_SECOND && end >= chunk.start + HALF_SECOND
 
 export const getSubtitlesChunksWithinRange = (
   state: AppState,

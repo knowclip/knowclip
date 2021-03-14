@@ -2,7 +2,7 @@ import React, { MutableRefObject, useCallback } from 'react'
 import cn from 'classnames'
 import css from './Waveform.module.css'
 import { $ } from './Waveform'
-import { SELECTION_BORDER_WIDTH, msToPixels, msToSeconds } from '../selectors'
+import { SELECTION_BORDER_MILLISECONDS, msToPixels, msToSeconds } from '../selectors'
 import { setCursorX } from '../utils/waveform'
 
 type ClipProps = {
@@ -12,6 +12,7 @@ type ClipProps = {
   isHighlighted: boolean
   height: number
   index: number
+  pixelsPerSecond: number
 }
 type ClipClickDataProps = {
   'data-clip-id': string
@@ -29,7 +30,15 @@ const getClipRectProps = (start: number, end: number, height: number) => ({
 })
 
 const Clip = React.memo(
-  ({ id, start, end, isHighlighted, height, index }: ClipProps) => {
+  ({
+    id,
+    start,
+    end,
+    isHighlighted,
+    height,
+    index,
+    pixelsPerSecond,
+  }: ClipProps) => {
     const clickDataProps: ClipClickDataProps = {
       'data-clip-id': id,
       'data-clip-start': start,
@@ -46,15 +55,19 @@ const Clip = React.memo(
             { [css.highlightedClip]: isHighlighted },
             $.waveformClip
           )}
-          {...getClipRectProps(msToPixels(start), msToPixels(end), height)}
+          {...getClipRectProps(
+            msToPixels(start, pixelsPerSecond),
+            msToPixels(end, pixelsPerSecond),
+            height
+          )}
           {...clickDataProps}
         />
 
         <rect
           className={css.waveformClipBorder}
-          x={start}
+          x={msToPixels(start, pixelsPerSecond)}
           y="0"
-          width={SELECTION_BORDER_WIDTH}
+          width={msToPixels(SELECTION_BORDER_MILLISECONDS, pixelsPerSecond)}
           height={height}
           {...clickDataProps}
         />
@@ -62,9 +75,9 @@ const Clip = React.memo(
           className={cn(css.waveformClipBorder, {
             [css.highlightedClipBorder]: isHighlighted,
           })}
-          x={msToPixels(end) - SELECTION_BORDER_WIDTH}
+          x={msToPixels(end - SELECTION_BORDER_MILLISECONDS, pixelsPerSecond)}
           y="0"
-          width={SELECTION_BORDER_WIDTH}
+          width={msToPixels(SELECTION_BORDER_MILLISECONDS, pixelsPerSecond)}
           height={height}
           {...clickDataProps}
         />
@@ -79,11 +92,13 @@ export const Clips = React.memo(
     highlightedClipId,
     height,
     playerRef,
+    pixelsPerSecond,
   }: {
     clips: Clip[]
     highlightedClipId: string | null
     height: number
-    playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
+    playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>,
+    pixelsPerSecond: number
   }) => {
     const handleClick = useCallback(
       (e) => {
@@ -93,7 +108,9 @@ export const Clips = React.memo(
             const player = playerRef.current
             if (player)
               player.currentTime = msToSeconds(clips[dataset.clipIndex].start)
-            setCursorX(msToPixels(clips[dataset.clipIndex].start))
+            setCursorX(
+              msToPixels(clips[dataset.clipIndex].start, pixelsPerSecond)
+            )
           }
           const currentSelected = document.querySelector(
             '.' + css.highlightedClip
@@ -106,7 +123,7 @@ export const Clips = React.memo(
           if (newSelected) newSelected.classList.add(css.highlightedClip)
         }
       },
-      [clips, playerRef]
+      [clips, pixelsPerSecond, playerRef]
     )
 
     return (
@@ -118,6 +135,7 @@ export const Clips = React.memo(
             key={clip.id}
             isHighlighted={clip.id === highlightedClipId}
             height={height}
+            pixelsPerSecond={pixelsPerSecond}
           />
         ))}
       </g>

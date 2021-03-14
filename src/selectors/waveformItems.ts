@@ -14,7 +14,6 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
 
 export const getWaveformItems = createSelector(
   getCurrentFileClips,

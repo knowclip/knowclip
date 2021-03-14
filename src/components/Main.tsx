@@ -58,9 +58,8 @@ const Main = () => {
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
   const waveform = useWaveformState(waveformItems)
-  const { svgRef, onMediaLoaded } = waveform
-
-  const { onTimeUpdate: handleTimeUpdate } = useWaveformMediaTimeUpdate(
+  const { svgRef, resetWaveformState } = waveform
+  const { onTimeUpdate } = useWaveformMediaTimeUpdate(
     svgRef,
     waveform
   )
@@ -73,6 +72,7 @@ const Main = () => {
         <Header
           currentProjectId={currentProject.id}
           currentMediaFile={currentMediaFile}
+          waveform={waveform}
         />
       </DarkTheme>
 
@@ -98,8 +98,8 @@ const Main = () => {
             subtitles={subtitles}
             viewMode={viewMode}
             playerRef={playerRef}
-            onMediaLoaded={onMediaLoaded}
-            onTimeUpdate={handleTimeUpdate}
+            onMediaLoaded={resetWaveformState}
+            onTimeUpdate={onTimeUpdate}
           />
         )}
 

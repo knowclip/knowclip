@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { pixelsToMs } from '../selectors'
 
+// TODO: FIX like below
 const toWaveformXRaw = (
   mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
   svgElement: SVGElement,
@@ -20,21 +21,16 @@ export const toWaveformX =
       }
     : toWaveformXRaw
 
-export const toWaveformCoordinates = (
+export const waveformTimeAtMousePosition = (
   mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
   svgElement: SVGElement,
 
-  viewBoxStartMs = 0 // should be minTime
+  viewBoxStartMs: number,
+  pixelsPerSecond: number,
 ) => {
   const { clientX } = mouseEvent
   const { left } = svgElement.getBoundingClientRect()
 
   const offsetX = clientX - left
-  return {
-    ms: pixelsToMs(offsetX) + viewBoxStartMs,
-    // x: +(clientX - left + xMin).toFixed(2),
-  }
+  return pixelsToMs(offsetX, pixelsPerSecond) + viewBoxStartMs
 }
-
-// export const getSecondsAtXFromWaveform = (x: number): number => // x / 1000
-//   +(x / PIXELS_PER_SECOND).toFixed(5)

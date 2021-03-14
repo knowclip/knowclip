@@ -2,8 +2,7 @@ type ViewState = {
   durationSeconds: number
   cursorMs: number
   viewBoxStartMs: number
-  stepsPerSecond: number
-  stepLength: number
+  pixelsPerSecond: number
   selection: WaveformSelection | null
   pendingAction:
     | import('../utils/WaveformMousedownEvent').WaveformDragAction

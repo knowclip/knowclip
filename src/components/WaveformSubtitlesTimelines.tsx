@@ -18,11 +18,13 @@ export const SubtitlesTimelines = memo(
   ({
     subtitles,
     waveformItems,
+    pixelsPerSecond,
     goToSubtitlesChunk,
     highlightedChunkIndex,
   }: {
     subtitles: SubtitlesCardBases
     waveformItems: WaveformSelectionExpanded[]
+    pixelsPerSecond: number
     goToSubtitlesChunk: (trackId: string, chunkIndex: number) => void
     highlightedChunkIndex: number | null
   }) => {
@@ -30,7 +32,7 @@ export const SubtitlesTimelines = memo(
       (e) => {
         const { dataset } = e.target
 
-        setCursorX(msToPixels(dataset.chunkStart))
+        setCursorX(msToPixels(dataset.chunkStart, pixelsPerSecond))
 
         goToSubtitlesChunk(dataset.trackId, dataset.chunkIndex)
 
@@ -43,7 +45,7 @@ export const SubtitlesTimelines = memo(
           e.target.classList.add(css.selectedSubtitlesChunk)
         }
       },
-      [goToSubtitlesChunk]
+      [goToSubtitlesChunk, pixelsPerSecond]
     )
     const dispatch = useDispatch()
     const handleDoubleClick = useCallback(
@@ -75,6 +77,7 @@ export const SubtitlesTimelines = memo(
               linkedTrackIds={subtitles.linkedTrackIds}
               getFieldsPreview={subtitles.getFieldsPreviewFromCardsBase}
               isSelected={highlightedChunkIndex === c.index}
+              pixelsPerSecond={pixelsPerSecond}
             />
           )
         })}
@@ -90,6 +93,7 @@ export const SubtitlesTimelines = memo(
                   trackOffsetY={trackOffsetY}
                   trackId={id}
                   chunkIndex={chunk.index}
+                  pixelsPerSecond={pixelsPerSecond}
                 />
               ))}
             </g>
@@ -103,19 +107,21 @@ export const SubtitlesTimelines = memo(
 const SubtitlesChunk = React.memo(
   ({
     chunk,
+    pixelsPerSecond,
     trackOffsetY,
     chunkIndex,
     trackId,
   }: {
     chunk: SubtitlesChunk
+    pixelsPerSecond: number
     trackOffsetY: number
     chunkIndex: number
     trackId: string
   }) => {
     const clipPathId = `${trackId}__${chunkIndex}`
 
-    const chunkDisplayStart = msToPixels(chunk.start)
-    const chunkDisplayEnd = msToPixels(chunk.end)
+    const chunkDisplayStart = msToPixels(chunk.start, pixelsPerSecond)
+    const chunkDisplayEnd = msToPixels(chunk.end, pixelsPerSecond)
     const width = chunkDisplayEnd - chunkDisplayStart
 
     const rect = {
@@ -159,20 +165,22 @@ const SubtitlesChunk = React.memo(
 const LinkedSubtitlesChunk = React.memo(
   ({
     cardBase,
+    pixelsPerSecond,
     getFieldsPreview,
     linkedTrackIds,
     isSelected,
     tracksCount,
   }: {
     cardBase: SubtitlesCardBase
+    pixelsPerSecond: number
     getFieldsPreview: (base: SubtitlesCardBase) => Dict<string, string>
     linkedTrackIds: SubtitlesTrackId[]
     isSelected: boolean
     tracksCount: number
   }) => {
     const clipPathId = `linkedSubtitles_${cardBase.start}`
-    const displayStart = msToPixels(cardBase.start)
-    const displayEnd = msToPixels(cardBase.end)
+    const displayStart = msToPixels(cardBase.start, pixelsPerSecond)
+    const displayEnd = msToPixels(cardBase.end, pixelsPerSecond)
     const width = displayEnd - displayStart
 
     const fieldsPreview = getFieldsPreview(cardBase)
