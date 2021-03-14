@@ -433,32 +433,16 @@ function useWaveformMouseActions(
       const ms = Math.min(durationMilliseconds, msAtMouse)
       const { dataset } = e.target as SVGGElement | SVGRectElement
 
-      if (
-        dataset &&
-        ((dataset.clipId && !dataset.clipIsHighlighted) || dataset.chunkIndex)
-      ) {
-        return
-        //  dispatch(
-        //   r. aveformItem(
-        //     dataset.clipId
-        //       ? {
-        //           type: 'Clip',
-        //           id: dataset.clipId,
-        //           index: Number(dataset.index),
-        //         }
-        //       : {
-        //           type: 'Preview',
-        //           index: Number(dataset.chunkIndex),
-        //           cardBaseIndex: Number(dataset.index),
-        //         }
-        //   )
-        // )
-      }
-
       if (playerRef.current) {
-        playerRef.current.currentTime = msToSeconds(ms)
+        const newTime = getTimeAfterMouseUp(
+          pendingAction,
+          waveform.selection,
+          dataset,
+          ms
+        )
 
-        setCursorX(msToPixels(ms, pixelsPerSecond))
+        playerRef.current.currentTime = msToSeconds(newTime)
+        if (!pendingAction) setCursorX(msToPixels(newTime, pixelsPerSecond))
       }
       if (pendingAction) {
         const finalAction = {
@@ -493,3 +477,28 @@ function useWaveformMouseActions(
 export default Waveform
 
 export { $ as waveform$ }
+
+function getTimeAfterMouseUp(
+  pendingAction: WaveformDragAction | null,
+  waveformSelection: WaveformSelection | null,
+  dataset: DOMStringMap,
+  mouseMilliseconds: number
+) {
+  const clipIsToBeNewlySelected =
+    dataset.clipId &&
+    (waveformSelection?.type !== 'Clip' ||
+      waveformSelection.id !== dataset.clipId)
+  if (clipIsToBeNewlySelected) {
+    console.log(dataset.clipStart)
+    return Number(dataset.clipStart)
+  }
+
+  const itemAtMouse = Boolean(
+    dataset &&
+      ((dataset.clipId && !dataset.clipIsHighlighted) || dataset.chunkIndex)
+  )
+
+  return !pendingAction && itemAtMouse
+    ? Number(dataset.clipStart || dataset.chunkStart)
+    : mouseMilliseconds
+}

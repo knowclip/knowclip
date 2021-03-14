@@ -16,12 +16,12 @@ subtitles:
     type: Embedded
     chunksMetadata:
       count: 26
-      endCue: 4321.5
+      endCue: 86430
   - id: b3347257-97c4-4c9a-8eae-9bf88a8edc23
     type: External
     chunksMetadata:
       count: 15
-      endCue: 4336.5
+      endCue: 86730
     name: pbc_jp.ass
 clips:
   - id: 632a6cff-7fd7-4d0f-b657-0b9636204261
@@ -38,7 +38,7 @@ clips:
       type: VideoStill
   - id: a272b282-4d89-4af0-9d17-baa807793f1f
     start: 00:15.12
-    end: 00:17.76
+    end: 00:18.4
     fields:
       transcription: またこの子は昼間からゴロゴロして
       pronunciation: mata kono ko-wa hirumá-kara góro-goro shite

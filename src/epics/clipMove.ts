@@ -5,10 +5,15 @@ import WaveformMousedownEvent, {
   WaveformDragEvent,
   WaveformDragMove,
 } from '../utils/WaveformMousedownEvent'
+import { msToSeconds } from '../selectors'
 
 const MOVE_START_DELAY = 400
 
-const clipMoveEpic: AppEpic = (action$, state$, { document }) => {
+const clipMoveEpic: AppEpic = (
+  action$,
+  state$,
+  { document, setCurrentTime }
+) => {
   return fromEvent<WaveformDragEvent>(document, 'waveformDrag').pipe(
     filter(
       (e): e is WaveformDragEvent & { action: WaveformDragMove } =>
@@ -29,15 +34,18 @@ const clipMoveEpic: AppEpic = (action$, state$, { document }) => {
         const newStart = move.clipToMove.start - deltaX
         const newEnd = move.clipToMove.end - deltaX
 
-        const overlapIds = r
+        const overlaps = r
           .getCurrentFileClips(state$.value)
           .filter(({ id, start, end }) => {
             return (
               id !== move.clipToMove.id && start <= newEnd && end >= newStart
             )
           })
-          .map((c) => c.id)
+        const overlapIds = overlaps.map((c) => c.id)
 
+        setCurrentTime(
+          msToSeconds(Math.min(newStart, ...overlaps.map((c) => c.start)))
+        )
         return from([r.moveClip(move.clipToMove.id, deltaX, overlapIds)])
       }
     )

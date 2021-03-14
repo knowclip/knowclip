@@ -25,6 +25,7 @@ export const clipsActions = {
     fileId,
   }),
 
+  // SHOULD ONLY BE USED WITH NULL IF LOCAL SELECTION TRIGGERS IT?
   selectWaveformItem: (selection: WaveformSelection | null) => ({
     type: A.selectWaveformItem,
     selection,

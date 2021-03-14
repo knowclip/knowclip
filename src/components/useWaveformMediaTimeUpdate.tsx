@@ -7,7 +7,7 @@ import {
   secondsToMs,
   WaveformSelectionExpanded,
 } from '../selectors'
-import { useWaveformState } from './useWaveformState'
+import { useWaveformState, WaveformAction } from './useWaveformState'
 import { usePrevious } from '../utils/usePrevious'
 import { useDispatch, useSelector } from 'react-redux'
 import { areSelectionsEqual } from '../utils/waveformSelection'
@@ -42,26 +42,16 @@ export function useWaveformMediaTimeUpdate(
     )
 
     if (localChange && notSyncedWithRemote) {
-      console.log('            selecting remote')
-      console.log({
-        localChange,
-        remoteChange,
-        notSyncedWithRemote,
-        remoteSelection,
-        selection: waveform.state.selection,
-      })
       dispatch(r.selectWaveformItem(waveform.state.selection))
     }
     if (remoteChange && notSyncedWithRemote) {
-      console.log('            selecting local')
-      console.log({
-        localChange,
-        remoteChange,
-        notSyncedWithRemote,
-        remoteSelection,
-        selection: waveform.state.selection,
-      })
-      dispatchViewState(r.selectWaveformItem(remoteSelection))
+      if (remoteSelection)
+        dispatchViewState({
+          type: 'SET_CURSOR_POSITION',
+          newSelection: remoteSelection,
+          ms: remoteSelection.item.start,
+        })
+      else console.error('REMOTE DESELECTION')
     }
   }, [
     dispatch,
@@ -92,19 +82,6 @@ export function useWaveformMediaTimeUpdate(
       const newSelection = getNewSelection(
         remoteSelection,
         possibleNewSelection
-      )
-      console.log(
-        'NEW SELECTION?',
-        newSelection,
-        { remoteSelection, possibleNewSelection },
-        'waveformitems',
-        {
-          waveformItems: waveform.waveformItems,
-          match: waveform.waveformItems.find(
-            (item) =>
-              item.type === 'Clip' && item.id === (remoteSelection as any)?.id
-          ),
-        }
       )
       const wasSeeking = seeking.current
       seeking.current = false
@@ -177,94 +154,94 @@ function getNewSelection(
 
 function updateWaveformAfterTimeUpdateEvent(
   viewState: ViewState,
-  newlyUpdatedMs: number,
+  updatedTime: number,
   svg: SVGSVGElement,
-  newSelection: WaveformSelectionExpanded | null,
+  newSelectionAtTime: WaveformSelectionExpanded | null,
   wasSeeking: boolean,
-  selection: WaveformSelectionExpanded | null
-) {
-  const setViewboxAction = setViewBox(
+  remoteSelection: WaveformSelectionExpanded | null
+): WaveformAction | null {
+  const newViewBoxStartMs = viewBoxStartMsOnTimeUpdate(
     viewState,
-    newlyUpdatedMs,
+    updatedTime,
     elementWidth(svg),
-    newSelection,
+    newSelectionAtTime,
     wasSeeking
   )
 
-  if (newSelection && !areSelectionsEqual(selection, newSelection)) {
-    console.log(' ~~~ a')
-    return setViewboxAction
-      ? {
-          ...setViewboxAction,
-          newSelection,
-        }
-      : r.selectWaveformItem(newSelection)
+  if (
+    newSelectionAtTime &&
+    !areSelectionsEqual(remoteSelection, newSelectionAtTime)
+  ) {
+    return {
+      type: 'SET_CURSOR_POSITION',
+      ms: updatedTime,
+      newSelection: newSelectionAtTime,
+      newViewBoxStartMs,
+    }
   }
 
-  if (!newSelection && wasSeeking) {
-    console.log(' ~~~ b', { newSelection })
-    return setViewboxAction
+  if (!newSelectionAtTime && wasSeeking) {
+    return newViewBoxStartMs !== null
       ? {
-          ...setViewboxAction,
-          newSelection,
+          type: 'SET_CURSOR_POSITION',
+          ms: updatedTime,
+          newSelection: newSelectionAtTime,
+          newViewBoxStartMs,
         }
       : // : r.selectWaveformItem(null)
         null
   }
 
-  console.log(' ~~~ c')
-
-  return setViewboxAction
+  return {
+    type: 'SET_CURSOR_POSITION',
+    ms: updatedTime,
+    newSelection: newSelectionAtTime,
+    newViewBoxStartMs,
+  }
 }
 
-function setViewBox(
+function viewBoxStartMsOnTimeUpdate(
   viewState: ViewState,
   newlySetMs: number,
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean
-) {
+): number {
   const visibleTimeSpan = pixelsToMs(svgWidth, viewState.pixelsPerSecond)
   const buffer = Math.round(visibleTimeSpan * 0.1)
-
-  const ms = newlySetMs
 
   const { viewBoxStartMs, durationSeconds } = viewState
   const durationMs = secondsToMs(durationSeconds)
 
-  if (newlySetMs < viewBoxStartMs) {
-    console.log('                     xxx 1')
-    console.log(
-      '                     newlySetMs < viewBoxStartMs',
-      newlySetMs,
-      viewBoxStartMs
-    )
-    return {
-      type: 'SET_CURSOR_POSITION' as const,
-      ms,
-      newViewBoxStartMs: Math.max(0, newlySetMs - buffer),
-    }
-  }
-  if (newlySetMs >= visibleTimeSpan + viewBoxStartMs) {
-    console.log('                     xxx 2')
-    const newViewBoxStartMs = Math.min(
-      newSelection ? newSelection.item.end + buffer : newlySetMs,
-      Math.max(durationMs - visibleTimeSpan, 0)
-    )
-    return {
-      type: 'SET_CURSOR_POSITION' as const,
-      ms,
-      newViewBoxStartMs,
-    }
+  const currentRightEdge = viewBoxStartMs + visibleTimeSpan
+
+  const leftShiftRequired = newlySetMs < viewBoxStartMs
+  if (leftShiftRequired) {
+    return Math.max(0, newlySetMs - buffer)
   }
 
-  if (seeking) console.log('                     xxx 3')
+  const rightShiftRequired = newlySetMs >= currentRightEdge
+  if (rightShiftRequired) {
+    return bound(newSelection ? newSelection.item.end + buffer : newlySetMs, [
+      0,
+      durationMs - visibleTimeSpan,
+    ])
+  }
 
-  return seeking
-    ? {
-        type: 'SET_CURSOR_POSITION' as const,
-        ms,
-        newViewBoxStartMs: undefined,
-      }
-    : undefined
+  if (seeking && newSelection) {
+    if (newSelection.item.end + buffer >= currentRightEdge)
+      return bound(newSelection.item.end + buffer - visibleTimeSpan, [
+        0,
+        durationMs - visibleTimeSpan,
+      ])
+
+    if (newSelection.item.start - buffer <= viewBoxStartMs)
+      return Math.max(0, newSelection.item.start - buffer)
+  }
+
+  function bound(number: number, [min, max]: [number, number]) {
+    return Math.max(min, Math.min(max, number))
+  }
+
+  return viewState.viewBoxStartMs
 }

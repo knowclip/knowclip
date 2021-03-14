@@ -38,6 +38,7 @@
   animation: flashIn 1s;
   fill: rgba(255, 255, 0, .2);
   stroke: rgba(255, 255, 0, 0.8);
+  pointer-events: none;
 }
 
 @keyframes flashIn {
@@ -62,6 +63,7 @@
 .waveformPendingStretch {
   stroke: rgba(0, 255, 255, 0.4);
   fill: rgba(0, 255, 255, 0.4);
+  pointer-events: none;
 }
 
 .highlightedClip {

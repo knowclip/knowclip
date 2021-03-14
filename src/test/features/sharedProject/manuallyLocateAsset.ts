@@ -1,29 +1,45 @@
-import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
+import { TestSetup, ASSETS_DIRECTORY, testBlock } from '../../setUpDriver'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { waveformMouseDrag } from '../../driver/waveform'
+import { waveformMouseHoldAndDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function manuallyLocateAsset({ app, client }: TestSetup) {
-  await client.clickElement_(subtitlesMenu$.openMenuButton)
+  await testBlock('go to locate external subtitles file in menu', async () => {
+    await client.clickElement_(subtitlesMenu$.openMenuButton)
 
-  await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
+    await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
 
-  await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
-
-  await mockElectronHelpers(app, {
-    showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
+    await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
   })
-  await client.waitForText_(fileSelectionForm$.container, 'pbc_jp.ass')
-  await client.clickElement_(fileSelectionForm$.filePathField)
-  await client.clickElement_(fileSelectionForm$.continueButton)
 
-  await client.clickElement('body')
-  await client.waitUntilGone_(subtitlesMenu$.trackMenuItems)
+  await testBlock('locate PBC japanese subtitles file', async () => {
+    await mockElectronHelpers(app, {
+      showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
+    })
 
-  await waveformMouseDrag(client, 591, 572)
+    await client.waitForText_(fileSelectionForm$.container, 'pbc_jp.ass')
+    await client.clickElement_(fileSelectionForm$.filePathField)
+    await client.clickElement_(fileSelectionForm$.continueButton)
+    await client.waitUntilGone_(fileSelectionForm$.continueButton)
+  })
 
-  await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
+  await testBlock('close subtitles menu', async () => {
+    await client.clickElement('body')
+    await client.waitUntilGone_(subtitlesMenu$.trackMenuItems)
+  })
+
+  await testBlock(
+    'fill in existing card with text from loaded subtitles via stretch',
+    async () => {
+      await waveformMouseHoldAndDrag(client, 300, 591, 572)
+
+      await client.waitForText_(
+        flashcardSection$.container,
+        'ああー  吸わないで'
+      )
+    }
+  )
 }

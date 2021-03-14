@@ -52,17 +52,14 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
   }
 }
 
+export type SetWaveformCursorPosition = {
+  type: 'SET_CURSOR_POSITION'
+  ms: number
+  newViewBoxStartMs?: number | undefined
+  newSelection?: WaveformSelection | null | undefined
+}
 export type WaveformAction =
-  | {
-      type: 'selectWaveformItem'
-      selection: WaveformSelection | null
-    }
-  | {
-      type: 'SET_CURSOR_POSITION'
-      ms: number
-      newViewBoxStartMs?: number | undefined
-      newSelection?: WaveformSelection | null | undefined
-    }
+  | SetWaveformCursorPosition
   | { type: 'setPendingAction'; action: WaveformDragAction | null }
   | { type: 'continuePendingAction'; ms: number }
   | { type: 'reset'; durationSeconds: number }
@@ -86,11 +83,6 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
               end: action.ms,
             }
           : null,
-      }
-    case 'selectWaveformItem':
-      return {
-        ...state,
-        selection: action.selection,
       }
     case 'SET_CURSOR_POSITION': {
       const newViewBoxStartMs =
