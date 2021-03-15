@@ -112,23 +112,28 @@ export const getNewWaveformSelectionAt = (
   return getNewWaveformSelectionAtFromSubset(selection, waveformItems, newX)
 }
 export const getNewWaveformSelectionAtFromSubset = (
-  selection: WaveformSelectionExpanded | null,
-  waveformItems: WaveformSelectionExpanded[],
+  currentSelection: WaveformSelection | null,
+  newWaveformItems: WaveformSelectionExpanded[],
   newMs: number
 ): WaveformSelectionExpanded | null => {
-  const updatedSelection =
-    selection &&
-    getUpdatedSameSelection(selection, waveformItems[selection.index] || null)
+  const itemAtCurrentSelectionPosition = currentSelection
+    ? newWaveformItems[currentSelection.index]
+    : null
+  const itemIsSameAsOldSelection =
+    currentSelection &&
+    itemAtCurrentSelectionPosition &&
+    isItemSameAsOldSelection(currentSelection, itemAtCurrentSelectionPosition)
   if (
-    updatedSelection &&
-    newMs >= updatedSelection.item.start &&
-    newMs <= updatedSelection.item.end
+    itemIsSameAsOldSelection &&
+    itemAtCurrentSelectionPosition &&
+    newMs >= itemAtCurrentSelectionPosition.item.start &&
+    newMs <= itemAtCurrentSelectionPosition.item.end
   )
-    return updatedSelection
+    return itemAtCurrentSelectionPosition
 
   const overlapping: WaveformSelectionExpanded[] = []
 
-  for (const clipOrPreview of waveformItems) {
+  for (const clipOrPreview of newWaveformItems) {
     const { item } = clipOrPreview
     if (item.start > newMs) break
 
@@ -141,20 +146,26 @@ export const getNewWaveformSelectionAtFromSubset = (
   return overlapping.find(({ type }) => type === 'Clip') || null
 }
 
-const getUpdatedSameSelection = (
-  prev: WaveformSelectionExpanded,
-  next: WaveformSelectionExpanded | null
-): WaveformSelectionExpanded | null => {
-  if (!next || prev.type !== next.type) return null
-  if (prev.type === 'Clip' && prev.item.id === (next.item as Clip).id)
-    return next
+const isItemSameAsOldSelection = (
+  oldCurrentSelection: WaveformSelection,
+  itemAtCurrentSelectionPosition: WaveformSelection
+) => {
+  if (oldCurrentSelection.type !== itemAtCurrentSelectionPosition.type)
+    return false
   if (
-    prev.type === 'Preview' &&
-    prev.item.index === (next.item as SubtitlesCardBase).index
+    oldCurrentSelection.type === 'Clip' &&
+    oldCurrentSelection.id ===
+      (itemAtCurrentSelectionPosition as typeof oldCurrentSelection).id
   )
-    return next
+    return true
+  if (
+    oldCurrentSelection.type === 'Preview' &&
+    oldCurrentSelection.index ===
+      (itemAtCurrentSelectionPosition as typeof oldCurrentSelection).index
+  )
+    return true
 
-  return null
+  return false
 }
 
 export const getBlankFields = (state: AppState) =>

@@ -198,11 +198,7 @@ const updateSelectionAfterLink: AppEpic = (
           ) {
             setCurrentTime(msToSeconds(newSelection.item.start))
           }
-          return of(
-            newSelection
-              ? r.selectWaveformItem(newSelection)
-              : r.clearWaveformSelection()
-          )
+          return newSelection ? of(r.selectWaveformItem(newSelection)) : EMPTY
         }
 
         return EMPTY

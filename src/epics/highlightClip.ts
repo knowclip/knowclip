@@ -9,7 +9,7 @@ const deselectOnOpenMediaFile: AppEpic = (action$) =>
   action$.pipe(
     ofType<Action, OpenFileRequest>(A.openFileRequest),
     filter(({ file }) => file.type === 'MediaFile'),
-    map(() => r.clearWaveformSelection())
+    map(() => r.selectWaveformItem(null))
   )
 
 const highlightRightEpic: AppEpic = (
@@ -103,7 +103,6 @@ const highlightLeftEpic: AppEpic = (
         waveformItems[waveformItems.length - 1]
 
       if (prev) {
-        const x = prev
         setCurrentTime(msToSeconds(prev.item.start))
         return r.isMediaFileLoaded(state)
           ? EMPTY

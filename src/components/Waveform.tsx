@@ -159,7 +159,7 @@ const Waveform = ({
 
   const handleMouseWheel: React.WheelEventHandler = useCallback(
     (e) => {
-      dispatchViewState({ type: 'zoom', delta: e.deltaY })
+      dispatchViewState({ type: 'ZOOM', delta: e.deltaY })
     },
     [dispatchViewState]
   )
@@ -300,10 +300,6 @@ function PendingWaveformItem({
   )
 }
 
-const setPendingAction = (action: WaveformDragAction | null) => ({
-  type: 'setPendingAction' as const,
-  action,
-})
 function useWaveformMouseActions(
   svgRef: React.RefObject<SVGSVGElement>,
   waveform: ViewState,
@@ -332,7 +328,7 @@ function useWaveformMouseActions(
           pixelsPerSecond
         )
         const x = Math.min(durationMilliseconds, msAtMouse)
-        dispatch({ type: 'continuePendingAction', ms: x })
+        dispatch({ type: 'CONTINUE_WAVEFORM_MOUSE_ACTION', ms: x })
       }
     }
     document.addEventListener('mousemove', handleMouseMoves)
@@ -362,50 +358,12 @@ function useWaveformMouseActions(
       document.dispatchEvent(waveformMousedown)
       const { dataset } = e.target as SVGGElement | SVGRectElement
 
-      if (
-        dataset &&
-        dataset.clipId &&
-        (Math.abs(Number(dataset.clipStart) - ms) <=
-          SELECTION_BORDER_MILLISECONDS ||
-          Math.abs(Number(dataset.clipEnd) - ms) <=
-            SELECTION_BORDER_MILLISECONDS)
-      ) {
-        dispatch(
-          setPendingAction({
-            type: 'STRETCH',
-            start: ms,
-            end: ms,
-            clipToStretch: {
-              id: dataset.clipId,
-              start: Number(dataset.clipStart),
-              end: Number(dataset.clipEnd),
-            },
-            viewState: waveform,
-          })
-        )
-      } else if (dataset && dataset.clipId)
-        dispatch(
-          setPendingAction({
-            type: 'MOVE',
-            start: ms,
-            end: ms,
-            clipToMove: {
-              id: dataset.clipId,
-              start: Number(dataset.clipStart),
-              end: Number(dataset.clipEnd),
-            },
-            viewState: waveform,
-          })
-        )
-      else
-        dispatch(
-          setPendingAction({
-            type: 'CREATE',
-            start: ms,
-            end: ms,
-            viewState: waveform,
-          })
-        )
+      const mousedownAction = getWaveformMousedownAction(dataset, ms, waveform)
+      if (mousedownAction)
+        dispatch({
+          type: 'START_WAVEFORM_MOUSE_ACTION',
+          action: mousedownAction,
+        })
 
       mouseIsDown.current = true
     },
@@ -416,9 +374,10 @@ function useWaveformMouseActions(
     const handleMouseUps = (e: MouseEvent) => {
       if (!mouseIsDown.current) return
       mouseIsDown.current = false
-      dispatch(setPendingAction(null))
-
-      // if (!pendingAction) return console.log('NO PENDING ACTION')
+      dispatch({
+        type: 'START_WAVEFORM_MOUSE_ACTION' as const,
+        action: null,
+      })
 
       const svg = svgRef.current
       if (!svg) return
@@ -429,7 +388,6 @@ function useWaveformMouseActions(
         waveform.viewBoxStartMs,
         pixelsPerSecond
       )
-      // not right, first below should be X and not MS
       const ms = Math.min(durationMilliseconds, msAtMouse)
       const { dataset } = e.target as SVGGElement | SVGRectElement
 
@@ -440,6 +398,8 @@ function useWaveformMouseActions(
           dataset,
           ms
         )
+
+        console.log({ newTime })
 
         playerRef.current.currentTime = msToSeconds(newTime)
         if (!pendingAction) setCursorX(msToPixels(newTime, pixelsPerSecond))
@@ -477,6 +437,50 @@ function useWaveformMouseActions(
 export default Waveform
 
 export { $ as waveform$ }
+
+function getWaveformMousedownAction(
+  dataset: DOMStringMap,
+  ms: number,
+  waveform: ViewState
+) {
+  if (
+    dataset &&
+    dataset.clipId &&
+    (Math.abs(Number(dataset.clipStart) - ms) <=
+      SELECTION_BORDER_MILLISECONDS ||
+      Math.abs(Number(dataset.clipEnd) - ms) <= SELECTION_BORDER_MILLISECONDS)
+  ) {
+    return {
+      type: 'STRETCH' as const,
+      start: ms,
+      end: ms,
+      clipToStretch: {
+        id: dataset.clipId,
+        start: Number(dataset.clipStart),
+        end: Number(dataset.clipEnd),
+      },
+      viewState: waveform,
+    }
+  } else if (dataset && dataset.clipId)
+    return {
+      type: 'MOVE' as const,
+      start: ms,
+      end: ms,
+      clipToMove: {
+        id: dataset.clipId,
+        start: Number(dataset.clipStart),
+        end: Number(dataset.clipEnd),
+      },
+      viewState: waveform,
+    }
+  else
+    return {
+      type: 'CREATE' as const,
+      start: ms,
+      end: ms,
+      viewState: waveform,
+    }
+}
 
 function getTimeAfterMouseUp(
   pendingAction: WaveformDragAction | null,

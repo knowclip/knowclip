@@ -83,7 +83,7 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         )
           return of(r.setLoop(false))
 
-        return of(r.clearWaveformSelection())
+        return EMPTY
       }
 
       return EMPTY

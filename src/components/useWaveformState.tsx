@@ -1,7 +1,9 @@
-import { useCallback, useMemo, useReducer, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { WaveformSelectionExpanded } from '../selectors'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
+import { usePrevious } from '../utils/usePrevious'
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
+import { useWaveformMediaTimeUpdate } from './useWaveformMediaTimeUpdate'
 
 const initialState: ViewState = {
   cursorMs: 0,
@@ -24,12 +26,12 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
   const [state, dispatch] = useReducer(updateViewState, initialState)
   const resetWaveformState = useCallback(
     (media: HTMLVideoElement | HTMLAudioElement | null) => {
-      dispatch({ type: 'reset', durationSeconds: media?.duration || 0 })
+      dispatch({ type: 'RESET', durationSeconds: media?.duration || 0 })
     },
     [dispatch]
   )
 
-  return {
+  const waveformInterface = {
     svgRef,
     state,
     dispatch,
@@ -50,31 +52,42 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
     ),
     waveformItems: waveformItems,
   }
+
+  return {
+    onTimeUpdate: useWaveformMediaTimeUpdate(
+      svgRef,
+      dispatch,
+      waveformItems,
+      state
+    ),
+    ...waveformInterface,
+  }
 }
 
 export type SetWaveformCursorPosition = {
-  type: 'SET_CURSOR_POSITION'
+  type: 'NAVIGATE_TO_TIME'
   ms: number
-  newViewBoxStartMs?: number | undefined
-  newSelection?: WaveformSelection | null | undefined
+  viewBoxStartMs?: number
+  selection?: WaveformSelection | null
 }
 export type WaveformAction =
   | SetWaveformCursorPosition
-  | { type: 'setPendingAction'; action: WaveformDragAction | null }
-  | { type: 'continuePendingAction'; ms: number }
-  | { type: 'reset'; durationSeconds: number }
-  | { type: 'zoom'; delta: number }
+  | { type: 'START_WAVEFORM_MOUSE_ACTION'; action: WaveformDragAction | null }
+  | { type: 'CONTINUE_WAVEFORM_MOUSE_ACTION'; ms: number }
+  | { type: 'CLEAR_WAVEFORM_MOUSE_ACTION' }
+  | { type: 'RESET'; durationSeconds: number }
+  | { type: 'ZOOM'; delta: number }
 
 function updateViewState(state: ViewState, action: WaveformAction): ViewState {
   switch (action.type) {
-    case 'reset':
+    case 'RESET':
       return { ...initialState, durationSeconds: action.durationSeconds }
-    case 'setPendingAction':
+    case 'START_WAVEFORM_MOUSE_ACTION':
       return {
         ...state,
         pendingAction: action.action,
       }
-    case 'continuePendingAction':
+    case 'CONTINUE_WAVEFORM_MOUSE_ACTION':
       return {
         ...state,
         pendingAction: state.pendingAction
@@ -84,28 +97,20 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
             }
           : null,
       }
-    case 'SET_CURSOR_POSITION': {
-      const newViewBoxStartMs =
-        typeof action.newViewBoxStartMs === 'number'
-          ? action.newViewBoxStartMs
-          : state.viewBoxStartMs
-      console.log(
-        'cursorMs:',
-        `${action.ms}`.padStart(10, ' '),
-        'newViewBoxStartMs',
-        newViewBoxStartMs
-      )
+    case 'NAVIGATE_TO_TIME': {
+      const { ms, viewBoxStartMs, selection } = action
       return {
         ...state,
-        cursorMs: action.ms,
-        viewBoxStartMs: newViewBoxStartMs,
+        cursorMs: ms,
+        viewBoxStartMs:
+          typeof viewBoxStartMs === 'number'
+            ? viewBoxStartMs
+            : state.viewBoxStartMs,
         selection:
-          typeof action.newSelection === 'undefined'
-            ? state.selection
-            : action.newSelection,
+          typeof selection !== 'undefined' ? selection : state.selection,
       }
     }
-    case 'zoom':
+    case 'ZOOM':
       return {
         ...state,
         pixelsPerSecond: Math.max(

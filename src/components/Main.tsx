@@ -15,7 +15,7 @@ import waveformCss from '../components/Waveform.module.css'
 import * as r from '../selectors'
 import { setMousePosition } from '../utils/mousePosition'
 import { useWaveformState } from './useWaveformState'
-import { useWaveformMediaTimeUpdate } from './useWaveformMediaTimeUpdate'
+import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
   container = 'main-screen-container',
@@ -58,8 +58,9 @@ const Main = () => {
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
   const waveform = useWaveformState(waveformItems)
-  const { svgRef, resetWaveformState } = waveform
-  const { onTimeUpdate } = useWaveformMediaTimeUpdate(svgRef, waveform)
+  const { onTimeUpdate, resetWaveformState } = waveform
+
+  useWaveformSelectionSyncWithRedux(waveform, playerRef)
 
   if (!currentProject) return <Redirect to="/projects" />
 

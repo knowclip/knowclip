@@ -11,7 +11,6 @@ const KEYBOARD_SHORTCUTS = {
   'Select next': '→',
   'Select previous (while editing)': 'Alt + ←',
   'Select next (while editing)': 'Alt + →',
-  'Deselect current': 'Esc',
   'Look up word at mouse cursor': 'D',
   'Close dictionary popover': 'Esc',
   'Start editing fields': 'E',
@@ -68,7 +67,6 @@ const KeyboardShortcuts = () => {
               <Shortcut action="Select next" />
               <Shortcut action="Select previous (while editing)" />
               <Shortcut action="Select next (while editing)" />
-              <Shortcut action="Deselect current" />
             </section>
 
             <section className={css.group}>

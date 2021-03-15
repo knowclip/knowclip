@@ -25,7 +25,7 @@ export const clipsActions = {
     fileId,
   }),
 
-  // SHOULD ONLY BE USED WITH NULL IF LOCAL SELECTION TRIGGERS IT?
+  /** Pass `null` to indicate waveform reset */
   selectWaveformItem: (selection: WaveformSelection | null) => ({
     type: A.selectWaveformItem,
     selection,
@@ -111,8 +111,6 @@ export const clipsActions = {
   }),
 }
 
-const clearWaveformSelection = () => clipsActions.selectWaveformItem(null)
-
 const addFlashcardImage = (id: ClipId, seconds?: number) => {
   const image: FlashcardImage = seconds
     ? {
@@ -162,7 +160,6 @@ const removeClozeDeletion = (
   })
 
 export const compositeClipsActions = {
-  clearWaveformSelection,
   addFlashcardImage,
   removeFlashcardImage,
   addClozeDeletion,
