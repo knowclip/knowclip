@@ -86,6 +86,12 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return EMPTY
       }
 
+      const highlightedClipId = r.getHighlightedClipId(state$.value)
+      if (key === KEYS.dUppercase && ctrlKey && highlightedClipId) {
+        event.preventDefault()
+        return of(r.deleteCard(highlightedClipId))
+      }
+
       return EMPTY
     })
   )
