@@ -5,6 +5,8 @@ import r from '../redux'
 import { extname, basename, join } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
+import packageJson from '../../package.json'
+import { pixelsToMs, secondsToPixels } from './waveform'
 
 const { readFile, writeFile } = promises
 
@@ -240,7 +242,7 @@ export const validateSubtitlesFromFilePath = async (
       parsed.length && typeof endCue === 'number'
         ? {
             count: parsed.length,
-            endCue: endCue,
+            endCueMs: endCue,
           }
         : null
 
@@ -248,11 +250,15 @@ export const validateSubtitlesFromFilePath = async (
       if (chunksMetadata.count !== parsed.length)
         differences.push({ attribute: 'count', name: 'number of cues' })
 
-      // if (chunksMetadata.endCue !== endCue)
-      //   differences.push({ attribute: 'endCue', name: 'timing' })
+      if (
+        'endCue' in chunksMetadata
+          ? chunksMetadata.endCue * 20 !== endCue
+          : chunksMetadata.endCueMs !== endCue
+      ) {
+        differences.push({ attribute: 'endCue', name: 'timing' })
+      }
 
       if (differences.length) {
-        console.log({ differences })
         return {
           differences,
           newChunksMetadata,
