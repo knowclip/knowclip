@@ -102,7 +102,7 @@ const clipStretchEpic: AppEpic = (
 
           const newCard = r.getNewFlashcardForStretchedClip(
             state$.value,
-            action.viewState,
+            action.waveformState,
             r.getCurrentNoteType(state$.value) as NoteType,
             stretchedClip,
             r.getFlashcard(state$.value, stretchedClip.id) as Flashcard,
@@ -126,7 +126,7 @@ const clipStretchEpic: AppEpic = (
         if (originKey === 'end' && stretchedClip && end > stretchedClip.start) {
           const newCard = r.getNewFlashcardForStretchedClip(
             state$.value,
-            action.viewState,
+            action.waveformState,
             r.getCurrentNoteType(state$.value) as NoteType,
             stretchedClip,
             r.getFlashcard(state$.value, stretchedClip.id) as Flashcard,

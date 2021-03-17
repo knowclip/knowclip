@@ -93,7 +93,7 @@ const Waveform = ({
   }))
 
   const {
-    state: viewState,
+    state: waveformState,
     dispatch: dispatchViewState,
     svgRef,
     visibleWaveformItems,
@@ -107,7 +107,7 @@ const Waveform = ({
     [dispatch]
   )
 
-  const { viewBoxStartMs, pixelsPerSecond } = viewState
+  const { viewBoxStartMs, pixelsPerSecond } = waveformState
   const subtitles = useMemo(() => {
     return {
       ...allSubtitles,
@@ -128,7 +128,7 @@ const Waveform = ({
 
   const { handleMouseDown, pendingActionRef } = useWaveformMouseActions(
     svgRef,
-    viewState,
+    waveformState,
     pixelsPerSecond,
     playerRef,
     dispatchViewState
@@ -180,7 +180,10 @@ const Waveform = ({
           fill="#222222"
           x={0}
           y={0}
-          width={secondsToPixels(viewState.durationSeconds, pixelsPerSecond)}
+          width={secondsToPixels(
+            waveformState.durationSeconds,
+            pixelsPerSecond
+          )}
           height={height}
         />
         <Clips
@@ -190,9 +193,9 @@ const Waveform = ({
           playerRef={playerRef}
           pixelsPerSecond={pixelsPerSecond}
         />
-        {viewState.pendingAction && (
+        {waveformState.pendingAction && (
           <PendingWaveformItem
-            action={viewState.pendingAction}
+            action={waveformState.pendingAction}
             height={height}
             rectRef={pendingActionRef}
             pixelsPerSecond={pixelsPerSecond}
@@ -210,7 +213,7 @@ const Waveform = ({
           />
         )}
         <Cursor
-          x={msToPixels(viewState.cursorMs, pixelsPerSecond)}
+          x={msToPixels(waveformState.cursorMs, pixelsPerSecond)}
           height={height}
           strokeWidth={1}
         />
@@ -407,7 +410,7 @@ function useWaveformMouseActions(
         const finalAction = {
           ...pendingAction,
           end: ms,
-          viewState: waveform,
+          waveformState: waveform,
         }
         document.dispatchEvent(new WaveformDragEvent(finalAction))
       }
@@ -456,7 +459,7 @@ function getWaveformMousedownAction(
         start: Number(dataset.clipStart),
         end: Number(dataset.clipEnd),
       },
-      viewState: waveform,
+      waveformState: waveform,
     }
   } else if (dataset && dataset.clipId)
     return {
@@ -468,14 +471,14 @@ function getWaveformMousedownAction(
         start: Number(dataset.clipStart),
         end: Number(dataset.clipEnd),
       },
-      viewState: waveform,
+      waveformState: waveform,
     }
   else
     return {
       type: 'CREATE' as const,
       start: ms,
       end: ms,
-      viewState: waveform,
+      waveformState: waveform,
     }
 }
 

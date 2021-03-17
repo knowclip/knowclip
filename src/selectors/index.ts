@@ -6,7 +6,6 @@ export * from './session'
 export * from './files'
 export * from './settings'
 
-export * from './waveformTime'
 export * from './currentMedia'
 export * from './project'
 export * from './highlightedClip'

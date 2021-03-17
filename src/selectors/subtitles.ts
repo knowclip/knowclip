@@ -247,7 +247,7 @@ export const getSubtitlesFlashcardFieldLinks = (
 
 export const getNewFlashcardForStretchedClip = (
   state: AppState,
-  viewState: WaveformState,
+  waveformState: WaveformState,
   noteType: NoteType,
   { start, end }: Clip,
   flashcard: Flashcard,
