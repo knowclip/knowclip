@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { pixelsToMs } from '../selectors'
+import { pixelsToMs } from './waveform'
 
 // TODO: FIX like below
 const toWaveformXRaw = (

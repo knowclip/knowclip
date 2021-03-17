@@ -5,7 +5,7 @@ import WaveformMousedownEvent, {
   WaveformDragEvent,
   WaveformDragStretch,
 } from '../utils/WaveformMousedownEvent'
-import { msToSeconds } from '../selectors'
+import { msToSeconds, CLIP_THRESHOLD_MILLSECONDS } from '../utils/waveform'
 
 const STRETCH_START_DELAY = 100
 
@@ -97,7 +97,7 @@ const clipStretchEpic: AppEpic = (
         if (originKey === 'start' && stretchedClip && stretchedClip.end > end) {
           const start = Math.min(
             end,
-            stretchedClip.end - r.CLIP_THRESHOLD_MILLSECONDS
+            stretchedClip.end - CLIP_THRESHOLD_MILLSECONDS
           )
 
           const newCard = r.getNewFlashcardForStretchedClip(
@@ -143,7 +143,7 @@ const clipStretchEpic: AppEpic = (
               {
                 end: Math.max(
                   end,
-                  stretchedClip.start + r.CLIP_THRESHOLD_MILLSECONDS
+                  stretchedClip.start + CLIP_THRESHOLD_MILLSECONDS
                 ),
               },
               newCard !==

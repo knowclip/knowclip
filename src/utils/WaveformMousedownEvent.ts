@@ -1,5 +1,5 @@
 import { MouseEvent } from 'react'
-import { msToSeconds } from '../selectors'
+import { msToSeconds } from './waveform'
 
 export default class WaveformMousedownEvent extends Event {
   milliseconds: number

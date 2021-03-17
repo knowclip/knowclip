@@ -6,7 +6,7 @@ import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { uuid } from '../utils/sideEffects'
 import { getUpdateWith } from '../files/updates'
-import { msToSeconds } from '../selectors'
+import { msToSeconds } from '../utils/waveform'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$

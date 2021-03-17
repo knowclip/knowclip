@@ -3,16 +3,18 @@ import cn from 'classnames'
 import { useDispatch } from 'react-redux'
 import r from '../redux'
 import css from './Waveform.module.css'
-import { setCursorX } from '../utils/waveform'
 import {
   msToPixels,
-  SubtitlesCardBases,
+  setCursorX,
   SUBTITLES_CHUNK_HEIGHT,
-  WaveformSelectionExpanded,
   WAVEFORM_HEIGHT,
-} from '../selectors'
+} from '../utils/waveform'
 import { $ } from './Waveform'
-import { SubtitlesCardBase } from '../selectors'
+import {
+  SubtitlesCardBase,
+  SubtitlesCardBases,
+  WaveformSelectionExpanded,
+} from '../selectors'
 
 export const SubtitlesTimelines = memo(
   ({

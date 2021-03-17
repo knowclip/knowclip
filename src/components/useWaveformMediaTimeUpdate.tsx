@@ -1,15 +1,10 @@
 import { useCallback, MutableRefObject, Dispatch } from 'react'
 import r from '../redux'
-import {
-  msToSeconds,
-  overlapsSignificantly,
-  pixelsToMs,
-  secondsToMs,
-  WaveformSelectionExpanded,
-} from '../selectors'
+import { overlapsSignificantly, WaveformSelectionExpanded } from '../selectors'
 import { WaveformAction } from './useWaveform'
 import { elementWidth } from '../utils/media'
 import { bound } from '../utils/bound'
+import { secondsToMs, msToSeconds, pixelsToMs } from '../utils/waveform'
 
 export function useWaveformMediaTimeUpdate(
   svgRef: MutableRefObject<SVGElement | null>,

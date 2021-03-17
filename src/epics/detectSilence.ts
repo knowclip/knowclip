@@ -6,7 +6,7 @@ import r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { ActionOf } from '../actions'
-import { secondsToMs } from '../selectors'
+import { secondsToMs } from '../utils/waveform'
 
 const detectSilence = (
   path: string,

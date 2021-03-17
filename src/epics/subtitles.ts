@@ -18,8 +18,9 @@ import A from '../types/ActionType'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
-import { msToSeconds, SubtitlesFileWithTrack } from '../selectors'
+import { SubtitlesFileWithTrack } from '../selectors'
 import { afterUpdates } from '../utils/afterUpdates'
+import { msToSeconds } from '../utils/waveform'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,

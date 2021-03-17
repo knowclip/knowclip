@@ -39,7 +39,7 @@ const ReviewAndExportMediaTableRow = memo(
     const {
       flashcard: { fields, tags, cloze },
       formattedClipTime,
-      clipTimeInSeconds: clipTime,
+      clipTimeInSeconds,
       isLoopOn,
       currentMediaFile,
     } = useSelector((state: AppState) => ({
@@ -57,13 +57,13 @@ const ReviewAndExportMediaTableRow = memo(
     )
 
     const selectClip = useCallback(() => {
-      if (currentMediaFile && !isHighlighted && clipTime) {
+      if (currentMediaFile && !isHighlighted && clipTimeInSeconds) {
         const mediaPlayer = document.getElementById(
           'mediaPlayer'
         ) as HTMLVideoElement | null
-        if (mediaPlayer) mediaPlayer.currentTime = clipTime.start
+        if (mediaPlayer) mediaPlayer.currentTime = clipTimeInSeconds.start
       }
-    }, [clipTime, currentMediaFile, isHighlighted])
+    }, [clipTimeInSeconds, currentMediaFile, isHighlighted])
 
     const startEditing = useCallback(() => {
       selectClip()
@@ -91,7 +91,7 @@ const ReviewAndExportMediaTableRow = memo(
             className={$.clipCheckboxes}
           />
         </section>
-        <section className={css.clipTime}>
+        <section className={css.clipTimeInSeconds}>
           <span className={css.clipTimeText}>{formattedClipTime}</span>
           <IconButton className={css.editButton} onClick={startEditing}>
             <Edit />

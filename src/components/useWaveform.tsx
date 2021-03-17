@@ -1,11 +1,8 @@
 import { useCallback, useMemo, useReducer, useRef } from 'react'
-import {
-  pixelsToMs,
-  secondsToMs,
-  WaveformSelectionExpanded,
-} from '../selectors'
+import { WaveformSelectionExpanded } from '../selectors'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
 import { bound } from '../utils/bound'
+import { pixelsToMs, secondsToMs } from '../utils/waveform'
 
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
 import { useWaveformMediaTimeUpdate } from './useWaveformMediaTimeUpdate'

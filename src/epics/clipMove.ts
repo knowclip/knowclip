@@ -5,7 +5,7 @@ import WaveformMousedownEvent, {
   WaveformDragEvent,
   WaveformDragMove,
 } from '../utils/WaveformMousedownEvent'
-import { msToSeconds } from '../selectors'
+import { msToSeconds } from '../utils/waveform'
 
 const MOVE_START_DELAY = 400
 

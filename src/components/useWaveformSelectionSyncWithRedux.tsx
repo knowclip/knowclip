@@ -4,7 +4,7 @@ import { WaveformInterface } from './useWaveform'
 import { usePrevious } from '../utils/usePrevious'
 import { useDispatch, useSelector } from 'react-redux'
 import { areSelectionsEqual } from '../utils/waveformSelection'
-import { msToSeconds } from '../selectors'
+import { msToSeconds } from '../utils/waveform'
 
 export function useWaveformSelectionSyncWithRedux(
   waveform: WaveformInterface,

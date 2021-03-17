@@ -5,8 +5,8 @@ import {
   WaveformDragEvent,
   WaveformDragCreate,
 } from '../utils/WaveformMousedownEvent'
-import { msToSeconds } from '../selectors'
 import { uuid } from '../utils/sideEffects'
+import { CLIP_THRESHOLD_MILLSECONDS, msToSeconds } from '../utils/waveform'
 
 const clipCreateEpic: AppEpic = (
   action$,
@@ -40,7 +40,7 @@ const clipCreateEpic: AppEpic = (
         pendingClipOverlaps ||
         !(
           Math.abs(pendingClip.end - pendingClip.start) >=
-          r.CLIP_THRESHOLD_MILLSECONDS
+          CLIP_THRESHOLD_MILLSECONDS
         )
 
       const newTime = msToSeconds(tooSmall ? right : left)

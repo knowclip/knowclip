@@ -15,22 +15,22 @@ import WaveformMousedownEvent, {
   WaveformDragAction,
   WaveformDragEvent,
 } from '../utils/WaveformMousedownEvent'
-import { setCursorX } from '../utils/waveform'
 import {
   msToPixels,
   msToSeconds,
   secondsToMs,
   secondsToPixels,
   SELECTION_BORDER_MILLISECONDS,
-  SubtitlesCardBase,
+  setCursorX,
   SUBTITLES_CHUNK_HEIGHT,
   WAVEFORM_HEIGHT,
-} from '../selectors'
+} from '../utils/waveform'
 import { SubtitlesTimelines } from './WaveformSubtitlesTimelines'
 import { Clips } from './WaveformClips'
 import { useWaveform, WaveformAction } from './useWaveform'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
 import { elementWidth } from '../utils/media'
+import { SubtitlesCardBase } from '../selectors'
 
 export enum $ {
   container = 'waveform-container',

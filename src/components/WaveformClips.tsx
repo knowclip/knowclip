@@ -3,11 +3,11 @@ import cn from 'classnames'
 import css from './Waveform.module.css'
 import { $ } from './Waveform'
 import {
-  SELECTION_BORDER_MILLISECONDS,
   msToPixels,
   msToSeconds,
-} from '../selectors'
-import { setCursorX } from '../utils/waveform'
+  SELECTION_BORDER_MILLISECONDS,
+  setCursorX,
+} from '../utils/waveform'
 
 type ClipProps = {
   id: string
