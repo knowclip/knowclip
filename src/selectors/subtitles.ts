@@ -6,7 +6,6 @@ import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
-import { secondsToMs } from '../utils/waveform'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,

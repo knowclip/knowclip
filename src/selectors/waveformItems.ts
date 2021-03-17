@@ -1,9 +1,5 @@
 import { createSelector } from 'reselect'
-import {
-  getSubtitlesCardBases,
-  WaveformSelectionExpanded,
-  SubtitlesCardBase,
-} from './cardPreview'
+import { getSubtitlesCardBases, WaveformSelectionExpanded } from './cardPreview'
 import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
 import {
   overlapsSignificantly,

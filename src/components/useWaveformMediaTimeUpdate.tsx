@@ -24,7 +24,6 @@ export function useWaveformMediaTimeUpdate(
 
       const newMilliseconds = secondsToMs(media.currentTime)
       const currentSelection = state.selection
-      // tODO: optimize
       const selectionItem = getSelectionWaveformItem(
         waveformItems,
         currentSelection

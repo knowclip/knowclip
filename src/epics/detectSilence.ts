@@ -90,10 +90,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         chunks.forEach(({ start, end }) => {
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
-            {
-              start: start,
-              end: end,
-            },
+            { start, end },
             fileId,
             uuid(),
             currentNoteType === 'Simple'

@@ -1,5 +1,4 @@
 import newFlashcard from '../utils/newFlashcard'
-import { WaveformDragCreate } from '../utils/WaveformMousedownEvent'
 import { getDefaultTags, getDefaultIncludeStill } from './session'
 
 const ascending = (a: number, b: number) => a - b

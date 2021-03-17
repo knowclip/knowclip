@@ -116,8 +116,7 @@ const clipStretchEpic: AppEpic = (
               {
                 start,
               },
-              newCard !==
-                (r.getFlashcard(state$.value, stretchedClip.id) as Flashcard)
+              newCard !== r.getFlashcard(state$.value, stretchedClip.id)
                 ? newCard
                 : null
             ),
@@ -135,7 +134,6 @@ const clipStretchEpic: AppEpic = (
             'APPEND'
           )
           setCurrentTime(msToSeconds(stretchedClip.start))
-          console.log('setting time', msToSeconds(stretchedClip.start))
 
           return from([
             r.editClip(
