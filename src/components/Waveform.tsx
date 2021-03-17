@@ -71,10 +71,10 @@ const limitSubtitlesCardsBasesCardsToDisplayed = limitSelectorToDisplayedItems(
 
 const Waveform = ({
   playerRef,
-  waveformState,
+  waveform,
 }: {
   playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
-  waveformState: ReturnType<typeof useWaveformState>
+  waveform: ReturnType<typeof useWaveformState>
 }) => {
   const {
     images,
@@ -97,7 +97,7 @@ const Waveform = ({
     dispatch: dispatchViewState,
     svgRef,
     visibleWaveformItems,
-  } = waveformState
+  } = waveform
 
   const dispatch = useDispatch()
   const goToSubtitlesChunk = useCallback(
@@ -125,13 +125,6 @@ const Waveform = ({
     msToPixels(viewBoxStartMs, pixelsPerSecond),
     height
   )
-
-  // handleStartClip
-  // handleEndClip
-  // handleStartMove
-  // handleEndMove
-  // handleSTartStretch
-  // handleEndStretch
 
   const { handleMouseDown, pendingActionRef } = useWaveformMouseActions(
     svgRef,
@@ -333,8 +326,8 @@ function useWaveformMouseActions(
           waveform.viewBoxStartMs,
           pixelsPerSecond
         )
-        const x = Math.min(durationMilliseconds, msAtMouse)
-        dispatch({ type: 'CONTINUE_WAVEFORM_MOUSE_ACTION', ms: x })
+        const ms = Math.min(durationMilliseconds, msAtMouse)
+        dispatch({ type: 'CONTINUE_WAVEFORM_MOUSE_ACTION', ms })
       }
     }
     document.addEventListener('mousemove', handleMouseMoves)
@@ -360,7 +353,7 @@ function useWaveformMouseActions(
         pixelsPerSecond
       )
       const ms = Math.min(durationMilliseconds, msAtMouse)
-      const waveformMousedown = new WaveformMousedownEvent(e, ms / 1000)
+      const waveformMousedown = new WaveformMousedownEvent(e, ms)
       document.dispatchEvent(waveformMousedown)
       const { dataset } = e.target as SVGGElement | SVGRectElement
 
@@ -416,10 +409,8 @@ function useWaveformMouseActions(
           end: ms,
           viewState: waveform,
         }
-        console.log('DRAGEEVENT', { finalAction })
         document.dispatchEvent(new WaveformDragEvent(finalAction))
       }
-      // if (!pendingAction) throw new Error('Problem with waveform drag event--no drag start registered')
     }
     document.addEventListener('mouseup', handleMouseUps)
     return () => document.removeEventListener('mouseup', handleMouseUps)
@@ -499,7 +490,6 @@ function getTimeAfterMouseUp(
     (waveformSelection?.type !== 'Clip' ||
       waveformSelection.id !== dataset.clipId)
   if (clipIsToBeNewlySelected) {
-    console.log(dataset.clipStart)
     return Number(dataset.clipStart)
   }
 

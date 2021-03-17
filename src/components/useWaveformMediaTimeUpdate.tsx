@@ -14,6 +14,7 @@ import { bound } from '../utils/bound'
 export function useWaveformMediaTimeUpdate(
   svgRef: MutableRefObject<SVGElement | null>,
   dispatch: Dispatch<WaveformAction>,
+  visibleWaveformItems: WaveformSelectionExpanded[],
   waveformItems: WaveformSelectionExpanded[],
   state: ViewState
 ) {
@@ -29,9 +30,10 @@ export function useWaveformMediaTimeUpdate(
       const newMilliseconds = secondsToMs(media.currentTime)
       const currentSelection = state.selection
       // tODO: optimize
-      const selectionItem = waveformItems.find(
-        (item) => item.index === currentSelection?.index
-      )?.item
+      const selectionItem = getSelectionWaveformItem(
+        waveformItems,
+        currentSelection
+      )
       const expandedSelection: WaveformSelectionExpanded | null =
         currentSelection && selectionItem
           ? ({
@@ -89,6 +91,15 @@ export function useWaveformMediaTimeUpdate(
     },
     [dispatch, svgRef, state, waveformItems]
   )
+}
+
+function getSelectionWaveformItem(
+  waveformItems: WaveformSelectionExpanded[],
+  currentSelection: WaveformSelection | null
+) {
+  return currentSelection
+    ? waveformItems[currentSelection.index]?.item || null
+    : null
 }
 
 function isValidNewSelection(

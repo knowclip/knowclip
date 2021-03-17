@@ -36,32 +36,35 @@ export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
     [dispatch]
   )
 
+  const visibleWaveformItems = useMemo(
+    () =>
+      limitWaveformItemsToDisplayed(
+        waveformItems,
+        state.viewBoxStartMs,
+        state.pixelsPerSecond
+      ),
+    [
+      limitWaveformItemsToDisplayed,
+      waveformItems,
+      state.viewBoxStartMs,
+      state.pixelsPerSecond,
+    ]
+  )
+
   const waveformInterface = {
     svgRef,
     state,
     dispatch,
     resetWaveformState,
-    visibleWaveformItems: useMemo(
-      () =>
-        limitWaveformItemsToDisplayed(
-          waveformItems,
-          state.viewBoxStartMs,
-          state.pixelsPerSecond
-        ),
-      [
-        limitWaveformItemsToDisplayed,
-        waveformItems,
-        state.viewBoxStartMs,
-        state.pixelsPerSecond,
-      ]
-    ),
-    waveformItems: waveformItems,
+    visibleWaveformItems,
+    waveformItems,
   }
 
   return {
     onTimeUpdate: useWaveformMediaTimeUpdate(
       svgRef,
       dispatch,
+      visibleWaveformItems,
       waveformItems,
       state
     ),

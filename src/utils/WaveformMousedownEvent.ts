@@ -1,19 +1,20 @@
 import { MouseEvent } from 'react'
+import { msToSeconds } from '../selectors'
 
 export default class WaveformMousedownEvent extends Event {
-  seconds: number
+  milliseconds: number
   browserMousedown: MouseEvent<SVGElement>
   svg: SVGElement
 
-  constructor(browserMousedown: MouseEvent<SVGElement>, seconds: number) {
+  constructor(browserMousedown: MouseEvent<SVGElement>, milliseconds: number) {
     super('waveformMousedown')
     this.browserMousedown = browserMousedown
     this.svg = browserMousedown.currentTarget
-    this.seconds = seconds
+    this.milliseconds = milliseconds
   }
 
-  get milliseconds() {
-    return this.seconds * 1000
+  get seconds() {
+    return msToSeconds(this.milliseconds)
   }
 }
 

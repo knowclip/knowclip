@@ -110,7 +110,7 @@ const Main = () => {
 
       {currentMediaFile && !mediaIsEffectivelyLoading ? (
         <Waveform
-          waveformState={waveform}
+          waveform={waveform}
           playerRef={playerRef}
           key={currentMediaFile.id}
         />
