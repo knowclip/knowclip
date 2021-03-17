@@ -8,7 +8,7 @@ const WAVE_COLOR = '#b7cee0'
 const BG_COLOR = '#00000000'
 const CORRECTION_OFFSET = 0
 
-export const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
+const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
 
 export const getWaveformPng = async (
   state: AppState,

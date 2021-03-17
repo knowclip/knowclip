@@ -1,7 +1,12 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { WaveformSelectionExpanded } from '../selectors'
+import { useCallback, useMemo, useReducer, useRef } from 'react'
+import {
+  pixelsToMs,
+  secondsToMs,
+  WaveformSelectionExpanded,
+} from '../selectors'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
-import { usePrevious } from '../utils/usePrevious'
+import { bound } from '../utils/bound'
+
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
 import { useWaveformMediaTimeUpdate } from './useWaveformMediaTimeUpdate'
 
@@ -76,7 +81,7 @@ export type WaveformAction =
   | { type: 'CONTINUE_WAVEFORM_MOUSE_ACTION'; ms: number }
   | { type: 'CLEAR_WAVEFORM_MOUSE_ACTION' }
   | { type: 'RESET'; durationSeconds: number }
-  | { type: 'ZOOM'; delta: number }
+  | { type: 'ZOOM'; delta: number; svgWidth: number }
 
 function updateViewState(state: ViewState, action: WaveformAction): ViewState {
   switch (action.type) {
@@ -110,14 +115,31 @@ function updateViewState(state: ViewState, action: WaveformAction): ViewState {
           typeof selection !== 'undefined' ? selection : state.selection,
       }
     }
-    case 'ZOOM':
+    case 'ZOOM': {
+      const newPixelsPerSecond = bound(state.pixelsPerSecond + action.delta, [
+        10,
+        200,
+      ])
+      const oldVisibleTimeSpan = pixelsToMs(
+        action.svgWidth,
+        state.pixelsPerSecond
+      )
+      const cursorScreenOffset = state.cursorMs - state.viewBoxStartMs
+      const cursorScreenOffsetRatio = cursorScreenOffset / oldVisibleTimeSpan
+      const newVisibleTimeSpan = pixelsToMs(action.svgWidth, newPixelsPerSecond)
+      const newCursorScreenOffset = Math.round(
+        cursorScreenOffsetRatio * newVisibleTimeSpan
+      )
+      const potentialNewViewBoxStartMs = state.cursorMs - newCursorScreenOffset
       return {
         ...state,
-        pixelsPerSecond: Math.max(
-          10,
-          Math.min(200, state.pixelsPerSecond + action.delta)
-        ),
+        pixelsPerSecond: newPixelsPerSecond,
+        viewBoxStartMs: bound(potentialNewViewBoxStartMs, [
+          0,
+          secondsToMs(state.durationSeconds) - newVisibleTimeSpan,
+        ]),
       }
+    }
     default:
       return state
   }

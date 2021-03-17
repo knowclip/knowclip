@@ -12,7 +12,8 @@ export function useWaveformSelectionSyncWithRedux(
 ) {
   const waveformDispatch = waveform.dispatch
   const dispatch = useDispatch()
-  const { remoteSelection } = useSelector((state: AppState) => ({
+  const { editing, remoteSelection } = useSelector((state: AppState) => ({
+    editing: r.isUserEditingCards(state),
     remoteSelection: r.getWaveformSelection(state),
   }))
 
@@ -35,6 +36,7 @@ export function useWaveformSelectionSyncWithRedux(
 
     if (localChange && notSyncedWithRemote) {
       dispatch(r.selectWaveformItem(currentLocalSelection))
+      if (currentLocalSelection && editing) dispatch(r.stopEditingCards())
     }
     if (remoteChange && notSyncedWithRemote) {
       if (remoteSelection) {
@@ -51,5 +53,6 @@ export function useWaveformSelectionSyncWithRedux(
     waveformDispatch,
     currentLocalSelection,
     mediaRef,
+    editing,
   ])
 }

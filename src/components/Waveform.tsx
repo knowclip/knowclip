@@ -30,7 +30,7 @@ import { SubtitlesTimelines } from './WaveformSubtitlesTimelines'
 import { Clips } from './WaveformClips'
 import { useWaveformState, WaveformAction } from './useWaveformState'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
-import { WAVEFORM_PNG_PIXELS_PER_SECOND } from '../utils/getWaveform'
+import { elementWidth } from '../utils/media'
 
 export enum $ {
   container = 'waveform-container',
@@ -142,16 +142,17 @@ const Waveform = ({
   )
 
   const imageBitmaps = useMemo(() => {
-    return images.map(({ path, x, file }) => (
+    return images.map(({ path, file }) => (
       <image
         key={file.id}
         xlinkHref={new URL(`file://${path}`).toString()}
         style={{ pointerEvents: 'none' }}
-        x={msToPixels(x, pixelsPerSecond)}
-        origin="0 0"
-        transform={`scale(${
-          1 * (pixelsPerSecond / WAVEFORM_PNG_PIXELS_PER_SECOND)
-        }, 1)`}
+        x={secondsToPixels(file.startSeconds, pixelsPerSecond)}
+        preserveAspectRatio="none"
+        width={secondsToPixels(
+          file.endSeconds - file.startSeconds,
+          pixelsPerSecond
+        )}
         height={WAVEFORM_HEIGHT}
       />
     ))
@@ -159,9 +160,14 @@ const Waveform = ({
 
   const handleMouseWheel: React.WheelEventHandler = useCallback(
     (e) => {
-      dispatchViewState({ type: 'ZOOM', delta: e.deltaY })
+      if (svgRef.current)
+        dispatchViewState({
+          type: 'ZOOM',
+          delta: e.deltaY,
+          svgWidth: elementWidth(svgRef.current),
+        })
     },
-    [dispatchViewState]
+    [dispatchViewState, svgRef]
   )
 
   return (

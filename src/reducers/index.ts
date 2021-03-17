@@ -194,6 +194,7 @@ function sessionAfterHistoryAction(
 ): SessionState {
   return {
     ...base,
+    editingCards: override.editingCards,
     loopMedia: override.loopMedia,
     defaultTags: override.defaultTags,
     defaultIncludeStill: override.defaultIncludeStill,

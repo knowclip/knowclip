@@ -9,9 +9,10 @@ import {
 } from '../selectors'
 import { WaveformAction } from './useWaveformState'
 import { elementWidth } from '../utils/media'
+import { bound } from '../utils/bound'
 
 export function useWaveformMediaTimeUpdate(
-  svgRef: any,
+  svgRef: MutableRefObject<SVGElement | null>,
   dispatch: Dispatch<WaveformAction>,
   waveformItems: WaveformSelectionExpanded[],
   state: ViewState
@@ -113,16 +114,18 @@ function isValidNewSelection(
 }
 
 function viewBoxStartMsOnTimeUpdate(
-  viewState: ViewState,
+  state: ViewState,
   newlySetMs: number,
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,
   seeking: boolean
 ): number {
-  const visibleTimeSpan = pixelsToMs(svgWidth, viewState.pixelsPerSecond)
+  if (state.pendingAction) return state.viewBoxStartMs
+
+  const visibleTimeSpan = pixelsToMs(svgWidth, state.pixelsPerSecond)
   const buffer = Math.round(visibleTimeSpan * 0.1)
 
-  const { viewBoxStartMs, durationSeconds } = viewState
+  const { viewBoxStartMs, durationSeconds } = state
   const durationMs = secondsToMs(durationSeconds)
 
   const currentRightEdge = viewBoxStartMs + visibleTimeSpan
@@ -151,9 +154,5 @@ function viewBoxStartMsOnTimeUpdate(
       return Math.max(0, newSelection.item.start - buffer)
   }
 
-  return viewState.viewBoxStartMs
-}
-
-function bound(number: number, [min, max]: [number, number]) {
-  return Math.max(min, Math.min(max, number))
+  return state.viewBoxStartMs
 }
