@@ -10,7 +10,7 @@ import { bound } from '../utils/bound'
 import { WaveformDragAction } from '../utils/WaveformMousedownEvent'
 import { useWaveformMediaTimeUpdate } from './useWaveformMediaTimeUpdate'
 
-const initialState: ViewState = {
+const initialState: WaveformState = {
   cursorMs: 0,
   durationSeconds: 0,
   viewBoxStartMs: 0,
@@ -19,9 +19,9 @@ const initialState: ViewState = {
   pendingAction: null,
 }
 
-export type WaveformInterface = ReturnType<typeof useWaveformState>
+export type WaveformInterface = ReturnType<typeof useWaveform>
 
-export function useWaveformState(waveformItems: WaveformSelectionExpanded[]) {
+export function useWaveform(waveformItems: WaveformSelectionExpanded[]) {
   const limitWaveformItemsToDisplayed = limitSelectorToDisplayedItems(
     (waveformItem: WaveformSelectionExpanded) => waveformItem.item.start,
     (waveformItem: WaveformSelectionExpanded) => waveformItem.item.end
@@ -86,7 +86,10 @@ export type WaveformAction =
   | { type: 'RESET'; durationSeconds: number }
   | { type: 'ZOOM'; delta: number; svgWidth: number }
 
-function updateViewState(state: ViewState, action: WaveformAction): ViewState {
+function updateViewState(
+  state: WaveformState,
+  action: WaveformAction
+): WaveformState {
   switch (action.type) {
     case 'RESET':
       return { ...initialState, durationSeconds: action.durationSeconds }

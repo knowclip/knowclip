@@ -7,7 +7,7 @@ import {
   secondsToMs,
   WaveformSelectionExpanded,
 } from '../selectors'
-import { WaveformAction } from './useWaveformState'
+import { WaveformAction } from './useWaveform'
 import { elementWidth } from '../utils/media'
 import { bound } from '../utils/bound'
 
@@ -16,7 +16,7 @@ export function useWaveformMediaTimeUpdate(
   dispatch: Dispatch<WaveformAction>,
   visibleWaveformItems: WaveformSelectionExpanded[],
   waveformItems: WaveformSelectionExpanded[],
-  state: ViewState
+  state: WaveformState
 ) {
   return useCallback(
     (
@@ -125,7 +125,7 @@ function isValidNewSelection(
 }
 
 function viewBoxStartMsOnTimeUpdate(
-  state: ViewState,
+  state: WaveformState,
   newlySetMs: number,
   svgWidth: number,
   newSelection: ReturnType<typeof r.getNewWaveformSelectionAt>,

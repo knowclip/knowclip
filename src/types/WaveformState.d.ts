@@ -1,4 +1,4 @@
-type ViewState = {
+type WaveformState = {
   durationSeconds: number
   cursorMs: number
   viewBoxStartMs: number

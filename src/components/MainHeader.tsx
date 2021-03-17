@@ -9,7 +9,7 @@ import headerCss from '../components/MainHeader.module.css'
 import { actions } from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 import { usePlayButtonSync } from './usePlayButtonSync'
-import { WaveformInterface } from './useWaveformState'
+import { WaveformInterface } from './useWaveform'
 
 enum $ {
   container = 'main-screen-header',

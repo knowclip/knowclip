@@ -1,6 +1,6 @@
 import { MutableRefObject, useEffect } from 'react'
 import r from '../redux'
-import { WaveformInterface } from './useWaveformState'
+import { WaveformInterface } from './useWaveform'
 import { usePrevious } from '../utils/usePrevious'
 import { useDispatch, useSelector } from 'react-redux'
 import { areSelectionsEqual } from '../utils/waveformSelection'

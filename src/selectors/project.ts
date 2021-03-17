@@ -18,7 +18,7 @@ import {
   ClipJson,
   ProjectJson,
 } from '../types/Project'
-import { msToSeconds } from './waveform'
+import { msToSeconds } from '../utils/waveform'
 
 const newestToOldest = (
   { lastOpened: a }: FileAvailability,
@@ -182,7 +182,7 @@ function getProjectClips<F extends FlashcardFields>(
         id,
         start: formatDurationWithMilliseconds(
           moment.duration({
-            seconds: start / 1000,
+            seconds: msToSeconds(start),
           })
         ),
         end: formatDurationWithMilliseconds(

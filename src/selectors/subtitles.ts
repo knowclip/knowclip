@@ -6,7 +6,7 @@ import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
-import { secondsToMs } from './waveform'
+import { secondsToMs } from '../utils/waveform'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,
@@ -193,25 +193,7 @@ export const readVttChunk = (
   text: (stripHtml(text) || '').trim(),
   index,
 })
-export const readParseSrtChunk = (
-  state: AppState,
-  {
-    start,
-    end,
-    text,
-    index,
-  }: {
-    start: number
-    end: number
-    text: string
-    index: number
-  }
-): SubtitlesChunk => ({
-  start: secondsToMs(start),
-  end: secondsToMs(end),
-  text: (stripHtml(text) || '').trim(),
-  index,
-})
+
 export const readSubsrtChunk = readVttChunk
 
 const HALF_SECOND = 500
@@ -266,7 +248,7 @@ export const getSubtitlesFlashcardFieldLinks = (
 
 export const getNewFlashcardForStretchedClip = (
   state: AppState,
-  viewState: ViewState,
+  viewState: WaveformState,
   noteType: NoteType,
   { start, end }: Clip,
   flashcard: Flashcard,

@@ -1,5 +1,5 @@
 export * from './clips'
-export * from './waveform'
+export * from '../utils/waveform'
 export * from './snackbar'
 export * from './dialog'
 export * from './subtitles'

@@ -1,4 +1,4 @@
-import { pixelsToMs } from './waveform'
+import { pixelsToMs } from '../utils/waveform'
 
 const MAX_WAVEFORM_VIEWPORT_WIDTH = 3000
 

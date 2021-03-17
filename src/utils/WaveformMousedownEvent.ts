@@ -36,19 +36,19 @@ export type WaveformDragCreate = {
   type: 'CREATE'
   start: number
   end: number
-  viewState: ViewState
+  viewState: WaveformState
 }
 export type WaveformDragMove = {
   type: 'MOVE'
   start: number
   end: number
   clipToMove: { id: ClipId; start: number; end: number }
-  viewState: ViewState
+  viewState: WaveformState
 }
 export type WaveformDragStretch = {
   type: 'STRETCH'
   start: number
   end: number
   clipToStretch: { id: ClipId; start: number; end: number }
-  viewState: ViewState
+  viewState: WaveformState
 }

@@ -28,7 +28,7 @@ import {
 } from '../selectors'
 import { SubtitlesTimelines } from './WaveformSubtitlesTimelines'
 import { Clips } from './WaveformClips'
-import { useWaveformState, WaveformAction } from './useWaveformState'
+import { useWaveform, WaveformAction } from './useWaveform'
 import { limitSelectorToDisplayedItems } from '../selectors/limitSelectorToDisplayedItems'
 import { elementWidth } from '../utils/media'
 
@@ -74,7 +74,7 @@ const Waveform = ({
   waveform,
 }: {
   playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
-  waveform: ReturnType<typeof useWaveformState>
+  waveform: ReturnType<typeof useWaveform>
 }) => {
   const {
     images,
@@ -301,7 +301,7 @@ function PendingWaveformItem({
 
 function useWaveformMouseActions(
   svgRef: React.RefObject<SVGSVGElement>,
-  waveform: ViewState,
+  waveform: WaveformState,
   pixelsPerSecond: number,
   playerRef: React.MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>,
   dispatch: (action: WaveformAction) => void
@@ -438,7 +438,7 @@ export { $ as waveform$ }
 function getWaveformMousedownAction(
   dataset: DOMStringMap,
   ms: number,
-  waveform: ViewState
+  waveform: WaveformState
 ) {
   if (
     dataset &&

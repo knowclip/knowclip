@@ -14,7 +14,7 @@ import css from '../components/Main.module.css'
 import waveformCss from '../components/Waveform.module.css'
 import * as r from '../selectors'
 import { setMousePosition } from '../utils/mousePosition'
-import { useWaveformState } from './useWaveformState'
+import { useWaveform } from './useWaveform'
 import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
@@ -57,7 +57,7 @@ const Main = () => {
   }, [])
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
-  const waveform = useWaveformState(waveformItems)
+  const waveform = useWaveform(waveformItems)
   const { onTimeUpdate, resetWaveformState } = waveform
 
   useWaveformSelectionSyncWithRedux(waveform, playerRef)
