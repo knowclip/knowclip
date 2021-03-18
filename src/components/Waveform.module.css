@@ -34,9 +34,36 @@
   pointer-events: none;
 }
 
+.waveformPendingClipMove {
+  animation: flashIn 1s;
+  fill: rgba(255, 255, 0, .2);
+  stroke: rgba(255, 255, 0, 0.8);
+  pointer-events: none;
+}
+
+@keyframes flashIn {
+  0% {
+    fill: rgba(255, 255, 0, .1);
+    stroke: rgba(255, 255, 0, .1);
+  }
+  40% {
+    fill: rgba(255, 255, 0, .1);
+    stroke: rgba(255, 255, 0, .1);
+  }
+  41% {
+    fill: rgba(255, 255, 0, .2);
+    stroke: rgba(255, 255, 0, 1);
+  }
+  100% {
+    fill: rgba(255, 255, 0, .2);
+    stroke: rgba(255, 255, 0, .8);
+  }
+}
+
 .waveformPendingStretch {
   stroke: rgba(0, 255, 255, 0.4);
   fill: rgba(0, 255, 255, 0.4);
+  pointer-events: none;
 }
 
 .highlightedClip {

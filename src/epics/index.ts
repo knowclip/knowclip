@@ -3,9 +3,9 @@ import { combineEpics } from 'redux-observable'
 import { of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
-import setWaveformCursorEpic from './setWaveformCursor'
-import addClip from './addClip'
-import stretchClip from './stretchClip'
+import clipCreate from './clipCreate'
+import clipMove from './clipMove'
+import clipStretch from './clipStretch'
 import editClip from './editClip'
 import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
@@ -90,11 +90,11 @@ const rootEpic: AppEpic = combineEpics(
   initialize,
   quit,
   addMediaToProject,
-  setWaveformCursorEpic,
   loopMedia,
-  addClip,
   editClip,
-  stretchClip,
+  clipCreate,
+  clipMove,
+  clipStretch,
   detectSilenceEpic,
   exportCsvAndMp3,
   exportApkg,

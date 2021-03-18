@@ -6,11 +6,16 @@
 // won't open during dev.
 
 type NoteType = 'Simple' | 'Transliteration' // TODO: remove this duplication
-type SubtitlesChunksMetadata = {
-  // TODO: remove this duplication
-  count: number
-  endCue: number
-}
+type SubtitlesChunksMetadata =
+  | {
+      // TODO: remove this duplication
+      count: number
+      endCue: number
+    }
+  | {
+      count: number
+      endCueMs: number
+    }
 export type ProjectMetadataJson = {
   name: string
   id: string

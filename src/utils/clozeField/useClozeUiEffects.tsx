@@ -164,7 +164,6 @@ export function useClozeUiEffects(
       editing,
       isMediaPlaying,
       setCursorPosition,
-      loopState,
       dispatch,
     ]
   )

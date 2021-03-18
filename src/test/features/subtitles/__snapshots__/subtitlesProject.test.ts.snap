@@ -248,7 +248,7 @@ so I'll do it later.",
           Object {
             "chunksMetadata": Object {
               "count": 26,
-              "endCue": 4321.5,
+              "endCueMs": 86430,
             },
             "id": "5f581055-dbf5-4f3b-bcee-a3215e405ffc",
             "streamIndex": 2,
@@ -257,7 +257,7 @@ so I'll do it later.",
           Object {
             "chunksMetadata": Object {
               "count": 15,
-              "endCue": 4336.5,
+              "endCueMs": 86730,
             },
             "id": "94367f0c-92ef-4542-a80a-6fbaf8e1ad76",
             "name": "pbc_jp.ass",

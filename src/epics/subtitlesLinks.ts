@@ -6,6 +6,7 @@ import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { uuid } from '../utils/sideEffects'
 import { getUpdateWith } from '../files/updates'
+import { msToSeconds } from '../utils/waveform'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$
@@ -139,7 +140,10 @@ export const newClipFromChunk: AppEpic = (
         )
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,
-          { start: selection.item.start, end: selection.item.end },
+          {
+            start: selection.item.start,
+            end: selection.item.end,
+          },
           mediaFileId,
           uuid(),
           fields
@@ -149,7 +153,7 @@ export const newClipFromChunk: AppEpic = (
           flashcard.cloze = [action.clozeDeletion]
         }
 
-        setCurrentTime(r.getSecondsAtX(state$.value, selection.item.start))
+        setCurrentTime(msToSeconds(selection.item.start))
 
         return from([r.addClip(clip, flashcard, action.startEditing || false)])
       })
@@ -190,18 +194,11 @@ const updateSelectionAfterLink: AppEpic = (
           )
           if (
             newSelection &&
-            r.getSecondsAtX(state$.value, newSelection.item.start) !==
-              getCurrentTime()
+            msToSeconds(newSelection.item.start) !== getCurrentTime()
           ) {
-            setCurrentTime(
-              r.getSecondsAtX(state$.value, newSelection.item.start)
-            )
+            setCurrentTime(msToSeconds(newSelection.item.start))
           }
-          return of(
-            newSelection
-              ? r.selectWaveformItem(newSelection)
-              : r.clearWaveformSelection()
-          )
+          return newSelection ? of(r.selectWaveformItem(newSelection)) : EMPTY
         }
 
         return EMPTY

@@ -18,3 +18,21 @@ export async function waveformMouseDrag(
     throw err
   }
 }
+
+export async function waveformMouseHoldAndDrag(
+  client: ClientWrapper,
+  holdMs: number,
+  start: number,
+  end: number
+) {
+  const waveform = await client.firstElement_(waveform$.container)
+  try {
+    const rect = await client._driver.client.getElementRect(waveform.elementId)
+
+    const { y, height } = rect
+    const midpoint = y + Math.round(height / 2)
+    await dragMouse(client._driver, [start, midpoint], [end, midpoint], holdMs)
+  } catch (err) {
+    throw err
+  }
+}

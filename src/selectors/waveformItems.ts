@@ -1,9 +1,5 @@
 import { createSelector } from 'reselect'
-import {
-  getSubtitlesCardBases,
-  WaveformSelectionExpanded,
-  SubtitlesCardBase,
-} from './cardPreview'
+import { getSubtitlesCardBases, WaveformSelectionExpanded } from './cardPreview'
 import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
 import {
   overlapsSignificantly,
@@ -14,14 +10,11 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import { limitSelectorToDisplayedItems } from './limitSelectorToDisplayedItems'
-import { getHalfSecond } from './waveform'
 
 export const getWaveformItems = createSelector(
   getCurrentFileClips,
-  getHalfSecond,
   getSubtitlesCardBases,
-  (clips, halfSecond, subtitles): Array<WaveformSelectionExpanded> => {
+  (clips, subtitles): Array<WaveformSelectionExpanded> => {
     const result: Array<WaveformSelectionExpanded> = []
 
     let clipIndex = 0
@@ -33,12 +26,7 @@ export const getWaveformItems = createSelector(
       const clip = clips[clipIndex]
       while (
         chunkIndex < chunks.length &&
-        overlapsSignificantly(
-          chunks[chunkIndex],
-          clip.start,
-          clip.end,
-          halfSecond
-        )
+        overlapsSignificantly(chunks[chunkIndex], clip.start, clip.end)
       ) {
         chunkIndex++
       }
@@ -83,15 +71,6 @@ export const getWaveformItems = createSelector(
   }
 )
 
-export const getDisplayedWaveformItems = createSelector(
-  getWaveformItems,
-  (state: AppState) => state.waveform.viewBox.xMin,
-  limitSelectorToDisplayedItems(
-    (waveformItem) => waveformItem.item.start,
-    (waveformItem) => waveformItem.item.end
-  )
-)
-
 export const getWaveformSelection = createSelector(
   (state: AppState) => state.session.waveformSelection,
   getSubtitlesCardBases,
@@ -129,27 +108,33 @@ export const getNewWaveformSelectionAt = (
   return getNewWaveformSelectionAtFromSubset(selection, waveformItems, newX)
 }
 export const getNewWaveformSelectionAtFromSubset = (
-  selection: WaveformSelectionExpanded | null,
-  waveformItems: WaveformSelectionExpanded[],
-  newX: number
+  currentSelection: WaveformSelection | null,
+  newWaveformItems: WaveformSelectionExpanded[],
+  newMs: number
 ): WaveformSelectionExpanded | null => {
-  const updatedSelection =
-    selection &&
-    getUpdatedSameSelection(selection, waveformItems[selection.index] || null)
+  const itemAtCurrentSelectionPosition = currentSelection
+    ? newWaveformItems[currentSelection.index]
+    : null
+  const itemIsSameAsOldSelection =
+    currentSelection &&
+    itemAtCurrentSelectionPosition &&
+    isItemSameAsOldSelection(currentSelection, itemAtCurrentSelectionPosition)
   if (
-    updatedSelection &&
-    newX >= updatedSelection.item.start &&
-    newX <= updatedSelection.item.end
+    itemIsSameAsOldSelection &&
+    itemAtCurrentSelectionPosition &&
+    newMs >= itemAtCurrentSelectionPosition.item.start &&
+    newMs <= itemAtCurrentSelectionPosition.item.end
   )
-    return updatedSelection
+    return itemAtCurrentSelectionPosition
 
   const overlapping: WaveformSelectionExpanded[] = []
 
-  for (const clipOrPreview of waveformItems) {
+  for (const clipOrPreview of newWaveformItems) {
     const { item } = clipOrPreview
-    if (item.start > newX) break
+    if (item.start > newMs) break
 
-    if (newX >= item.start && newX <= item.end) overlapping.push(clipOrPreview)
+    if (newMs >= item.start && newMs <= item.end)
+      overlapping.push(clipOrPreview)
   }
 
   if (overlapping.length <= 1) return overlapping[0] || null
@@ -157,20 +142,26 @@ export const getNewWaveformSelectionAtFromSubset = (
   return overlapping.find(({ type }) => type === 'Clip') || null
 }
 
-const getUpdatedSameSelection = (
-  prev: WaveformSelectionExpanded,
-  next: WaveformSelectionExpanded | null
-): WaveformSelectionExpanded | null => {
-  if (!next || prev.type !== next.type) return null
-  if (prev.type === 'Clip' && prev.item.id === (next.item as Clip).id)
-    return next
+const isItemSameAsOldSelection = (
+  oldCurrentSelection: WaveformSelection,
+  itemAtCurrentSelectionPosition: WaveformSelection
+) => {
+  if (oldCurrentSelection.type !== itemAtCurrentSelectionPosition.type)
+    return false
   if (
-    prev.type === 'Preview' &&
-    prev.item.index === (next.item as SubtitlesCardBase).index
+    oldCurrentSelection.type === 'Clip' &&
+    oldCurrentSelection.id ===
+      (itemAtCurrentSelectionPosition as typeof oldCurrentSelection).id
   )
-    return next
+    return true
+  if (
+    oldCurrentSelection.type === 'Preview' &&
+    oldCurrentSelection.index ===
+      (itemAtCurrentSelectionPosition as typeof oldCurrentSelection).index
+  )
+    return true
 
-  return null
+  return false
 }
 
 export const getBlankFields = (state: AppState) =>
@@ -187,7 +178,7 @@ export const getNewFieldsFromLinkedSubtitles = (
   const fields = { ...getBlankFields(state) } as TransliterationFlashcardFields
 
   for (const cardBase of subs.cards) {
-    if (overlapsSignificantly(cardBase, start, end, getHalfSecond(state))) {
+    if (overlapsSignificantly(cardBase, start, end)) {
       const tracksToFieldsText = cardBase
         ? subs.getFieldsPreviewFromCardsBase(cardBase)
         : null

@@ -1,6 +1,6 @@
-import { getMillisecondsAtX, getSecondsAtX } from './waveformTime'
 import { createSelector } from 'reselect'
 import formatTime from '../utils/formatTime'
+import { msToSeconds } from '../utils/waveform'
 
 export const getClip = (state: AppState, id: ClipId): Clip | null =>
   state.clips.byId[id]
@@ -43,13 +43,16 @@ export const getAllProjectClipsIds: (
   Object.keys(clipsObject)
 )
 
-export const getClipTime = (state: AppState, id: ClipId): TimeSpan | null => {
+export const getClipTimeInSeconds = (
+  state: AppState,
+  id: ClipId
+): TimeSpan | null => {
   const clip = getClip(state, id)
   if (!clip) return null
 
   return {
-    start: getSecondsAtX(state, clip.start),
-    end: getSecondsAtX(state, clip.end),
+    start: msToSeconds(clip.start),
+    end: msToSeconds(clip.end),
   }
 }
 
@@ -57,7 +60,7 @@ export const getFormattedClipTime = (
   state: AppState,
   id: ClipId
 ): string | null => {
-  const clipTime = getClipTime(state, id)
+  const clipTime = getClipTimeInSeconds(state, id)
   if (!clipTime) return null
 
   return `${formatTime(clipTime.start)} - ${formatTime(clipTime.end)}`
@@ -73,8 +76,8 @@ export const getClipMilliseconds = (
   const clip = state.clips.byId[id]
   if (!clip) throw new Error('Maybe impossible')
   return {
-    start: getMillisecondsAtX(state, clip.start),
-    end: getMillisecondsAtX(state, clip.end),
+    start: clip.start,
+    end: clip.end,
   }
 }
 

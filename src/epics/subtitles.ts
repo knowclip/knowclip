@@ -20,6 +20,7 @@ import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
 import { SubtitlesFileWithTrack } from '../selectors'
 import { afterUpdates } from '../utils/afterUpdates'
+import { msToSeconds } from '../utils/waveform'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -172,7 +173,7 @@ const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
         return
       }
       const { start } = track.chunks[chunkIndex]
-      setCurrentTime(r.getSecondsAtX(state$.value, start))
+      setCurrentTime(msToSeconds(start))
       return
     }),
     ignoreElements()

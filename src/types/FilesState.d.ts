@@ -108,10 +108,15 @@ declare type VttFromEmbeddedSubtitles = {
   parentType: 'MediaFile'
   chunksMetadata: SubtitlesChunksMetadata | null
 }
-declare type SubtitlesChunksMetadata = {
-  count: number
-  endCue: number
-}
+declare type SubtitlesChunksMetadata =
+  | {
+      count: number
+      endCue: number
+    }
+  | {
+      count: number
+      endCueMs: number
+    }
 
 declare type WaveformPng = {
   type: 'WaveformPng'

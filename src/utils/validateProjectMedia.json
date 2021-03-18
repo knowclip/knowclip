@@ -137,20 +137,40 @@
         "chunksMetadata": {
           "anyOf": [
             {
-              "additionalProperties": false,
-              "properties": {
-                "count": {
-                  "type": "number"
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    },
+                    "endCue": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "endCue"
+                  ],
+                  "type": "object"
                 },
-                "endCue": {
-                  "type": "number"
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    },
+                    "endCueMs": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "endCueMs"
+                  ],
+                  "type": "object"
                 }
-              },
-              "required": [
-                "count",
-                "endCue"
-              ],
-              "type": "object"
+              ]
             },
             {
               "type": "null"
@@ -182,20 +202,40 @@
         "chunksMetadata": {
           "anyOf": [
             {
-              "additionalProperties": false,
-              "properties": {
-                "count": {
-                  "type": "number"
+              "anyOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    },
+                    "endCue": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "endCue"
+                  ],
+                  "type": "object"
                 },
-                "endCue": {
-                  "type": "number"
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    },
+                    "endCueMs": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "endCueMs"
+                  ],
+                  "type": "object"
                 }
-              },
-              "required": [
-                "count",
-                "endCue"
-              ],
-              "type": "object"
+              ]
             },
             {
               "type": "null"

@@ -1,5 +1,4 @@
 import stripHtml from '../utils/stripHtml'
-import { getXAtMilliseconds } from './waveformTime'
 import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
@@ -7,7 +6,6 @@ import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
-import { getHalfSecond } from './waveform'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,
@@ -189,38 +187,22 @@ export const readVttChunk = (
     index: number
   }
 ): SubtitlesChunk => ({
-  start: getXAtMilliseconds(state, start),
-  end: getXAtMilliseconds(state, end),
+  start: start,
+  end: end,
   text: (stripHtml(text) || '').trim(),
   index,
 })
-export const readParseSrtChunk = (
-  state: AppState,
-  {
-    start,
-    end,
-    text,
-    index,
-  }: {
-    start: number
-    end: number
-    text: string
-    index: number
-  }
-): SubtitlesChunk => ({
-  start: getXAtMilliseconds(state, start * 1000),
-  end: getXAtMilliseconds(state, end * 1000),
-  text: (stripHtml(text) || '').trim(),
-  index,
-})
+
 export const readSubsrtChunk = readVttChunk
+
+const HALF_SECOND = 500
 
 export const overlapsSignificantly = (
   chunk: { start: number; end: number },
-  start: WaveformX,
-  end: WaveformX,
-  halfSecond: WaveformX
-): boolean => start <= chunk.end - halfSecond && end >= chunk.start + halfSecond
+  start: number,
+  end: number
+): boolean =>
+  start <= chunk.end - HALF_SECOND && end >= chunk.start + HALF_SECOND
 
 export const getSubtitlesChunksWithinRange = (
   state: AppState,
@@ -230,7 +212,6 @@ export const getSubtitlesChunksWithinRange = (
 ): Array<SubtitlesChunk> =>
   getSubtitlesChunksWithinRangeFromTracksState(
     state.subtitles,
-    state.waveform,
     subtitlesTrackId,
     start,
     end
@@ -238,7 +219,6 @@ export const getSubtitlesChunksWithinRange = (
 
 export const getSubtitlesChunksWithinRangeFromTracksState = (
   state: AppState['subtitles'],
-  waveform: WaveformState,
   subtitlesTrackId: SubtitlesTrackId,
   start: WaveformX,
   end: WaveformX
@@ -253,15 +233,7 @@ export const getSubtitlesChunksWithinRangeFromTracksState = (
     if (chunk.end < start) continue
     if (chunk.start > end) break
 
-    if (
-      overlapsSignificantly(
-        chunk,
-        start,
-        end,
-        (waveform.stepsPerSecond * waveform.stepLength) / 2
-      )
-    )
-      chunks.push(chunk)
+    if (overlapsSignificantly(chunk, start, end)) chunks.push(chunk)
   }
   return chunks
 }
@@ -275,6 +247,7 @@ export const getSubtitlesFlashcardFieldLinks = (
 
 export const getNewFlashcardForStretchedClip = (
   state: AppState,
+  waveformState: WaveformState,
   noteType: NoteType,
   { start, end }: Clip,
   flashcard: Flashcard,
@@ -292,8 +265,7 @@ export const getNewFlashcardForStretchedClip = (
     const trackId = links[fieldName]
     const originalText = originalFields[fieldName]
     const newlyOverlapped = (chunk: SubtitlesChunk) =>
-      !originalText.trim() ||
-      !overlapsSignificantly(chunk, start, end, getHalfSecond(state))
+      !originalText.trim() || !overlapsSignificantly(chunk, start, end)
     const chunks = trackId
       ? getSubtitlesChunksWithinRange(
           state,

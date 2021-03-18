@@ -83,19 +83,6 @@ declare type HighlightRightClipRequest = import('../actions').ActionOf<
 declare type SetCursorPosition = import('../actions').ActionOf<
   'setCursorPosition'
 >
-declare type SetWaveformViewBox = import('../actions').ActionOf<
-  'setWaveformViewBox'
->
-declare type SetPendingClip = import('../actions').ActionOf<'setPendingClip'>
-declare type ClearPendingClip = import('../actions').ActionOf<
-  'clearPendingClip'
->
-declare type SetPendingStretch = import('../actions').ActionOf<
-  'setPendingStretch'
->
-declare type ClearPendingStretch = import('../actions').ActionOf<
-  'clearPendingStretch'
->
 declare type GenerateWaveformImages = import('../actions').ActionOf<
   'generateWaveformImages'
 >

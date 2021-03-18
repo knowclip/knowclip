@@ -1,17 +1,4 @@
-declare type PendingClip = {
-  start: WaveformX
-  end: WaveformX
-}
-
-declare type PendingStretch = {
-  originKey: 'start' | 'end'
-  id: ClipId
-  end: WaveformX
-}
-
 declare type SessionState = {
-  pendingClip: PendingClip | null
-  pendingStretch: PendingStretch | null
   waveformSelection: WaveformSelection | null
   defaultTags: Array<string>
   defaultIncludeStill: boolean

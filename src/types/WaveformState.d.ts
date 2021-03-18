@@ -1,14 +1,10 @@
-declare type WaveformState = {
-  stepsPerSecond: number
-  stepLength: number
-  cursor: {
-    x: number
-    y: number
-  }
-  viewBox: WaveformViewBox
-  length: number
-}
-
-declare type WaveformViewBox = {
-  xMin: number
+type WaveformState = {
+  durationSeconds: number
+  cursorMs: number
+  viewBoxStartMs: number
+  pixelsPerSecond: number
+  selection: WaveformSelection | null
+  pendingAction:
+    | import('../utils/WaveformMousedownEvent').WaveformDragAction
+    | null
 }

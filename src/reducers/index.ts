@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux'
 
-import waveform from './waveform'
 import clips from './clips'
 import session from './session'
 import snackbar from './snackbar'
@@ -44,7 +43,6 @@ const rootConfig: PersistConfig<AppState> = {
 }
 
 const root = combineReducers<AppState>({
-  waveform,
   clips,
   session,
   snackbar,
@@ -68,6 +66,7 @@ const UNDOABLE_ACTIONS = new Set<Action['type']>([
   A.addClip,
   A.addClips,
   A.mergeClips,
+  A.moveClip,
 ])
 
 const HISTORY_CLEARING_ACTIONS = new Set<Action['type']>([
@@ -189,9 +188,14 @@ function undoable<S extends AppState>(
   }
 }
 
-function sessionAfterHistoryAction(base: SessionState, override: SessionState) {
+function sessionAfterHistoryAction(
+  base: SessionState,
+  override: SessionState
+): SessionState {
   return {
     ...base,
+    editingCards: override.editingCards,
+    loopMedia: override.loopMedia,
     defaultTags: override.defaultTags,
     defaultIncludeStill: override.defaultIncludeStill,
     tagsToClipIds: override.tagsToClipIds,

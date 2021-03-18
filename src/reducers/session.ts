@@ -4,8 +4,6 @@ import deleteKey from '../utils/deleteKey'
 import { areSelectionsEqual } from '../utils/waveformSelection'
 
 const initialState: SessionState = {
-  pendingClip: null,
-  pendingStretch: null,
   waveformSelection: null,
   defaultTags: [],
   defaultIncludeStill: true,
@@ -91,20 +89,7 @@ const session: Reducer<SessionState, Action> = (
     case A.addClip:
       return {
         ...state,
-        pendingClip: null,
         editingCards: action.startEditing,
-      }
-
-    case A.setPendingClip:
-      return {
-        ...state,
-        pendingClip: action.clip,
-      }
-
-    case A.clearPendingClip:
-      return {
-        ...state,
-        pendingClip: null,
       }
 
     case A.selectWaveformItem: {
@@ -126,17 +111,6 @@ const session: Reducer<SessionState, Action> = (
             loopMedia,
           }
     }
-    case A.setPendingStretch:
-      return {
-        ...state,
-        pendingStretch: action.stretch,
-      }
-
-    case A.clearPendingStretch:
-      return {
-        ...state,
-        pendingStretch: null,
-      }
 
     case A.mergeClips:
       return {

@@ -113,3 +113,20 @@ async function copyFixtures() {
   await mkdirp(TMP_DIRECTORY)
   await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
 }
+
+export async function testBlock(name: string, cb: () => Promise<void>) {
+  try {
+    process.stdout.write('\n     ' + name)
+
+    await cb()
+
+    process.stdout.write(' ✅  \n')
+  } catch (err) {
+    process.stdout.write(' ❗️ \n')
+    const errName = String(err.name || err.constructor)
+    process.stdout.write(errName + ' ' + String(err.message) + '\n')
+    throw err
+  }
+
+  process.stdout.write('\n')
+}

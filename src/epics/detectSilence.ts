@@ -6,6 +6,7 @@ import r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { ActionOf } from '../actions'
+import { secondsToMs } from '../utils/waveform'
 
 const detectSilence = (
   path: string,
@@ -33,8 +34,8 @@ const detectSilence = (
             // eslint-disable-line no-cond-assign
             const [, startStr, endStr] = addition
             matchData.push({
-              start: Number(startStr) * 1000,
-              end: Number(endStr) * 1000,
+              start: secondsToMs(Number(startStr)),
+              end: secondsToMs(Number(endStr)),
             })
           }
           res(matchData)
@@ -50,7 +51,7 @@ const detectSilence = (
 const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType<Action, ActionOf<'detectSilence'>>(A.detectSilence),
-    mergeMap<ActionOf<'detectSilence'>, Promise<Action[]>>(() => {
+    mergeMap<ActionOf<typeof A.detectSilence>, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMedia = r.getCurrentMediaFile(state$.value)
       if (!currentMedia || !currentFilePath)
@@ -72,7 +73,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
           if (nextSilence) {
             chunks.push({ start: silenceEnd, end: nextSilence.start })
           } else {
-            const durationMs = currentMedia.durationSeconds * 1000
+            const durationMs = secondsToMs(currentMedia.durationSeconds)
             if (silenceEnd !== durationMs)
               chunks.push({ start: silenceEnd, end: durationMs })
           }
@@ -89,10 +90,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         chunks.forEach(({ start, end }) => {
           const { clip, flashcard } = r.getNewClipAndCard(
             state$.value,
-            {
-              start: r.getXAtMilliseconds(state$.value, start),
-              end: r.getXAtMilliseconds(state$.value, end),
-            },
+            { start, end },
             fileId,
             uuid(),
             currentNoteType === 'Simple'

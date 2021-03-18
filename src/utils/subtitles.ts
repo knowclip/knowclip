@@ -5,7 +5,8 @@ import r from '../redux'
 import { extname, basename, join } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
-import { getMillisecondsAtX } from '../selectors'
+import packageJson from '../../package.json'
+import { pixelsToMs, secondsToPixels } from './waveform'
 
 const { readFile, writeFile } = promises
 
@@ -70,8 +71,8 @@ export const getExternalSubtitlesVttPath = async (
       vttFilePath,
       stringifyVtt(
         chunks.map((chunk) => ({
-          start: Math.round(getMillisecondsAtX(state, chunk.start)),
-          end: Math.round(getMillisecondsAtX(state, chunk.end)),
+          start: Math.round(chunk.start),
+          end: Math.round(chunk.end),
           text: chunk.text,
         }))
       ),
@@ -241,7 +242,7 @@ export const validateSubtitlesFromFilePath = async (
       parsed.length && typeof endCue === 'number'
         ? {
             count: parsed.length,
-            endCue: endCue,
+            endCueMs: endCue,
           }
         : null
 
@@ -249,10 +250,15 @@ export const validateSubtitlesFromFilePath = async (
       if (chunksMetadata.count !== parsed.length)
         differences.push({ attribute: 'count', name: 'number of cues' })
 
-      if (chunksMetadata.endCue !== endCue)
+      if (
+        'endCue' in chunksMetadata
+          ? chunksMetadata.endCue * 20 !== endCue
+          : chunksMetadata.endCueMs !== endCue
+      ) {
         differences.push({ attribute: 'endCue', name: 'timing' })
+      }
 
-      if (differences.length)
+      if (differences.length) {
         return {
           differences,
           newChunksMetadata,
@@ -264,6 +270,7 @@ export const validateSubtitlesFromFilePath = async (
             .map(({ name }) => name)
             .join('\n')}. \n\nAre you sure this is the file you want to open?`,
         }
+      }
     }
     return { valid: true, newChunksMetadata }
   } catch (error) {

@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react'
+import React from 'react'
+import { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { CircularProgress } from '@material-ui/core'
 import { Redirect } from 'react-router-dom'
@@ -13,6 +14,8 @@ import css from '../components/Main.module.css'
 import waveformCss from '../components/Waveform.module.css'
 import * as r from '../selectors'
 import { setMousePosition } from '../utils/mousePosition'
+import { useWaveform } from './useWaveform'
+import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
   container = 'main-screen-container',
@@ -27,6 +30,7 @@ const Main = () => {
     currentMediaFile,
     subtitles,
     viewMode,
+    waveformItems,
   } = useSelector((state: AppState) => {
     const currentMediaFile = r.getCurrentMediaFile(state)
     return {
@@ -40,6 +44,7 @@ const Main = () => {
         : EMPTY,
       subtitles: r.getSubtitlesFilesWithTracks(state),
       viewMode: state.settings.viewMode,
+      waveformItems: r.getWaveformItems(state),
     }
   })
 
@@ -51,6 +56,12 @@ const Main = () => {
     return () => document.removeEventListener('mousemove', trackCursor)
   }, [])
 
+  const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
+  const waveform = useWaveform(waveformItems)
+  const { onTimeUpdate, resetWaveformState } = waveform
+
+  useWaveformSelectionSyncWithRedux(waveform, playerRef)
+
   if (!currentProject) return <Redirect to="/projects" />
 
   return (
@@ -59,6 +70,7 @@ const Main = () => {
         <Header
           currentProjectId={currentProject.id}
           currentMediaFile={currentMediaFile}
+          waveform={waveform}
         />
       </DarkTheme>
 
@@ -83,6 +95,9 @@ const Main = () => {
             metadata={currentMediaFile}
             subtitles={subtitles}
             viewMode={viewMode}
+            playerRef={playerRef}
+            onMediaLoaded={resetWaveformState}
+            onTimeUpdate={onTimeUpdate}
           />
         )}
 
@@ -93,8 +108,12 @@ const Main = () => {
         />
       </section>
 
-      {Boolean(currentMediaFile && !mediaIsEffectivelyLoading) ? (
-        <Waveform />
+      {currentMediaFile && !mediaIsEffectivelyLoading ? (
+        <Waveform
+          waveform={waveform}
+          playerRef={playerRef}
+          key={currentMediaFile.id}
+        />
       ) : (
         <div className={waveformCss.waveformPlaceholder} />
       )}

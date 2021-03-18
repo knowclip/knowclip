@@ -11,10 +11,10 @@ const KEYBOARD_SHORTCUTS = {
   'Select next': '→',
   'Select previous (while editing)': 'Alt + ←',
   'Select next (while editing)': 'Alt + →',
-  'Deselect current': 'Esc',
   'Look up word at mouse cursor': 'D',
   'Close dictionary popover': 'Esc',
   'Start editing fields': 'E',
+  'Delete clip and card': 'Ctrl + Shift + D',
   'Stop editing fields': 'Esc',
   'Start making cloze deletion': 'C',
   'Stop making cloze deletion': 'Esc',
@@ -68,7 +68,6 @@ const KeyboardShortcuts = () => {
               <Shortcut action="Select next" />
               <Shortcut action="Select previous (while editing)" />
               <Shortcut action="Select next (while editing)" />
-              <Shortcut action="Deselect current" />
             </section>
 
             <section className={css.group}>
@@ -83,6 +82,7 @@ const KeyboardShortcuts = () => {
               <Shortcut action="Stop editing fields" />
               <Shortcut action="Start making cloze deletion" />
               <Shortcut action="Stop making cloze deletion" />
+              <Shortcut action="Delete clip and card" />
             </section>
 
             <section className={css.group}>

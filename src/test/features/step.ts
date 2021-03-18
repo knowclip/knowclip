@@ -1,3 +1,4 @@
+import { stdout } from 'process'
 import { TestSetup } from '../setUpDriver'
 
 type TestStep = {
@@ -11,9 +12,10 @@ export const step = (
 ): TestStep => ({ description, runTest })
 
 export const runAll = (testSteps: TestStep[], getSetup: () => TestSetup) => {
-  testSteps.forEach(({ description, runTest }) =>
+  testSteps.forEach(({ description, runTest }) => {
     test(description, async () => {
       const setup = getSetup()
+      stdout.write('\n\n ' + description + '\n' + '='.repeat(30) + '\n')
       try {
         await runTest(setup)
       } catch (err) {
@@ -33,5 +35,5 @@ export const runAll = (testSteps: TestStep[], getSetup: () => TestSetup) => {
         throw err
       }
     })
-  )
+  })
 }

@@ -1,12 +1,15 @@
 import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
 import tempy from 'tempy'
 import { existsSync } from 'fs'
-import { getFileAvailabilityById, getXAtMilliseconds } from '../selectors'
+import { getFileAvailabilityById } from '../selectors'
 import { basename, join } from 'path'
+import { secondsToMs } from './waveform'
 
 const WAVE_COLOR = '#b7cee0'
 const BG_COLOR = '#00000000'
 const CORRECTION_OFFSET = 0
+
+const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
 
 export const getWaveformPng = async (
   state: AppState,
@@ -14,8 +17,8 @@ export const getWaveformPng = async (
   mediaFilePath: string
 ): AsyncResult<string> => {
   try {
-    const startX = getXAtMilliseconds(state, file.startSeconds * 1000)
-    const endX = getXAtMilliseconds(state, file.endSeconds * 1000)
+    const startX = WAVEFORM_PNG_PIXELS_PER_SECOND * file.startSeconds
+    const endX = WAVEFORM_PNG_PIXELS_PER_SECOND * file.endSeconds
     const width = ~~(endX - startX)
     const outputFilename = getWaveformPngPath(state, mediaFilePath, file)
     if (outputFilename && existsSync(outputFilename))
@@ -23,8 +26,8 @@ export const getWaveformPng = async (
 
     const newFileName: string = await new Promise((res, rej) => {
       return ffmpeg(mediaFilePath)
-        .seekInput(toTimestamp(file.startSeconds * 1000))
-        .inputOptions(`-to ${toTimestamp(file.endSeconds * 1000)}`)
+        .seekInput(toTimestamp(secondsToMs(file.startSeconds)))
+        .inputOptions(`-to ${toTimestamp(secondsToMs(file.endSeconds))}`)
         .withNoVideo()
         .complexFilter(
           [

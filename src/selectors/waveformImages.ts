@@ -1,21 +1,18 @@
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
 import { getWaveformIds } from '../utils/getWaveform'
-import { getXAtMillisecondsFromWaveform } from '../utils/waveformCoordinates'
 
 export const getWaveformImages = createSelector(
   getCurrentMediaFile,
   (state: AppState) => state.files.WaveformPng,
   (state: AppState) => state.fileAvailabilities.WaveformPng,
-  (state: AppState) => state.waveform,
   (
     currentMediaFile,
     files,
-    fileAvailabilities,
-    waveform
-  ): { file: WaveformPng; path: string; x: number }[] => {
+    fileAvailabilities
+  ): { file: WaveformPng; path: string }[] => {
     if (!currentMediaFile) return []
-    const result: { file: WaveformPng; path: string; x: number }[] = []
+    const result: { file: WaveformPng; path: string }[] = []
 
     for (const id of getWaveformIds(currentMediaFile)) {
       const file = files[id]
@@ -24,7 +21,6 @@ export const getWaveformImages = createSelector(
         result.push({
           file,
           path: availability.filePath,
-          x: getXAtMillisecondsFromWaveform(waveform, file.startSeconds * 1000),
         })
       }
     }

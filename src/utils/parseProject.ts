@@ -1,6 +1,5 @@
 import YAML from 'yaml'
 import { readFile } from 'fs-extra'
-import { getXAtMilliseconds } from '../selectors'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
 import {
@@ -179,14 +178,8 @@ function getMediaClips<F extends FlashcardFields>(
     (c): Clip => {
       return {
         id: c.id,
-        start: getXAtMilliseconds(
-          state,
-          parseFormattedDuration(c.start).asMilliseconds()
-        ),
-        end: getXAtMilliseconds(
-          state,
-          parseFormattedDuration(c.end).asMilliseconds()
-        ),
+        start: parseFormattedDuration(c.start).asMilliseconds(),
+        end: parseFormattedDuration(c.end).asMilliseconds(),
         fileId: media.id,
       }
     }

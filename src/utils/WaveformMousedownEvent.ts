@@ -1,14 +1,54 @@
+import { MouseEvent } from 'react'
+import { msToSeconds } from './waveform'
+
 export default class WaveformMousedownEvent extends Event {
-  seconds: number
+  milliseconds: number
+  browserMousedown: MouseEvent<SVGElement>
   svg: SVGElement
 
-  constructor(svg: SVGElement, seconds: number) {
+  constructor(browserMousedown: MouseEvent<SVGElement>, milliseconds: number) {
     super('waveformMousedown')
-    this.svg = svg
-    this.seconds = seconds
+    this.browserMousedown = browserMousedown
+    this.svg = browserMousedown.currentTarget
+    this.milliseconds = milliseconds
   }
 
-  get milliseconds() {
-    return this.seconds * 1000
+  get seconds() {
+    return msToSeconds(this.milliseconds)
   }
+}
+
+export class WaveformDragEvent extends Event {
+  action: WaveformDragAction
+
+  constructor(action: WaveformDragAction) {
+    super('waveformDrag')
+    this.action = action
+  }
+}
+
+export type WaveformDragAction =
+  | WaveformDragCreate
+  | WaveformDragMove
+  | WaveformDragStretch
+
+export type WaveformDragCreate = {
+  type: 'CREATE'
+  start: number
+  end: number
+  waveformState: WaveformState
+}
+export type WaveformDragMove = {
+  type: 'MOVE'
+  start: number
+  end: number
+  clipToMove: { id: ClipId; start: number; end: number }
+  waveformState: WaveformState
+}
+export type WaveformDragStretch = {
+  type: 'STRETCH'
+  start: number
+  end: number
+  clipToStretch: { id: ClipId; start: number; end: number }
+  waveformState: WaveformState
 }

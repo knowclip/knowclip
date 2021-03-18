@@ -8,6 +8,8 @@ import ProjectMenu from '../components/ProjectMenu'
 import headerCss from '../components/MainHeader.module.css'
 import { actions } from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
+import { usePlayButtonSync } from './usePlayButtonSync'
+import { WaveformInterface } from './useWaveform'
 
 enum $ {
   container = 'main-screen-header',
@@ -16,15 +18,20 @@ enum $ {
 const MainHeader = ({
   currentProjectId,
   currentMediaFile,
+  waveform,
 }: {
   currentProjectId: string
   currentMediaFile: MediaFile | null
+  waveform: WaveformInterface
 }) => {
   const dispatch = useDispatch()
   const deleteAllCurrentFileClipsRequest = useCallback(
     () => dispatch(actions.deleteAllCurrentFileClipsRequest()),
     [dispatch]
   )
+
+  const playButtonSync = usePlayButtonSync(waveform.state.pixelsPerSecond)
+
   return (
     <header className={cn(headerCss.container, $.container)}>
       <ProjectMenu className={headerCss.block} />
@@ -32,6 +39,7 @@ const MainHeader = ({
         <MediaFilesMenu
           className={headerCss.leftMenu}
           currentProjectId={currentProjectId}
+          playButtonSync={playButtonSync}
         />
       </section>
       <ul className={headerCss.rightMenu}>

@@ -16,11 +16,6 @@ declare type ClipsState = {
   flashcards: FlashcardsState
 }
 
-declare type PendingClip = {
-  start: WaveformX
-  end: WaveformX
-}
-
 type TimeSpan = {
   start: number
   end: number

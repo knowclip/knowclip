@@ -38,7 +38,13 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         (event[playPauseForceKey] || !isTextFieldFocused())
       ) {
         event.preventDefault()
-        effects.toggleMediaPaused()
+        if (
+          !(
+            document.activeElement &&
+            document.activeElement === effects.getMediaPlayer()
+          )
+        )
+          effects.toggleMediaPaused()
         return EMPTY
       }
 
@@ -67,14 +73,23 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
           return from([r.closeDictionaryPopover()])
         }
 
-        return of(
-          effects.isMediaPlaying()
-            ? r.getClipIdAt(state$.value, state$.value.waveform.cursor.x) ===
-              r.getHighlightedClipId(state$.value)
-              ? r.setLoop(false)
-              : r.clearWaveformSelection()
-            : r.clearWaveformSelection()
+        const mediaIsPlaying = effects.isMediaPlaying()
+        const currentTime = effects.getCurrentTime()
+
+        if (
+          mediaIsPlaying &&
+          r.getClipIdAt(state$.value, currentTime * 1000) ===
+            r.getHighlightedClipId(state$.value)
         )
+          return of(r.setLoop(false))
+
+        return EMPTY
+      }
+
+      if (key === KEYS.dUppercase && ctrlKey) {
+        const highlightedClipId = r.getHighlightedClipId(state$.value)
+        event.preventDefault()
+        return highlightedClipId ? of(r.deleteCard(highlightedClipId)) : EMPTY
       }
 
       return EMPTY

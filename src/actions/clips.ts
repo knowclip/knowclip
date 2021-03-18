@@ -25,6 +25,7 @@ export const clipsActions = {
     fileId,
   }),
 
+  /** Pass `null` to indicate waveform reset */
   selectWaveformItem: (selection: WaveformSelection | null) => ({
     type: A.selectWaveformItem,
     selection,
@@ -66,6 +67,13 @@ export const clipsActions = {
     newSelection,
   }),
 
+  moveClip: (id: ClipId, deltaX: number, overlapIds: Array<ClipId>) => ({
+    type: A.moveClip,
+    id,
+    deltaX,
+    overlapIds,
+  }),
+
   setFlashcardField: (
     id: ClipId,
     key: FlashcardFieldName,
@@ -102,8 +110,6 @@ export const clipsActions = {
     ids,
   }),
 }
-
-const clearWaveformSelection = () => clipsActions.selectWaveformItem(null)
 
 const addFlashcardImage = (id: ClipId, seconds?: number) => {
   const image: FlashcardImage = seconds
@@ -154,7 +160,6 @@ const removeClozeDeletion = (
   })
 
 export const compositeClipsActions = {
-  clearWaveformSelection,
   addFlashcardImage,
   removeFlashcardImage,
   addClozeDeletion,

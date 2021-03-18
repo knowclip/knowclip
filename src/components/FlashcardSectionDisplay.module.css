@@ -95,8 +95,7 @@
 }
 
 .clozeValueChar {
-  white-space: nowrap;
-  white-space: pre;
+  white-space: pre-wrap;
 
   position: relative;
 

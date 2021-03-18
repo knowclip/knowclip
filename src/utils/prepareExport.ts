@@ -144,8 +144,8 @@ export const getApkgExportData = (
       const extension = extname(fileLoaded.filePath)
       const filenameWithoutExtension = basename(fileLoaded.filePath, extension)
 
-      const startTime = r.getMillisecondsAtX(state, clip.start)
-      const endTime = r.getMillisecondsAtX(state, clip.end)
+      const startTime = clip.start
+      const endTime = clip.end
       const outputFilename =
         sanitizeFileName(
           `${filenameWithoutExtension.slice(0, 20)}__${media.id}`

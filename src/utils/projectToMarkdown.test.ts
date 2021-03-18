@@ -1,6 +1,5 @@
 import { combineReducers } from 'redux'
 
-import waveform from '../reducers/waveform'
 import clips from '../reducers/clips'
 import session from '../reducers/session'
 import snackbar from '../reducers/snackbar'
@@ -13,9 +12,9 @@ import files from '../reducers/files'
 import projectToMarkdown from './projectToMarkdown'
 
 import { initialState } from '../reducers/files'
+import { pixelsToMs } from './waveform'
 
 export const reducer = combineReducers<AppState>({
-  waveform,
   clips,
   session,
   snackbar,
@@ -43,7 +42,12 @@ describe('projectToMarkdown', () => {
     ],
     tags: string[]
   ): { clip: Clip; flashcard: Flashcard } => ({
-    clip: { start, end, fileId: mediaFileId, id },
+    clip: {
+      start: pixelsToMs(start, 50),
+      end: pixelsToMs(end, 50),
+      fileId: mediaFileId,
+      id,
+    },
     flashcard: {
       id,
       type: 'Transliteration',
