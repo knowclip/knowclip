@@ -107,7 +107,7 @@ const FlashcardSectionDisplayCard = memo(
 
     return (
       <FlashcardSectionDisplay
-        className={cn(className, css.card)}
+        className={cn(className, css.card, $.container)}
         mediaFile={mediaFile}
         fieldsToTracks={fieldsToTracks}
         fields={fields}

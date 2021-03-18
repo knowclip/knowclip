@@ -68,8 +68,8 @@ export default async function exportWithMissingMedia({
         throw err
       })
       zipfile.on('entry', function (entry) {
-        console.log(entry)
-        console.log(entry.getLastModDate())
+        // console.log(entry)
+        // console.log(entry.getLastModDate())
         files.push(entry.fileName)
         zipfile.openReadStream(entry, function (err, readStream) {
           if (err) throw err

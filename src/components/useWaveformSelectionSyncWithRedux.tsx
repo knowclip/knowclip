@@ -36,7 +36,7 @@ export function useWaveformSelectionSyncWithRedux(
 
     if (localChange && notSyncedWithRemote) {
       dispatch(r.selectWaveformItem(currentLocalSelection))
-      if (currentLocalSelection && editing) dispatch(r.stopEditingCards())
+      if (!currentLocalSelection && editing) dispatch(r.stopEditingCards())
     }
     if (remoteChange && notSyncedWithRemote) {
       if (remoteSelection) {

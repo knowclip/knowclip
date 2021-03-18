@@ -2,6 +2,7 @@ import { testBlock, TestSetup } from '../../setUpDriver'
 import { clickAt } from '../../driver/ClientWrapper'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
+import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard'
 
 export default async function navigateBetweenClips({ app, client }: TestSetup) {
   const { previousClipButton, container } = flashcardSection$
@@ -17,7 +18,7 @@ export default async function navigateBetweenClips({ app, client }: TestSetup) {
   await testBlock('click to select new clip', async () => {
     await clickAt(app, [800, 655])
 
-    await client.waitUntilPresent_(flashcardForm$.flashcardFields)
+    await client.waitUntilPresent_(flashcardSectionDisplayCard$.container)
   })
 
   await testBlock('navigate to previous clip', async () => {
