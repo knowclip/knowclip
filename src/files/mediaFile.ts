@@ -1,12 +1,12 @@
 import r from '../redux'
-import { basename, join } from 'path'
+import { basename, dirname, join } from 'path'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { readMediaFile } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
-import { existsSync } from 'fs-extra'
+import { existsSync, readdir } from 'fs-extra'
 import { getWaveformPngs } from '../utils/getWaveform'
 import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 import { updaterGetter } from './updaterGetter'
@@ -52,6 +52,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
   openSuccess: [
     addEmbeddedSubtitles,
     loadExternalSubtitles,
+    autoAddExternalSubtitles,
     getCbr,
     getWaveform,
     setDefaultClipSpecs,
@@ -143,6 +144,55 @@ export const validateMediaFile = async (
   }
 
   return { value: [null, newFile] }
+}
+
+const SUBTITLES_FILE_EXTENSIONS: SubtitlesFileExtension[] = [
+  'vtt',
+  'ass',
+  'srt',
+]
+const extensionRegex = new RegExp(
+  `\\.(${SUBTITLES_FILE_EXTENSIONS.join('|')})$`
+)
+const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
+  { id, subtitles },
+  filePath,
+  state,
+  effects
+) => {
+  const fileNameWithoutExtension = basename(filePath).replace(/\..+$/, '')
+  const potentialSubtitlesFilenames = (await readdir(dirname(filePath))).filter(
+    (filename) =>
+      filename.startsWith(fileNameWithoutExtension) &&
+      extensionRegex.test(filename)
+  )
+
+  const linkedExternalSubtitlesFiles = subtitles
+    .map((s) =>
+      r.getFile<ExternalSubtitlesFile>(state, 'ExternalSubtitlesFile', s.id)
+    )
+    .filter((f): f is ExternalSubtitlesFile => Boolean(f))
+
+  const notAlreadyAdded = potentialSubtitlesFilenames.filter((name) => {
+    return !linkedExternalSubtitlesFiles.some((s) => s.name === name)
+  })
+
+  return notAlreadyAdded.map((newSubtitlesfileName) => {
+    const file: ExternalSubtitlesFile = {
+      id: effects.uuid(),
+      type: 'ExternalSubtitlesFile',
+      name: newSubtitlesfileName,
+      parentId: id,
+      chunksMetadata: null,
+    }
+
+    const subtitlesfilePath = join(dirname(filePath), newSubtitlesfileName)
+    console.log({subtitlesfilePath})
+    return r.openFileRequest(
+      file,
+      subtitlesfilePath
+    )
+  })
 }
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (

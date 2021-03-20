@@ -7,7 +7,7 @@ import { getWaveformPng } from './utils/getWaveform'
 import { getVideoStill } from './utils/getVideoStill'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 import tempy from 'tempy'
-import { nowUtcTimestamp } from './utils/sideEffects'
+import { nowUtcTimestamp, uuid } from './utils/sideEffects'
 import { getDexieDb } from './utils/dictionariesDatabase'
 import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDictionary'
 import * as electronHelpers from './utils/electron'
@@ -40,6 +40,7 @@ const dependencies = {
   getConstantBitrateMediaPath,
   processNoteMedia,
   nowUtcTimestamp,
+  uuid,
   getDexieDb,
 
   parseAndImportDictionary,

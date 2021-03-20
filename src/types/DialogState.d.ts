@@ -66,6 +66,7 @@ declare type SettingsDialogData = {
 declare type LinkSubtitlesDialogData = {
   type: 'LinkSubtitles'
   subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles
+  subtitlesChunks: SubtitlesChunk[]
   mediaFileId: MediaFileId
 }
 

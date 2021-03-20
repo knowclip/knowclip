@@ -401,8 +401,6 @@ function useWaveformMouseActions(
           ms
         )
 
-        console.log({ newTime })
-
         playerRef.current.currentTime = msToSeconds(newTime)
         if (!pendingAction) setCursorX(msToPixels(newTime, pixelsPerSecond))
       }

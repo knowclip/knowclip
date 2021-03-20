@@ -117,7 +117,7 @@ const SubtitlesMenu = () => {
                 id={relation.id}
                 track={track}
                 file={sourceFile}
-                title={`External track ${i + 1}`}
+                title={sourceFile?.name || `External track ${i+ 1}`}
               />
             ))}
             <Divider />
