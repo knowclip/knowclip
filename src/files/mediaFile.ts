@@ -187,11 +187,7 @@ const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     }
 
     const subtitlesfilePath = join(dirname(filePath), newSubtitlesfileName)
-    console.log({subtitlesfilePath})
-    return r.openFileRequest(
-      file,
-      subtitlesfilePath
-    )
+    return r.openFileRequest(file, subtitlesfilePath)
   })
 }
 
