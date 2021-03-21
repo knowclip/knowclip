@@ -42,21 +42,27 @@ const MainHeader = ({
     viewMode: state.settings.viewMode,
   }))
 
-  const { isShowing, handleHover, handleMouseOut } = useAutoHide(
-    currentMediaFile,
-    currentProjectId
-  )
+  const {
+    isShowing,
+    handleHover,
+    handleMouseLeave,
+    handleFocus,
+    handleBlur,
+  } = useAutoHide(currentMediaFile, currentProjectId)
 
   const playButtonSync = usePlayButtonSync(waveform.state.pixelsPerSecond)
 
   return (
     <header
       className={cn(headerCss.container, $.container, {
+        [headerCss.audio]: !currentMediaFile?.isVideo,
         [headerCss.horizontal]: viewMode === 'HORIZONTAL',
         [headerCss.isShowing]: isShowing,
       })}
       onMouseEnter={handleHover}
-      onMouseLeave={handleMouseOut}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     >
       <ProjectMenu className={headerCss.block} />
       <section className={headerCss.block}>
@@ -92,6 +98,7 @@ const MainHeader = ({
       </ul>
       <div
         className={cn($.hoverArea, headerCss.hoverArea, {
+          [headerCss.audio]: !currentMediaFile?.isVideo,
           [headerCss.horizontal]: viewMode === 'HORIZONTAL',
           [headerCss.isShowing]: isShowing,
         })}
@@ -103,11 +110,13 @@ const MainHeader = ({
 export default MainHeader
 
 export { $ as mainHeader$ }
+
 function useAutoHide(
   currentMediaFile: MediaFile | null,
   currentProjectId: string
 ) {
   const [forceVisible, setForceVisible] = useState(false)
+  const [_focused, setFocused] = useState(false)
   const [hovering, setHovering] = useState(false)
   const isShowing = forceVisible || hovering || !currentMediaFile
 
@@ -116,10 +125,17 @@ function useAutoHide(
   const forceVisibleTimeout = useRef<number | null>(null)
   const currentMediaFileId = currentMediaFile?.id
 
+  const handleFocus = useCallback(() => {
+    setFocused(true)
+  }, [])
+  const handleBlur: React.FocusEventHandler = useCallback(() => {
+    setHovering(false)
+    setFocused(false)
+  }, [])
   const handleHover = useCallback(() => {
     setHovering(true)
   }, [])
-  const handleMouseOut = useCallback(() => {
+  const handleMouseLeave = useCallback(() => {
     setHovering(false)
   }, [])
   useEffect(() => {
@@ -142,5 +158,11 @@ function useAutoHide(
     previousProjectId,
     forceVisibleTimeout,
   ])
-  return { isShowing, handleHover, handleMouseOut }
+  return {
+    isShowing,
+    handleHover,
+    handleMouseLeave,
+    handleFocus,
+    handleBlur,
+  }
 }

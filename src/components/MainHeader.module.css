@@ -13,17 +13,21 @@
   flex-grow: 0;
   height: 4rem;
 
-  transition: margin .2s;
+  transition: all .2s;
 }
 
 .container.horizontal {
   position: fixed;
   width: 100%;
-  margin-bottom: 1rem;
   margin-top: -4rem;
 }
 
-.isShowing.horizontal,
+.container.horizontal.audio {
+  position: relative;
+}
+
+.container.horizontal.isShowing,
+.container.horizontal.audio,
 .container.horizontal:focus-within
  {
   margin-top: 0;
@@ -42,8 +46,13 @@
   display: block;
 }
 
-.isShowing.horizontal.hoverArea,
-.container.horizontal:focus-within.hoverArea {
+.hoverArea.horizontal.audio {
+  display: none;
+}
+
+.hoverArea.horizontal.isShowing,
+.container:focus-within > .hoverArea.horizontal,
+.hoverArea.horizontal.audio {
   height: 0;
   bottom: -0;
   width: 100%;
