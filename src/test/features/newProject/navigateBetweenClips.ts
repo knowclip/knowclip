@@ -22,6 +22,9 @@ export default async function navigateBetweenClips({ app, client }: TestSetup) {
   })
 
   await testBlock('navigate to previous clip', async () => {
+    await client.clickElement_(flashcardSectionDisplayCard$.container)
+    await client.waitForVisible_(previousClipButton)
+
     await client.clickElement_(previousClipButton)
 
     await client.waitForText('body', '1 / 2')

@@ -1,5 +1,11 @@
-import React, { Fragment, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { IconButton, Tooltip } from '@material-ui/core'
 import { Delete } from '@material-ui/icons'
 import cn from 'classnames'
@@ -10,9 +16,11 @@ import { actions } from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 import { usePlayButtonSync } from './usePlayButtonSync'
 import { WaveformInterface } from './useWaveform'
+import { usePrevious } from '../utils/usePrevious'
 
 enum $ {
   container = 'main-screen-header',
+  hoverArea = 'hover-area',
 }
 
 const MainHeader = ({
@@ -30,10 +38,26 @@ const MainHeader = ({
     [dispatch]
   )
 
+  const { viewMode } = useSelector((state: AppState) => ({
+    viewMode: state.settings.viewMode,
+  }))
+
+  const { isShowing, handleHover, handleMouseOut } = useAutoHide(
+    currentMediaFile,
+    currentProjectId
+  )
+
   const playButtonSync = usePlayButtonSync(waveform.state.pixelsPerSecond)
 
   return (
-    <header className={cn(headerCss.container, $.container)}>
+    <header
+      className={cn(headerCss.container, $.container, {
+        [headerCss.horizontal]: viewMode === 'HORIZONTAL',
+        [headerCss.isShowing]: isShowing,
+      })}
+      onMouseEnter={handleHover}
+      onMouseLeave={handleMouseOut}
+    >
       <ProjectMenu className={headerCss.block} />
       <section className={headerCss.block}>
         <MediaFilesMenu
@@ -66,6 +90,12 @@ const MainHeader = ({
           </Fragment>
         )}
       </ul>
+      <div
+        className={cn($.hoverArea, headerCss.hoverArea, {
+          [headerCss.horizontal]: viewMode === 'HORIZONTAL',
+          [headerCss.isShowing]: isShowing,
+        })}
+      ></div>
     </header>
   )
 }
@@ -73,3 +103,44 @@ const MainHeader = ({
 export default MainHeader
 
 export { $ as mainHeader$ }
+function useAutoHide(
+  currentMediaFile: MediaFile | null,
+  currentProjectId: string
+) {
+  const [forceVisible, setForceVisible] = useState(false)
+  const [hovering, setHovering] = useState(false)
+  const isShowing = forceVisible || hovering || !currentMediaFile
+
+  const previousProjectId = usePrevious(currentProjectId)
+  const previousMediaFileId = usePrevious(currentMediaFile?.id)
+  const forceVisibleTimeout = useRef<number | null>(null)
+  const currentMediaFileId = currentMediaFile?.id
+
+  const handleHover = useCallback(() => {
+    setHovering(true)
+  }, [])
+  const handleMouseOut = useCallback(() => {
+    setHovering(false)
+  }, [])
+  useEffect(() => {
+    if (
+      currentProjectId !== previousProjectId ||
+      currentMediaFileId !== (previousMediaFileId || null)
+    ) {
+      setForceVisible(true)
+      if (typeof forceVisibleTimeout.current === 'number')
+        clearTimeout(forceVisibleTimeout.current)
+      const timeout = setTimeout(() => {
+        setForceVisible(false)
+      }, 1000)
+      forceVisibleTimeout.current = (timeout as any) as number
+    }
+  }, [
+    currentMediaFileId,
+    currentProjectId,
+    previousMediaFileId,
+    previousProjectId,
+    forceVisibleTimeout,
+  ])
+  return { isShowing, handleHover, handleMouseOut }
+}

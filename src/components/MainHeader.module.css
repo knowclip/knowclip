@@ -1,13 +1,52 @@
 .container {
+  z-index: 2;
+  position: relative;
+  margin-top: 0;
+
   background-color: #222;
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: -.5em 0;
+  margin: 0;
   flex-shrink: 0;
   flex-grow: 0;
   height: 4rem;
+
+  transition: margin .2s;
+}
+
+.container.horizontal {
+  position: fixed;
+  width: 100%;
+  margin-bottom: 1rem;
+  margin-top: -4rem;
+}
+
+.isShowing.horizontal,
+.container.horizontal:focus-within
+ {
+  margin-top: 0;
+}
+
+.hoverArea {
+  display: none;
+  transition: all .2s;
+  background: transparent;
+  bottom: -4em;
+  height: 4em;
+  width: 100%;
+  position: absolute;
+}
+.hoverArea.horizontal {
+  display: block;
+}
+
+.isShowing.horizontal.hoverArea,
+.container.horizontal:focus-within.hoverArea {
+  height: 0;
+  bottom: -0;
+  width: 100%;
 }
 
 .block {
