@@ -17,7 +17,7 @@
 .viewModeButton {
   position: absolute !important;
   z-index: 1;
-  top: 3rem;
+  top: 4.5rem;
   left: 3rem;
   opacity: 0;
   transition: opacity .2s, background-color .2s;

@@ -23,6 +23,8 @@ import {
   blankTransliterationFields,
 } from '../../utils/newFlashcard'
 import { capitalize } from '../FlashcardSectionForm'
+import { formatDurationWithMilliseconds } from '../../utils/formatTime'
+import moment from 'moment'
 
 enum $ {
   container = 'link-subtitles-dialog-container',
@@ -31,7 +33,7 @@ enum $ {
 
 const LinkSubtitlesDialog = ({
   open,
-  data: { subtitles, mediaFileId },
+  data: { subtitles, subtitlesChunks, mediaFileId },
 }: DialogProps<LinkSubtitlesDialogData>) => {
   const dispatch = useDispatch()
 
@@ -97,26 +99,49 @@ const LinkSubtitlesDialog = ({
     return null
   }
 
+  const chunksDisplay = (
+    <pre
+      style={{
+        height: '200px',
+        overflow: 'auto',
+        backgroundColor: '#eeeeee',
+        padding: '1em',
+      }}
+    >
+      {subtitlesChunks.slice(0, 100).map(({ text, start }) => (
+        <React.Fragment key={String(start)}>
+          <span>
+            {formatDurationWithMilliseconds(moment.duration(start)).padStart(
+              10
+            )}
+          </span>{' '}
+          {text.split(/\n+/).map((t) => '  ' + t)}
+          <br />
+        </React.Fragment>
+      ))}
+      {subtitlesChunks.length > 100 ? <>'...'</> : null}
+    </pre>
+  )
+
   const prompt =
     subtitles.type === 'ExternalSubtitlesFile' ? (
-      <p>
-        Would you like to link this subtitles track to a specific flashcard
-        field to help you create flashcards?
-        <br />
-        <br />
-        You can always change this later.
-      </p>
+      <>
+        <p>
+          Would you like to link this subtitles track to a specific flashcard
+          field to help you create flashcards? You can always change this later.
+        </p>
+        <h3>{subtitles.name}</h3>
+        {chunksDisplay}
+      </>
     ) : (
-      <p>
-        An embedded subtitles track was detected in this media file!
-        <br />
-        <br />
-        Would you like to link this track to a flashcard field to help you
-        create flashcards?
-        <br />
-        <br />
-        You can always change this later.
-      </p>
+      <>
+        <p>An embedded subtitles track was detected in this media file!</p>
+        <p>
+          Would you like to link this subtitles track to a specific flashcard
+          field to help you create flashcards? You can always change this later.
+        </p>
+        {chunksDisplay}
+      </>
     )
 
   return (

@@ -81,11 +81,13 @@ const settingsDialog = () =>
 
 const linkSubtitlesDialog = (
   subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles,
+  subtitlesChunks: SubtitlesChunk[],
   mediaFileId: MediaFileId
 ) =>
   dialogActions.enqueueDialog({
     type: 'LinkSubtitles',
     subtitles,
+    subtitlesChunks,
     mediaFileId,
   })
 

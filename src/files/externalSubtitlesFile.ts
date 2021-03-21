@@ -39,7 +39,13 @@ export default {
                 r.addSubtitlesTrack(track, mediaFile.id),
                 ...(state.dialog.queue.some((d) => d.type === 'SubtitlesClips')
                   ? []
-                  : [r.linkSubtitlesDialog(validatedFile, mediaFile.id)]),
+                  : [
+                      r.linkSubtitlesDialog(
+                        validatedFile,
+                        chunks,
+                        mediaFile.id
+                      ),
+                    ]),
               ]
             : []),
           r.mountSubtitlesTrack(track), // maybe should only do this after linkSubtitlesDialog in case this is first time mounting,

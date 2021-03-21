@@ -4,7 +4,6 @@ import { of, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
-import { uuid } from '../utils/sideEffects'
 import { getUpdateWith } from '../files/updates'
 import { msToSeconds } from '../utils/waveform'
 
@@ -122,7 +121,7 @@ export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
 export const newClipFromChunk: AppEpic = (
   action$,
   state$,
-  { setCurrentTime }
+  { setCurrentTime, uuid }
 ) =>
   action$
     .ofType<NewCardFromSubtitlesRequest>(A.newCardFromSubtitlesRequest)

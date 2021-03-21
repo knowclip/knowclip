@@ -5,8 +5,6 @@ import r from '../redux'
 import { extname, basename, join } from 'path'
 import { parse, stringifyVtt } from 'subtitle'
 import subsrt from 'subsrt'
-import packageJson from '../../package.json'
-import { pixelsToMs, secondsToPixels } from './waveform'
 
 const { readFile, writeFile } = promises
 

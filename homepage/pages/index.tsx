@@ -82,9 +82,9 @@ const IndexPage = () => {
               level
             </li>
             <li>
-              instantly bundle them into a ready-to-use{" "}
+              instantly bundle them into a ready-to-use deck of{" "}
               <A href="#anki" onClick={focusAnki} className={css.link}>
-                Anki deck
+                Anki flashcards
               </A>
               .
             </li>
