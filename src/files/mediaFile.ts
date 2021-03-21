@@ -163,18 +163,18 @@ const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   const fileNameWithoutExtension = basename(filePath).replace(/\..+$/, '')
   const potentialSubtitlesFilenames = (await readdir(dirname(filePath))).filter(
     (filename) =>
-      filename.startsWith(fileNameWithoutExtension) &&
+      filename.startsWith(`${fileNameWithoutExtension}.`) &&
       extensionRegex.test(filename)
   )
 
-  const linkedExternalSubtitlesFiles = subtitles
+  const previouslyLoadedExternalSubtitlesFiles = subtitles
     .map((s) =>
       r.getFile<ExternalSubtitlesFile>(state, 'ExternalSubtitlesFile', s.id)
     )
     .filter((f): f is ExternalSubtitlesFile => Boolean(f))
 
   const notAlreadyAdded = potentialSubtitlesFilenames.filter((name) => {
-    return !linkedExternalSubtitlesFiles.some((s) => s.name === name)
+    return !previouslyLoadedExternalSubtitlesFiles.some((s) => s.name === name)
   })
 
   return notAlreadyAdded.map((newSubtitlesfileName) => {

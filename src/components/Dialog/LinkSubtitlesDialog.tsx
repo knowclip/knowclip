@@ -108,7 +108,7 @@ const LinkSubtitlesDialog = ({
         padding: '1em',
       }}
     >
-      {subtitlesChunks.map(({ text, index, start }) => (
+      {subtitlesChunks.slice(0, 100).map(({ text, start }) => (
         <React.Fragment key={String(start)}>
           <span>
             {formatDurationWithMilliseconds(moment.duration(start)).padStart(
@@ -119,6 +119,7 @@ const LinkSubtitlesDialog = ({
           <br />
         </React.Fragment>
       ))}
+      {subtitlesChunks.length > 100 ? <>'...'</> : null}
     </pre>
   )
 
@@ -127,24 +128,20 @@ const LinkSubtitlesDialog = ({
       <>
         <p>
           Would you like to link this subtitles track to a specific flashcard
-          field to help you create flashcards?
+          field to help you create flashcards? You can always change this later.
         </p>
-        <p>{subtitles.name}</p>
+        <h3>{subtitles.name}</h3>
         {chunksDisplay}
-        <p>You can always change this later.</p>
       </>
     ) : (
-      <p>
-        An embedded subtitles track was detected in this media file!
-        <br />
+      <>
+        <p>An embedded subtitles track was detected in this media file!</p>
+        <p>
+          Would you like to link this subtitles track to a specific flashcard
+          field to help you create flashcards? You can always change this later.
+        </p>
         {chunksDisplay}
-        <br />
-        Would you like to link this track to a flashcard field to help you
-        create flashcards?
-        <br />
-        <br />
-        You can always change this later.
-      </p>
+      </>
     )
 
   return (
