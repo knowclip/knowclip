@@ -12,7 +12,7 @@ import files from '../reducers/files'
 import projectToMarkdown from './projectToMarkdown'
 
 import { initialState } from '../reducers/files'
-import { pixelsToMs } from './waveform'
+import { pixelsToMs } from 'clipwave'
 
 export const reducer = combineReducers<AppState>({
   clips,

@@ -10,7 +10,6 @@ import {
   useWaveform,
   WaveformItem,
   sortWaveformItems,
-  usePlayButtonSync,
   WaveformGestureOf,
   ClipDrag,
   msToSeconds,
@@ -18,6 +17,7 @@ import {
   CLIP_THRESHOLD_MILLSECONDS,
   ClipStretch,
   recalculateRegions,
+  usePlayButtonSync,
 } from 'clipwave'
 import FlashcardSection from '../components/FlashcardSection'
 import Header from '../components/MainHeader'
