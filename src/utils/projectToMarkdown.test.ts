@@ -43,6 +43,7 @@ describe('projectToMarkdown', () => {
     tags: string[]
   ): { clip: Clip; flashcard: Flashcard } => ({
     clip: {
+      clipwaveType: 'Primary',
       start: pixelsToMs(start, 50),
       end: pixelsToMs(end, 50),
       fileId: mediaFileId,
