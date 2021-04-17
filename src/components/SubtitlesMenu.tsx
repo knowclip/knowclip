@@ -147,12 +147,18 @@ const SubtitlesMenu = () => {
 
 const VisibilityIcon = ({ visible }: { visible: boolean }) => (
   <Icon>
-    <Tooltip title={visible ? "Hide subtitles track in video" : "Show subtitles track in video"}>
-    {visible ? (
-      <VisibilityOnIcon fontSize="small" />
-    ) : (
-      <VisibilityOffIcon fontSize="small" />
-    )}
+    <Tooltip
+      title={
+        visible
+          ? 'Hide subtitles track in video'
+          : 'Show subtitles track in video'
+      }
+    >
+      {visible ? (
+        <VisibilityOnIcon fontSize="small" />
+      ) : (
+        <VisibilityOffIcon fontSize="small" />
+      )}
     </Tooltip>
   </Icon>
 )

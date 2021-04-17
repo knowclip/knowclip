@@ -10,14 +10,11 @@ import {
   useWaveform,
   WaveformItem,
   sortWaveformItems,
-  WaveformGestureOf,
-  ClipDrag,
-  msToSeconds,
-  WaveformDrag,
-  CLIP_THRESHOLD_MILLSECONDS,
-  ClipStretch,
-  recalculateRegions,
   usePlayButtonSync,
+  WAVEFORM_HEIGHT,
+  SUBTITLES_CHUNK_HEIGHT,
+  calculateRegions,
+  secondsToMs,
 } from 'clipwave'
 import FlashcardSection from '../components/FlashcardSection'
 import Header from '../components/MainHeader'
@@ -30,10 +27,9 @@ import { actions } from '../actions'
 import { setMousePosition } from '../utils/mousePosition'
 import 'clipwave/dist/index.css'
 import { SubtitlesCardBase } from '../selectors'
-import { bound } from '../utils/bound'
 import { usePrevious } from '../utils/usePrevious'
-import { uuid } from '../utils/sideEffects'
-import { setCurrentTime } from '../utils/media'
+import { useRenderSecondaryClip } from './WaveformSubtitlesTimelines'
+import { useWaveformEventHandlers } from './useWaveformEventHandlers'
 // import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
@@ -83,7 +79,7 @@ const Main = () => {
   }, [waveformImages])
 
   const getWaveformItem = useCallback(
-    (id: string): WaveformItem => {
+    (id: string): WaveformItem | null => {
       const clip: Clip | null = clipsMap[id] || null
       if (clip)
         return {
@@ -93,11 +89,18 @@ const Main = () => {
           end: clip.end,
         }
 
-      // const subsChunk: SubtitlesCardBase | null = subsBases.cards
-      // if (!clip)
-      throw new Error('could not find clip ' + id)
+      const subsBase: SubtitlesCardBase | null = subsBases.cardsMap[id]
+      if (subsBase)
+        return {
+          clipwaveType: 'Secondary',
+          id,
+          start: subsBase.start,
+          end: subsBase.end,
+        }
+
+      return null
     },
-    [clipsMap]
+    [clipsMap, subsBases]
   )
 
   useEffect(() => {
@@ -122,15 +125,29 @@ const Main = () => {
     },
     [clipsMap, resetWaveformState, subsBases.cards]
   )
-  // useWaveformSelectionSyncWithRedux(waveform, playerRef)
   usePlayButtonSync(waveform.state.pixelsPerSecond, playerRef)
+
+  const prevSubsBases = usePrevious(subsBases)
+  useEffect(() => {
+    if (subsBases !== prevSubsBases) {
+      const sortedItems = sortWaveformItems([
+        ...Object.values(clipsMap),
+        ...subsBases.cards,
+      ])
+      const { regions } = calculateRegions(
+        sortedItems,
+        secondsToMs(waveform.state.durationSeconds)
+      )
+
+      waveform.dispatch({
+        type: 'SET_REGIONS',
+        regions,
+      })
+    }
+  }, [subsBases, prevSubsBases, clipsMap, waveform])
 
   const dispatch = useDispatch()
 
-  const { regions } = waveform.state
-  const waveformActions = waveform.actions
-  const { selectItem } = waveform.actions
-  const { getItem } = waveform
   const { highlightedClipId } = useSelector((state: AppState) => {
     return {
       highlightedClipId: r.getHighlightedClipId(state),
@@ -149,200 +166,13 @@ const Main = () => {
     }
   }, [dispatch, previousSelection, selection])
 
-  const handleWaveformDrag = useCallback(
-    ({ gesture }: WaveformGestureOf<WaveformDrag>) => {
-      const { start: startRaw, end: endRaw, overlaps } = gesture
-      const left = Math.min(startRaw, endRaw)
-      const right = Math.max(startRaw, endRaw)
+  const {
+    handleWaveformDrag,
+    handleClipDrag,
+    handleClipEdgeDrag,
+  } = useWaveformEventHandlers(playerRef, dispatch, waveform, highlightedClipId)
 
-      const tooSmallOrClipOverlapsExist =
-        right - left < CLIP_THRESHOLD_MILLSECONDS ||
-        overlaps.some((id) => getItem(id).clipwaveType === 'Primary')
-      if (tooSmallOrClipOverlapsExist) {
-        if (playerRef.current) {
-          playerRef.current.currentTime = msToSeconds(endRaw)
-        }
-        return
-      }
-
-      const newId = uuid()
-
-      dispatch(actions.addClipRequest(gesture, newId))
-
-      waveformActions.addItem({
-        start: left,
-        end: right,
-        clipwaveType: 'Primary',
-        id: newId,
-      })
-
-      if (playerRef.current) {
-        playerRef.current.currentTime = msToSeconds(left)
-      }
-
-      // setTimeout(() => {
-      //   const button: HTMLTextAreaElement | null = document.querySelector(
-      //     `#${getCaptionArticleId(id)} button`
-      //   );
-      //   button?.click();
-      // }, 0);
-    },
-    [dispatch, getItem, waveformActions]
-  )
-
-  const MOVE_START_DELAY = 400
-  const handleClipDrag = useCallback(
-    ({ gesture: move, mouseDown, timeStamp }: WaveformGestureOf<ClipDrag>) => {
-      const moveImminent = timeStamp - mouseDown.timeStamp >= MOVE_START_DELAY
-      if (moveImminent) {
-        // const deltaX = move.start - move.end
-        const deltaX = move.end - move.start
-
-        const offsetStart = move.clip.start + deltaX
-        const offsetEnd = move.clip.end + deltaX
-
-        const clipToMoveId = move.clip.id
-        console.log('overlaps', move.overlaps)
-
-        const overlaps = move.overlaps.flatMap((id) => {
-          const item = getItem(id)
-          const { start, end } = item
-          // id check not ncessary in 0.1.3
-          return item.clipwaveType === 'Primary' &&
-            start <= offsetEnd &&
-            end >= offsetStart
-            ? [item]
-            : []
-        })
-        console.log(
-          { overlaps },
-          move.overlaps.map((ol) => getItem(ol))
-        )
-        const overlapIds = overlaps.map((c) => c.id)
-
-        setCurrentTime(
-          msToSeconds(Math.min(offsetStart, ...overlaps.map((c) => c.start)))
-        )
-
-        const toMerge = [
-          { id: clipToMoveId, start: offsetStart, end: offsetEnd },
-          ...overlaps,
-        ].sort((a, b) => a.start - b.start)
-
-        const newStartWithMerges = Math.min(...toMerge.map((c) => c.start))
-        const newEndWithMerges = Math.max(...toMerge.map((c) => c.end))
-
-        const newRegions = recalculateRegions(regions, getItem, [
-          {
-            id: clipToMoveId,
-            newItem: {
-              ...getItem(clipToMoveId),
-              id: clipToMoveId,
-              start: newStartWithMerges,
-              end: newEndWithMerges,
-            },
-          },
-          ...overlapIds.map((id) => ({ id, newItem: null })),
-        ])
-        console.log('newRegions', newRegions)
-
-        waveform.dispatch({
-          type: 'SET_REGIONS',
-          regions: newRegions,
-        })
-        dispatch(actions.moveClip(clipToMoveId, deltaX, overlapIds))
-      }
-
-      const { regionIndex, start, end } = move
-      const deltaX = end - start
-      const { id } = move.clip
-
-      const draggedClip = getItem(id)
-      const isHighlighted = draggedClip.id === highlightedClipId
-      const region = regions[regionIndex]
-      if (!isHighlighted) {
-        selectItem(region, draggedClip)
-      }
-
-      if (playerRef.current) {
-        const clipStart = moveImminent
-          ? draggedClip.start + deltaX
-          : draggedClip.start
-        const newTimeSeconds =
-          !isHighlighted || moveImminent
-            ? bound(msToSeconds(clipStart), [0, waveform.state.durationSeconds])
-            : msToSeconds(end)
-        if (playerRef.current.currentTime !== newTimeSeconds) {
-          waveform.selectionDoesntNeedSetAtNextTimeUpdate.current = true
-          playerRef.current.currentTime = newTimeSeconds
-        }
-      }
-    },
-    [getItem, highlightedClipId, regions, dispatch, waveform, selectItem]
-  )
-
-  // TODO: set time after stretch
-  const STRETCH_START_DELAY = 100
-  const handleClipEdgeDrag = useCallback(
-    ({
-      gesture: stretch,
-      mouseDown,
-      timeStamp,
-    }: WaveformGestureOf<ClipStretch>) => {
-      if (timeStamp - mouseDown.timeStamp > STRETCH_START_DELAY) {
-        const stretchedClip = {
-          ...getItem(stretch.clipId),
-          [stretch.originKey]: stretch.end,
-        }
-
-        const overlaps = stretch.overlaps.flatMap((id) => {
-          const item = getItem(id)
-          const { start, end } = item
-          // id check not ncessary in 0.1.3
-          return item.clipwaveType === 'Primary' &&
-            start <= stretchedClip.end &&
-            end >= stretchedClip.start
-            ? [item]
-            : []
-        })
-        console.log(
-          { overlaps },
-          stretch.overlaps.map((ol) => getItem(ol))
-        )
-        const overlapIds = overlaps.map((c) => c.id)
-
-        const newStartWithMerges = Math.min(
-          ...[stretchedClip, ...overlaps].map((i) => i.start)
-        )
-        const newEndWithMerges = Math.max(
-          ...[stretchedClip, ...overlaps].map((i) => i.end)
-        )
-
-        // change regions
-        // stretch in knowclip
-        const clipToStretchId = stretch.clipId
-        const newRegions = recalculateRegions(regions, getItem, [
-          {
-            id: clipToStretchId,
-            newItem: {
-              ...getItem(clipToStretchId),
-              id: clipToStretchId,
-              start: newStartWithMerges,
-              end: newEndWithMerges,
-            },
-          },
-          ...overlapIds.map((id) => ({ id, newItem: null })),
-        ])
-        waveform.dispatch({
-          type: 'SET_REGIONS',
-          regions: newRegions,
-        })
-        dispatch(actions.stretchClip(stretchedClip, overlapIds))
-      } else {
-      }
-    },
-    [dispatch, getItem, regions, waveform]
-  )
+  const renderSecondaryClip = useRenderSecondaryClip(waveform)
 
   if (!currentProject) return <Redirect to="/projects" />
 
@@ -400,6 +230,11 @@ const Main = () => {
           onWaveformDrag={handleWaveformDrag}
           onClipDrag={handleClipDrag}
           onClipEdgeDrag={handleClipEdgeDrag}
+          renderSecondaryClip={renderSecondaryClip}
+          height={
+            WAVEFORM_HEIGHT +
+            subsBases.linkedTrackIds.length * SUBTITLES_CHUNK_HEIGHT
+          }
         />
       ) : (
         // <div className={waveformCss.waveformPlaceholder} />
