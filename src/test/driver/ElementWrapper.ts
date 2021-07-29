@@ -19,6 +19,7 @@ export interface ElementWrapper {
   isExisting: () => Promise<boolean>
   isSelected: () => Promise<boolean>
   getAttribute: (attributeName: string) => Promise<string | null>
+  moveTo: (opts: { x: number; y: number }) => Promise<void>
 }
 
 export const element = (
@@ -122,6 +123,15 @@ export const element = (
       } catch (err) {
         throw new Error(
           `Could not click "${selector}" at offset ${x} ${y}: ${err}`
+        )
+      }
+    },
+    moveTo: async ({ x, y }: { x: number; y: number }) => {
+      try {
+        await element.moveTo({ xOffset: x, yOffset: y })
+      } catch (err) {
+        throw new Error(
+          `Could not move to "${selector}" at offset ${x} ${y}: ${err}`
         )
       }
     },

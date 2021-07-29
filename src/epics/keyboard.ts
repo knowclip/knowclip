@@ -48,13 +48,6 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return EMPTY
       }
 
-      if (key === KEYS.arrowRight && (altKey || !isTextFieldFocused())) {
-        return of(r.highlightRightClipRequest())
-      }
-
-      if (key === KEYS.arrowLeft && (altKey || !isTextFieldFocused())) {
-        return of(r.highlightLeftClipRequest())
-      }
 
       if (key === KEYS.escape) {
         if (r.getCurrentDialog(state$.value) || (window as any).cloze)

@@ -272,7 +272,6 @@ const EmbeddedTrackMenuItem = ({
               dense
               onClick={handleClickLinkSubtitlesDialog}
               disabled={!file}
-              id={$.locateExternalFileButton}
             >
               <ListItemIcon>
                 <Icon>
@@ -405,7 +404,6 @@ const ExternalTrackMenuItem = ({
             dense
             onClick={handleClickLinkSubtitlesDialog}
             disabled={!file}
-            id={$.locateExternalFileButton}
           >
             <ListItemIcon>
               <Icon>

@@ -16,7 +16,7 @@ export default async function openSavedProject({ client }: TestSetup) {
     mediaFilesMenu$.openMediaFilesMenuButton,
     'polar_bear_cafe.mp4'
   )
-  await client.elements_(waveform$.subtitlesTimelines, 2)
+  // await client.elements_(waveform$.subtitlesChunk, 2)
 
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
 

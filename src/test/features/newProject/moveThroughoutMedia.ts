@@ -30,7 +30,7 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
       await client.waitUntil(async () => {
         try {
           const visibility = (await clipsVisibility(client)).join(' ')
-          return visibility === 'false false true'
+          return visibility === 'true'
         } catch (err) {
           console.error(err)
           throw new Error(
@@ -38,7 +38,7 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
           )
         }
       })
-      expect(await clipsVisibility(client)).toMatchObject([false, false, true])
+      expect(await clipsVisibility(client)).toMatchObject([true])
     }
   )
 
@@ -49,9 +49,9 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
       await client.waitForText('body', '2 / 3')
 
       await client.waitUntil(async () => {
-        return (await clipsVisibility(client)).join(' ') === 'false true false'
+        return (await clipsVisibility(client)).join(' ') === 'true'
       })
-      expect(await clipsVisibility(client)).toMatchObject([false, true, false])
+      expect(await clipsVisibility(client)).toMatchObject([true])
       expect(
         Number(await client.getAttribute('video', 'currentTime'))
       ).toBeLessThan(53)

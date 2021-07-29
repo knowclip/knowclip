@@ -8,7 +8,11 @@ export async function setVideoTime(client: ClientWrapper, seconds: number) {
         const video = document.getElementById(
           mediaPlayerId
         ) as HTMLVideoElement | null
-        if (video) video.currentTime = seconds
+        console.log("setting time to", seconds)
+        if (video) {
+          video.click()
+          video.currentTime = seconds
+        }
         else throw new Error('Could not find video element')
       },
       seconds,

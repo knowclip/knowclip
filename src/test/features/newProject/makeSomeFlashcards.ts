@@ -2,7 +2,7 @@ import { testBlock, TestSetup } from '../../setUpDriver'
 import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/Waveform'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
-import { waveformMouseDrag } from '../../driver/waveform'
+import { waveformMouseDrag, waveformMouseHoldAndDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeTwoFlashcards({ client }: TestSetup) {
@@ -35,7 +35,7 @@ export default async function makeTwoFlashcards({ client }: TestSetup) {
   })
 
   await testBlock('select and edit card', async () => {
-    await waveformMouseDrag(client, 917, 888)
+    await waveformMouseHoldAndDrag(client, 300, 917, 888)
 
     await client.elements_(tagsInput$.tagChip, 1)
     await client.waitForText_(tagsInput$.tagChip, 'pbc')

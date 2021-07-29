@@ -14,6 +14,8 @@ import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { sendToMainProcess } from './messages'
 import { processNoteMedia } from './utils/ankiNote'
+import { callbackify } from 'util'
+import { ClipwaveRegionsUpdateEvent, WaveformInterface } from 'clipwave'
 
 const {
   existsSync,
@@ -22,7 +24,6 @@ const {
 } = fs
 
 const fsDependencies = { existsSync, createWriteStream, writeFile }
-
 
 const dependencies = {
   ...electronHelpers,
@@ -50,6 +51,12 @@ const dependencies = {
   quitApp: () => ipcRenderer.send('closed'),
   tmpDirectory: () => tempy.directory(),
   tmpFilename: () => tempy.file(),
+
+  dispatchClipwaveEvent: (
+    callback: (waveform: WaveformInterface) => void
+  ) => {
+    window.dispatchEvent(new ClipwaveRegionsUpdateEvent('waveform', callback))
+  },
 }
 
 export default dependencies

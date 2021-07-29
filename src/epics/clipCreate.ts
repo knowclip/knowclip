@@ -1,10 +1,17 @@
-import { switchMap } from 'rxjs/operators'
+import { ignoreElements, map, switchMap, tap } from 'rxjs/operators'
 import { of } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { ActionOf } from '../actions'
+import { combineEpics } from 'redux-observable'
+import { RecalculateWaveformRegionsEvent } from '../components/Main'
+import { afterUpdates } from '../utils/afterUpdates'
+import { ClipwaveRegionsUpdateEvent } from 'clipwave'
 
-const clipCreateEpic: AppEpic = (action$, state$) => {
+const clipCreateEpic: AppEpic = (
+  action$,
+  state$,
+) => {
   return action$
     .ofType<ActionOf<typeof A.addClipRequest>>(A.addClipRequest)
     .pipe(
@@ -31,6 +38,7 @@ const clipCreateEpic: AppEpic = (action$, state$) => {
           clipId,
           fields
         )
+
         return of(
           r.addClip(
             clip,
@@ -42,4 +50,30 @@ const clipCreateEpic: AppEpic = (action$, state$) => {
     )
 }
 
-export default clipCreateEpic
+// maybe instead of manually calling waveform actions alongside Knowclip addClip, stretchClip, etc. in waveform event handlers,
+// listen to all those knowclip actions ike this
+// and dispatch a WaveformRegionsUpdateEvent which takes a callback, (waveform: WaveformInterface) => void.
+// in the callback, do the updates.
+const recalculateWaveformRegionsEpic: AppEpic = (
+  action$,
+  state$,
+  { document, window }
+) => {
+  return action$
+    .ofType<ActionOf<typeof A.addClip | typeof A.addClips>>(
+      A.addClip,
+      A.addClips
+    )
+    .pipe(
+      tap(() => {
+        console.log('dispatching recalculate event!')
+        window.setTimeout(
+          () => document.dispatchEvent(new RecalculateWaveformRegionsEvent()),
+          0
+        )
+      }),
+      ignoreElements()
+    )
+}
+
+export default combineEpics(clipCreateEpic)

@@ -1,4 +1,4 @@
-import { TestSetup } from '../../setUpDriver'
+import { testBlock, TestSetup } from '../../setUpDriver'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { waveform$ } from '../../../components/Waveform'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
@@ -9,32 +9,46 @@ import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeSomeFlashcards({ client }: TestSetup) {
   const { deleteButton } = flashcardForm$
+  await testBlock('create first card', async () => {
+    await waveformMouseDrag(client, 351, 438)
+    await client.waitForText_(flashcardSection$.container, '1 / 1')
 
-  await waveformMouseDrag(client, 351, 438)
-  await client.waitForText_(flashcardSection$.container, '1 / 1')
-
-  await fillInTransliterationCardFields(client, {
-    transcription: 'Ich bin keine Katze, sagte Frederick böse',
-    meaning: 'I am not a cat, said Frederick angrily',
+    await fillInTransliterationCardFields(client, {
+      transcription: 'Ich bin keine Katze, sagte Frederick böse',
+      meaning: 'I am not a cat, said Frederick angrily',
+    })
   })
 
-  await waveformMouseDrag(client, 921, 1000)
-  await client.waitForText_(flashcardSection$.container, '2 / 2')
+  await testBlock('create another card', async () => {
+    await waveformMouseDrag(client, 921, 1000)
+    await client.waitForText_(flashcardSection$.container, '2 / 2')
 
-  await fillInTransliterationCardFields(client, {
-    transcription: "Das hab' ich nicht gesagt",
-    meaning: "I didn't say that",
+    await fillInTransliterationCardFields(client, {
+      transcription: "Das hab' ich nicht gesagt",
+      meaning: "I didn't say that",
+    })
   })
 
-  await setVideoTime(client, 38)
-  await client.waitForHidden_(waveform$.waveformClip)
+  await testBlock('seek to new video time', async () => {
+    await setVideoTime(client, 38)
+    await client.waitUntilGone_(waveform$.waveformClip)
+    // await client.waitUntil(async () => {
+    //   const isVisible = await clip.()
+    //   console.log({ isVisible})
+    //   return !(isVisible)
+    // })
+  })
 
-  await waveformMouseDrag(client, 176, 355)
-  await client.waitForText_(flashcardSection$.container, '3 / 3')
+  await testBlock('create a third card', async () => {
+    await waveformMouseDrag(client, 176, 355)
+    await client.waitForText_(flashcardSection$.container, '3 / 3')
+    await client.waitForVisible_(waveform$.waveformClip)
+  })
 
-  await client.clickElement_(deleteButton)
-
-  await client.elements_(waveform$.waveformClip, 2)
+  await testBlock('delete third card', async () => {
+    await client.clickElement_(deleteButton)
+    await client.waitUntilGone_(waveform$.waveformClip)
+  })
 
   // await setVideoTime(client, 0)
   // await setVideoTime(client, 20)

@@ -24,15 +24,6 @@ export const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
   'notes',
 ]
 
-export type WaveformSelectionExpanded =
-  | { type: 'Clip'; index: number; item: Clip; id: string }
-  | {
-      type: 'Preview'
-      index: number
-      item: SubtitlesCardBase
-      cardBaseIndex: number
-    }
-
 const getSubtitlesCardBaseFieldPriority = createSelector(
   getSubtitlesFlashcardFieldLinks,
   (state: AppState) => state.subtitles,

@@ -185,10 +185,15 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
           },
         },
       }
-      return action.overlappedClipsIds.length
+
+existingClip.clipwaveType
+
+      action.frontOverlappedSubtitlesCardBases
+
+      return action.overlaps.length
         ? mergeClips(
             action.stretchedClip.id,
-            action.overlappedClipsIds,
+            action.overlaps.map(c => c.id),
             stretchedState.byId,
             stretchedState
           )

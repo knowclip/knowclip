@@ -114,19 +114,35 @@ async function copyFixtures() {
   await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
 }
 
-export async function testBlock(name: string, cb: () => Promise<void>) {
+export async function testBlock<T>(name: string, cb: () => Promise<T>): Promise<T> {
   try {
     process.stdout.write('\n     ' + name)
 
-    await cb()
+    const result = await cb()
 
     process.stdout.write(' ✅  \n')
+
+    return result
   } catch (err) {
     process.stdout.write(' ❗️ \n')
-    const errName = String(err.name || err.constructor)
-    process.stdout.write(errName + ' ' + String(err.message) + '\n')
-    throw err
-  }
 
-  process.stdout.write('\n')
+    const errName = String(err.name || err.constructor)
+    process.stdout.write(
+      errName + ' ' + String(err.message) + '\nFailure at: ' + name
+    )
+    throw new TestBlockError(name, err.message, err.stack)
+  } finally {
+    process.stdout.write('\n')
+  }
+}
+
+class TestBlockError extends Error {
+  constructor(
+    blockName: string,
+    message: string,
+    stack: typeof Error.prototype.stack
+  ) {
+    super(`Failure at ${JSON.stringify(blockName)}: ${message}`)
+    this.stack = stack
+  }
 }

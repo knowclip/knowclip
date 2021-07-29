@@ -238,4 +238,12 @@ export class ClientWrapper {
   async clickAtOffset_(testLabel: string, { x, y }: { x: number; y: number }) {
     return await this.clickAtOffset(getSelector(testLabel), { x, y })
   }
+
+  async moveTo(selector: string, offset: { x: number; y: number }) {
+    const el = await this.firstElement(selector)
+    return await el.moveTo(offset)
+  }
+  async moveTo_(testLabel: string, offset: { x: number; y: number }) {
+    return await this.moveTo(getSelector(testLabel), offset)
+  }
 }

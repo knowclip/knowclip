@@ -116,6 +116,7 @@ const Media = ({
       (e) => {
         const media = e.target as HTMLVideoElement | HTMLAudioElement
         const wasSeeking = seeking.current
+        console.log('time updated! was seeking?', wasSeeking)
         onTimeUpdate(media, seeking, looping)
         if (wasSeeking) blur(e)
       },

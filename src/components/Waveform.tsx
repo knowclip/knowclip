@@ -1,9 +1,7 @@
 export enum $ {
-  container = 'waveform-container',
-  subtitlesTimelinesContainer = 'subtitles-timelines-container',
-  subtitlesTimelines = 'subtitles-timeline',
-  waveformClipsContainer = 'waveform-clips-container',
-  waveformClip = 'waveform-clip',
+  placeholder = 'waveform-placeholder',
+  subtitlesChunk = 'subtitles-chunk',
+  waveformClip = 'main-screen-container > svg g[data-clip-id]'
 }
 
 export { $ as waveform$ }

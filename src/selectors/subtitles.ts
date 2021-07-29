@@ -6,6 +6,7 @@ import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
+import { SubtitlesCardBase } from './cardPreview'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,
@@ -208,7 +209,7 @@ export const overlapsSignificantly = (
 ): boolean =>
   start <= chunk.end - HALF_SECOND && end >= chunk.start + HALF_SECOND
 
-export const getSubtitlesChunksWithinRange = (
+const getSubtitlesChunksWithinRange = (
   state: AppState,
   subtitlesTrackId: SubtitlesTrackId,
   start: WaveformX,
@@ -221,7 +222,7 @@ export const getSubtitlesChunksWithinRange = (
     end
   )
 
-export const getSubtitlesChunksWithinRangeFromTracksState = (
+const getSubtitlesChunksWithinRangeFromTracksState = (
   state: AppState['subtitles'],
   subtitlesTrackId: SubtitlesTrackId,
   start: WaveformX,
@@ -250,54 +251,100 @@ export const getSubtitlesFlashcardFieldLinks = (
 }
 
 export const getNewFlashcardForStretchedClip = (
-  state: AppState,
-  waveformState: WaveformState,
-  noteType: NoteType,
-  { start, end }: Clip,
-  flashcard: Flashcard,
-  { start: stretchStart, end: stretchEnd }: { start: number; end: number },
-  direction: 'PREPEND' | 'APPEND'
+  links: SubtitlesFlashcardFieldsLinks,
+  subtitles: SubtitlesState,
+  clip: Clip,
+  flashcards: FlashcardsState,
+  newlyOverlapped: {
+    front: Array<SubtitlesCardBase | Clip>
+    back: Array<SubtitlesCardBase | Clip>
+  }
 ): Flashcard => {
-  const links = getSubtitlesFlashcardFieldLinks(state)
-  if (!Object.keys(links).length) return flashcard
+  const flashcard = flashcards[clip.id]
+  const linkedFieldNames = Object.keys(
+    links
+  ) as TransliterationFlashcardFieldName[]
+  if (!linkedFieldNames.length) return flashcard
 
   const originalFields: TransliterationFlashcardFields = flashcard.fields as any
-  const newFields: TransliterationFlashcardFields = { ...originalFields }
+  const newFields = {} as TransliterationFlashcardFields
+  const newCloze: ClozeDeletion[] = []
 
-  for (const fn in links) {
-    const fieldName = fn as TransliterationFlashcardFieldName
+  const newlyOverlappedClips = {
+    front: newlyOverlapped.front.filter((o) => o.clipwaveType === 'Primary'),
+    back: newlyOverlapped.back.filter((o) => o.clipwaveType === 'Primary'),
+  }
+  // const clipsToIntegrate = [...newlyOverlappedClips.front, clip, ...newlyOverlappedClips.back]
+  const itemsToIntegrate = {
+    front: newlyOverlapped.front.filter(
+      (o) =>
+        o.clipwaveType === 'Primary' ||
+        newlyOverlappedClips.front.some((c) =>
+          overlapsSignificantly(c, o.start, o.end)
+        )
+    ),
+    back: newlyOverlapped.back.filter(
+      (o) =>
+        o.clipwaveType === 'Primary' ||
+        newlyOverlappedClips.back.some((c) =>
+          overlapsSignificantly(c, o.start, o.end)
+        )
+    ),
+  }
+
+  for (const fieldName of linkedFieldNames) {
     const trackId = links[fieldName]
-    const originalText = originalFields[fieldName]
-    const newlyOverlapped = (chunk: SubtitlesChunk) =>
-      !originalText.trim() || !overlapsSignificantly(chunk, start, end)
-    const chunks = trackId
-      ? getSubtitlesChunksWithinRange(
-          state,
-          trackId,
-          stretchStart,
-          stretchEnd
-        ).filter(newlyOverlapped)
-      : []
+    const trackChunks = trackId ? subtitles[trackId].chunks : []
+    const combined = [
+      ...itemsToIntegrate.front,
+      clip,
+      ...itemsToIntegrate.back,
+    ].reduce(
+      (acc, overlappedItem) => {
+        // if (overlappedItem.clipwaveType === 'Secondary' )
+        const startIndex = acc.text.length
+        const trimmedTextSoFar = acc.text.trim()
+        if (overlappedItem.clipwaveType === 'Secondary') {
+          const newText = getFlashcardTextFromCardBase(
+            overlappedItem,
+            fieldName,
+            trackChunks
+          )
+            .filter((t) => t.trim())
+            .join('\n')
+          const padding = trimmedTextSoFar || newText ? '\n' : ''
+          acc.text += padding + newText
+        } else {
+          const flashcard = flashcards[overlappedItem.id]
+          const newText = (
+            (flashcard?.fields as TransliterationFlashcardFields | undefined)?.[
+              fieldName
+            ] || ''
+          ).trim()
 
-    const newText = chunks.map((chunk) => chunk.text).join('\n')
+          const padding = trimmedTextSoFar || newText ? '\n' : ''
 
-    newFields[fieldName] = (direction === 'PREPEND'
-      ? [newText, originalText]
-      : [originalText, newText]
+          acc.text += padding + newText
+
+          const cloze = flashcard?.cloze || []
+          acc.cloze.push(
+            ...cloze.map((c) => ({
+              ...c,
+              ranges: c.ranges.map(({ start, end }) => ({
+                start: start + startIndex,
+                end: end + startIndex,
+              })),
+            }))
+          )
+        }
+
+        return acc
+      },
+      { text: '', cloze: [] as ClozeDeletion[] }
     )
-      .filter((t) => t.trim())
-      .join('\n')
 
-    if (fieldName === 'transcription' && direction === 'PREPEND') {
-      const difference = newFields[fieldName].length - originalText.length
-      flashcard.cloze = flashcard.cloze.map((c) => ({
-        ...c,
-        ranges: c.ranges.map(({ start, end }) => ({
-          start: start + difference,
-          end: end + difference,
-        })),
-      }))
-    }
+    newFields[fieldName] = (newFields[fieldName] || '') + combined.text
+    newCloze.push(...combined.cloze)
   }
 
   if (
@@ -310,4 +357,15 @@ export const getNewFlashcardForStretchedClip = (
     return flashcard
 
   return { ...flashcard, fields: newFields }
+}
+export function getFlashcardTextFromCardBase(
+  cardBase: SubtitlesCardBase,
+  fieldName: string,
+  trackChunks: SubtitlesChunk[]
+) {
+  if (!trackChunks.length) return []
+
+  const chunkIndexes = cardBase.fields[fieldName]
+  if (!chunkIndexes) return []
+  return chunkIndexes.flatMap((chunkIndex) => trackChunks[chunkIndex].text)
 }

@@ -26,5 +26,5 @@ export default async function addFirstMediaToProject(
 
   await client.clickElement_(linkSubtitlesDialog$.skipButton)
 
-  await client.waitUntilPresent_(waveform$.subtitlesTimelinesContainer)
+  await client.waitUntilGone_(waveform$.subtitlesChunk)
 }

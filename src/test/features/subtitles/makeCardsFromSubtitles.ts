@@ -27,7 +27,7 @@ export default async function makeCardsFromSubtitles({
   await client.clickElement_(subtitlesMenu$.openMenuButton)
   await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
   await client.clickElement_(subtitlesMenu$.deleteTrackButton)
-  await client.elements_(waveform$.subtitlesTimelines, 1)
+  await client.elements_(waveform$.subtitlesChunk, 1)
 
   await client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton)
   await client.clickElement_(confirmationDialog$.okButton)

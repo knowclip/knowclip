@@ -1,7 +1,8 @@
 import { DeepPartial } from 'redux'
 import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 import A from '../types/ActionType'
-import { WaveformDrag } from 'clipwave'
+import { PrimaryClip, WaveformDrag, WaveformRegion } from 'clipwave'
+import { SubtitlesCardBase } from '../selectors'
 
 export const clipsActions = {
   [A.addClipRequest]: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
@@ -12,11 +13,19 @@ export const clipsActions = {
 
   [A.stretchClip]: (
     stretchedClip: { id: Clip['id']; start: number; end: number },
-    overlappedClipsIds: Array<Clip['id']>
+    overlaps: PrimaryClip[],
+    // overlappedClipsIds: Array<Clip['id']>,
+    frontOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
+    backOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
+    newRegions: WaveformRegion[]
   ) => ({
     type: A.stretchClip,
     stretchedClip,
-    overlappedClipsIds,
+    overlaps,
+    // overlappedClipsIds,
+    frontOverlappedSubtitlesCardBases,
+    backOverlappedSubtitlesCardBases,
+    newRegions,
   }),
 
   addClip: (
@@ -83,11 +92,12 @@ export const clipsActions = {
     newSelection,
   }),
 
-  moveClip: (id: ClipId, deltaX: number, overlapIds: Array<ClipId>) => ({
+  moveClip: (id: ClipId, deltaX: number, overlapIds: Array<ClipId>, newRegions: WaveformRegion[]) => ({
     type: A.moveClip,
     id,
     deltaX,
     overlapIds,
+    newRegions
   }),
 
   setFlashcardField: (

@@ -4,6 +4,7 @@ import { EMPTY, of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
 import { msToSeconds, secondsToMs } from 'clipwave'
+import { getSubtitlesCardBases, SubtitlesCardBase } from '../selectors'
 
 const deselectOnOpenMediaFile: AppEpic = (action$) =>
   action$.pipe(
@@ -12,50 +13,53 @@ const deselectOnOpenMediaFile: AppEpic = (action$) =>
     map(() => r.selectWaveformItem(null))
   )
 
-const highlightRightEpic: AppEpic = (
-  action$,
-  state$,
-  { getCurrentTime, setCurrentTime }
-) =>
-  action$.pipe(
-    ofType<Action, HighlightRightClipRequest>(A.highlightRightClipRequest),
-    switchMap(() => {
-      const state = state$.value
-      const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return EMPTY
-      const waveformItems = r.getWaveformItems(state)
-      const selection = r.getWaveformSelection(state)
-      const currentIndex = selection ? selection.index : -1
-      const nextIndex = currentIndex !== -1 ? currentIndex + 1 : -1
-      if (selection && nextIndex !== -1) {
-        const lastIndex = waveformItems.length - 1
-        const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
+// const highlightRightEpic: AppEpic = (
+//   action$,
+//   state$,
+//   { getCurrentTime, setCurrentTime }
+// ) =>
+//   action$.pipe(
+//     ofType<Action, HighlightRightClipRequest>(A.highlightRightClipRequest),
+//     switchMap(() => {
+//       const state = state$.value
+//       const currentFileId = r.getCurrentFileId(state)
+//       if (!currentFileId) return EMPTY
+//       const waveformItems = r.getWaveformItems(state)
+//       const selection = r.getWaveformSelection(state)
+//       // TODO: optimize by moving closer to waveform code
+//       const currentIndex = selection ? waveformItems.indexOf(selection) : -1
+//       const nextIndex = currentIndex !== -1 ? currentIndex + 1 : -1
+//       if (selection && nextIndex !== -1) {
+//         const lastIndex = waveformItems.length - 1
+//         const next = waveformItems[nextIndex > lastIndex ? 0 : nextIndex]
 
-        if (next) {
-          setCurrentTime(
-            msToSeconds(Math.max(next.item.start, selection.item.end + 1))
-          )
-          return r.isMediaFileLoaded(state)
-            ? EMPTY
-            : of(r.selectWaveformItem(next))
-        }
-      }
+//         const selectionItem = getSelectionItem(state$.value, selection.id)
+//         const nextItem = next && getSelectionItem(state$.value, selection.id)
+//         if (nextItem && selectionItem) {
+//           setCurrentTime(
+//             msToSeconds(Math.max(nextItem.start, selectionItem.end + 1))
+//           )
+//           return r.isMediaFileLoaded(state)
+//             ? EMPTY
+//             : of(r.selectWaveformItem(next))
+//         }
+//       }
 
-      const currentMs = secondsToMs(getCurrentTime())
+//       const currentMs = secondsToMs(getCurrentTime())
 
-      const next =
-        waveformItems.find(({ item }) => item.start >= currentMs) ||
-        waveformItems[0]
-      if (next) {
-        setCurrentTime(msToSeconds(next.item.start))
-        return r.isMediaFileLoaded(state)
-          ? EMPTY
-          : of(r.selectWaveformItem(next))
-      }
+//       const next =
+//         waveformItems.find(({ item }) => item.start >= currentMs) ||
+//         waveformItems[0]
+//       if (next) {
+//         setCurrentTime(msToSeconds(next.item.start))
+//         return r.isMediaFileLoaded(state)
+//           ? EMPTY
+//           : of(r.selectWaveformItem(next))
+//       }
 
-      return EMPTY
-    })
-  )
+//       return EMPTY
+//     })
+//   )
 
 const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
   if (!array.length) return null
@@ -65,56 +69,56 @@ const findLast = <T>(array: Array<T>, predicate: (item: T) => boolean) => {
   }
 }
 
-const highlightLeftEpic: AppEpic = (
-  action$,
-  state$,
-  { getCurrentTime, setCurrentTime }
-) =>
-  action$.pipe(
-    ofType<Action, HighlightLeftClipRequest>(A.highlightLeftClipRequest),
-    switchMap(() => {
-      const state = state$.value
-      const currentFileId = r.getCurrentFileId(state)
-      if (!currentFileId) return EMPTY
+// const highlightLeftEpic: AppEpic = (
+//   action$,
+//   state$,
+//   { getCurrentTime, setCurrentTime }
+// ) =>
+//   action$.pipe(
+//     ofType<Action, HighlightLeftClipRequest>(A.highlightLeftClipRequest),
+//     switchMap(() => {
+//       const state = state$.value
+//       const currentFileId = r.getCurrentFileId(state)
+//       if (!currentFileId) return EMPTY
 
-      const waveformItems = r.getWaveformItems(state)
-      const selection = r.getWaveformSelection(state)
+//       const waveformItems = r.getWaveformItems(state)
+//       const selection = r.getWaveformSelection(state)
 
-      if (selection) {
-        const highlightedIndex = selection.index
-        const prev =
-          waveformItems[
-            highlightedIndex === 0
-              ? waveformItems.length - 1
-              : highlightedIndex - 1
-          ]
+//       if (selection) {
+//         const highlightedIndex = selection.index
+//         const prev =
+//           waveformItems[
+//             highlightedIndex === 0
+//               ? waveformItems.length - 1
+//               : highlightedIndex - 1
+//           ]
 
-        if (prev) {
-          setCurrentTime(msToSeconds(prev.item.start))
-          return r.isMediaFileLoaded(state)
-            ? EMPTY
-            : of(r.selectWaveformItem(prev))
-        }
-      }
-      const ms = msToSeconds(getCurrentTime())
+//         if (prev) {
+//           setCurrentTime(msToSeconds(prev.item.start))
+//           return r.isMediaFileLoaded(state)
+//             ? EMPTY
+//             : of(r.selectWaveformItem(prev))
+//         }
+//       }
+//       const ms = msToSeconds(getCurrentTime())
 
-      const prev =
-        findLast(waveformItems, ({ item }) => item.end <= ms) ||
-        waveformItems[waveformItems.length - 1]
+//       const prev =
+//         findLast(waveformItems, ({ item }) => item.end <= ms) ||
+//         waveformItems[waveformItems.length - 1]
 
-      if (prev) {
-        setCurrentTime(msToSeconds(prev.item.start))
-        return r.isMediaFileLoaded(state)
-          ? EMPTY
-          : of(r.selectWaveformItem(prev))
-      }
+//       if (prev) {
+//         setCurrentTime(msToSeconds(prev.item.start))
+//         return r.isMediaFileLoaded(state)
+//           ? EMPTY
+//           : of(r.selectWaveformItem(prev))
+//       }
 
-      return EMPTY
-    })
-  )
+//       return EMPTY
+//     })
+//   )
 
 export default combineEpics(
-  deselectOnOpenMediaFile,
-  highlightRightEpic,
-  highlightLeftEpic
+  deselectOnOpenMediaFile
+  // highlightRightEpic,
+  // highlightLeftEpic
 )
