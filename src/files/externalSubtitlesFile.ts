@@ -43,7 +43,8 @@ export default {
                       r.linkSubtitlesDialog(
                         validatedFile,
                         chunks,
-                        mediaFile.id
+                        mediaFile.id,
+                        true
                       ),
                     ]),
               ]

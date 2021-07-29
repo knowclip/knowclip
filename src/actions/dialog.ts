@@ -82,13 +82,15 @@ const settingsDialog = () =>
 const linkSubtitlesDialog = (
   subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles,
   subtitlesChunks: SubtitlesChunk[],
-  mediaFileId: MediaFileId
+  mediaFileId: MediaFileId,
+  triggeredOnOpenFile: boolean
 ) =>
   dialogActions.enqueueDialog({
     type: 'LinkSubtitles',
     subtitles,
     subtitlesChunks,
     mediaFileId,
+    triggeredOnOpenFile
   })
 
 const dictionariesDialog = () =>
