@@ -41,7 +41,10 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
 export default ErrorMessage
 
 function displayError(error: any) {
-  if (error.message) return [error.message, error.stack].join('\n')
+  if (error instanceof Error || error?.message) return [
+    error.name,
+    error.message,
+    error.stack].join('\n')
 
   const stringified = JSON.stringify(error, null, 2)
   if (stringified === '{}') {
