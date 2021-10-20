@@ -11,7 +11,7 @@ import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { TestDriver } from '../../driver/TestDriver'
 import { runAll, step } from '../step'
 
-jest.setTimeout(60000)
+jest.setTimeout(120000)
 
 const testId = 'sharedProject'
 
@@ -29,7 +29,7 @@ describe('opening a shared project', () => {
   })
 
   runAll(sharedProjectTestSteps(), () => setup)
-  // test('save and close project', () => saveAndCloseProject(setup))
+  test('save and close project', () => saveAndCloseProject(setup))
 
   afterAll(async () => {
     await stopApp(context)

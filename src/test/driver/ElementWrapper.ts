@@ -14,6 +14,7 @@ export interface ElementWrapper {
   getText: () => Promise<string>
   waitForText: (text: string) => Promise<void>
   doubleClick: () => Promise<void>
+  isClickable: () => Promise<boolean>
   isVisible: () => Promise<boolean>
   isVisibleOrDisplayed: () => Promise<boolean>
   isExisting: () => Promise<boolean>
@@ -84,9 +85,18 @@ export const element = (
         )
       }
     },
+    isClickable: async () => {
+      try {
+        return await element.isClickable()
+        // return await client.isElementDisplayed(id)
+      } catch (err) {
+        throw Error(`Could not get clickable status of "${selector}": ${err}`)
+      }
+    },
     isVisible: async () => {
       try {
-        return await client.isElementDisplayed(id)
+        return await element.isDisplayedInViewport()
+        // return await client.isElementDisplayed(id)
       } catch (err) {
         throw Error(`Could not get displayed status of "${selector}": ${err}`)
       }

@@ -39,6 +39,7 @@ import { useWaveformEventHandlers } from './useWaveformEventHandlers'
 import { GetWaveformItem } from 'clipwave/dist/useWaveform'
 import { setCurrentTime } from '../utils/media'
 import { waveform$ } from './Waveform'
+import { useWaveformRenderClip } from './useWaveformRenderClip'
 // import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
@@ -296,6 +297,7 @@ const Main = () => {
     selectNext: selectNextWaveformItem,
   })
 
+  const renderPrimaryClip = useWaveformRenderClip()
   const renderSecondaryClip = useRenderSecondaryClip(waveform)
 
   if (!currentProject) return <Redirect to="/projects" />
@@ -356,6 +358,7 @@ const Main = () => {
           onWaveformDrag={handleWaveformDrag}
           onClipDrag={handleClipDrag}
           onClipEdgeDrag={handleClipEdgeDrag}
+          renderPrimaryClip={renderPrimaryClip}
           renderSecondaryClip={renderSecondaryClip}
           height={
             WAVEFORM_HEIGHT +

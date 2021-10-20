@@ -10,6 +10,9 @@ import {
   recalculateRegions,
   PrimaryClip,
   WaveformRegion,
+  secondsToMs,
+  GetWaveformItemDangerously,
+  WaveformItem,
 } from 'clipwave'
 import { actions } from '../actions'
 import { bound } from '../utils/bound'
@@ -22,6 +25,7 @@ import {
   getSubtitlesCardBases,
   overlapsSignificantly,
   SubtitlesCardBase,
+  SubtitlesCardBases,
 } from '../selectors'
 import { useSelector } from 'react-redux'
 console.log('update went throo')
@@ -44,7 +48,7 @@ export function useWaveformEventHandlers({
   const {
     getItemDangerously,
     actions: waveformActions,
-    state: { regions },
+    state: { regions, durationSeconds },
   } = waveform
   const handleWaveformDrag = useCallback(
     ({ gesture }: WaveformGestureOf<WaveformDrag>) => {
@@ -87,6 +91,7 @@ export function useWaveformEventHandlers({
   const MOVE_START_DELAY = 400
   const handleClipDrag = useCallback(
     ({ gesture: move, mouseDown, timeStamp }: WaveformGestureOf<ClipDrag>) => {
+      console.log('handleClipDrag')
       const moveImminent = timeStamp - mouseDown.timeStamp >= MOVE_START_DELAY
       if (moveImminent) {
         const deltaX = move.end - move.start
@@ -143,6 +148,14 @@ export function useWaveformEventHandlers({
         waveform.dispatch({
           type: 'SET_REGIONS',
           regions: newRegions,
+          newSelection: {
+            regionIndex: newRegions.findIndex(
+              (r) =>
+                r.start >= newStartWithMerges &&
+                (r.end ?? secondsToMs(durationSeconds)) < newEndWithMerges
+            ),
+            item: clipToMoveId,
+          },
         })
         dispatch(actions.moveClip(clipToMoveId, deltaX, overlapIds, newRegions))
 
@@ -166,17 +179,21 @@ export function useWaveformEventHandlers({
               waveform.state.durationSeconds,
             ])
           : msToSeconds(end)
-      // waveformActions.selectItemAndSeekTo(
-      //   regionIndex,
-      //   clipId,
-      //   playerRef.current,
-      //   newTimeSeconds
-      // )
-      if (playerRef.current) {
-        playerRef.current.currentTime = newTimeSeconds
-      }
+      waveformActions.selectItemAndSeekTo(
+        regionIndex,
+        clipId,
+        playerRef.current,
+        secondsToMs(newTimeSeconds)
+      )
     },
-    [getItemDangerously, highlightedClipId, waveform, playerRef, regions, dispatch]
+    [
+      getItemDangerously,
+      highlightedClipId,
+      waveform,
+      playerRef,
+      regions,
+      dispatch,
+    ]
   )
 
   const cardsBases = useSelector(getSubtitlesCardBases)
@@ -190,128 +207,98 @@ export function useWaveformEventHandlers({
       timeStamp,
     }: WaveformGestureOf<ClipStretch>) => {
       console.log('hihihi')
-      if (timeStamp - mouseDown.timeStamp > STRETCH_START_DELAY) {
-        const unstretchedClip = getItemDangerously(stretch.clipId)
-        const stretchedClip = {
-          ...unstretchedClip,
-          [stretch.originKey]: stretch.end,
-        }
-
-        const {
-          overlaps,
-          newlyOverlappedFront,
-          newlyOverlappedBack,
-        } = stretch.overlaps.reduce(
-          (acc, id) => {
-            const item = getItemDangerously(id)
-            const { start, end } = item
-            const overlap =
-              start <= stretchedClip.end && end >= stretchedClip.start
-            if (overlap && item.clipwaveType === 'Primary') {
-              acc.overlaps.push(item)
-            }
-            if (overlap && item.clipwaveType === 'Secondary') {
-              const newlyOverlapped =
-                overlapsSignificantly(stretchedClip, item.start, item.end) &&
-                !overlapsSignificantly(unstretchedClip, item.start, item.end)
-              if (newlyOverlapped) {
-                const side =
-                  item.start < stretchedClip.start
-                    ? acc.newlyOverlappedFront
-                    : acc.newlyOverlappedBack
-                const cardBase = cardsBases.cardsMap[item.id]
-                if (cardBase) side.push(cardBase)
-              }
-            }
-            return acc
-          },
-          {
-            overlaps: [],
-            newlyOverlappedFront: [],
-            newlyOverlappedBack: [],
-          } as {
-            overlaps: PrimaryClip[]
-            newlyOverlappedFront: SubtitlesCardBase[]
-            newlyOverlappedBack: SubtitlesCardBase[]
-          }
-        )
-        console.log(
-          { overlaps },
-          stretch.overlaps.map((ol) => getItemDangerously(ol))
-        )
-        const overlapIds = overlaps.map((c) => c.id)
-
-        const newStartWithMerges = Math.min(
-          ...[stretchedClip, ...overlaps].map((i) => i.start)
-        )
-        const newEndWithMerges = Math.max(
-          ...[stretchedClip, ...overlaps].map((i) => i.end)
-        )
-
-        // change regions
-        // stretch in knowclip
-        const clipToStretchId = stretch.clipId
-        // TODO: inside recalculateRegions, return region info for updated items in params
-        const newItem = {
-          ...getItemDangerously(clipToStretchId),
-          id: clipToStretchId,
-          start: newStartWithMerges,
-          end: newEndWithMerges,
-        }
-        const newRegions = recalculateRegions(regions, getItemDangerously, [
-          {
-            id: clipToStretchId,
-            newItem,
-          },
-          ...overlapIds.map((id) => ({ id, newItem: null })),
-        ])
-        console.log('stretchiboo')
-        const newSelection = {
-          item: clipToStretchId,
-          regionIndex: newRegions.findIndex(
-            (region, i) =>
-              region.start >= newStartWithMerges &&
-              getRegionEnd(newRegions, i) < newEndWithMerges
-          ),
-        }
-        waveform.dispatch({
-          type: 'SET_REGIONS',
-          regions: newRegions,
-          newSelection,
-          // // TODO: optimize via guarantee that new selection item is stretchedClip
-          // newSelection: getNewWaveformSelectionAt(
-          //   getItemDangerously,
-          //   newRegions,
-          //   secondsToMs(stretchedClip.start),
-          //   waveform.state.selection
-          // )
-        })
-
-        dispatch(
-          actions.stretchClip(
-            stretchedClip,
-            overlaps,
-            newlyOverlappedFront,
-            newlyOverlappedBack,
-            newRegions
-          )
-        )
-
-        // waveform.actions.selectItemAndSeekTo(
-        //   newSelection.regionIndex,
-        //   newSelection.item,
-        //   playerRef.current,
-        //   msToSeconds(stretchedClip.start)
-        // )
-        if (playerRef.current) {
-          playerRef.current.currentTime =  msToSeconds(newItem.start)
-        }
-      } else {
+      const stretchImminent =
+        timeStamp - mouseDown.timeStamp > STRETCH_START_DELAY
+      if (!stretchImminent) return
+      
+      const unstretchedClip = getItemDangerously(stretch.clipId)
+      const stretchedClip = {
+        ...unstretchedClip,
+        [stretch.originKey]: stretch.end,
       }
+
+      const { clips, subtitlesFront, subtitlesBack } = getStretchedClipOverlaps(
+        stretch,
+        getItemDangerously,
+        stretchedClip,
+        cardsBases
+      )
+      console.log(
+        { overlaps: clips },
+        stretch.overlaps.map((ol) => getItemDangerously(ol))
+      )
+      const overlapIds = clips.map((c) => c.id)
+
+      const newStartWithMerges = Math.min(
+        ...[stretchedClip, ...clips].map((i) => i.start)
+      )
+      const newEndWithMerges = Math.max(
+        ...[stretchedClip, ...clips].map((i) => i.end)
+      )
+
+      // change regions
+      // stretch in knowclip
+      const clipToStretchId = stretch.clipId
+      // TODO: inside recalculateRegions, return region info for updated items in params
+      const newItem = {
+        ...getItemDangerously(clipToStretchId),
+        id: clipToStretchId,
+        start: newStartWithMerges,
+        end: newEndWithMerges,
+      }
+      const newRegions = recalculateRegions(regions, getItemDangerously, [
+        {
+          id: clipToStretchId,
+          newItem,
+        },
+        ...overlapIds.map((id) => ({ id, newItem: null })),
+      ])
+      console.log('stretchiboo')
+      const newSelection = {
+        item: clipToStretchId,
+        regionIndex: newRegions.findIndex(
+          (region, i) =>
+            region.start >= newStartWithMerges &&
+            getRegionEnd(newRegions, i) < newEndWithMerges
+        ),
+      }
+      waveform.dispatch({
+        type: 'SET_REGIONS',
+        regions: newRegions,
+        newSelection,
+        // // TODO: optimize via guarantee that new selection item is stretchedClip
+        // newSelection: getNewWaveformSelectionAt(
+        //   getItemDangerously,
+        //   newRegions,
+        //   secondsToMs(stretchedClip.start),
+        //   waveform.state.selection
+        // )
+      })
+
+      dispatch(
+        actions.stretchClip(stretchedClip, clips, unstretchedClip, subtitlesFront, subtitlesBack, newRegions)
+      )
+      // console.log('seekyupdate went through')
+      waveform.actions.selectItemAndSeekTo(
+        newSelection.regionIndex,
+        newSelection.item,
+        playerRef.current,
+        stretchedClip.start
+      )
+      // if (playerRef.current) {
+      //   playerRef.current.currentTime =  msToSeconds(newItem.start)
+      // }
     },
-    [cardsBases.cardsMap, dispatch, getItemDangerously, playerRef, regions, waveform]
+    [
+      cardsBases.cardsMap,
+      dispatch,
+      getItemDangerously,
+      playerRef,
+      regions,
+      waveform,
+    ]
   )
-  console.log({ regions })
+  console.log({ regions }, 'hi')
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       const { altKey, key } = event
@@ -329,6 +316,41 @@ export function useWaveformEventHandlers({
   })
 
   return { handleWaveformDrag, handleClipDrag, handleClipEdgeDrag }
+}
+
+type StretchedClipOverlaps = {
+  clips: PrimaryClip[]
+  subtitlesFront: SubtitlesCardBase[]
+  subtitlesBack: SubtitlesCardBase[]
+}
+function getStretchedClipOverlaps(
+  stretch: ClipStretch,
+  getItemDangerously: GetWaveformItemDangerously,
+  stretchedClip: WaveformItem,
+  cardsBases: SubtitlesCardBases
+): StretchedClipOverlaps {
+  return stretch.overlaps.reduce(
+    (acc: StretchedClipOverlaps, id) => {
+      const item = getItemDangerously(id)
+      const { start, end } = item
+      const overlap = start <= stretchedClip.end && end >= stretchedClip.start
+      if (!overlap) return acc
+
+      if (item.clipwaveType === 'Primary') acc.clips.push(item)
+
+      if (item.clipwaveType === 'Secondary') {
+        const side = item.start < stretchedClip.start ? acc.subtitlesFront : acc.subtitlesBack
+        const cardBase = cardsBases.cardsMap[item.id]
+        if (cardBase) side.push(cardBase)
+      }
+      return acc
+    },
+    {
+      clips: [],
+      subtitlesFront: [],
+      subtitlesBack: [],
+    }
+  )
 }
 
 export function getRegionEnd(regions: WaveformRegion[], index: number): number {

@@ -16,6 +16,8 @@ type SubtitlesChunksMetadata =
       count: number
       endCueMs: number
     }
+// TODO: remove this duplication
+type SubtitlesTrackId = string
 export type ProjectMetadataJson = {
   name: string
   id: string

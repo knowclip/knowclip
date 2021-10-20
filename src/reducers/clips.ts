@@ -186,9 +186,9 @@ const clips: Reducer<ClipsState, Action> = (state = initialState, action) => {
         },
       }
 
-existingClip.clipwaveType
+// existingClip.clipwaveType
 
-      action.frontOverlappedSubtitlesCardBases
+//       action.frontOverlappedSubtitlesCardBases
 
       return action.overlaps.length
         ? mergeClips(

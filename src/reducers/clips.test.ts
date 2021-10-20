@@ -168,7 +168,7 @@ describe('clips reducer', () => {
     )
     const mergeAction = r.mergeClips(['a', 'b'], {
       type: 'Clip',
-      index: 0,
+      // index: 0,
       id: 'a',
     })
 
@@ -244,7 +244,7 @@ describe('clips reducer', () => {
     )
     const mergeAction = r.mergeClips(['a', 'b'], {
       type: 'Clip',
-      index: 0,
+      // index: 0,
       id: 'a',
     })
 

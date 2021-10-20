@@ -133,14 +133,9 @@ const makeClipsFromSubtitles: AppEpic = (
                   const newFields = linkedFieldNames.reduce(
                     (fields, fieldName) => {
                       const trackId = fieldNamesToTrackIds[fieldName] || null
-                      const trackChunks = trackId
-                        ? r.getSubtitlesTrack(state$.value, trackId)?.chunks ||
-                          []
-                        : []
                       const fieldText = getFlashcardTextFromCardBase(
                         cardBase,
-                        fieldName,
-                        trackChunks
+                        trackId ? r.getSubtitlesTrack(state$.value, trackId) : null
                       )
                       fields[fieldName] = fieldText
                         .filter((t) => t.trim())

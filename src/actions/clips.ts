@@ -15,6 +15,7 @@ export const clipsActions = {
     stretchedClip: { id: Clip['id']; start: number; end: number },
     overlaps: PrimaryClip[],
     // overlappedClipsIds: Array<Clip['id']>,
+    unstretchedClip: { id: Clip['id']; start: number; end: number },
     frontOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
     backOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
     newRegions: WaveformRegion[]
@@ -23,12 +24,13 @@ export const clipsActions = {
     stretchedClip,
     overlaps,
     // overlappedClipsIds,
+    unstretchedClip,
     frontOverlappedSubtitlesCardBases,
     backOverlappedSubtitlesCardBases,
     newRegions,
   }),
 
-  addClip: (
+  [A.addClip]: (
     clip: Clip,
     flashcard: Flashcard,
     startEditing: boolean = false
@@ -39,7 +41,7 @@ export const clipsActions = {
     startEditing,
   }),
 
-  addClips: (
+  [A.addClips]: (
     clips: Array<Clip>,
     flashcards: Array<Flashcard>,
     fileId: MediaFileId
