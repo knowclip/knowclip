@@ -20,9 +20,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
           <DialogContentText>
             An error has occurred. Please restart the app to continue.
             <h3>Details</h3>
-            <pre>
-              {displayError(reactError)}
-            </pre>
+            <pre>{displayError(reactError)}</pre>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -47,10 +45,7 @@ function displayError(error: any) {
 
   const stringified = JSON.stringify(error, null, 2)
   if (stringified === '{}') {
-    return [
-      String(error),
-      error?.constructor?.name
-    ].join('')
+    return [String(error), error?.constructor?.name].join('')
   }
 
   return stringified
