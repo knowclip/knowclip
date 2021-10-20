@@ -4,7 +4,7 @@
   "version": "0.10.2-beta",
   "private": true,
   "engines": {
-    "node": "^12.4.0"
+    "node": "^14.18.1"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -18,7 +18,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.0",
     "@material-ui/icons": "^4.5.1",
-    "@sentry/electron": "^1.3.0",
+    "@sentry/electron": "^2.5.4",
     "@silvestre/mkanki": "^3.1.0",
     "@types/archiver": "^5.1.0",
     "@types/react-virtualized": "^9.21.10",
@@ -119,7 +119,7 @@
     }
   },
   "browserslist": [
-    "electron >= 11.3.0"
+    "electron >= 12.2.2"
   ],
   "devDependencies": {
     "@types/better-sqlite3": "^5.4.1",
@@ -128,7 +128,7 @@
     "@types/fluent-ffmpeg": "^2.1.11",
     "@types/fs-extra": "^8.0.1",
     "@types/jest": "^26.0.15",
-    "@types/node": "^12.7.11",
+    "@types/node": "^14.17.27",
     "@types/papaparse": "^5.0.1",
     "@types/react": "^16.9.5",
     "@types/react-autosuggest": "^9.3.13",
@@ -143,9 +143,9 @@
     "@types/yaml": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
-    "chromedriver": "^87.0.7",
-    "electron": "^11.3.0",
-    "electron-builder": "^22.8.1",
+    "chromedriver": "^89.0.0",
+    "electron": "^12.0.0",
+    "electron-builder": "^22.13.1",
     "eslint-config-prettier": "^6.7.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-react-hooks": "^1.6.0",

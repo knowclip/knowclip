@@ -48,6 +48,7 @@ async function createWindow() {
     webPreferences: {
       webSecurity: isPackaged,
       nodeIntegration: true,
+      contextIsolation: false,
       devTools: useDevtools,
       enableRemoteModule: true,
     },
