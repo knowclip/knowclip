@@ -27,8 +27,7 @@ export default async function linkSubtitlesToFields({
   })
 
   await testBlock('select clip', async () => {
-    await clickClip(app, client, 0)
-    // await client.clickElement_(waveform$.waveformClip)
+    await clickClip(app, client, 0, 2)
     await client.waitForText_(flashcardSection$.container, '1 / 3')
   })
 

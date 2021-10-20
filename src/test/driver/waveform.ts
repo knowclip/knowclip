@@ -24,9 +24,13 @@ export async function waveformMouseDrag(
 export async function clickClip(
   app: TestDriver,
   client: ClientWrapper,
-  indexInVisibleClips: number
+  indexInVisibleClips: number,
+  expectedVisibleClipsCount?: number
 ) {
-  const clips = await client.elements_(waveform$.waveformClip)
+  const clips = await client.elements_(
+    waveform$.waveformClip,
+    expectedVisibleClipsCount
+  )
   const clip = clips[indexInVisibleClips]
   const rect = await client._driver.client.getElementRect(clip.elementId)
 
