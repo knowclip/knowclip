@@ -23,6 +23,9 @@ jobs:
         yarn lint
         yarn tsc
         yarn test
+    - name: integration tests
+      run: |
+        yarn integration
     - name: build
       run: yarn dist --mac
       env:
