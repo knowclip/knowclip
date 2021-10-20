@@ -9,7 +9,7 @@ import truncate from '../utils/truncate'
 import { actions } from '../actions'
 import { ListRowProps } from 'react-virtualized'
 import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer'
-import { ClipwaveRegionsUpdateEvent, getRegionEnd } from 'clipwave'
+import { ClipwaveCallbackEvent, getRegionEnd } from 'clipwave'
 import { getMediaPlayer } from '../utils/media'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 
@@ -59,7 +59,7 @@ const ReviewAndExportMediaTableRow = memo(
 
     const handleDoubleClick = useCallback(() => {
       window.dispatchEvent(
-        new ClipwaveRegionsUpdateEvent(
+        new ClipwaveCallbackEvent(
           CLIPWAVE_ID,
           ({ actions, state, getItem }) => {
             const item = getItem(id)

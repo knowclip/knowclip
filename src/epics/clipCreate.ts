@@ -6,7 +6,6 @@ import { ActionOf } from '../actions'
 import { combineEpics } from 'redux-observable'
 import { RecalculateWaveformRegionsEvent } from '../components/Main'
 import { afterUpdates } from '../utils/afterUpdates'
-import { ClipwaveRegionsUpdateEvent } from 'clipwave'
 
 const clipCreateEpic: AppEpic = (action$, state$) => {
   return action$

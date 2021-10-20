@@ -15,7 +15,7 @@ import * as mediaHelpers from './utils/media'
 import { sendToMainProcess } from './messages'
 import { processNoteMedia } from './utils/ankiNote'
 import { callbackify } from 'util'
-import { ClipwaveRegionsUpdateEvent, WaveformInterface } from 'clipwave'
+import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
 
 const {
@@ -56,7 +56,7 @@ const dependencies = {
   dispatchClipwaveEvent: (
     callback: (waveform: WaveformInterface) => void
   ) => {
-    window.dispatchEvent(new ClipwaveRegionsUpdateEvent(CLIPWAVE_ID, callback))
+    window.dispatchEvent(new ClipwaveCallbackEvent(CLIPWAVE_ID, callback))
   },
 }
 

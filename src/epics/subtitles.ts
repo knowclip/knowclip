@@ -23,7 +23,7 @@ import {
   SubtitlesFileWithTrack,
 } from '../selectors'
 import { afterUpdates } from '../utils/afterUpdates'
-import { ClipwaveRegionsUpdateEvent, msToSeconds } from 'clipwave'
+import { ClipwaveCallbackEvent, msToSeconds } from 'clipwave'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 
@@ -191,7 +191,7 @@ const makeClipsFromSubtitles: AppEpic = (
             }),
             afterUpdates(async () => {
               window.dispatchEvent(
-                new ClipwaveRegionsUpdateEvent(CLIPWAVE_ID, ({ actions }) => {
+                new ClipwaveCallbackEvent(CLIPWAVE_ID, ({ actions }) => {
                   const mediaPlayer = getMediaPlayer()
                   actions.selectNextItemAndSeek(mediaPlayer)
                 })
