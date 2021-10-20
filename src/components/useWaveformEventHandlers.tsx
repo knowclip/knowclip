@@ -28,7 +28,6 @@ import {
   SubtitlesCardBases,
 } from '../selectors'
 import { useSelector } from 'react-redux'
-console.log('update went throo')
 
 export function useWaveformEventHandlers({
   playerRef,
@@ -52,7 +51,6 @@ export function useWaveformEventHandlers({
   } = waveform
   const handleWaveformDrag = useCallback(
     ({ gesture }: WaveformGestureOf<WaveformDrag>) => {
-      console.log('handleWaveformDrag!')
       const { start: startRaw, end: endRaw, overlaps } = gesture
       const left = Math.min(startRaw, endRaw)
       const right = Math.max(startRaw, endRaw)
@@ -60,15 +58,6 @@ export function useWaveformEventHandlers({
       const tooSmallOrClipOverlapsExist =
         right - left < CLIP_THRESHOLD_MILLSECONDS ||
         overlaps.some((id) => getItemDangerously(id).clipwaveType === 'Primary')
-      console.log(
-        {
-          tooSmallOrClipOverlapsExist,
-          left,
-          right,
-          CLIP_THRESHOLD_MILLSECONDS,
-        },
-        overlaps.map((id) => getItemDangerously(id))
-      )
       if (tooSmallOrClipOverlapsExist) {
         if (playerRef.current) {
           playerRef.current.currentTime = msToSeconds(endRaw)
@@ -78,7 +67,6 @@ export function useWaveformEventHandlers({
 
       const newId = uuid()
 
-      console.log('dispatching adcliprequest')
       dispatch(actions.addClipRequest(gesture, newId))
 
       if (playerRef.current) {
@@ -91,7 +79,6 @@ export function useWaveformEventHandlers({
   const MOVE_START_DELAY = 400
   const handleClipDrag = useCallback(
     ({ gesture: move, mouseDown, timeStamp }: WaveformGestureOf<ClipDrag>) => {
-      console.log('handleClipDrag')
       const moveImminent = timeStamp - mouseDown.timeStamp >= MOVE_START_DELAY
       if (moveImminent) {
         const deltaX = move.end - move.start
@@ -102,7 +89,6 @@ export function useWaveformEventHandlers({
         const offsetEnd = clipToMove.end + deltaX
 
         const clipToMoveId = clipToMove.id
-        console.log('overlaps', move.overlaps)
 
         const overlaps = move.overlaps.flatMap((id) => {
           const item = getItemDangerously(id)
@@ -113,10 +99,6 @@ export function useWaveformEventHandlers({
             ? [item]
             : []
         })
-        console.log(
-          { overlaps },
-          move.overlaps.map((ol) => getItemDangerously(ol))
-        )
         const overlapIds = overlaps.map((c) => c.id)
 
         setCurrentTime(
@@ -143,7 +125,6 @@ export function useWaveformEventHandlers({
           },
           ...overlapIds.map((id) => ({ id, newItem: null })),
         ])
-        console.log('newRegions', newRegions)
 
         waveform.dispatch({
           type: 'SET_REGIONS',
@@ -206,7 +187,6 @@ export function useWaveformEventHandlers({
       mouseDown,
       timeStamp,
     }: WaveformGestureOf<ClipStretch>) => {
-      console.log('hihihi')
       const stretchImminent =
         timeStamp - mouseDown.timeStamp > STRETCH_START_DELAY
       if (!stretchImminent) return
@@ -223,10 +203,7 @@ export function useWaveformEventHandlers({
         stretchedClip,
         cardsBases
       )
-      console.log(
-        { overlaps: clips },
-        stretch.overlaps.map((ol) => getItemDangerously(ol))
-      )
+
       const overlapIds = clips.map((c) => c.id)
 
       const newStartWithMerges = Math.min(
@@ -253,7 +230,6 @@ export function useWaveformEventHandlers({
         },
         ...overlapIds.map((id) => ({ id, newItem: null })),
       ])
-      console.log('stretchiboo')
       const newSelection = {
         item: clipToStretchId,
         regionIndex: newRegions.findIndex(
@@ -285,7 +261,6 @@ export function useWaveformEventHandlers({
           newRegions
         )
       )
-      // console.log('seekyupdate went through')
       waveform.actions.selectItemAndSeekTo(
         newSelection.regionIndex,
         newSelection.item,
@@ -305,7 +280,6 @@ export function useWaveformEventHandlers({
       waveform,
     ]
   )
-  console.log({ regions }, 'hi')
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       const { altKey, key } = event

@@ -205,7 +205,6 @@ export default function useClozeControls({
   const clozeTextInputActions = {
     onBackspace: useCallback(
       (selection) => {
-        console.log({ selection })
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end && selection.start !== 0) {
             const newCursor = selection.start - 1

@@ -16,6 +16,7 @@ import { sendToMainProcess } from './messages'
 import { processNoteMedia } from './utils/ankiNote'
 import { callbackify } from 'util'
 import { ClipwaveRegionsUpdateEvent, WaveformInterface } from 'clipwave'
+import { CLIPWAVE_ID } from './utils/clipwave'
 
 const {
   existsSync,
@@ -55,7 +56,7 @@ const dependencies = {
   dispatchClipwaveEvent: (
     callback: (waveform: WaveformInterface) => void
   ) => {
-    window.dispatchEvent(new ClipwaveRegionsUpdateEvent('waveform', callback))
+    window.dispatchEvent(new ClipwaveRegionsUpdateEvent(CLIPWAVE_ID, callback))
   },
 }
 

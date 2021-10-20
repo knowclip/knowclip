@@ -81,7 +81,6 @@ export function useClozeUiEffects(
               const start = cursorPosition == null ? 0 : cursorPosition
               const end = cursorPosition == null ? 0 : cursorPosition + 1
 
-              console.log({ start, end })
               ref.current && setSelectionRange(ref.current, start, end)
               e.preventDefault()
             } else {

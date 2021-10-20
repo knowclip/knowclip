@@ -11,6 +11,7 @@ import { ListRowProps } from 'react-virtualized'
 import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer'
 import { ClipwaveRegionsUpdateEvent, getRegionEnd } from 'clipwave'
 import { getMediaPlayer } from '../utils/media'
+import { CLIPWAVE_ID } from '../utils/clipwave'
 
 enum $ {
   container = 'review-and-export-table-row-container',
@@ -57,11 +58,9 @@ const ReviewAndExportMediaTableRow = memo(
     )
 
     const handleDoubleClick = useCallback(() => {
-      // highlightClip(id)
-      console.log('dispatching...')
       window.dispatchEvent(
         new ClipwaveRegionsUpdateEvent(
-          'waveform',
+          CLIPWAVE_ID,
           ({ actions, state, getItem }) => {
             const item = getItem(id)
             const regionIndex = item
@@ -72,12 +71,6 @@ const ReviewAndExportMediaTableRow = memo(
                 )
               : -1
             const media = getMediaPlayer()
-            console.log({
-              item,
-              regionIndex,
-              regions: state.regions,
-              media: media ? 'media!' : 'not found',
-            })
             if (item && regionIndex !== -1 && media) {
               actions.selectItemAndSeekTo(regionIndex, id, media, item?.start)
             }

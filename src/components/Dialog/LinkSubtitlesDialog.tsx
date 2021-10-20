@@ -59,7 +59,6 @@ const LinkSubtitlesDialog = ({
     const trackWithFile = subs.all.find((t) => t.id === subtitles.id)
     const trackId = trackWithFile?.track?.id
     if (!trackId) return undefined
-    console.log({ trackId })
     const [field] =
       Object.entries(fieldsToTracks).find(([, track]) => track === trackId) ||
       []

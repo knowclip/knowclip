@@ -211,7 +211,6 @@ const Main = () => {
         regions,
         newSelection,
       })
-      console.log('recalculate event!', e, regions)
     }
     document.addEventListener('recalculate-waveform-regions', recalculate)
     return () =>

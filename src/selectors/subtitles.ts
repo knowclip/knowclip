@@ -262,7 +262,6 @@ export const getNewFlashcardForStretchedClip_ = (
     back: Array<SubtitlesCardBase>
   }
 ): Flashcard => {
-  console.log('getNewFlashcardForStretchedClip')
   const flashcard = flashcards[clip.id]
   const linkedFieldNames = Object.keys(
     links
@@ -291,13 +290,6 @@ export const getNewFlashcardForStretchedClip_ = (
             trackId != null ? subtitles[trackId] : trackId
           )
           const newText = newTextSegments.filter((t) => t.trim()).join('\n')
-          console.log({
-            newText,
-            overlappedItem,
-            fieldName,
-            trackChunks,
-            newTextSegments,
-          })
 
           const padding = trimmedTextSoFar || newText ? '\n' : ''
           acc.text += padding + newText
@@ -356,7 +348,6 @@ function getFlashcardFieldsFromSubtitlesCardBase(
   const newFields = {} as TransliterationFlashcardFields
   for (const fn in linkedTracks) {
     const fieldName = fn as TransliterationFlashcardFieldName
-    console.log({ shouldUseField: shouldUseField(fieldName) })
     if (shouldUseField(fieldName)) {
       const trackId = linkedTracks[fieldName]
       const track = trackId ? subtitles[trackId] : null
@@ -365,7 +356,6 @@ function getFlashcardFieldsFromSubtitlesCardBase(
         track
       )
       const newText = newTextSegments.filter((t) => t.trim()).join('\n')
-      console.log({ newText })
       newFields[fieldName] = newText
     }
   }
@@ -401,13 +391,6 @@ export const getNewFlashcardForStretchedClip = (
         ).trim()
     )
   )
-  console.log({
-    fieldNames,
-    links,
-    currentlyBlankFieldNames,
-    unstretchedClip,
-    stretchedClip,
-  })
 
   function newlyOverlapped(overlappedCardBase: SubtitlesCardBase) {
     return !overlapsSignificantly(
@@ -446,7 +429,6 @@ export const getNewFlashcardForStretchedClip = (
     { ...getBlankFields(state) } as TransliterationFlashcardFields,
     all
   )
-  console.log({ all, combined })
 
   return {
     ...flashcards[stretchedClip.id],
@@ -471,14 +453,6 @@ function combineFlashcards(
 
       const newText = (card.fields[fieldName] || '').trim()
       const padding = trimmedTextSoFar && newText ? '\n' : ''
-      console.log(
-        'newText',
-        newText,
-        'trimmedTextSoFar',
-        trimmedTextSoFar,
-        'padding.length',
-        padding.length
-      )
       acc.text += padding + newText
 
       if (fieldName === 'transcription') {
@@ -512,11 +486,6 @@ export function getFlashcardTextFromCardBase(
   if (!track || !track.chunks.length) return []
 
   const chunkIndexes = cardBase.fields[track.id]
-  console.log(
-    { chunkIndexes },
-    'chunkIndexes?.flatMap((chunkIndex) => trackChunks[chunkIndex])',
-    chunkIndexes?.flatMap((chunkIndex) => track.chunks[chunkIndex])
-  )
   if (!chunkIndexes) return []
   return chunkIndexes.flatMap((chunkIndex) => track.chunks[chunkIndex].text)
 }

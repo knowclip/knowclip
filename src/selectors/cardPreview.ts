@@ -83,10 +83,6 @@ export const getSubtitlesCardBases = createSelector(
       (cueChunk, index) => {
         const id = `${index}-----${Object.keys(fieldsCuePriority).join('___')}`
 
-        if (cueChunk.text.includes('はい') || cueChunk.text.includes('kay')) {
-          console.log({ cueChunk })
-        }
-
         const cardBase: SubtitlesCardBase = {
           index,
           id,

@@ -63,7 +63,6 @@ const recalculateWaveformRegionsEpic: AppEpic = (
     )
     .pipe(
       tap(() => {
-        console.log('dispatching recalculate event!')
         window.setTimeout(
           () => document.dispatchEvent(new RecalculateWaveformRegionsEvent()),
           0

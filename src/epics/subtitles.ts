@@ -25,6 +25,7 @@ import {
 import { afterUpdates } from '../utils/afterUpdates'
 import { ClipwaveRegionsUpdateEvent, msToSeconds } from 'clipwave'
 import { TransliterationFlashcardFields } from '../types/Project'
+import { CLIPWAVE_ID } from '../utils/clipwave'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -119,7 +120,6 @@ const makeClipsFromSubtitles: AppEpic = (
         ]).pipe(
           concat(
             afterUpdates(async () => {
-              console.log('gonna make cards from subs!')
               const linkedFieldNames = Object.keys(
                 r.getSubtitlesFlashcardFieldLinks(state$.value)
               ) as TransliterationFlashcardFieldName[]
@@ -127,7 +127,6 @@ const makeClipsFromSubtitles: AppEpic = (
               if (!currentNoteType) throw new Error('Note type not found')
 
               const cardsBases = r.getSubtitlesCardBases(state$.value)
-              console.log('cards bases!', cardsBases)
               const { clips, cards } = cardsBases.cards.reduce(
                 (acc, cardBase) => {
                   const newFields = linkedFieldNames.reduce(
@@ -192,7 +191,7 @@ const makeClipsFromSubtitles: AppEpic = (
             }),
             afterUpdates(async () => {
               window.dispatchEvent(
-                new ClipwaveRegionsUpdateEvent('waveform', ({ actions }) => {
+                new ClipwaveRegionsUpdateEvent(CLIPWAVE_ID, ({ actions }) => {
                   const mediaPlayer = getMediaPlayer()
                   actions.selectNextItemAndSeek(mediaPlayer)
                 })

@@ -26,9 +26,7 @@ import { EMPTY, of } from 'rxjs'
 const addClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
   return action$.ofType<ActionOf<typeof A.addClip>>(A.addClip).pipe(
     tap(({ clip }) => {
-      console.log('dispatching addclip event')
       dispatchClipwaveEvent(({ actions: { addItem } }) => {
-        console.log('running addclip callback')
         addItem({
           start: clip.start,
           end: clip.end,
@@ -107,25 +105,13 @@ const stretchClipEpic: AppEpic = (
                 //   waveform.state.selection
                 // )
               })
-
-            // const fields: TransliterationFlashcardFields = getFlashcard(state$.value, clipToStretchId)?.fields ?? {}
-            // const overlapsFields: TransliterationFlashcardFields[] = [
-            //   ...frontOverlappedSubtitlesCardBases.map((base): TransliterationFlashcardFields => ({
-            //     pronunciation: getFlashcardTextFromCardBase(base, 'pronunciation', base.]).join('\n')
-            //     base.fields
-            //   }),
-            //   fields,
-            //   ...frontOverlappedSubtitlesCardBases.map(base => base.fields),
-            // ]
           }
         )
 
-        console.log('overlaps?')
         if (
           frontOverlappedSubtitlesCardBases.length ||
           backOverlappedSubtitlesCardBases.length
         ) {
-          console.log('overlaps!!')
           // const bases = getSubtitlesCardBases(state$.value)
           const newFields = getNewFlashcardForStretchedClip(
             state$.value,
@@ -149,9 +135,7 @@ const stretchClipEpic: AppEpic = (
 
 const moveClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
   return action$.ofType<ActionOf<typeof A.moveClip>>(A.moveClip).pipe(
-    tap(() => {
-      console.log('move clip triggered')
-    }),
+    tap(() => {}),
     ignoreElements()
   )
 }
