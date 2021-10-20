@@ -106,22 +106,6 @@ export const getSubtitlesCardBases = createSelector(
                 throw new Error('invalid chunk index')
               }
 
-              if (chunk.text.includes('はい') || chunk.text.includes('kay')) {
-                console.log(
-                  {
-                    chunk,
-                    cueChunk,
-                    overlapsSignificantly: overlapsSignificantly(
-                      cueChunk,
-                      chunk.start,
-                      chunk.end
-                    ),
-                  },
-                  'chunk.start >= cueChunk.end',
-                  chunk.start >= cueChunk.end
-                )
-              }
-
               if (chunk.start >= cueChunk.end) {
                 break
               }

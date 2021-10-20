@@ -72,7 +72,7 @@ const ReviewAndExportMediaTableRow = memo(
               : -1
             const media = getMediaPlayer()
             if (item && regionIndex !== -1 && media) {
-              actions.selectItemAndSeekTo(regionIndex, id, media, item?.start)
+              actions.selectItemAndSeekTo(regionIndex, id, media, item.start)
             }
 
             if (!media) {

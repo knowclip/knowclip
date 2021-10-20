@@ -134,6 +134,10 @@ export const newClipFromChunk: AppEpic = (
         const cardBases = r.getSubtitlesCardBases(state$.value)
 
         const cardBase = cardBases.cardsMap[selection.id]
+        if (!cardBase)
+          throw new Error(
+            `No subtitles card base found with id "${selection.id}""`
+          )
         const fields = r.getNewFieldsFromLinkedSubtitles(state$.value, cardBase)
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,

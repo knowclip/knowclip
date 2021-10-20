@@ -45,7 +45,9 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
   await testBlock(
     'shift waveform view by navigating with previous button',
     async () => {
-      await client._driver.client.pause(1000)
+      // we should properly wait until update above is really done
+      // somehow checking the waveform items have been updated.
+      // await client._driver.client.pause(1000)
       await client.clickElement_(flashcardSection$.previousClipButton)
       await client.waitForText('body', '2 / 3')
 
