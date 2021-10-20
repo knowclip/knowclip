@@ -18,8 +18,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
         <DialogContent>
           <DialogContentText>
             An error has occurred. Please restart the app to continue.
-            <details>
-              <summary>Details</summary>
+              <h3>Details</h3>
               <pre>
                 {reactError?.message
                   ? JSON.stringify(
@@ -31,7 +30,6 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
                     )
                   : String(reactError)}
               </pre>
-            </details>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
