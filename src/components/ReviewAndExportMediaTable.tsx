@@ -80,14 +80,14 @@ const ReviewAndExportMediaTable = memo(
       media.id,
     ])
 
-    const handleSelectRow = useCallback((id: string) => onSelectRow(media.id, id), [
-      media.id,
-      onSelectRow,
-    ])
-    const handleDoubleClickRow = useCallback((id: string) => onDoubleClickRow(media.id, id), [
-      media.id,
-      onDoubleClickRow
-    ])
+    const handleSelectRow = useCallback(
+      (id: string) => onSelectRow(media.id, id),
+      [media.id, onSelectRow]
+    )
+    const handleDoubleClickRow = useCallback(
+      (id: string) => onDoubleClickRow(media.id, id),
+      [media.id, onDoubleClickRow]
+    )
 
     const rowRenderer: ListRowRenderer = useCallback(
       ({ index, key, parent, style }) => {

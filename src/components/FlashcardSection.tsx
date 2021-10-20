@@ -30,13 +30,13 @@ const FlashcardSection = ({
   className,
   projectFile,
   selectPrevious,
-  selectNext
+  selectNext,
 }: {
   mediaFile: MediaFile | null
   className?: string
-  projectFile: ProjectFile,
-  selectPrevious: () => void,
-  selectNext: () => void,
+  projectFile: ProjectFile
+  selectPrevious: () => void
+  selectNext: () => void
 }) => {
   const {
     waveformSelection,
@@ -105,10 +105,7 @@ const FlashcardSection = ({
       >
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
-          onClick={useCallback(
-            () => selectPrevious(),
-            [selectPrevious]
-          )}
+          onClick={useCallback(() => selectPrevious(), [selectPrevious])}
         >
           <ChevronLeft />
         </IconButton>
@@ -163,10 +160,7 @@ const FlashcardSection = ({
       >
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
-          onClick={useCallback(
-            () => selectNext(),
-            [selectNext]
-          )}
+          onClick={useCallback(() => selectNext(), [selectNext])}
         >
           <ChevronRight />
         </IconButton>

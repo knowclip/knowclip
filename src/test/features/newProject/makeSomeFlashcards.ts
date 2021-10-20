@@ -2,7 +2,10 @@ import { testBlock, TestSetup } from '../../setUpDriver'
 import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/Waveform'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
-import { waveformMouseDrag, waveformMouseHoldAndDrag } from '../../driver/waveform'
+import {
+  waveformMouseDrag,
+  waveformMouseHoldAndDrag,
+} from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
 export default async function makeTwoFlashcards({ client }: TestSetup) {

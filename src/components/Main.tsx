@@ -260,28 +260,30 @@ const Main = () => {
   const { getItem } = waveform
   const { regions, pixelsPerSecond } = waveform.state
   const selectPreviousWaveformItem = useCallback(() => {
-    const previous = getPreviousWaveformItem({
-      currentSelection: selection.selection,
-      regions,
-      getItem,
-    })
-    if (previous) {
-      setCursorX(msToPixels(previous.item.start, pixelsPerSecond))
-      setCurrentTime(msToSeconds(previous.item.start))
-      waveform.actions.selectItem(previous.regionIndex, previous.item.id)
-    }
+    // const previous = getPreviousWaveformItem({
+    //   currentSelection: selection.selection,
+    //   regions,
+    //   getItem,
+    // })
+    // if (previous) {
+    //   setCursorX(msToPixels(previous.item.start, pixelsPerSecond))
+    //   setCurrentTime(msToSeconds(previous.item.start))
+    //   waveform.actions.selectItem(previous.regionIndex, previous.item.id)
+    // }
+    waveform.actions.selectPreviousItemAndSeek(playerRef.current)
   }, [getItem, pixelsPerSecond, regions, selection.selection, waveform.actions])
   const selectNextWaveformItem = useCallback(() => {
-    const next = getNextWaveformItem({
-      currentSelection: selection.selection,
-      regions,
-      getItem,
-    })
-    if (next) {
-      setCursorX(msToPixels(next.item.start, pixelsPerSecond))
-      setCurrentTime(msToSeconds(next.item.start))
-      waveform.actions.selectItem(next.regionIndex, next.item.id)
-    }
+    // const next = getNextWaveformItem({
+    //   currentSelection: selection.selection,
+    //   regions,
+    //   getItem,
+    // })
+    // if (next) {
+    //   setCursorX(msToPixels(next.item.start, pixelsPerSecond))
+    //   setCurrentTime(msToSeconds(next.item.start))
+    //   waveform.actions.selectItem(next.regionIndex, next.item.id)
+    // }
+    waveform.actions.selectNextItemAndSeek(playerRef.current)
   }, [getItem, pixelsPerSecond, regions, selection.selection, waveform.actions])
 
   const {
@@ -382,83 +384,6 @@ const EMPTY: string[] = []
 export default Main
 
 export { $ as main$ }
-
-function getPreviousWaveformItem({
-  currentSelection,
-  regions,
-  getItem,
-}: {
-  currentSelection: WaveformState['selection']
-  regions: WaveformRegion[]
-  getItem: GetWaveformItem
-}) {
-  let loopedAround = false
-  let i = currentSelection.regionIndex
-  let cycleComplete = false
-  while (!cycleComplete) {
-    if (i === 0) {
-      loopedAround = true
-      i = regions.length - 1
-    } else {
-      // or below?
-      i--
-    }
-
-    const region = regions[i]
-    if (!region) console.error('no prev region found at ', i)
-    const { start: regionStart, itemIds } = region
-
-    const firstItemStartingNowId = itemIds.find((id) => {
-      const item = getItem(id)
-      return item?.start === regionStart
-    })
-    if (firstItemStartingNowId)
-      return {
-        regionIndex: i,
-        item: getItem(firstItemStartingNowId)!,
-      }
-
-    if (loopedAround && i === currentSelection.regionIndex) cycleComplete = true
-  }
-}
-
-function getNextWaveformItem({
-  currentSelection,
-  regions,
-  getItem,
-}: {
-  currentSelection: WaveformState['selection']
-  regions: WaveformRegion[]
-  getItem: GetWaveformItem
-}) {
-  let loopedAround = false
-  let i = currentSelection.regionIndex
-  let cycleComplete = false
-  while (!cycleComplete) {
-    if (i === regions.length - 1) {
-      loopedAround = true
-      i = 0
-    } else {
-      // or below?
-      i++
-    }
-
-    const region = regions[i]
-    const { start: regionStart, itemIds } = region
-
-    const firstItemStartingNowId = itemIds.find((id) => {
-      const item = getItem(id)
-      return item?.start === regionStart
-    })
-    if (firstItemStartingNowId)
-      return {
-        regionIndex: i,
-        item: getItem(firstItemStartingNowId)!,
-      }
-
-    if (loopedAround && i === currentSelection.regionIndex) cycleComplete = true
-  }
-}
 
 export class RecalculateWaveformRegionsEvent extends Event {
   constructor() {

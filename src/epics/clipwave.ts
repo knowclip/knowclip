@@ -9,7 +9,16 @@ import {
   PrimaryClip,
 } from 'clipwave'
 import * as selectors from '../selectors'
-import { getClip, getCurrentFileId, getFlashcard, getFlashcardTextFromCardBase, getNewFlashcardForStretchedClip, getSubtitlesCardBases, getSubtitlesFlashcardFieldLinks, SubtitlesCardBase } from '../selectors'
+import {
+  getClip,
+  getCurrentFileId,
+  getFlashcard,
+  getFlashcardTextFromCardBase,
+  getNewFlashcardForStretchedClip,
+  getSubtitlesCardBases,
+  getSubtitlesFlashcardFieldLinks,
+  SubtitlesCardBase,
+} from '../selectors'
 import { MEDIA_PLAYER_ID } from '../components/Media'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { EMPTY, of } from 'rxjs'
@@ -56,71 +65,84 @@ const stretchClipEpic: AppEpic = (
   { dispatchClipwaveEvent }
 ) => {
   return action$.ofType<ActionOf<typeof A.stretchClip>>(A.stretchClip).pipe(
-    mergeMap(({ stretchedClip, unstretchedClip, overlaps, newRegions, frontOverlappedSubtitlesCardBases, backOverlappedSubtitlesCardBases }) => {
-      dispatchClipwaveEvent(({ dispatch: clipwaveDispatch, state: { regions } }) => {
-        const clipToStretchId = stretchedClip.id
+    mergeMap(
+      ({
+        stretchedClip,
+        unstretchedClip,
+        overlaps,
+        newRegions,
+        frontOverlappedSubtitlesCardBases,
+        backOverlappedSubtitlesCardBases,
+      }) => {
+        dispatchClipwaveEvent(
+          ({ dispatch: clipwaveDispatch, state: { regions } }) => {
+            const clipToStretchId = stretchedClip.id
 
-        const newStartWithMerges = Math.min(
-          ...[stretchedClip, ...overlaps].map((i) => i.start)
-        )
-        const newEndWithMerges = Math.max(
-          ...[stretchedClip, ...overlaps].map((i) => i.end)
+            const newStartWithMerges = Math.min(
+              ...[stretchedClip, ...overlaps].map((i) => i.start)
+            )
+            const newEndWithMerges = Math.max(
+              ...[stretchedClip, ...overlaps].map((i) => i.end)
+            )
+
+            const newSelection = {
+              item: clipToStretchId,
+              regionIndex: newRegions.findIndex(
+                (region, i) =>
+                  region.start >= newStartWithMerges &&
+                  getRegionEnd(newRegions, i) < newEndWithMerges
+              ),
+            }
+
+            if (regions !== newRegions)
+              clipwaveDispatch({
+                type: 'SET_REGIONS',
+                regions: newRegions,
+                newSelection,
+                // // TODO: optimize via guarantee that new selection item is stretchedClip
+                // newSelection: getNewWaveformSelectionAt(
+                //   getItemDangerously,
+                //   newRegions,
+                //   secondsToMs(stretchedClip.start),
+                //   waveform.state.selection
+                // )
+              })
+
+            // const fields: TransliterationFlashcardFields = getFlashcard(state$.value, clipToStretchId)?.fields ?? {}
+            // const overlapsFields: TransliterationFlashcardFields[] = [
+            //   ...frontOverlappedSubtitlesCardBases.map((base): TransliterationFlashcardFields => ({
+            //     pronunciation: getFlashcardTextFromCardBase(base, 'pronunciation', base.]).join('\n')
+            //     base.fields
+            //   }),
+            //   fields,
+            //   ...frontOverlappedSubtitlesCardBases.map(base => base.fields),
+            // ]
+          }
         )
 
-        const newSelection = 
-        {
-          item: clipToStretchId,
-          regionIndex: newRegions.findIndex(
-            (region, i) =>
-              region.start >= newStartWithMerges &&
-              getRegionEnd(newRegions, i) < newEndWithMerges
-          ),
+        console.log('overlaps?')
+        if (
+          frontOverlappedSubtitlesCardBases.length ||
+          backOverlappedSubtitlesCardBases.length
+        ) {
+          console.log('overlaps!!')
+          // const bases = getSubtitlesCardBases(state$.value)
+          const newFields = getNewFlashcardForStretchedClip(
+            state$.value,
+            unstretchedClip,
+            stretchedClip,
+            {
+              front: frontOverlappedSubtitlesCardBases,
+              back: backOverlappedSubtitlesCardBases,
+            }
+          )
+
+          // add overlapped text to stretched clip
+          return of(actions.editClip(stretchedClip.id, null, newFields))
         }
-
-        if (regions !== newRegions)
-          clipwaveDispatch({
-            type: 'SET_REGIONS',
-            regions: newRegions,
-            newSelection,
-            // // TODO: optimize via guarantee that new selection item is stretchedClip
-            // newSelection: getNewWaveformSelectionAt(
-            //   getItemDangerously,
-            //   newRegions,
-            //   secondsToMs(stretchedClip.start),
-            //   waveform.state.selection
-            // )
-          })
-
-
-        // const fields: TransliterationFlashcardFields = getFlashcard(state$.value, clipToStretchId)?.fields ?? {}
-        // const overlapsFields: TransliterationFlashcardFields[] = [
-        //   ...frontOverlappedSubtitlesCardBases.map((base): TransliterationFlashcardFields => ({
-        //     pronunciation: getFlashcardTextFromCardBase(base, 'pronunciation', base.]).join('\n')
-        //     base.fields
-        //   }),
-        //   fields,
-        //   ...frontOverlappedSubtitlesCardBases.map(base => base.fields),
-        // ]
-
-      })
-
-
-      console.log('overlaps?')
-      if (frontOverlappedSubtitlesCardBases.length || backOverlappedSubtitlesCardBases.length) {
-      console.log('overlaps!!')
-      // const bases = getSubtitlesCardBases(state$.value)
-        const newFields = getNewFlashcardForStretchedClip(
-          state$.value,
-          unstretchedClip,
-          stretchedClip,          {
-            front: frontOverlappedSubtitlesCardBases,
-            back: backOverlappedSubtitlesCardBases
-          })
-
-      // add overlapped text to stretched clip
-      return of(actions.editClip(stretchedClip.id, null, newFields))
-        } return EMPTY
-    }),
+        return EMPTY
+      }
+    )
     // ignoreElements()
   )
 }

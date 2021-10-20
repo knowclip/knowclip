@@ -11,7 +11,9 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
     await client.clickElement_(subtitlesMenu$.openMenuButton)
 
     // should expect second menu item has text "pbc_jp.ass"
-    const [, pbcJpOpenTrackSubmenuButton] = await client.elements_(subtitlesMenu$.openTrackSubmenuButton)
+    const [, pbcJpOpenTrackSubmenuButton] = await client.elements_(
+      subtitlesMenu$.openTrackSubmenuButton
+    )
     pbcJpOpenTrackSubmenuButton.click()
 
     await client.clickElement_(subtitlesMenu$.locateExternalFileButton)

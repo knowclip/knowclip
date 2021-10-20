@@ -46,7 +46,6 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
   )
 
   await testBlock('check all PBC checkboxes', async () => {
-
     await polarBearCafeCheckbox.click()
     expect(
       await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
@@ -68,12 +67,15 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     })
   })
 
-  await testBlock('open piggeldy table and select first piggeldy card', async () => {
-    const [, piggeldyHeader] = await client.elements_(mediaTables$.header)
-    piggeldyHeader.click()
-    await client.waitUntilGone_(mediaTableRows$.highlightedClipRow)
-    await client.doubleClickElement_(mediaTableRows$.container)
-  })
+  await testBlock(
+    'open piggeldy table and select first piggeldy card',
+    async () => {
+      const [, piggeldyHeader] = await client.elements_(mediaTables$.header)
+      piggeldyHeader.click()
+      await client.waitUntilGone_(mediaTableRows$.highlightedClipRow)
+      await client.doubleClickElement_(mediaTableRows$.container)
+    }
+  )
 
   await testBlock('check all piggeldy checkboxes', async () => {
     expect(

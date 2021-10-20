@@ -25,8 +25,8 @@ function getStore(initialState: Partial<AppState> | undefined) {
             reduxDevtoolsExtension({
               stateSanitizer: ({ previous, next, ...state }: any) => ({
                 ...state,
-                previous: `${previous.length} items`,
-                next: `${next.length} items`,
+                previous: `${previous?.length} items`,
+                next: `${next?.length} items`,
               }),
             }),
           ]

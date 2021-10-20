@@ -1,3 +1,4 @@
+import { async } from 'rxjs'
 import { Element } from 'webdriverio'
 import { TestDriver } from './TestDriver'
 
@@ -21,9 +22,10 @@ export interface ElementWrapper {
   isSelected: () => Promise<boolean>
   getAttribute: (attributeName: string) => Promise<string | null>
   moveTo: (opts: { x: number; y: number }) => Promise<void>
+  findDescendant: (descendantSelector: string) => Promise<ElementWrapper | null>
 }
 
-export const element = (
+export const wrapElement = (
   driver: TestDriver,
   element: Element,
   selector: string
@@ -145,5 +147,17 @@ export const element = (
         )
       }
     },
+    findDescendant: async (descendantSelector: string) => {
+      const rawElement = await element.findElement(
+        'css selector',
+        descendantSelector
+      )
+      if (rawElement)
+        return wrapElement(driver, element, `${selector} ${descendantSelector}`)
+
+      return null
+    },
   }
 }
+
+export { wrapElement as element }

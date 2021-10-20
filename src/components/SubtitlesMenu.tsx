@@ -29,6 +29,7 @@ import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 
 enum $ {
+  container = 'subtitles-menu',
   openMenuButton = 'subtitles-menu-open-menu-button',
   trackMenuItems = 'subtitles-menu-track-item',
   openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
@@ -110,7 +111,7 @@ const SubtitlesMenu = () => {
       </Tooltip>
       {isOpen && (
         <Popover anchorEl={anchorEl} open={isOpen} onClose={close}>
-          <MenuList>
+          <MenuList className={$.container}>
             {!subtitles.total && (
               <MenuItem dense disabled>
                 No subtitles loaded.

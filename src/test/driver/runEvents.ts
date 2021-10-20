@@ -75,7 +75,7 @@ function getMouseDragEvents(
       type: 'mouseDown',
       x: fromX,
       y: fromY,
-      clickCount: 1
+      clickCount: 1,
     },
     {
       type: 'mouseMove',
@@ -91,7 +91,7 @@ function getMouseDragEvents(
       type: 'mouseUp',
       x: toX,
       y: toY,
-      clickCount: 1
+      clickCount: 1,
     },
   ]
 }

@@ -210,7 +210,7 @@ export function useWaveformEventHandlers({
       const stretchImminent =
         timeStamp - mouseDown.timeStamp > STRETCH_START_DELAY
       if (!stretchImminent) return
-      
+
       const unstretchedClip = getItemDangerously(stretch.clipId)
       const stretchedClip = {
         ...unstretchedClip,
@@ -276,7 +276,14 @@ export function useWaveformEventHandlers({
       })
 
       dispatch(
-        actions.stretchClip(stretchedClip, clips, unstretchedClip, subtitlesFront, subtitlesBack, newRegions)
+        actions.stretchClip(
+          stretchedClip,
+          clips,
+          unstretchedClip,
+          subtitlesFront,
+          subtitlesBack,
+          newRegions
+        )
       )
       // console.log('seekyupdate went through')
       waveform.actions.selectItemAndSeekTo(
@@ -339,7 +346,10 @@ function getStretchedClipOverlaps(
       if (item.clipwaveType === 'Primary') acc.clips.push(item)
 
       if (item.clipwaveType === 'Secondary') {
-        const side = item.start < stretchedClip.start ? acc.subtitlesFront : acc.subtitlesBack
+        const side =
+          item.start < stretchedClip.start
+            ? acc.subtitlesFront
+            : acc.subtitlesBack
         const cardBase = cardsBases.cardsMap[item.id]
         if (cardBase) side.push(cardBase)
       }

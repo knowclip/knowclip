@@ -8,10 +8,7 @@ import { RecalculateWaveformRegionsEvent } from '../components/Main'
 import { afterUpdates } from '../utils/afterUpdates'
 import { ClipwaveRegionsUpdateEvent } from 'clipwave'
 
-const clipCreateEpic: AppEpic = (
-  action$,
-  state$,
-) => {
+const clipCreateEpic: AppEpic = (action$, state$) => {
   return action$
     .ofType<ActionOf<typeof A.addClipRequest>>(A.addClipRequest)
     .pipe(

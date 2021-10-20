@@ -90,7 +90,7 @@ const linkSubtitlesDialog = (
     subtitles,
     subtitlesChunks,
     mediaFileId,
-    triggeredOnOpenFile
+    triggeredOnOpenFile,
   })
 
 const dictionariesDialog = () =>

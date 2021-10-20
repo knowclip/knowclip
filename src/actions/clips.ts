@@ -58,14 +58,6 @@ export const clipsActions = {
     selection,
   }),
 
-  highlightLeftClipRequest: () => ({
-    type: A.highlightLeftClipRequest,
-  }),
-
-  highlightRightClipRequest: () => ({
-    type: A.highlightRightClipRequest,
-  }),
-
   editClip: (
     id: ClipId,
     override: DeepPartial<Clip> | null,
@@ -94,12 +86,17 @@ export const clipsActions = {
     newSelection,
   }),
 
-  moveClip: (id: ClipId, deltaX: number, overlapIds: Array<ClipId>, newRegions: WaveformRegion[]) => ({
+  moveClip: (
+    id: ClipId,
+    deltaX: number,
+    overlapIds: Array<ClipId>,
+    newRegions: WaveformRegion[]
+  ) => ({
     type: A.moveClip,
     id,
     deltaX,
     overlapIds,
-    newRegions
+    newRegions,
   }),
 
   setFlashcardField: (

@@ -114,7 +114,10 @@ async function copyFixtures() {
   await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
 }
 
-export async function testBlock<T>(name: string, cb: () => Promise<T>): Promise<T> {
+export async function testBlock<T>(
+  name: string,
+  cb: () => Promise<T>
+): Promise<T> {
   try {
     process.stdout.write('\n     ' + name)
 

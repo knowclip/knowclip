@@ -48,7 +48,6 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         return EMPTY
       }
 
-
       if (key === KEYS.escape) {
         if (r.getCurrentDialog(state$.value) || (window as any).cloze)
           return of(({ type: 'NOOP_ESC_KEY' } as unknown) as Action)

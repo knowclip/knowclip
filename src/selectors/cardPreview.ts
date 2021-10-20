@@ -82,6 +82,11 @@ export const getSubtitlesCardBases = createSelector(
     const cards: SubtitlesCardBase[] = cueTrack.chunks.map(
       (cueChunk, index) => {
         const id = `${index}-----${Object.keys(fieldsCuePriority).join('___')}`
+
+        if (cueChunk.text.includes('はい') || cueChunk.text.includes('kay')) {
+          console.log({ cueChunk })
+        }
+
         const cardBase: SubtitlesCardBase = {
           index,
           id,
@@ -97,7 +102,7 @@ export const getSubtitlesCardBases = createSelector(
 
             for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
               const chunk = chunks[i]
-              lastIndexes[fieldPriority] = i
+              // lastIndexes[fieldPriority] = i
 
               if (!chunk) {
                 console.log({ track, i })
@@ -105,10 +110,33 @@ export const getSubtitlesCardBases = createSelector(
                 throw new Error('invalid chunk index')
               }
 
+              if (chunk.text.includes('はい') || chunk.text.includes('kay')) {
+                console.log(
+                  {
+                    chunk,
+                    cueChunk,
+                    overlapsSignificantly: overlapsSignificantly(
+                      cueChunk,
+                      chunk.start,
+                      chunk.end
+                    ),
+                  },
+                  'chunk.start >= cueChunk.end',
+                  chunk.start >= cueChunk.end
+                )
+              }
+
               if (chunk.start >= cueChunk.end) {
                 break
               }
+
+              lastIndexes[fieldPriority] = i
+
+              const overlapsAtAll =
+                cueChunk.start <= chunk.end - 0 &&
+                cueChunk.end >= chunk.start + 0
               if (overlapsSignificantly(cueChunk, chunk.start, chunk.end)) {
+                // if (overlapsAtAll) {
                 overlappedIndexes.push(i)
               }
             }

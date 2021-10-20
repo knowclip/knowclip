@@ -6,7 +6,10 @@ import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { clickClip } from '../../driver/waveform'
 
-export default async function linkSubtitlesToFields({ client, app }: TestSetup) {
+export default async function linkSubtitlesToFields({
+  client,
+  app,
+}: TestSetup) {
   await testBlock('open media menu', async () => {
     await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
     await client.waitForText_(

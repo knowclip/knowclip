@@ -4075,10 +4075,10 @@ cli-width@^3.0.0:
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-3.0.0.tgz#a2f48437a2caa9a22436e794bf071ec9e61cedf6"
   integrity sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==
 
-clipwave@^0.1.7-10:
-  version "0.1.7-10"
-  resolved "https://registry.yarnpkg.com/clipwave/-/clipwave-0.1.7-10.tgz#a182ef47b37e765526daf3d4c4bb87c528d235c1"
-  integrity sha512-3x6MC99vR4hyM7OjRJzuRi0b0oOgAMuGpaC5fDIR3ndmE3lPK/7sb40vvXl9ZOoGY1jF04mxkg+LO7gM5nOsqA==
+clipwave@^0.1.7-11:
+  version "0.1.7-11"
+  resolved "https://registry.yarnpkg.com/clipwave/-/clipwave-0.1.7-11.tgz#3db5292148c30e17645e1e6b320114ccdcfa4248"
+  integrity sha512-RFJt8IqkY97OWMP82I4hBg1p/c8+mRppONM14qsmN1EBIHATTvea8wuIJjy+zT82bzYkIX5bOa69oZ5G8FYzyg==
   dependencies:
     classnames "^2.3.1"
 

@@ -62,7 +62,12 @@ export default {
           ...(mediaFile && !mediaFile.subtitles.some((s) => s.id === track.id)
             ? [
                 r.addSubtitlesTrack(track, mediaFile.id),
-                r.linkSubtitlesDialog(validatedFile, chunks, mediaFile.id, true),
+                r.linkSubtitlesDialog(
+                  validatedFile,
+                  chunks,
+                  mediaFile.id,
+                  true
+                ),
               ]
             : []),
           r.mountSubtitlesTrack(track),
@@ -97,7 +102,9 @@ export default {
               r.addSubtitlesTrack(track, mediaFile.id),
               ...(state.dialog.queue.some((d) => d.type === 'SubtitlesClips')
                 ? []
-                : [r.linkSubtitlesDialog(external, chunks, mediaFile.id, true)]), // TODO: extract and share between here and externalSubtitlesFile.ts
+                : [
+                    r.linkSubtitlesDialog(external, chunks, mediaFile.id, true),
+                  ]), // TODO: extract and share between here and externalSubtitlesFile.ts
             ]
           : []),
         r.mountSubtitlesTrack(track),

@@ -59,21 +59,35 @@ const ReviewAndExportMediaTableRow = memo(
     const handleDoubleClick = useCallback(() => {
       // highlightClip(id)
       console.log('dispatching...')
-      window.dispatchEvent(new ClipwaveRegionsUpdateEvent('waveform', ({ actions, state, getItem }) => {
-        const item = getItem(id)
-        const regionIndex = item
-          ? state.regions.findIndex((r, i) => item.start >= r.start && getRegionEnd(state.regions, i) <= item.end )
-          : -1
-        const media = getMediaPlayer()
-        console.log({ item, regionIndex, regions: state.regions, media: media ? 'media!' : 'not found' })
-        if (item && regionIndex !== -1 && media) {
-          actions.selectItemAndSeekTo(regionIndex, id, media, item?.start)
-        }
+      window.dispatchEvent(
+        new ClipwaveRegionsUpdateEvent(
+          'waveform',
+          ({ actions, state, getItem }) => {
+            const item = getItem(id)
+            const regionIndex = item
+              ? state.regions.findIndex(
+                  (r, i) =>
+                    item.start >= r.start &&
+                    getRegionEnd(state.regions, i) <= item.end
+                )
+              : -1
+            const media = getMediaPlayer()
+            console.log({
+              item,
+              regionIndex,
+              regions: state.regions,
+              media: media ? 'media!' : 'not found',
+            })
+            if (item && regionIndex !== -1 && media) {
+              actions.selectItemAndSeekTo(regionIndex, id, media, item?.start)
+            }
 
-        if (!media) {
-          dispatch(r.selectWaveformItem({ type: 'Clip', id }))
-        }
-      }))
+            if (!media) {
+              dispatch(r.selectWaveformItem({ type: 'Clip', id }))
+            }
+          }
+        )
+      )
     }, [highlightClip, id])
 
     const startEditing = useCallback(() => {

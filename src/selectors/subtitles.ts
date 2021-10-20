@@ -396,10 +396,8 @@ export const getNewFlashcardForStretchedClip = (
       (fn) =>
         links[fn] &&
         !(
-          (
-            flashcards[stretchedClip.id]
-              .fields as TransliterationFlashcardFields
-          )[fn] || ''
+          (flashcards[stretchedClip.id]
+            .fields as TransliterationFlashcardFields)[fn] || ''
         ).trim()
     )
   )
@@ -474,9 +472,12 @@ function combineFlashcards(
       const newText = (card.fields[fieldName] || '').trim()
       const padding = trimmedTextSoFar && newText ? '\n' : ''
       console.log(
-        'newText', newText,
-        'trimmedTextSoFar', trimmedTextSoFar,
-        'padding.length', padding.length,
+        'newText',
+        newText,
+        'trimmedTextSoFar',
+        trimmedTextSoFar,
+        'padding.length',
+        padding.length
       )
       acc.text += padding + newText
 

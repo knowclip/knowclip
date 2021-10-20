@@ -40,7 +40,10 @@ export const useRenderSecondaryClip = (
       const isSelected = selection.item?.id === clip.id
 
       return (
-        <g className={cn(css.subtitlesChunk, $.subtitlesChunk)} {...clickDataProps}>
+        <g
+          className={cn(css.subtitlesChunk, $.subtitlesChunk)}
+          {...clickDataProps}
+        >
           <clipPath id={clipPathId}>
             <rect {...rect} width={width - 10} />
           </clipPath>

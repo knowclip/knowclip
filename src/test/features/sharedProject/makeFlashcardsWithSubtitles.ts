@@ -10,13 +10,16 @@ import { stdout } from 'process'
 export default async function makeFlashcardsWithSubtitles({
   client,
 }: TestSetup) {
-  await testBlock('open flashcard field menu for meaning field of third card', async () => {
-    await client.waitForText_(flashcardSection$.container, '3 / 4')
+  await testBlock(
+    'open flashcard field menu for meaning field of third card',
+    async () => {
+      await client.waitForText_(flashcardSection$.container, '3 / 4')
 
-    await client.clickElement(
-      `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
-    )
-  })
+      await client.clickElement(
+        `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
+      )
+    }
+  )
 
   await testBlock('link embedded track to meaning', async () => {
     await client.clickElement_(flashcardFieldMenu$.embeddedTrackMenuItem)
@@ -25,7 +28,7 @@ export default async function makeFlashcardsWithSubtitles({
 
   await testBlock('delete card', async () => {
     await client.clickElement_(flashcardForm$.deleteButton)
-  
+
     await client.elements_(waveform$.waveformClip, 1)
     await client.waitForHidden_(waveform$.waveformClip)
     process.stdout.write('HIDDEN \n')
@@ -36,12 +39,12 @@ export default async function makeFlashcardsWithSubtitles({
     process.stdout.write('DRAGGED \n')
     const els = await client.elements_(waveform$.waveformClip)
     process.stdout.write('CLIP PRESENT \n')
-   
-    await client.waitUntil(() => els[1].isVisible());
+
+    await client.waitUntil(() => els[1].isVisible())
     // process.stdout.write(`VISIBLE 1b: ${visible} \n`) // this didnt get logged, it seems
     // await client.waitForVisible_(waveform$.waveformClip)
     process.stdout.write('VISIBLE 2 \n') // this didnt get logged, it seems
-  
+
     console.log('made clip')
     console.log('bodytext', await client.getText('body'))
 

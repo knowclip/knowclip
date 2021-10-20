@@ -12,7 +12,7 @@ import {
   concat,
   tap,
 } from 'rxjs/operators'
-import { of, Observable } from 'rxjs'
+import { of, Observable, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { from } from 'rxjs'
@@ -23,13 +23,13 @@ import {
   SubtitlesFileWithTrack,
 } from '../selectors'
 import { afterUpdates } from '../utils/afterUpdates'
-import { msToSeconds } from 'clipwave'
+import { ClipwaveRegionsUpdateEvent, msToSeconds } from 'clipwave'
 import { TransliterationFlashcardFields } from '../types/Project'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
   state$,
-  { pauseMedia, setCurrentTime }
+  { pauseMedia, setCurrentTime, getMediaPlayer }
 ) =>
   action$.pipe(
     ofType<Action, MakeClipsFromSubtitles>(A.makeClipsFromSubtitles),
@@ -135,11 +135,13 @@ const makeClipsFromSubtitles: AppEpic = (
                       const trackId = fieldNamesToTrackIds[fieldName] || null
                       const fieldText = getFlashcardTextFromCardBase(
                         cardBase,
-                        trackId ? r.getSubtitlesTrack(state$.value, trackId) : null
+                        trackId
+                          ? r.getSubtitlesTrack(state$.value, trackId)
+                          : null
                       )
                       fields[fieldName] = fieldText
                         .filter((t) => t.trim())
-                        .join('\n')
+                        .join(' ')
                       return fields
                     },
                     (currentNoteType === 'Simple'
@@ -186,10 +188,17 @@ const makeClipsFromSubtitles: AppEpic = (
               //   },
               //   { clips: [] as Clip[], cards: [] as Flashcard[] }
               // )
-              return from([
-                r.addClips(clips, cards, fileId),
-                r.highlightRightClipRequest(),
-              ])
+              return from([r.addClips(clips, cards, fileId)])
+            }),
+            afterUpdates(async () => {
+              window.dispatchEvent(
+                new ClipwaveRegionsUpdateEvent('waveform', ({ actions }) => {
+                  const mediaPlayer = getMediaPlayer()
+                  actions.selectNextItemAndSeek(mediaPlayer)
+                })
+              )
+
+              return EMPTY
             })
           )
         )
