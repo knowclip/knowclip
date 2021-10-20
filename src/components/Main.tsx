@@ -256,34 +256,12 @@ const Main = () => {
       dispatch(actions.selectWaveformItem(newSelection))
     }
   }, [dispatch, editing, previousSelection, selection])
-  const { getItem } = waveform
-  const { regions, pixelsPerSecond } = waveform.state
   const selectPreviousWaveformItem = useCallback(() => {
-    // const previous = getPreviousWaveformItem({
-    //   currentSelection: selection.selection,
-    //   regions,
-    //   getItem,
-    // })
-    // if (previous) {
-    //   setCursorX(msToPixels(previous.item.start, pixelsPerSecond))
-    //   setCurrentTime(msToSeconds(previous.item.start))
-    //   waveform.actions.selectItem(previous.regionIndex, previous.item.id)
-    // }
     waveform.actions.selectPreviousItemAndSeek(playerRef.current)
-  }, [getItem, pixelsPerSecond, regions, selection.selection, waveform.actions])
+  }, [playerRef, waveform.actions.selectPreviousItemAndSeek])
   const selectNextWaveformItem = useCallback(() => {
-    // const next = getNextWaveformItem({
-    //   currentSelection: selection.selection,
-    //   regions,
-    //   getItem,
-    // })
-    // if (next) {
-    //   setCursorX(msToPixels(next.item.start, pixelsPerSecond))
-    //   setCurrentTime(msToSeconds(next.item.start))
-    //   waveform.actions.selectItem(next.regionIndex, next.item.id)
-    // }
     waveform.actions.selectNextItemAndSeek(playerRef.current)
-  }, [getItem, pixelsPerSecond, regions, selection.selection, waveform.actions])
+  }, [playerRef, waveform.actions.selectPreviousItemAndSeek])
 
   const {
     handleWaveformDrag,
