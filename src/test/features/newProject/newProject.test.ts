@@ -34,7 +34,7 @@ describe('create a deck from a new project', () => {
       join(TMP_DIRECTORY, 'my_cool_new_project.kyml')
     )
 
-    if (process.platform !== 'linux') {
+    if (process.platform === 'linux') {
       // slight difference after clipwave update,
       // adjusting here until cause is found
       const pbcClips = actualProjectFileContents.value?.media[0]?.clips
