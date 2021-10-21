@@ -16,7 +16,6 @@ export function useWaveformRenderClip() {
       isHighlighted,
       height,
       pixelsPerSecond,
-      // @ts-ignore
       level,
       clickDataProps,
     }: PrimaryClipDisplayProps) => {

@@ -13,12 +13,7 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
     ).toMatchObject([true, true])
     await setVideoTime(client, 61)
 
-    await client.waitUntil(async () => {
-      const clips = await client.elements_(waveform$.waveformClip)
-      return (await Promise.all(clips.map((c) => c.isVisible()))).every(
-        (visible) => !visible
-      )
-    })
+    await client.waitUntilGone_(waveform$.waveformClip)
   })
 
   await testBlock(
@@ -39,6 +34,12 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
         }
       })
       expect(await clipsVisibility(client)).toMatchObject([true])
+
+      await client.waitUntil(async () => {
+        // return !await initiallyHighlightedClip.getAttribute('data-clip-is-highlighted')
+        const clip = await client.firstElement_(waveform$.waveformClip)
+        return Boolean(await clip.getAttribute('data-clip-is-highlighted'))
+      })
     }
   )
 
