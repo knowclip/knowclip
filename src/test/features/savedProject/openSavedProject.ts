@@ -1,6 +1,5 @@
 import { TestSetup } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
-import { waveform$ } from '../../../components/Waveform'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 
 export default async function openSavedProject({ client }: TestSetup) {

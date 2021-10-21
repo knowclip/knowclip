@@ -97,7 +97,7 @@
     "eject": "react-scripts eject",
     "electron": "export NODE_ENV=development && yarn build-main && electron .",
     "electron:win": "set NODE_ENV=development&& yarn build-main && electron .",
-    "lint": "eslint src/**/*.{ts,tsx,js}",
+    "lint": "eslint 'src/**/*.{ts,tsx,js}'",
     "format": "prettier --ignore-path ./.gitignore \"{src/**,.}/*.{js,ts,tsx}\"",
     "format:write": "yarn format --write",
     "tsc": "tsc",

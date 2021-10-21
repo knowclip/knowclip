@@ -81,10 +81,10 @@ export function waitForChromeDriverToStop(
 }
 
 export async function createTestDriver({
-  chromedriverPath: chromedriverPath,
+  chromedriverPath,
   webdriverIoPath,
   appDir,
-  chromeArgs: chromeArgs,
+  chromeArgs,
   env: givenEnv,
   logLevel = 'silent',
 }: {

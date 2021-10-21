@@ -1,5 +1,4 @@
 import { testBlock, TestSetup } from '../../setUpDriver'
-import { waveform$ } from '../../../components/Waveform'
 import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'

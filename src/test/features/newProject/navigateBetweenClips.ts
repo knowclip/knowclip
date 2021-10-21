@@ -3,8 +3,6 @@ import { clickAt } from '../../driver/ClientWrapper'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard'
-import { waveform$ } from '../../../components/Waveform'
-import { waveformSelector } from '../../driver/waveform'
 
 export default async function navigateBetweenClips({ app, client }: TestSetup) {
   const { previousClipButton, container } = flashcardSection$

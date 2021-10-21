@@ -17,7 +17,6 @@ import {
   getCurrentNoteType,
   getCurrentMediaFile,
   getSubtitlesFilesWithTracks,
-  getSubtitlesTrack,
 } from '../../selectors'
 import {
   blankSimpleFields,

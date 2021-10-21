@@ -1,4 +1,3 @@
-import { async } from 'rxjs'
 import { Element } from 'webdriverio'
 import { TestDriver } from './TestDriver'
 

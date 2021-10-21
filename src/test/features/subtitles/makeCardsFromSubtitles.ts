@@ -8,7 +8,6 @@ import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsD
 import { waveform$ } from '../../../components/Waveform'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
-import { stdout } from 'process'
 
 export default async function makeCardsFromSubtitles({
   app,

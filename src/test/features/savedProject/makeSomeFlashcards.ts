@@ -1,7 +1,6 @@
 import { testBlock, TestSetup } from '../../setUpDriver'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { waveform$ } from '../../../components/Waveform'
-import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
