@@ -39,8 +39,8 @@ describe('create a deck from a new project', () => {
       // adjusting here until cause is found
       const pbcClips = actualProjectFileContents.value?.media[0]?.clips
       if (pbcClips) {
-        pbcClips[2].end = '01:23.214'
-        pbcClips[2].start = '01:17.254'
+        pbcClips[2].end = '01:21.16'
+        pbcClips[2].start = '01:15.2'
       }
     }
     expect(actualProjectFileContents).toMatchSnapshot()

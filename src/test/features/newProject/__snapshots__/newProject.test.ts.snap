@@ -40,12 +40,12 @@ Object {
             ],
           },
           Object {
-            "end": "01:23.214",
+            "end": "01:21.16",
             "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
             "image": Object {
               "type": "VideoStill",
             },
-            "start": "01:17.254",
+            "start": "01:15.2",
             "tags": Array [
               "pbc",
             ],
