@@ -40,19 +40,3 @@ class App extends Component<
 }
 
 export default App
-
-export const IntegrationApp = () => {
-  return (
-    <MuiThemeProvider theme={theme}>
-      <CssBaseline />
-      <HashRouter>
-        <Switch>
-          <Route exact path="/" component={Main} />
-          <Route exact path="/projects" component={ProjectsMenu} />
-        </Switch>
-      </HashRouter>
-      <Snackbar />
-      <Dialog />
-    </MuiThemeProvider>
-  )
-}

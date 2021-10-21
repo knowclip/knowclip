@@ -1,6 +1,6 @@
 import { testBlock, TestSetup } from '../../setUpDriver'
 import { tagsInput$ } from '../../../components/TagsInput'
-import { waveform$ } from '../../../components/Waveform'
+import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import {
   waveformMouseDrag,

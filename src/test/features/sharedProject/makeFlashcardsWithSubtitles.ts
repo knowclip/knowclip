@@ -1,5 +1,5 @@
 import { testBlock, TestSetup } from '../../setUpDriver'
-import { waveform$ } from '../../../components/Waveform'
+import { waveform$ } from '../../../components/waveformTestLabels'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'

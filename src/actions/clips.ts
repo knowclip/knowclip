@@ -11,10 +11,9 @@ export const clipsActions = {
     clipId,
   }),
 
-  [A.stretchClip]: (
+  stretchClip: (
     stretchedClip: { id: Clip['id']; start: number; end: number },
-    overlaps: PrimaryClip[],
-    // overlappedClipsIds: Array<Clip['id']>,
+    overlappedClips: PrimaryClip[],
     unstretchedClip: { id: Clip['id']; start: number; end: number },
     frontOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
     backOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
@@ -22,8 +21,7 @@ export const clipsActions = {
   ) => ({
     type: A.stretchClip,
     stretchedClip,
-    overlaps,
-    // overlappedClipsIds,
+    overlappedClips,
     unstretchedClip,
     frontOverlappedSubtitlesCardBases,
     backOverlappedSubtitlesCardBases,

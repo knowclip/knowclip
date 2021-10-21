@@ -160,54 +160,7 @@ export const newClipFromChunk: AppEpic = (
       })
     )
 
-// const updateSelectionAfterLink: AppEpic = (
-//   action$,
-//   state$,
-//   { setCurrentTime, getCurrentTime }
-// ) =>
-//   action$
-//     .ofType<LinkFlashcardFieldToSubtitlesTrackRequest>(
-//       A.linkFlashcardFieldToSubtitlesTrackRequest
-//     )
-//     .pipe(
-//       map(() => {
-//         return r.getWaveformSelection(state$.value)
-//       }),
-//       sample(
-//         action$.pipe(
-//           filter(
-//             (action) =>
-//               action.type === A.updateFile &&
-//               Boolean(
-//                 getUpdateWith(
-//                   action.update,
-//                   'linkFlashcardFieldToSubtitlesTrack'
-//                 )
-//               )
-//           )
-//         )
-//       ),
-//       mergeMap((selection) => {
-//         if (selection && selection.type === 'Preview') {
-//           const newSelection = r.getNewWaveformSelectionAt(
-//             state$.value,
-//             selection.item.start
-//           )
-//           if (
-//             newSelection &&
-//             msToSeconds(newSelection.item.start) !== getCurrentTime()
-//           ) {
-//             setCurrentTime(msToSeconds(newSelection.item.start))
-//           }
-//           return newSelection ? of(r.selectWaveformItem(newSelection)) : EMPTY
-//         }
-
-//         return EMPTY
-//       })
-//     )
-
 export default combineEpics(
-  // updateSelectionAfterLink,
   linkFieldToTrackRequest,
   linkFieldToTrack,
   newClipFromChunk,

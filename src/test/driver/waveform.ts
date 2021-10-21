@@ -2,7 +2,7 @@ import { clickAt, dragMouse } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main'
 import { ElementWrapper } from './ElementWrapper'
-import { waveform$ } from '../../components/Waveform'
+import { waveform$ } from '../../components/waveformTestLabels'
 import { TestDriver } from './TestDriver'
 
 export const waveformSelector = `#${main$.container} > svg`

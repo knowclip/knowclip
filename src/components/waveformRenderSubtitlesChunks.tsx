@@ -9,7 +9,7 @@ import {
   useWaveform,
   WAVEFORM_HEIGHT,
 } from 'clipwave'
-import { $ } from './Waveform'
+import { $ } from './waveformTestLabels'
 import { RenderSecondaryClip } from 'clipwave/dist/Waveform'
 
 export const useRenderSecondaryClip = (

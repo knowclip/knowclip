@@ -1,6 +1,6 @@
 import { testBlock, TestSetup } from '../../setUpDriver'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
-import { waveform$ } from '../../../components/Waveform'
+import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
@@ -49,7 +49,6 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
       // we should properly wait until update above is really done
       // somehow checking the waveform items have been updated.
 
-      if (process.platform === 'linux') await client._driver.client.pause(1000)
       await client.clickElement_(flashcardSection$.previousClipButton)
       await client.waitForText('body', '2 / 3')
 

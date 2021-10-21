@@ -284,7 +284,6 @@ const Subtitles = ({
       id={track.id}
       kind="subtitles"
       src={new URL(`file://${availability.filePath}`).toString()}
-      // @ts-ignore
       mode={track.mode}
       default={isDefault}
     />
@@ -293,7 +292,6 @@ const Subtitles = ({
       id={track.id}
       kind="subtitles"
       src={new URL(`file://${availability.filePath}`).toString()}
-      // @ts-ignore
       mode={track.mode}
       default={isDefault}
     />

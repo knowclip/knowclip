@@ -50,52 +50,41 @@ const stretchClipEpic: AppEpic = (
       ({
         stretchedClip,
         unstretchedClip,
-        overlaps,
+        overlappedClips,
         newRegions,
         frontOverlappedSubtitlesCardBases,
         backOverlappedSubtitlesCardBases,
       }) => {
-        dispatchClipwaveEvent(
-          ({ dispatch: clipwaveDispatch, state: { regions } }) => {
-            const clipToStretchId = stretchedClip.id
+        dispatchClipwaveEvent(({ dispatch, state: { regions } }) => {
+          const clipToStretchId = stretchedClip.id
 
-            const newStartWithMerges = Math.min(
-              ...[stretchedClip, ...overlaps].map((i) => i.start)
-            )
-            const newEndWithMerges = Math.max(
-              ...[stretchedClip, ...overlaps].map((i) => i.end)
-            )
+          const newStartWithMerges = Math.min(
+            ...[stretchedClip, ...overlappedClips].map((i) => i.start)
+          )
+          const newEndWithMerges = Math.max(
+            ...[stretchedClip, ...overlappedClips].map((i) => i.end)
+          )
 
-            const newSelection = {
-              item: clipToStretchId,
-              regionIndex: newRegions.findIndex(
-                (region, i) =>
-                  region.start >= newStartWithMerges &&
-                  getRegionEnd(newRegions, i) < newEndWithMerges
-              ),
-            }
-
-            if (regions !== newRegions)
-              clipwaveDispatch({
-                type: 'SET_REGIONS',
-                regions: newRegions,
-                newSelection,
-                // // TODO: optimize via guarantee that new selection item is stretchedClip
-                // newSelection: getNewWaveformSelectionAt(
-                //   getItemDangerously,
-                //   newRegions,
-                //   secondsToMs(stretchedClip.start),
-                //   waveform.state.selection
-                // )
-              })
-          }
-        )
+          if (regions !== newRegions)
+            dispatch({
+              type: 'SET_REGIONS',
+              regions: newRegions,
+              newSelection: {
+                item: clipToStretchId,
+                // TODO: optimize via guarantee that new selection item is stretchedClip
+                regionIndex: newRegions.findIndex(
+                  (region, i) =>
+                    region.start >= newStartWithMerges &&
+                    getRegionEnd(newRegions, i) < newEndWithMerges
+                ),
+              },
+            })
+        })
 
         if (
           frontOverlappedSubtitlesCardBases.length ||
           backOverlappedSubtitlesCardBases.length
         ) {
-          // const bases = getSubtitlesCardBases(state$.value)
           const newFields = getNewFlashcardForStretchedClip(
             state$.value,
             unstretchedClip,
@@ -106,13 +95,11 @@ const stretchClipEpic: AppEpic = (
             }
           )
 
-          // add overlapped text to stretched clip
           return of(actions.editClip(stretchedClip.id, null, newFields))
         }
         return EMPTY
       }
     )
-    // ignoreElements()
   )
 }
 

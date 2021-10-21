@@ -173,20 +173,6 @@ const makeClipsFromSubtitles: AppEpic = (
                 { clips: [] as Clip[], cards: [] as Flashcard[] }
               )
 
-              // const { clips, cards } = getClipsAndCardsFromSubtitles(
-              //   tracksValidation.cueTrackFieldName,
-              //   fieldNamesToTrackIds,
-              //   state$.value,
-              //   fileId
-              // ).reduce(
-              //   (acc, { clip, flashcard }) => {
-              //     const { clips, cards } = acc
-              //     clips.push(clip)
-              //     cards.push(flashcard)
-              //     return acc
-              //   },
-              //   { clips: [] as Clip[], cards: [] as Flashcard[] }
-              // )
               return from([r.addClips(clips, cards, fileId)])
             }),
             afterUpdates(async () => {
@@ -303,71 +289,6 @@ function validateTracks(
     cueTrackFieldName,
   }
 }
-
-// function getClipsAndCardsFromSubtitles(
-//   cueTrackFieldName: TransliterationFlashcardFieldName,
-//   fieldNamesToTrackIds: SubtitlesFlashcardFieldsLinks,
-//   state: AppState,
-//   fileId: string
-// ) {
-//   const trackId = fieldNamesToTrackIds[cueTrackFieldName]
-//   const cueTrack = trackId && r.getSubtitlesTrack(state, trackId)
-//   if (!cueTrack)
-//     throw new Error('Could not load subtitles file for generating clips')
-
-//   const currentNoteType = r.getCurrentNoteType(state)
-//   if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
-
-//   // careful, pretty sure this mutates
-//   const sortedChunks = cueTrack.chunks.sort(
-//     ({ start: a }, { start: b }) => a - b
-//   )
-//   return sortedChunks.map((chunk, chunkIndex) => {
-//     const fields =
-//       currentNoteType === 'Simple'
-//         ? {
-//             transcription: chunk.text,
-//             meaning: '',
-//             notes: '',
-//           }
-//         : {
-//             transcription: chunk.text,
-//             meaning: '',
-//             notes: '',
-//             pronunciation: '',
-//           }
-//     ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(
-//       (fieldName) => {
-//         const trackId = fieldNamesToTrackIds[fieldName]
-//         fields[fieldName] = trackId
-//           ? r
-//               .getSubtitlesChunksWithinRange(
-//                 state,
-//                 trackId,
-//                 chunk.start,
-//                 chunk.end
-//               )
-//               .map((chunk) => chunk.text)
-//               .join(' ')
-//           : ''
-//       }
-//     )
-//     return r.getNewClipAndCard(
-//       state,
-//       {
-//         start: chunk.start,
-//         end:
-//           sortedChunks[chunkIndex + 1] &&
-//           chunk.end === sortedChunks[chunkIndex + 1].start
-//             ? chunk.end - 1
-//             : chunk.end,
-//       },
-//       fileId,
-//       uuid(),
-//       fields
-//     )
-//   })
-// }
 
 export default combineEpics(
   makeClipsFromSubtitles,

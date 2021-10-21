@@ -5,7 +5,7 @@ import { join } from 'path'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
-import { waveform$ } from '../../../components/Waveform'
+import { waveform$ } from '../../../components/waveformTestLabels'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 

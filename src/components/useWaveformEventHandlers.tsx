@@ -176,7 +176,6 @@ export function useWaveformEventHandlers({
 
   const cardsBases = useSelector(getSubtitlesCardBases)
 
-  // TODO: set time after stretch
   const STRETCH_START_DELAY = 100
   const handleClipEdgeDrag = useCallback(
     ({
@@ -210,8 +209,6 @@ export function useWaveformEventHandlers({
         ...[stretchedClip, ...clips].map((i) => i.end)
       )
 
-      // change regions
-      // stretch in knowclip
       const clipToStretchId = stretch.clipId
       // TODO: inside recalculateRegions, return region info for updated items in params
       const newItem = {
@@ -231,6 +228,7 @@ export function useWaveformEventHandlers({
         item: clipToStretchId,
         regionIndex: newRegions.findIndex(
           (region, i) =>
+            // TODO: optimize via guarantee that new selection item is stretchedClip
             region.start >= newStartWithMerges &&
             getRegionEnd(newRegions, i) < newEndWithMerges
         ),
@@ -239,13 +237,6 @@ export function useWaveformEventHandlers({
         type: 'SET_REGIONS',
         regions: newRegions,
         newSelection,
-        // // TODO: optimize via guarantee that new selection item is stretchedClip
-        // newSelection: getNewWaveformSelectionAt(
-        //   getItemDangerously,
-        //   newRegions,
-        //   secondsToMs(stretchedClip.start),
-        //   waveform.state.selection
-        // )
       })
 
       dispatch(
@@ -264,9 +255,6 @@ export function useWaveformEventHandlers({
         playerRef.current,
         stretchedClip.start
       )
-      // if (playerRef.current) {
-      //   playerRef.current.currentTime =  msToSeconds(newItem.start)
-      // }
     },
     [cardsBases, dispatch, getItemDangerously, playerRef, regions, waveform]
   )

@@ -6,7 +6,7 @@ import {
   SELECTION_BORDER_MILLISECONDS,
 } from 'clipwave'
 import cn from 'classnames'
-import { waveform$ } from './Waveform'
+import { waveform$ } from './waveformTestLabels'
 
 export function useWaveformRenderClip() {
   return useCallback(

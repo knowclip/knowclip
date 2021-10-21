@@ -29,13 +29,12 @@ import { setMousePosition } from '../utils/mousePosition'
 import 'clipwave/dist/index.css'
 import { overlapsSignificantly, SubtitlesCardBase } from '../selectors'
 import { usePrevious } from '../utils/usePrevious'
-import { useRenderSecondaryClip } from './WaveformSubtitlesTimelines'
+import { useRenderSecondaryClip } from './waveformRenderSubtitlesChunks'
 import { useWaveformEventHandlers } from './useWaveformEventHandlers'
 import { GetWaveformItem } from 'clipwave/dist/useWaveform'
-import { waveform$ } from './Waveform'
+import { waveform$ } from './waveformTestLabels'
 import { useWaveformRenderClip } from './useWaveformRenderClip'
 import { getFreshRegions } from '../epics/getFreshRegions'
-// import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
   container = 'main-screen-container',
@@ -68,7 +67,6 @@ const Main = () => {
         : EMPTY,
       subtitles: r.getSubtitlesFilesWithTracks(state),
       viewMode: state.settings.viewMode,
-      // waveformItems: r.getWaveformItems(state),
       waveformImages: r.getWaveformImages(state),
       clipsMap: r.getClipsObject(state),
       currentFileClipsOrder: r.getCurrentFileClipsOrder(state),
@@ -89,26 +87,16 @@ const Main = () => {
 
   const mediaFileId = currentMediaFile?.id
 
-  // const waveformItemsCache = useRef<Record<WaveformItem['id'], WaveformItem>>(
-  //   {}
-  // )
-  // useEffect(() => {
-  //   waveformItemsCache.current = {}
-  // }, [clipsMap, subsBases, mediaFileId])
   const getWaveformItem = useCallback(
     (id: string): WaveformItem | null => {
-      // const cachedItem = waveformItemsCache.current[id]
-      // if (cachedItem) return cachedItem
       const clip: Clip | null = clipsMap[id] || null
       if (clip && clip.fileId === mediaFileId) {
         const item = clip
-        // waveformItemsCache.current[id] = item
         return item
       }
       const subsBase: SubtitlesCardBase | null = subsBases.cardsMap[id]
       if (subsBase) {
         const item = subsBase
-        // waveformItemsCache.current[id] = item
         return item
       }
 
@@ -167,23 +155,6 @@ const Main = () => {
   const previousSelection = usePrevious(waveform.state.selection)
 
   const selection = waveform.getSelection()
-
-  // ALTERNATIVE TO EPIC WITH ADDCLIP HOOK: add flag to redux state "regions_refresh_needed"
-  // and refresh here whenever flag goes on, then turn it off.
-
-  // useEffect(() => {
-  //   const recalculate = (e: any) => {
-  //     const { regions, newSelection } = getFreshRegions()
-  //     waveform.dispatch({
-  //       type: 'SET_REGIONS',
-  //       regions,
-  //       newSelection,
-  //     })
-  //   }
-  //   document.addEventListener('recalculate-waveform-regions', recalculate)
-  //   return () =>
-  //     document.removeEventListener('recalculate-waveform-regions', recalculate)
-  // }, [getFreshRegions, waveform])
 
   const prevSubsBases = usePrevious(subsBases)
   useEffect(() => {
@@ -325,7 +296,6 @@ const Main = () => {
           }
         />
       ) : (
-        // <div className={waveformCss.waveformPlaceholder} />
         <div
           className={cn(waveformCss.waveformPlaceholder, waveform$.placeholder)}
         />
@@ -352,18 +322,13 @@ function isWaveformItemSelectable(
   if (item.start !== region.start) return false
 
   if (item.clipwaveType === 'Primary') return true
-  // - when moving back/forth searching for nearest clips, when we hit a clip, we would check:
   const overlappingPrimaryClips = getPrimaryClipsOverlappingSecondaryClip(
     regions,
     getItem,
     regionIndex,
     item
   )
-  //   -- what regions does the clip occupy?
-  //   -- what primary clips also occupy those regions?
-  //   -- do any of those overlapping primary clips *significantly* overlap the hit clip?
 
-  // properly, don't need all of them
   return !overlappingPrimaryClips.length
 }
 
