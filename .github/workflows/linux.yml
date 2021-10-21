@@ -21,8 +21,8 @@ jobs:
         yarn install --frozen-lockfile
     - name: integration tests
       run: |
-        export DISPLAY=':99.0'
-        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        # export DISPLAY=':99.0'
+        # Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         yarn integration -t "new project"
     - name: build
       run: yarn dist --linux
