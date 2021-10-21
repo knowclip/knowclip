@@ -98,7 +98,6 @@ export const getSubtitlesCardBases = createSelector(
 
             for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
               const chunk = chunks[i]
-              // lastIndexes[fieldPriority] = i
 
               if (!chunk) {
                 console.log({ track, i })

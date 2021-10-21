@@ -31,11 +31,6 @@ export default async function makeSomeFlashcards({ client }: TestSetup) {
   await testBlock('seek to new video time', async () => {
     await setVideoTime(client, 38)
     await client.waitUntilGone_(waveform$.waveformClip)
-    // await client.waitUntil(async () => {
-    //   const isVisible = await clip.()
-    //   console.log({ isVisible})
-    //   return !(isVisible)
-    // })
   })
 
   await testBlock('create a third card', async () => {

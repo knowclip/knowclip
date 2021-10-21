@@ -37,7 +37,6 @@ export default async function makeFlashcardsWithSubtitles({
     const els = await client.elements_(waveform$.waveformClip)
 
     await client.waitUntil(() => els[1].isVisible())
-    // await client.waitForVisible_(waveform$.waveformClip)
 
     await client.waitForText_(
       flashcardSection$.container,

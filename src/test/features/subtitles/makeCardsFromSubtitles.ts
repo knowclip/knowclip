@@ -41,7 +41,6 @@ export default async function makeCardsFromSubtitles({
     const [, pbcTrackOpenSubmenuButton] = await client.elements_(
       subtitlesMenu$.openTrackSubmenuButton
     )
-    // await client.clickElement_(subtitlesMenu$.openTrackSubmenuButton)
     await pbcTrackOpenSubmenuButton!.click()
     await client.clickElement_(subtitlesMenu$.deleteTrackButton)
     await client.waitUntilGone_(waveform$.subtitlesChunk)

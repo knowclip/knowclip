@@ -36,7 +36,6 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
       expect(await clipsVisibility(client)).toMatchObject([true])
 
       await client.waitUntil(async () => {
-        // return !await initiallyHighlightedClip.getAttribute('data-clip-is-highlighted')
         const clip = await client.firstElement_(waveform$.waveformClip)
         return Boolean(await clip.getAttribute('data-clip-is-highlighted'))
       })
@@ -46,9 +45,6 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
   await testBlock(
     'shift waveform view by navigating with previous button',
     async () => {
-      // we should properly wait until update above is really done
-      // somehow checking the waveform items have been updated.
-
       await client.clickElement_(flashcardSection$.previousClipButton)
       await client.waitForText('body', '2 / 3')
 

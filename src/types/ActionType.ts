@@ -41,8 +41,6 @@ const ActionTypes = {
   closeDictionaryPopover: 'closeDictionaryPopover',
   newCardFromSubtitlesRequest: 'newCardFromSubtitlesRequest',
   selectWaveformItem: 'selectWaveformItem',
-  // highlightLeftClipRequest: 'highlightLeftClipRequest',
-  // highlightRightClipRequest: 'highlightRightClipRequest',
   setCursorPosition: 'setCursorPosition',
   generateWaveformImages: 'generateWaveformImages',
   enqueueDialog: 'enqueueDialog',

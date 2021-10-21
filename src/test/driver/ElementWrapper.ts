@@ -89,7 +89,6 @@ export const wrapElement = (
     isClickable: async () => {
       try {
         return await element.isClickable()
-        // return await client.isElementDisplayed(id)
       } catch (err) {
         throw Error(`Could not get clickable status of "${selector}": ${err}`)
       }
@@ -97,7 +96,6 @@ export const wrapElement = (
     isVisible: async () => {
       try {
         return await element.isDisplayedInViewport()
-        // return await client.isElementDisplayed(id)
       } catch (err) {
         throw Error(`Could not get displayed status of "${selector}": ${err}`)
       }

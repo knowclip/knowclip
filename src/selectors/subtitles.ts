@@ -373,7 +373,6 @@ export const getNewFlashcardForStretchedClip = (
         subtitles,
         (fn) => currentlyBlankFieldNames.has(fn) || newlyOverlapped(base)
       ),
-      //  fields: getFlashcardFieldsFromSubtitlesCardBase(links, base, subtitles),
 
       cloze: [],
     })),
@@ -384,7 +383,6 @@ export const getNewFlashcardForStretchedClip = (
         subtitles,
         (fn) => currentlyBlankFieldNames.has(fn) || newlyOverlapped(base)
       ),
-      // fields: getFlashcardFieldsFromSubtitlesCardBase(links, base, subtitles),
       cloze: [],
     })),
   }
@@ -404,8 +402,6 @@ function combineFlashcards(
   newFields: TransliterationFlashcardFields,
   cards: Pick<Flashcard, 'cloze' | 'fields'>[]
 ): Pick<Flashcard, 'cloze' | 'fields'> {
-  // get fieldnames from other source?
-  // const newFields = {} as TransliterationFlashcardFields
   const newCloze: ClozeDeletion[] = []
 
   for (const fn in newFields) {
