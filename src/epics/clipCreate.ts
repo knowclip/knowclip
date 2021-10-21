@@ -6,6 +6,9 @@ import { ActionOf } from '../actions'
 import { combineEpics } from 'redux-observable'
 import { RecalculateWaveformRegionsEvent } from '../components/Main'
 import { afterUpdates } from '../utils/afterUpdates'
+import { ClipwaveCallbackEvent } from 'clipwave'
+import { CLIPWAVE_ID } from '../utils/clipwave'
+import { getFreshRegions } from './getFreshRegions'
 
 const clipCreateEpic: AppEpic = (action$, state$) => {
   return action$
@@ -53,7 +56,7 @@ const clipCreateEpic: AppEpic = (action$, state$) => {
 const recalculateWaveformRegionsEpic: AppEpic = (
   action$,
   state$,
-  { document, window }
+  { document, window, getMediaPlayer }
 ) => {
   return action$
     .ofType<ActionOf<typeof A.addClip | typeof A.addClips>>(
@@ -62,10 +65,29 @@ const recalculateWaveformRegionsEpic: AppEpic = (
     )
     .pipe(
       tap(() => {
-        window.setTimeout(
-          () => document.dispatchEvent(new RecalculateWaveformRegionsEvent()),
-          0
-        )
+        // need timeout now?
+        window.setTimeout(() => {
+          const currentFileClipsOrder = r.getCurrentFileClipsOrder(state$.value)
+          const clipsMap = r.getClipsObject(state$.value)
+          const subsBases = r.getSubtitlesCardBases(state$.value)
+
+          document.dispatchEvent(
+            new ClipwaveCallbackEvent(CLIPWAVE_ID, (waveform) => {
+              const { regions, newSelection } = getFreshRegions(
+                currentFileClipsOrder,
+                clipsMap,
+                subsBases,
+                waveform,
+                getMediaPlayer()
+              )
+              waveform.dispatch({
+                type: 'SET_REGIONS',
+                regions,
+                newSelection,
+              })
+            })
+          )
+        }, 0)
       }),
       ignoreElements()
     )

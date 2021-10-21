@@ -182,7 +182,7 @@ const Media = ({
 
       {metadata.isVideo ? (
         <video
-          {...props}
+          {...(props as VideoHTMLAttributes<HTMLVideoElement>)}
           ref={playerRef as MutableRefObject<HTMLVideoElement>}
           className={cn(css.video, css.mediaPlayer)}
         >
@@ -284,6 +284,7 @@ const Subtitles = ({
       id={track.id}
       kind="subtitles"
       src={new URL(`file://${availability.filePath}`).toString()}
+      // @ts-ignore
       mode={track.mode}
       default={isDefault}
     />
@@ -292,6 +293,7 @@ const Subtitles = ({
       id={track.id}
       kind="subtitles"
       src={new URL(`file://${availability.filePath}`).toString()}
+      // @ts-ignore
       mode={track.mode}
       default={isDefault}
     />

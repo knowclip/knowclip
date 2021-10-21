@@ -245,11 +245,12 @@ const getSubtitlesChunksWithinRangeFromTracksState = (
   return chunks
 }
 
+const EMPTY_OBJECT = Object.freeze({})
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
 ): SubtitlesFlashcardFieldsLinks => {
   const media = getCurrentMediaFile(state)
-  return media ? media.flashcardFieldsToSubtitlesTracks : {}
+  return media ? media.flashcardFieldsToSubtitlesTracks : EMPTY_OBJECT
 }
 
 export const getNewFlashcardForStretchedClip_ = (

@@ -135,7 +135,7 @@ function useAutoHide(
   const handleFocus = useCallback(() => {
     setFocused(true)
   }, [])
-  const handleBlur: React.FocusEventHandler = useCallback(() => {
+  const handleBlur = useCallback(() => {
     setHovering(false)
     setFocused(false)
   }, [])

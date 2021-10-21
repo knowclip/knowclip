@@ -21,6 +21,8 @@ import {
   setCursorX,
   msToPixels,
   getNewWaveformSelectionAt,
+  SecondaryClip,
+  PrimaryClip,
 } from 'clipwave'
 import FlashcardSection from '../components/FlashcardSection'
 import Header from '../components/MainHeader'
@@ -32,14 +34,19 @@ import * as r from '../selectors'
 import { actions } from '../actions'
 import { setMousePosition } from '../utils/mousePosition'
 import 'clipwave/dist/index.css'
-import { SubtitlesCardBase } from '../selectors'
+import { overlapsSignificantly, SubtitlesCardBase } from '../selectors'
 import { usePrevious } from '../utils/usePrevious'
 import { useRenderSecondaryClip } from './WaveformSubtitlesTimelines'
 import { useWaveformEventHandlers } from './useWaveformEventHandlers'
-import { GetWaveformItem } from 'clipwave/dist/useWaveform'
+import {
+  ClipwaveCallbackEvent,
+  GetWaveformItem,
+} from 'clipwave/dist/useWaveform'
 import { setCurrentTime } from '../utils/media'
 import { waveform$ } from './Waveform'
 import { useWaveformRenderClip } from './useWaveformRenderClip'
+import { CLIPWAVE_ID } from '../utils/clipwave'
+import { getFreshRegions } from '../epics/getFreshRegions'
 // import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
 enum $ {
@@ -173,60 +180,38 @@ const Main = () => {
 
   const selection = waveform.getSelection()
 
-  // TODO: call this whenever addClip or addClips is called
-  // OR: add flag to redux state "regions_refresh_needed"
+  // ALTERNATIVE TO EPIC WITH ADDCLIP HOOK: add flag to redux state "regions_refresh_needed"
   // and refresh here whenever flag goes on, then turn it off.
-  const getFreshRegions = useCallback(() => {
-    const sortedItems = sortWaveformItems([
-      ...currentFileClipsOrder.map((id) => clipsMap[id]),
-      ...subsBases.cards,
-    ])
-    const { regions } = calculateRegions(
-      sortedItems,
-      secondsToMs(waveform.state.durationSeconds)
-    )
-    return {
-      regions,
-      newSelection: getNewWaveformSelectionAt(
-        getWaveformItem,
-        regions,
-        secondsToMs(playerRef.current?.currentTime || 0),
-        selection.selection
-      ),
-    }
-  }, [
-    clipsMap,
-    currentFileClipsOrder,
-    getWaveformItem,
-    selection.selection,
-    subsBases.cards,
-    waveform.state.durationSeconds,
-  ])
 
+  // useEffect(() => {
+  //   const recalculate = (e: any) => {
+  //     const { regions, newSelection } = getFreshRegions()
+  //     waveform.dispatch({
+  //       type: 'SET_REGIONS',
+  //       regions,
+  //       newSelection,
+  //     })
+  //   }
+  //   document.addEventListener('recalculate-waveform-regions', recalculate)
+  //   return () =>
+  //     document.removeEventListener('recalculate-waveform-regions', recalculate)
+  // }, [getFreshRegions, waveform])
+
+  const prevSubsBases = usePrevious(subsBases)
   useEffect(() => {
-    const recalculate = (e: any) => {
-      const { regions, newSelection } = getFreshRegions()
+    if (subsBases !== prevSubsBases) {
+      const { regions, newSelection } = getFreshRegions(
+        currentFileClipsOrder,
+        clipsMap,
+        subsBases,
+        waveform,
+        playerRef.current
+      )
       waveform.dispatch({
         type: 'SET_REGIONS',
         regions,
         newSelection,
       })
-    }
-    document.addEventListener('recalculate-waveform-regions', recalculate)
-    return () =>
-      document.removeEventListener('recalculate-waveform-regions', recalculate)
-  }, [getFreshRegions, waveform])
-
-  const prevSubsBases = usePrevious(subsBases)
-  useEffect(() => {
-    if (subsBases !== prevSubsBases) {
-      document.dispatchEvent(new RecalculateWaveformRegionsEvent())
-      // const { regions, newSelection } = getFreshRegions()
-      // waveform.dispatch({
-      //   type: 'SET_REGIONS',
-      //   regions,
-      //   newSelection,
-      // })
     }
   }, [prevSubsBases, subsBases])
 
@@ -256,12 +241,19 @@ const Main = () => {
       dispatch(actions.selectWaveformItem(newSelection))
     }
   }, [dispatch, editing, previousSelection, selection])
-  const selectPreviousWaveformItem = useCallback(() => {
-    waveform.actions.selectPreviousItemAndSeek(playerRef.current)
-  }, [playerRef, waveform.actions.selectPreviousItemAndSeek])
-  const selectNextWaveformItem = useCallback(() => {
-    waveform.actions.selectNextItemAndSeek(playerRef.current)
-  }, [playerRef, waveform.actions.selectPreviousItemAndSeek])
+
+  const selectPreviousCard = useCallback(() => {
+    waveform.actions.selectPreviousItemAndSeek(
+      playerRef.current,
+      isWaveformItemSelectable
+    )
+  }, [waveform.actions.selectPreviousItemAndSeek])
+  const selectNextCard = useCallback(() => {
+    waveform.actions.selectNextItemAndSeek(
+      playerRef.current,
+      isWaveformItemSelectable
+    )
+  }, [waveform.actions.selectNextItemAndSeek])
 
   const {
     handleWaveformDrag,
@@ -272,8 +264,6 @@ const Main = () => {
     dispatch,
     waveform,
     highlightedClipId,
-    selectPrevious: selectPreviousWaveformItem,
-    selectNext: selectNextWaveformItem,
   })
 
   const renderPrimaryClip = useWaveformRenderClip()
@@ -323,8 +313,8 @@ const Main = () => {
           mediaFile={currentMediaFile}
           className={css.flashcardSection}
           projectFile={currentProject}
-          selectPrevious={selectPreviousWaveformItem}
-          selectNext={selectNextWaveformItem}
+          selectPrevious={selectPreviousCard}
+          selectNext={selectNextCard}
         />
       </section>
 
@@ -362,8 +352,65 @@ export default Main
 
 export { $ as main$ }
 
+// can delete?
 export class RecalculateWaveformRegionsEvent extends Event {
   constructor() {
     super('recalculate-waveform-regions')
   }
+}
+
+function isWaveformItemSelectable(
+  item: WaveformItem,
+  region: WaveformRegion,
+  regionIndex: number,
+  regions: WaveformRegion[],
+  getItem: GetWaveformItem
+) {
+  if (item.start !== region.start) return false
+
+  if (item.clipwaveType === 'Primary') return true
+  // - when moving back/forth searching for nearest clips, when we hit a clip, we would check:
+  const overlappingPrimaryClips = getPrimaryClipsOverlappingSecondaryClip(
+    regions,
+    getItem,
+    regionIndex,
+    item
+  )
+  //   -- what regions does the clip occupy?
+  //   -- what primary clips also occupy those regions?
+  //   -- do any of those overlapping primary clips *significantly* overlap the hit clip?
+
+  // properly, don't need all of them
+  return !overlappingPrimaryClips.length
+}
+
+function getPrimaryClipsOverlappingSecondaryClip(
+  regions: WaveformRegion[],
+  getItem: GetWaveformItem,
+  startRegionIndex: number,
+  item: SecondaryClip
+) {
+  const allLocalItemsIds = new Set<string>()
+
+  let regionIndex = startRegionIndex
+  while (regions[regionIndex]?.itemIds.includes(item.id)) {
+    regions[regionIndex].itemIds.forEach((itemId) =>
+      allLocalItemsIds.add(itemId)
+    )
+
+    regionIndex++
+  }
+  allLocalItemsIds.delete(item.id)
+
+  const overlappingPrimaryClips: PrimaryClip[] = []
+  allLocalItemsIds.forEach((id) => {
+    const overlapped = getItem(id)
+    if (
+      overlapped?.clipwaveType === 'Primary' &&
+      overlapsSignificantly(overlapped, item.start, item.end)
+    )
+      overlappingPrimaryClips.push(overlapped)
+  })
+
+  return overlappingPrimaryClips
 }

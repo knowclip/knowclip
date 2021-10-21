@@ -4180,10 +4180,10 @@ cli-width@^3.0.0:
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-3.0.0.tgz#a2f48437a2caa9a22436e794bf071ec9e61cedf6"
   integrity sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==
 
-clipwave@^0.1.7-12:
-  version "0.1.7-12"
-  resolved "https://registry.yarnpkg.com/clipwave/-/clipwave-0.1.7-12.tgz#9d2e905acbeae76c3a62086e9e7c5cde3f7e84bf"
-  integrity sha512-3meY20VySIzbkOV/lSEqXOgCVGHwJIWEfq9dFos514d2V8aKlj1rPcxDk5AbBb5jHHLDm+/jbLjKYxF5C+GVkw==
+clipwave@^0.1.7-14:
+  version "0.1.7-14"
+  resolved "https://registry.yarnpkg.com/clipwave/-/clipwave-0.1.7-14.tgz#20a2c1b026b8b298be0dcd34899b8b363eb688d4"
+  integrity sha512-p99Kvi9yYGkUq/RDhLQSU/D+7RM2OTxjFMcLwBGcoSqrBSedSOJdq9aZW1lTYHRDR5bwc9UBtxC4cuxuQ8IK8g==
   dependencies:
     classnames "^2.3.1"
 
@@ -11606,10 +11606,10 @@ react-transition-group@^4.4.0:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react-virtualized@^9.21.2:
-  version "9.22.2"
-  resolved "https://registry.yarnpkg.com/react-virtualized/-/react-virtualized-9.22.2.tgz#217a870bad91e5438f46f01a009e1d8ce1060a5a"
-  integrity sha512-5j4h4FhxTdOpBKtePSs1yk6LDNT4oGtUwjT7Nkh61Z8vv3fTG/XeOf8J4li1AYaexOwTXnw0HFVxsV0GBUqwRw==
+react-virtualized@^9.22.3:
+  version "9.22.3"
+  resolved "https://registry.yarnpkg.com/react-virtualized/-/react-virtualized-9.22.3.tgz#f430f16beb0a42db420dbd4d340403c0de334421"
+  integrity sha512-MKovKMxWTcwPSxE1kK1HcheQTWfuCxAuBoSTf2gwyMM21NdX/PXUhnoP8Uc5dRKd+nKm8v41R36OellhdCpkrw==
   dependencies:
     "@babel/runtime" "^7.7.2"
     clsx "^1.0.4"

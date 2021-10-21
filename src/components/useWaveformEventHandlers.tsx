@@ -13,6 +13,7 @@ import {
   secondsToMs,
   GetWaveformItemDangerously,
   WaveformItem,
+  WaveformInterface,
 } from 'clipwave'
 import { actions } from '../actions'
 import { bound } from '../utils/bound'
@@ -34,15 +35,11 @@ export function useWaveformEventHandlers({
   dispatch,
   waveform,
   highlightedClipId,
-  selectPrevious,
-  selectNext,
 }: {
   playerRef: React.MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
   dispatch: Dispatch<Action>
-  waveform: ReturnType<typeof useWaveform>
+  waveform: WaveformInterface
   highlightedClipId: string | null
-  selectPrevious: () => void
-  selectNext: () => void
 }) {
   const {
     getItemDangerously,
@@ -284,17 +281,17 @@ export function useWaveformEventHandlers({
     const handleKeydown = (event: KeyboardEvent) => {
       const { altKey, key } = event
       if (key === KEYS.arrowRight && (altKey || !isTextFieldFocused())) {
-        return selectNext()
+        return waveform.actions.selectNextItemAndSeek(playerRef.current)
       }
 
       if (key === KEYS.arrowLeft && (altKey || !isTextFieldFocused())) {
-        return selectPrevious()
+        return waveform.actions.selectPreviousItemAndSeek(playerRef.current)
       }
     }
 
     window.addEventListener('keydown', handleKeydown)
     return () => window.removeEventListener('keydown', handleKeydown)
-  })
+  }, [playerRef])
 
   return { handleWaveformDrag, handleClipDrag, handleClipEdgeDrag }
 }

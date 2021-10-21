@@ -1,4 +1,4 @@
-import React, { useCallback, ReactNodeArray } from 'react'
+import React, { useCallback, ReactNodeArray, ReactNode } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
@@ -78,7 +78,7 @@ const FlashcardDisplayFieldValue = ({
       <span className={css.emptyFieldPlaceholder}>{fieldName}</span>
     )
 
-  const withoutNewlines: ReactNodeArray = []
+  const withoutNewlines: ReactNode[] = []
   const lines = value.split(/[\n\r]/)
   lines.forEach((line, i) => {
     if (i !== 0)
