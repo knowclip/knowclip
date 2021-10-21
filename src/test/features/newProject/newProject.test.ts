@@ -34,16 +34,6 @@ describe('create a deck from a new project', () => {
       join(TMP_DIRECTORY, 'my_cool_new_project.kyml')
     )
 
-    // if (process.platform === 'linux') {
-    //   // slight difference after clipwave update,
-    //   // adjusting here until cause is found
-    //   const pbcClips = actualProjectFileContents.value?.media[0]?.clips
-    //   if (pbcClips) {
-    //     console.log(pbcClips[2])
-    //     pbcClips[2].end = '01:23.214'
-    //     pbcClips[2].start = '01:17.254'
-    //   }
-    // }
     expect(actualProjectFileContents).toMatchSnapshot()
   })
 
