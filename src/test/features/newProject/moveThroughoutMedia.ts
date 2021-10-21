@@ -17,7 +17,7 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
   })
 
   await testBlock(
-    'shift waveform view by selecting clip at screen edge',
+    'shift waveform view by creating clip at screen edge',
     async () => {
       await waveformMouseDrag(client, 710, 1008)
       await client.waitForText('body', '3 / 3')
@@ -48,7 +48,8 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
     async () => {
       // we should properly wait until update above is really done
       // somehow checking the waveform items have been updated.
-      // await client._driver.client.pause(1000)
+
+      if (process.platform === 'linux') await client._driver.client.pause(1000)
       await client.clickElement_(flashcardSection$.previousClipButton)
       await client.waitForText('body', '2 / 3')
 

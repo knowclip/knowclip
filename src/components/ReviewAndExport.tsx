@@ -98,9 +98,12 @@ const Export = React.memo(
         }),
       [clipIdsByMediaFileId]
     )
-    const onDoubleClickRow = useCallback((mediaFileId: string, id: string) => {
-      dispatch(r.selectWaveformItem({ type: 'Clip', id }))
-    }, [])
+    const onDoubleClickRow = useCallback(
+      (mediaFileId: string, id: string) => {
+        dispatch(r.selectWaveformItem({ type: 'Clip', id }))
+      },
+      [dispatch]
+    )
     const onSelectAll = useCallback(
       (mediaFileId: string) => {
         setSelectedIds((mediaToClips) => {

@@ -14,7 +14,6 @@ import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { sendToMainProcess } from './messages'
 import { processNoteMedia } from './utils/ankiNote'
-import { callbackify } from 'util'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
 

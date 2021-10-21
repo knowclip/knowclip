@@ -44,7 +44,15 @@ const FlashcardSectionPreview = ({
   const clozeControls = useClozeControls({
     onNewClozeCard: useCallback(
       (deletion) => {
-        // dispatch(r.newCardFromSubtitlesRequest(cardBase, deletion))
+        dispatch(
+          r.newCardFromSubtitlesRequest(
+            {
+              type: 'Preview',
+              id: cardBase.id,
+            },
+            deletion
+          )
+        )
       },
       [cardBase, dispatch]
     ),

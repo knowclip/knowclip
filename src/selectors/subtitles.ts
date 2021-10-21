@@ -7,7 +7,6 @@ import {
   SubtitlesFlashcardFieldsLinks,
 } from '../types/Project'
 import { SubtitlesCardBase } from './cardPreview'
-import { WaveformItem } from 'clipwave'
 import { getBlankFields } from '.'
 
 export const getSubtitlesDisplayFile = (
@@ -211,40 +210,6 @@ export const overlapsSignificantly = (
 ): boolean =>
   start <= chunk.end - HALF_SECOND && end >= chunk.start + HALF_SECOND
 
-const getSubtitlesChunksWithinRange = (
-  state: AppState,
-  subtitlesTrackId: SubtitlesTrackId,
-  start: WaveformX,
-  end: WaveformX
-): Array<SubtitlesChunk> =>
-  getSubtitlesChunksWithinRangeFromTracksState(
-    state.subtitles,
-    subtitlesTrackId,
-    start,
-    end
-  )
-
-const getSubtitlesChunksWithinRangeFromTracksState = (
-  state: AppState['subtitles'],
-  subtitlesTrackId: SubtitlesTrackId,
-  start: WaveformX,
-  end: WaveformX
-): Array<SubtitlesChunk> => {
-  const track = state[subtitlesTrackId]
-  const chunks: SubtitlesChunk[] = []
-
-  if (!track) return chunks
-
-  for (let i = 0; i < track.chunks.length; i++) {
-    const chunk = track.chunks[i]
-    if (chunk.end < start) continue
-    if (chunk.start > end) break
-
-    if (overlapsSignificantly(chunk, start, end)) chunks.push(chunk)
-  }
-  return chunks
-}
-
 const EMPTY_OBJECT = Object.freeze({})
 export const getSubtitlesFlashcardFieldLinks = (
   state: AppState // should probably be ?id
@@ -281,8 +246,6 @@ export const getNewFlashcardForStretchedClip_ = (
       ...newlyOverlapped.back,
     ].reduce(
       (acc, overlappedItem) => {
-        const trackChunks = trackId ? subtitles[trackId].chunks : []
-        // if (overlappedItem.clipwaveType === 'Secondary' )
         const startIndex = acc.text.length
         const trimmedTextSoFar = acc.text.trim()
         if (overlappedItem.clipwaveType === 'Secondary') {

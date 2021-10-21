@@ -112,11 +112,7 @@ export const getSubtitlesCardBases = createSelector(
 
               lastIndexes[fieldPriority] = i
 
-              const overlapsAtAll =
-                cueChunk.start <= chunk.end - 0 &&
-                cueChunk.end >= chunk.start + 0
               if (overlapsSignificantly(cueChunk, chunk.start, chunk.end)) {
-                // if (overlapsAtAll) {
                 overlappedIndexes.push(i)
               }
             }

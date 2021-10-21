@@ -81,7 +81,7 @@ const ReviewAndExportMediaTableRow = memo(
           }
         )
       )
-    }, [highlightClip, id])
+    }, [id, dispatch])
 
     const startEditing = useCallback(() => {
       highlightClip(id)

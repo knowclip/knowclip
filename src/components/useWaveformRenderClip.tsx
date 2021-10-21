@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import {
   PrimaryClipDisplayProps,
-  WaveformRegion,
   css,
   msToPixels,
   SELECTION_BORDER_MILLISECONDS,

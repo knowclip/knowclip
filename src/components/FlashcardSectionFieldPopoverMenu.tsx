@@ -75,7 +75,7 @@ const FlashcardSectionFieldPopoverMenu = ({
                 className={$.embeddedTrackMenuItem}
               />
             ))}
-            {subtitles.external.map((track, i) => (
+            {subtitles.external.map((track) => (
               <FieldMenuItem
                 key={track.id}
                 trackId={track.id}

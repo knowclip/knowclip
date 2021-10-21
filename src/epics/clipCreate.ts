@@ -1,11 +1,9 @@
-import { ignoreElements, map, switchMap, tap } from 'rxjs/operators'
+import { ignoreElements, switchMap, tap } from 'rxjs/operators'
 import { of } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { ActionOf } from '../actions'
 import { combineEpics } from 'redux-observable'
-import { RecalculateWaveformRegionsEvent } from '../components/Main'
-import { afterUpdates } from '../utils/afterUpdates'
 import { ClipwaveCallbackEvent } from 'clipwave'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 import { getFreshRegions } from './getFreshRegions'
@@ -93,4 +91,4 @@ const recalculateWaveformRegionsEpic: AppEpic = (
     )
 }
 
-export default combineEpics(clipCreateEpic)
+export default combineEpics(clipCreateEpic, recalculateWaveformRegionsEpic)

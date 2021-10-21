@@ -13,7 +13,7 @@ const playPauseForceKey = os.platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     mergeMap((event) => {
-      const { ctrlKey, altKey, key } = event
+      const { ctrlKey, key } = event
 
       if (
         key.toLowerCase() === KEYS.lLowercase &&

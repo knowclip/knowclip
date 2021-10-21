@@ -1,26 +1,9 @@
-import { ignoreElements, mergeMap, switchMap, tap } from 'rxjs/operators'
+import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import A from '../types/ActionType'
 import { ActionOf, actions } from '../actions'
 import { combineEpics } from 'redux-observable'
-import {
-  recalculateRegions,
-  getRegionEnd,
-  msToSeconds,
-  PrimaryClip,
-} from 'clipwave'
-import * as selectors from '../selectors'
-import {
-  getClip,
-  getCurrentFileId,
-  getFlashcard,
-  getFlashcardTextFromCardBase,
-  getNewFlashcardForStretchedClip,
-  getSubtitlesCardBases,
-  getSubtitlesFlashcardFieldLinks,
-  SubtitlesCardBase,
-} from '../selectors'
-import { MEDIA_PLAYER_ID } from '../components/Media'
-import { TransliterationFlashcardFields } from '../types/Project'
+import { getRegionEnd } from 'clipwave'
+import { getNewFlashcardForStretchedClip } from '../selectors'
 import { EMPTY, of } from 'rxjs'
 
 const addClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
@@ -130,13 +113,6 @@ const stretchClipEpic: AppEpic = (
       }
     )
     // ignoreElements()
-  )
-}
-
-const moveClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
-  return action$.ofType<ActionOf<typeof A.moveClip>>(A.moveClip).pipe(
-    tap(() => {}),
-    ignoreElements()
   )
 }
 

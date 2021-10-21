@@ -117,7 +117,13 @@ const ReviewAndExportMediaTable = memo(
           </CellMeasurer>
         )
       },
-      [clipsIds, handleSelectRow, highlightedClipId, selectedIds]
+      [
+        clipsIds,
+        handleDoubleClickRow,
+        handleSelectRow,
+        highlightedClipId,
+        selectedIds,
+      ]
     )
 
     return (

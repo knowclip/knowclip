@@ -1,6 +1,5 @@
-import { createSelector } from 'reselect'
 import { getSubtitlesCardBases, SubtitlesCardBase } from './cardPreview'
-import { getCurrentFileClips, getCurrentNoteType } from './currentMedia'
+import { getCurrentNoteType } from './currentMedia'
 import {
   overlapsSignificantly,
   getSubtitlesFlashcardFieldLinks,
@@ -22,72 +21,6 @@ export const getSelectionItem = (
     state.clips.byId[id] || getSubtitlesCardBases(state).cardsMap[id] || null
   )
 }
-
-// export const getNewWaveformSelectionAt = (
-//   state: AppState,
-//   newX: number
-// ): WaveformSelection | null => {
-//   const selection = getWaveformSelection(state)
-//   const waveformItems = getWaveformItems(state)
-
-//   return getNewWaveformSelectionAtFromSubset(selection, waveformItems, newX)
-// }
-// const getNewWaveformSelectionAtFromSubset = (
-//   currentSelection: WaveformSelection | null,
-//   newWaveformItems: WaveformSelection[],
-//   newMs: number
-// ): WaveformSelection | null => {
-//   const itemAtCurrentSelectionPosition = currentSelection
-//     ? newWaveformItems[currentSelection.index]
-//     : null
-//   const itemIsSameAsOldSelection =
-//     currentSelection &&
-//     itemAtCurrentSelectionPosition &&
-//     isItemSameAsOldSelection(currentSelection, itemAtCurrentSelectionPosition)
-//   if (
-//     itemIsSameAsOldSelection &&
-//     itemAtCurrentSelectionPosition &&
-//     newMs >= itemAtCurrentSelectionPosition.item.start &&
-//     newMs <= itemAtCurrentSelectionPosition.item.end
-//   )
-//     return itemAtCurrentSelectionPosition
-
-//   const overlapping: WaveformSelection[] = []
-
-//   for (const clipOrPreview of newWaveformItems) {
-//     const { item } = clipOrPreview
-//     if (item.start > newMs) break
-
-//     if (newMs >= item.start && newMs <= item.end)
-//       overlapping.push(clipOrPreview)
-//   }
-
-//   if (overlapping.length <= 1) return overlapping[0] || null
-
-//   return overlapping.find(({ type }) => type === 'Clip') || null
-// }
-
-// const isItemSameAsOldSelection = (
-//   oldCurrentSelection: WaveformSelection,
-//   itemAtCurrentSelectionPosition: WaveformSelection
-// ) => {
-//   if (oldCurrentSelection.type !== itemAtCurrentSelectionPosition.type)
-//     return false
-//   if (
-//     oldCurrentSelection.type === 'Clip' &&
-//     oldCurrentSelection.id ===
-//       (itemAtCurrentSelectionPosition as typeof oldCurrentSelection).id
-//   )
-//     return true
-//   if (
-//     oldCurrentSelection.type === 'Preview' &&
-//     oldCurrentSelection.index ===
-//       (itemAtCurrentSelectionPosition as typeof oldCurrentSelection).index
-//   )
-//     return true
-
-//   return false
-// }
 
 export const getBlankFields = (state: AppState) =>
   getCurrentNoteType(state) === 'Simple'

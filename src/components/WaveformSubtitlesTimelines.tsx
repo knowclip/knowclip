@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react'
 import cn from 'classnames'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import r from '../redux'
 import css from './Waveform.module.css'
 import {
   msToPixels,
-  setCursorX,
   SUBTITLES_CHUNK_HEIGHT,
   useWaveform,
   WAVEFORM_HEIGHT,
@@ -20,7 +19,7 @@ export const useRenderSecondaryClip = (
   const { linkedTrackIds, getFieldsPreviewFromCardsBase } = subsBases
   const selection = waveform.getSelection()
   const renderSecondaryClip: RenderSecondaryClip = useCallback(
-    ({ clip, region, regionIndex, pixelsPerSecond }) => {
+    ({ clip, pixelsPerSecond }) => {
       const cardBase = subsBases.cardsMap[clip.id]
       if (!cardBase) return null
       const clipPathId = `subs__${clip.id}`

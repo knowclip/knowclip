@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
 import {
-  useWaveform,
   WaveformGestureOf,
   ClipDrag,
   msToSeconds,
@@ -24,7 +23,6 @@ import { KEYS } from '../utils/keyboard'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
 import {
   getSubtitlesCardBases,
-  overlapsSignificantly,
   SubtitlesCardBase,
   SubtitlesCardBases,
 } from '../selectors'
@@ -168,9 +166,11 @@ export function useWaveformEventHandlers({
       getItemDangerously,
       highlightedClipId,
       waveform,
+      waveformActions,
       playerRef,
       regions,
       dispatch,
+      durationSeconds,
     ]
   )
 
@@ -268,14 +268,7 @@ export function useWaveformEventHandlers({
       //   playerRef.current.currentTime =  msToSeconds(newItem.start)
       // }
     },
-    [
-      cardsBases.cardsMap,
-      dispatch,
-      getItemDangerously,
-      playerRef,
-      regions,
-      waveform,
-    ]
+    [cardsBases, dispatch, getItemDangerously, playerRef, regions, waveform]
   )
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
@@ -291,7 +284,12 @@ export function useWaveformEventHandlers({
 
     window.addEventListener('keydown', handleKeydown)
     return () => window.removeEventListener('keydown', handleKeydown)
-  }, [playerRef])
+  }, [
+    playerRef,
+    waveform.actions.selectPreviousItemAndSeek,
+    waveform.actions.selectNextItemAndSeek,
+    waveform.actions,
+  ])
 
   return { handleWaveformDrag, handleClipDrag, handleClipEdgeDrag }
 }

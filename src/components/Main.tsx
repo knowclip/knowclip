@@ -13,14 +13,7 @@ import {
   usePlayButtonSync,
   WAVEFORM_HEIGHT,
   SUBTITLES_CHUNK_HEIGHT,
-  calculateRegions,
-  secondsToMs,
   WaveformRegion,
-  WaveformState,
-  msToSeconds,
-  setCursorX,
-  msToPixels,
-  getNewWaveformSelectionAt,
   SecondaryClip,
   PrimaryClip,
 } from 'clipwave'
@@ -38,14 +31,9 @@ import { overlapsSignificantly, SubtitlesCardBase } from '../selectors'
 import { usePrevious } from '../utils/usePrevious'
 import { useRenderSecondaryClip } from './WaveformSubtitlesTimelines'
 import { useWaveformEventHandlers } from './useWaveformEventHandlers'
-import {
-  ClipwaveCallbackEvent,
-  GetWaveformItem,
-} from 'clipwave/dist/useWaveform'
-import { setCurrentTime } from '../utils/media'
+import { GetWaveformItem } from 'clipwave/dist/useWaveform'
 import { waveform$ } from './Waveform'
 import { useWaveformRenderClip } from './useWaveformRenderClip'
-import { CLIPWAVE_ID } from '../utils/clipwave'
 import { getFreshRegions } from '../epics/getFreshRegions'
 // import { useWaveformSelectionSyncWithRedux } from './useWaveformSelectionSyncWithRedux'
 
@@ -213,7 +201,14 @@ const Main = () => {
         newSelection,
       })
     }
-  }, [prevSubsBases, subsBases])
+  }, [
+    prevSubsBases,
+    subsBases,
+    currentFileClipsOrder,
+    clipsMap,
+    waveform,
+    playerRef,
+  ])
 
   const dispatch = useDispatch()
 
@@ -242,18 +237,13 @@ const Main = () => {
     }
   }, [dispatch, editing, previousSelection, selection])
 
+  const { selectPreviousItemAndSeek, selectNextItemAndSeek } = waveform.actions
   const selectPreviousCard = useCallback(() => {
-    waveform.actions.selectPreviousItemAndSeek(
-      playerRef.current,
-      isWaveformItemSelectable
-    )
-  }, [waveform.actions.selectPreviousItemAndSeek])
+    selectPreviousItemAndSeek(playerRef.current, isWaveformItemSelectable)
+  }, [selectPreviousItemAndSeek])
   const selectNextCard = useCallback(() => {
-    waveform.actions.selectNextItemAndSeek(
-      playerRef.current,
-      isWaveformItemSelectable
-    )
-  }, [waveform.actions.selectNextItemAndSeek])
+    selectNextItemAndSeek(playerRef.current, isWaveformItemSelectable)
+  }, [selectNextItemAndSeek])
 
   const {
     handleWaveformDrag,
@@ -351,13 +341,6 @@ const EMPTY: string[] = []
 export default Main
 
 export { $ as main$ }
-
-// can delete?
-export class RecalculateWaveformRegionsEvent extends Event {
-  constructor() {
-    super('recalculate-waveform-regions')
-  }
-}
 
 function isWaveformItemSelectable(
   item: WaveformItem,
