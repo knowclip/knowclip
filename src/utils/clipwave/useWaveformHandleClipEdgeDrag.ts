@@ -11,7 +11,6 @@ import { SubtitlesCardBases } from '../../selectors'
 import {
   STRETCH_START_DELAY,
   getStretchedClipOverlaps,
-  getRegionEnd,
 } from './useWaveformEventHandlers'
 
 export function useWaveformHandleClipEdgeDrag(
@@ -57,14 +56,13 @@ export function useWaveformHandleClipEdgeDrag(
       )
 
       const clipToStretchId = stretch.clipId
-      // TODO: inside recalculateRegions, return region info for updated items in params
       const newItem = {
         ...getItemDangerously(clipToStretchId),
         id: clipToStretchId,
         start: newStartWithMerges,
         end: newEndWithMerges,
       }
-      const { regions: newRegions } = recalculateRegions(
+      const { regions: newRegions, newSelectionRegion } = recalculateRegions(
         regions,
         getItemDangerously,
         [
@@ -73,16 +71,12 @@ export function useWaveformHandleClipEdgeDrag(
             newItem,
           },
           ...overlapIds.map((id) => ({ type: 'DELETE' as const, itemId: id })),
-        ]
+        ],
+        newStartWithMerges
       )
       const newSelection = {
         item: clipToStretchId,
-        regionIndex: newRegions.findIndex(
-          (region, i) =>
-            // TODO: optimize via guarantee that new selection item is stretchedClip
-            region.start >= newStartWithMerges &&
-            getRegionEnd(newRegions, i) < newEndWithMerges
-        ),
+        regionIndex: newSelectionRegion,
       }
       waveform.dispatch({
         type: 'SET_REGIONS',
@@ -101,12 +95,13 @@ export function useWaveformHandleClipEdgeDrag(
           newRegions
         )
       )
-      waveform.actions.selectItemAndSeekTo(
-        newSelection.regionIndex,
-        newSelection.item,
-        playerRef.current,
-        stretchedClip.start
-      )
+      if (typeof newSelection.regionIndex === 'number')
+        waveform.actions.selectItemAndSeekTo(
+          newSelection.regionIndex,
+          newSelection.item,
+          playerRef.current,
+          stretchedClip.start
+        )
     },
     [cardsBases, dispatch, getItemDangerously, playerRef, regions, waveform]
   )

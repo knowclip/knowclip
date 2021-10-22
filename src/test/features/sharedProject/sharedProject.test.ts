@@ -11,7 +11,7 @@ import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { TestDriver } from '../../driver/TestDriver'
 import { runAll, step } from '../step'
 
-jest.setTimeout(120000)
+jest.setTimeout(60000)
 
 const testId = 'sharedProject'
 
