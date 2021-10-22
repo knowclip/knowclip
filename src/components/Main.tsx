@@ -90,15 +90,10 @@ const Main = () => {
   const getWaveformItem = useCallback(
     (id: string): WaveformItem | null => {
       const clip: Clip | null = clipsMap[id] || null
-      if (clip && clip.fileId === mediaFileId) {
-        const item = clip
-        return item
-      }
+      if (clip && clip.fileId === mediaFileId) return clip
+
       const subsBase: SubtitlesCardBase | null = subsBases.cardsMap[id]
-      if (subsBase) {
-        const item = subsBase
-        return item
-      }
+      if (subsBase) return subsBase
 
       return null
     },
@@ -169,7 +164,8 @@ const Main = () => {
       waveform.dispatch({
         type: 'SET_REGIONS',
         regions,
-        newSelection,
+        newSelectionRegion: newSelection.regionIndex,
+        newSelectionItemId: newSelection.item || undefined,
       })
     }
   }, [
@@ -204,6 +200,7 @@ const Main = () => {
       if (!newSelection && editing) {
         dispatch(actions.stopEditingCards())
       }
+
       dispatch(actions.selectWaveformItem(newSelection))
     }
   }, [dispatch, editing, previousSelection, selection])

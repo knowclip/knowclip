@@ -2,9 +2,10 @@ import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import A from '../types/ActionType'
 import { ActionOf, actions } from '../actions'
 import { combineEpics } from 'redux-observable'
-import { getRegionEnd } from 'clipwave'
-import { getNewFlashcardForStretchedClip } from '../selectors'
+import { getRegionEnd, secondsToMs } from 'clipwave'
+import { getFlashcard, getNewFlashcardForStretchedClip } from '../selectors'
 import { EMPTY, of } from 'rxjs'
+import { TransliterationFlashcardFields } from '../types/Project'
 
 const addClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
   return action$.ofType<ActionOf<typeof A.addClip>>(A.addClip).pipe(
@@ -22,17 +23,26 @@ const addClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
   )
 }
 
-const addClipsEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
+const addClipsEpic: AppEpic = (
+  action$,
+  state$,
+  { dispatchClipwaveEvent, getMediaPlayer }
+) => {
   return action$.ofType<ActionOf<typeof A.addClips>>(A.addClips).pipe(
     tap(({ clips }) => {
       dispatchClipwaveEvent(({ actions: { addItems } }) => {
+        const newItems = clips.map((clip) => ({
+          start: clip.start,
+          end: clip.end,
+          clipwaveType: 'Primary' as const,
+          id: clip.id,
+        }))
+
+        const currentTime = getMediaPlayer()?.currentTime
+
         addItems(
-          clips.map((clip) => ({
-            start: clip.start,
-            end: clip.end,
-            clipwaveType: 'Primary',
-            id: clip.id,
-          }))
+          newItems,
+          currentTime != null ? secondsToMs(currentTime) : undefined
         )
       })
     }),
@@ -69,15 +79,12 @@ const stretchClipEpic: AppEpic = (
             dispatch({
               type: 'SET_REGIONS',
               regions: newRegions,
-              newSelection: {
-                item: clipToStretchId,
-                // TODO: optimize via guarantee that new selection item is stretchedClip
-                regionIndex: newRegions.findIndex(
-                  (region, i) =>
-                    region.start >= newStartWithMerges &&
-                    getRegionEnd(newRegions, i) < newEndWithMerges
-                ),
-              },
+              newSelectionItemId: clipToStretchId,
+              newSelectionRegion: newRegions.findIndex(
+                (region, i) =>
+                  region.start >= newStartWithMerges &&
+                  getRegionEnd(newRegions, i) < newEndWithMerges
+              ),
             })
         })
 
@@ -95,7 +102,20 @@ const stretchClipEpic: AppEpic = (
             }
           )
 
-          return of(actions.editClip(stretchedClip.id, null, newFields))
+          const oldFields = getFlashcard(state$.value, stretchedClip.id)
+            ?.fields as TransliterationFlashcardFields | undefined
+          const fieldWasUpdated = Object.entries(newFields?.fields || {}).some(
+            ([fn, val]) => {
+              const oldFieldValue =
+                oldFields?.[fn as TransliterationFlashcardFieldName] || ''
+              const newFieldValue = val || ''
+              return oldFieldValue !== newFieldValue
+            }
+          )
+
+          return fieldWasUpdated
+            ? of(actions.editClip(stretchedClip.id, null, newFields))
+            : EMPTY
         }
         return EMPTY
       }

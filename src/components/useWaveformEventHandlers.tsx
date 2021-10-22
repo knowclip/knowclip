@@ -108,30 +108,35 @@ export function useWaveformEventHandlers({
         const newStartWithMerges = Math.min(...toMerge.map((c) => c.start))
         const newEndWithMerges = Math.max(...toMerge.map((c) => c.end))
 
-        const newRegions = recalculateRegions(regions, getItemDangerously, [
-          {
-            id: clipToMoveId,
-            newItem: {
-              ...getItemDangerously(clipToMoveId),
-              id: clipToMoveId,
-              start: newStartWithMerges,
-              end: newEndWithMerges,
+        const { regions: newRegions } = recalculateRegions(
+          regions,
+          getItemDangerously,
+          [
+            {
+              type: 'UPDATE',
+              newItem: {
+                ...getItemDangerously(clipToMoveId),
+                id: clipToMoveId,
+                start: newStartWithMerges,
+                end: newEndWithMerges,
+              },
             },
-          },
-          ...overlapIds.map((id) => ({ id, newItem: null })),
-        ])
+            ...overlapIds.map((id) => ({
+              itemId: id,
+              type: 'DELETE' as const,
+            })),
+          ]
+        )
 
         waveform.dispatch({
           type: 'SET_REGIONS',
           regions: newRegions,
-          newSelection: {
-            regionIndex: newRegions.findIndex(
-              (r) =>
-                r.start >= newStartWithMerges &&
-                (r.end ?? secondsToMs(durationSeconds)) < newEndWithMerges
-            ),
-            item: clipToMoveId,
-          },
+          newSelectionRegion: newRegions.findIndex(
+            (r) =>
+              r.start >= newStartWithMerges &&
+              (r.end ?? secondsToMs(durationSeconds)) < newEndWithMerges
+          ),
+          newSelectionItemId: clipToMoveId,
         })
         dispatch(actions.moveClip(clipToMoveId, deltaX, overlapIds, newRegions))
 
@@ -217,13 +222,17 @@ export function useWaveformEventHandlers({
         start: newStartWithMerges,
         end: newEndWithMerges,
       }
-      const newRegions = recalculateRegions(regions, getItemDangerously, [
-        {
-          id: clipToStretchId,
-          newItem,
-        },
-        ...overlapIds.map((id) => ({ id, newItem: null })),
-      ])
+      const { regions: newRegions } = recalculateRegions(
+        regions,
+        getItemDangerously,
+        [
+          {
+            type: 'UPDATE',
+            newItem,
+          },
+          ...overlapIds.map((id) => ({ type: 'DELETE' as const, itemId: id })),
+        ]
+      )
       const newSelection = {
         item: clipToStretchId,
         regionIndex: newRegions.findIndex(
@@ -236,7 +245,8 @@ export function useWaveformEventHandlers({
       waveform.dispatch({
         type: 'SET_REGIONS',
         regions: newRegions,
-        newSelection,
+        newSelectionRegion: newSelection.regionIndex,
+        newSelectionItemId: newSelection.item,
       })
 
       dispatch(

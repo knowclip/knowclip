@@ -1,11 +1,9 @@
 import { ignoreElements, switchMap, tap } from 'rxjs/operators'
-import { of } from 'rxjs'
+import { EMPTY, of } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { ActionOf } from '../actions'
 import { combineEpics } from 'redux-observable'
-import { ClipwaveCallbackEvent } from 'clipwave'
-import { CLIPWAVE_ID } from '../utils/clipwave'
 import { getFreshRegions } from './getFreshRegions'
 
 const clipCreateEpic: AppEpic = (action$, state$) => {
@@ -28,6 +26,8 @@ const clipCreateEpic: AppEpic = (action$, state$) => {
           state$.value,
           coordinates
         )
+
+        // waveformDrag.overlaps
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,
           coordinates,
@@ -54,38 +54,34 @@ const clipCreateEpic: AppEpic = (action$, state$) => {
 const recalculateWaveformRegionsEpic: AppEpic = (
   action$,
   state$,
-  { document, window, getMediaPlayer }
+  { dispatchClipwaveEvent, getMediaPlayer }
 ) => {
   return action$
-    .ofType<ActionOf<typeof A.addClip | typeof A.addClips>>(
-      A.addClip,
-      A.addClips
-    )
+    .ofType<ActionOf<typeof A.undo | typeof A.redo>>(A.undo, A.redo)
     .pipe(
       tap(() => {
-        // need timeout now?
-        window.setTimeout(() => {
-          const currentFileClipsOrder = r.getCurrentFileClipsOrder(state$.value)
-          const clipsMap = r.getClipsObject(state$.value)
-          const subsBases = r.getSubtitlesCardBases(state$.value)
+        const currentFileClipsOrder = r.getCurrentFileClipsOrder(state$.value)
+        const clipsMap = r.getClipsObject(state$.value)
+        const subsBases = r.getSubtitlesCardBases(state$.value)
 
-          document.dispatchEvent(
-            new ClipwaveCallbackEvent(CLIPWAVE_ID, (waveform) => {
-              const { regions, newSelection } = getFreshRegions(
-                currentFileClipsOrder,
-                clipsMap,
-                subsBases,
-                waveform,
-                getMediaPlayer()
-              )
-              waveform.dispatch({
-                type: 'SET_REGIONS',
-                regions,
-                newSelection,
-              })
-            })
+        dispatchClipwaveEvent((waveform) => {
+          const { regions, newSelection } = getFreshRegions(
+            currentFileClipsOrder,
+            clipsMap,
+            subsBases,
+            waveform,
+            getMediaPlayer()
           )
-        }, 0)
+
+          waveform.dispatch({
+            type: 'SET_REGIONS',
+            regions,
+            newSelectionItemId: newSelection.item || undefined,
+            newSelectionRegion: newSelection.regionIndex,
+          })
+        })
+
+        return EMPTY
       }),
       ignoreElements()
     )
