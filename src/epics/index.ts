@@ -24,6 +24,7 @@ import preloadVideoStills from './preloadVideoStills'
 import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import dictionaries from './dictionaries'
+import { adjustWaveformViaHistory } from './adjustWaveformViaHistory'
 
 const closeEpic: AppEpic = (
   action$,
@@ -110,7 +111,8 @@ const rootEpic: AppEpic = combineEpics(
   menu,
   pauseAndChangeCursorOnBusy,
   dictionaries,
-  clipwave
+  clipwave,
+  adjustWaveformViaHistory
 )
 
 export default rootEpic

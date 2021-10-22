@@ -13,9 +13,6 @@ import {
   usePlayButtonSync,
   WAVEFORM_HEIGHT,
   SUBTITLES_CHUNK_HEIGHT,
-  WaveformRegion,
-  SecondaryClip,
-  PrimaryClip,
 } from 'clipwave'
 import FlashcardSection from '../components/FlashcardSection'
 import Header from '../components/MainHeader'
@@ -27,14 +24,14 @@ import * as r from '../selectors'
 import { actions } from '../actions'
 import { setMousePosition } from '../utils/mousePosition'
 import 'clipwave/dist/index.css'
-import { overlapsSignificantly, SubtitlesCardBase } from '../selectors'
+import { SubtitlesCardBase } from '../selectors'
 import { usePrevious } from '../utils/usePrevious'
 import { useRenderSecondaryClip } from './waveformRenderSubtitlesChunks'
-import { useWaveformEventHandlers } from './useWaveformEventHandlers'
-import { GetWaveformItem } from 'clipwave/dist/useWaveform'
 import { waveform$ } from './waveformTestLabels'
 import { useWaveformRenderClip } from './useWaveformRenderClip'
 import { getFreshRegions } from '../epics/getFreshRegions'
+import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
+import { useWaveformEventHandlers } from '../utils/clipwave/useWaveformEventHandlers'
 
 enum $ {
   container = 'main-screen-container',
@@ -308,54 +305,3 @@ const EMPTY: string[] = []
 export default Main
 
 export { $ as main$ }
-
-function isWaveformItemSelectable(
-  item: WaveformItem,
-  region: WaveformRegion,
-  regionIndex: number,
-  regions: WaveformRegion[],
-  getItem: GetWaveformItem
-) {
-  if (item.start !== region.start) return false
-
-  if (item.clipwaveType === 'Primary') return true
-  const overlappingPrimaryClips = getPrimaryClipsOverlappingSecondaryClip(
-    regions,
-    getItem,
-    regionIndex,
-    item
-  )
-
-  return !overlappingPrimaryClips.length
-}
-
-function getPrimaryClipsOverlappingSecondaryClip(
-  regions: WaveformRegion[],
-  getItem: GetWaveformItem,
-  startRegionIndex: number,
-  item: SecondaryClip
-) {
-  const allLocalItemsIds = new Set<string>()
-
-  let regionIndex = startRegionIndex
-  while (regions[regionIndex]?.itemIds.includes(item.id)) {
-    regions[regionIndex].itemIds.forEach((itemId) =>
-      allLocalItemsIds.add(itemId)
-    )
-
-    regionIndex++
-  }
-  allLocalItemsIds.delete(item.id)
-
-  const overlappingPrimaryClips: PrimaryClip[] = []
-  allLocalItemsIds.forEach((id) => {
-    const overlapped = getItem(id)
-    if (
-      overlapped?.clipwaveType === 'Primary' &&
-      overlapsSignificantly(overlapped, item.start, item.end)
-    )
-      overlappingPrimaryClips.push(overlapped)
-  })
-
-  return overlappingPrimaryClips
-}
