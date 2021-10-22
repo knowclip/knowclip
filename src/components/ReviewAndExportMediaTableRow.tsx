@@ -9,6 +9,9 @@ import truncate from '../utils/truncate'
 import { actions } from '../actions'
 import { ListRowProps } from 'react-virtualized'
 import { CellMeasurerChildProps } from 'react-virtualized/dist/es/CellMeasurer'
+import { ClipwaveCallbackEvent, getRegionEnd } from 'clipwave'
+import { getMediaPlayer } from '../utils/media'
+import { CLIPWAVE_ID } from '../utils/clipwave'
 
 enum $ {
   container = 'review-and-export-table-row-container',
@@ -19,6 +22,7 @@ enum $ {
 type FlashcardRowProps = {
   id: string
   onSelect: (id: string) => void
+  highlightClip: (id: string) => void
   isSelected: boolean
   isHighlighted: boolean
   style: ListRowProps['style']
@@ -31,6 +35,7 @@ const ReviewAndExportMediaTableRow = memo(
     id,
     isSelected,
     onSelect,
+    highlightClip,
     isHighlighted,
     style,
     measure,
@@ -39,15 +44,11 @@ const ReviewAndExportMediaTableRow = memo(
     const {
       flashcard: { fields, tags, cloze },
       formattedClipTime,
-      clipTimeInSeconds,
       isLoopOn,
-      currentMediaFile,
     } = useSelector((state: AppState) => ({
       flashcard: r.getFlashcard(state, id) as Flashcard,
-      clipTimeInSeconds: r.getClipTimeInSeconds(state, id),
       formattedClipTime: r.getFormattedClipTime(state, id),
       isLoopOn: r.getLoopState(state),
-      currentMediaFile: r.getCurrentMediaFile(state),
     }))
 
     const dispatch = useDispatch()
@@ -56,20 +57,37 @@ const ReviewAndExportMediaTableRow = memo(
       [dispatch]
     )
 
-    const selectClip = useCallback(() => {
-      if (currentMediaFile && !isHighlighted && clipTimeInSeconds) {
-        const mediaPlayer = document.getElementById(
-          'mediaPlayer'
-        ) as HTMLVideoElement | null
-        if (mediaPlayer) mediaPlayer.currentTime = clipTimeInSeconds.start
-      }
-    }, [clipTimeInSeconds, currentMediaFile, isHighlighted])
+    const handleDoubleClick = useCallback(() => {
+      window.dispatchEvent(
+        new ClipwaveCallbackEvent(
+          CLIPWAVE_ID,
+          ({ actions, state, getItem }) => {
+            const item = getItem(id)
+            const regionIndex = item
+              ? state.regions.findIndex(
+                  (r, i) =>
+                    item.start >= r.start &&
+                    getRegionEnd(state.regions, i) <= item.end
+                )
+              : -1
+            const media = getMediaPlayer()
+            if (item && regionIndex !== -1 && media) {
+              actions.selectItemAndSeekTo(regionIndex, id, media, item.start)
+            }
+
+            if (!media) {
+              dispatch(r.selectWaveformItem({ type: 'Clip', id }))
+            }
+          }
+        )
+      )
+    }, [id, dispatch])
 
     const startEditing = useCallback(() => {
-      selectClip()
+      highlightClip(id)
       dispatch(actions.startEditingCards())
       dispatch(actions.closeDialog())
-    }, [dispatch, selectClip])
+    }, [dispatch, highlightClip, id])
 
     useEffect(() => measure(), [measure])
 
@@ -81,7 +99,7 @@ const ReviewAndExportMediaTableRow = memo(
           [$.highlightedClipRow]: isHighlighted,
           [css.highlightedClipRow]: isHighlighted,
         })}
-        onDoubleClick={selectClip}
+        onDoubleClick={handleDoubleClick}
       >
         <section className={css.checkbox}>
           <Checkbox

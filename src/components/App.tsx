@@ -22,7 +22,7 @@ class App extends Component<
 
   render() {
     if (this.state.hasError)
-      return <ErrorMessage reactError={{ reactError: this.state.error }} />
+      return <ErrorMessage reactError={this.state.error} />
     return (
       <MuiThemeProvider theme={theme}>
         <CssBaseline />

@@ -4,8 +4,7 @@ import { of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
 import clipCreate from './clipCreate'
-import clipMove from './clipMove'
-import clipStretch from './clipStretch'
+import clipwave from './clipwave'
 import editClip from './editClip'
 import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
@@ -25,6 +24,7 @@ import preloadVideoStills from './preloadVideoStills'
 import generateWaveformImages from './generateWaveformImages'
 import menu from './menu'
 import dictionaries from './dictionaries'
+import { adjustWaveformViaHistory } from './adjustWaveformViaHistory'
 
 const closeEpic: AppEpic = (
   action$,
@@ -93,8 +93,6 @@ const rootEpic: AppEpic = combineEpics(
   loopMedia,
   editClip,
   clipCreate,
-  clipMove,
-  clipStretch,
   detectSilenceEpic,
   exportCsvAndMp3,
   exportApkg,
@@ -112,7 +110,9 @@ const rootEpic: AppEpic = combineEpics(
   generateWaveformImages,
   menu,
   pauseAndChangeCursorOnBusy,
-  dictionaries
+  dictionaries,
+  clipwave,
+  adjustWaveformViaHistory
 )
 
 export default rootEpic

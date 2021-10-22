@@ -29,7 +29,6 @@ export default async function exportWithMissingMedia({
     ],
   })
   await client.clickElement_(fileSelectionForm$.filePathField)
-  // await client.waitForText('body', join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4'))
   await client.clickElement_(fileSelectionForm$.continueButton)
   await client.waitUntilGone_(fileSelectionForm$.container)
 

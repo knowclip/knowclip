@@ -10,13 +10,12 @@ export default async function navigateBetweenClips({ app, client }: TestSetup) {
   await testBlock('click away from selected clip', async () => {
     await client.waitUntilPresent_(flashcardForm$.flashcardFields)
 
-    await clickAt(app, [650, 655])
-
+    await clickAt(app, [650, 711])
     await client.waitUntilGone_(flashcardForm$.flashcardFields)
   })
 
   await testBlock('click to select new clip', async () => {
-    await clickAt(app, [800, 655])
+    await clickAt(app, [800, 711])
 
     await client.waitUntilPresent_(flashcardSectionDisplayCard$.container)
   })

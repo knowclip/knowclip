@@ -3,10 +3,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.waveformSvg,
-.waveformPlaceholder {
   background: gray;
   flex-grow: 0;
   flex-shrink: 0;

@@ -1,11 +1,11 @@
 import { combineEpics } from 'redux-observable'
-import { filter, mergeMap, map, sample } from 'rxjs/operators'
+import { mergeMap, map } from 'rxjs/operators'
 import { of, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { getUpdateWith } from '../files/updates'
-import { msToSeconds } from '../utils/waveform'
+import { msToSeconds } from 'clipwave'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$
@@ -133,15 +133,17 @@ export const newClipFromChunk: AppEpic = (
         if (!mediaFileId) return EMPTY
         const cardBases = r.getSubtitlesCardBases(state$.value)
 
-        const fields = r.getNewFieldsFromLinkedSubtitles(
-          state$.value,
-          cardBases.cards[selection.item.index]
-        )
+        const cardBase = cardBases.cardsMap[selection.id]
+        if (!cardBase)
+          throw new Error(
+            `No subtitles card base found with id "${selection.id}""`
+          )
+        const fields = r.getNewFieldsFromLinkedSubtitles(state$.value, cardBase)
         const { clip, flashcard } = r.getNewClipAndCard(
           state$.value,
           {
-            start: selection.item.start,
-            end: selection.item.end,
+            start: cardBase.start,
+            end: cardBase.end,
           },
           mediaFileId,
           uuid(),
@@ -152,60 +154,13 @@ export const newClipFromChunk: AppEpic = (
           flashcard.cloze = [action.clozeDeletion]
         }
 
-        setCurrentTime(msToSeconds(selection.item.start))
+        setCurrentTime(msToSeconds(cardBase.start))
 
         return from([r.addClip(clip, flashcard, action.startEditing || false)])
       })
     )
 
-const updateSelectionAfterLink: AppEpic = (
-  action$,
-  state$,
-  { setCurrentTime, getCurrentTime }
-) =>
-  action$
-    .ofType<LinkFlashcardFieldToSubtitlesTrackRequest>(
-      A.linkFlashcardFieldToSubtitlesTrackRequest
-    )
-    .pipe(
-      map(() => {
-        return r.getWaveformSelection(state$.value)
-      }),
-      sample(
-        action$.pipe(
-          filter(
-            (action) =>
-              action.type === A.updateFile &&
-              Boolean(
-                getUpdateWith(
-                  action.update,
-                  'linkFlashcardFieldToSubtitlesTrack'
-                )
-              )
-          )
-        )
-      ),
-      mergeMap((selection) => {
-        if (selection && selection.type === 'Preview') {
-          const newSelection = r.getNewWaveformSelectionAt(
-            state$.value,
-            selection.item.start
-          )
-          if (
-            newSelection &&
-            msToSeconds(newSelection.item.start) !== getCurrentTime()
-          ) {
-            setCurrentTime(msToSeconds(newSelection.item.start))
-          }
-          return newSelection ? of(r.selectWaveformItem(newSelection)) : EMPTY
-        }
-
-        return EMPTY
-      })
-    )
-
 export default combineEpics(
-  updateSelectionAfterLink,
   linkFieldToTrackRequest,
   linkFieldToTrack,
   newClipFromChunk,

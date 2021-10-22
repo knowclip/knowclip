@@ -16,12 +16,6 @@ export const getHighlightedFlashcard = (state: AppState): Flashcard | null => {
   return highlightedClipId ? state.clips.flashcards[highlightedClipId] : null
 }
 
-export const getHighlightedChunkIndex = (state: AppState): number | null =>
-  state.session.waveformSelection &&
-  state.session.waveformSelection.type === 'Preview'
-    ? state.session.waveformSelection.cardBaseIndex
-    : null
-
 export const getAllTags = (state: AppState): Array<string> => {
   const tags = Object.keys(state.session.tagsToClipIds)
   return tags.reduce((a, b) => a.concat(b), [] as Array<string>)

@@ -1,22 +1,57 @@
-import { dragMouse } from './runEvents'
+import { clickAt, dragMouse } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
-import { waveform$ } from '../../components/Waveform'
+import { main$ } from '../../components/Main'
+import { ElementWrapper } from './ElementWrapper'
+import { waveform$ } from '../../components/waveformTestLabels'
+import { TestDriver } from './TestDriver'
+
+export const waveformSelector = `#${main$.container} > svg`
 
 export async function waveformMouseDrag(
   client: ClientWrapper,
   start: number,
   end: number
 ) {
-  const waveform = await client.firstElement_(waveform$.container)
+  const waveform = await client.firstElement(waveformSelector)
   try {
-    const rect = await client._driver.client.getElementRect(waveform.elementId)
-
-    const { y, height } = rect
-    const midpoint = y + Math.round(height / 2)
+    const midpoint = await getWaveformMidpoint(client, waveform)
     await dragMouse(client._driver, [start, midpoint], [end, midpoint])
   } catch (err) {
     throw err
   }
+}
+
+export async function clickClip(
+  app: TestDriver,
+  client: ClientWrapper,
+  indexInVisibleClips: number,
+  expectedVisibleClipsCount?: number
+) {
+  const clips = await client.elements_(
+    waveform$.waveformClip,
+    expectedVisibleClipsCount
+  )
+  const clip = clips[indexInVisibleClips]
+  const rect = await client._driver.client.getElementRect(clip.elementId)
+
+  const offsetFromCorner = {
+    x: Math.round(rect.width / 2),
+    y: Math.round(rect.height / 2),
+  }
+  await clip.moveTo(offsetFromCorner)
+
+  await clickAt(app, [rect.x + offsetFromCorner.x, rect.y + offsetFromCorner.y])
+}
+
+export async function getWaveformMidpoint(
+  client: ClientWrapper,
+  waveform: ElementWrapper
+) {
+  const rect = await client._driver.client.getElementRect(waveform.elementId)
+
+  const { y, height } = rect
+  const midpoint = y + Math.round(height / 2)
+  return midpoint
 }
 
 export async function waveformMouseHoldAndDrag(
@@ -25,7 +60,7 @@ export async function waveformMouseHoldAndDrag(
   start: number,
   end: number
 ) {
-  const waveform = await client.firstElement_(waveform$.container)
+  const waveform = await client.firstElement(waveformSelector)
   try {
     const rect = await client._driver.client.getElementRect(waveform.elementId)
 

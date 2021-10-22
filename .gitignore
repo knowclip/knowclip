@@ -29,3 +29,6 @@ release-builds
 build-main
 
 .eslintcache
+
+.yalc
+yalc.lock

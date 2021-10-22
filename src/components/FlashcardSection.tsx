@@ -29,14 +29,17 @@ const FlashcardSection = ({
   mediaFile,
   className,
   projectFile,
+  selectPrevious,
+  selectNext,
 }: {
   mediaFile: MediaFile | null
   className?: string
   projectFile: ProjectFile
+  selectPrevious: () => void
+  selectNext: () => void
 }) => {
   const {
     waveformSelection,
-    waveformItems,
     clipsIds,
     editing,
     flashcard,
@@ -46,8 +49,7 @@ const FlashcardSection = ({
   } = useSelector((state: AppState) => {
     const mediaIsEffectivelyLoading = r.isMediaEffectivelyLoading(state)
     return {
-      waveformSelection: r.getWaveformSelection(state),
-      waveformItems: mediaIsEffectivelyLoading ? [] : r.getWaveformItems(state),
+      waveformSelection: r.getSelectionItem(state),
       clipsIds: mediaFile ? r.getClipIdsByMediaFileId(state, mediaFile.id) : [],
       editing: state.session.editingCards,
       flashcard: r.getHighlightedFlashcard(state),
@@ -60,16 +62,13 @@ const FlashcardSection = ({
   })
 
   const highlightedClip =
-    waveformSelection?.type === 'Clip' ? waveformSelection.item : null
+    waveformSelection?.clipwaveType === 'Primary' ? waveformSelection : null
 
-  const itemsLength = waveformItems.length
   const clipsLength = clipsIds.length
   const clipIndex = useMemo(
     () => (highlightedClip ? clipsIds.indexOf(highlightedClip.id) : -1),
     [clipsIds, highlightedClip]
   )
-  const dispatch = useDispatch()
-
   // TODO: restore autofocus
   const [autofocusFieldName, _setAutofocusFieldName] = useState<
     TransliterationFlashcardFieldName
@@ -106,11 +105,7 @@ const FlashcardSection = ({
       >
         <IconButton
           className={cn(css.prevButton, $.previousClipButton)}
-          disabled={itemsLength < 2}
-          onClick={useCallback(
-            () => dispatch(actions.highlightLeftClipRequest()),
-            [dispatch]
-          )}
+          onClick={useCallback(() => selectPrevious(), [selectPrevious])}
         >
           <ChevronLeft />
         </IconButton>
@@ -137,11 +132,11 @@ const FlashcardSection = ({
       {mediaFile &&
         subtitles &&
         waveformSelection &&
-        waveformSelection.type === 'Preview' && (
+        waveformSelection.clipwaveType === 'Secondary' && (
           <Preview
-            key={waveformSelection.cardBaseIndex}
+            key={waveformSelection.id}
             cardBases={subtitles}
-            cardPreviewSelection={waveformSelection}
+            cardBase={waveformSelection}
             clipsIds={clipsIds}
             mediaFile={mediaFile}
             fieldsToTracks={fieldsToTracks}
@@ -165,11 +160,7 @@ const FlashcardSection = ({
       >
         <IconButton
           className={cn(css.nextButton, $.nextClipButton)}
-          disabled={itemsLength < 2}
-          onClick={useCallback(
-            () => dispatch(actions.highlightRightClipRequest()),
-            [dispatch]
-          )}
+          onClick={useCallback(() => selectNext(), [selectNext])}
         >
           <ChevronRight />
         </IconButton>

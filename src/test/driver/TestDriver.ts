@@ -81,10 +81,10 @@ export function waitForChromeDriverToStop(
 }
 
 export async function createTestDriver({
-  chromedriverPath: chromedriverPath,
+  chromedriverPath,
   webdriverIoPath,
   appDir,
-  chromeArgs: chromeArgs,
+  chromeArgs,
   env: givenEnv,
   logLevel = 'silent',
 }: {
@@ -168,7 +168,8 @@ export class TestDriver {
   async sendToMainProcess<T extends MessageToMainType>(
     message: MessageToMain<T>
   ): Promise<MessageResponse<MessageHandlerResult<T>>> {
-    return this.client.executeAsync(async (message: MessageToMain<T>, done) => {
+    // @ts-ignore
+    return this.client.executeAsync((message: MessageToMain<T>, done) => {
       const { ipcRenderer } = require('electron')
       ipcRenderer.invoke('message', message).then(async (result) => {
         done(await result)

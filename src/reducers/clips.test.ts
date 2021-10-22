@@ -9,6 +9,7 @@ const newClip = (
   fields: TransliterationFlashcardFields
 ): { clip: Clip; card: Flashcard } => ({
   clip: {
+    clipwaveType: 'Primary',
     start,
     end,
     fileId,
@@ -167,7 +168,6 @@ describe('clips reducer', () => {
     )
     const mergeAction = r.mergeClips(['a', 'b'], {
       type: 'Clip',
-      index: 0,
       id: 'a',
     })
 
@@ -243,7 +243,6 @@ describe('clips reducer', () => {
     )
     const mergeAction = r.mergeClips(['a', 'b'], {
       type: 'Clip',
-      index: 0,
       id: 'a',
     })
 

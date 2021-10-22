@@ -182,7 +182,7 @@ const Media = ({
 
       {metadata.isVideo ? (
         <video
-          {...props}
+          {...(props as VideoHTMLAttributes<HTMLVideoElement>)}
           ref={playerRef as MutableRefObject<HTMLVideoElement>}
           className={cn(css.video, css.mediaPlayer)}
         >
@@ -201,7 +201,7 @@ const Media = ({
         </video>
       ) : (
         <audio
-          {...props}
+          {...(props as AudioHTMLAttributes<HTMLAudioElement>)}
           ref={playerRef as MutableRefObject<HTMLAudioElement>}
           className={cn(css.audio, css.mediaPlayer)}
         />

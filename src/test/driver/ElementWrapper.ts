@@ -14,14 +14,17 @@ export interface ElementWrapper {
   getText: () => Promise<string>
   waitForText: (text: string) => Promise<void>
   doubleClick: () => Promise<void>
+  isClickable: () => Promise<boolean>
   isVisible: () => Promise<boolean>
   isVisibleOrDisplayed: () => Promise<boolean>
   isExisting: () => Promise<boolean>
   isSelected: () => Promise<boolean>
   getAttribute: (attributeName: string) => Promise<string | null>
+  moveTo: (opts: { x: number; y: number }) => Promise<void>
+  findDescendant: (descendantSelector: string) => Promise<ElementWrapper | null>
 }
 
-export const element = (
+export const wrapElement = (
   driver: TestDriver,
   element: Element,
   selector: string
@@ -83,9 +86,16 @@ export const element = (
         )
       }
     },
+    isClickable: async () => {
+      try {
+        return await element.isClickable()
+      } catch (err) {
+        throw Error(`Could not get clickable status of "${selector}": ${err}`)
+      }
+    },
     isVisible: async () => {
       try {
-        return await client.isElementDisplayed(id)
+        return await element.isDisplayedInViewport()
       } catch (err) {
         throw Error(`Could not get displayed status of "${selector}": ${err}`)
       }
@@ -125,5 +135,26 @@ export const element = (
         )
       }
     },
+    moveTo: async ({ x, y }: { x: number; y: number }) => {
+      try {
+        await element.moveTo({ xOffset: x, yOffset: y })
+      } catch (err) {
+        throw new Error(
+          `Could not move to "${selector}" at offset ${x} ${y}: ${err}`
+        )
+      }
+    },
+    findDescendant: async (descendantSelector: string) => {
+      const rawElement = await element.findElement(
+        'css selector',
+        descendantSelector
+      )
+      if (rawElement)
+        return wrapElement(driver, element, `${selector} ${descendantSelector}`)
+
+      return null
+    },
   }
 }
+
+export { wrapElement as element }

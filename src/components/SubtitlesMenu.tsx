@@ -1,14 +1,15 @@
-import React, { Fragment, useCallback } from 'react'
+import React, { Fragment, useCallback, useMemo } from 'react'
 import {
   Subtitles as SubtitlesIcon,
   Visibility as VisibilityOnIcon,
   VisibilityOff as VisibilityOffIcon,
   MoreVert,
   FolderSpecial,
+  Link,
   Delete as DeleteIcon,
 } from '@material-ui/icons'
 import { useDispatch, useSelector } from 'react-redux'
-import r from '../redux'
+import * as selectors from '../selectors'
 import { actions } from '../actions'
 import {
   IconButton,
@@ -28,6 +29,7 @@ import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 
 enum $ {
+  container = 'subtitles-menu',
   openMenuButton = 'subtitles-menu-open-menu-button',
   trackMenuItems = 'subtitles-menu-track-item',
   openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
@@ -40,13 +42,34 @@ enum $ {
 const SubtitlesMenu = () => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
 
-  const { subtitles, currentFileId } = useSelector((state: AppState) => {
-    const currentFileId = r.getCurrentFileId(state)
-    return {
-      subtitles: r.getSubtitlesFilesWithTracks(state),
-      currentFileId,
+  const { subtitles, currentFileId, fieldNamesToTrackIds } = useSelector(
+    (state: AppState) => {
+      const currentFileId = selectors.getCurrentFileId(state)
+      return {
+        subtitles: selectors.getSubtitlesFilesWithTracks(state),
+        currentFileId,
+        fieldNamesToTrackIds: selectors.getSubtitlesFlashcardFieldLinks(state),
+      }
     }
-  })
+  )
+
+  const trackIdsToFieldNames = useMemo(
+    () =>
+      Object.entries(fieldNamesToTrackIds).reduce(
+        (map, [fieldName, trackId]) => {
+          if (fieldName)
+            map[
+              trackId as SubtitlesTrackId
+            ] = fieldName as TransliterationFlashcardFieldName
+          return map
+        },
+        {} as Record<
+          SubtitlesTrackId,
+          TransliterationFlashcardFieldName | undefined
+        >
+      ),
+    [fieldNamesToTrackIds]
+  )
 
   const dispatch = useDispatch()
   const loadExternalTrack = useCallback(
@@ -88,7 +111,7 @@ const SubtitlesMenu = () => {
       </Tooltip>
       {isOpen && (
         <Popover anchorEl={anchorEl} open={isOpen} onClose={close}>
-          <MenuList>
+          <MenuList className={$.container}>
             {!subtitles.total && (
               <MenuItem dense disabled>
                 No subtitles loaded.
@@ -108,6 +131,10 @@ const SubtitlesMenu = () => {
                   }
                   track={track}
                   title={`Embedded track ${i + 1}`}
+                  currentFileId={currentFileId}
+                  linkedFieldTitle={
+                    track ? trackIdsToFieldNames[track.id] : undefined
+                  }
                 />
               )
             )}
@@ -118,6 +145,10 @@ const SubtitlesMenu = () => {
                 track={track}
                 file={sourceFile}
                 title={sourceFile?.name || `External track ${i + 1}`}
+                currentFileId={currentFileId}
+                linkedFieldTitle={
+                  track ? trackIdsToFieldNames[track.id] : undefined
+                }
               />
             ))}
             <Divider />
@@ -144,42 +175,122 @@ const SubtitlesMenu = () => {
 
 const VisibilityIcon = ({ visible }: { visible: boolean }) => (
   <Icon>
-    {visible ? (
-      <VisibilityOnIcon fontSize="small" />
-    ) : (
-      <VisibilityOffIcon fontSize="small" />
-    )}
+    <Tooltip
+      title={
+        visible
+          ? 'Hide subtitles track in video'
+          : 'Show subtitles track in video'
+      }
+    >
+      {visible ? (
+        <VisibilityOnIcon fontSize="small" />
+      ) : (
+        <VisibilityOffIcon fontSize="small" />
+      )}
+    </Tooltip>
   </Icon>
 )
 
 const EmbeddedTrackMenuItem = ({
   id,
+  file,
   track,
   title,
+  currentFileId,
+  linkedFieldTitle,
 }: {
   id: string
   file: (VttConvertedSubtitlesFile & { parentType: 'MediaFile' }) | null
   track: EmbeddedSubtitlesTrack | null
   title: string
+  currentFileId: MediaFileId | null
+  linkedFieldTitle: string | undefined
 }) => {
+  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+  const stopPropagation = useCallback((e) => {
+    e.stopPropagation()
+  }, [])
+
+  const dispatch = useDispatch()
+  const linkSubtitlesDialog = useLinkSubtitlesDialogAction(
+    track,
+    file,
+    dispatch,
+    currentFileId
+  )
+  const handleClickLinkSubtitlesDialog = useCallback(
+    (e) => {
+      linkSubtitlesDialog()
+      close(e)
+    },
+    [close, linkSubtitlesDialog]
+  )
+
   return (
-    <MenuItem
-      dense
-      onClick={useToggleVisible(track, id)}
-      className={$.trackMenuItems}
-      autoFocus
-    >
-      <ListItemIcon>
-        {track ? (
-          <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
-        ) : (
-          <Tooltip title="Problem reading embedded subtitles">
-            <FolderSpecial />
-          </Tooltip>
+    <>
+      <MenuItem
+        dense
+        onClick={useToggleVisible(track, id)}
+        className={$.trackMenuItems}
+        autoFocus
+      >
+        <ListItemIcon>
+          {track ? (
+            <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
+          ) : (
+            <Tooltip title="Problem reading embedded subtitles">
+              <FolderSpecial />
+            </Tooltip>
+          )}
+        </ListItemIcon>
+        <ListItemText
+          className={css.subtitlesMenuListItemText}
+          primary={title}
+          secondary={linkedFieldTitle}
+        />
+        <Tooltip title="More actions">
+          <ListItemSecondaryAction>
+            <IconButton
+              buttonRef={anchorCallbackRef}
+              onClick={open}
+              className={$.openTrackSubmenuButton}
+            >
+              <MoreVert />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </Tooltip>
+        {isOpen && (
+          <Menu
+            autoFocus
+            open={isOpen}
+            onClose={close}
+            anchorEl={anchorEl}
+            onKeyDown={stopPropagation}
+            onKeyPress={stopPropagation}
+            onClick={stopPropagation}
+          >
+            <MenuItem
+              dense
+              onClick={handleClickLinkSubtitlesDialog}
+              disabled={!file}
+            >
+              <ListItemIcon>
+                <Icon>
+                  <Link />
+                </Icon>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  linkedFieldTitle
+                    ? 'Link track to different flashcard field'
+                    : 'Link track to a flashcard field'
+                }
+              />
+            </MenuItem>
+          </Menu>
         )}
-      </ListItemIcon>
-      <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
-    </MenuItem>
+      </MenuItem>
+    </>
   )
 }
 
@@ -188,11 +299,15 @@ const ExternalTrackMenuItem = ({
   file,
   track,
   title,
+  currentFileId,
+  linkedFieldTitle,
 }: {
   id: SubtitlesTrackId
   file: ExternalSubtitlesFile | null
   track: ExternalSubtitlesTrack | null
   title: string
+  currentFileId: string | null
+  linkedFieldTitle: string | undefined
 }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
   const dispatch = useDispatch()
@@ -221,6 +336,19 @@ const ExternalTrackMenuItem = ({
     [dispatch, file, close]
   )
 
+  const linkSubtitlesDialog = useLinkSubtitlesDialogAction(
+    track,
+    file,
+    dispatch,
+    currentFileId
+  )
+  const handleClickLinkSubtitlesDialog = useCallback(
+    (e) => {
+      linkSubtitlesDialog()
+      close(e)
+    },
+    [close, linkSubtitlesDialog]
+  )
   const toggleVisible = useToggleVisible(track, id)
 
   const stopPropagation = useCallback((e) => {
@@ -246,7 +374,11 @@ const ExternalTrackMenuItem = ({
         )}
       </ListItemIcon>
 
-      <ListItemText className={css.subtitlesMenuListItemText} primary={title} />
+      <ListItemText
+        className={css.subtitlesMenuListItemText}
+        primary={title}
+        secondary={linkedFieldTitle}
+      />
 
       <Tooltip title="More actions">
         <ListItemSecondaryAction>
@@ -269,6 +401,24 @@ const ExternalTrackMenuItem = ({
           onKeyPress={stopPropagation}
           onClick={stopPropagation}
         >
+          <MenuItem
+            dense
+            onClick={handleClickLinkSubtitlesDialog}
+            disabled={!file}
+          >
+            <ListItemIcon>
+              <Icon>
+                <Link />
+              </Icon>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                linkedFieldTitle
+                  ? 'Link track to different flashcard field'
+                  : 'Link track to a flashcard field'
+              }
+            />
+          </MenuItem>
           <MenuItem
             dense
             onClick={locateFileRequest}
@@ -299,6 +449,23 @@ const ExternalTrackMenuItem = ({
       )}
     </MenuItem>
   )
+}
+
+function useLinkSubtitlesDialogAction(
+  track: SubtitlesTrack | null,
+  file: VttFromEmbeddedSubtitles | ExternalSubtitlesFile | null,
+  dispatch: Function,
+  currentFileId: string | null
+) {
+  const chunks = track?.chunks
+  const linkSubtitlesDialog = useCallback(() => {
+    if (file && currentFileId) {
+      dispatch(
+        actions.linkSubtitlesDialog(file, chunks || [], currentFileId, false)
+      )
+    }
+  }, [file, dispatch, chunks, currentFileId])
+  return linkSubtitlesDialog
 }
 
 function useToggleVisible(track: SubtitlesTrack | null, id: string) {

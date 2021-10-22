@@ -154,8 +154,8 @@ export class ClientWrapper {
     const element = await this.firstElement(selector)
     return await element.getText()
   }
-  async getText_(selector: string) {
-    return await this.getText(getSelector(selector))
+  async getText_(testLabel: string) {
+    return await this.getText(getSelector(testLabel))
   }
 
   async elementWithText(selector: string, text: string) {
@@ -171,6 +171,10 @@ export class ClientWrapper {
         `No elements matching "${selector}" contain text "${text}"`
       )
     return elementWithText
+  }
+
+  elementWithText_(testLabel: string, text: string) {
+    return this.elementWithText(getSelector(testLabel), text)
   }
 
   async waitForVisible(selector: string) {
@@ -237,5 +241,13 @@ export class ClientWrapper {
   }
   async clickAtOffset_(testLabel: string, { x, y }: { x: number; y: number }) {
     return await this.clickAtOffset(getSelector(testLabel), { x, y })
+  }
+
+  async moveTo(selector: string, offset: { x: number; y: number }) {
+    const el = await this.firstElement(selector)
+    return await el.moveTo(offset)
+  }
+  async moveTo_(testLabel: string, offset: { x: number; y: number }) {
+    return await this.moveTo(getSelector(testLabel), offset)
   }
 }

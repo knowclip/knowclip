@@ -33,17 +33,19 @@ enum $ {
 
 const LinkSubtitlesDialog = ({
   open,
-  data: { subtitles, subtitlesChunks, mediaFileId },
+  data: { subtitles, subtitlesChunks, mediaFileId, triggeredOnOpenFile },
 }: DialogProps<LinkSubtitlesDialogData>) => {
   const dispatch = useDispatch()
 
   const {
     mediaFile,
+    subs,
     fieldsToTracks,
     blankFields,
     mediaSubtitles,
   } = useSelector((state: AppState) => ({
     mediaFile: getCurrentMediaFile(state),
+    subs: getSubtitlesFilesWithTracks(state),
     fieldsToTracks: getSubtitlesFlashcardFieldLinks(state),
     blankFields:
       getCurrentNoteType(state) === 'Simple'
@@ -52,13 +54,27 @@ const LinkSubtitlesDialog = ({
     mediaSubtitles: getSubtitlesFilesWithTracks(state),
   }))
 
+  const currentlyLinkedField = useMemo(() => {
+    const trackWithFile = subs.all.find((t) => t.id === subtitles.id)
+    const trackId = trackWithFile?.track?.id
+    if (!trackId) return undefined
+    const [field] =
+      Object.entries(fieldsToTracks).find(([, track]) => track === trackId) ||
+      []
+    return field as TransliterationFlashcardFieldName
+  }, [fieldsToTracks, subs.all, subtitles.id])
+
   const fieldNames = Object.keys(blankFields)
-  const [fieldSelection, setFieldSelection] = useState(
+  const [fieldSelection, setFieldSelection] = useState<
+    TransliterationFlashcardFieldName | ''
+  >(
     () =>
+      currentlyLinkedField ||
       (fieldNames.find(
         (fieldName) =>
           !fieldsToTracks[fieldName as TransliterationFlashcardFieldName]
-      ) as TransliterationFlashcardFieldName) || ''
+      ) as TransliterationFlashcardFieldName) ||
+      ''
   )
   const onChangeField = useCallback((e) => {
     setFieldSelection(e.target.value)
@@ -67,16 +83,25 @@ const LinkSubtitlesDialog = ({
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault()
-      dispatch(
-        actions.linkFlashcardFieldToSubtitlesTrackRequest(
-          fieldSelection,
-          mediaFileId,
-          subtitles.id
+      if (fieldSelection && fieldSelection !== currentlyLinkedField)
+        dispatch(
+          actions.linkFlashcardFieldToSubtitlesTrackRequest(
+            fieldSelection,
+            mediaFileId,
+            subtitles.id
+          )
         )
-      )
+      else if (currentlyLinkedField)
+        dispatch(
+          actions.linkFlashcardFieldToSubtitlesTrack(
+            currentlyLinkedField,
+            mediaFileId,
+            null
+          )
+        )
       dispatch(actions.closeDialog())
     },
-    [dispatch, fieldSelection, mediaFileId, subtitles.id]
+    [currentlyLinkedField, dispatch, fieldSelection, mediaFileId, subtitles.id]
   )
 
   const close = useCallback(() => dispatch(actions.closeDialog()), [dispatch])
@@ -126,19 +151,26 @@ const LinkSubtitlesDialog = ({
   const prompt =
     subtitles.type === 'ExternalSubtitlesFile' ? (
       <>
+        {triggeredOnOpenFile && (
+          <p>An external subtitles file was detected for this media file!</p>
+        )}
         <p>
           Would you like to link this subtitles track to a specific flashcard
-          field to help you create flashcards? You can always change this later.
+          field to help you create flashcards? (You can change this later in the
+          subtitles menu.)
         </p>
         <h3>{subtitles.name}</h3>
         {chunksDisplay}
       </>
     ) : (
       <>
-        <p>An embedded subtitles track was detected in this media file!</p>
+        {triggeredOnOpenFile && (
+          <p>An embedded subtitles track was detected in this media file!</p>
+        )}
         <p>
           Would you like to link this subtitles track to a specific flashcard
-          field to help you create flashcards? You can always change this later.
+          field to help you create flashcards? (You can change this later in the
+          subtitles menu.)
         </p>
         {chunksDisplay}
       </>
@@ -153,22 +185,29 @@ const LinkSubtitlesDialog = ({
             <InputLabel htmlFor="field">Field</InputLabel>
             <Select value={fieldSelection} onChange={onChangeField}>
               {fieldNames.map((fieldName) => {
+                const currentlyLinkedToThisField =
+                  currentlyLinkedField === fieldName
+
                 const label =
                   fieldNamesToTrackLabels[
                     fieldName as TransliterationFlashcardFieldName
                   ]
                 return (
                   <MenuItem value={fieldName} key={fieldName}>
-                    {capitalize(fieldName)} {label && `(Replace ${label})`}
+                    {capitalize(fieldName)}{' '}
+                    {!currentlyLinkedToThisField &&
+                      label &&
+                      `(Replace ${label})`}
                   </MenuItem>
                 )
               })}
+              {!triggeredOnOpenFile && <MenuItem value="">None</MenuItem>}
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={close} id={$.skipButton}>
-            Skip
+            {triggeredOnOpenFile ? <>Skip</> : <>Cancel</>}
           </Button>
           <Button variant="contained" color="primary" type="submit">
             Link subtitles to chosen flashcard field

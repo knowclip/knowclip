@@ -12,20 +12,25 @@ import {
   concat,
   tap,
 } from 'rxjs/operators'
-import { of, Observable } from 'rxjs'
+import { of, Observable, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { from } from 'rxjs'
 import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
-import { SubtitlesFileWithTrack } from '../selectors'
+import {
+  getFlashcardTextFromCardBase,
+  SubtitlesFileWithTrack,
+} from '../selectors'
 import { afterUpdates } from '../utils/afterUpdates'
-import { msToSeconds } from '../utils/waveform'
+import { ClipwaveCallbackEvent, msToSeconds } from 'clipwave'
+import { TransliterationFlashcardFields } from '../types/Project'
+import { CLIPWAVE_ID } from '../utils/clipwave'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
   state$,
-  { pauseMedia, setCurrentTime }
+  { pauseMedia, setCurrentTime, getMediaPlayer }
 ) =>
   action$.pipe(
     ofType<Action, MakeClipsFromSubtitles>(A.makeClipsFromSubtitles),
@@ -115,22 +120,70 @@ const makeClipsFromSubtitles: AppEpic = (
         ]).pipe(
           concat(
             afterUpdates(async () => {
-              const clips: Clip[] = []
-              const cards: Flashcard[] = []
+              const linkedFieldNames = Object.keys(
+                r.getSubtitlesFlashcardFieldLinks(state$.value)
+              ) as TransliterationFlashcardFieldName[]
+              const currentNoteType = r.getCurrentNoteType(state$.value)
+              if (!currentNoteType) throw new Error('Note type not found')
 
-              getClipsAndCardsFromSubtitles(
-                tracksValidation.cueTrackFieldName,
-                fieldNamesToTrackIds,
-                state$.value,
-                fileId
-              ).forEach(({ clip, flashcard }) => {
-                clips.push(clip)
-                cards.push(flashcard)
-              })
-              return from([
-                r.addClips(clips, cards, fileId),
-                r.highlightRightClipRequest(),
-              ])
+              const cardsBases = r.getSubtitlesCardBases(state$.value)
+              const { clips, cards } = cardsBases.cards.reduce(
+                (acc, cardBase) => {
+                  const newFields = linkedFieldNames.reduce(
+                    (fields, fieldName) => {
+                      const trackId = fieldNamesToTrackIds[fieldName] || null
+                      const fieldText = getFlashcardTextFromCardBase(
+                        cardBase,
+                        trackId
+                          ? r.getSubtitlesTrack(state$.value, trackId)
+                          : null
+                      )
+                      fields[fieldName] = fieldText
+                        .filter((t) => t.trim())
+                        .join(' ')
+                      return fields
+                    },
+                    (currentNoteType === 'Simple'
+                      ? {
+                          transcription: '',
+                          meaning: '',
+                          notes: '',
+                        }
+                      : {
+                          transcription: '',
+                          meaning: '',
+                          notes: '',
+                          pronunciation: '',
+                        }) as TransliterationFlashcardFields
+                  )
+                  const { clip, flashcard } = r.getNewClipAndCard(
+                    state$.value,
+                    {
+                      start: cardBase.start,
+                      end: cardBase.end,
+                    },
+                    fileId,
+                    uuid(),
+                    newFields
+                  )
+                  acc.cards.push(flashcard)
+                  acc.clips.push(clip)
+                  return acc
+                },
+                { clips: [] as Clip[], cards: [] as Flashcard[] }
+              )
+
+              return from([r.addClips(clips, cards, fileId)])
+            }),
+            afterUpdates(async () => {
+              window.dispatchEvent(
+                new ClipwaveCallbackEvent(CLIPWAVE_ID, ({ actions }) => {
+                  const mediaPlayer = getMediaPlayer()
+                  actions.selectNextItemAndSeek(mediaPlayer)
+                })
+              )
+
+              return EMPTY
             })
           )
         )
@@ -235,71 +288,6 @@ function validateTracks(
     status: 'SUCCESS',
     cueTrackFieldName,
   }
-}
-
-function getClipsAndCardsFromSubtitles(
-  cueTrackFieldName: TransliterationFlashcardFieldName,
-  fieldNamesToTrackIds: SubtitlesFlashcardFieldsLinks,
-  state: AppState,
-  fileId: string
-) {
-  const trackId = fieldNamesToTrackIds[cueTrackFieldName]
-  const cueTrack = trackId && r.getSubtitlesTrack(state, trackId)
-  if (!cueTrack)
-    throw new Error('Could not load subtitles file for generating clips')
-
-  const currentNoteType = r.getCurrentNoteType(state)
-  if (!currentNoteType) throw new Error('Could not find note type.') // should be impossible
-
-  // careful, pretty sure this mutates
-  const sortedChunks = cueTrack.chunks.sort(
-    ({ start: a }, { start: b }) => a - b
-  )
-  return sortedChunks.map((chunk, chunkIndex) => {
-    const fields =
-      currentNoteType === 'Simple'
-        ? {
-            transcription: chunk.text,
-            meaning: '',
-            notes: '',
-          }
-        : {
-            transcription: chunk.text,
-            meaning: '',
-            notes: '',
-            pronunciation: '',
-          }
-    ;(Object.keys(fields) as Array<keyof typeof fields>).forEach(
-      (fieldName) => {
-        const trackId = fieldNamesToTrackIds[fieldName]
-        fields[fieldName] = trackId
-          ? r
-              .getSubtitlesChunksWithinRange(
-                state,
-                trackId,
-                chunk.start,
-                chunk.end
-              )
-              .map((chunk) => chunk.text)
-              .join(' ')
-          : ''
-      }
-    )
-    return r.getNewClipAndCard(
-      state,
-      {
-        start: chunk.start,
-        end:
-          sortedChunks[chunkIndex + 1] &&
-          chunk.end === sortedChunks[chunkIndex + 1].start
-            ? chunk.end - 1
-            : chunk.end,
-      },
-      fileId,
-      uuid(),
-      fields
-    )
-  })
 }
 
 export default combineEpics(

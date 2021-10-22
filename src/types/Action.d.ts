@@ -74,12 +74,6 @@ declare type NewCardFromSubtitlesRequest = import('../actions').ActionOf<
 declare type SelectWaveformItem = import('../actions').ActionOf<
   'selectWaveformItem'
 >
-declare type HighlightLeftClipRequest = import('../actions').ActionOf<
-  'highlightLeftClipRequest'
->
-declare type HighlightRightClipRequest = import('../actions').ActionOf<
-  'highlightRightClipRequest'
->
 declare type SetCursorPosition = import('../actions').ActionOf<
   'setCursorPosition'
 >

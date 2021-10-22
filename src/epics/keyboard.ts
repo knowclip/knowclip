@@ -13,7 +13,7 @@ const playPauseForceKey = os.platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
     mergeMap((event) => {
-      const { ctrlKey, altKey, key } = event
+      const { ctrlKey, key } = event
 
       if (
         key.toLowerCase() === KEYS.lLowercase &&
@@ -46,14 +46,6 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         )
           effects.toggleMediaPaused()
         return EMPTY
-      }
-
-      if (key === KEYS.arrowRight && (altKey || !isTextFieldFocused())) {
-        return of(r.highlightRightClipRequest())
-      }
-
-      if (key === KEYS.arrowLeft && (altKey || !isTextFieldFocused())) {
-        return of(r.highlightLeftClipRequest())
       }
 
       if (key === KEYS.escape) {

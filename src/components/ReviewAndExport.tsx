@@ -83,7 +83,7 @@ const Export = React.memo(
       [dispatch, selectedIds]
     )
 
-    const onSelect = useCallback(
+    const onSelectRow = useCallback(
       (mediaFileId: string, id: string) =>
         setSelectedIds((mediaToClips) => {
           const selectedIds = mediaToClips[mediaFileId]
@@ -97,6 +97,12 @@ const Export = React.memo(
           }
         }),
       [clipIdsByMediaFileId]
+    )
+    const onDoubleClickRow = useCallback(
+      (mediaFileId: string, id: string) => {
+        dispatch(r.selectWaveformItem({ type: 'Clip', id }))
+      },
+      [dispatch]
     )
     const onSelectAll = useCallback(
       (mediaFileId: string) => {
@@ -162,7 +168,8 @@ const Export = React.memo(
                     onClick={onClickTable}
                     media={metadata}
                     selectedIds={selectedIds[metadata.id]}
-                    onSelect={onSelect}
+                    onSelectRow={onSelectRow}
+                    onDoubleClickRow={onDoubleClickRow}
                     onSelectAll={onSelectAll}
                   />
                 ))}

@@ -32,7 +32,8 @@ type MediaTableProps = {
   media: MediaFile
   open: boolean
   selectedIds: Array<string | undefined>
-  onSelect: (mediaFileId: string, id: string) => void
+  onSelectRow: (mediaFileId: string, id: string) => void
+  onDoubleClickRow: (mediaFileId: string, id: string) => void
   onSelectAll: (mediaFileId: string) => void
   onClick: (index: number) => void
   mediaIndex: number
@@ -49,7 +50,8 @@ const ReviewAndExportMediaTable = memo(
     media,
     open,
     selectedIds,
-    onSelect,
+    onSelectRow,
+    onDoubleClickRow,
     onSelectAll,
     onClick,
     mediaIndex,
@@ -78,10 +80,14 @@ const ReviewAndExportMediaTable = memo(
       media.id,
     ])
 
-    const handleSelect = useCallback((id: string) => onSelect(media.id, id), [
-      media.id,
-      onSelect,
-    ])
+    const handleSelectRow = useCallback(
+      (id: string) => onSelectRow(media.id, id),
+      [media.id, onSelectRow]
+    )
+    const handleDoubleClickRow = useCallback(
+      (id: string) => onDoubleClickRow(media.id, id),
+      [media.id, onDoubleClickRow]
+    )
 
     const rowRenderer: ListRowRenderer = useCallback(
       ({ index, key, parent, style }) => {
@@ -99,7 +105,8 @@ const ReviewAndExportMediaTable = memo(
               <FlashcardRow
                 key={key}
                 id={id}
-                onSelect={handleSelect}
+                onSelect={handleSelectRow}
+                highlightClip={handleDoubleClickRow}
                 isSelected={selectedIds.includes(id)}
                 isHighlighted={highlightedClipId === id}
                 style={style}
@@ -110,7 +117,13 @@ const ReviewAndExportMediaTable = memo(
           </CellMeasurer>
         )
       },
-      [clipsIds, handleSelect, highlightedClipId, selectedIds]
+      [
+        clipsIds,
+        handleDoubleClickRow,
+        handleSelectRow,
+        highlightedClipId,
+        selectedIds,
+      ]
     )
 
     return (

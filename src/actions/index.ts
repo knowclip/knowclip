@@ -1,5 +1,4 @@
 import A from '../types/ActionType'
-import { WaveformSelectionExpanded } from '../selectors/cardPreview'
 
 import { clipsActions, compositeClipsActions } from './clips'
 import { waveformActions } from './waveform'
@@ -143,7 +142,7 @@ const appActions = {
   }),
 
   newCardFromSubtitlesRequest: (
-    linkedSubtitlesChunkSelection: WaveformSelectionExpanded & {
+    linkedSubtitlesChunkSelection: WaveformSelection & {
       type: 'Preview'
     },
     clozeDeletion?: ClozeDeletion,

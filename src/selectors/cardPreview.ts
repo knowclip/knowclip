@@ -5,8 +5,12 @@ import {
 } from './subtitles'
 import { getCurrentMediaFile } from './currentMedia'
 
+type SubtitlesCardBaseId = string
+
 export type SubtitlesCardBase = {
   fields: Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>
+  clipwaveType: 'Secondary'
+  id: SubtitlesCardBaseId
   index: number
   start: number
   end: number
@@ -19,15 +23,6 @@ export const CUES_BASE_PRIORITY: TransliterationFlashcardFieldName[] = [
   'meaning',
   'notes',
 ]
-
-export type WaveformSelectionExpanded =
-  | { type: 'Clip'; index: number; item: Clip; id: string }
-  | {
-      type: 'Preview'
-      index: number
-      item: SubtitlesCardBase
-      cardBaseIndex: number
-    }
 
 const getSubtitlesCardBaseFieldPriority = createSelector(
   getSubtitlesFlashcardFieldLinks,
@@ -43,6 +38,7 @@ const getSubtitlesCardBaseFieldPriority = createSelector(
 export type SubtitlesCardBases = {
   totalTracksCount: number
   cards: SubtitlesCardBase[]
+  cardsMap: Record<string, SubtitlesCardBase>
   fieldNames: TransliterationFlashcardFieldName[]
   linkedTrackIds: SubtitlesTrackId[]
   excludedTracks: SubtitlesTrack[]
@@ -70,6 +66,7 @@ export const getSubtitlesCardBases = createSelector(
       return {
         totalTracksCount,
         cards: [],
+        cardsMap: {},
         fieldNames: fieldsCuePriority,
         linkedTrackIds: [],
         excludedTracks: Object.values(subtitles),
@@ -81,10 +78,15 @@ export const getSubtitlesCardBases = createSelector(
     )
 
     const lastIndexes = fieldsCuePriority.map(() => 0)
+    const cardsMap: Record<string, SubtitlesCardBase> = {}
     const cards: SubtitlesCardBase[] = cueTrack.chunks.map(
       (cueChunk, index) => {
-        return {
+        const id = `${index}-----${Object.keys(fieldsCuePriority).join('___')}`
+
+        const cardBase: SubtitlesCardBase = {
           index,
+          id,
+          clipwaveType: 'Secondary',
           start: cueChunk.start,
           end: cueChunk.end,
           fields: fieldsCuePriority.reduce((dict, fn, fieldPriority) => {
@@ -96,7 +98,6 @@ export const getSubtitlesCardBases = createSelector(
 
             for (let i = lastIndexes[fieldPriority]; i < chunks.length; i++) {
               const chunk = chunks[i]
-              lastIndexes[fieldPriority] = i
 
               if (!chunk) {
                 console.log({ track, i })
@@ -107,6 +108,9 @@ export const getSubtitlesCardBases = createSelector(
               if (chunk.start >= cueChunk.end) {
                 break
               }
+
+              lastIndexes[fieldPriority] = i
+
               if (overlapsSignificantly(cueChunk, chunk.start, chunk.end)) {
                 overlappedIndexes.push(i)
               }
@@ -116,12 +120,15 @@ export const getSubtitlesCardBases = createSelector(
             return dict
           }, {} as Dict<SubtitlesTrackId, SubtitlesChunkIndex[]>),
         }
+        cardsMap[id] = cardBase
+        return cardBase
       }
     )
 
     return {
       totalTracksCount,
       cards,
+      cardsMap,
       fieldNames: fieldsCuePriority,
       linkedTrackIds: fieldsCuePriority
         .map((f) => fieldsToTracks[f])

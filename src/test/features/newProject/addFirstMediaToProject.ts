@@ -1,6 +1,6 @@
 import { TestSetup, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
-import { waveform$ } from '../../../components/Waveform'
+import { waveform$ } from '../../../components/waveformTestLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
@@ -26,5 +26,5 @@ export default async function addFirstMediaToProject(
 
   await client.clickElement_(linkSubtitlesDialog$.skipButton)
 
-  await client.waitUntilPresent_(waveform$.subtitlesTimelinesContainer)
+  await client.waitUntilGone_(waveform$.subtitlesChunk)
 }

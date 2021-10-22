@@ -12,26 +12,15 @@ import { theme } from './theme'
 const ErrorMessage = ({ reactError }: { reactError: any }) => {
   console.log('crash:', { reactError })
   console.error(reactError)
+
   return (
     <MuiThemeProvider theme={theme}>
       <Dialog open={true}>
         <DialogContent>
           <DialogContentText>
             An error has occurred. Please restart the app to continue.
-            <details>
-              <summary>Details</summary>
-              <pre>
-                {reactError?.message
-                  ? JSON.stringify(
-                      {
-                        message: reactError.message,
-                      },
-                      null,
-                      2
-                    )
-                  : String(reactError)}
-              </pre>
-            </details>
+            <h3>Details</h3>
+            <pre>{displayError(reactError)}</pre>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -50,3 +39,15 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
 }
 
 export default ErrorMessage
+
+function displayError(error: any) {
+  if (error instanceof Error || error?.message)
+    return ['error: ' + error.name, error.message, error.stack].join('\n')
+
+  const stringified = JSON.stringify(error, null, 2)
+  if (stringified === '{}') {
+    return [String(error), error?.constructor?.name].join(' - ')
+  }
+
+  return stringified
+}

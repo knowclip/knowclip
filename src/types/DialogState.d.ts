@@ -68,6 +68,7 @@ declare type LinkSubtitlesDialogData = {
   subtitles: ExternalSubtitlesFile | VttFromEmbeddedSubtitles
   subtitlesChunks: SubtitlesChunk[]
   mediaFileId: MediaFileId
+  triggeredOnOpenFile: boolean
 }
 
 declare type DictionariesDialogData = {

@@ -1,9 +1,34 @@
 import { DeepPartial } from 'redux'
 import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 import A from '../types/ActionType'
+import { PrimaryClip, WaveformDrag, WaveformRegion } from 'clipwave'
+import { SubtitlesCardBase } from '../selectors'
 
 export const clipsActions = {
-  addClip: (
+  [A.addClipRequest]: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
+    type: A.addClipRequest,
+    waveformDrag,
+    clipId,
+  }),
+
+  stretchClip: (
+    stretchedClip: { id: Clip['id']; start: number; end: number },
+    overlappedClips: PrimaryClip[],
+    unstretchedClip: { id: Clip['id']; start: number; end: number },
+    frontOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
+    backOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
+    newRegions: WaveformRegion[]
+  ) => ({
+    type: A.stretchClip,
+    stretchedClip,
+    overlappedClips,
+    unstretchedClip,
+    frontOverlappedSubtitlesCardBases,
+    backOverlappedSubtitlesCardBases,
+    newRegions,
+  }),
+
+  [A.addClip]: (
     clip: Clip,
     flashcard: Flashcard,
     startEditing: boolean = false
@@ -14,7 +39,7 @@ export const clipsActions = {
     startEditing,
   }),
 
-  addClips: (
+  [A.addClips]: (
     clips: Array<Clip>,
     flashcards: Array<Flashcard>,
     fileId: MediaFileId
@@ -29,14 +54,6 @@ export const clipsActions = {
   selectWaveformItem: (selection: WaveformSelection | null) => ({
     type: A.selectWaveformItem,
     selection,
-  }),
-
-  highlightLeftClipRequest: () => ({
-    type: A.highlightLeftClipRequest,
-  }),
-
-  highlightRightClipRequest: () => ({
-    type: A.highlightRightClipRequest,
   }),
 
   editClip: (
@@ -67,11 +84,17 @@ export const clipsActions = {
     newSelection,
   }),
 
-  moveClip: (id: ClipId, deltaX: number, overlapIds: Array<ClipId>) => ({
+  moveClip: (
+    id: ClipId,
+    deltaX: number,
+    overlapIds: Array<ClipId>,
+    newRegions: WaveformRegion[]
+  ) => ({
     type: A.moveClip,
     id,
     deltaX,
     overlapIds,
+    newRegions,
   }),
 
   setFlashcardField: (

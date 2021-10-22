@@ -14,7 +14,7 @@ import { SubtitlesCardBase, SubtitlesCardBases } from '../selectors'
 
 const FlashcardSectionPreview = ({
   cardBases,
-  cardPreviewSelection,
+  cardBase,
   mediaFile,
   fieldsToTracks,
   viewMode,
@@ -22,20 +22,13 @@ const FlashcardSectionPreview = ({
 }: {
   clipsIds: string[]
   cardBases: SubtitlesCardBases
-  cardPreviewSelection: {
-    type: 'Preview'
-    index: number
-    item: SubtitlesCardBase
-    cardBaseIndex: number
-  }
+  cardBase: SubtitlesCardBase
   mediaFile: MediaFile
   fieldsToTracks: SubtitlesFlashcardFieldsLinks
   viewMode: ViewMode
   className: string
 }) => {
-  const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(
-    cardPreviewSelection.item
-  )
+  const tracksToFieldsText = cardBases.getFieldsPreviewFromCardsBase(cardBase)
   const fields = {} as TransliterationFlashcardFields
   for (const fieldName of cardBases.fieldNames) {
     const trackId = fieldsToTracks[fieldName]
@@ -51,9 +44,17 @@ const FlashcardSectionPreview = ({
   const clozeControls = useClozeControls({
     onNewClozeCard: useCallback(
       (deletion) => {
-        dispatch(r.newCardFromSubtitlesRequest(cardPreviewSelection, deletion))
+        dispatch(
+          r.newCardFromSubtitlesRequest(
+            {
+              type: 'Preview',
+              id: cardBase.id,
+            },
+            deletion
+          )
+        )
       },
-      [cardPreviewSelection, dispatch]
+      [cardBase, dispatch]
     ),
   })
 

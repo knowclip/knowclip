@@ -1,6 +1,5 @@
 import { TestSetup } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
-import { waveform$ } from '../../../components/Waveform'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 
 export default async function openSavedProject({ client }: TestSetup) {
@@ -16,7 +15,6 @@ export default async function openSavedProject({ client }: TestSetup) {
     mediaFilesMenu$.openMediaFilesMenuButton,
     'polar_bear_cafe.mp4'
   )
-  await client.elements_(waveform$.subtitlesTimelines, 2)
 
   await client.clickElement_(mediaFilesMenu$.openMediaFilesMenuButton)
 
