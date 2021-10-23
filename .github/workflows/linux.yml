@@ -1,6 +1,9 @@
 name: Linux Node CI
 
-on: [push]
+on:
+  push:
+      paths-ignore:
+      - 'homepage/**'
 
 jobs:
   linux_build_and_test:
