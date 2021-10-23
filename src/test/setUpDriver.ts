@@ -129,11 +129,12 @@ export async function testBlock<T>(
   } catch (err) {
     process.stdout.write(' ❗️ \n')
 
-    const errName = String(err.name || err.constructor)
-    process.stdout.write(
-      errName + ' ' + String(err.message) + '\nFailure at: ' + name
+    process.stdout.write(String(err) + '\nFailure at: ' + name)
+    throw new TestBlockError(
+      name,
+      err instanceof Error ? err.message : String(err),
+      err instanceof Error ? err.stack : 'non-error thrown'
     )
-    throw new TestBlockError(name, err.message, err.stack)
   } finally {
     process.stdout.write('\n')
   }

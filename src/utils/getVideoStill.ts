@@ -44,7 +44,7 @@ export const getVideoStill = async (
 
     return { value: outputFilePath }
   } catch (error) {
-    return { errors: [error] }
+    return { errors: [String(error)] }
   }
 }
 

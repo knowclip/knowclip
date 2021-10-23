@@ -15,8 +15,6 @@ export async function setVideoTime(client: ClientWrapper, seconds: number) {
       MEDIA_PLAYER_ID
     )
   } catch (err) {
-    throw new Error(
-      `Could not set video time to ${seconds} seconds: ${err.message}`
-    )
+    throw new Error(`Could not set video time to ${seconds} seconds: ${err}`)
   }
 }

@@ -217,7 +217,9 @@ export const validateBeforeOpenFileAction = async <S extends SubtitlesFile>(
       ),
     ]
 
-  return [r.openFileFailure(existingFile, sourceFilePath, validation.error)]
+  return [
+    r.openFileFailure(existingFile, sourceFilePath, String(validation.error)),
+  ]
 }
 
 export const validateSubtitlesFromFilePath = async (

@@ -148,7 +148,7 @@ export default {
         }
       }
     } catch (err) {
-      return [r.openFileFailure(file, null, err.message)]
+      return [r.openFileFailure(file, null, err ? String(err) : null)]
     }
   },
 

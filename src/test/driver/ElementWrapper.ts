@@ -81,8 +81,8 @@ export const wrapElement = (
       } catch (err) {
         throw new Error(
           typeof found === 'string'
-            ? `Selector "${selector}" received not "${text}", but "${found}", and then there was a problem: ${err.message}`
-            : `Could not get text from "${selector}: ` + err.message
+            ? `Selector "${selector}" received not "${text}", but "${found}", and then there was a problem: ${err}`
+            : `Could not get text from "${selector}: ${err}`
         )
       }
     },

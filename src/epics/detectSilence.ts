@@ -50,7 +50,7 @@ const detectSilence = (
 
 const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ActionOf<'detectSilence'>>(A.detectSilence),
+    ofType(A.detectSilence),
     mergeMap<ActionOf<typeof A.detectSilence>, Promise<Action[]>>(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMedia = r.getCurrentMediaFile(state$.value)
@@ -121,7 +121,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
 
 const detectSilenceRequestEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ActionOf<'detectSilenceRequest'>>(A.detectSilenceRequest),
+    ofType(A.detectSilenceRequest),
     map(() =>
       r.doesCurrentFileHaveClips(state$.value)
         ? r.confirmationDialog(

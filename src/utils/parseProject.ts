@@ -54,7 +54,7 @@ export const parseProjectJson = async <F extends FlashcardFields>(
       },
     }
   } catch (err) {
-    return { errors: [err.message] }
+    return { errors: [String(err)] }
   }
 }
 

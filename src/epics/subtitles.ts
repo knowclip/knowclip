@@ -33,7 +33,7 @@ const makeClipsFromSubtitles: AppEpic = (
   { pauseMedia, setCurrentTime, getMediaPlayer }
 ) =>
   action$.pipe(
-    ofType<Action, MakeClipsFromSubtitles>(A.makeClipsFromSubtitles),
+    ofType(A.makeClipsFromSubtitles),
     mergeMap<MakeClipsFromSubtitles, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags, includeStill }) => {
         const tracksValidation = validateTracks(
@@ -67,7 +67,7 @@ const makeClipsFromSubtitles: AppEpic = (
             tracksValidation.fieldNamesToFiles
           ) as [TransliterationFlashcardFieldName, SubtitlesFile][]
           const openMissingSubtitlesFailure = action$.pipe(
-            ofType<Action, OpenFileFailure>('openFileFailure'),
+            ofType(A.openFileFailure),
             filter(({ file }) =>
               missingTracks.some(([, t]) => t.id === file.id)
             ),
@@ -78,7 +78,7 @@ const makeClipsFromSubtitles: AppEpic = (
               of(r.openFileRequest(file)).pipe(
                 concat(
                   action$.pipe(
-                    ofType<Action, OpenFileSuccess>('openFileSuccess'),
+                    ofType(A.openFileSuccess),
                     filter((a) => areSameFile(file, a.validatedFile)),
                     take(1),
                     ignoreElements()
@@ -193,9 +193,7 @@ const makeClipsFromSubtitles: AppEpic = (
 
 const showSubtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, ShowSubtitlesClipsDialogRequest>(
-      A.showSubtitlesClipsDialogRequest
-    ),
+    ofType(A.showSubtitlesClipsDialogRequest),
     map(() => {
       const tracks = r.getSubtitlesTracks(state$.value)
       if (!tracks.length)
@@ -218,7 +216,7 @@ const showSubtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
 
 const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
   action$.pipe(
-    ofType<Action, GoToSubtitlesChunk>(A.goToSubtitlesChunk),
+    ofType(A.goToSubtitlesChunk),
     tap(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
       if (!track) {

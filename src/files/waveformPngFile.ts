@@ -40,11 +40,7 @@ export default {
       return [r.locateFileSuccess(file, pngPath.value)]
     } catch (err) {
       return [
-        r.openFileFailure(
-          file,
-          null,
-          'Problem making waveform image: ' + (err.message || err.toString())
-        ),
+        r.openFileFailure(file, null, `Problem making waveform image: ${err}`),
       ]
     }
   },

@@ -9,9 +9,7 @@ import { msToSeconds } from 'clipwave'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, LinkFlashcardFieldToSubtitlesTrackRequest>(
-      A.linkFlashcardFieldToSubtitlesTrackRequest
-    ),
+    ofType(A.linkFlashcardFieldToSubtitlesTrackRequest),
     map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
       ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
         const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)

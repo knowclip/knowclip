@@ -9,7 +9,7 @@ import { TransliterationFlashcardFields } from '../types/Project'
 
 const addClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
   return action$.pipe(
-    ofType<Action, ActionOf<typeof A.addClip>>(A.addClip),
+    ofType(A.addClip),
     tap(({ clip }) => {
       dispatchClipwaveEvent(({ actions: { addItem } }) => {
         addItem({
@@ -58,7 +58,7 @@ const stretchClipEpic: AppEpic = (
   { dispatchClipwaveEvent }
 ) => {
   return action$.pipe(
-    ofType<Action, ActionOf<typeof A.stretchClip>>(A.stretchClip),
+    ofType(A.stretchClip),
     mergeMap(
       ({
         stretchedClip,

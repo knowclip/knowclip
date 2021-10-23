@@ -101,8 +101,7 @@ export default {
         r.openFileFailure(
           file,
           null,
-          'Problem making still image from media: ' +
-            (err.message || err.toString())
+          `Problem making still image from media: ${err}`
         ),
       ]
     }

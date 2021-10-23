@@ -90,7 +90,7 @@ const openProject: AppEpic = (
 
 const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<any>(REHYDRATE),
+    ofType(REHYDRATE as Action['type']),
     take(1),
     mergeMap(async () => {
       const { window, showMessageBox, openExternal } = effects

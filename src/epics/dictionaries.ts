@@ -47,7 +47,7 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
 
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, ImportDictionaryRequest>(A.importDictionaryRequest),
+    ofType(A.importDictionaryRequest),
     mergeMap(
       async (action): Promise<Action> => {
         try {
@@ -82,7 +82,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
 
 const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, StartDictionaryImport>(A.startDictionaryImport),
+    ofType(A.startDictionaryImport),
     mergeMap(({ file, filePath }) => {
       return concat(
         from([
@@ -141,7 +141,7 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
 
 const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, DeleteImportedDictionary>(A.deleteImportedDictionary),
+    ofType(A.deleteImportedDictionary),
     mergeMap((action) => {
       return concat(
         of(
@@ -184,7 +184,7 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
 
 const deleteDatabaseEpic: AppEpic = (action$, state$, _effects) =>
   action$.pipe(
-    ofType(Action, A.resetDictionariesDatabase),
+    ofType(A.resetDictionariesDatabase),
     mergeMap(() => {
       return from(resetDictionariesDatabase()).pipe(
         mergeMap(() => {

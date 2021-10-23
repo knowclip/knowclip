@@ -14,7 +14,7 @@ import { getClip, getCurrentMediaFile, getFile } from '../selectors'
 
 const remakeStill: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, EditClip>(A.editClip),
+    ofType(A.editClip),
     mergeMap(({ flashcardOverride, id }) => {
       const clip = getClip(state$.value, id) as Clip
       const mediaFile = getCurrentMediaFile(state$.value)
@@ -52,7 +52,7 @@ const remakeStill: AppEpic = (action$, state$) =>
 
 const setDefaultClipSpecs: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, EditClip>(A.editClip),
+    ofType(A.editClip),
     mergeMap(({ flashcardOverride }) => {
       if (!flashcardOverride) return EMPTY
 

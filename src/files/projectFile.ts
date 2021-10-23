@@ -51,11 +51,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     } catch (err) {
       console.error(err)
       return [
-        r.openFileFailure(
-          file,
-          filePath,
-          `Error opening project file: ${err.message}`
-        ),
+        r.openFileFailure(file, filePath, `Error opening project file: ${err}`),
       ]
     }
   },

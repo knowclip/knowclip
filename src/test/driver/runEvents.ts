@@ -37,7 +37,7 @@ export async function dragMouse(
     const [x1, y1] = start
     const [x2, y2] = end
     throw new Error(
-      `Could not drag mouse from [${x1}, ${y1}] to [${x2}, ${y2}]: ${err.message}`
+      `Could not drag mouse from [${x1}, ${y1}] to [${x2}, ${y2}]: ${err}`
     )
   }
 }
@@ -62,7 +62,7 @@ export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
       },
     ])
   } catch (err) {
-    throw new Error(`Could not click mouse at [${x}, ${y}]: ${err.message}`)
+    throw new Error(`Could not click mouse at [${x}, ${y}]: ${err}`)
   }
 }
 

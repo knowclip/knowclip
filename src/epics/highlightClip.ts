@@ -5,7 +5,7 @@ import r from '../redux'
 
 const deselectOnOpenMediaFile: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, OpenFileRequest>(A.openFileRequest),
+    ofType(A.openFileRequest),
     filter(({ file }) => file.type === 'MediaFile'),
     map(() => r.selectWaveformItem(null))
   )
