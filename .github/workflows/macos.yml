@@ -1,6 +1,9 @@
 name: MacOS Node CI
 
-on: [push]
+on:
+  push:
+      paths-ignore:
+      - 'homepage/**'
 
 jobs:
   mac_build:
