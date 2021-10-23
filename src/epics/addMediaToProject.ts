@@ -8,11 +8,9 @@ import { ActionOf } from '../actions'
 
 const addMediaToProject: AppEpic = (action$, _state$) =>
   action$.pipe(
-    ofType<Action, ActionOf<'addMediaToProjectRequest'>>(
-      A.addMediaToProjectRequest
-    ),
-    mergeMap<ActionOf<'addMediaToProjectRequest'>, Promise<Array<Action>>>(
-      ({ projectId, filePaths }) =>
+    ofType(A.addMediaToProjectRequest),
+    mergeMap(
+      ({ projectId, filePaths }: ActionOf<typeof A.addMediaToProjectRequest>) =>
         Promise.all(
           filePaths.map(async (filePath) => {
             const file = await readMediaFile(filePath, uuid(), projectId)

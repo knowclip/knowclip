@@ -1,4 +1,4 @@
-import { combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 import { mergeMap, map } from 'rxjs/operators'
 import { of, from, EMPTY } from 'rxjs'
 import r from '../redux'
@@ -8,60 +8,59 @@ import { getUpdateWith } from '../files/updates'
 import { msToSeconds } from 'clipwave'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
-  action$
-    .ofType<LinkFlashcardFieldToSubtitlesTrackRequest>(
+  action$.pipe(
+    ofType<Action, LinkFlashcardFieldToSubtitlesTrackRequest>(
       A.linkFlashcardFieldToSubtitlesTrackRequest
-    )
-    .pipe(
-      map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
-        ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
-          const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
-          const previouslyLinkedField = (Object.keys(
-            previousLinks
-          ) as FlashcardFieldName[]).find((fn) => {
-            const fieldName = fn as TransliterationFlashcardFieldName
-            return previousLinks[fieldName] === subtitlesTrackId
-          })
-          const cards = r.getFlashcards(state$.value, mediaFileId)
-          if (!cards.length)
-            return r.linkFlashcardFieldToSubtitlesTrack(
-              flashcardFieldName,
-              mediaFileId,
-              subtitlesTrackId
-            )
+    ),
+    map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
+      ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
+        const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
+        const previouslyLinkedField = (Object.keys(
+          previousLinks
+        ) as FlashcardFieldName[]).find((fn) => {
+          const fieldName = fn as TransliterationFlashcardFieldName
+          return previousLinks[fieldName] === subtitlesTrackId
+        })
+        const cards = r.getFlashcards(state$.value, mediaFileId)
+        if (!cards.length)
+          return r.linkFlashcardFieldToSubtitlesTrack(
+            flashcardFieldName,
+            mediaFileId,
+            subtitlesTrackId
+          )
 
-          const actions: string[] = []
-          const unlinking = !subtitlesTrackId
-          if (previouslyLinkedField || unlinking) {
-            actions.push(
-              `clear the ${previouslyLinkedField || flashcardFieldName} field`
-            )
-          }
-          if (!unlinking) {
-            actions.push(`overwrite the ${flashcardFieldName} field`)
-          }
-
-          const message =
-            "It looks like you've already made some flashcards from this media file." +
-            '\n\n' +
-            `This action will ${actions.join(
-              ' and '
-            )} for all these existing cards.` +
-            '\n\n' +
-            'Is that OK?'
-
-          return r.confirmationDialog(
-            message,
-            r.linkFlashcardFieldToSubtitlesTrack(
-              flashcardFieldName,
-              mediaFileId,
-              subtitlesTrackId,
-              previouslyLinkedField
-            )
+        const actions: string[] = []
+        const unlinking = !subtitlesTrackId
+        if (previouslyLinkedField || unlinking) {
+          actions.push(
+            `clear the ${previouslyLinkedField || flashcardFieldName} field`
           )
         }
-      )
+        if (!unlinking) {
+          actions.push(`overwrite the ${flashcardFieldName} field`)
+        }
+
+        const message =
+          "It looks like you've already made some flashcards from this media file." +
+          '\n\n' +
+          `This action will ${actions.join(
+            ' and '
+          )} for all these existing cards.` +
+          '\n\n' +
+          'Is that OK?'
+
+        return r.confirmationDialog(
+          message,
+          r.linkFlashcardFieldToSubtitlesTrack(
+            flashcardFieldName,
+            mediaFileId,
+            subtitlesTrackId,
+            previouslyLinkedField
+          )
+        )
+      }
     )
+  )
 
 const linkFieldToTrack: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -108,7 +107,8 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
   )
 
 export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
-  action$.ofType<StartEditingCards>(A.startEditingCards).pipe(
+  action$.pipe(
+    ofType(A.startEditingCards),
     mergeMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
@@ -123,42 +123,41 @@ export const newClipFromChunk: AppEpic = (
   state$,
   { setCurrentTime, uuid }
 ) =>
-  action$
-    .ofType<NewCardFromSubtitlesRequest>(A.newCardFromSubtitlesRequest)
-    .pipe(
-      mergeMap((action) => {
-        const selection = action.linkedSubtitlesChunkSelection
+  action$.pipe(
+    ofType(A.newCardFromSubtitlesRequest),
+    mergeMap((action) => {
+      const selection = action.linkedSubtitlesChunkSelection
 
-        const mediaFileId = r.getCurrentFileId(state$.value)
-        if (!mediaFileId) return EMPTY
-        const cardBases = r.getSubtitlesCardBases(state$.value)
+      const mediaFileId = r.getCurrentFileId(state$.value)
+      if (!mediaFileId) return EMPTY
+      const cardBases = r.getSubtitlesCardBases(state$.value)
 
-        const cardBase = cardBases.cardsMap[selection.id]
-        if (!cardBase)
-          throw new Error(
-            `No subtitles card base found with id "${selection.id}""`
-          )
-        const fields = r.getNewFieldsFromLinkedSubtitles(state$.value, cardBase)
-        const { clip, flashcard } = r.getNewClipAndCard(
-          state$.value,
-          {
-            start: cardBase.start,
-            end: cardBase.end,
-          },
-          mediaFileId,
-          uuid(),
-          fields
+      const cardBase = cardBases.cardsMap[selection.id]
+      if (!cardBase)
+        throw new Error(
+          `No subtitles card base found with id "${selection.id}""`
         )
+      const fields = r.getNewFieldsFromLinkedSubtitles(state$.value, cardBase)
+      const { clip, flashcard } = r.getNewClipAndCard(
+        state$.value,
+        {
+          start: cardBase.start,
+          end: cardBase.end,
+        },
+        mediaFileId,
+        uuid(),
+        fields
+      )
 
-        if (action.clozeDeletion) {
-          flashcard.cloze = [action.clozeDeletion]
-        }
+      if (action.clozeDeletion) {
+        flashcard.cloze = [action.clozeDeletion]
+      }
 
-        setCurrentTime(msToSeconds(cardBase.start))
+      setCurrentTime(msToSeconds(cardBase.start))
 
-        return from([r.addClip(clip, flashcard, action.startEditing || false)])
-      })
-    )
+      return from([r.addClip(clip, flashcard, action.startEditing || false)])
+    })
+  )
 
 export default combineEpics(
   linkFieldToTrackRequest,

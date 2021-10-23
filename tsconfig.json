@@ -17,13 +17,13 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "downlevelIteration": true,
     "isolatedModules": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src",
+    "src"
   ],
   "exclude": [
     "homepage",

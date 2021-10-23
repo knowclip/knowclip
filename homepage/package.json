@@ -14,15 +14,18 @@
     "@pinjollist/next-with-analytics": "^1.0.0-rc.0",
     "@types/classnames": "^2.2.10",
     "classnames": "^2.2.6",
-    "next": "^11.1.2",
+    "next": "^11.1.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "sass": "^1.26.10"
   },
   "devDependencies": {
+    "@types/archiver": "^5.1.1",
     "@types/node": "^v14.17.29",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",
+    "@types/react-virtualized": "^9.21.14",
+    "@types/wanakana": "^4.0.3",
     "typescript": "^4.3.2"
   },
   "license": "MIT"

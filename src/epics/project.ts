@@ -15,7 +15,8 @@ import './setYamlOptions'
 import { getUpdateWith } from '../files/updates'
 
 const createProject: AppEpic = (action$, state$, { writeFile }) =>
-  action$.ofType<CreateProject>(A.createProject).pipe(
+  action$.pipe(
+    ofType<Action, CreateProject>(A.createProject),
     switchMap(({ project, filePath }) => {
       return from(
         writeFile(filePath, r.getProjectFileContents(state$.value, project))
