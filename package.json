@@ -70,7 +70,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build:homepage": "yarn --cwd homepage run build",
-    "postinstall": "############## electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "start:integration": "REACT_APP_CHROMEDRIVER=true yarn start",
     "start:integration-win": "set REACT_APP_CHROMEDRIVER=true&& yarn start",
     "build-main": "yarn tsc ./electron/main.ts --outDir ./build-main",
