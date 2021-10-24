@@ -53,18 +53,11 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
   })
 
   await testBlock('select first card via double-click', async () => {
-    await client.waitForText_(
-      mediaTableRows$.container,
-      '笹を食べながらのんびりするのは最高だなぁ'
-    )
+    const firstCardText = '笹を食べながらのんびりするのは最高だなぁ'
+    await client.waitForText_(mediaTableRows$.container, firstCardText)
     await client.doubleClickElement_(mediaTableRows$.container)
-    await client.waitUntil(async () => {
-      const row = await client.firstElement_(mediaTableRows$.container)
-      const classNames = await row.getAttribute('className')
-      return Boolean(
-        classNames && classNames.includes(mediaTableRows$.highlightedClipRow)
-      )
-    })
+
+    await client.waitForText_(mediaTableRows$.highlightedClipRow, firstCardText)
   })
 
   await testBlock(
