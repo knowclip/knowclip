@@ -21,7 +21,7 @@
     "@sentry/electron": "^2.5.4",
     "@silvestre/mkanki": "^3.1.0",
     "@types/archiver": "^5.1.0",
-    "@types/react-virtualized": "^9.21.10",
+    "@types/react-virtualized": "^9.21.14",
     "@types/wanakana": "^4.0.0",
     "ajv": "^6.11.0",
     "asar": "0.14.3",
