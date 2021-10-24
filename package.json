@@ -55,7 +55,7 @@
     "rxjs": "^7.0.0",
     "semver": "^7.1.2",
     "subsrt": "^1.0.0",
-    "subtitle": "^2.0.3",
+    "subtitle": "^4.1.1",
     "tempy": "^1.0.0",
     "ts-json-schema-generator": "^0.78",
     "uuid": "^3.3.2",
