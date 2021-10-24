@@ -2,7 +2,6 @@ import { switchMap } from 'rxjs/operators'
 import { of } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
-import { ActionOf } from '../actions'
 import { combineEpics, ofType } from 'redux-observable'
 
 const clipCreateEpic: AppEpic = (action$, state$) =>

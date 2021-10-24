@@ -2,7 +2,6 @@ import { ignoreElements, tap } from 'rxjs/operators'
 import { EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
-import { ActionOf } from '../actions'
 import { getFreshRegions } from './getFreshRegions'
 import { ofType } from 'redux-observable'
 

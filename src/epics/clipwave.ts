@@ -1,6 +1,6 @@
 import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import A from '../types/ActionType'
-import { ActionOf, actions } from '../actions'
+import { actions } from '../actions'
 import { combineEpics, ofType } from 'redux-observable'
 import { getRegionEnd, secondsToMs } from 'clipwave'
 import { getFlashcard, getNewFlashcardForStretchedClip } from '../selectors'

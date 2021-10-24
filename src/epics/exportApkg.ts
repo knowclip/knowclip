@@ -220,7 +220,7 @@ function getMissingMedia(
 ) {
   const missingMediaFileIds = missingMediaFiles.map((file) => file.id)
   const openMissingMediaFailure = action$.pipe(
-    ofType('openFileFailure' as const),
+    ofType(A.openFileFailure),
     filter(
       (a) =>
         a.file.type === 'MediaFile' && missingMediaFileIds.includes(a.file.id)
@@ -232,7 +232,7 @@ function getMissingMedia(
       of(r.openFileRequest(file)).pipe(
         concat(
           action$.pipe(
-            ofType('openFileSuccess' as const),
+            ofType(A.openFileSuccess),
             filter((a) => areSameFile(file, a.validatedFile)),
             take(1),
             ignoreElements()

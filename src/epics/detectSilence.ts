@@ -1,11 +1,10 @@
 import { mergeMap, map } from 'rxjs/operators'
-import { from, Observable } from 'rxjs'
+import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
 import ffmpeg from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
-import { ActionOf } from '../actions'
 import { secondsToMs } from 'clipwave'
 
 const detectSilence = (
@@ -51,7 +50,7 @@ const detectSilence = (
 const detectSilenceEpic: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType(A.detectSilence),
-    mergeMap<ActionOf<typeof A.detectSilence>, Promise<Action[]>>(() => {
+    mergeMap(() => {
       const currentFilePath = r.getCurrentFilePath(state$.value)
       const currentMedia = r.getCurrentMediaFile(state$.value)
       if (!currentMedia || !currentFilePath)
@@ -116,7 +115,7 @@ const detectSilenceEpic: AppEpic = (action$, state$) =>
         ]
       })
     }),
-    mergeMap<Array<Action>, Observable<Action>>((val) => from(val))
+    mergeMap((val) => from(val))
   )
 
 const detectSilenceRequestEpic: AppEpic = (action$, state$) =>

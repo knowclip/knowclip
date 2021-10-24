@@ -4,20 +4,18 @@ import { ofType } from 'redux-observable'
 import r from '../redux'
 import { readMediaFile } from '../utils/ffmpeg'
 import { uuid } from '../utils/sideEffects'
-import { ActionOf } from '../actions'
 
 const addMediaToProject: AppEpic = (action$, _state$) =>
   action$.pipe(
     ofType(A.addMediaToProjectRequest),
-    mergeMap(
-      ({ projectId, filePaths }: ActionOf<typeof A.addMediaToProjectRequest>) =>
-        Promise.all(
-          filePaths.map(async (filePath) => {
-            const file = await readMediaFile(filePath, uuid(), projectId)
-            if (file.errors) throw file.errors.join('; ')
-            else return r.openFileRequest(file.value, filePath)
-          })
-        )
+    mergeMap(({ projectId, filePaths }) =>
+      Promise.all(
+        filePaths.map(async (filePath) => {
+          const file = await readMediaFile(filePath, uuid(), projectId)
+          if (file.errors) throw file.errors.join('; ')
+          else return r.openFileRequest(file.value, filePath)
+        })
+      )
     ),
     mergeAll(),
     catchError((err) => {
