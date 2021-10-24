@@ -17,7 +17,7 @@
     "next": "^11.1.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "sass": "^1.26.10"
+    "sass": "^1.43.3"
   },
   "devDependencies": {
     "@types/node": "^v14.17.29",
