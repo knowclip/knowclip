@@ -122,7 +122,7 @@ export class ClientWrapper {
               throw new Error(`Problem detecting element "${selector}": ${err}`)
           }
         },
-        { timeout: 60000, interval: 200 }
+        { timeout: 10000, interval: 200 }
       )
     } catch (err) {
       throw new Error(`Element "${selector}" would not disappear: ${err}`)
@@ -183,7 +183,7 @@ export class ClientWrapper {
           const element = await this.firstElement(selector)
           return await element.isVisible()
         },
-        { timeout: 60000 }
+        { timeout: 10000 }
       )
     } catch (err) {
       throw new Error(`Element "${selector}" would not show: ${err}`)
@@ -200,7 +200,7 @@ export class ClientWrapper {
           const element = await this.firstElement(selector)
           return !(await element.isVisible())
         },
-        { timeout: 60000 }
+        { timeout: 10000 }
       )
     } catch (err) {
       throw new Error(`Element "${selector}" would not hide: ${err}`)
@@ -218,7 +218,7 @@ export class ClientWrapper {
   async waitUntil(condition: () => Promise<boolean>) {
     try {
       await this._driver.client.waitUntil(condition, {
-        timeout: 60000,
+        timeout: 10000,
         interval: 200,
       })
     } catch (err) {
