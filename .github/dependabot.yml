@@ -11,7 +11,6 @@ updates:
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
-    ignore: []
   - package-ecosystem: "npm"
     directory: "/homepage"
     schedule:
