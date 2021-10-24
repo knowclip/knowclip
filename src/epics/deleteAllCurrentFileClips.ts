@@ -6,9 +6,7 @@ import A from '../types/ActionType'
 
 const deleteAllCurrentFileClips: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, DeleteAllCurrentFileClipsRequest>(
-      A.deleteAllCurrentFileClipsRequest
-    ),
+    ofType(A.deleteAllCurrentFileClipsRequest),
     mergeMap(() => {
       const currentFileId = r.getCurrentFileId(state$.value)
       return currentFileId ? of(currentFileId) : EMPTY

@@ -11,7 +11,7 @@ const exportMarkdown: AppEpic = (
   { showSaveDialog, writeFile }
 ) =>
   action$.pipe(
-    ofType<Action, ExportMarkdown>(A.exportMarkdown),
+    ofType(A.exportMarkdown),
     mergeMap<ExportMarkdown, Promise<Observable<Action>>>(async (action) => {
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
@@ -34,9 +34,7 @@ const exportMarkdown: AppEpic = (
         ])
       } catch (err) {
         return of(
-          r.simpleMessageSnackbar(
-            `Problem saving markdown file: ${err.message}`
-          )
+          r.simpleMessageSnackbar(`Problem saving markdown file: ${err}`)
         )
       }
     }),

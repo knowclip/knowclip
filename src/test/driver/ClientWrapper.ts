@@ -55,7 +55,7 @@ export class ClientWrapper {
       throw new Error(
         `Could not find ${count} elements with selector "${selector}". Instead found ${
           elementsSoFar ? elementsSoFar.length : 'none'
-        } before: ${err.message}`
+        } before: ${err}`
       )
     }
   }
@@ -96,7 +96,7 @@ export class ClientWrapper {
         timeout: ms,
       })
     } catch (err) {
-      throw new Error(`Element "${selector}" would not appear: ${err.message}`)
+      throw new Error(`Element "${selector}" would not appear: ${err}`)
     }
   }
   async waitUntilPresent_(testLabel: string, ms?: number) {
@@ -116,7 +116,8 @@ export class ClientWrapper {
             return !displayed
           } catch (err) {
             console.error(err)
-            if (err.message.includes('no such element')) return true
+            if (err instanceof Error && err.message.includes('no such element'))
+              return true
             else
               throw new Error(`Problem detecting element "${selector}": ${err}`)
           }
@@ -124,9 +125,7 @@ export class ClientWrapper {
         { timeout: 60000, interval: 200 }
       )
     } catch (err) {
-      throw new Error(
-        `Element "${selector}" would not disappear: ${err.message}`
-      )
+      throw new Error(`Element "${selector}" would not disappear: ${err}`)
     }
   }
   async waitUntilGone_(testLabel: string) {
@@ -187,7 +186,7 @@ export class ClientWrapper {
         { timeout: 60000 }
       )
     } catch (err) {
-      throw new Error(`Element "${selector}" would not show: ${err.message}`)
+      throw new Error(`Element "${selector}" would not show: ${err}`)
     }
   }
   async waitForVisible_(selector: string) {
@@ -204,7 +203,7 @@ export class ClientWrapper {
         { timeout: 60000 }
       )
     } catch (err) {
-      throw new Error(`Element "${selector}" would not hide: ${err.message}`)
+      throw new Error(`Element "${selector}" would not hide: ${err}`)
     }
   }
   async waitForHidden_(testLabel: string) {

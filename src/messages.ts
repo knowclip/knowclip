@@ -57,9 +57,9 @@ export function handleMessages(mainWindow: BrowserWindow) {
       return { result: await result }
     } catch (rawError) {
       const error = {
-        message: rawError.message,
-        stack: rawError.stack,
-        name: rawError.name,
+        message: rawError instanceof Error ? rawError.message : 'Non-error thrown: ' + String(rawError),
+        stack: rawError instanceof Error ? rawError.stack : '',
+        name: rawError instanceof Error ? rawError.name : '',
       }
       return { error }
     }

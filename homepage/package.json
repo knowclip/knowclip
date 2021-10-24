@@ -9,17 +9,17 @@
     "type-check": "tsc"
   },
   "dependencies": {
-    "@icons-pack/react-simple-icons": "^3.10.0",
+    "@icons-pack/react-simple-icons": "^4.6.0",
     "@netlify/plugin-nextjs": "^3.9.2",
-    "@pinjollist/next-with-analytics": "^1.0.0-rc.0",
-    "@types/classnames": "^2.2.10",
+    "@pinjollist/next-with-analytics": "^1.0.1",
     "classnames": "^2.2.6",
-    "next": "^11.1.2",
+    "next": "^11.1.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "sass": "^1.26.10"
   },
   "devDependencies": {
+    "@babel/core": "7.15.8",
     "@types/node": "^v14.17.29",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",

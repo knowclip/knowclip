@@ -14,8 +14,8 @@ import {
   ignoreElements,
   switchMap,
 } from 'rxjs/operators'
-import { ofType, combineEpics, ActionsObservable } from 'redux-observable'
-import { of, EMPTY, defer, from } from 'rxjs'
+import { ofType, combineEpics } from 'redux-observable'
+import { of, EMPTY, defer, from, Observable } from 'rxjs'
 import r from '../redux'
 import * as anki from '@silvestre/mkanki'
 import sql from 'better-sqlite3'
@@ -28,7 +28,7 @@ import archiver from 'archiver'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, ExportApkgFailure>(A.exportApkgFailure),
+    ofType(A.exportApkgFailure),
     tap(() => (document.body.style.cursor = 'default')),
     mergeMap(({ errorMessage }) =>
       errorMessage
@@ -42,14 +42,14 @@ const exportApkgFailure: AppEpic = (action$) =>
   )
 const exportApkgSuccess: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, ExportApkgSuccess>(A.exportApkgSuccess),
+    ofType(A.exportApkgSuccess),
     tap(() => (document.body.style.cursor = 'default')),
     map(({ successMessage }) => r.simpleMessageSnackbar(successMessage))
   )
 
 const exportApkg: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType<Action, ExportApkgRequest>(A.exportApkgRequest),
+    ofType(A.exportApkgRequest),
     switchMap((exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
       const directory = effects.tmpDirectory()
@@ -215,12 +215,12 @@ async function addNoteMedia(pkg: any, noteMedia: AnkiNoteMedia) {
 
 function getMissingMedia(
   missingMediaFiles: Array<MediaFile>,
-  action$: ActionsObservable<Action>,
+  action$: Observable<Action>,
   exportApkgRequest: ExportApkgRequest
 ) {
   const missingMediaFileIds = missingMediaFiles.map((file) => file.id)
   const openMissingMediaFailure = action$.pipe(
-    ofType<Action, OpenFileFailure>('openFileFailure'),
+    ofType(A.openFileFailure),
     filter(
       (a) =>
         a.file.type === 'MediaFile' && missingMediaFileIds.includes(a.file.id)
@@ -232,7 +232,7 @@ function getMissingMedia(
       of(r.openFileRequest(file)).pipe(
         concat(
           action$.pipe(
-            ofType<Action, OpenFileSuccess>('openFileSuccess'),
+            ofType(A.openFileSuccess),
             filter((a) => areSameFile(file, a.validatedFile)),
             take(1),
             ignoreElements()

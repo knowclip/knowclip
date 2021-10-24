@@ -6,7 +6,7 @@ import { from } from 'rxjs'
 
 const preloadVideoStills: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, PreloadVideoStills>(A.preloadVideoStills),
+    ofType(A.preloadVideoStills),
     switchMap(({ file: mediaFile, clipId }) => {
       const mediaClipIds = r.getClipIdsByMediaFileId(state$.value, mediaFile.id)
       const index = mediaClipIds.indexOf(clipId)

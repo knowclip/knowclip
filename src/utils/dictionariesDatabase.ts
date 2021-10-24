@@ -160,7 +160,8 @@ export async function deleteDictionary(
     const record = await db.table(DICTIONARIES_TABLE).get(key)
     if (record) await db.table(DICTIONARIES_TABLE).delete(key)
   } catch (err) {
-    result.dictionaryDeletion = err
+    result.dictionaryDeletion =
+      err instanceof Error ? err : new Error(String(err))
   }
 
   try {
@@ -184,7 +185,7 @@ export async function deleteDictionary(
           .delete()
     }
   } catch (err) {
-    result.entriesDeletion = err
+    result.entriesDeletion = err instanceof Error ? err : new Error(String(err))
   }
 
   return result

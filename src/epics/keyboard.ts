@@ -1,6 +1,6 @@
 import { filter, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators'
 import { fromEvent, from, of, merge, EMPTY } from 'rxjs'
-import { combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 import r from '../redux'
 import A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
@@ -99,13 +99,14 @@ const saveKey = (window: Window) =>
   )
 
 const saveEpic: AppEpic = (action$, state$, { window }) =>
-  action$.ofType(A.openProject).pipe(
+  action$.pipe(
+    ofType(A.openProject),
     switchMap(() =>
       saveKey(window).pipe(
         map(({ shiftKey }) =>
           shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
         ),
-        takeUntil(action$.ofType(A.closeProject))
+        takeUntil(action$.pipe(ofType(A.closeProject)))
       )
     )
   )

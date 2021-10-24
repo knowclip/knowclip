@@ -1,14 +1,15 @@
 import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
 import A from '../types/ActionType'
-import { ActionOf, actions } from '../actions'
-import { combineEpics } from 'redux-observable'
+import { actions } from '../actions'
+import { combineEpics, ofType } from 'redux-observable'
 import { getRegionEnd, secondsToMs } from 'clipwave'
 import { getFlashcard, getNewFlashcardForStretchedClip } from '../selectors'
 import { EMPTY, of } from 'rxjs'
 import { TransliterationFlashcardFields } from '../types/Project'
 
 const addClipEpic: AppEpic = (action$, state$, { dispatchClipwaveEvent }) => {
-  return action$.ofType<ActionOf<typeof A.addClip>>(A.addClip).pipe(
+  return action$.pipe(
+    ofType(A.addClip),
     tap(({ clip }) => {
       dispatchClipwaveEvent(({ actions: { addItem } }) => {
         addItem({
@@ -28,7 +29,8 @@ const addClipsEpic: AppEpic = (
   state$,
   { dispatchClipwaveEvent, getMediaPlayer }
 ) => {
-  return action$.ofType<ActionOf<typeof A.addClips>>(A.addClips).pipe(
+  return action$.pipe(
+    ofType(A.addClips),
     tap(({ clips }) => {
       dispatchClipwaveEvent(({ actions: { addItems } }) => {
         const newItems = clips.map((clip) => ({
@@ -55,7 +57,8 @@ const stretchClipEpic: AppEpic = (
   state$,
   { dispatchClipwaveEvent }
 ) => {
-  return action$.ofType<ActionOf<typeof A.stretchClip>>(A.stretchClip).pipe(
+  return action$.pipe(
+    ofType(A.stretchClip),
     mergeMap(
       ({
         stretchedClip,

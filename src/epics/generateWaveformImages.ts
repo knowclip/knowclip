@@ -14,14 +14,14 @@ import { areSameFile } from '../utils/files'
 
 const generateWaveformImages: AppEpic = (action$) =>
   action$.pipe(
-    ofType<Action, GenerateWaveformImages>(A.generateWaveformImages),
+    ofType(A.generateWaveformImages),
     switchMap((action) => {
       return from(action.waveformPngs).pipe(
         concatMap((file) => {
           return of(r.openFileRequest(file)).pipe(
             concat(
               action$.pipe(
-                ofType<Action, OpenFileSuccess>('openFileSuccess'),
+                ofType(A.openFileSuccess),
                 filter((a) => areSameFile(file, a.validatedFile)),
                 take(1),
                 ignoreElements()

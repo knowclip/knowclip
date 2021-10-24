@@ -6,7 +6,7 @@ import {
   mergeAll,
   take,
 } from 'rxjs/operators'
-import { combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 import { EMPTY, of } from 'rxjs'
 import r from '../redux'
 import rcompare from 'semver/functions/rcompare'
@@ -89,7 +89,8 @@ const openProject: AppEpic = (
   )
 
 const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
-  action$.ofType<any>(REHYDRATE).pipe(
+  action$.pipe(
+    ofType(REHYDRATE as Action['type']),
     take(1),
     mergeMap(async () => {
       const { window, showMessageBox, openExternal } = effects

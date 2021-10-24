@@ -15,7 +15,8 @@ import './setYamlOptions'
 import { getUpdateWith } from '../files/updates'
 
 const createProject: AppEpic = (action$, state$, { writeFile }) =>
-  action$.ofType<CreateProject>(A.createProject).pipe(
+  action$.pipe(
+    ofType(A.createProject),
     switchMap(({ project, filePath }) => {
       return from(
         writeFile(filePath, r.getProjectFileContents(state$.value, project))
@@ -39,7 +40,7 @@ const createProject: AppEpic = (action$, state$, { writeFile }) =>
 
 const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
   action$.pipe(
-    ofType<Action, OpenProjectRequestById>(A.openProjectRequestById),
+    ofType(A.openProjectRequestById),
     map(({ id }) => {
       const project = r.getFileAvailabilityById<ProjectFile>(
         state$.value,
@@ -66,9 +67,7 @@ const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
 
 const openProjectByFilePath: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, OpenProjectRequestByFilePath>(
-      A.openProjectRequestByFilePath
-    ),
+    ofType(A.openProjectRequestByFilePath),
     switchMap(({ filePath }) =>
       from(parseProjectJson(filePath)).pipe(
         mergeMap((parse) => {
@@ -89,7 +88,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
 
 const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
   action$.pipe(
-    ofType<Action, SaveProjectRequest>(A.saveProjectRequest),
+    ofType(A.saveProjectRequest),
     filter(() => {
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
@@ -130,7 +129,7 @@ const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
       } catch (err) {
         console.error(err)
         return of(
-          r.simpleMessageSnackbar(`Problem saving project file: ${err.message}`)
+          r.simpleMessageSnackbar(`Problem saving project file: ${err}`)
         )
       }
     }),

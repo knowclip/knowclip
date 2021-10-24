@@ -56,8 +56,8 @@ export const getWaveformPng = async (
       throw new Error('Problem creating waveform image')
 
     return { value: newFileName }
-  } catch (err) {
-    return { errors: [err] }
+  } catch (error) {
+    return { errors: [String(error)] }
   }
 }
 

@@ -5,10 +5,7 @@ import A from '../types/ActionType'
 
 const defaultTagsEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType<Action, AddFlashcardTag | DeleteFlashcardTag>(
-      A.addFlashcardTag,
-      A.deleteFlashcardTag
-    ),
+    ofType(A.addFlashcardTag, A.deleteFlashcardTag),
     map(({ id }) => {
       const flashcard = r.getFlashcard(state$.value, id)
       if (!flashcard) {

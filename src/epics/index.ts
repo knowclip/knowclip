@@ -1,5 +1,5 @@
 import { ignoreElements, mergeMap, tap } from 'rxjs/operators'
-import { combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import A from '../types/ActionType'
 import r from '../redux'
@@ -68,7 +68,8 @@ const closeEpic: AppEpic = (
 const initialize: AppEpic = () => of(r.initializeApp())
 
 const quit: AppEpic = (action$, state$, { quitApp }) =>
-  action$.ofType(A.quitApp).pipe(
+  action$.pipe(
+    ofType(A.quitApp),
     tap(() => {
       quitApp()
     }),
@@ -76,7 +77,8 @@ const quit: AppEpic = (action$, state$, { quitApp }) =>
   )
 
 const pauseAndChangeCursorOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
-  action$.ofType(A.setProgress, A.enqueueDialog).pipe(
+  action$.pipe(
+    ofType(A.setProgress, A.enqueueDialog),
     tap((action) => {
       if (action.type === A.setProgress) {
         document.body.style.cursor = action.progress ? 'progress' : 'default'

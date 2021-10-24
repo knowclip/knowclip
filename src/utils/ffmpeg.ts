@@ -47,7 +47,7 @@ export const getMediaMetadata = async (
       })
     })
   } catch (error) {
-    return { errors: [error] }
+    return { errors: [String(error)] }
   }
 }
 
