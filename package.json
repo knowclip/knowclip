@@ -110,13 +110,13 @@
     "husky": "husky"
   },
   "lint-staged": {
-    "./src/**/*.{ts,tsx,js}": [
-      "yarn eslint",
-      "yarn prettier --ignore-path ./.gitignore"
+    "src/**/*.{ts,tsx,js}": [
+      "yarn prettier --write --ignore-path ./.gitignore",
+      "yarn eslint"
     ]
   },
   "browserslist": [
-    "electron >= 13.6.0"
+    "electron >= 14.2.0"
   ],
   "devDependencies": {
     "@types/archiver": "^5.1.1",
