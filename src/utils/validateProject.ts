@@ -1,9 +1,9 @@
-import Ajv from 'ajv'
+import Ajv, { ErrorObject } from 'ajv'
 import projectMetadataJsonSchema from './validateProjectMetadata.json'
 import mediaJsonSchema from './validateProjectMedia.json'
 import betterAjvErrors from 'better-ajv-errors'
 
-const ajv = new Ajv({ jsonPointers: true })
+const ajv = new Ajv()
 
 const validateProjectMetadata = ajv.compile(projectMetadataJsonSchema)
 const validateMedia = ajv.compile(mediaJsonSchema)
@@ -11,8 +11,13 @@ const validateMedia = ajv.compile(mediaJsonSchema)
 const getErrors = (
   schema: any,
   json: any,
-  errors: Ajv.ErrorObject[] | null | undefined
+  errors: ErrorObject[] | null | undefined
 ) => {
+  errors?.forEach((error) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Workaround https://github.com/atlassian/better-ajv-errors/issues/90
+    error.dataPath = error.instancePath
+  })
   const result: string = betterAjvErrors(schema, json, errors, {
     // with default format: cli option, returns a string
     // contrary to typings.

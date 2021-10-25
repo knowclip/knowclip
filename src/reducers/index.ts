@@ -218,6 +218,6 @@ function getStateUnaffectedByHistoryAction(state: AppState) {
   }
 }
 
-const undoableReducer = undoable(persistedReducer)
+export const persistedUndoableReducer = undoable(persistedReducer)
 
-export default undoableReducer
+export const undoableReducer = undoable(root)

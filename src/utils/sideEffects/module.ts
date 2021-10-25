@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import moment from 'moment'
 
 const nowUtcTimestamp = () => moment.utc().format()
