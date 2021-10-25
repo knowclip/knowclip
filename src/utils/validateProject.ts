@@ -13,6 +13,11 @@ const getErrors = (
   json: any,
   errors: ErrorObject[] | null | undefined
 ) => {
+  errors?.forEach(error => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Workaround https://github.com/atlassian/better-ajv-errors/issues/90
+    error.dataPath = error.instancePath;
+  })
   const result: string = betterAjvErrors(schema, json, errors, {
     // with default format: cli option, returns a string
     // contrary to typings.
