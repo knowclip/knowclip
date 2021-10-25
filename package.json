@@ -54,7 +54,7 @@
     "semver": "^7.1.2",
     "subsrt": "^1.0.0",
     "subtitle": "^4.1.1",
-    "tempy": "^1.0.0",
+    "tempy": "^2.0.0",
     "ts-json-schema-generator": "^0.78",
     "uuid": "^8.3.2",
     "wanakana": "^4.0.2",
