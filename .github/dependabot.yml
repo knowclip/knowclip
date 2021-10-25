@@ -12,7 +12,7 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      dependency-name: "@types/*"
+    - dependency-name: "@types/*"
   - package-ecosystem: "npm"
     directory: "/homepage"
     schedule:
