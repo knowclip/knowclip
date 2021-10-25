@@ -128,9 +128,8 @@ const useLocationForm = (
 
   const [locationText, setLocationText] = useState('')
   const [errorText, setErrorText] = useState('')
-  const [checkFolderAutomatically, setCheckFolderAutomatically] = useState(
-    false
-  )
+  const [checkFolderAutomatically, setCheckFolderAutomatically] =
+    useState(false)
 
   const autoCheckFolders = useSelector(
     (state: AppState) => state.settings.assetsDirectories

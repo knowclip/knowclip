@@ -109,11 +109,10 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
             : null
 
           if (matchingFile && matchingFile.valid)
-            newlyAutoFoundSubtitlesPaths[
-              subtitlesFile.id
-            ] = newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
-              ? { multipleMatches: true, singleMatch: undefined }
-              : { singleMatch: nameMatch }
+            newlyAutoFoundSubtitlesPaths[subtitlesFile.id] =
+              newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
+                ? { multipleMatches: true, singleMatch: undefined }
+                : { singleMatch: nameMatch }
         }
       }
 
@@ -169,9 +168,9 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   deleteSuccess: [
     async (action, _state) => [
       r.commitFileDeletions('ProjectFile'),
-      ...Array.from(
-        new Set(action.descendants.map((a) => a.type))
-      ).map((type) => r.commitFileDeletions(type)),
+      ...Array.from(new Set(action.descendants.map((a) => a.type))).map(
+        (type) => r.commitFileDeletions(type)
+      ),
     ],
   ],
 }

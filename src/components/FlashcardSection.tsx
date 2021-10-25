@@ -70,9 +70,8 @@ const FlashcardSection = ({
     [clipsIds, highlightedClip]
   )
   // TODO: restore autofocus
-  const [autofocusFieldName, _setAutofocusFieldName] = useState<
-    TransliterationFlashcardFieldName
-  >('transcription')
+  const [autofocusFieldName, _setAutofocusFieldName] =
+    useState<TransliterationFlashcardFieldName>('transcription')
 
   // const handleDoubleClickCardDisplayField = useCallback(
   //   fieldName => {

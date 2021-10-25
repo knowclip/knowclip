@@ -276,9 +276,8 @@ export function getGermanSearchTokensFromText(
   lowerCase: boolean = false
 ) {
   const withoutAnnotations = germanText.trim()
-  const tokens = (lowerCase
-    ? withoutAnnotations.toLowerCase()
-    : withoutAnnotations
+  const tokens = (
+    lowerCase ? withoutAnnotations.toLowerCase() : withoutAnnotations
   )
     .split(NON_LETTERS_DIGITS_PLUS)
     .filter((x) => x)

@@ -16,7 +16,7 @@ const exportMarkdown: AppEpic = (
       try {
         const filename = await showSaveDialog('Markdown', ['md'])
         if (!filename)
-          return of(({ type: 'NOOP_EXPORT_MARKDOWN' } as unknown) as Action)
+          return of({ type: 'NOOP_EXPORT_MARKDOWN' } as unknown as Action)
         const currentProject = r.getCurrentProject(state$.value)
         if (!currentProject)
           return of(r.simpleMessageSnackbar('Could not find project'))

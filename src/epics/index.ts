@@ -57,7 +57,7 @@ const closeEpic: AppEpic = (
         message: 'Are you sure you want to quit without saving your work?',
       })
       if (!choice || choice.response === 0) {
-        return ((await { type: "DON'T QUIT ON ME!!" }) as unknown) as Action
+        return (await { type: "DON'T QUIT ON ME!!" }) as unknown as Action
       } else {
         quitApp()
         return await r.quitApp()

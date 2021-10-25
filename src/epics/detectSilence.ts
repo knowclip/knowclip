@@ -24,7 +24,8 @@ const detectSilence = (
         //listener must be a function, so to return the callback wrapping it inside a function
         function (_, string) {
           const preparedString = string.replace(/\s/g, ' ')
-          const regex = /silence_start:\s(\d+\.\d+|\d+).+?silence_end:\s(\d+\.\d+|\d+)/g
+          const regex =
+            /silence_start:\s(\d+\.\d+|\d+).+?silence_end:\s(\d+\.\d+|\d+)/g
           // window.preparedString = preparedString
 
           const matchData = []

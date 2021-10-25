@@ -62,10 +62,12 @@ const FlashcardSectionFormField = memo(
 
     const text =
       name in currentFlashcard.fields
-        ? (currentFlashcard.fields as Record<
-            TransliterationFlashcardFieldName,
-            string
-          >)[name]
+        ? (
+            currentFlashcard.fields as Record<
+              TransliterationFlashcardFieldName,
+              string
+            >
+          )[name]
         : ''
 
     const registeredCaretLocation = useSelector((s: WithHistory<AppState>) => {

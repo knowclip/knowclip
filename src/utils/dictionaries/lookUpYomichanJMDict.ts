@@ -50,38 +50,40 @@ export async function lookUpYomichanJMDict(
         ]
       })
 
-      const translatedTokensAtCharacterIndex: TranslatedToken[] = candidates.length
-        ? [
-            {
-              matchedTokenText: token,
-              candidates: candidates.sort((a, b) => {
-                if (
-                  [a.entry.head, b.entry.head].filter((head) => head === token)
-                    .length !== 1
-                ) {
-                  const inflectionsDifference =
-                    a.inflections.length - b.inflections.length
-                  if (inflectionsDifference) return inflectionsDifference
+      const translatedTokensAtCharacterIndex: TranslatedToken[] =
+        candidates.length
+          ? [
+              {
+                matchedTokenText: token,
+                candidates: candidates.sort((a, b) => {
+                  if (
+                    [a.entry.head, b.entry.head].filter(
+                      (head) => head === token
+                    ).length !== 1
+                  ) {
+                    const inflectionsDifference =
+                      a.inflections.length - b.inflections.length
+                    if (inflectionsDifference) return inflectionsDifference
 
-                  const aScore =
-                    typeof a.entry.frequencyScore === 'number'
-                      ? a.entry.frequencyScore
-                      : Infinity
-                  const bScore =
-                    typeof b.entry.frequencyScore === 'number'
-                      ? b.entry.frequencyScore
-                      : Infinity
+                    const aScore =
+                      typeof a.entry.frequencyScore === 'number'
+                        ? a.entry.frequencyScore
+                        : Infinity
+                    const bScore =
+                      typeof b.entry.frequencyScore === 'number'
+                        ? b.entry.frequencyScore
+                        : Infinity
 
-                  const frequencyDifference = bScore - aScore
+                    const frequencyDifference = bScore - aScore
 
-                  return frequencyDifference
-                } else {
-                  return a.entry.head === token ? -1 : 1
-                }
-              }),
-            },
-          ]
-        : []
+                    return frequencyDifference
+                  } else {
+                    return a.entry.head === token ? -1 : 1
+                  }
+                }),
+              },
+            ]
+          : []
       return translatedTokensAtCharacterIndex
     })
 

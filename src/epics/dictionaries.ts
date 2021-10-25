@@ -15,9 +15,7 @@ import { RehydrateAction } from 'redux-persist'
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
     ofType('persist/REHYDRATE' as any),
-    filter(
-      (action) => ((action as unknown) as RehydrateAction).key === 'files'
-    ),
+    filter((action) => (action as unknown as RehydrateAction).key === 'files'),
     mergeMap((_rehydrated) => {
       // TODO: investigate if it would be better to get these from indexed DB dictionaries table instead
       const dicts = Object.entries(state$.value.fileAvailabilities.Dictionary)
@@ -48,36 +46,32 @@ const initializeDictionaries: AppEpic = (action$, state$) =>
 const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.importDictionaryRequest),
-    mergeMap(
-      async (action): Promise<Action> => {
-        try {
-          const files = await effects.showOpenDialog(
-            getFileFilters('Dictionary')
+    mergeMap(async (action): Promise<Action> => {
+      try {
+        const files = await effects.showOpenDialog(getFileFilters('Dictionary'))
+
+        if (!files || !files.length)
+          return { type: 'NOOP' } as unknown as Action
+
+        const [filePath] = files
+        const dictionary = await newDictionary(
+          effects.getDexieDb(),
+          action.dictionaryType,
+          filePath
+        )
+        if (s.isWorkUnsaved(state$.value))
+          return actions.simpleMessageSnackbar(
+            `Please save your work before trying to import a dictionary.`
           )
 
-          if (!files || !files.length)
-            return ({ type: 'NOOP' } as unknown) as Action
-
-          const [filePath] = files
-          const dictionary = await newDictionary(
-            effects.getDexieDb(),
-            action.dictionaryType,
-            filePath
-          )
-          if (s.isWorkUnsaved(state$.value))
-            return actions.simpleMessageSnackbar(
-              `Please save your work before trying to import a dictionary.`
-            )
-
-          return actions.startDictionaryImport(dictionary, filePath)
-        } catch (err) {
-          return actions.errorDialog(
-            `There was a problem importing your dictionary: ${err}`,
-            String(err)
-          )
-        }
+        return actions.startDictionaryImport(dictionary, filePath)
+      } catch (err) {
+        return actions.errorDialog(
+          `There was a problem importing your dictionary: ${err}`,
+          String(err)
+        )
       }
-    )
+    })
   )
 
 const startImportEpic: AppEpic = (action$, state$, effects) =>

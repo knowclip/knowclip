@@ -5,4 +5,5 @@ declare type AppEpic = import('redux-observable').Epic<
   import('../epicsDependencies').EpicsDependencies
 >
 
-declare type EpicsDependencies = import('../epicsDependencies').EpicsDependencies
+declare type EpicsDependencies =
+  import('../epicsDependencies').EpicsDependencies

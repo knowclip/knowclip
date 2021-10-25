@@ -82,87 +82,83 @@ export const getProjectJson = <F extends FlashcardFields>(
       id: file.id,
     },
 
-    media: mediaFiles.map(
-      (mediaFile): MediaJson<F> => {
-        const { name, format, durationSeconds, id } = mediaFile
+    media: mediaFiles.map((mediaFile): MediaJson<F> => {
+      const { name, format, durationSeconds, id } = mediaFile
 
-        const externalSubtitles = mediaFile.subtitles
-          .filter(
-            (s): s is ExternalSubtitlesTrack =>
-              s.type === 'ExternalSubtitlesTrack'
-          )
-          .map(
-            (s): ExternalSubtitlesJson => {
+      const externalSubtitles = mediaFile.subtitles
+        .filter(
+          (s): s is ExternalSubtitlesTrack =>
+            s.type === 'ExternalSubtitlesTrack'
+        )
+        .map((s): ExternalSubtitlesJson => {
+          const sourceFile = getSubtitlesSourceFile(
+            state,
+            s.id
+          ) as ExternalSubtitlesFile | null
+
+          return {
+            id: s.id,
+            type: 'External',
+            chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
+            name: sourceFile ? sourceFile.name : 'External subtitles file',
+          }
+        })
+      const embeddedSubtitles = mediaFile.subtitlesTracksStreamIndexes
+        .map((streamIndex) => {
+          for (const s of mediaFile.subtitles) {
+            if (s.type !== 'EmbeddedSubtitlesTrack') continue
+
+            const file = getSubtitlesSourceFile(state, s.id)
+            if (
+              file &&
+              file.type === 'VttConvertedSubtitlesFile' &&
+              file.parentType === 'MediaFile' &&
+              file.streamIndex === streamIndex
+            ) {
               const sourceFile = getSubtitlesSourceFile(
                 state,
                 s.id
-              ) as ExternalSubtitlesFile | null
+              ) as VttFromEmbeddedSubtitles | null
 
-              return {
-                id: s.id,
-                type: 'External',
+              const subtitles: EmbeddedSubtitlesJson = {
+                id: file.id,
+                streamIndex: streamIndex,
+                type: 'Embedded',
                 chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
-                name: sourceFile ? sourceFile.name : 'External subtitles file',
               }
+              return subtitles
             }
-          )
-        const embeddedSubtitles = mediaFile.subtitlesTracksStreamIndexes
-          .map((streamIndex) => {
-            for (const s of mediaFile.subtitles) {
-              if (s.type !== 'EmbeddedSubtitlesTrack') continue
+          }
 
-              const file = getSubtitlesSourceFile(state, s.id)
-              if (
-                file &&
-                file.type === 'VttConvertedSubtitlesFile' &&
-                file.parentType === 'MediaFile' &&
-                file.streamIndex === streamIndex
-              ) {
-                const sourceFile = getSubtitlesSourceFile(
-                  state,
-                  s.id
-                ) as VttFromEmbeddedSubtitles | null
+          return undefined
+        })
+        .filter((s): s is EmbeddedSubtitlesJson => Boolean(s))
+      const subtitles: SubtitlesJson[] = [
+        ...embeddedSubtitles,
+        ...externalSubtitles,
+      ]
 
-                const subtitles: EmbeddedSubtitlesJson = {
-                  id: file.id,
-                  streamIndex: streamIndex,
-                  type: 'Embedded',
-                  chunksMetadata: sourceFile ? sourceFile.chunksMetadata : null,
-                }
-                return subtitles
-              }
-            }
+      const clips = getProjectClips(state, mediaFile, fieldsTemplate)
 
-            return undefined
+      const newMediaFile: MediaJson<F> = {
+        name,
+        format,
+        duration: formatDurationWithMilliseconds(
+          moment.duration({
+            seconds: durationSeconds,
           })
-          .filter((s): s is EmbeddedSubtitlesJson => Boolean(s))
-        const subtitles: SubtitlesJson[] = [
-          ...embeddedSubtitles,
-          ...externalSubtitles,
-        ]
-
-        const clips = getProjectClips(state, mediaFile, fieldsTemplate)
-
-        const newMediaFile: MediaJson<F> = {
-          name,
-          format,
-          duration: formatDurationWithMilliseconds(
-            moment.duration({
-              seconds: durationSeconds,
-            })
-          ),
-          id,
-        }
-
-        if (subtitles.length) newMediaFile.subtitles = subtitles
-        if (clips.length) newMediaFile.clips = clips
-        if (Object.keys(mediaFile.flashcardFieldsToSubtitlesTracks).length)
-          newMediaFile.flashcardFieldsToSubtitlesTracks =
-            mediaFile.flashcardFieldsToSubtitlesTracks
-
-        return newMediaFile
+        ),
+        id,
       }
-    ),
+
+      if (subtitles.length) newMediaFile.subtitles = subtitles
+      if (clips.length) newMediaFile.clips = clips
+      if (Object.keys(mediaFile.flashcardFieldsToSubtitlesTracks).length)
+        newMediaFile.flashcardFieldsToSubtitlesTracks =
+          mediaFile.flashcardFieldsToSubtitlesTracks
+
+      return newMediaFile
+    }),
   }
 }
 function getProjectClips<F extends FlashcardFields>(

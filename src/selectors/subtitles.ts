@@ -350,8 +350,10 @@ export const getNewFlashcardForStretchedClip = (
       (fn) =>
         links[fn] &&
         !(
-          (flashcards[stretchedClip.id]
-            .fields as TransliterationFlashcardFields)[fn] || ''
+          (
+            flashcards[stretchedClip.id]
+              .fields as TransliterationFlashcardFields
+          )[fn] || ''
         ).trim()
     )
   )

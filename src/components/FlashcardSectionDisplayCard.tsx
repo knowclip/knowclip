@@ -101,9 +101,10 @@ const FlashcardSectionDisplayCard = memo(
         [dispatch, flashcard.cloze, flashcard.id]
       ),
     })
-    const toggleLoop = useCallback(() => dispatch(r.toggleLoop('BUTTON')), [
-      dispatch,
-    ])
+    const toggleLoop = useCallback(
+      () => dispatch(r.toggleLoop('BUTTON')),
+      [dispatch]
+    )
 
     return (
       <FlashcardSectionDisplay

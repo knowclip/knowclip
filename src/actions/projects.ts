@@ -80,7 +80,7 @@ export const projectActions = {
 }
 
 function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
-  return (u as any) as FileUpdate<keyof FileUpdates>
+  return u as any as FileUpdate<keyof FileUpdates>
 }
 
 const setProjectName = (id: ProjectId, name: string) =>

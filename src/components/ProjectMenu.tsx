@@ -27,29 +27,26 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
   if (!projectFile) throw new Error('Could not find project file')
 
-  const {
-    currentMediaFile,
-    mediaFileIds,
-    currentFileClipsIds,
-    workIsUnsaved,
-  } = useSelector((state: AppState) => {
-    const currentMediaFile = r.getCurrentMediaFile(state)
-    const currentProject = r.getCurrentProject(state)
-    return {
-      loop: r.getLoopState(state),
-      audioIsLoading: r.isMediaEffectivelyLoading(state),
-      currentProjectId: r.getCurrentProjectId(state),
-      constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
-      currentMediaFile,
-      mediaFileIds: currentProject ? currentProject.mediaFileIds : EMPTY,
-      currentFileClipsIds: currentMediaFile
-        ? state.clips.idsByMediaFileId[currentMediaFile.id]
-        : EMPTY,
-      subtitles: r.getSubtitlesTracks(state),
-      viewMode: state.settings.viewMode,
-      workIsUnsaved: r.isWorkUnsaved(state),
-    }
-  })
+  const { currentMediaFile, mediaFileIds, currentFileClipsIds, workIsUnsaved } =
+    useSelector((state: AppState) => {
+      const currentMediaFile = r.getCurrentMediaFile(state)
+      const currentProject = r.getCurrentProject(state)
+      return {
+        loop: r.getLoopState(state),
+        audioIsLoading: r.isMediaEffectivelyLoading(state),
+        currentProjectId: r.getCurrentProjectId(state),
+        constantBitrateFilePath:
+          r.getCurrentMediaConstantBitrateFilePath(state),
+        currentMediaFile,
+        mediaFileIds: currentProject ? currentProject.mediaFileIds : EMPTY,
+        currentFileClipsIds: currentMediaFile
+          ? state.clips.idsByMediaFileId[currentMediaFile.id]
+          : EMPTY,
+        subtitles: r.getSubtitlesTracks(state),
+        viewMode: state.settings.viewMode,
+        workIsUnsaved: r.isWorkUnsaved(state),
+      }
+    })
 
   const clipsIdsForExport = useMemo(() => {
     const result: ReviewAndExportDialogData['mediaFileIdsToClipIds'] = {}

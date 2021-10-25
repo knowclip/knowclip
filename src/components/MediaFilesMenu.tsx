@@ -41,13 +41,15 @@ const MediaFilesMenu = ({
   currentProjectId,
   playButtonSync: { playOrPauseAudio, playing },
 }: MediaFilesMenuProps) => {
-  const { currentFile, projectMediaFiles, loopIsOn: loopState } = useSelector(
-    (state: AppState) => ({
-      loopIsOn: r.getLoopState(state),
-      currentFile: r.getCurrentMediaFile(state),
-      projectMediaFiles: r.getCurrentProjectMediaFiles(state),
-    })
-  )
+  const {
+    currentFile,
+    projectMediaFiles,
+    loopIsOn: loopState,
+  } = useSelector((state: AppState) => ({
+    loopIsOn: r.getLoopState(state),
+    currentFile: r.getCurrentMediaFile(state),
+    projectMediaFiles: r.getCurrentProjectMediaFiles(state),
+  }))
   const popover = usePopover()
 
   const dispatch = useDispatch()
@@ -62,9 +64,10 @@ const MediaFilesMenu = ({
     [dispatch, currentProjectId, popover]
   )
 
-  const toggleLoop = useCallback(() => dispatch(actions.toggleLoop('BUTTON')), [
-    dispatch,
-  ])
+  const toggleLoop = useCallback(
+    () => dispatch(actions.toggleLoop('BUTTON')),
+    [dispatch]
+  )
 
   return (
     <DarkTheme>

@@ -6,10 +6,8 @@ export default async function navigateBetweenMedia({ client }: TestSetup) {
     'piggeldy_cat.mp4'
   )
 
-  const {
-    openMediaFilesMenuButton: mediaFilesMenuButton,
-    mediaFileMenuItem,
-  } = mediaFilesMenu$
+  const { openMediaFilesMenuButton: mediaFilesMenuButton, mediaFileMenuItem } =
+    mediaFilesMenu$
 
   await client.clickElement_(mediaFilesMenuButton)
 

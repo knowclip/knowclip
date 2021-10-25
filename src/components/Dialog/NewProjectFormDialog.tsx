@@ -112,9 +112,10 @@ const NewProjectFormDialog = ({
     return newErrors
   }, [errors, fieldValues])
 
-  const closeDialog = useCallback(() => dispatch(actions.closeDialog()), [
-    dispatch,
-  ])
+  const closeDialog = useCallback(
+    () => dispatch(actions.closeDialog()),
+    [dispatch]
+  )
 
   const handleSubmit = useCallback(() => {
     const errors = validate()
@@ -126,7 +127,7 @@ const NewProjectFormDialog = ({
       actions.createProject(
         uuid(),
         name,
-        (fieldValues.noteType as unknown) as NoteType, // guaranteed after validation
+        fieldValues.noteType as unknown as NoteType, // guaranteed after validation
         filePath,
         nowUtcTimestamp()
       )
@@ -152,9 +153,10 @@ const NewProjectFormDialog = ({
     [setState]
   )
 
-  const handleChangeNameText = useCallback((e) => setNameText(e.target.value), [
-    setNameText,
-  ])
+  const handleChangeNameText = useCallback(
+    (e) => setNameText(e.target.value),
+    [setNameText]
+  )
 
   const handleChangeNoteType = useCallback(
     (e) =>

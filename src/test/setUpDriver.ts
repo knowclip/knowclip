@@ -46,7 +46,7 @@ export async function startApp(
     webdriverIoPath:
       process.platform === 'win32'
         ? join(rootDir, 'node_modules', 'electron', 'dist', 'electron.exe')
-        : ((electron as unknown) as string),
+        : (electron as unknown as string),
     appDir: rootDir,
     chromeArgs: [
       'disable-extensions',

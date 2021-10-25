@@ -62,8 +62,8 @@ export default async function moveThroughoutMedia({ client }: TestSetup) {
 
 async function clipsVisibility(wrapper: ClientWrapper) {
   return await Promise.all(
-    await (await wrapper.elements_(waveform$.waveformClip)).map((el) =>
-      el.isVisible()
-    )
+    await (
+      await wrapper.elements_(waveform$.waveformClip)
+    ).map((el) => el.isVisible())
   )
 }

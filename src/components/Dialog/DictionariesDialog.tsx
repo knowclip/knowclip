@@ -227,10 +227,10 @@ function DictionaryFileItem({
   onChange: (id: string, dictionaryType: DictionaryFileType) => void
   selected: boolean
 }) {
-  const handleClickDelete = useCallback(() => onClickDelete(availability.id), [
-    availability.id,
-    onClickDelete,
-  ])
+  const handleClickDelete = useCallback(
+    () => onClickDelete(availability.id),
+    [availability.id, onClickDelete]
+  )
   const handleChange = useCallback(
     (_e) => onChange(file.id, file.dictionaryType),
     [onChange, file.id, file.dictionaryType]

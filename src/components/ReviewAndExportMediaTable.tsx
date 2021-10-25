@@ -75,10 +75,10 @@ const ReviewAndExportMediaTable = memo(
         dispatch(fileRemembered ? r.openFileRequest(media) : r.dismissMedia())
     }, [onClick, open, mediaIndex, dispatch, fileRemembered, media])
     const stopPropagation = useCallback((e) => e.stopPropagation(), [])
-    const selectAll = useCallback(() => onSelectAll(media.id), [
-      onSelectAll,
-      media.id,
-    ])
+    const selectAll = useCallback(
+      () => onSelectAll(media.id),
+      [onSelectAll, media.id]
+    )
 
     const handleSelectRow = useCallback(
       (id: string) => onSelectRow(media.id, id),

@@ -3,7 +3,8 @@ import { basename } from 'path'
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
 import { sendToMainProcess } from '../messages'
 
-const ffmpeg = require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
+const ffmpeg =
+  require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
 if (!process.env.JEST_WORKER_ID)
   sendToMainProcess({

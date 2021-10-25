@@ -66,9 +66,10 @@ const FlashcardSectionPreview = ({
   const toggleIncludeStill = useCallback(() => {
     dispatch(r.setDefaultClipSpecs({ includeStill: !defaultIncludeStill }))
   }, [defaultIncludeStill, dispatch])
-  const toggleLoop = useCallback(() => dispatch(r.toggleLoop('BUTTON')), [
-    dispatch,
-  ])
+  const toggleLoop = useCallback(
+    () => dispatch(r.toggleLoop('BUTTON')),
+    [dispatch]
+  )
   return (
     <FlashcardSectionDisplay
       className={cn(className, css.preview)}

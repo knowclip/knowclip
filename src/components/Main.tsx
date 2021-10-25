@@ -210,16 +210,13 @@ const Main = () => {
     selectNextItemAndSeek(playerRef.current, isWaveformItemSelectable)
   }, [selectNextItemAndSeek])
 
-  const {
-    handleWaveformDrag,
-    handleClipDrag,
-    handleClipEdgeDrag,
-  } = useWaveformEventHandlers({
-    playerRef,
-    dispatch,
-    waveform,
-    highlightedClipId,
-  })
+  const { handleWaveformDrag, handleClipDrag, handleClipEdgeDrag } =
+    useWaveformEventHandlers({
+      playerRef,
+      dispatch,
+      waveform,
+      highlightedClipId,
+    })
 
   const renderPrimaryClip = useWaveformRenderClip()
   const renderSecondaryClip = useRenderSecondaryClip(waveform)

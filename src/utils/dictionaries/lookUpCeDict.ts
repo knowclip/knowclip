@@ -30,9 +30,11 @@ export async function lookUpCeDict(
     .distinct()
     .primaryKeys()
 
-  const allQueries = ((await table.bulkGet([
-    ...new Set([...(await fromText.primaryKeys()), ...simplifiedFromText]),
-  ])) as LexiconEntry[]).sort((a, b) => {
+  const allQueries = (
+    (await table.bulkGet([
+      ...new Set([...(await fromText.primaryKeys()), ...simplifiedFromText]),
+    ])) as LexiconEntry[]
+  ).sort((a, b) => {
     const aTraditional = a.head
     const bTraditional = b.head
     let differentTraditional = 0
@@ -57,38 +59,41 @@ export async function lookUpCeDict(
         return []
       })
 
-      const translatedTokensAtCharacterIndex: TranslatedToken[] = candidates.length
-        ? [
-            {
-              matchedTokenText: token,
-              candidates: candidates.sort((a, b) => {
-                const deprioritizeOldVariants = sortResult(
-                  !(
-                    a.entry.meanings.length &&
-                    /variant of/.test(a.entry.meanings.join(''))
-                  ),
-                  !(
-                    b.entry.meanings.length &&
-                    /variant of/.test(b.entry.meanings.join(''))
+      const translatedTokensAtCharacterIndex: TranslatedToken[] =
+        candidates.length
+          ? [
+              {
+                matchedTokenText: token,
+                candidates: candidates.sort((a, b) => {
+                  const deprioritizeOldVariants = sortResult(
+                    !(
+                      a.entry.meanings.length &&
+                      /variant of/.test(a.entry.meanings.join(''))
+                    ),
+                    !(
+                      b.entry.meanings.length &&
+                      /variant of/.test(b.entry.meanings.join(''))
+                    )
                   )
-                )
-                if (deprioritizeOldVariants) return deprioritizeOldVariants
+                  if (deprioritizeOldVariants) return deprioritizeOldVariants
 
-                const deprioritizeProperNouns = sortResult(
-                  !(
-                    a.entry.pronunciation && /[A-Z]/.test(a.entry.pronunciation)
-                  ),
-                  !(
-                    b.entry.pronunciation && /[A-Z]/.test(b.entry.pronunciation)
+                  const deprioritizeProperNouns = sortResult(
+                    !(
+                      a.entry.pronunciation &&
+                      /[A-Z]/.test(a.entry.pronunciation)
+                    ),
+                    !(
+                      b.entry.pronunciation &&
+                      /[A-Z]/.test(b.entry.pronunciation)
+                    )
                   )
-                )
-                if (deprioritizeProperNouns) return deprioritizeProperNouns
+                  if (deprioritizeProperNouns) return deprioritizeProperNouns
 
-                return 0
-              }),
-            },
-          ]
-        : []
+                  return 0
+                }),
+              },
+            ]
+          : []
       return translatedTokensAtCharacterIndex
     })
 

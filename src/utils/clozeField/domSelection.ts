@@ -52,7 +52,7 @@ export function setSelectionRange(el: HTMLElement, start: number, end: number) {
       (start < endCharCount ||
         (start === endCharCount && i <= textNodes.length))
     ) {
-      range.setStart((textNode as unknown) as Node, start - charCount)
+      range.setStart(textNode as unknown as Node, start - charCount)
       foundStart = true
     }
     if (foundStart && end <= endCharCount) {

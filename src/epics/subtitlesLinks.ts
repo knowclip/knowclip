@@ -13,9 +13,9 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
     map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
       ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
         const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
-        const previouslyLinkedField = (Object.keys(
-          previousLinks
-        ) as FlashcardFieldName[]).find((fn) => {
+        const previouslyLinkedField = (
+          Object.keys(previousLinks) as FlashcardFieldName[]
+        ).find((fn) => {
           const fieldName = fn as TransliterationFlashcardFieldName
           return previousLinks[fieldName] === subtitlesTrackId
         })
@@ -75,11 +75,8 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       if (!currentNoteType) return EMPTY
 
       const mediaFileId = update.id
-      const [
-        flashcardFieldName,
-        _subtitlesTrackId,
-        fieldToClear,
-      ] = update.updatePayload
+      const [flashcardFieldName, _subtitlesTrackId, fieldToClear] =
+        update.updatePayload
 
       const edits: EditClips['edits'] = []
 

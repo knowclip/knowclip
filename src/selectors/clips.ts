@@ -37,11 +37,8 @@ export const getFlashcards = (
   return clipsOrder ? clipsOrder.map((id) => state.clips.flashcards[id]) : []
 }
 
-export const getAllProjectClipsIds: (
-  state: AppState
-) => Array<ClipId> = createSelector(getClipsObject, (clipsObject) =>
-  Object.keys(clipsObject)
-)
+export const getAllProjectClipsIds: (state: AppState) => Array<ClipId> =
+  createSelector(getClipsObject, (clipsObject) => Object.keys(clipsObject))
 
 export const getClipTimeInSeconds = (
   state: AppState,

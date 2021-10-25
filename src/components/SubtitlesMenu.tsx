@@ -58,9 +58,8 @@ const SubtitlesMenu = () => {
       Object.entries(fieldNamesToTrackIds).reduce(
         (map, [fieldName, trackId]) => {
           if (fieldName)
-            map[
-              trackId as SubtitlesTrackId
-            ] = fieldName as TransliterationFlashcardFieldName
+            map[trackId as SubtitlesTrackId] =
+              fieldName as TransliterationFlashcardFieldName
           return map
         },
         {} as Record<

@@ -37,22 +37,17 @@ const LinkSubtitlesDialog = ({
 }: DialogProps<LinkSubtitlesDialogData>) => {
   const dispatch = useDispatch()
 
-  const {
-    mediaFile,
-    subs,
-    fieldsToTracks,
-    blankFields,
-    mediaSubtitles,
-  } = useSelector((state: AppState) => ({
-    mediaFile: getCurrentMediaFile(state),
-    subs: getSubtitlesFilesWithTracks(state),
-    fieldsToTracks: getSubtitlesFlashcardFieldLinks(state),
-    blankFields:
-      getCurrentNoteType(state) === 'Simple'
-        ? blankSimpleFields
-        : blankTransliterationFields,
-    mediaSubtitles: getSubtitlesFilesWithTracks(state),
-  }))
+  const { mediaFile, subs, fieldsToTracks, blankFields, mediaSubtitles } =
+    useSelector((state: AppState) => ({
+      mediaFile: getCurrentMediaFile(state),
+      subs: getSubtitlesFilesWithTracks(state),
+      fieldsToTracks: getSubtitlesFlashcardFieldLinks(state),
+      blankFields:
+        getCurrentNoteType(state) === 'Simple'
+          ? blankSimpleFields
+          : blankTransliterationFields,
+      mediaSubtitles: getSubtitlesFilesWithTracks(state),
+    }))
 
   const currentlyLinkedField = useMemo(() => {
     const trackWithFile = subs.all.find((t) => t.id === subtitles.id)

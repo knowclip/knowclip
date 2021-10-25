@@ -16,11 +16,9 @@ type SpectronMocks<M extends ModuleLike> = {
   resetMocks: () => void
   mockFunctions: (
     app: TestDriver,
-    mocks: Partial<
-      {
-        [K in keyof M]: ReturnType<M[K]>[]
-      }
-    >
+    mocks: Partial<{
+      [K in keyof M]: ReturnType<M[K]>[]
+    }>
   ) => Promise<void>
   logMocks: (app: TestDriver) => Promise<void>
 }

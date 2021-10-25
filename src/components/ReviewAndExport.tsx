@@ -62,9 +62,10 @@ const Export = React.memo(
       setCurrentTabIndex(index)
       setSelectionHasStarted(false)
     }
-    const startSelection = useCallback(() => setSelectionHasStarted(true), [
-      setSelectionHasStarted,
-    ])
+    const startSelection = useCallback(
+      () => setSelectionHasStarted(true),
+      [setSelectionHasStarted]
+    )
     const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
     const somethingSelected = useMemo(
       () =>

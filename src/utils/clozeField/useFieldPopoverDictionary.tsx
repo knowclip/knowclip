@@ -111,25 +111,19 @@ export function useFieldPopoverDictionary(
   const [tokenTranslations, setTokenTranslations] = useState<
     TranslatedTokensAtCharacterIndex[]
   >([])
-  const [
-    translationsAtCharacter,
-    setTranslationsAtCharacter,
-  ] = useState<TranslatedTokensAtCharacterIndex | null>(null)
+  const [translationsAtCharacter, setTranslationsAtCharacter] =
+    useState<TranslatedTokensAtCharacterIndex | null>(null)
 
-  const {
-    onKeyDown,
-    handleFocus,
-    handleBlur,
-    cursorPosition,
-  } = useClozeUiEffects(
-    clozeControls,
-    value,
-    dispatch,
-    dictionaryPopoverIsShowing,
-    editing,
-    isMediaPlaying,
-    loopState
-  )
+  const { onKeyDown, handleFocus, handleBlur, cursorPosition } =
+    useClozeUiEffects(
+      clozeControls,
+      value,
+      dispatch,
+      dictionaryPopoverIsShowing,
+      editing,
+      isMediaPlaying,
+      loopState
+    )
 
   useEffect(() => {
     if (activeDictionaryType) {

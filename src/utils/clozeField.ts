@@ -16,10 +16,10 @@ export const unescapeClozeFields = <F extends FlashcardFields>(
     const value: string = fieldsFromJson[fieldName] as any
     if (fieldName === 'transcription') {
       const { text, clozeDeletions } = unescapeClozeField(value)
-      fields[fieldName] = (text as unknown) as F[keyof F]
+      fields[fieldName] = text as unknown as F[keyof F]
       cloze.push(...clozeDeletions)
     } else {
-      fields[fieldName] = (value as unknown) as F[keyof F]
+      fields[fieldName] = value as unknown as F[keyof F]
     }
   }
 

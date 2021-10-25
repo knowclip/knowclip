@@ -46,13 +46,8 @@ const MainHeader = ({
     viewMode: state.settings.viewMode,
   }))
 
-  const {
-    isShowing,
-    handleHover,
-    handleMouseLeave,
-    handleFocus,
-    handleBlur,
-  } = useAutoHide(currentMediaFile, currentProjectId)
+  const { isShowing, handleHover, handleMouseLeave, handleFocus, handleBlur } =
+    useAutoHide(currentMediaFile, currentProjectId)
 
   const playButtonSync = usePlayButtonSync(
     waveform.state.pixelsPerSecond,
@@ -156,7 +151,7 @@ function useAutoHide(
       const timeout = setTimeout(() => {
         setForceVisible(false)
       }, 1000)
-      forceVisibleTimeout.current = (timeout as any) as number
+      forceVisibleTimeout.current = timeout as any as number
     }
   }, [
     currentMediaFileId,

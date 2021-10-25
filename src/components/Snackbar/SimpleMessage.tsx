@@ -29,9 +29,10 @@ const SimpleMessageSnackbar = ({
   )
 
   const dispatch = useDispatch()
-  const handleExited = useCallback((_e) => dispatch(r.closeSnackbar()), [
-    dispatch,
-  ])
+  const handleExited = useCallback(
+    (_e) => dispatch(r.closeSnackbar()),
+    [dispatch]
+  )
 
   return (
     // TODO: distinguish error and success messages

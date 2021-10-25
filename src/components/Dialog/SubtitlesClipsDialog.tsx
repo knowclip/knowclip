@@ -101,7 +101,8 @@ const SubtitlesClipsDialog = ({
           errorText: 'Please choose at least one subtitles track.',
         }))
 
-      const fieldsWithoutBlankValues: Partial<TransliterationFlashcardFields> = {}
+      const fieldsWithoutBlankValues: Partial<TransliterationFlashcardFields> =
+        {}
       for (const fn in fields) {
         const fieldName = fn as TransliterationFlashcardFieldName
         const value = fields[fieldName]
