@@ -30,7 +30,7 @@
     "electron-store": "^8.0.1",
     "ffmpeg-static": "^2.4.0",
     "ffprobe-static": "^3.0.0",
-    "filenamify": "^4.1.0",
+    "filenamify": "^5.0.2",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^10.0.0",
     "material-ui-chip-input": "^1.1.0",
