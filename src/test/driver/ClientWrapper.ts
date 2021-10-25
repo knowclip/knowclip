@@ -40,7 +40,9 @@ export class ClientWrapper {
       if (count)
         await this._driver.client.waitUntil(
           async () => {
-            const elements: Element<'async'>[] = await this._driver.client.$$(selector)
+            const elements: Element<'async'>[] = await this._driver.client.$$(
+              selector
+            )
             elementsSoFar = elements
             return elements.length === count
           },
@@ -92,7 +94,9 @@ export class ClientWrapper {
 
   async waitUntilPresent(selector: string, ms?: number) {
     try {
-      return await (await this._driver.client.$(selector)).waitForExist({
+      return await (
+        await this._driver.client.$(selector)
+      ).waitForExist({
         timeout: ms,
       })
     } catch (err) {
