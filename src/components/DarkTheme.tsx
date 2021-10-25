@@ -1,8 +1,8 @@
 import React, { ReactChild } from 'react'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import { MuiThemeProvider, createTheme } from '@material-ui/core/styles'
 import themeSpecs from '../themeSpecs'
 
-const theme = createMuiTheme({
+const theme = createTheme({
   ...themeSpecs,
   palette: {
     // ...(themeSpecs.palette || {}),
