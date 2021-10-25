@@ -16,6 +16,7 @@ updates:
     - dependency-name: "@types/node"
     - dependency-name: "chromedriver"
       # locked to react-scripts
+    - dependency-name: "eslint"
     - dependency-name: "@types/jest"
     - dependency-name: "@types/react"
     - dependency-name: "@types/react-dom"

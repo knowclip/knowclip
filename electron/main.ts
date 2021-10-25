@@ -25,7 +25,7 @@ const useDevtools = process.env.NODE_ENV === 'test' ? INTEGRATION_DEV : true
 const context: { mainWindow: BrowserWindow | null } = { mainWindow: null }
 
 // have to do it this to access ffmpeg path from within webpack bundle
-const ffmpegStaticBasePath = require('ffmpeg-static').path
+const ffmpegStaticBasePath = require('ffmpeg-static')
 const ffprobeStaticBasePath = require('ffprobe-static').path
 const getFfmpegStaticPath = (basePath: string) =>
   basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
