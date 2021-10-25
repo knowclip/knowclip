@@ -3,7 +3,7 @@ import { promises } from 'fs'
 import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
 import r from '../redux'
 import { extname, basename, join } from 'path'
-import { parse, stringifyVtt } from 'subtitle'
+import { parseSync, stringifySync } from 'subtitle'
 import subsrt from 'subsrt'
 
 const { readFile, writeFile } = promises
@@ -67,12 +67,16 @@ export const getExternalSubtitlesVttPath = async (
   if (extension === '.srt')
     await writeFile(
       vttFilePath,
-      stringifyVtt(
+      stringifySync(
         chunks.map((chunk) => ({
-          start: Math.round(chunk.start),
-          end: Math.round(chunk.end),
-          text: chunk.text,
-        }))
+          type: 'cue',
+          data: {
+            start: Math.round(chunk.start),
+            end: Math.round(chunk.end),
+            text: chunk.text,
+          },
+        })),
+        { format: 'WebVTT' }
       ),
       'utf8'
     )
@@ -133,14 +137,16 @@ const parseSubtitles = (
     case '.vtt':
     case '.srt':
       return sanitizeSubtitles(
-        parse(fileContents).map(
-          (vttChunk, index) =>
-            r.readVttChunk(state, {
-              start: Number(vttChunk.start),
-              end: Number(vttChunk.end),
-              text: vttChunk.text,
-              index,
-            }) // TODO: handle failed number parse
+        parseSync(fileContents).flatMap(
+          ({ data: vttChunk }, index) =>
+            typeof vttChunk === 'string'
+              ? []
+              : r.readVttChunk(state, {
+                  start: Number(vttChunk.start),
+                  end: Number(vttChunk.end),
+                  text: vttChunk.text,
+                  index,
+                }) // TODO: handle failed number parse
         )
       )
     default:

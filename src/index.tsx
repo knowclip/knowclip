@@ -28,10 +28,10 @@ window.addEventListener('error', (e) => {
 sendToMainProcess({
   type: 'getPersistedTestState',
   args: [],
-}).then(({ result: initialState }) => {
-  if (initialState) console.log({ initialState })
-  
-  const { store } = getStore(initialState as Partial<AppState>)
+}).then(({ result: initialTestState }) => {
+  if (initialTestState) console.log({ initialTestState })
+
+  const { store } = getStore(initialTestState as Partial<AppState>)
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>

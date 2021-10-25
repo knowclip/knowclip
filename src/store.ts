@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-import persistedUndoableReducer from './reducers'
+import { persistedUndoableReducer, undoableReducer } from './reducers'
 import epic from './epics'
 import { listenForPersistedDataLogMessage } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
@@ -10,14 +10,16 @@ const reduxDevtoolsExtension = ((window as unknown) as {
   __REDUX_DEVTOOLS_EXTENSION__: any
 }).__REDUX_DEVTOOLS_EXTENSION__
 
-function getStore(initialState: Partial<AppState> | undefined) {
+function getStore(initialTestState: Partial<AppState> | undefined) {
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
   })
 
   const store = createStore(
-    persistedUndoableReducer,
-    initialState as any,
+    process.env.REACT_APP_CHROMEDRIVER
+      ? (undoableReducer as typeof persistedUndoableReducer)
+      : persistedUndoableReducer,
+    initialTestState as any,
     compose(
       applyMiddleware(epicMiddleware),
       ...(process.env.NODE_ENV === 'development' && reduxDevtoolsExtension
@@ -36,7 +38,7 @@ function getStore(initialState: Partial<AppState> | undefined) {
 
   listenForPersistedDataLogMessage(store.getState)
 
-  const persistor = persistStore(store)
+  const persistor = process.env.REACT_APP_CHROMEDRIVER ? null : persistStore(store)
 
   epicMiddleware.run(epic as any)
 
