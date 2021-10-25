@@ -106,14 +106,8 @@
     "electron-builder:skip-publish": "electron-builder -p never",
     "dist": "yarn build-main && yarn webpack:ci && yarn electron-builder:skip-publish",
     "dist:appveyor": "yarn build-main && yarn webpack:appveyor && yarn electron-builder",
-    "yalc": "yalc"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint-staged && yarn tsc",
-      "post-commit": "git diff",
-      "post-push": "echo '############ BUILDING JSON SCHEMAS JUST IN CASE! ###############' && yarn build-schemas"
-    }
+    "yalc": "yalc",
+    "husky": "husky"
   },
   "lint-staged": {
     "./src/**/*.{ts,tsx,js}": [
@@ -122,7 +116,7 @@
     ]
   },
   "browserslist": [
-    "electron >= 12.2.2"
+    "electron >= 13.6.0"
   ],
   "devDependencies": {
     "@types/archiver": "^5.1.1",
@@ -150,7 +144,7 @@
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "chromedriver": "^91.0.0",
-    "electron": "^13.0.0",
+    "electron": "^13.6.0",
     "electron-builder": "^22.13.1",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^8.3.0",

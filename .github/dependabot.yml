@@ -14,11 +14,17 @@ updates:
     ignore:
       # locked to electron
     - dependency-name: "@types/node"
+    - dependency-name: "chromedriver"
       # locked to react-scripts
     - dependency-name: "@types/jest"
     - dependency-name: "@types/react"
     - dependency-name: "@types/react-dom"
+      # waiting for ESM support in Electron and CRA
+    - dependency-name: "tempy"
+    - dependency-name: "filenamify"
   - package-ecosystem: "npm"
     directory: "/homepage"
     schedule:
       interval: "daily"
+    ignore:
+    - dependency-name: "@types/node"
