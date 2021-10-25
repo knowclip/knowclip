@@ -10565,10 +10565,10 @@ pinkie@^2.0.0:
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
-pinyin-utils@^1.69.0:
-  version "1.74.0"
-  resolved "https://registry.yarnpkg.com/pinyin-utils/-/pinyin-utils-1.74.0.tgz#b1a5721cd78ae511176dc86719eb79a1ed0f1f9e"
-  integrity sha512-U2A58vW7W6n4S/Avcflx3mnNXTG02VTpoDe+bBRWTwwWzNdPv+ALziRXtyI6foHh9Q6vCTh7r+62Kk/J5hyp0g==
+pinyin-utils@^2.32.0:
+  version "2.32.0"
+  resolved "https://registry.yarnpkg.com/pinyin-utils/-/pinyin-utils-2.32.0.tgz#fb869b5b967a514a75b37dc8d0ea287d2e259786"
+  integrity sha512-jgPlD0lhF9GCxhFkUD+KZ0NEHw3QCIGX1n11DPmPvvgqvrX3YUdlp2p7bdrbejnjmzNK+BJaDwG9uyApw3xL8Q==
 
 pirates@^4.0.1:
   version "4.0.1"
