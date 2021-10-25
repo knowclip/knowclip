@@ -50,7 +50,7 @@ const root = combineReducers<AppState>({
   subtitles,
   settings,
   fileAvailabilities,
-  files: (persistReducer(filesPersistConfig, files) as unknown) as typeof files,
+  files: persistReducer(filesPersistConfig, files) as unknown as typeof files,
 })
 
 const persistedReducer = persistReducer(rootConfig, root)
@@ -109,7 +109,7 @@ function undoable<S extends AppState>(
         previous: previous.slice(0, previous.length - 1),
         next: [
           {
-            state: (state as unknown) as S,
+            state: state as unknown as S,
             triggerAction: lastHistoryAction,
           },
           ...next,
@@ -136,7 +136,7 @@ function undoable<S extends AppState>(
         lastHistoryAction: newCurrent.triggerAction,
         previous: [
           ...previous,
-          { state: (state as unknown) as S, triggerAction: lastHistoryAction },
+          { state: state as unknown as S, triggerAction: lastHistoryAction },
         ],
         next,
       }
@@ -149,7 +149,7 @@ function undoable<S extends AppState>(
         lastHistoryAction,
         ...stateRaw
       } = stateWithHistory
-      const state: S = (stateRaw as unknown) as any
+      const state: S = stateRaw as unknown as any
       const newState = reducer(state, action)
 
       const newPrevious: HistoryEntry<S>[] = [
