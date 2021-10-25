@@ -92,9 +92,7 @@ export class ClientWrapper {
 
   async waitUntilPresent(selector: string, ms?: number) {
     try {
-      return await (
-        await this._driver.client.$(selector)
-      ).waitForExist({
+      return await (await this._driver.client.$(selector)).waitForExist({
         timeout: ms,
       })
     } catch (err) {

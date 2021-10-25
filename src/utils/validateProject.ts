@@ -1,9 +1,9 @@
-import Ajv from 'ajv'
+import Ajv, { ErrorObject } from 'ajv'
 import projectMetadataJsonSchema from './validateProjectMetadata.json'
 import mediaJsonSchema from './validateProjectMedia.json'
 import betterAjvErrors from 'better-ajv-errors'
 
-const ajv = new Ajv({ jsonPointers: true })
+const ajv = new Ajv()
 
 const validateProjectMetadata = ajv.compile(projectMetadataJsonSchema)
 const validateMedia = ajv.compile(mediaJsonSchema)
@@ -11,7 +11,7 @@ const validateMedia = ajv.compile(mediaJsonSchema)
 const getErrors = (
   schema: any,
   json: any,
-  errors: Ajv.ErrorObject[] | null | undefined
+  errors: ErrorObject[] | null | undefined
 ) => {
   const result: string = betterAjvErrors(schema, json, errors, {
     // with default format: cli option, returns a string
