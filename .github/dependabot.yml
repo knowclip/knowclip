@@ -12,7 +12,9 @@ updates:
     schedule:
       interval: "daily"
     ignore:
+      # locked to electron
     - dependency-name: "@types/node"
+      # locked to react-scripts
     - dependency-name: "@types/jest"
     - dependency-name: "@types/react"
     - dependency-name: "@types/react-dom"

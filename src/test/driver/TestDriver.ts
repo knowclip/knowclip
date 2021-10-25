@@ -1,4 +1,4 @@
-import { BrowserObject, remote } from 'webdriverio'
+import { Browser, remote } from 'webdriverio'
 import Chromedriver from './Chromedriver'
 import request from 'request'
 import {
@@ -113,7 +113,7 @@ export async function createTestDriver({
     7000
   )
 
-  const browser: BrowserObject = await remote({
+  const browser: Browser<'async'> = await remote({
     waitforTimeout: 30000,
     hostname,
     port, // "9515" is the port opened by chrome driver.
@@ -143,7 +143,7 @@ export async function createTestDriver({
 
 export class TestDriver {
   isReady: Promise<MessageResponse<boolean>>
-  client: BrowserObject
+  client: Browser<'async'>
   _driver: Chromedriver
 
   constructor({
@@ -151,7 +151,7 @@ export class TestDriver {
     browser,
   }: {
     driver: Chromedriver
-    browser: BrowserObject
+    browser: Browser<'async'>
   }) {
     this.client = browser
     this._driver = driver
@@ -225,6 +225,6 @@ export class TestDriver {
   async closeWindow() {
     await this.client.execute(() => {
       return require('electron').ipcRenderer.invoke('close')
-    }, [])
+    })
   }
 }

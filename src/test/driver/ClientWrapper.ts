@@ -35,12 +35,12 @@ export class ClientWrapper {
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
     if (typeof count === 'number' && count <= 0)
       throw new Error('Count must be at least 1')
-    let elementsSoFar: Element[] | undefined
+    let elementsSoFar: Element<'async'>[] | undefined
     try {
       if (count)
         await this._driver.client.waitUntil(
           async () => {
-            const elements: Element[] = await this._driver.client.$$(selector)
+            const elements: Element<'async'>[] = await this._driver.client.$$(selector)
             elementsSoFar = elements
             return elements.length === count
           },
