@@ -30,7 +30,7 @@ jobs:
       run: |
         npm run integration
     - name: build
-      run: npm run dist --mac
+      run: npm run dist -- --mac
       env:
         CI: true
     - name: Create Release

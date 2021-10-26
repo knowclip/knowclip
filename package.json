@@ -166,6 +166,7 @@
     "appId": "com.electron.knowclip",
     "asar": true,
     "productName": "Knowclip",
+    "npmRebuild": false,
     "copyright": "Copyright 2020 Justin Silvestre",
     "files": [
       "./build/**/*",

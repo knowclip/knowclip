@@ -79,6 +79,13 @@ npm test -- -t "clips reducer"
 
 Upgrading Electron version requires a few config files to be touched.
 
-* Node version in [.nvmrc](./.nvmrc), [.tool-versions](./.tool-versions), and `"engines"` in [package.json](./package.json).
-* Electron version in [.npmrc](./.npmrc) `"browserslist"` and `"dependencies"` in [package.json](./package.json)
-* Chromedriver version in `"dependencies"` [package.json](./package.json) 
+* Node version must be updated in:
+  * [.nvmrc](./.nvmrc),
+  * [.tool-versions](./.tool-versions)
+  * `"engines"` in [package.json](./package.json)
+  * Github workflows (Mac, Linux, and Windows)
+* Electron version must be updated in:
+  * [.npmrc](./.npmrc) `"browserslist"`
+  * `"dependencies"` in [package.json](./package.json)
+* Chromedriver version must be updated in:
+  * `"dependencies"` [package.json](./package.json)
