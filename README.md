@@ -75,3 +75,10 @@ So if you wanted to say, run just one specific test, you can do something like t
 npm test -- -t "clips reducer"
 ```
 
+#### Electron upgrade config checklist
+
+Upgrading Electron version requires a few config files to be touched.
+
+* Node version in [.nvmrc](./.nvmrc), [.tool-versions](./.tool-versions), and `"engines"` in [package.json](./package.json).
+* Electron version in [.npmrc](./.npmrc) `"browserslist"` and `"dependencies"` in [package.json](./package.json)
+* Chromedriver version in `"dependencies"` [package.json](./package.json) 
