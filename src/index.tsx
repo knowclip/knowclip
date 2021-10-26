@@ -41,3 +41,7 @@ sendToMainProcess({
     document.getElementById('root')
   )
 })
+
+// on create new card with blank fields, focus transcription field
+
+// define action types and action creators according to one way. maybe delete individual types and use only ActionOf.
