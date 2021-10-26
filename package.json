@@ -102,7 +102,7 @@
     "build-schemas": "npm run build-schema:project && npm run build-schema:media",
     "build-schema:project": "npm run build-schema -- --out ./src/utils/validateProjectMetadata.json --type \\ProjectMetadataJson ",
     "build-schema:media": "npm run build-schema -- --out ./src/utils/validateProjectMedia.json --type \\$MediaJson",
-    "build-schema": "npm run ts-json-schema-generator -path ./src/types/Project.ts --tsconfig ./tsconfig.json",
+    "build-schema": "ts-json-schema-generator --path ./src/types/Project.ts --tsconfig ./tsconfig.json",
     "tidy": "npm run format -- --list-different && npm run lint && npm run tsc",
     "electron-builder": "electron-builder",
     "electron-builder:skip-publish": "electron-builder -p never",
