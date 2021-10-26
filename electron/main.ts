@@ -7,6 +7,8 @@ import { ROOT_DIRECTORY } from './root'
 import { getStartUrl, WINDOW_START_DIMENSIONS } from './window'
 import { handleMessages } from '../src/messages'
 
+require('electron-store').initRenderer()
+
 const { isPackaged } = app
 
 const Sentry = require('@sentry/electron')
