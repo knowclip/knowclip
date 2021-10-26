@@ -28,7 +28,7 @@ jobs:
         Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         npm run integration
     - name: build
-      run: npm run dist --linux
+      run: npm run dist -- --linux
       env:
         CI: false
     - name: Upload test screenshots
