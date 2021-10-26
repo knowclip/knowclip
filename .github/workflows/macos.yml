@@ -19,18 +19,18 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install and test
+    - name: npm install and test
       run: |
-        yarn install --frozen-lockfile --network-timeout 300000
-        yarn format --list-different
-        yarn lint
-        yarn tsc
-        yarn test
+        npm ci
+        npm run format -- --list-different
+        npm run lint
+        npm run tsc
+        npm run test
     - name: integration tests
       run: |
-        yarn integration
+        npm run integration
     - name: build
-      run: yarn dist --mac
+      run: npm run dist --mac
       env:
         CI: true
     - name: Create Release

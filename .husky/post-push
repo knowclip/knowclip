@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo '############ BUILDING JSON SCHEMAS JUST IN CASE! ###############' && yarn build-schemas
+echo '############ BUILDING JSON SCHEMAS JUST IN CASE! ###############' && npm run build-schemas
