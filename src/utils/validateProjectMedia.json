@@ -1,4 +1,5 @@
 {
+  "$ref": "#/definitions/%24MediaJson",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "$MediaJson": {
@@ -260,16 +261,6 @@
       ],
       "type": "object"
     },
-    "FlashcardFields": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/SimpleFlashcardFields"
-        },
-        {
-          "$ref": "#/definitions/TransliterationFlashcardFields"
-        }
-      ]
-    },
     "MediaJson<SimpleFlashcardFields>": {
       "anyOf": [
         {
@@ -450,58 +441,6 @@
         }
       ]
     },
-    "ProjectMetadataJson": {
-      "additionalProperties": false,
-      "properties": {
-        "createdAt": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "noteType": {
-          "enum": [
-            "Simple",
-            "Transliteration"
-          ],
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "id",
-        "createdAt",
-        "noteType",
-        "timestamp"
-      ],
-      "type": "object"
-    },
-    "SimpleFlashcardFields": {
-      "additionalProperties": false,
-      "properties": {
-        "meaning": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        },
-        "transcription": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "transcription",
-        "meaning",
-        "notes"
-      ],
-      "type": "object"
-    },
     "SubtitlesFlashcardFieldsLinks": {
       "additionalProperties": false,
       "properties": {
@@ -529,30 +468,6 @@
           "$ref": "#/definitions/ExternalSubtitlesJson"
         }
       ]
-    },
-    "TransliterationFlashcardFields": {
-      "additionalProperties": false,
-      "properties": {
-        "meaning": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        },
-        "pronunciation": {
-          "type": "string"
-        },
-        "transcription": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "transcription",
-        "pronunciation",
-        "meaning",
-        "notes"
-      ],
-      "type": "object"
     }
   }
 }
