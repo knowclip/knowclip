@@ -13,9 +13,6 @@ export const sessionActions = {
     loop,
   }),
 
-  playMedia: () => ({ type: A.playMedia }),
-  pauseMedia: () => ({ type: A.pauseMedia }),
-
   setViewMode: (viewMode: ViewMode) => ({
     type: A.setViewMode,
     viewMode,

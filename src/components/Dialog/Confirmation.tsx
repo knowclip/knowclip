@@ -5,6 +5,7 @@ import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 
 enum $ {
+  container = 'confirmation-dialog',
   cancelButton = 'confirmation-dialog-cancel-button',
   okButton = 'confirmation-dialog-ok-button',
 }
@@ -32,7 +33,7 @@ const ConfirmationDialog = ({
   )
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent style={{ whiteSpace: 'pre-line' }}>
         {message}
       </DialogContent>

@@ -24,7 +24,7 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
       showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
     })
 
-    await client.waitForText_(fileSelectionForm$.container, 'pbc_jp.ass')
+    await client.waitForText_(fileSelectionForm$.form, 'pbc_jp.ass')
     await client.clickElement_(fileSelectionForm$.filePathField)
     await client.clickElement_(fileSelectionForm$.continueButton)
     await client.waitUntilGone_(fileSelectionForm$.continueButton)

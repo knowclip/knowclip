@@ -13,9 +13,9 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
       2
     )
     await secondMediaFile.click()
-    await client.waitForVisible_(fileSelectionForm$.container)
+    await client.waitForVisible_(fileSelectionForm$.form)
     await client.waitForText_(
-      fileSelectionForm$.container,
+      fileSelectionForm$.form,
       'Please locate your media file "piggeldy_cat.mp4" in the filesystem so you can make clips with it.'
     )
   })
@@ -44,7 +44,7 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
     await firstMediaFile.click()
 
     await client.waitForText_(
-      fileSelectionForm$.container,
+      fileSelectionForm$.form,
       'polar_bear_cafe.mp4'
     )
   })
@@ -60,7 +60,7 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
   })
 
   await testBlock('dismiss subtitles dialog and snackbar', async () => {
-    await client.waitForText_(fileSelectionForm$.container, 'pbc_jp.ass')
+    await client.waitForText_(fileSelectionForm$.form, 'pbc_jp.ass')
     await client.clickElement_(fileSelectionForm$.cancelButton)
     await client.clickElement_(snackbar$.closeButton)
     await client.waitUntilGone_(snackbar$.closeButton)

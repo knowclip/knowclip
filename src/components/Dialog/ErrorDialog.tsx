@@ -5,6 +5,9 @@ import { DialogProps } from './DialogProps'
 import css from './ErrorDialog.module.css'
 import { actions } from '../../actions'
 
+enum $ { container = 'error-dialog' }
+export { $ as errorDialog$ }
+
 const ErrorDialog = ({
   open,
   data: { message, log },
@@ -19,7 +22,7 @@ const ErrorDialog = ({
   )
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
         <p>{message}</p>
 

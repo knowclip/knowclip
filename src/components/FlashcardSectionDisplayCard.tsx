@@ -35,7 +35,6 @@ const FlashcardSectionDisplayCard = memo(
         currentNoteType: r.getCurrentNoteType(state),
         isLoopOn: r.getLoopState(state),
         fieldsToTracks: r.getSubtitlesFlashcardFieldLinks(state),
-        mediaIsPlaying: r.isMediaPlaying(state),
         viewMode: state.settings.viewMode,
       })
     )

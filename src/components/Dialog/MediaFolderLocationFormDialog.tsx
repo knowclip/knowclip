@@ -5,6 +5,9 @@ import MediaFolderLocationForm from '../MediaFolderLocationForm'
 import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
 
+enum $ { container = 'media-folder-location-form-dialog' }
+export { $ as mediaFolderLocationFormDialog$ }
+
 const MediaFolderLocationFormDialog = ({
   open,
   data: { action },
@@ -16,7 +19,7 @@ const MediaFolderLocationFormDialog = ({
   }, [dispatch, action])
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
         <MediaFolderLocationForm onSubmit={dispatchAction} />
       </DialogContent>

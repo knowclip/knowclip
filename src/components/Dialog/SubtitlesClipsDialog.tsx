@@ -23,6 +23,7 @@ import { TransliterationFlashcardFields } from '../../types/Project'
 import { getFileFilters } from '../../utils/files'
 
 enum $ {
+  container = 'subtitles-clips-dialog',
   loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
   transcriptionField = 'subtitles-clips-transcription-field',
   pronunciationField = 'subtitles-clips-pronunciation-field',
@@ -173,7 +174,7 @@ const SubtitlesClipsDialog = ({
   const { fields, errorText } = state
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
         <form
           onSubmit={useCallback(

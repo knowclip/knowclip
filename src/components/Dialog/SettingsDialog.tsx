@@ -31,6 +31,7 @@ import { displayDictionaryType } from '../../selectors'
 import { ImportInterruptedListIcon } from './DictionariesDialog'
 
 enum $ {
+  container = 'settings-dialog',
   cancelButton = 'settings-dialog-cancel-button',
   saveButton = 'settings-dialog-save-button',
 }
@@ -57,7 +58,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   }, [close, dispatch, settings])
 
   return (
-    <Dialog open={open} fullScreen>
+    <Dialog open={open} fullScreen className={$.container}>
       <DialogTitle>Settings</DialogTitle>
       <DialogContent className={css.container}>
         <section className={css.settingsGroup}>

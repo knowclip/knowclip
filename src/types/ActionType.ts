@@ -4,8 +4,6 @@ const ActionTypes = {
   setCurrentFile: 'setCurrentFile',
   toggleLoop: 'toggleLoop',
   setLoop: 'setLoop',
-  playMedia: 'playMedia',
-  pauseMedia: 'pauseMedia',
   setViewMode: 'setViewMode',
   dismissMedia: 'dismissMedia',
   initializeApp: 'initializeApp',

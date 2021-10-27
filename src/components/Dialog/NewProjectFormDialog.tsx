@@ -21,6 +21,7 @@ import { actions } from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
 enum $ {
+  container = 'new-project-form-dialog',
   projectNameField = 'project-name',
   projectFileLocationField = 'project-file-location',
   noteTypeSelect = 'note-type-select',
@@ -173,7 +174,7 @@ const NewProjectFormDialog = ({
   }, [setFilePathText])
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
         <form className={css.form} onSubmit={handleSubmit}>
           <h3>New project</h3>

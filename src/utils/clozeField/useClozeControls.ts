@@ -10,6 +10,7 @@ import {
 import { KEYS } from '../keyboard'
 import { getSelectionWithin, setSelectionRange } from './domSelection'
 import { useClozeCursorPosition } from './useClozeUiEffects'
+import { isMediaPlaying } from '../media'
 
 const empty: ClozeDeletion[] = []
 
@@ -30,7 +31,6 @@ export default function useClozeControls({
   ) => void
   onDeleteClozeCard?: (clozeIndex: number) => void
 }) {
-  const playing = useSelector((state: AppState) => r.isMediaPlaying(state))
   const dispatch = useDispatch()
 
   const inputRef = useRef<HTMLSpanElement>(null)
@@ -53,9 +53,9 @@ export default function useClozeControls({
       } else {
         _setClozeIndex(newIndex)
       }
-      if (playing) dispatch(r.setLoop(newIndex !== -1 ? 'EDIT' : false))
+      if (isMediaPlaying()) dispatch(r.setLoop(newIndex !== -1 ? 'EDIT' : false))
     },
-    [clozeIndex, deletions, dispatch, onDeleteClozeCard, playing]
+    [clozeIndex, deletions, dispatch, onDeleteClozeCard]
   )
   useEffect(() => {
     ;(window as any).cloze = clozeIndex !== -1

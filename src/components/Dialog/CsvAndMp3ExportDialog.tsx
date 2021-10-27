@@ -25,6 +25,9 @@ type ErrorsState = {
   mediaFolderLocation?: string
 }
 
+enum $ { container = 'csv-and-mp3-export-dialog' }
+export { $ as csvAndMp3ExportDialog$ }
+
 const CsvAndMp3ExportDialog = ({
   open,
   data: { mediaFileIdsToClipIds },
@@ -98,7 +101,7 @@ const CsvAndMp3ExportDialog = ({
   )
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
         <form
           onSubmit={useCallback(

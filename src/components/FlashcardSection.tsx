@@ -31,12 +31,14 @@ const FlashcardSection = ({
   projectFile,
   selectPrevious,
   selectNext,
+  mediaIsPlaying
 }: {
   mediaFile: MediaFile | null
   className?: string
   projectFile: ProjectFile
   selectPrevious: () => void
   selectNext: () => void
+  mediaIsPlaying: boolean
 }) => {
   const {
     waveformSelection,
@@ -117,6 +119,7 @@ const FlashcardSection = ({
           mediaFile={mediaFile}
           flashcard={flashcard}
           clipId={highlightedClip.id}
+          mediaIsPlaying={mediaIsPlaying}
           autofocusFieldName={autofocusFieldName}
         />
       )}
