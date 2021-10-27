@@ -12,8 +12,6 @@ import { SELECTION_BORDER_MILLISECONDS } from 'clipwave'
 
 export const getLoopState = (state: AppState) => state.session.loopMedia
 
-export const isMediaPlaying = (state: AppState) => state.session.mediaIsPlaying
-
 export const getConstantBitrateFilePath = (
   state: AppState,
   id: MediaFileId

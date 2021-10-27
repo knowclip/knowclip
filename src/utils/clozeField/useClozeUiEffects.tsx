@@ -8,6 +8,7 @@ import { getSelectionWithin, setSelectionRange } from './domSelection'
 import r from '../../redux'
 import { KEYS } from '../keyboard'
 import { ClozeControls } from './useClozeControls'
+import { isMediaPlaying } from '../media'
 
 export function useClozeUiEffects(
   clozeControls: ClozeControls,
@@ -15,7 +16,6 @@ export function useClozeUiEffects(
   dispatch: any,
   dictionaryPopoverIsShowing: boolean,
   editing: boolean,
-  isMediaPlaying: boolean,
   loopState: LoopState
 ) {
   const {
@@ -152,19 +152,12 @@ export function useClozeUiEffects(
           const currentlySelected = selection.end - selection.start !== 0
           if (!currentlySelected) setCursorPosition(0)
         }
-        if (!editing && isMediaPlaying) {
+        if (!editing && isMediaPlaying()) {
           dispatch(r.setLoop('FOCUS'))
         }
       }
     },
-    [
-      dictionaryPopoverIsShowing,
-      ref,
-      editing,
-      isMediaPlaying,
-      setCursorPosition,
-      dispatch,
-    ]
+    [dictionaryPopoverIsShowing, ref, editing, setCursorPosition, dispatch]
   )
   const handleBlur = useCallback(
     (_e) => {

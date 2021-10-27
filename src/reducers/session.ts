@@ -12,7 +12,6 @@ const initialState: SessionState = {
   workIsUnsaved: false,
   tagsToClipIds: {},
   loopMedia: false,
-  mediaIsPlaying: false,
   progress: null,
   editingCards: false,
   dictionaryPopoverIsOpen: false,
@@ -187,10 +186,6 @@ const session: Reducer<SessionState, Action> = (
         }
       return state
     }
-    case A.playMedia:
-      return { ...state, mediaIsPlaying: true }
-    case A.pauseMedia:
-      return { ...state, mediaIsPlaying: false }
 
     case A.setProgress:
       return {

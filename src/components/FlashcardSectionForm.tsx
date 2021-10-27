@@ -41,6 +41,7 @@ const FlashcardSectionForm = memo(
   ({
     className,
     mediaFile,
+    mediaIsPlaying,
     autofocusFieldName,
     flashcard,
   }: {
@@ -48,6 +49,7 @@ const FlashcardSectionForm = memo(
     mediaFile: MediaFile
     clipId: ClipId
     flashcard: Flashcard
+    mediaIsPlaying: boolean
     autofocusFieldName: FlashcardFieldName
   }) => {
     const {
@@ -56,7 +58,6 @@ const FlashcardSectionForm = memo(
       isLoopOn,
       subtitlesFlashcardFieldLinks,
       subtitles,
-      mediaIsPlaying,
       viewMode,
     } = useSelector((state: AppState) => ({
       allTags: r.getAllTags(state),
@@ -64,7 +65,6 @@ const FlashcardSectionForm = memo(
       isLoopOn: r.getLoopState(state),
       subtitlesFlashcardFieldLinks: r.getSubtitlesFlashcardFieldLinks(state),
       subtitles: r.getSubtitlesFilesWithTracks(state),
-      mediaIsPlaying: r.isMediaPlaying(state),
       viewMode: state.settings.viewMode,
     }))
     const { id } = flashcard

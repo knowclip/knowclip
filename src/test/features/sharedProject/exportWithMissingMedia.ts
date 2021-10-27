@@ -30,7 +30,7 @@ export default async function exportWithMissingMedia({
   })
   await client.clickElement_(fileSelectionForm$.filePathField)
   await client.clickElement_(fileSelectionForm$.continueButton)
-  await client.waitUntilGone_(fileSelectionForm$.container)
+  await client.waitUntilGone_(fileSelectionForm$.form)
 
   await client.clickElement_(dialog$.continueButton)
   const mediaCheckboxesChecked = await checkboxesChecked(

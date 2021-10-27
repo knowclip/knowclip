@@ -9,7 +9,6 @@ declare type SessionState = {
   currentMediaFileId: MediaFileId | null
   workIsUnsaved: boolean
   loopMedia: LoopState
-  mediaIsPlaying: boolean
   editingCards: boolean
   dictionaryPopoverIsOpen: boolean
 

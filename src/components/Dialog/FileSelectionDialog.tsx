@@ -19,10 +19,11 @@ import { showOpenDialog } from '../../utils/electron'
 import { getFileAvailability } from '../../selectors'
 
 enum $ {
-  container = 'file-selection-form-container',
-  filePathField = 'file-selection-form-file-path-field',
-  cancelButton = 'file-selection-form-cancel-button',
-  continueButton = 'file-selection-form-continue-button',
+  container = 'file-selection-dialog',
+  form = 'file-selection-dialog-form',
+  filePathField = 'file-selection-dialog-file-path-field',
+  cancelButton = 'file-selection-dialog-cancel-button',
+  continueButton = 'file-selection-dialog-continue-button',
 }
 
 const FileSelectionDialog = ({
@@ -73,9 +74,9 @@ const FileSelectionDialog = ({
   //       and close dialog in that case.
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
-        <section className={css.container} id={$.container}>
+        <section className={css.container} id={$.form}>
           <p className={css.prompt}>{message}</p>
           <form className={css.form}>
             <TextField

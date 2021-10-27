@@ -27,7 +27,8 @@ import { formatDurationWithMilliseconds } from '../../utils/formatTime'
 import moment from 'moment'
 
 enum $ {
-  container = 'link-subtitles-dialog-container',
+  container = 'link-subtitles-dialog',
+  form = 'link-subtitles-dialog-form',
   skipButton = 'link-subtitles-dialog-skip-button',
 }
 
@@ -172,8 +173,8 @@ const LinkSubtitlesDialog = ({
     )
 
   return (
-    <Dialog open={open}>
-      <form onSubmit={handleSubmit} id={$.container}>
+    <Dialog open={open} className={$.container}>
+      <form onSubmit={handleSubmit} id={$.form}>
         <DialogContent>
           {prompt}
           <FormControl fullWidth margin="normal">

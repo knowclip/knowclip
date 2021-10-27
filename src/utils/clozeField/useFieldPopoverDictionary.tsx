@@ -15,6 +15,7 @@ import { usePrevious } from '../usePrevious'
 import { useClozeUiEffects } from './useClozeUiEffects'
 import { LETTERS_DIGITS_PLUS } from '../dictCc'
 import { getMousePosition } from '../mousePosition'
+import { isMediaPlaying } from '../media'
 
 function getMouseoverChar(mousePosition: [number, number] | null) {
   if (!mousePosition) return null
@@ -38,9 +39,8 @@ export function useFieldPopoverDictionary(
 ) {
   const { inputRef: ref } = clozeControls
   const dispatch = useDispatch()
-  const { isMediaPlaying, loopState, popoverIsOpenFromStore } = useSelector(
+  const { loopState, popoverIsOpenFromStore } = useSelector(
     (state: AppState) => ({
-      isMediaPlaying: r.isMediaPlaying(state),
       loopState: r.getLoopState(state),
       popoverIsOpenFromStore: state.session.dictionaryPopoverIsOpen,
     })
@@ -61,35 +61,21 @@ export function useFieldPopoverDictionary(
   // loop when using dictionary
   useEffect(() => {
     const openingPopover = popover.isOpen && !previousPopoverIsOpen
-    if (openingPopover && !editing && isMediaPlaying) {
+    if (openingPopover && !editing && isMediaPlaying()) {
       dispatch(r.setLoop('FOCUS'))
     }
-  }, [
-    isMediaPlaying,
-    popover.isOpen,
-    editing,
-    previousPopoverIsOpen,
-    loopState,
-    dispatch,
-  ])
+  }, [popover.isOpen, editing, previousPopoverIsOpen, loopState, dispatch])
 
   const popoverWasOpen = usePrevious(popover.isOpen)
 
   useEffect(() => {
     const closingPopover = popoverWasOpen && !popover.isOpen
     if (closingPopover) {
-      if (isMediaPlaying && !editing && loopState === 'FOCUS') {
+      if (isMediaPlaying() && !editing && loopState === 'FOCUS') {
         dispatch(r.setLoop(false))
       }
     }
-  }, [
-    dispatch,
-    editing,
-    isMediaPlaying,
-    loopState,
-    popover.isOpen,
-    popoverWasOpen,
-  ])
+  }, [dispatch, editing, loopState, popover.isOpen, popoverWasOpen])
 
   useEffect(() => {
     if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {
@@ -100,7 +86,6 @@ export function useFieldPopoverDictionary(
     popover.isOpen,
     popoverIsOpenFromStore,
     closePopover,
-    isMediaPlaying,
     editing,
     loopState,
     dispatch,
@@ -121,7 +106,6 @@ export function useFieldPopoverDictionary(
       dispatch,
       dictionaryPopoverIsShowing,
       editing,
-      isMediaPlaying,
       loopState
     )
 

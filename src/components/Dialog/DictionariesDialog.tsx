@@ -24,6 +24,11 @@ import { Delete, Warning } from '@material-ui/icons'
 import { openInBrowser } from '../../utils/electron'
 import { useLocalSettingsReducer } from './SettingsDialog'
 
+enum $ {
+  container = 'dictionaries-dialog',
+}
+export { $ as dictionariesDialog$ }
+
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
   const { settings, dispatchLocal } = useLocalSettingsReducer()
@@ -97,7 +102,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
     [dispatchLocal, settings.activeDictionaries]
   )
   return (
-    <Dialog open={open}>
+    <Dialog open={open} className={$.container}>
       <DialogContent>
         <div style={{ minWidth: '500px' }}>
           {progress && progress.message.toLowerCase().includes('import') && (
@@ -149,6 +154,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                 {dictionaryFiles.map(({ file, availability }) => {
                   return (
                     <DictionaryFileItem
+                      key={file.id}
                       {...{
                         availability,
                         file,

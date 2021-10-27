@@ -9,13 +9,18 @@ import {
 } from '@material-ui/core'
 import { theme } from './theme'
 
+enum $ {
+  container = 'error-message',
+}
+export { $ as errorMessage$ }
+
 const ErrorMessage = ({ reactError }: { reactError: any }) => {
   console.log('crash:', { reactError })
   console.error(reactError)
 
   return (
     <MuiThemeProvider theme={theme}>
-      <Dialog open={true}>
+      <Dialog open={true} className={$.container}>
         <DialogContent>
           <DialogContentText>
             An error has occurred. Please restart the app to continue.
