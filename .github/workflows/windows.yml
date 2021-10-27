@@ -27,7 +27,7 @@ jobs:
         REACT_APP_CHROMEDRIVER: true
         SPECTRON_LOG_FAILURES: true
         APPVEYOR: true
-    - name: Upload test artifacts
+    - name: Upload test screenshots
       uses: actions/upload-artifact@v2
       with:
         name: tmp-test
@@ -38,14 +38,12 @@ jobs:
       env:
         APPVEYOR: true
         CI: false
-    - name: Upload test artifacts
+    - name: Upload test screenshots
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: test-artifacts
-        path: |
-          tmp-test
-          screenshots
+        name: test-screenshots
+        path: screenshots
     - name: Upload build artifacts
       if: "!startsWith(github.ref, 'refs/tags/')"
       uses: actions/upload-artifact@v2
