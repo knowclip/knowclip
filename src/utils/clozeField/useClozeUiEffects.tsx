@@ -146,7 +146,6 @@ export function useClozeUiEffects(
 
   const handleFocus = useCallback(
     (_e) => {
-      console.log({ dictionaryPopoverIsShowing, editing,  })
       if (!dictionaryPopoverIsShowing) {
         if (ref.current) {
           const selection = getSelectionWithin(ref.current)
