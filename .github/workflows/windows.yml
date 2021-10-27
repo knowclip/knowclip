@@ -39,6 +39,7 @@ jobs:
         APPVEYOR: true
         CI: false
     - name: Upload test artifacts
+      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: tmp-test

@@ -45,6 +45,7 @@ jobs:
         draft: true
         prerelease: false
     - name: Upload test artifacts
+      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: tmp-test
