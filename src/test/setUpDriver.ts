@@ -8,6 +8,7 @@ import { createTestDriver, TestDriver } from './driver/TestDriver'
 const rootDir = join(process.cwd())
 
 export const TMP_DIRECTORY = join(rootDir, 'tmp-test')
+export const SCREENSHOTS_DIRECTORY = join(rootDir, 'tmp-test', 'screenshots')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
 export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
@@ -111,6 +112,7 @@ export async function stopApp(context: {
 async function copyFixtures() {
   if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
   await mkdirp(TMP_DIRECTORY)
+  await mkdirp(SCREENSHOTS_DIRECTORY)
   await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
 }
 

@@ -31,6 +31,12 @@ jobs:
       run: yarn dist --linux
       env:
         CI: false
+    - name: Upload test artifacts
+      if: "!startsWith(github.ref, 'refs/tags/')"
+      uses: actions/upload-artifact@v2
+      with:
+        name: tmp-test
+        path: tmp-test
     - name: Upload build artifacts
       if: "!startsWith(github.ref, 'refs/tags/')"
       uses: actions/upload-artifact@v2

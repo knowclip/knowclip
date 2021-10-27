@@ -1,5 +1,8 @@
+import filenamify from 'filenamify/filenamify'
+import moment from 'moment'
+import { join } from 'path'
 import { stdout } from 'process'
-import { TestSetup } from '../setUpDriver'
+import { SCREENSHOTS_DIRECTORY, TestSetup } from '../setUpDriver'
 
 type TestStep = {
   description: string
@@ -9,7 +12,27 @@ type TestStep = {
 export const step = (
   description: string,
   runTest: (setup: TestSetup) => Promise<any>
-): TestStep => ({ description, runTest })
+): TestStep => ({
+  description,
+  runTest: async (setup) => {
+    try {
+      await runTest(setup)
+    } catch (error) {
+      try {
+        const screenshotFilepath = join(
+          SCREENSHOTS_DIRECTORY,
+          filenamify(
+            moment().toISOString() + '___' + expect.getState().currentTestName
+          ) + '.png'
+        )
+        await setup.client._driver.client.saveScreenshot(screenshotFilepath)
+      } catch (screenshotError) {
+        console.error(screenshotError)
+      }
+      throw error
+    }
+  },
+})
 
 export const runAll = (testSteps: TestStep[], getSetup: () => TestSetup) => {
   testSteps.forEach(({ description, runTest }) => {
