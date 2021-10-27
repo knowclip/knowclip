@@ -8,7 +8,7 @@ import { createTestDriver, TestDriver } from './driver/TestDriver'
 const rootDir = join(process.cwd())
 
 export const TMP_DIRECTORY = join(rootDir, 'tmp-test')
-export const SCREENSHOTS_DIRECTORY = join(rootDir, 'tmp-test', 'screenshots')
+export const SCREENSHOTS_DIRECTORY = join('screenshots')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
 export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')

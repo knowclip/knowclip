@@ -48,8 +48,10 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: tmp-test
-        path: tmp-test
+        name: test-artifacts
+        path: |
+          tmp-test
+          screenshots
     - name: Upload build artifacts
       if: "!startsWith(github.ref, 'refs/tags/')"
       uses: actions/upload-artifact@v2
