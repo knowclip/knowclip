@@ -31,7 +31,7 @@ const FlashcardSection = ({
   projectFile,
   selectPrevious,
   selectNext,
-  mediaIsPlaying
+  mediaIsPlaying,
 }: {
   mediaFile: MediaFile | null
   className?: string

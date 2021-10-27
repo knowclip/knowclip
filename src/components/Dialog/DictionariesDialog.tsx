@@ -24,7 +24,9 @@ import { Delete, Warning } from '@material-ui/icons'
 import { openInBrowser } from '../../utils/electron'
 import { useLocalSettingsReducer } from './SettingsDialog'
 
-enum $ { container = 'dictionaries-dialog' }
+enum $ {
+  container = 'dictionaries-dialog',
+}
 export { $ as dictionariesDialog$ }
 
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {

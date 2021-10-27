@@ -64,13 +64,7 @@ export function useFieldPopoverDictionary(
     if (openingPopover && !editing && isMediaPlaying()) {
       dispatch(r.setLoop('FOCUS'))
     }
-  }, [
-    popover.isOpen,
-    editing,
-    previousPopoverIsOpen,
-    loopState,
-    dispatch,
-  ])
+  }, [popover.isOpen, editing, previousPopoverIsOpen, loopState, dispatch])
 
   const popoverWasOpen = usePrevious(popover.isOpen)
 
@@ -81,13 +75,7 @@ export function useFieldPopoverDictionary(
         dispatch(r.setLoop(false))
       }
     }
-  }, [
-    dispatch,
-    editing,
-    loopState,
-    popover.isOpen,
-    popoverWasOpen,
-  ])
+  }, [dispatch, editing, loopState, popover.isOpen, popoverWasOpen])
 
   useEffect(() => {
     if (popoverWasOpen && popover.isOpen && !popoverIsOpenFromStore) {

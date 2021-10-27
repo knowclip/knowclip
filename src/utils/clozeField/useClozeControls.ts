@@ -53,7 +53,8 @@ export default function useClozeControls({
       } else {
         _setClozeIndex(newIndex)
       }
-      if (isMediaPlaying()) dispatch(r.setLoop(newIndex !== -1 ? 'EDIT' : false))
+      if (isMediaPlaying())
+        dispatch(r.setLoop(newIndex !== -1 ? 'EDIT' : false))
     },
     [clozeIndex, deletions, dispatch, onDeleteClozeCard]
   )

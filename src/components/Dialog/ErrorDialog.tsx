@@ -5,7 +5,9 @@ import { DialogProps } from './DialogProps'
 import css from './ErrorDialog.module.css'
 import { actions } from '../../actions'
 
-enum $ { container = 'error-dialog' }
+enum $ {
+  container = 'error-dialog',
+}
 export { $ as errorDialog$ }
 
 const ErrorDialog = ({

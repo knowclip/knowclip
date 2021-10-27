@@ -9,7 +9,9 @@ import {
 } from '@material-ui/core'
 import { theme } from './theme'
 
-enum $ { container = 'error-message' }
+enum $ {
+  container = 'error-message',
+}
 export { $ as errorMessage$ }
 
 const ErrorMessage = ({ reactError }: { reactError: any }) => {

@@ -43,10 +43,7 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
     )
     await firstMediaFile.click()
 
-    await client.waitForText_(
-      fileSelectionForm$.form,
-      'polar_bear_cafe.mp4'
-    )
+    await client.waitForText_(fileSelectionForm$.form, 'polar_bear_cafe.mp4')
   })
 
   await testBlock('locate missing media file', async () => {

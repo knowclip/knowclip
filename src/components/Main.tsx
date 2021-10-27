@@ -142,7 +142,10 @@ const Main = () => {
     },
     [clipsMap, currentFileClipsOrder, resetWaveformState, subsBases.cards]
   )
-  const { playing: mediaIsPlaying } = usePlayButtonSync(waveform.state.pixelsPerSecond, playerRef)
+  const { playing: mediaIsPlaying } = usePlayButtonSync(
+    waveform.state.pixelsPerSecond,
+    playerRef
+  )
 
   const previousSelection = usePrevious(waveform.state.selection)
 

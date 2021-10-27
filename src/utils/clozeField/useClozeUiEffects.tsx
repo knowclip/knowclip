@@ -157,14 +157,7 @@ export function useClozeUiEffects(
         }
       }
     },
-    [
-      dictionaryPopoverIsShowing,
-      ref,
-      editing,
-      
-      setCursorPosition,
-      dispatch,
-    ]
+    [dictionaryPopoverIsShowing, ref, editing, setCursorPosition, dispatch]
   )
   const handleBlur = useCallback(
     (_e) => {
