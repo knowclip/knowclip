@@ -107,12 +107,13 @@
     "dist": "yarn build-main && yarn webpack:ci && yarn electron-builder:skip-publish",
     "dist:appveyor": "yarn build-main && yarn webpack:appveyor && yarn electron-builder",
     "yalc": "yalc",
-    "husky": "husky"
+    "husky": "husky",
+    "eslint": "eslint"
   },
   "lint-staged": {
     "./src/**/*.{ts,tsx,js}": [
       "yarn eslint",
-      "yarn prettier --ignore-path ./.gitignore"
+      "yarn prettier --list-different --ignore-path ./.gitignore"
     ]
   },
   "browserslist": [
