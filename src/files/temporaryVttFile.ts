@@ -74,17 +74,24 @@ export default {
         ]
       }
 
-      const external = r.getFile(
+      const external = r.getFile<ExternalSubtitlesFile>(
         state,
         'ExternalSubtitlesFile',
         validatedFile.parentId
-      ) as ExternalSubtitlesFile
+      )
       if ('error' in chunks) {
         return [
           r.simpleMessageSnackbar(
             `There was a problem reading subtitles from ${
-              external ? external.name : 'media file'
+              external ? external.name : '[external subtitles file not found]'
             }: ${chunks.error}`
+          ),
+        ]
+      }
+      if (!external) {
+        return [
+          r.simpleMessageSnackbar(
+            `External subtitles file not found for converted VTT track ${validatedFile.id}`
           ),
         ]
       }
