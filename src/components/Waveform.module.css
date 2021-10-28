@@ -89,13 +89,17 @@
   fill: #e4ecf7;
   font-size: 9px;
 }
-.subtitlesChunk:hover .subtitlesText {
+.subtitlesChunk:not(.unselectable):hover .subtitlesText {
   fill: black;
   cursor: default;
   pointer-events: none;
 }
  
-.subtitlesChunk:hover .subtitlesChunkRectangle {
+.subtitlesChunk:not(.unselectable):hover .subtitlesChunkRectangle {
   fill: #e4ecf7;
   opacity: 1;
+}
+
+.unselectable {
+  pointer-events: none;
 }

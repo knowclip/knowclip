@@ -26,9 +26,9 @@ import { setMousePosition } from '../utils/mousePosition'
 import 'clipwave/dist/index.css'
 import { SubtitlesCardBase } from '../selectors'
 import { usePrevious } from '../utils/usePrevious'
-import { useRenderSecondaryClip } from './waveformRenderSubtitlesChunks'
+import { useWaveformRenderSubtitlesChunk } from './WaveformSubtitlesChunk'
 import { waveform$ } from './waveformTestLabels'
-import { useWaveformRenderClip } from './useWaveformRenderClip'
+import { useWaveformRenderClip } from './WaveformClip'
 import { getFreshRegions } from '../epics/getFreshRegions'
 import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
 import { useWaveformEventHandlers } from '../utils/clipwave/useWaveformEventHandlers'
@@ -222,7 +222,7 @@ const Main = () => {
     })
 
   const renderPrimaryClip = useWaveformRenderClip()
-  const renderSecondaryClip = useRenderSecondaryClip(waveform)
+  const renderSecondaryClip = useWaveformRenderSubtitlesChunk(waveform)
 
   if (!currentProject) return <Redirect to="/projects" />
 

@@ -11,6 +11,7 @@ import saveAndCloseProject from './saveAndCloseProject'
 import { join } from 'path'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { TestDriver } from '../../driver/TestDriver'
+import { runAll, step } from '../step'
 
 jest.setTimeout(60000)
 
@@ -29,9 +30,15 @@ describe('make clips and cards from subtitles', () => {
     await mockSideEffects(setup.app, sideEffectsMocks)
   })
 
-  test('automatically make clips and cards from subtitles', () =>
-    makeCardsFromSubtitles(setup))
-  test('saves and closes project', () => saveAndCloseProject(setup))
+  runAll(
+    [
+      step('automatically make clips and cards from subtitles', (setup) =>
+        makeCardsFromSubtitles(setup)
+      ),
+      step('saves and closes project', (setup) => saveAndCloseProject(setup)),
+    ],
+    () => setup
+  )
 
   afterAll(async () => {
     await stopApp(context)
