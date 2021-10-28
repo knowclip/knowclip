@@ -1,3 +1,4 @@
+import { Console } from 'console'
 import filenamify from 'filenamify/filenamify'
 import moment from 'moment'
 import { join } from 'path'
@@ -25,6 +26,8 @@ export const step = (
             moment().toISOString() + '___' + expect.getState().currentTestName
           ) + '.png'
         )
+        console.log(`Saving screenshot to: ${screenshotFilepath}`)
+
         await setup.client._driver.client.saveScreenshot(screenshotFilepath)
       } catch (screenshotError) {
         console.error(screenshotError)
