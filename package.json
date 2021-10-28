@@ -4,7 +4,7 @@
   "version": "0.11.2-beta",
   "private": true,
   "engines": {
-    "node": "^14.18.0"
+    "node": "^16.5.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -68,7 +68,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build:homepage": "npm run -- --cwd homepage run build",
-    "postinstall": "npm rebuild",
     "start:integration": "REACT_APP_CHROMEDRIVER=true npm run start",
     "start:integration-win": "set REACT_APP_CHROMEDRIVER=true&& npm run start",
     "build-main": "npm run tsc -- ./electron/main.ts --outDir ./build-main",
@@ -100,9 +99,8 @@
     "format:write": "npm run format -- --write",
     "tsc": "tsc",
     "build-schemas": "npm run build-schema:project && npm run build-schema:media",
-    "build-schema:project": "npm run build-schema -- --path ./src/types/Project.ts --tsconfig ./tsconfig.json --out ./src/utils/validateProjectMetadata.json --type \\ProjectMetadataJson",
-    "build-schema:media": "npm run build-schema -- --path ./src/types/Project.ts --tsconfig ./tsconfig.json --out ./src/utils/validateProjectMedia.json --type '\\$MediaJson'",
-    "build-schema": "ts-json-schema-generator",
+    "build-schema:project": "ts-json-schema-generator --path ./src/types/Project.ts --tsconfig ./tsconfig.json --out ./src/utils/validateProjectMetadata.json --type \\ProjectMetadataJson",
+    "build-schema:media": "ts-json-schema-generator --path ./src/types/Project.ts --tsconfig ./tsconfig.json --out ./src/utils/validateProjectMedia.json --type '$MediaJson'",
     "tidy": "npm run format -- --list-different && npm run lint && npm run tsc",
     "electron-builder": "electron-builder",
     "electron-builder:skip-publish": "electron-builder -p never",
@@ -144,8 +142,8 @@
     "@types/yaml": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.1.0",
-    "chromedriver": "^93.0.0",
-    "electron": "^14.0.0",
+    "chromedriver": "^94.0.0",
+    "electron": "^15.0.0",
     "electron-builder": "^22.13.1",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^8.3.0",
