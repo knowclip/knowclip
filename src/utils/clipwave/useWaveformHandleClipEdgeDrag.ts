@@ -4,10 +4,15 @@ import {
   ClipStretch,
   recalculateRegions,
   WaveformInterface,
+  getRegionEnd,
 } from 'clipwave'
 import { actions } from '../../actions'
 import { Dispatch } from 'redux'
-import { SubtitlesCardBase, SubtitlesCardBases } from '../../selectors'
+import {
+  overlapsSignificantly,
+  SubtitlesCardBase,
+  SubtitlesCardBases,
+} from '../../selectors'
 import {
   STRETCH_START_DELAY,
   getStretchedClipOverlaps,
@@ -55,18 +60,22 @@ export function useWaveformHandleClipEdgeDrag(
       if (!region)
         console.error('region not found for stretch ' + stretchedClip.id)
 
-      const isSelectable = (sb: SubtitlesCardBase) =>
-        isWaveformItemSelectable(
+      const isSelectable = (sb: SubtitlesCardBase) => {
+        if (!overlapsSignificantly(sb, stretchedClip.start, stretchedClip.end))
+          return false
+        const stretchEndRegionIndex = regions.findIndex(
+          (r, i) => sb.start < getRegionEnd(regions, i) && sb.end > r.start
+        )
+        return isWaveformItemSelectable(
           sb,
-          region,
-          stretch.regionIndex,
-          waveform.state.regions,
+          regions[stretchEndRegionIndex],
+          stretchEndRegionIndex,
+          regions,
           waveform.getItem
         )
-      const subtitlesFront = region
-        ? allOverlappedFront.filter(isSelectable)
-        : []
-      const subtitlesBack = region ? allOverlappedBack.filter(isSelectable) : []
+      }
+      const subtitlesFront = allOverlappedFront.filter(isSelectable)
+      const subtitlesBack = allOverlappedBack.filter(isSelectable)
 
       const overlapIds = clips.map((c) => c.id)
 
