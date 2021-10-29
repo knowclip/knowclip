@@ -113,7 +113,7 @@
   "lint-staged": {
     "./src/**/*.{ts,tsx,js}": [
       "yarn eslint",
-      "yarn prettier --list-different --ignore-path ./.gitignore"
+      "yarn prettier --write --ignore-path ./.gitignore"
     ]
   },
   "browserslist": [
