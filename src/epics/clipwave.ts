@@ -3,12 +3,7 @@ import A from '../types/ActionType'
 import { actions } from '../actions'
 import { combineEpics, ofType } from 'redux-observable'
 import { getRegionEnd, secondsToMs } from 'clipwave'
-import {
-  getFlashcard,
-  getNewFlashcardForStretchedClip,
-  overlapsSignificantly,
-  SubtitlesCardBase,
-} from '../selectors'
+import { getFlashcard, getNewFlashcardForStretchedClip } from '../selectors'
 import { EMPTY, of } from 'rxjs'
 import { TransliterationFlashcardFields } from '../types/Project'
 

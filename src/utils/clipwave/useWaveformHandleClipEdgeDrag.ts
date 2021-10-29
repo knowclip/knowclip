@@ -8,11 +8,7 @@ import {
 } from 'clipwave'
 import { actions } from '../../actions'
 import { Dispatch } from 'redux'
-import {
-  overlapsSignificantly,
-  SubtitlesCardBase,
-  SubtitlesCardBases,
-} from '../../selectors'
+import { SubtitlesCardBase, SubtitlesCardBases } from '../../selectors'
 import {
   STRETCH_START_DELAY,
   getStretchedClipOverlaps,

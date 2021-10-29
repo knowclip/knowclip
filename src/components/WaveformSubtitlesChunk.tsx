@@ -7,9 +7,7 @@ import {
   msToPixels,
   SecondaryClipDisplayProps,
   SUBTITLES_CHUNK_HEIGHT,
-  useWaveform,
   WaveformInterface,
-  WaveformRegion,
   WAVEFORM_HEIGHT,
 } from 'clipwave'
 import { $ } from './waveformTestLabels'
@@ -82,7 +80,7 @@ function WaveformSubtitlesChunk({
   const handleClick = useCallback(() => {
     if (!isSelected)
       selectItemAndSeekTo(regionIndex, clip.id, getMediaPlayer(), clip.start)
-  }, [isSelected])
+  }, [clip.id, clip.start, isSelected, regionIndex, selectItemAndSeekTo])
 
   const cardBase = subsBases.cardsMap[clip.id]
   if (!cardBase) return null
