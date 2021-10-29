@@ -376,8 +376,9 @@ export const getNewFlashcardForStretchedClip = (
           base,
           subtitles,
           (fn) =>
-            currentlyBlankFieldNames.has(fn) ||
-            (!isSelectable && newlyOverlapped(base))
+            isSelectable
+              ? newlyOverlapped(base)
+              : currentlyBlankFieldNames.has(fn)
         ),
 
         cloze: [],
@@ -390,8 +391,9 @@ export const getNewFlashcardForStretchedClip = (
           base,
           subtitles,
           (fn) =>
-            currentlyBlankFieldNames.has(fn) ||
-            (!isSelectable && newlyOverlapped(base))
+            isSelectable
+              ? newlyOverlapped(base)
+              : currentlyBlankFieldNames.has(fn)
         ),
         cloze: [],
       })
