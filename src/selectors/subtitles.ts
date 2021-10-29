@@ -8,6 +8,7 @@ import {
 } from '../types/Project'
 import { SubtitlesCardBase } from './cardPreview'
 import { getBlankFields } from '.'
+import { OverlappedCardBaseDuringClipStretch } from '../actions/clips'
 
 export const getSubtitlesDisplayFile = (
   state: AppState,
@@ -332,8 +333,8 @@ export const getNewFlashcardForStretchedClip = (
   unstretchedClip: { id: ClipId; start: number; end: number },
   stretchedClip: { id: ClipId; start: number; end: number },
   overlappedSubtitlesCardBases: {
-    front: Array<SubtitlesCardBase>
-    back: Array<SubtitlesCardBase>
+    front: OverlappedCardBaseDuringClipStretch[]
+    back: OverlappedCardBaseDuringClipStretch[]
   }
 ): Pick<Flashcard, 'cloze' | 'fields'> => {
   const {
@@ -366,27 +367,35 @@ export const getNewFlashcardForStretchedClip = (
     )
   }
   const { front, back } = {
-    front: overlappedSubtitlesCardBases.front.map((base) => ({
-      // if a given field is blank, use the combined text from ALL overlaps
-      // otherwise, only used the combined text of NEW overlaps
-      fields: getFlashcardFieldsFromSubtitlesCardBase(
-        links,
-        base,
-        subtitles,
-        (fn) => currentlyBlankFieldNames.has(fn) || newlyOverlapped(base)
-      ),
+    front: overlappedSubtitlesCardBases.front.map(
+      ({ subtitlesCardBase: base, isSelectable }) => ({
+        // if a given field is blank, use the combined text from ALL overlaps
+        // otherwise, only used the combined text of NEW overlaps
+        fields: getFlashcardFieldsFromSubtitlesCardBase(
+          links,
+          base,
+          subtitles,
+          (fn) =>
+            currentlyBlankFieldNames.has(fn) ||
+            (!isSelectable && newlyOverlapped(base))
+        ),
 
-      cloze: [],
-    })),
-    back: overlappedSubtitlesCardBases.back.map((base) => ({
-      fields: getFlashcardFieldsFromSubtitlesCardBase(
-        links,
-        base,
-        subtitles,
-        (fn) => currentlyBlankFieldNames.has(fn) || newlyOverlapped(base)
-      ),
-      cloze: [],
-    })),
+        cloze: [],
+      })
+    ),
+    back: overlappedSubtitlesCardBases.back.map(
+      ({ subtitlesCardBase: base, isSelectable }) => ({
+        fields: getFlashcardFieldsFromSubtitlesCardBase(
+          links,
+          base,
+          subtitles,
+          (fn) =>
+            currentlyBlankFieldNames.has(fn) ||
+            (!isSelectable && newlyOverlapped(base))
+        ),
+        cloze: [],
+      })
+    ),
   }
   const all = [...front, flashcards[stretchedClip.id], ...back]
   const combined = combineFlashcards(

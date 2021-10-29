@@ -60,22 +60,23 @@ export function useWaveformHandleClipEdgeDrag(
       if (!region)
         console.error('region not found for stretch ' + stretchedClip.id)
 
-      const isSelectable = (sb: SubtitlesCardBase) => {
-        if (!overlapsSignificantly(sb, stretchedClip.start, stretchedClip.end))
-          return false
+      const getOverlapStats = (sb: SubtitlesCardBase) => {
         const stretchEndRegionIndex = regions.findIndex(
           (r, i) => sb.start < getRegionEnd(regions, i) && sb.end > r.start
         )
-        return isWaveformItemSelectable(
-          sb,
-          regions[stretchEndRegionIndex],
-          stretchEndRegionIndex,
-          regions,
-          waveform.getItem
-        )
+        return {
+          subtitlesCardBase: sb,
+          isSelectable: isWaveformItemSelectable(
+            sb,
+            regions[stretchEndRegionIndex],
+            stretchEndRegionIndex,
+            regions,
+            waveform.getItem
+          ),
+        }
       }
-      const subtitlesFront = allOverlappedFront.filter(isSelectable)
-      const subtitlesBack = allOverlappedBack.filter(isSelectable)
+      const subtitlesFront = allOverlappedFront.map(getOverlapStats)
+      const subtitlesBack = allOverlappedBack.map(getOverlapStats)
 
       const overlapIds = clips.map((c) => c.id)
 

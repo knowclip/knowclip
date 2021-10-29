@@ -4,6 +4,11 @@ import A from '../types/ActionType'
 import { PrimaryClip, WaveformDrag, WaveformRegion } from 'clipwave'
 import { SubtitlesCardBase } from '../selectors'
 
+export type OverlappedCardBaseDuringClipStretch = {
+  subtitlesCardBase: SubtitlesCardBase
+  isSelectable: boolean
+}
+
 export const clipsActions = {
   [A.addClipRequest]: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
     type: A.addClipRequest,
@@ -15,8 +20,8 @@ export const clipsActions = {
     stretchedClip: { id: Clip['id']; start: number; end: number },
     overlappedClips: PrimaryClip[],
     unstretchedClip: { id: Clip['id']; start: number; end: number },
-    frontOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
-    backOverlappedSubtitlesCardBases: Array<SubtitlesCardBase>,
+    frontOverlappedSubtitlesCardBases: OverlappedCardBaseDuringClipStretch[],
+    backOverlappedSubtitlesCardBases: OverlappedCardBaseDuringClipStretch[],
     newRegions: WaveformRegion[]
   ) => ({
     type: A.stretchClip,
