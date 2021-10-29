@@ -1,5 +1,8 @@
 import { createSelector } from 'reselect'
-import { getSubtitlesFlashcardFieldLinks } from './subtitles'
+import {
+  getSubtitlesFlashcardFieldLinks,
+  overlapsSignificantly,
+} from './subtitles'
 import { getCurrentMediaFile } from './currentMedia'
 import { calculateRegions, PrimaryClip, WaveformRegion } from 'clipwave'
 import { getRegionEnd } from '../utils/clipwave/useWaveformEventHandlers'
@@ -110,6 +113,9 @@ export const getSubtitlesCardBases = createSelector(
 )
 
 const DELIMITER = '///'
+function subBaseClipId(trackId: string, chunkIndex: number) {
+  return trackId + DELIMITER + chunkIndex
+}
 function combineSubtitles(
   fieldsToTracks: SubtitlesFlashcardFieldsLinks,
   subtitles: SubtitlesState,
@@ -122,20 +128,25 @@ function combineSubtitles(
       const track = subtitles[trackId]
       return track.chunks.map((chunk, i) => ({
         clipwaveType: 'Primary' as const,
-        id: trackId + DELIMITER + i,
+        id: subBaseClipId(trackId, i),
         start: chunk.start,
         end: chunk.end,
         trackId,
       }))
     })
     .sort((a, b) => a.start - b.start)
-  const getChunk = (id: string) => {
+  const getChunkSpecs = (id: string) => {
     const [trackId, chunkIndexString] = id.split(DELIMITER)
     const chunkIndex = +chunkIndexString
+    const chunk = subtitles[trackId].chunks[+chunkIndex]
+    if (!chunk)
+      throw new Error(
+        `Could not display subtitles chunk for track ${trackId} at position ${chunkIndex}`
+      )
     return {
       trackId,
       chunkIndex,
-      chunk: subtitles[trackId].chunks[+chunkIndex],
+      chunk,
     }
   }
 
@@ -154,47 +165,60 @@ function combineSubtitles(
     : []
   const cardsMap: Record<string, SubtitlesCardBase> = {}
   const cards: SubtitlesCardBase[] = []
+  const getItemIdsFromCardBase = (sb: SubtitlesCardBase) => {
+    return Object.entries(sb.fields).flatMap(
+      ([trackId, chunkIndexes]) =>
+        chunkIndexes?.map((chunkIndex) => subBaseClipId(trackId, chunkIndex)) ||
+        []
+    )
+  }
   regionsFromClips.forEach((region, regionIndex) => {
     const lastRegion: WaveformRegion | undefined =
       regionsFromClips[regionIndex - 1]
-    const lastcard = cards[cards.length - 1]
-    const continuingLastCard =
-      lastcard &&
-      region.itemIds.length &&
-      lastRegion &&
-      regionsShareItems(lastRegion, region)
-    const newItemIds = region.itemIds.filter(
-      (id) => !lastRegion || !lastRegion.itemIds.includes(id)
+    const lastCard = cards[cards.length - 1]
+    const lastCardItemIds = lastCard ? getItemIdsFromCardBase(lastCard) : []
+    const newItemIds = region.itemIds.filter((id) => {
+      return !lastCardItemIds.includes(id)
+    })
+    const itemsAlsoInLastCard = lastCardItemIds.filter((id) =>
+      region.itemIds.includes(id)
     )
+
+    const continuingLastCard =
+      itemsAlsoInLastCard.length &&
+      itemsAlsoInLastCard.some((idFromItemInLastCard) => {
+        const { chunk: lastRegionChunk } = getChunkSpecs(idFromItemInLastCard)
+        return newItemIds.some((id) => {
+          const { chunk: newItemChunk } = getChunkSpecs(id)
+
+          return overlapsSignificantly(
+            lastRegionChunk,
+            newItemChunk.start,
+            newItemChunk.end
+          )
+        })
+      })
 
     if (continuingLastCard) {
       newItemIds.forEach((itemId) => {
         if (!lastRegion.itemIds.includes(itemId)) {
-          const { chunkIndex, trackId } = getChunk(itemId)
-          lastcard.fields[trackId] = lastcard.fields[trackId] || []
-          lastcard.fields[trackId]?.push(chunkIndex)
+          const { chunkIndex, trackId } = getChunkSpecs(itemId)
+          lastCard.fields[trackId] = lastCard.fields[trackId] || []
+          lastCard.fields[trackId]?.push(chunkIndex)
         }
-        lastcard.end = getRegionEnd(regionsFromClips, regionIndex)
+        lastCard.end = getRegionEnd(regionsFromClips, regionIndex)
       })
     } else if (newItemIds.length) {
-      const newFields: SubtitlesCardBase['fields'] = {}
-      newItemIds.forEach((id) => {
-        const { chunkIndex, trackId } = getChunk(id)
-        newFields[trackId] = newFields[trackId] || []
-        newFields[trackId]?.push(chunkIndex)
-      })
-      const index = cards.length
-      const id = `${index}-----${Object.keys(fieldsCuePriority).join('___')}`
-
-      fieldsCuePriority.forEach((fn) => (newFields[fn] = []))
-      const newCard: SubtitlesCardBase = {
-        index,
-        id,
-        clipwaveType: 'Secondary',
-        start: region.start,
-        end: getRegionEnd(regionsFromClips, regionIndex),
-        fields: newFields,
-      }
+      const { id, newCard }: { id: string; newCard: SubtitlesCardBase } =
+        getNewCardBase(
+          newItemIds,
+          getChunkSpecs,
+          cards,
+          fieldsCuePriority,
+          region,
+          regionsFromClips,
+          regionIndex
+        )
       cardsMap[id] = newCard
       cards.push(newCard)
     }
@@ -202,9 +226,36 @@ function combineSubtitles(
   return { cards, cardsMap }
 }
 
-function regionsShareItems(lastRegion: WaveformRegion, region: WaveformRegion) {
-  return (
-    new Set([...lastRegion.itemIds, ...region.itemIds]).size <
-    lastRegion.itemIds.length + region.itemIds.length
-  )
+function getNewCardBase(
+  newItemIds: string[],
+  getChunk: (id: string) => {
+    trackId: string
+    chunkIndex: number
+    chunk: SubtitlesChunk
+  },
+  cards: SubtitlesCardBase[],
+  fieldsCuePriority: TransliterationFlashcardFieldName[],
+  region: WaveformRegion,
+  regionsFromClips: WaveformRegion[],
+  regionIndex: number
+) {
+  const newFields: SubtitlesCardBase['fields'] = {}
+  newItemIds.forEach((id) => {
+    const { chunkIndex, trackId } = getChunk(id)
+    newFields[trackId] = newFields[trackId] || []
+    newFields[trackId]?.push(chunkIndex)
+  })
+  const index = cards.length
+  const id = `${index}-----${Object.keys(fieldsCuePriority).join('___')}`
+
+  fieldsCuePriority.forEach((fn) => (newFields[fn] = []))
+  const newCard: SubtitlesCardBase = {
+    index,
+    id,
+    clipwaveType: 'Secondary',
+    start: region.start,
+    end: getRegionEnd(regionsFromClips, regionIndex),
+    fields: newFields,
+  }
+  return { id, newCard }
 }
