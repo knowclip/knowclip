@@ -434,8 +434,8 @@ function combineFlashcards(
           ...cloze.map((c) => ({
             ...c,
             ranges: c.ranges.map(({ start, end }) => ({
-              start: start + startIndex,
-              end: end + startIndex,
+              start: start + startIndex + padding.length,
+              end: end + startIndex + padding.length,
             })),
           }))
         )
