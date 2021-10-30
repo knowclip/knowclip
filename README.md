@@ -20,19 +20,19 @@ Currently being built with [Electron](https://electronjs.org), [Create React App
 To install NPM packages, use [Yarn](https://yarnpkg.com/):
 
 ```bash
-yarn install
+npm install
 ```
 
 Once packages are installed, you may run the dev build:
 
 ```bash
-yarn start
+npm start
 ```
 
 Wait until you see that see a message about compilation completed (some warnings are OK). Then, in another terminal tab, open the Electron app:
 
 ```bash
-yarn electron
+npm run electron
 ```
 
 ### Tests
@@ -42,7 +42,7 @@ Tests are run with [Jest](https://jestjs.io/) via [Create React App](https://cre
 #### Unit tests
 
 ```bash
-yarn test
+npm run test
 ```
 
 #### Integration tests
@@ -50,7 +50,7 @@ yarn test
 Integration tests use [Spectron](https://electronjs.org/spectron) to make sure all the parts of the app are working together.
 
 ```bash
-yarn integration
+npm run integration
 ```
 
 
@@ -58,11 +58,11 @@ The disadvantage of integration tests is that they are slow to run. To speed thi
 
 ```bash
 # run a dev server configured for integration tests
-yarn start:integration
+npm run start:integration
 
 # run integration tests without closing
 # the app at the end so you can inspect it
-yarn integration:debug
+npm run integration:debug
 ```
 
 #### Test CLI options
@@ -72,6 +72,20 @@ Any arguments you pass to the test scripts will be [forwarded to Jest](https://j
 So if you wanted to say, run just one specific test, you can do something like this:
 
 ```bash
-yarn test -t "clips reducer"
+npm test -- -t "clips reducer"
 ```
 
+#### Electron upgrade config checklist
+
+Upgrading Electron version requires a few config files to be touched.
+
+* Node version must be updated in:
+  * [.nvmrc](./.nvmrc),
+  * [.tool-versions](./.tool-versions)
+  * `"engines"` in [package.json](./package.json)
+  * Github workflows (Mac, Linux, and Windows)
+* Electron version must be updated in:
+  * [.npmrc](./.npmrc) `"browserslist"`
+  * `"dependencies"` in [package.json](./package.json)
+* Chromedriver version must be updated in:
+  * `"dependencies"` [package.json](./package.json)

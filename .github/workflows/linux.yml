@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
 
     steps:
     - uses: actions/checkout@v1
@@ -19,16 +19,16 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: yarn install and test
+    - name: npm install and test
       run: |
-        yarn install --frozen-lockfile
+        npm ci
     - name: integration tests
       run: |
         export DISPLAY=':99.0'
         Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        yarn integration # -t "new project"
+        npm run integration
     - name: build
-      run: yarn dist --linux
+      run: npm run dist -- --linux
       env:
         CI: false
     - name: Upload test screenshots

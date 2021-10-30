@@ -25,7 +25,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
           <DialogContentText>
             An error has occurred. Please restart the app to continue.
             <h3>Details</h3>
-            <pre style={{ whiteSpace: 'pre-line' }}>
+            <pre style={{ whiteSpace: 'pre-line', fontSize: '0.6em' }}>
               {displayError(reactError)}
             </pre>
           </DialogContentText>

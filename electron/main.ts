@@ -52,7 +52,6 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       devTools: useDevtools,
-      enableRemoteModule: true,
     },
   })
 
