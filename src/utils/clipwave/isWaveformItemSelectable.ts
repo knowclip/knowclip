@@ -15,9 +15,9 @@ export function isWaveformItemSelectable(
   getItem: GetWaveformItem
 ) {
   if (item.start !== region.start) return false
-
   if (item.clipwaveType === 'Primary') return true
-  const overlappingPrimaryClips = getPrimaryClipsOverlappingSecondaryClip(
+
+  const overlappingPrimaryClips = getPrimaryClipsOverlappingSubtitlesCardBase(
     regions,
     getItem,
     regionIndex,
@@ -27,30 +27,33 @@ export function isWaveformItemSelectable(
   return !overlappingPrimaryClips.length
 }
 
-function getPrimaryClipsOverlappingSecondaryClip(
+function getPrimaryClipsOverlappingSubtitlesCardBase(
   regions: WaveformRegion[],
   getItem: GetWaveformItem,
   startRegionIndex: number,
-  item: SecondaryClip
+  subtitlesCardBase: SecondaryClip
 ) {
   const allLocalItemsIds = new Set<string>()
 
   let regionIndex = startRegionIndex
-  while (regions[regionIndex]?.itemIds.includes(item.id)) {
+  while (regions[regionIndex]?.itemIds.includes(subtitlesCardBase.id)) {
     regions[regionIndex].itemIds.forEach((itemId) =>
       allLocalItemsIds.add(itemId)
     )
-
     regionIndex++
   }
-  allLocalItemsIds.delete(item.id)
+  allLocalItemsIds.delete(subtitlesCardBase.id)
 
   const overlappingPrimaryClips: PrimaryClip[] = []
   allLocalItemsIds.forEach((id) => {
     const overlapped = getItem(id)
     if (
       overlapped?.clipwaveType === 'Primary' &&
-      overlapsSignificantly(overlapped, item.start, item.end)
+      overlapsSignificantly(
+        overlapped,
+        subtitlesCardBase.start,
+        subtitlesCardBase.end
+      )
     )
       overlappingPrimaryClips.push(overlapped)
   })

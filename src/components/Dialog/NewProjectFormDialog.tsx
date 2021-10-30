@@ -111,7 +111,7 @@ const NewProjectFormDialog = ({
       newErrors.noteType = 'Please choose a note type.'
 
     return newErrors
-  }, [errors, fieldValues])
+  }, [fieldValues])
 
   const closeDialog = useCallback(
     () => dispatch(actions.closeDialog()),

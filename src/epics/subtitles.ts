@@ -26,6 +26,7 @@ import { afterUpdates } from '../utils/afterUpdates'
 import { ClipwaveCallbackEvent, msToSeconds } from 'clipwave'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { CLIPWAVE_ID } from '../utils/clipwave'
+import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -166,8 +167,12 @@ const makeClipsFromSubtitles: AppEpic = (
                     uuid(),
                     newFields
                   )
-                  acc.cards.push(flashcard)
-                  acc.clips.push(clip)
+
+                  if (flashcard.fields.transcription?.trim()) {
+                    acc.cards.push(flashcard)
+                    acc.clips.push(clip)
+                  }
+
                   return acc
                 },
                 { clips: [] as Clip[], cards: [] as Flashcard[] }
@@ -179,7 +184,10 @@ const makeClipsFromSubtitles: AppEpic = (
               window.dispatchEvent(
                 new ClipwaveCallbackEvent(CLIPWAVE_ID, ({ actions }) => {
                   const mediaPlayer = getMediaPlayer()
-                  actions.selectNextItemAndSeek(mediaPlayer)
+                  actions.selectNextItemAndSeek(
+                    mediaPlayer,
+                    isWaveformItemSelectable
+                  )
                 })
               )
 

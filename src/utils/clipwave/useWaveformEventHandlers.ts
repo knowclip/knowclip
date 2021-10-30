@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux'
 import { useHandleWaveformDrag } from './useWaveformHandleDrag'
 import { useHandleWaveformClipDrag } from './useWaveformHandleClipDrag'
 import { useWaveformHandleClipEdgeDrag } from './useWaveformHandleClipEdgeDrag'
+import { isWaveformItemSelectable } from './isWaveformItemSelectable'
 export const STRETCH_START_DELAY = 100
 
 export function useWaveformEventHandlers({
@@ -38,11 +39,17 @@ export function useWaveformEventHandlers({
     const handleKeydown = (event: KeyboardEvent) => {
       const { altKey, key } = event
       if (key === KEYS.arrowRight && (altKey || !isTextFieldFocused())) {
-        return waveform.actions.selectNextItemAndSeek(playerRef.current)
+        return waveform.actions.selectNextItemAndSeek(
+          playerRef.current,
+          isWaveformItemSelectable
+        )
       }
 
       if (key === KEYS.arrowLeft && (altKey || !isTextFieldFocused())) {
-        return waveform.actions.selectPreviousItemAndSeek(playerRef.current)
+        return waveform.actions.selectPreviousItemAndSeek(
+          playerRef.current,
+          isWaveformItemSelectable
+        )
       }
     }
 

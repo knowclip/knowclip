@@ -28,8 +28,8 @@ const aboutMessage = [
   `Version ${packageJson.version}`,
   `Build #${process.env.REACT_APP_BUILD_NUMBER || '[DEV BUILD]'}`,
   'Distributed under GNU Affero General Public License 3.0.',
-  'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Juan Antonio Tubío',
-  '© 2020 Justin Silvestre',
+  'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Wei, Sky Beast',
+  '© 2021 Justin Silvestre',
 ].join('\n\n')
 
 const showAboutDialog: AppEpic = (

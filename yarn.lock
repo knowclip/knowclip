@@ -4346,10 +4346,10 @@ cli-truncate@^1.1.0:
     slice-ansi "^1.0.0"
     string-width "^2.0.0"
 
-clipwave@^0.1.8:
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/clipwave/-/clipwave-0.1.8.tgz#1c69641276b05f0beabceeeb27db09746e59e33c"
-  integrity sha512-vZOpw4iSIynu2jxFsZipqSmuJnZbHbH8hVG5GnEc4nQV2dDCATUKzeWy5b5M7rGt62RjH/WkbzyHgc6zocmmgw==
+clipwave@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/clipwave/-/clipwave-0.1.9.tgz#9fdebca1a9ea3bc54b4674a1d5bdc075a85286db"
+  integrity sha512-YvVoOFwujcpNMOFJUXnhrPUH4DhpK9ZgxoL5ahGpOAdL2+gjvlC37ulnctNor5HJpDfhKRzSlWyxUSp1mEU9Cg==
   dependencies:
     classnames "^2.3.1"
 

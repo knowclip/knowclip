@@ -1,7 +1,7 @@
 {
   "name": "knowclip",
   "productName": "Knowclip",
-  "version": "0.11.0-beta",
+  "version": "0.11.2-beta",
   "private": true,
   "engines": {
     "node": "^14.18.0"
@@ -24,7 +24,7 @@
     "asar": "3.1.0",
     "better-ajv-errors": "^0.7.0",
     "better-sqlite3": "^7.4.3",
-    "clipwave": "^0.1.8",
+    "clipwave": "^0.1.9",
     "dexie": "^3.0.2",
     "electron-devtools-installer": "^3.1.1",
     "electron-store": "^8.0.1",
@@ -107,12 +107,13 @@
     "dist": "yarn build-main && yarn webpack:ci && yarn electron-builder:skip-publish",
     "dist:appveyor": "yarn build-main && yarn webpack:appveyor && yarn electron-builder",
     "yalc": "yalc",
-    "husky": "husky"
+    "husky": "husky",
+    "eslint": "eslint"
   },
   "lint-staged": {
     "./src/**/*.{ts,tsx,js}": [
       "yarn eslint",
-      "yarn prettier --ignore-path ./.gitignore"
+      "yarn prettier --write --ignore-path ./.gitignore"
     ]
   },
   "browserslist": [

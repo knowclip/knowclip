@@ -127,6 +127,7 @@ const LinkSubtitlesDialog = ({
         overflow: 'auto',
         backgroundColor: '#eeeeee',
         padding: '1em',
+        whiteSpace: 'pre-line',
       }}
     >
       {subtitlesChunks.slice(0, 100).map(({ text, start }) => (

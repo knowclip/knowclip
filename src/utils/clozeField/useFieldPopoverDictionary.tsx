@@ -179,7 +179,6 @@ export function useFieldPopoverDictionary(
         !isNaN(+(mouseoverChar.dataset.characterIndex || ''))
           ? +(mouseoverChar.dataset.characterIndex || '')
           : -1
-      console.log(mouseoverChar.dataset.characterIndex, mouseCharIndex)
       const translationsAtCharacter = mouseoverChar?.dataset
         ? findTranslationsAtCharIndex(tokenTranslations, mouseCharIndex)
         : null

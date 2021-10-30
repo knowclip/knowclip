@@ -7,13 +7,13 @@ Object {
       Object {
         "clips": Array [
           Object {
-            "end": "00:12.52",
+            "end": "00:12.47",
             "fields": Object {
               "meaning": "Chilling and eating bamboo 
 grass is the best thing ever.",
               "transcription": "笹を食べながらのんびりするのは最高だなぁ",
             },
-            "id": "e78620d8-9ebd-45b8-b335-d3280a4f3ecc",
+            "id": "320265ad-8190-4729-8ec1-5fcf0d1b832e",
             "image": Object {
               "type": "VideoStill",
             },
@@ -29,7 +29,7 @@ grass is the best thing ever.",
 so early in the day.",
               "transcription": "ちょっと  またこの子は昼間からゴロゴロして",
             },
-            "id": "320265ad-8190-4729-8ec1-5fcf0d1b832e",
+            "id": "2f5ad340-c06b-4754-a468-56852ec9638c",
             "image": Object {
               "type": "VideoStill",
             },
@@ -39,12 +39,12 @@ so early in the day.",
             ],
           },
           Object {
-            "end": "00:21.26",
+            "end": "00:20.999",
             "fields": Object {
               "meaning": "You're in the way of my cleaning. Scoot.",
               "transcription": "掃除の邪魔よ  どきなさい",
             },
-            "id": "2f5ad340-c06b-4754-a468-56852ec9638c",
+            "id": "7d4e2afe-55d1-4a1a-8365-767aa83c83e5",
             "image": Object {
               "type": "VideoStill",
             },
@@ -54,27 +54,27 @@ so early in the day.",
             ],
           },
           Object {
-            "end": "00:22.72",
+            "end": "00:22.34",
             "fields": Object {
               "meaning": "Okay.",
               "transcription": "はいー",
             },
-            "id": "7d4e2afe-55d1-4a1a-8365-767aa83c83e5",
+            "id": "8a0d55ba-e456-4108-9fe2-911d7d25ffde",
             "image": Object {
               "type": "VideoStill",
             },
-            "start": "00:21.28",
+            "start": "00:21.0",
             "tags": Array [
               "pbc",
             ],
           },
           Object {
-            "end": "00:27.45",
+            "end": "00:27.0",
             "fields": Object {
               "meaning": "Seconds please, Mom.",
               "transcription": "お母さん  おかわり",
             },
-            "id": "8a0d55ba-e456-4108-9fe2-911d7d25ffde",
+            "id": "193c54f4-49f0-442b-b866-320ba111d369",
             "image": Object {
               "type": "VideoStill",
             },
@@ -90,7 +90,7 @@ so early in the day.",
 planned for your future?",
               "transcription": "どうするの  あなた将来は",
             },
-            "id": "193c54f4-49f0-442b-b866-320ba111d369",
+            "id": "c7e5886a-0899-4192-8a9c-4b30c304a717",
             "image": Object {
               "type": "VideoStill",
             },
@@ -100,12 +100,12 @@ planned for your future?",
             ],
           },
           Object {
-            "end": "00:39.22",
+            "end": "00:38.73",
             "fields": Object {
               "meaning": "Jeez... Could we not talk about my future when I'm relaxing?",
               "transcription": "もう  ゴロゴロしてるときに  将来の話なんかしないでよ",
             },
-            "id": "c7e5886a-0899-4192-8a9c-4b30c304a717",
+            "id": "f4f17e82-af87-459e-af11-4f3d65f9d5d7",
             "image": Object {
               "type": "VideoStill",
             },
@@ -115,28 +115,28 @@ planned for your future?",
             ],
           },
           Object {
-            "end": "00:42.63",
+            "end": "00:42.46",
             "fields": Object {
               "meaning": "If you have so much time to relax, you could go look for a part-time job.",
               "transcription": "暇があるなら  ちょっとはバイトでも探しなさい",
             },
-            "id": "f4f17e82-af87-459e-af11-4f3d65f9d5d7",
+            "id": "f1def124-bbaa-418a-8836-34a8d8cf74da",
             "image": Object {
               "type": "VideoStill",
             },
-            "start": "00:39.25",
+            "start": "00:38.87",
             "tags": Array [
               "pbc",
             ],
           },
           Object {
-            "end": "00:49.29",
+            "end": "00:49.18",
             "fields": Object {
               "meaning": "I'm too busy relaxing, 
 so I'll do it later.",
               "transcription": "ええ  ゴロゴロするのに忙しいから  後にするよ",
             },
-            "id": "f1def124-bbaa-418a-8836-34a8d8cf74da",
+            "id": "6c34f168-1e1d-4933-84ae-df589c68ec06",
             "image": Object {
               "type": "VideoStill",
             },
@@ -151,7 +151,7 @@ so I'll do it later.",
               "meaning": "Don't try to suck me up!",
               "transcription": "ああー  吸わないで",
             },
-            "id": "6c34f168-1e1d-4933-84ae-df589c68ec06",
+            "id": "24374cd7-bed9-4f30-aace-dbdf8fe31422",
             "image": Object {
               "type": "VideoStill",
             },
@@ -161,12 +161,12 @@ so I'll do it later.",
             ],
           },
           Object {
-            "end": "00:58.24",
+            "end": "00:57.67",
             "fields": Object {
               "meaning": "Jeez...",
               "transcription": "もう",
             },
-            "id": "24374cd7-bed9-4f30-aace-dbdf8fe31422",
+            "id": "8f0f15ae-fe46-4b73-ad7d-36c4d10359dd",
             "image": Object {
               "type": "VideoStill",
             },
@@ -176,12 +176,12 @@ so I'll do it later.",
             ],
           },
           Object {
-            "end": "01:04.67",
+            "end": "01:04.63",
             "fields": Object {
               "meaning": "I wonder why Mom can't understand how much time relaxing takes up.",
               "transcription": "どうしてお母さんはゴロゴロする忙しさが分かんないんだろな",
             },
-            "id": "8f0f15ae-fe46-4b73-ad7d-36c4d10359dd",
+            "id": "2a3ce4c2-4714-47f6-9e33-2e28ba56eb1f",
             "image": Object {
               "type": "VideoStill",
             },
@@ -191,12 +191,12 @@ so I'll do it later.",
             ],
           },
           Object {
-            "end": "01:21.98",
+            "end": "01:21.8",
             "fields": Object {
               "meaning": "Excuse me, which of these will have jobs where I can get paid to do nothing?",
               "transcription": "えーと  働かないでお金がもらえる仕事が載っているのはどれですか",
             },
-            "id": "2a3ce4c2-4714-47f6-9e33-2e28ba56eb1f",
+            "id": "82746bca-e8a1-4411-9b0c-39a0085526ca",
             "image": Object {
               "type": "VideoStill",
             },
@@ -206,31 +206,31 @@ so I'll do it later.",
             ],
           },
           Object {
-            "end": "01:25.09",
+            "end": "01:24.76",
             "fields": Object {
               "meaning": "I don't think there is one.",
               "transcription": "ないと思います",
             },
-            "id": "90bf45fc-00e0-41b7-b82e-fda29473761e",
+            "id": "78ec78a2-8520-4311-9f15-9f2061e6ffe5",
             "image": Object {
               "type": "VideoStill",
             },
-            "start": "01:23.46",
+            "start": "01:23.44",
             "tags": Array [
               "pbc",
             ],
           },
           Object {
-            "end": "01:26.73",
+            "end": "01:26.43",
             "fields": Object {
               "meaning": "Really?",
               "transcription": "え",
             },
-            "id": "f85a53cc-4763-41a7-bfb2-ef615e2fc84d",
+            "id": "8a27cad2-517a-47fb-a68d-4e527bec6387",
             "image": Object {
               "type": "VideoStill",
             },
-            "start": "01:25.36",
+            "start": "01:25.25",
             "tags": Array [
               "pbc",
             ],

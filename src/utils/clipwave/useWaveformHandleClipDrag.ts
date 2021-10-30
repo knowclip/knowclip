@@ -81,16 +81,19 @@ export function useHandleWaveformClipDrag(
           ]
         )
 
+        const newSelectionRegion = newRegions.findIndex(
+          (r) =>
+            r.start >= newStartWithMerges &&
+            (r.end ?? secondsToMs(durationSeconds)) < newEndWithMerges
+        )
         waveform.dispatch({
           type: 'SET_REGIONS',
           regions: newRegions,
-          newSelectionRegion: newRegions.findIndex(
-            (r) =>
-              r.start >= newStartWithMerges &&
-              (r.end ?? secondsToMs(durationSeconds)) < newEndWithMerges
-          ),
+          newSelectionRegion,
           newSelectionItemId: clipToMoveId,
         })
+        // TODO: investigate making sure this happens in clipwave
+        waveform.actions.selectItem(newSelectionRegion, clipToMoveId)
         dispatch(actions.moveClip(clipToMoveId, deltaX, overlapIds, newRegions))
 
         return

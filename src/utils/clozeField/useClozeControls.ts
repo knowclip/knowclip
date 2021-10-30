@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import r from '../../redux'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { ClozeIds } from '../../components/FlashcardSectionDisplayClozeField'
 import {
   collapseRanges,

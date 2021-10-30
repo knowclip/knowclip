@@ -44,16 +44,13 @@ const CsvAndMp3ExportDialog = ({
     mediaFolderLocation: currentMediaFolderLocation || '',
     csvFilePath: '',
   })
-  const setField = useCallback(
-    (key: keyof typeof fields, value: string) => {
-      setErrors((errors) => ({ ...errors, [key]: null }))
-      setFields((fields) => ({
-        ...fields,
-        [key]: value,
-      }))
-    },
-    [fields]
-  )
+  const setField = useCallback((key: keyof typeof fields, value: string) => {
+    setErrors((errors) => ({ ...errors, [key]: null }))
+    setFields((fields) => ({
+      ...fields,
+      [key]: value,
+    }))
+  }, [])
   const [errors, setErrors] = useState<ErrorsState>({})
   const [rememberLocation, setRememberLocation] = useState(true)
   const toggleRememberLocation = useCallback(() => {
