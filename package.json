@@ -107,8 +107,7 @@
     "dist": "npm run build-main && npm run webpack:ci && npm run electron-builder:skip-publish",
     "dist:appveyor": "npm run build-main && npm run webpack:appveyor && npm run electron-builder",
     "yalc": "yalc",
-    "husky": "husky",
-    "eslint": "eslint"
+    "husky": "husky"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,js}": [
