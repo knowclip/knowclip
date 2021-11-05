@@ -140,7 +140,7 @@
     "@types/wanakana": "^4.0.3",
     "@types/yaml": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
-    "@typescript-eslint/parser": "^5.1.0",
+    "@typescript-eslint/parser": "^5.3.0",
     "chromedriver": "^94.0.0",
     "electron": "^15.0.0",
     "electron-builder": "^22.13.1",
