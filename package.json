@@ -150,7 +150,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^7.0.4",
     "levenary": "^1.1.1",
-    "lint-staged": "^11.2.3",
+    "lint-staged": "^11.2.6",
     "prettier": "^2.1.2",
     "request": "^2.88.2",
     "silvestre-afa-react-scripts": "^4.0.4-2",
