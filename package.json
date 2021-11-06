@@ -120,7 +120,7 @@
   ],
   "devDependencies": {
     "@types/archiver": "^5.1.1",
-    "@types/better-sqlite3": "^7.4.0",
+    "@types/better-sqlite3": "^7.4.1",
     "@types/chromedriver": "^81.0.0",
     "@types/fluent-ffmpeg": "^2.1.19",
     "@types/fs-extra": "^9.0.13",
