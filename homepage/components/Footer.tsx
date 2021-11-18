@@ -2,6 +2,7 @@ import React from "react"
 import css from "./Footer.module.css"
 import cn from "classnames"
 import { Twitter, Patreon, Github, Icon as IconComponent } from "@icons-pack/react-simple-icons"
+import { PATREON_URL } from "../urls"
 
 const Footer = ({ className }: { className?: string }) => (
   <footer className={cn(className, css.container)}>
@@ -32,7 +33,7 @@ const Footer = ({ className }: { className?: string }) => (
           </a>
         </p>
         <p>
-          <a href="https://patreon.com/knowclip" className={css.link}>
+          <a href={PATREON_URL} className={css.link}>
             Support me on Patreon!{" "}
             <span role="img" aria-label="green heart">
               💚️
@@ -52,7 +53,7 @@ const Footer = ({ className }: { className?: string }) => (
           className={css.patreon}
           title="Patreon"
           Icon={Patreon}
-          href="https://patreon.com/knowclip"
+          href={PATREON_URL}
         />
         <SocialLink
           className={css.github}

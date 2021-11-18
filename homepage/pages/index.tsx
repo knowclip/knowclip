@@ -5,6 +5,7 @@ import Layout from "../components/layout"
 import A from "../components/Link"
 import FaqSubsection from "../components/HomeFaqSubsection"
 import DownloadSection from "../components/HomeDownloadSection"
+import { PATREON_URL } from "../urls"
 
 type InfoSectionId =
 | 'anki'
@@ -327,7 +328,7 @@ const IndexPage = () => {
             Of course, finding that content to download isn't always easy. I'm
             hoping to build a platform to make this easier, either as a web
             site, or as an integrated feature in Knowclip—please consider{" "}
-            <span><A href="https://patreon.com/knowclip" className={css.link}>
+            <span><A href={PATREON_URL} className={css.link}>
               supporting me on Patreon
             </A></span>{" "}
             so I can make this happen while continuing to keep Knowclip free to
@@ -446,7 +447,7 @@ const IndexPage = () => {
 
         <p>
           Please consider{" "}
-          <span><A href="https://patreon.com/knowclip" className={css.link} newWindow>
+          <span><A href={PATREON_URL} className={css.link} newWindow>
             supporting me on Patreon
           </A></span>
           . You'll be directly enabling me to roll out new features and bugfixes

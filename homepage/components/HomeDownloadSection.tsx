@@ -8,6 +8,7 @@ import React, {
 import css from "../pages/index.module.css"
 import A from "./Link"
 import cn from "classnames"
+import { PATREON_URL } from "../urls"
 
 const WINDOWS = "win"
 const MAC = "mac"
@@ -331,7 +332,7 @@ const PostDownloadMessage = (_: { os: string }) => (
 )
 
 const PatreonLink = ({ children }: PropsWithChildren<{}>) => (
-  <A href="https://patreon.com/knowclip" className={css.link}>
+  <A href={PATREON_URL} className={css.link}>
     {children}
   </A>
 )
