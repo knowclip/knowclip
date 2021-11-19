@@ -22,7 +22,7 @@
     "@silvestre/mkanki": "^3.3.0",
     "ajv": "^8.6.3",
     "asar": "3.1.0",
-    "better-ajv-errors": "^0.7.0",
+    "better-ajv-errors": "^1.1.1",
     "better-sqlite3": "^7.4.4",
     "clipwave": "^0.1.9",
     "dexie": "^3.0.2",
