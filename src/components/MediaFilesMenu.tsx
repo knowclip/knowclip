@@ -9,7 +9,7 @@ import {
   ListItemText,
   Divider,
   Popover,
-} from '@material-ui/core'
+} from '@mui/material'
 import { PlayArrow, Pause, Loop } from '@material-ui/icons'
 import DarkTheme from './DarkTheme'
 import MediaFilesMenuItem from './MediaFilesMenuItem'

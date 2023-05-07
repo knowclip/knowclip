@@ -8,7 +8,7 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   Menu,
-} from '@material-ui/core'
+} from '@mui/material'
 import {
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
@@ -98,7 +98,7 @@ const MediaFilesMenuItem = ({
           onClick && onClick(e)
           submenu.toggle(e)
         }}
-        buttonRef={submenu.anchorCallbackRef}
+        ref={submenu.anchorCallbackRef}
       >
         {needsFilePath ? <FolderSpecial /> : <MoreVertIcon />}
       </IconButton>

@@ -13,7 +13,7 @@ import {
   IconButton,
   Paper,
   Popper,
-} from '@material-ui/core'
+} from '@mui/material'
 import { Close } from '@material-ui/icons'
 import { tokenize } from 'wanakana'
 import usePopover from '../utils/usePopover'
@@ -128,7 +128,7 @@ export function DictionaryPopover({
   const closeOnClickAway = useCallback((e) => closePopover(e), [closePopover])
   const stopPropagation = useCallback((e) => e.stopPropagation(), [])
 
-  const ref = useRef<HTMLElement>()
+  const ref = useRef<HTMLDivElement>(null)
   const textCharacterIndex =
     translationsAtCharacter && translationsAtCharacter.textCharacterIndex
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React, { useCallback, MutableRefObject } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
-import { Tooltip, Button } from '@material-ui/core'
+import { Tooltip, Button } from '@mui/material'
 import {
   ClozeId,
   ClozeIds,

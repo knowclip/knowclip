@@ -1,4 +1,4 @@
-import { createMuiTheme } from '@material-ui/core/styles'
+import { createTheme } from '@mui/material/styles'
 import themeSpecs from '../themeSpecs'
 
-export const theme = createMuiTheme(themeSpecs)
+export const theme = createTheme(themeSpecs)

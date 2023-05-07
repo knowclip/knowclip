@@ -9,7 +9,7 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-} from '@material-ui/core'
+} from '@mui/material'
 import { getHumanFileName, getFileFilters } from '../../utils/files'
 import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'

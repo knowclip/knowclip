@@ -1,12 +1,12 @@
 import React from 'react'
 import {
-  MuiThemeProvider,
+  ThemeProvider,
   DialogContent,
   DialogContentText,
   DialogActions,
   Button,
   Dialog,
-} from '@material-ui/core'
+} from '@mui/material'
 import { theme } from './theme'
 
 enum $ {
@@ -19,7 +19,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
   console.error(reactError)
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <Dialog open={true} className={$.container}>
         <DialogContent>
           <DialogContentText>
@@ -41,7 +41,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </MuiThemeProvider>
+    </ThemeProvider>
   )
 }
 

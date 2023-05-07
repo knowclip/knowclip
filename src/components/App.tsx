@@ -5,10 +5,10 @@ import Snackbar from './Snackbar'
 import Main from './Main'
 import Dialog from './Dialog'
 import ProjectsMenu from './ProjectsMenu'
-import { MuiThemeProvider } from '@material-ui/core/styles'
+import { ThemeProvider } from '@mui/material/styles'
 import ErrorMessage from './ErrorMessage'
 import { theme } from './theme'
-import { CssBaseline } from '@material-ui/core'
+import { CssBaseline } from '@mui/material'
 
 class App extends Component<
   { sentryDsn: string },
@@ -24,7 +24,7 @@ class App extends Component<
     if (this.state.hasError)
       return <ErrorMessage reactError={this.state.error} />
     return (
-      <MuiThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         <HashRouter>
           <Switch>
@@ -34,7 +34,7 @@ class App extends Component<
         </HashRouter>
         <Snackbar />
         <Dialog />
-      </MuiThemeProvider>
+      </ThemeProvider>
     )
   }
 }

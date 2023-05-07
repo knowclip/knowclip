@@ -23,7 +23,7 @@ import {
   Divider,
   MenuList,
   Popover,
-} from '@material-ui/core'
+} from '@mui/material'
 import { showOpenDialog } from '../utils/electron'
 import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
@@ -101,7 +101,7 @@ const SubtitlesMenu = () => {
     <Fragment>
       <Tooltip title="Subtitles">
         <IconButton
-          buttonRef={anchorCallbackRef}
+          ref={anchorCallbackRef}
           onClick={open}
           id={$.openMenuButton}
         >
@@ -250,7 +250,7 @@ const EmbeddedTrackMenuItem = ({
         <Tooltip title="More actions">
           <ListItemSecondaryAction>
             <IconButton
-              buttonRef={anchorCallbackRef}
+              ref={anchorCallbackRef}
               onClick={open}
               className={$.openTrackSubmenuButton}
             >
@@ -382,7 +382,7 @@ const ExternalTrackMenuItem = ({
       <Tooltip title="More actions">
         <ListItemSecondaryAction>
           <IconButton
-            buttonRef={anchorCallbackRef}
+            ref={anchorCallbackRef}
             onClick={open}
             className={$.openTrackSubmenuButton}
           >

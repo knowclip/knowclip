@@ -8,7 +8,7 @@ import {
   Tabs,
   Tab,
   LinearProgress,
-} from '@material-ui/core'
+} from '@mui/material'
 import r from '../redux'
 import css from './Export.module.css'
 import { actions } from '../actions'

@@ -9,7 +9,7 @@ import {
   FormControl,
   Select,
   InputLabel,
-} from '@material-ui/core'
+} from '@mui/material'
 import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
 import {

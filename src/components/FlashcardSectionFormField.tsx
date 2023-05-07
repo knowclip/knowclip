@@ -6,8 +6,8 @@ import React, {
   useEffect,
   useRef,
 } from 'react'
-import { TextField } from '@material-ui/core'
-import { OutlinedInputProps } from '@material-ui/core/OutlinedInput'
+import { TextField } from '@mui/material'
+import { OutlinedInputProps } from '@mui/material/OutlinedInput'
 import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { flashcardSectionForm$, capitalize } from './FlashcardSectionForm'

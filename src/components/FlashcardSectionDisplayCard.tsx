@@ -1,7 +1,7 @@
 import React, { useCallback, memo } from 'react'
 import cn from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
-import { IconButton, Tooltip } from '@material-ui/core'
+import { IconButton, Tooltip } from '@mui/material'
 import r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
 import { Edit, Photo, Delete, Loop } from '@material-ui/icons'

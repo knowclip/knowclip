@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { IconButton, Tooltip } from '@material-ui/core'
+import { IconButton, Tooltip } from '@mui/material'
 import { Delete } from '@material-ui/icons'
 import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'

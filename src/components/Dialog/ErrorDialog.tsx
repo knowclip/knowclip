@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { Dialog, DialogContent, DialogActions, Button } from '@material-ui/core'
+import { Dialog, DialogContent, DialogActions, Button } from '@mui/material'
 import { DialogProps } from './DialogProps'
 import css from './ErrorDialog.module.css'
 import { actions } from '../../actions'

@@ -2,7 +2,7 @@ import React, { useCallback, ReactNode } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
-import { Tooltip } from '@material-ui/core'
+import { Tooltip } from '@mui/material'
 
 const FlashcardDisplayField = ({
   children,

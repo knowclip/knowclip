@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { Snackbar, IconButton } from '@material-ui/core'
+import { Snackbar, IconButton } from '@mui/material'
 import { Close } from '@material-ui/icons'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
@@ -42,7 +42,9 @@ const SimpleMessageSnackbar = ({
       message={message}
       autoHideDuration={autoHideDuration}
       onClose={closeExceptOnClickaway}
-      onExited={handleExited}
+      TransitionProps={{
+        onExited: handleExited,
+      }}
       action={
         <DarkTheme>
           <IconButton onClick={handleClose} id={closeButtonId}>

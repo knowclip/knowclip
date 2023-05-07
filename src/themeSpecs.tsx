@@ -1,4 +1,5 @@
 const themeSpecs = {
+  palette: {},
   overrides: {
     MuiTooltip: {
       tooltip: {

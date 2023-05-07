@@ -12,7 +12,7 @@ import {
   MenuItem,
   Paper,
   FormHelperText,
-} from '@material-ui/core'
+} from '@mui/material'
 import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'classnames'
@@ -223,8 +223,6 @@ const NewProjectFormDialog = ({
               <MenuItem
                 id={$.transcriptionNoteTypeOption}
                 value="Transliteration"
-                ContainerComponent="div"
-                ContainerProps={{ id: $.transcriptionNoteTypeOption }}
               >
                 Including pronunciation field
               </MenuItem>

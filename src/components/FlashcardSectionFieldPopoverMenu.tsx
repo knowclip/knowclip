@@ -1,11 +1,5 @@
 import React, { useCallback, SyntheticEvent } from 'react'
-import {
-  IconButton,
-  MenuItem,
-  Tooltip,
-  MenuList,
-  Popover,
-} from '@material-ui/core'
+import { IconButton, MenuItem, Tooltip, MenuList, Popover } from '@mui/material'
 import { MoreVert } from '@material-ui/icons'
 import { useDispatch, useSelector } from 'react-redux'
 import cn from 'classnames'
@@ -50,7 +44,7 @@ const FlashcardSectionFieldPopoverMenu = ({
         <IconButton
           tabIndex={1}
           className={cn(className, $.openMenuButtons)}
-          buttonRef={subtitlesPopover.anchorCallbackRef}
+          ref={subtitlesPopover.anchorCallbackRef}
           onClick={subtitlesPopover.open}
         >
           <MoreVert />

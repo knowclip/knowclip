@@ -9,9 +9,8 @@ import {
   ListItemText,
   IconButton,
   Menu,
-  RootRef,
   Tooltip,
-} from '@material-ui/core'
+} from '@mui/material'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { basename, join, dirname } from 'path'
 import packageJson from '../../package.json'
@@ -36,7 +35,7 @@ const ProjectMenuItem = ({
   availability: FileAvailability
   file?: ProjectFile
 }) => {
-  const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
+  const { anchorEl, open, close, isOpen } = usePopover()
 
   const dispatch = useDispatch()
   const removeFromRecents = useCallback(
@@ -70,25 +69,23 @@ const ProjectMenuItem = ({
         onClick={openProjectById}
         className={$.recentProjectsListItem}
       >
-        <RootRef rootRef={anchorCallbackRef}>
-          <ListItemText
-            primary={file ? file.name : availability.name}
-            secondary={
-              availability && (
-                <Tooltip title={availability.filePath || ''}>
-                  <span>
-                    {availability.filePath
-                      ? join(
-                          basename(dirname(availability.filePath)),
-                          basename(availability.filePath)
-                        )
-                      : 'File not found'}
-                  </span>
-                </Tooltip>
-              )
-            }
-          />
-        </RootRef>
+        <ListItemText
+          primary={file ? file.name : availability.name}
+          secondary={
+            availability && (
+              <Tooltip title={availability.filePath || ''}>
+                <span>
+                  {availability.filePath
+                    ? join(
+                        basename(dirname(availability.filePath)),
+                        basename(availability.filePath)
+                      )
+                    : 'File not found'}
+                </span>
+              </Tooltip>
+            )
+          }
+        />
         <IconButton onClick={open}>
           <MoreVertIcon />
         </IconButton>

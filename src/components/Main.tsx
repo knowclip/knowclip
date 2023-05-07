@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { CircularProgress } from '@material-ui/core'
+import { CircularProgress } from '@mui/material'
 import { Redirect } from 'react-router-dom'
 import cn from 'classnames'
 import Media from '../components/Media'

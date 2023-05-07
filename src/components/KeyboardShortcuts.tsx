@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { Card, CardContent } from '@material-ui/core'
+import { Card, CardContent } from '@mui/material'
 import css from './KeyboardShortcuts.module.css'
 import os from 'os'
 
