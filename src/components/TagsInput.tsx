@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react'
 import cn from 'classnames'
 import { MenuItem, Paper, Chip } from '@material-ui/core'
-import ChipInput, { ChipRenderer } from 'material-ui-chip-input'
+import ChipInput, { ChipRenderer } from 'material-ui-chip-input-v5'
 import css from './FlashcardSection.module.css'
 import Autosuggest, {
   RenderSuggestion,
