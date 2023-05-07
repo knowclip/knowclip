@@ -5,6 +5,10 @@ import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
 
+// https://github.com/prisma/prisma/issues/8558
+// @ts-ignore
+global.setImmediate = global.setTimeout
+
 const rootDir = join(process.cwd())
 
 export const TMP_DIRECTORY = join(rootDir, 'tmp-test')

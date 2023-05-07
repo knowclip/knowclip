@@ -83,7 +83,7 @@
     "integration:win": "set REACT_APP_CHROMEDRIVER=true&& npm run build-main && npm run webpack:ci-win && react-scripts test ./src/test/ --watchAll=false  --runInBand",
     "integration:skip-build": "npm run build-main && REACT_APP_CHROMEDRIVER=true react-scripts test ./src/test/ --watchAll=false --runInBand",
     "integration:skip-build-win": "npm run build-main && set REACT_APP_CHROMEDRIVER=true&& react-scripts test ./src/test/ --watchAll=false --runInBand",
-    "integration:debug": "INTEGRATION_DEV=true npm run integration:skip-build --verbose",
+    "integration:debug": "INTEGRATION_DEV=true npm run integration:skip-build -- --verbose",
     "integration:debug-win": "set INTEGRATION_DEV=true&& npm run integration:skip-build-win -- --verbose",
     "build-fixture:saved": "npm run integration:build-fixture -- -t \"testing saved projects\"",
     "build-fixture:shared": "npm run integration:build-fixture -- -t \"shared project\" && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",

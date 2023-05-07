@@ -17,6 +17,7 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
     pbcJpOpenTrackSubmenuButton.click()
 
     await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
+    await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
   })
 
   await testBlock('locate PBC japanese subtitles file', async () => {
