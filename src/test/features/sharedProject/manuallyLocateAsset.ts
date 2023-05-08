@@ -17,11 +17,13 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
     )
     pbcJpOpenTrackSubmenuButton.click()
 
-    do {
-      await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
-    } while (
-      !(await app.client.$(getSelector(fileSelectionForm$.form)).isExisting())
-    )
+    await retryUntil({
+      action: () =>
+        client.clickElement_(subtitlesMenu$.locateExternalFileButton),
+      conditionName: 'file selection form appears',
+      check: () =>
+        app.client.$(getSelector(fileSelectionForm$.form)).isExisting(),
+    })
   })
 
   await testBlock('locate PBC japanese subtitles file', async () => {
@@ -50,5 +52,34 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
         'ああー  吸わないで'
       )
     }
+  )
+}
+
+/** after mui v5,
+ * clicking the file selection menu item
+ * started failing, but only sometimes
+ */
+async function retryUntil({
+  attemptsCount = 50,
+  action,
+  check,
+  conditionName,
+}: {
+  attemptsCount?: number
+  action: () => Promise<void>
+  check: () => Promise<boolean>
+  conditionName: string
+}) {
+  let attemptsMade = 0
+  do {
+    await action()
+    attemptsMade += 1
+    if (await check()) return
+  } while (attemptsMade < attemptsCount)
+
+  throw new Error(
+    `Tried ${attemptsMade} times, but condition ${JSON.stringify(
+      conditionName
+    )} was never met`
   )
 }
