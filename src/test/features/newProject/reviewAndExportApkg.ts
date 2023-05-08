@@ -22,7 +22,7 @@ export default async function reviewAndExportApkg({ client, app }: TestSetup) {
   )
   await third.click()
 
-  client.waitUntil(async () => {
+  await client.waitUntil(async () => {
     return (await checkboxesChecked(client)).join(' ') === `true true false`
   })
   expect(await checkboxesChecked(client)).toMatchObject([true, true, false])
