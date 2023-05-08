@@ -20,7 +20,7 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
     do {
       await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
     } while (
-      !(await app.client.$(getSelector(fileSelectionForm$.form)).isExisting)
+      !(await app.client.$(getSelector(fileSelectionForm$.form)).isExisting())
     )
   })
 
