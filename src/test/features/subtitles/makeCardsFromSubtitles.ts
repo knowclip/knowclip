@@ -49,6 +49,7 @@ export default async function makeCardsFromSubtitles({
   await testBlock(
     'open dialog to generate clips and click button to load a subtitles track',
     async () => {
+      // TODO: flaky
       await client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton)
       await client.clickElement_(confirmationDialog$.okButton)
 

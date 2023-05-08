@@ -26,6 +26,7 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
     const otherVideoIndex = menuItemsText.findIndex((text) =>
       text.includes('polar_bear_cafe.mp4')
     )
+    // TODO: flaky
     expect(otherVideoIndex).toBeGreaterThan(-1)
 
     await retryUntil({
