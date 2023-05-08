@@ -4,7 +4,7 @@
   "version": "0.12.0-beta",
   "private": true,
   "engines": {
-    "node": "^16.5.0"
+    "node": "^16.17.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -20,11 +20,11 @@
     "@mui/material": "^5.12.3",
     "@mui/styles": "^5.12.3",
     "@sentry/electron": "^2.5.4",
-    "@silvestre/mkanki": "^3.3.0",
+    "@silvestre/mkanki": "^3.4.0",
     "ajv": "^8.8.2",
     "asar": "3.1.0",
     "better-ajv-errors": "^1.2.0",
-    "better-sqlite3": "^7.4.4",
+    "better-sqlite3": "^8.3.0",
     "clipwave": "^0.1.9",
     "dexie": "^3.0.2",
     "electron-devtools-installer": "^3.1.1",
@@ -67,6 +67,7 @@
   "main": "./build-main/electron/main.js",
   "homepage": "./",
   "scripts": {
+    "postinstall": "electron-builder install-app-deps",
     "start": "react-scripts start",
     "build:homepage": "npm run -- --cwd homepage run build",
     "start:integration": "REACT_APP_CHROMEDRIVER=true npm run start",
@@ -146,8 +147,8 @@
     "@types/wanakana": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
-    "chromedriver": "^94.0.0",
-    "electron": "^15.0.0",
+    "chromedriver": "^108.0.0",
+    "electron": "^22.0.0",
     "electron-builder": "^23.6.0",
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.3.0",
@@ -168,7 +169,7 @@
     "appId": "com.electron.knowclip",
     "asar": true,
     "productName": "Knowclip",
-    "npmRebuild": false,
+    "npmRebuild": true,
     "copyright": "Copyright 2020 Justin Silvestre",
     "files": [
       "./build/**/*",
