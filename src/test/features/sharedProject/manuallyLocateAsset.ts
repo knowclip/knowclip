@@ -5,6 +5,7 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { waveformMouseHoldAndDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { getSelector } from '../../driver/ClientWrapper'
 
 export default async function manuallyLocateAsset({ app, client }: TestSetup) {
   await testBlock('go to locate external subtitles file in menu', async () => {
@@ -16,8 +17,11 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
     )
     pbcJpOpenTrackSubmenuButton.click()
 
-    await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
-    await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
+    do {
+      await client.clickElement_(subtitlesMenu$.locateExternalFileButton)
+    } while (
+      !(await app.client.$(getSelector(fileSelectionForm$.form)).isExisting)
+    )
   })
 
   await testBlock('locate PBC japanese subtitles file', async () => {
