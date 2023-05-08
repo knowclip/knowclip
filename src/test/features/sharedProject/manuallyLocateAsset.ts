@@ -6,6 +6,7 @@ import { join } from 'path'
 import { waveformMouseHoldAndDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { getSelector } from '../../driver/ClientWrapper'
+import { retryUntil } from '../../driver/retryUntil'
 
 export default async function manuallyLocateAsset({ app, client }: TestSetup) {
   await testBlock('go to locate external subtitles file in menu', async () => {
@@ -52,34 +53,5 @@ export default async function manuallyLocateAsset({ app, client }: TestSetup) {
         'ああー  吸わないで'
       )
     }
-  )
-}
-
-/** after mui v5,
- * clicking the file selection menu item
- * started failing, but only sometimes
- */
-async function retryUntil({
-  attemptsCount = 50,
-  action,
-  check,
-  conditionName,
-}: {
-  attemptsCount?: number
-  action: () => Promise<void>
-  check: () => Promise<boolean>
-  conditionName: string
-}) {
-  let attemptsMade = 0
-  do {
-    await action()
-    attemptsMade += 1
-    if (await check()) return
-  } while (attemptsMade < attemptsCount)
-
-  throw new Error(
-    `Tried ${attemptsMade} times, but condition ${JSON.stringify(
-      conditionName
-    )} was never met`
   )
 }
