@@ -30,13 +30,18 @@ export default async function navigateBetweenMedia(
 
     const menuItems = await client.elements_(mediaFileMenuItem, 2)
 
+    const otherVideoFilename = 'polar_bear_cafe.mp4'
+    await client.waitUntil(async () => {
+      const menuItemsText = await Promise.all(
+        menuItems.map((mi) => mi.getText())
+      )
+      return menuItemsText.includes(otherVideoFilename)
+    })
+
     const menuItemsText = await Promise.all(menuItems.map((mi) => mi.getText()))
     const otherVideoIndex = menuItemsText.findIndex((text) =>
-      text.includes('polar_bear_cafe.mp4')
+      text.includes(otherVideoFilename)
     )
-    // TODO: flaky
-    expect(otherVideoIndex).toBeGreaterThan(-1)
-
     await retryUntil({
       action: () => menuItems[otherVideoIndex].click(),
       conditionName: 'media files menu has closed',

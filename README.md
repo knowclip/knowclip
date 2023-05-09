@@ -72,7 +72,7 @@ Any arguments you pass to the test scripts will be [forwarded to Jest](https://j
 So if you wanted to say, run just one specific test, you can do something like this:
 
 ```bash
-npm test -- -t "clips reducer"
+npm test -- -t "reducers/clips" # target tests with "reducers/clips" in the filepath
 ```
 
 #### Electron upgrade config checklist
