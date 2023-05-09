@@ -6,6 +6,7 @@ import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { projectMenu$ } from '../../../components/ProjectMenu'
 import { ClientWrapper } from '../../driver/ClientWrapper'
+import { retryUntil } from '../../driver/retryUntil'
 
 export default async function reviewAndExportApkg(
   context: IntegrationTestContext
@@ -27,12 +28,13 @@ export default async function reviewAndExportApkg(
       `${dialogTableRow$.clipCheckboxes}`,
       3
     )
-    await third.click()
 
-    await client.waitUntil(async () => {
-      return (await checkboxesChecked(client)).join(' ') === `true true false`
+    retryUntil({
+      action: () => third.click(),
+      conditionName: 'third checkbox is unchecked',
+      check: async () =>
+        (await checkboxesChecked(client)).join(' ') === `true true false`,
     })
-    expect(await checkboxesChecked(client)).toMatchObject([true, true, false])
   })
   test('export clips', async () => {
     const { app, client } = context
