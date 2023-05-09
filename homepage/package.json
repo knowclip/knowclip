@@ -12,7 +12,7 @@
     "@icons-pack/react-simple-icons": "^4.6.0",
     "@netlify/plugin-nextjs": "^3.9.2",
     "@pinjollist/next-with-analytics": "^1.0.1",
-    "classnames": "^2.2.6",
+    "classnames": "^2.3.2",
     "next": "^12.0.3",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
