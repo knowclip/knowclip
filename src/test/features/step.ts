@@ -47,7 +47,6 @@ export const runAll = (
 ) => {
   testSteps.forEach(({ description, runTest }) => {
     describe(description, async () => {
-      console.log('\n\n ' + description + '\n' + '='.repeat(30) + '\n')
       try {
         await runTest(context)
       } catch (err) {
