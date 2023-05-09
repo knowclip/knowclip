@@ -26,7 +26,7 @@ export interface ElementWrapper {
 
 export const wrapElement = (
   driver: TestDriver,
-  element: Element<'async'>,
+  element: Element,
   selector: string
 ): ElementWrapper => {
   const client = driver.client

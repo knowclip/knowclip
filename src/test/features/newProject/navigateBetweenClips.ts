@@ -1,26 +1,34 @@
-import { testBlock, TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { clickAt } from '../../driver/ClientWrapper'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard'
 
-export default async function navigateBetweenClips({ app, client }: TestSetup) {
+export default async function navigateBetweenClips(
+  context: IntegrationTestContext
+) {
   const { previousClipButton, container } = flashcardSection$
 
-  await testBlock('click away from selected clip', async () => {
+  test('click away from selected clip', async () => {
+    const { client, app } = context
+
     await client.waitUntilPresent_(flashcardForm$.flashcardFields)
 
     await clickAt(app, [650, 711])
     await client.waitUntilGone_(flashcardForm$.flashcardFields)
   })
 
-  await testBlock('click to select new clip', async () => {
+  test('click to select new clip', async () => {
+    const { client, app } = context
+
     await clickAt(app, [800, 711])
 
     await client.waitUntilPresent_(flashcardSectionDisplayCard$.container)
   })
 
-  await testBlock('navigate to previous clip', async () => {
+  test('navigate to previous clip', async () => {
+    const { client } = context
+
     await client.clickElement_(flashcardSectionDisplayCard$.container)
     await client.waitForVisible_(previousClipButton)
 

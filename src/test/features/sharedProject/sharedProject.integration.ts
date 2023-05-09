@@ -1,4 +1,4 @@
-import { startApp, stopApp, TestSetup } from '../../setUpDriver'
+import { initTestContext, startApp, stopApp } from '../../setUpDriver'
 import openSharedProject from './openSharedProject'
 import navigateBetweenMedia from './navigateBetweenMedia'
 import makeFlashcards from './makeFlashcards'
@@ -8,28 +8,21 @@ import reviewWithMissingMedia from './reviewWithMissingMedia'
 import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
-import { TestDriver } from '../../driver/TestDriver'
 import { runAll, step } from '../step'
-
-jest.setTimeout(60000)
 
 const testId = 'sharedProject'
 
 describe('opening a shared project', () => {
-  let context: { app: TestDriver | null; testId: string } = {
-    app: null,
-    testId,
-  }
-  let setup: TestSetup
+  let context = initTestContext(testId)
 
   beforeAll(async () => {
-    setup = await startApp(context)
+    const { app } = await startApp(context)
 
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    await mockSideEffects(app, sideEffectsMocks)
   })
 
-  runAll(sharedProjectTestSteps(), () => setup)
-  test('save and close project', () => saveAndCloseProject(setup))
+  runAll(sharedProjectTestSteps(), context)
+  test('save and close project', () => saveAndCloseProject(context))
 
   afterAll(async () => {
     await stopApp(context)

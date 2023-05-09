@@ -1,15 +1,18 @@
-import { TestSetup } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
+import { IntegrationTestContext } from '../../setUpDriver'
 
 export default async function saveAndCloseProject(
-  { client }: TestSetup,
+  context: IntegrationTestContext,
   projectTitle: string
 ) {
-  await saveProjectViaButton(client)
+  test('saves and closes project', async () => {
+    const { client } = context
+    await saveProjectViaButton(client)
 
-  await closeProject(client)
+    await closeProject(client)
 
-  const { recentProjectsListItem } = projectsMenu$
-  await client.waitForText_(recentProjectsListItem, projectTitle)
+    const { recentProjectsListItem } = projectsMenu$
+    await client.waitForText_(recentProjectsListItem, projectTitle)
+  })
 }

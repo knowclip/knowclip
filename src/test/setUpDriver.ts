@@ -26,19 +26,41 @@ const chromedriverPath = require(join(
   'chromedriver'
 )).path
 
-export type TestSetup = {
+export type IntegrationTestContext = {
+  testId: string
+  setup: {
+    app: TestDriver
+    client: ClientWrapper
+    logPersistedData: () => Promise<void>
+  } | null
+  /** for easy access within `test` blocks. will be null before setup is complete. */
+  client: ClientWrapper
+  /** for easy access within `test` blocks. will be null before setup is complete. */
+  app: TestDriver
+}
+
+export function initTestContext(testId: string): IntegrationTestContext {
+  return {
+    testId,
+    setup: null,
+    get client() {
+      return this.setup!.client as ClientWrapper
+    },
+    get app() {
+      return this.setup!.app as TestDriver
+    },
+  }
+}
+
+/** mutates context */
+export async function startApp(
+  context: IntegrationTestContext,
+  persistedState?: Partial<AppState>
+): Promise<{
   app: TestDriver
   client: ClientWrapper
   logPersistedData: () => Promise<void>
-}
-
-export async function startApp(
-  context: {
-    app: TestDriver | null
-    testId: string
-  },
-  persistedState?: Partial<AppState>
-): Promise<TestSetup> {
+}> {
   await copyFixtures()
 
   const persistedStatePath = persistedState ? tempy.file() : null
@@ -72,13 +94,6 @@ export async function startApp(
         : null),
     },
   })
-  context.app = app
-  if (!(await app.isReady)) {
-    throw new Error('Problem starting test driver')
-  }
-
-  await app.webContentsSend('start-test', context.testId)
-
   const setup = {
     app,
     client: new ClientWrapper(app),
@@ -90,14 +105,22 @@ export async function startApp(
       })
     },
   }
+  context.setup = setup
+
+  if (!(await app.isReady)) {
+    throw new Error('Problem starting test driver')
+  }
+
+  await app.webContentsSend('start-test', context.testId)
+
   return setup
 }
 
-export async function stopApp(context: {
-  app: TestDriver | null
-  testId: string
-}): Promise<null> {
-  const { app } = context
+export async function stopApp(context: IntegrationTestContext): Promise<null> {
+  const app = context.setup?.app
+
+  if (!app) console.error('No app instance found, not closing app')
+
   if (process.env.INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
     return null
   }
@@ -108,7 +131,7 @@ export async function stopApp(context: {
     await app.stop()
   }
 
-  context.app = null
+  context.setup = null
 
   return null
 }
@@ -118,41 +141,4 @@ async function copyFixtures() {
   await mkdirp(TMP_DIRECTORY)
   await mkdirp(SCREENSHOTS_DIRECTORY)
   await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
-}
-
-export async function testBlock<T>(
-  name: string,
-  cb: () => Promise<T>
-): Promise<T> {
-  try {
-    process.stdout.write('\n     ' + name)
-
-    const result = await cb()
-
-    process.stdout.write(' ✅  \n')
-
-    return result
-  } catch (err) {
-    process.stdout.write(' ❗️ \n')
-
-    process.stdout.write(String(err) + '\nFailure at: ' + name)
-    throw new TestBlockError(
-      name,
-      err instanceof Error ? err.message : String(err),
-      err instanceof Error ? err.stack : 'non-error thrown'
-    )
-  } finally {
-    process.stdout.write('\n')
-  }
-}
-
-class TestBlockError extends Error {
-  constructor(
-    blockName: string,
-    message: string,
-    stack: typeof Error.prototype.stack
-  ) {
-    super(`Failure at ${JSON.stringify(blockName)}: ${message}`)
-    this.stack = stack
-  }
 }

@@ -9,10 +9,12 @@ export const getSelector = (testLabel: string) => `#${testLabel}, .${testLabel}`
 
 export class ClientWrapper {
   /** The original client. To be avoided except in ClientWrapper methods,
-   * as the API and typings are outdated, and will hopefully be upgraded soon
-   * when Spectron moves to WebdriverIO v5.
+   * as the API and typings have been historically outdated,
+   * and using the Webdriver client methods have caused lots of flakiness in previous versions.
+   * May be worth removing some of these flaky-prevention checks after testing without them.
    *
-   * The WebDriverIO v4 API docs can be found here: http://v4.webdriver.io/api.html. */
+   * WebDriverIO v8 API docs: https://v8.webdriver.io/docs/api.
+   * */
   _driver: TestDriver
 
   constructor(client: TestDriver) {
@@ -35,14 +37,12 @@ export class ClientWrapper {
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
     if (typeof count === 'number' && count <= 0)
       throw new Error('Count must be at least 1')
-    let elementsSoFar: Element<'async'>[] | undefined
+    let elementsSoFar: Element[] | undefined
     try {
       if (count)
         await this._driver.client.waitUntil(
           async () => {
-            const elements: Element<'async'>[] = await this._driver.client.$$(
-              selector
-            )
+            const elements: Element[] = await this._driver.client.$$(selector)
             elementsSoFar = elements
             return elements.length === count
           },

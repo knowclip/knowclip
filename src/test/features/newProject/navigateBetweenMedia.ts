@@ -1,10 +1,14 @@
-import { TestSetup, testBlock } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { retryUntil } from '../../driver/retryUntil'
 import { getSelector } from '../../driver/ClientWrapper'
 
-export default async function navigateBetweenMedia({ app, client }: TestSetup) {
-  await testBlock('ensure previously selected video has loaded', async () => {
+export default async function navigateBetweenMedia(
+  context: IntegrationTestContext
+) {
+  test('ensure previously selected video has loaded', async () => {
+    const { client } = context
+
     expect(await client.getAttribute('video', 'src')).toContain(
       'piggeldy_cat.mp4'
     )
@@ -13,13 +17,17 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
   const { openMediaFilesMenuButton: mediaFilesMenuButton, mediaFileMenuItem } =
     mediaFilesMenu$
 
-  await testBlock('click to open media files menu', async () => {
+  test('click to open media files menu', async () => {
+    const { client } = context
+
     await client.clickElement_(mediaFilesMenuButton)
 
     await client.waitUntilPresent_(mediaFileMenuItem)
   })
 
-  await testBlock('select other video', async () => {
+  test('select other video', async () => {
+    const { app, client } = context
+
     const menuItems = await client.elements_(mediaFileMenuItem, 2)
 
     const menuItemsText = await Promise.all(menuItems.map((mi) => mi.getText()))
@@ -37,7 +45,9 @@ export default async function navigateBetweenMedia({ app, client }: TestSetup) {
     })
   })
 
-  await testBlock('ensure other video has loaded', async () => {
+  test('ensure other video has loaded', async () => {
+    const { client } = context
+
     await client.waitUntilPresent_(mediaFilesMenuButton)
 
     expect(await client.getAttribute('video', 'src')).toContain(

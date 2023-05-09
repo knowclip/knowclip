@@ -1,4 +1,4 @@
-import { testBlock, TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
 import {
@@ -9,50 +9,59 @@ import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { projectMenu$ } from '../../../components/ProjectMenu'
 
-export default async function reviewWithMissingMedia({ client }: TestSetup) {
+export default async function reviewWithMissingMedia(
+  context: IntegrationTestContext
+) {
   // maybe the first part for the loaded media should go in a different integration test
-  await testBlock('open dialog with correct flashcard selected', async () => {
+  test('open dialog with correct flashcard selected', async () => {
+    const { client } = context
+
     await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
     await client.clickElement_(projectMenu$.exportButton)
   })
 
-  await testBlock(
-    'continue to APKG Export view and check correct card is highlighted',
-    async () => {
-      await client.clickElement_(dialog$.continueButton)
-      await client.elements_(mediaTables$.container, 2)
-      await client.waitForText_(
-        reviewAndExportMediaTableRow$.highlightedClipRow,
-        'ああー  吸わないで'
-      )
-    }
-  )
+  test('continue to APKG Export view and check correct card is highlighted', async () => {
+    const { client } = context
 
-  await testBlock('first table checkbox is checked', async () => {
+    await client.clickElement_(dialog$.continueButton)
+    await client.elements_(mediaTables$.container, 2)
+    await client.waitForText_(
+      reviewAndExportMediaTableRow$.highlightedClipRow,
+      'ああー  吸わないで'
+    )
+  })
+
+  test('first table checkbox is checked', async () => {
+    const { client } = context
+
     expect(
       await checkboxesChecked(client, mediaTables$.checkbox)
     ).toMatchObject([true, false])
   })
 
-  await testBlock('uncheck first checkbox', async () => {
+  test('uncheck first checkbox', async () => {
+    const { client } = context
+
     await client.clickElement_(mediaTableRows$.clipCheckboxes)
     expect(
       await checkboxesChecked(client, mediaTables$.checkbox)
     ).toMatchObject([false, false])
   })
 
-  const [polarBearCafeCheckbox, piggeldyCheckbox] = await client.elements_(
-    mediaTables$.checkbox
-  )
-
-  await testBlock('check all PBC checkboxes', async () => {
+  test('check all PBC checkboxes', async () => {
+    const { client } = context
+    const [polarBearCafeCheckbox, _piggeldyCheckbox] = await client.elements_(
+      mediaTables$.checkbox
+    )
     await polarBearCafeCheckbox.click()
     expect(
       await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
     ).toMatchObject([true, true, true, true])
   })
 
-  await testBlock('select first card via double-click', async () => {
+  test('select first card via double-click', async () => {
+    const { client } = context
+
     const firstCardText = '笹を食べながらのんびりするのは最高だなぁ'
     await client.waitForText_(mediaTableRows$.container, firstCardText)
     await client.doubleClickElement_(mediaTableRows$.container)
@@ -60,17 +69,20 @@ export default async function reviewWithMissingMedia({ client }: TestSetup) {
     await client.waitForText_(mediaTableRows$.highlightedClipRow, firstCardText)
   })
 
-  await testBlock(
-    'open piggeldy table and select first piggeldy card',
-    async () => {
-      const [, piggeldyHeader] = await client.elements_(mediaTables$.header)
-      piggeldyHeader.click()
-      await client.waitUntilGone_(mediaTableRows$.highlightedClipRow)
-      await client.doubleClickElement_(mediaTableRows$.container)
-    }
-  )
+  test('open piggeldy table and select first piggeldy card', async () => {
+    const { client } = context
 
-  await testBlock('check all piggeldy checkboxes', async () => {
+    const [, piggeldyHeader] = await client.elements_(mediaTables$.header)
+    piggeldyHeader.click()
+    await client.waitUntilGone_(mediaTableRows$.highlightedClipRow)
+    await client.doubleClickElement_(mediaTableRows$.container)
+  })
+
+  test('check all piggeldy checkboxes', async () => {
+    const { client } = context
+    const [_polarBearCafeCheckbox, piggeldyCheckbox] = await client.elements_(
+      mediaTables$.checkbox
+    )
     expect(
       await checkboxesChecked(client, mediaTableRows$.clipCheckboxes)
     ).toMatchObject([false, false])

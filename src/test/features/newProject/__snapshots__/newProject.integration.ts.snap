@@ -1,52 +1,52 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`create a deck from a new project resulting project file matches snapshot 1`] = `
-Object {
-  "value": Object {
-    "media": Array [
-      Object {
-        "clips": Array [
-          Object {
+exports[`create a deck from a new project > resulting project file matches snapshot 1`] = `
+{
+  "value": {
+    "media": [
+      {
+        "clips": [
+          {
             "end": "00:12.5",
-            "fields": Object {
+            "fields": {
               "meaning": "Relaxing while eating bamboo grass is the best",
               "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
               "transcription": "笹を食べながらのんびりするのは最高だなぁ",
             },
             "id": "8e92ca1d-8d29-486b-81d1-0a44d2da8366",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:08.04",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:17.76",
-            "fields": Object {
+            "fields": {
               "meaning": "This kid, lazing about again so early",
               "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
               "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
               "transcription": "またこの子は昼間からゴロゴロして",
             },
             "id": "a1eb3142-ce18-4595-a3c3-8c867e1058f4",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:15.12",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "01:21.16",
             "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "01:15.2",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
@@ -55,9 +55,9 @@ Object {
         "format": "mov,mp4,m4a,3gp,3g2,mj2",
         "id": "5b0db4e9-a28f-4499-9cd7-d775f4eb7cb0",
         "name": "polar_bear_cafe.mp4",
-        "subtitles": Array [
-          Object {
-            "chunksMetadata": Object {
+        "subtitles": [
+          {
+            "chunksMetadata": {
               "count": 26,
               "endCueMs": 86430,
             },
@@ -65,8 +65,8 @@ Object {
             "streamIndex": 2,
             "type": "Embedded",
           },
-          Object {
-            "chunksMetadata": Object {
+          {
+            "chunksMetadata": {
               "count": 15,
               "endCueMs": 86730,
             },
@@ -76,14 +76,14 @@ Object {
           },
         ],
       },
-      Object {
+      {
         "duration": "00:58.24",
         "format": "mov,mp4,m4a,3gp,3g2,mj2",
         "id": "906db000-f3d2-46c9-9ec9-0a1069304e41",
         "name": "piggeldy_cat.mp4",
       },
     ],
-    "project": Object {
+    "project": {
       "createdAt": "2020-01-28T12:35:20Z",
       "id": "6f58206b-9384-411c-8432-e7ff8d6c958b",
       "name": "My cool new project",

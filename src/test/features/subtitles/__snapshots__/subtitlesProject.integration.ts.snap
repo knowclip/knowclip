@@ -1,252 +1,252 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`make clips and cards from subtitles saves and closes project 1`] = `
-Object {
-  "value": Object {
-    "media": Array [
-      Object {
-        "clips": Array [
-          Object {
+exports[`make clips and cards from subtitles > saves and closes project > save and close project 1`] = `
+{
+  "value": {
+    "media": [
+      {
+        "clips": [
+          {
             "end": "00:12.47",
-            "fields": Object {
+            "fields": {
               "meaning": "Chilling and eating bamboo 
 grass is the best thing ever.",
               "transcription": "笹を食べながらのんびりするのは最高だなぁ",
             },
             "id": "320265ad-8190-4729-8ec1-5fcf0d1b832e",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:07.63",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:17.65",
-            "fields": Object {
+            "fields": {
               "meaning": "Hey now. Look at you, being so lazy 
 so early in the day.",
               "transcription": "ちょっと  またこの子は昼間からゴロゴロして",
             },
             "id": "2f5ad340-c06b-4754-a468-56852ec9638c",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:12.78",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:20.999",
-            "fields": Object {
+            "fields": {
               "meaning": "You're in the way of my cleaning. Scoot.",
               "transcription": "掃除の邪魔よ  どきなさい",
             },
             "id": "7d4e2afe-55d1-4a1a-8365-767aa83c83e5",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:18.33",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:22.34",
-            "fields": Object {
+            "fields": {
               "meaning": "Okay.",
               "transcription": "はいー",
             },
             "id": "8a0d55ba-e456-4108-9fe2-911d7d25ffde",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:21.0",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:27.0",
-            "fields": Object {
+            "fields": {
               "meaning": "Seconds please, Mom.",
               "transcription": "お母さん  おかわり",
             },
             "id": "193c54f4-49f0-442b-b866-320ba111d369",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:24.8",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:32.19",
-            "fields": Object {
+            "fields": {
               "meaning": "Exactly what do you have 
 planned for your future?",
               "transcription": "どうするの  あなた将来は",
             },
             "id": "c7e5886a-0899-4192-8a9c-4b30c304a717",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:29.32",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:38.73",
-            "fields": Object {
+            "fields": {
               "meaning": "Jeez... Could we not talk about my future when I'm relaxing?",
               "transcription": "もう  ゴロゴロしてるときに  将来の話なんかしないでよ",
             },
             "id": "f4f17e82-af87-459e-af11-4f3d65f9d5d7",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:33.23",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:42.46",
-            "fields": Object {
+            "fields": {
               "meaning": "If you have so much time to relax, you could go look for a part-time job.",
               "transcription": "暇があるなら  ちょっとはバイトでも探しなさい",
             },
             "id": "f1def124-bbaa-418a-8836-34a8d8cf74da",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:38.87",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:49.18",
-            "fields": Object {
+            "fields": {
               "meaning": "I'm too busy relaxing, 
 so I'll do it later.",
               "transcription": "ええ  ゴロゴロするのに忙しいから  後にするよ",
             },
             "id": "6c34f168-1e1d-4933-84ae-df589c68ec06",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:42.73",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:55.1",
-            "fields": Object {
+            "fields": {
               "meaning": "Don't try to suck me up!",
               "transcription": "ああー  吸わないで",
             },
             "id": "24374cd7-bed9-4f30-aace-dbdf8fe31422",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:50.33",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:57.67",
-            "fields": Object {
+            "fields": {
               "meaning": "Jeez...",
               "transcription": "もう",
             },
             "id": "8f0f15ae-fe46-4b73-ad7d-36c4d10359dd",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:56.88",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "01:04.63",
-            "fields": Object {
+            "fields": {
               "meaning": "I wonder why Mom can't understand how much time relaxing takes up.",
               "transcription": "どうしてお母さんはゴロゴロする忙しさが分かんないんだろな",
             },
             "id": "2a3ce4c2-4714-47f6-9e33-2e28ba56eb1f",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:59.02",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "01:21.8",
-            "fields": Object {
+            "fields": {
               "meaning": "Excuse me, which of these will have jobs where I can get paid to do nothing?",
               "transcription": "えーと  働かないでお金がもらえる仕事が載っているのはどれですか",
             },
             "id": "82746bca-e8a1-4411-9b0c-39a0085526ca",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "01:15.29",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "01:24.76",
-            "fields": Object {
+            "fields": {
               "meaning": "I don't think there is one.",
               "transcription": "ないと思います",
             },
             "id": "78ec78a2-8520-4311-9f15-9f2061e6ffe5",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "01:23.44",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "01:26.43",
-            "fields": Object {
+            "fields": {
               "meaning": "Really?",
               "transcription": "え",
             },
             "id": "8a27cad2-517a-47fb-a68d-4e527bec6387",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "01:25.25",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
         ],
         "duration": "01:27.062",
-        "flashcardFieldsToSubtitlesTracks": Object {
+        "flashcardFieldsToSubtitlesTracks": {
           "meaning": "5f581055-dbf5-4f3b-bcee-a3215e405ffc",
           "transcription": "94367f0c-92ef-4542-a80a-6fbaf8e1ad76",
         },
         "format": "mov,mp4,m4a,3gp,3g2,mj2",
         "id": "bd8aca85-de21-4666-bbab-a33fd21d03f1",
         "name": "polar_bear_cafe.mp4",
-        "subtitles": Array [
-          Object {
-            "chunksMetadata": Object {
+        "subtitles": [
+          {
+            "chunksMetadata": {
               "count": 26,
               "endCueMs": 86430,
             },
@@ -254,8 +254,8 @@ so I'll do it later.",
             "streamIndex": 2,
             "type": "Embedded",
           },
-          Object {
-            "chunksMetadata": Object {
+          {
+            "chunksMetadata": {
               "count": 15,
               "endCueMs": 86730,
             },
@@ -265,35 +265,35 @@ so I'll do it later.",
           },
         ],
       },
-      Object {
-        "clips": Array [
-          Object {
+      {
+        "clips": [
+          {
             "end": "00:08.76",
-            "fields": Object {
+            "fields": {
               "meaning": "I am not a cat, said Frederick angrily",
               "transcription": "Ich bin keine Katze, sagte Frederick böse",
             },
             "id": "152077c6-336b-47d6-88e6-1ba4410db553",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:07.02",
-            "tags": Array [
+            "tags": [
               "piggeldy_cat.mp4",
             ],
           },
-          Object {
+          {
             "end": "00:20.0",
-            "fields": Object {
+            "fields": {
               "meaning": "I didn't say that",
               "transcription": "Das hab' ich nicht gesagt",
             },
             "id": "864d822f-d482-438e-9620-684b2730a688",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:18.42",
-            "tags": Array [
+            "tags": [
               "piggeldy_cat.mp4",
             ],
           },
@@ -304,7 +304,7 @@ so I'll do it later.",
         "name": "piggeldy_cat.mp4",
       },
     ],
-    "project": Object {
+    "project": {
       "createdAt": "2020-02-01T16:10:37Z",
       "id": "ef3a2602-37a0-4158-89d6-47b75edb5bea",
       "name": "Project with subtitles",

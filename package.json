@@ -34,7 +34,7 @@
     "filenamify": "^4.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^10.0.0",
-    "material-ui-chip-input-v5": "^1.0.0",
+    "@silvestre/material-ui-chip-input-v5": "^1.0.0",
     "moment": "^2.24.0",
     "normalizr": "^3.5.0",
     "papaparse": "^5.2.0",
@@ -59,7 +59,7 @@
     "ts-json-schema-generator": "^0.97",
     "uuid": "^8.3.2",
     "wanakana": "^4.0.2",
-    "webdriverio": "^7.16.3",
+    "webdriverio": "^8.0.0",
     "xss": "^1.0.6",
     "yaml": "^1.7.2",
     "yauzl": "^2.10.0"
@@ -79,21 +79,22 @@
     "webpack:ci": "CI=false npm run webpack",
     "webpack:ci-win": "set CI=false&& npm run webpack:win",
     "webpack:appveyor": "react-scripts build",
-    "test": "npm run build-main && react-scripts test --env=jsdom ./src --testPathIgnorePatterns=./src/test",
-    "integration": "npm run build-main && REACT_APP_CHROMEDRIVER=true npm run webpack:ci && react-scripts test ./src/test/ --watchAll=false  --runInBand",
-    "integration:win": "set REACT_APP_CHROMEDRIVER=true&& npm run build-main && npm run webpack:ci-win && react-scripts test ./src/test/ --watchAll=false  --runInBand",
-    "integration:skip-build": "npm run build-main && REACT_APP_CHROMEDRIVER=true react-scripts test ./src/test/ --watchAll=false --runInBand",
-    "integration:skip-build-win": "npm run build-main && set REACT_APP_CHROMEDRIVER=true&& react-scripts test ./src/test/ --watchAll=false --runInBand",
+    "test": "npm run build-main && npm run vitest run -- --config ./vitest.config.ts",
+    "integration": "npm run build-main && REACT_APP_CHROMEDRIVER=true npm run webpack:ci && npm run vitest run -- --config ./vitest-integration.config.ts",
+    "integration:win": "set REACT_APP_CHROMEDRIVER=true&& npm run build-main && npm run webpack:ci-win && npm run vitest run -- --config ./vitest-integration.config.ts",
+    "integration:skip-build": "npm run build-main && REACT_APP_CHROMEDRIVER=true npm run integration",
+    "integration:skip-build-win": "npm run build-main && set REACT_APP_CHROMEDRIVER=true&& npm run integration",
     "integration:debug": "INTEGRATION_DEV=true npm run integration:skip-build -- --verbose",
     "integration:debug-win": "set INTEGRATION_DEV=true&& npm run integration:skip-build-win -- --verbose",
-    "build-fixture:saved": "npm run integration:build-fixture -- -t \"testing saved projects\"",
-    "build-fixture:shared": "npm run integration:build-fixture -- -t \"shared project\" && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",
-    "build-fixture:subtitles": "npm run integration:build-fixture -- -t \"from subtitles\"",
-    "integration:build-fixture": "npm run build-main && INTEGRATION_DEV=true REACT_APP_CHROMEDRIVER=true BUILDING_FIXTURES=true react-scripts test ./src/test/ --testMatch=**/*.fixture.{js,jsx,ts,tsx} --watchAll=false --runInBand",
+    "build-fixture:saved": "npm run integration:build-fixture -- -t \"savedProject\"",
+    "build-fixture:shared": "npm run integration:build-fixture -- -t \"sharedProject\" && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",
+    "build-fixture:subtitles": "npm run integration:build-fixture -- -t \"subtitlesProject\"",
+    "integration:build-fixture": "npm run build-main && INTEGRATION_DEV=true REACT_APP_CHROMEDRIVER=true BUILDING_FIXTURES=true npm run vitest run -- --config ./vitest-integration-fixtures.config.ts",
     "eject": "react-scripts eject",
     "electron": "export NODE_ENV=development && npm run build-main && electron .",
     "electron:win": "set NODE_ENV=development&& npm run build-main && electron .",
     "lint": "npm run eslint 'src/**/*.{ts,tsx,js}'",
+    "vitest": "vitest",
     "lint-staged": "lint-staged",
     "eslint": "eslint",
     "prettier": "prettier",
@@ -120,11 +121,6 @@
   "browserslist": [
     "electron >= 14.2.0"
   ],
-  "jest": {
-    "transformIgnorePatterns": [
-      "node_modules/(?!@mui/.+|material-ui-chip-input-v5|@material-ui/.+|@babel-runtime/.+)/"
-    ]
-  },
   "devDependencies": {
     "@types/archiver": "^5.1.1",
     "@types/better-sqlite3": "^7.4.0",
@@ -154,12 +150,14 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-react-app": "^7.0.1",
     "husky": "^7.0.4",
+    "jsdom": "^22.0.0",
     "levenary": "^1.1.1",
     "lint-staged": "^11.2.6",
     "prettier": "^2.1.2",
     "request": "^2.88.2",
     "silvestre-afa-react-scripts": "5.0.1-5",
-    "typescript": "^4.4.4",
+    "typescript": "^4.9.4",
+    "vitest": "^0.31.0",
     "yalc": "^1.0.0-pre.53"
   },
   "resolutions": {

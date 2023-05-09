@@ -18,25 +18,27 @@ export const newProjectTestSteps = ({
   projectFileName: string
   projectTitle: string
 }) => [
-  step('create a new project', (setup) =>
-    createNewProject(setup, projectFileName, 'My cool new poject')
+  step('create a new project', (context) =>
+    createNewProject(context, projectFileName, 'My cool new poject')
   ),
-  step('change project name', (setup) =>
-    changeProjectName(setup, 'My cool new poject', projectTitle)
+  step('change project name', (context) =>
+    changeProjectName(context, 'My cool new poject', projectTitle)
   ),
-  step('add media to project', (setup) =>
-    addFirstMediaToProject(setup, 'polar_bear_cafe.mp4')
+  step('add media to project', (context) =>
+    addFirstMediaToProject(context, 'polar_bear_cafe.mp4')
   ),
-  step('add a subtitles file', (setup) =>
-    addSomeSubtitles(setup, 'pbc_jp.ass')
+  step('add a subtitles file', (context) =>
+    addSomeSubtitles(context, 'pbc_jp.ass')
   ),
-  step('create clips + flashcards', (setup) => makeSomeFlashcards(setup)),
-  step('navigate between clips', (setup) => navigateBetweenClips(setup)),
-  step('move throughout media file', (setup) => moveThroughoutMedia(setup)),
-  step('add more media to project', (setup) => addMoreMediaToProject(setup)),
-  step('navigate between media', (setup) => navigateBetweenMedia(setup)),
-  step('exporting an .apkg', (setup) => reviewAndExportApkg(setup)),
-  step('saving a project file', (setup) =>
-    saveAndCloseProject(setup, projectTitle)
+  step('create clips + flashcards', (context) => makeSomeFlashcards(context)),
+  step('navigate between clips', (context) => navigateBetweenClips(context)),
+  step('move throughout media file', (context) => moveThroughoutMedia(context)),
+  step('add more media to project', (context) =>
+    addMoreMediaToProject(context)
+  ),
+  step('navigate between media', (context) => navigateBetweenMedia(context)),
+  step('exporting an .apkg', (context) => reviewAndExportApkg(context)),
+  step('saving a project file', (context) =>
+    saveAndCloseProject(context, projectTitle)
   ),
 ]

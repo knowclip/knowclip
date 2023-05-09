@@ -113,7 +113,7 @@ export async function createTestDriver({
     7000
   )
 
-  const browser: Browser<'async'> = await remote({
+  const browser: Browser = await remote({
     waitforTimeout: 30000,
     hostname,
     port, // "9515" is the port opened by chrome driver.
@@ -143,16 +143,10 @@ export async function createTestDriver({
 
 export class TestDriver {
   isReady: Promise<MessageResponse<boolean>>
-  client: Browser<'async'>
+  client: Browser
   _driver: Chromedriver
 
-  constructor({
-    driver,
-    browser,
-  }: {
-    driver: Chromedriver
-    browser: Browser<'async'>
-  }) {
+  constructor({ driver, browser }: { driver: Chromedriver; browser: Browser }) {
     this.client = browser
     this._driver = driver
 

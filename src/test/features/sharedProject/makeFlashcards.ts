@@ -1,11 +1,13 @@
-import { testBlock, TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function makeFlashcards({ client }: TestSetup) {
-  await testBlock('select clip', async () => {
+export default async function makeFlashcards(context: IntegrationTestContext) {
+  test('select clip', async () => {
+    const { client } = context
+
     await client.elements_(waveform$.waveformClip, 2)
     await client.clickElement_(waveform$.waveformClip)
     await client.waitForText_(flashcardSection$.container, '1 / 3')
@@ -15,7 +17,9 @@ export default async function makeFlashcards({ client }: TestSetup) {
     )
   })
 
-  await testBlock('seek to video time with with no visible clips', async () => {
+  test('seek to video time with with no visible clips', async () => {
+    const { client } = context
+
     await setVideoTime(client, 0)
     await Promise.resolve(null)
     await setVideoTime(client, 60)
@@ -25,7 +29,9 @@ export default async function makeFlashcards({ client }: TestSetup) {
     await client.waitForHidden_(waveform$.waveformClip)
   })
 
-  await testBlock('create clip', async () => {
+  test('create clip', async () => {
+    const { client } = context
+
     await waveformMouseDrag(client, 589, 824)
     await client.waitForText_(flashcardSection$.container, '3 / 4')
   })
