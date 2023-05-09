@@ -1,24 +1,23 @@
-import { startApp, stopApp, TestSetup, TMP_DIRECTORY } from '../../setUpDriver'
+import {
+  initTestContext,
+  startApp,
+  stopApp,
+  IntegrationTestContext,
+  TMP_DIRECTORY,
+} from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll } from '../step'
 import { newProjectTestSteps } from './newProjectTestSteps'
 import { join } from 'path'
 import { parseProjectJson } from '../../../utils/parseProject'
-import { TestDriver } from '../../driver/TestDriver'
-
-jest.setTimeout(60000)
 
 describe('create a deck from a new project', () => {
-  let context: { app: TestDriver | null; testId: string } = {
-    app: null,
-    testId: 'newProject',
-  }
-  let setup: TestSetup
+  let context: IntegrationTestContext = initTestContext('newProject')
 
   beforeAll(async () => {
-    setup = await startApp(context)
+    const { app } = await startApp(context)
 
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    await mockSideEffects(app, sideEffectsMocks)
   })
 
   runAll(
@@ -26,7 +25,7 @@ describe('create a deck from a new project', () => {
       projectFileName: 'my_cool_new_project',
       projectTitle: 'My cool new project',
     }),
-    () => setup
+    context
   )
 
   test('resulting project file matches snapshot', async () => {

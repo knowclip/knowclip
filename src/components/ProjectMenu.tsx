@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { IconButton, TextField, Tooltip } from '@material-ui/core'
+import { IconButton, TextField, Tooltip } from '@mui/material'
 import {
   Close as CloseIcon,
   Save as SaveIcon,

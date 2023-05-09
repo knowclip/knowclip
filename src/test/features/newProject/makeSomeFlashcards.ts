@@ -1,4 +1,4 @@
-import { testBlock, TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { tagsInput$ } from '../../../components/TagsInput'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
@@ -8,8 +8,11 @@ import {
 } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function makeTwoFlashcards({ client }: TestSetup) {
-  await testBlock('create first card', async () => {
+export default async function makeTwoFlashcards(
+  context: IntegrationTestContext
+) {
+  test('create first card', async () => {
+    const { client } = context
     await waveformMouseDrag(client, 402, 625)
 
     await fillInTransliterationCardFields(client, {
@@ -19,7 +22,8 @@ export default async function makeTwoFlashcards({ client }: TestSetup) {
     })
   })
 
-  await testBlock('edit tags', async () => {
+  test('edit tags', async () => {
+    const { client } = context
     await client.elements_(tagsInput$.tagChip, 1)
     await client.clickElement_(tagsInput$.tagChip)
     await client.elements_(tagsInput$.tagChip)
@@ -32,12 +36,14 @@ export default async function makeTwoFlashcards({ client }: TestSetup) {
     await client.waitForText_(tagsInput$.tagChip, 'pbc')
   })
 
-  await testBlock('create second card', async () => {
+  test('create second card', async () => {
+    const { client } = context
     await waveformMouseDrag(client, 756, 920)
     await client.waitForText_(flashcardSection$.container, '2 / 2')
   })
 
-  await testBlock('select and edit card', async () => {
+  test('select and edit card', async () => {
+    const { client } = context
     await waveformMouseHoldAndDrag(client, 300, 917, 888)
 
     await client.elements_(tagsInput$.tagChip, 1)

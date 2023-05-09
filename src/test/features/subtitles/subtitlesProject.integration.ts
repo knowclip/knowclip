@@ -1,43 +1,38 @@
 import {
   startApp,
   stopApp,
-  TestSetup,
   TMP_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
+  initTestContext,
 } from '../../setUpDriver'
 import makeCardsFromSubtitles from './makeCardsFromSubtitles'
 import saveAndCloseProject from './saveAndCloseProject'
 import { join } from 'path'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
-import { TestDriver } from '../../driver/TestDriver'
 import { runAll, step } from '../step'
-
-jest.setTimeout(60000)
 
 const testId = 'subtitlesProject'
 
 describe('make clips and cards from subtitles', () => {
-  let context: { app: TestDriver | null; testId: string } = {
-    app: null,
-    testId,
-  }
-  let setup: TestSetup
+  let context = initTestContext(testId)
 
   beforeAll(async () => {
-    setup = await startApp(context, persistedState)
+    const { app } = await startApp(context, persistedState)
 
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    await mockSideEffects(app, sideEffectsMocks)
   })
 
   runAll(
     [
-      step('automatically make clips and cards from subtitles', (setup) =>
-        makeCardsFromSubtitles(setup)
+      step('automatically make clips and cards from subtitles', (context) =>
+        makeCardsFromSubtitles(context)
       ),
-      step('saves and closes project', (setup) => saveAndCloseProject(setup)),
+      step('saves and closes project', (context) =>
+        saveAndCloseProject(context)
+      ),
     ],
-    () => setup
+    context
   )
 
   afterAll(async () => {

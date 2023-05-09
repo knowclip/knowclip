@@ -1,69 +1,69 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`opening and saving a previously saved project resulting project file matches snapshot 1`] = `
-Object {
-  "value": Object {
-    "media": Array [
-      Object {
-        "clips": Array [
-          Object {
+exports[`opening and saving a previously saved project > resulting project file matches snapshot 1`] = `
+{
+  "value": {
+    "media": [
+      {
+        "clips": [
+          {
             "end": "00:12.5",
-            "fields": Object {
+            "fields": {
               "meaning": "Relaxing while eating bamboo grass is the best",
               "pronunciation": "sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa",
               "transcription": "笹を食べながらのんびりするのは最高だなぁ",
             },
             "id": "632a6cff-7fd7-4d0f-b657-0b9636204261",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:08.04",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "00:18.4",
-            "fields": Object {
+            "fields": {
               "meaning": "This kid, lazing about again so early",
               "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
               "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
               "transcription": "ちょっと  またこの子は昼間からゴロゴロして",
             },
             "id": "a272b282-4d89-4af0-9d17-baa807793f1f",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:15.12",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
-          Object {
+          {
             "end": "01:21.16",
-            "fields": Object {
+            "fields": {
               "transcription": "えーと  働かないでお金がもらえる仕事が載っているのはどれですか",
             },
             "id": "6fce08e8-9312-4930-9601-c14b470e57ab",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "01:15.2",
-            "tags": Array [
+            "tags": [
               "pbc",
             ],
           },
         ],
         "duration": "01:27.062",
-        "flashcardFieldsToSubtitlesTracks": Object {
+        "flashcardFieldsToSubtitlesTracks": {
           "transcription": "b3347257-97c4-4c9a-8eae-9bf88a8edc23",
         },
         "format": "mov,mp4,m4a,3gp,3g2,mj2",
         "id": "10fd95ee-ba1a-424f-95fb-66a28c91faf1",
         "name": "polar_bear_cafe.mp4",
-        "subtitles": Array [
-          Object {
-            "chunksMetadata": Object {
+        "subtitles": [
+          {
+            "chunksMetadata": {
               "count": 26,
               "endCueMs": 86430,
             },
@@ -71,8 +71,8 @@ Object {
             "streamIndex": 2,
             "type": "Embedded",
           },
-          Object {
-            "chunksMetadata": Object {
+          {
+            "chunksMetadata": {
               "count": 15,
               "endCueMs": 86730,
             },
@@ -82,35 +82,35 @@ Object {
           },
         ],
       },
-      Object {
-        "clips": Array [
-          Object {
+      {
+        "clips": [
+          {
             "end": "00:08.76",
-            "fields": Object {
+            "fields": {
               "meaning": "I am not a cat, said Frederick angrily",
               "transcription": "Ich bin keine Katze, sagte Frederick böse",
             },
             "id": "136042f2-00bc-4d9b-a3a7-3da1b7868c78",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:07.02",
-            "tags": Array [
+            "tags": [
               "piggeldy_cat.mp4",
             ],
           },
-          Object {
+          {
             "end": "00:20.0",
-            "fields": Object {
+            "fields": {
               "meaning": "I didn't say that",
               "transcription": "Das hab' ich nicht gesagt",
             },
             "id": "1e62d23d-3f3b-4785-b8ba-5d61dddc78ed",
-            "image": Object {
+            "image": {
               "type": "VideoStill",
             },
             "start": "00:18.42",
-            "tags": Array [
+            "tags": [
               "piggeldy_cat.mp4",
             ],
           },
@@ -121,7 +121,7 @@ Object {
         "name": "piggeldy_cat.mp4",
       },
     ],
-    "project": Object {
+    "project": {
       "createdAt": "2020-02-01T13:20:55Z",
       "id": "91bfd159-155c-4b61-bdd5-d71e2e944773",
       "name": "My cool saved project",

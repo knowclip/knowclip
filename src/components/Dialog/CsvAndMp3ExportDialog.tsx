@@ -9,7 +9,7 @@ import {
   FormControl,
   FormControlLabel,
   Checkbox,
-} from '@material-ui/core'
+} from '@mui/material'
 import r from '../../redux'
 import {
   showOpenDirectoryDialog,

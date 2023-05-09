@@ -6,7 +6,7 @@ import { sendToMainProcess } from '../messages'
 const ffmpeg =
   require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
-if (!process.env.JEST_WORKER_ID)
+if (!process.env.VITEST_WORKER_ID)
   sendToMainProcess({
     type: 'getFfmpegAndFfprobePath',
     args: [],

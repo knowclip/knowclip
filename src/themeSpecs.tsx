@@ -1,13 +1,17 @@
-const themeSpecs = {
-  overrides: {
+import { ThemeOptions } from '@mui/material'
+
+const themeSpecs: ThemeOptions = {
+  components: {
     MuiTooltip: {
-      tooltip: {
-        fontSize: '.8rem',
+      styleOverrides: {
+        tooltip: {
+          fontSize: '.8rem',
+        },
       },
     },
-    ...(process.env.REACT_APP_CHROMEDRIVER
+    MuiCssBaseline: process.env.REACT_APP_CHROMEDRIVER
       ? {
-          MuiCssBaseline: {
+          styleOverrides: {
             '@global': {
               '*, *::before, *::after': {
                 transition: 'none !important',
@@ -15,10 +19,22 @@ const themeSpecs = {
               },
             },
           },
-          transitions: () => 'none',
         }
-      : null),
+      : {},
   },
+  transitions: process.env.REACT_APP_CHROMEDRIVER
+    ? {
+        duration: {
+          shortest: 0,
+          shorter: 0,
+          short: 0,
+          standard: 0,
+          complex: 0,
+          enteringScreen: 0,
+          leavingScreen: 0,
+        },
+      }
+    : {},
 }
 
 export default themeSpecs

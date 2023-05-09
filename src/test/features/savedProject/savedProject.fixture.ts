@@ -1,31 +1,25 @@
 import {
   startApp,
   stopApp,
-  TestSetup,
   TMP_DIRECTORY,
   FIXTURES_DIRECTORY,
+  initTestContext,
 } from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll } from '../step'
 import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'
 import { join } from 'path'
-import { TestDriver } from '../../driver/TestDriver'
-
-jest.setTimeout(60000)
 
 const testId = 'savedProject'
 
 describe('make a project file for testing saved projects', () => {
-  let context: { app: TestDriver | null; testId: string } = {
-    app: null,
-    testId,
-  }
-  let setup: TestSetup
+  let context = initTestContext(testId)
 
   beforeAll(async () => {
-    setup = await startApp(context)
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    const { app } = await startApp(context)
+
+    await mockSideEffects(app, sideEffectsMocks)
   })
 
   runAll(
@@ -33,7 +27,7 @@ describe('make a project file for testing saved projects', () => {
       projectFileName: 'my_previously_saved_project',
       projectTitle: 'My cool saved project',
     }),
-    () => setup
+    context
   )
 
   afterAll(async () => {
@@ -42,7 +36,9 @@ describe('make a project file for testing saved projects', () => {
       join(FIXTURES_DIRECTORY, 'my_previously_saved_project.kyml')
     )
 
-    await setup.logPersistedData()
+    if (context.setup) await context.setup.logPersistedData()
+    else
+      console.error('Could not log persisted data while running app not found')
 
     await stopApp(context)
   })

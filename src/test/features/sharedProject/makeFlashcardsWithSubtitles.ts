@@ -1,4 +1,4 @@
-import { testBlock, TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
@@ -6,33 +6,38 @@ import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function makeFlashcardsWithSubtitles({
-  client,
-}: TestSetup) {
-  await testBlock(
-    'open flashcard field menu for meaning field of third card',
-    async () => {
-      await client.waitForText_(flashcardSection$.container, '3 / 4')
+export default async function makeFlashcardsWithSubtitles(
+  context: IntegrationTestContext
+) {
+  test('open flashcard field menu for meaning field of third card', async () => {
+    const { client } = context
 
-      await client.clickElement(
-        `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
-      )
-    }
-  )
+    await client.waitForText_(flashcardSection$.container, '3 / 4')
 
-  await testBlock('link embedded track to meaning', async () => {
+    await client.clickElement(
+      `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
+    )
+  })
+
+  test('link embedded track to meaning', async () => {
+    const { client } = context
+
     await client.clickElement_(flashcardFieldMenu$.embeddedTrackMenuItem)
     await client.clickElement_(confirmationDialog$.okButton)
   })
 
-  await testBlock('delete card', async () => {
+  test('delete card', async () => {
+    const { client } = context
+
     await client.clickElement_(flashcardForm$.deleteButton)
 
     await client.elements_(waveform$.waveformClip, 1)
     await client.waitForHidden_(waveform$.waveformClip)
   })
 
-  await testBlock('create card', async () => {
+  test('create card', async () => {
+    const { client } = context
+
     await waveformMouseDrag(client, 589, 824)
     const els = await client.elements_(waveform$.waveformClip)
 

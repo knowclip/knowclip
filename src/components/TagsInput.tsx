@@ -1,7 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react'
 import cn from 'classnames'
-import { MenuItem, Paper, Chip } from '@material-ui/core'
-import ChipInput, { ChipRenderer } from 'material-ui-chip-input'
+import { MenuItem, Paper, Chip } from '@mui/material'
+import ChipInput, { ChipRenderer } from '@silvestre/material-ui-chip-input-v5'
 import css from './FlashcardSection.module.css'
 import Autosuggest, {
   RenderSuggestion,
@@ -9,7 +9,7 @@ import Autosuggest, {
   RenderSuggestionsContainer,
   InputProps,
 } from 'react-autosuggest'
-import { blue } from '@material-ui/core/colors'
+import { blue } from '@mui/material/colors'
 import truncate from '../utils/truncate'
 
 enum $ {

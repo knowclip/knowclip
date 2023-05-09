@@ -1,26 +1,32 @@
-import { TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { projectMenu$ } from '../../../components/ProjectMenu'
 
+const { projectTitle, projectTitleInput } = projectMenu$
+
 export default async function changeProjectName(
-  setup: TestSetup,
+  context: IntegrationTestContext,
   oldName: string,
   newName: string
 ) {
-  const { client } = setup
-  const { projectTitle, projectTitleInput } = projectMenu$
+  test('edit project title', async () => {
+    const { client } = context
 
-  const projectTitleEl = await client.firstElement_(projectTitle)
-  await projectTitleEl.waitForText(oldName)
+    const projectTitleEl = await client.firstElement_(projectTitle)
+    await projectTitleEl.waitForText(oldName)
 
-  await projectTitleEl.doubleClick()
-  const projectTitleInputEl = await client.firstElement_(projectTitleInput)
-  await projectTitleInputEl.click()
-  await client.pressKeys([
-    ...[...oldName].map(() => 'ArrowRight'),
-    ...[...oldName].map(() => 'Backspace'),
-    ...newName,
-    'Enter',
-  ])
+    await projectTitleEl.doubleClick()
+    const projectTitleInputEl = await client.firstElement_(projectTitleInput)
+    await projectTitleInputEl.click()
+    await client.pressKeys([
+      ...[...oldName].map(() => 'ArrowRight'),
+      ...[...oldName].map(() => 'Backspace'),
+      ...newName,
+      'Enter',
+    ])
+  })
 
-  await (await client.firstElement_(projectTitle)).waitForText(newName)
+  test('ensure project title has updated', async () => {
+    const { client } = context
+    await (await client.firstElement_(projectTitle)).waitForText(newName)
+  })
 }

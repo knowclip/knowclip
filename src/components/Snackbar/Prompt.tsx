@@ -1,5 +1,5 @@
 import React, { useState, useCallback, Fragment } from 'react'
-import { Snackbar, IconButton, Button } from '@material-ui/core'
+import { Snackbar, IconButton, Button } from '@mui/material'
 import { Close } from '@material-ui/icons'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
@@ -51,7 +51,9 @@ const PromptSnackbar = ({
       message={message}
       autoHideDuration={autoHideDuration}
       onClose={closeExceptOnClickaway}
-      onExited={handleExited}
+      TransitionProps={{
+        onExited: handleExited,
+      }}
       action={
         <DarkTheme>
           <Fragment>

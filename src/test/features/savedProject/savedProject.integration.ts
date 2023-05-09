@@ -1,40 +1,33 @@
 import {
   startApp,
   stopApp,
-  TestSetup,
   TMP_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
+  initTestContext,
 } from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { join } from 'path'
 import { runAll } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
 import { parseProjectJson } from '../../../utils/parseProject'
-import { TestDriver } from '../../driver/TestDriver'
-
-jest.setTimeout(60000)
 
 const testId = 'savedProject'
 
 describe('opening and saving a previously saved project', () => {
-  let context: { app: TestDriver | null; testId: string } = {
-    app: null,
-    testId,
-  }
-  let setup: TestSetup
+  let context = initTestContext(testId)
 
   beforeAll(async () => {
-    setup = await startApp(context, persistedState)
+    const { app } = await startApp(context, persistedState)
 
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    await mockSideEffects(app, sideEffectsMocks)
   })
 
   runAll(
     savedProjectTestSteps({
       projectTitle: 'My cool saved project',
     }),
-    () => setup
+    context
   )
 
   test('resulting project file matches snapshot', async () => {

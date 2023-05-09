@@ -1,17 +1,17 @@
 import React, { ReactChild } from 'react'
-import { MuiThemeProvider, createTheme } from '@material-ui/core/styles'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 import themeSpecs from '../themeSpecs'
 
 const theme = createTheme({
   ...themeSpecs,
   palette: {
+    mode: 'dark',
     // ...(themeSpecs.palette || {}),
-    type: 'dark',
   },
 })
 
 const DarkTheme = ({ children }: { children: ReactChild }) => (
-  <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+  <ThemeProvider theme={theme}>{children}</ThemeProvider>
 )
 
 export default DarkTheme

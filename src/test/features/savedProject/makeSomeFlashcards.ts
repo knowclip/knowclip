@@ -1,4 +1,4 @@
-import { testBlock, TestSetup } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
@@ -6,9 +6,13 @@ import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
-export default async function makeSomeFlashcards({ client }: TestSetup) {
+export default async function makeSomeFlashcards(
+  context: IntegrationTestContext
+) {
   const { deleteButton } = flashcardForm$
-  await testBlock('create first card', async () => {
+  test('create first card', async () => {
+    const { client } = context
+
     await waveformMouseDrag(client, 351, 438)
     await client.waitForText_(flashcardSection$.container, '1 / 1')
 
@@ -18,7 +22,9 @@ export default async function makeSomeFlashcards({ client }: TestSetup) {
     })
   })
 
-  await testBlock('create another card', async () => {
+  test('create another card', async () => {
+    const { client } = context
+
     await waveformMouseDrag(client, 921, 1000)
     await client.waitForText_(flashcardSection$.container, '2 / 2')
 
@@ -28,18 +34,24 @@ export default async function makeSomeFlashcards({ client }: TestSetup) {
     })
   })
 
-  await testBlock('seek to new video time', async () => {
+  test('seek to new video time', async () => {
+    const { client } = context
+
     await setVideoTime(client, 38)
     await client.waitUntilGone_(waveform$.waveformClip)
   })
 
-  await testBlock('create a third card', async () => {
+  test('create a third card', async () => {
+    const { client } = context
+
     await waveformMouseDrag(client, 176, 355)
     await client.waitForText_(flashcardSection$.container, '3 / 3')
     await client.waitForVisible_(waveform$.waveformClip)
   })
 
-  await testBlock('delete third card', async () => {
+  test('delete third card', async () => {
+    const { client } = context
+
     await client.clickElement_(deleteButton)
     await client.waitUntilGone_(waveform$.waveformClip)
   })

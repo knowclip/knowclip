@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { Dialog, DialogContent } from '@material-ui/core'
+import { Dialog, DialogContent } from '@mui/material'
 import MediaFolderLocationForm from '../MediaFolderLocationForm'
 import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'

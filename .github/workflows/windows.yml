@@ -14,15 +14,15 @@ jobs:
         node-version: [16.x]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
     - name: integration test
       run: |
         npm ci
-        npm run integration:win -- -t "shared project"
+        npm run integration:win -- "sharedProject"
       env:
         REACT_APP_CHROMEDRIVER: true
         SPECTRON_LOG_FAILURES: true

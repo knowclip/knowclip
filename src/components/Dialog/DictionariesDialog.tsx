@@ -17,7 +17,7 @@ import {
   MenuItem,
   Select,
   Tooltip,
-} from '@material-ui/core'
+} from '@mui/material'
 import { DialogProps } from './DialogProps'
 import r from '../../redux'
 import { Delete, Warning } from '@material-ui/icons'

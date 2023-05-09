@@ -16,9 +16,9 @@ import { settingsActions } from './settings'
 
 type ActionType = keyof typeof A
 export type ActionOf<T extends ActionType> = ReturnType<
-  typeof baseActions[T]
+  (typeof baseActions)[T]
 > extends { type: T }
-  ? ReturnType<typeof baseActions[T]>
+  ? ReturnType<(typeof baseActions)[T]>
   : never
 export type Action = ActionOf<ActionType>
 

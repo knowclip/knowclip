@@ -1,23 +1,21 @@
-import { Console } from 'console'
-import filenamify from 'filenamify/filenamify'
+import filenamify from 'filenamify'
 import moment from 'moment'
 import { join } from 'path'
-import { stdout } from 'process'
-import { SCREENSHOTS_DIRECTORY, TestSetup } from '../setUpDriver'
+import { SCREENSHOTS_DIRECTORY, IntegrationTestContext } from '../setUpDriver'
 
 type TestStep = {
   description: string
-  runTest: (setup: TestSetup) => Promise<any>
+  runTest: (context: IntegrationTestContext) => Promise<any>
 }
 
 export const step = (
   description: string,
-  runTest: (setup: TestSetup) => Promise<any>
+  runTest: (context: IntegrationTestContext) => Promise<any>
 ): TestStep => ({
   description,
-  runTest: async (setup) => {
+  runTest: async (context: IntegrationTestContext) => {
     try {
-      await runTest(setup)
+      await runTest(context as any)
     } catch (error) {
       try {
         const screenshotFilepath = join(
@@ -28,7 +26,13 @@ export const step = (
         )
         console.log(`Saving screenshot to: ${screenshotFilepath}`)
 
-        await setup.client._driver.client.saveScreenshot(screenshotFilepath)
+        await context.setup?.client._driver.client.saveScreenshot(
+          screenshotFilepath
+        )
+        if (!context.setup)
+          console.error(
+            'Could not save screenshot, currently running app not found'
+          )
       } catch (screenshotError) {
         console.error(screenshotError)
       }
@@ -37,22 +41,24 @@ export const step = (
   },
 })
 
-export const runAll = (testSteps: TestStep[], getSetup: () => TestSetup) => {
+export const runAll = (
+  testSteps: TestStep[],
+  context: IntegrationTestContext
+) => {
   testSteps.forEach(({ description, runTest }) => {
-    test(description, async () => {
-      const setup = getSetup()
-      stdout.write('\n\n ' + description + '\n' + '='.repeat(30) + '\n')
+    describe(description, async () => {
       try {
-        await runTest(setup)
+        await runTest(context)
       } catch (err) {
         try {
           if (process.env.SPECTRON_LOG_FAILURES) {
             console.log('Logging markup from failed test:')
-            const source = await setup.client._driver.client.getPageSource()
+            const source =
+              await context.setup?.client._driver.client.getPageSource()
             console.log(source)
 
             console.log('Logging persisted data from failed test:')
-            await setup.logPersistedData()
+            await context.setup?.logPersistedData()
           }
         } catch (err) {
           console.error(`Could not log info for failed test: ${err}`)

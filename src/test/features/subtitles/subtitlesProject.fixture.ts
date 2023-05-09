@@ -1,9 +1,9 @@
 import {
   startApp,
   stopApp,
-  TestSetup,
   TMP_DIRECTORY,
   FIXTURES_DIRECTORY,
+  initTestContext,
 } from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll } from '../step'
@@ -11,22 +11,16 @@ import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'
 import { join } from 'path'
 import { savedProjectTestSteps } from '../savedProject/savedProjectTestSteps'
-import { TestDriver } from '../../driver/TestDriver'
-
-jest.setTimeout(60000)
 
 const testId = 'subtitlesProject'
 
 describe('make a project file for testing generating clips from subtitles', () => {
-  let context: { app: TestDriver | null; testId: string } = {
-    app: null,
-    testId,
-  }
-  let setup: TestSetup
+  let context = initTestContext(testId)
 
   beforeAll(async () => {
-    setup = await startApp(context)
-    await mockSideEffects(setup.app, sideEffectsMocks)
+    const { app } = await startApp(context)
+
+    await mockSideEffects(app, sideEffectsMocks)
   })
 
   runAll(
@@ -39,7 +33,7 @@ describe('make a project file for testing generating clips from subtitles', () =
         projectTitle: 'Project with subtitles',
       }),
     ],
-    () => setup
+    context
   )
 
   afterAll(async () => {
@@ -48,7 +42,9 @@ describe('make a project file for testing generating clips from subtitles', () =
       join(FIXTURES_DIRECTORY, 'project_with_subtitles.kyml')
     )
 
-    await setup.logPersistedData()
+    if (context.setup) await context.setup.logPersistedData()
+    else
+      console.error('Could not log persisted data while running app not found')
 
     await stopApp(context)
   })

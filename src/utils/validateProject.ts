@@ -18,7 +18,7 @@ const getErrors = (
     // @ts-ignore Workaround https://github.com/atlassian/better-ajv-errors/issues/90
     error.dataPath = error.instancePath
   })
-  const result: string = betterAjvErrors(schema, json, errors, {
+  const result: string = betterAjvErrors(schema, json, errors || [], {
     // with default format: cli option, returns a string
     // contrary to typings.
     indent: 2,

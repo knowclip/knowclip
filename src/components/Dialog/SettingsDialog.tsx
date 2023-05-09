@@ -17,7 +17,7 @@ import {
   ListItemIcon,
   FormControlLabel,
   Checkbox,
-} from '@material-ui/core'
+} from '@mui/material'
 import { actions } from '../../actions'
 import * as selectors from '../../selectors'
 import { DialogProps } from './DialogProps'
