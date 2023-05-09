@@ -28,4 +28,4 @@ export const KEYS = {
   cmd: 'Meta',
 } as const
 
-export type KeyId = typeof KEYS[keyof typeof KEYS]
+export type KeyId = (typeof KEYS)[keyof typeof KEYS]
