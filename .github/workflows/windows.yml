@@ -22,7 +22,7 @@ jobs:
     - name: integration test
       run: |
         npm ci
-        npm run integration:win -- -t "shared project"
+        npm run integration:win -- "sharedProject"
       env:
         REACT_APP_CHROMEDRIVER: true
         SPECTRON_LOG_FAILURES: true

@@ -1,7 +1,6 @@
 import { ThemeOptions } from '@mui/material'
 
 const themeSpecs: ThemeOptions = {
-  palette: {},
   components: {
     MuiTooltip: {
       styleOverrides: {
