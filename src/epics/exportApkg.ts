@@ -3,28 +3,34 @@ import {
   tap,
   map,
   catchError,
-  mergeAll,
   startWith,
   endWith,
-  concat,
   concatMap,
   filter,
   takeUntil,
   take,
   ignoreElements,
   switchMap,
+  concatWith,
+  takeLast,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, EMPTY, defer, from, Observable } from 'rxjs'
+import {
+  of,
+  EMPTY,
+  from,
+  Observable,
+  fromEvent,
+  race,
+  defer,
+  merge,
+} from 'rxjs'
 import r from '../redux'
-import * as anki from '@silvestre/mkanki'
-import sql from 'better-sqlite3'
+
 import { getApkgExportData } from '../utils/prepareExport'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import { processNoteMedia, AnkiNoteMedia } from '../utils/ankiNote'
-import { Database } from 'better-sqlite3'
-import archiver from 'archiver'
+import { writeApkgDeck } from './writeToApkg'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
@@ -73,103 +79,74 @@ const exportApkg: AppEpic = (action$, state$, effects) =>
         )
       }
 
-      return makeApkg(exportData, directory, effects)
+      return makeApkg(exportData, effects)
     })
   )
 
 function makeApkg(
   exportData: ApkgExportData,
-  directory: string,
-  {
-    showSaveDialog,
-    createWriteStream,
-    existsSync,
-    tmpFilename,
-  }: EpicsDependencies
+  { showSaveDialog, tmpDirectory }: EpicsDependencies
 ) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
     mergeMap((outputFilePath) => {
       document.body.style.cursor = 'progress'
-      const pkg = new anki.Package()
-      const deck = new anki.Deck(exportData.projectId, exportData.deckName)
-      const noteModel = new anki.Model(exportData.noteModel)
-      const clozeNoteModel = new anki.ClozeModel(exportData.clozeNoteModel)
 
       let processed = 0
-
-      const processClipsObservables = exportData.clips.map(
-        (clipSpecs: ClipSpecs) => {
-          registerClip(deck, noteModel, clozeNoteModel, clipSpecs)
-
-          return defer(async () => {
-            const noteMediaResult = await processNoteMedia(clipSpecs, directory)
-            if (noteMediaResult.errors)
-              throw new Error(noteMediaResult.errors.join('; '))
-
-            const noteMedia = noteMediaResult.value
-            await addNoteMedia(pkg, noteMedia)
-
-            const number = ++processed
-            return r.setProgress({
-              percentage: (number / exportData.clips.length) * 100,
-              message: `${number} clips out of ${exportData.clips.length} processed`,
-            })
+      const deckCreationEnded = merge(
+        fromEvent(window, 'deck-creation-error').pipe(
+          map((e) => {
+            throw new Error((e as any).message)
           })
-        }
+        ),
+        fromEvent(window, 'deck-saved')
+      ).pipe(
+        tap((e) => {
+          console.log('deck creation event', e)
+        }),
+        take(1)
       )
       return of(
         r.setProgress({
           percentage: 0,
           message: 'Processing clips...',
         })
-      ).pipe(
-        concat(from(processClipsObservables).pipe(mergeAll(20))),
-        concat(
-          of(
-            r.setProgress({
-              percentage: 100,
-              message: 'Almost done! Saving .apkg file...',
-            })
-          ).pipe(
-            concatMap(() => {
-              pkg.addDeck(deck)
-              const tempFilename = tmpFilename()
-              return defer(async () => {
-                const archive = archiver('zip')
-
-                return new Promise((res, rej) => {
-                  archive.on('error', (err) => {
-                    console.error(`Problem with archive!`)
-                    console.error(err)
-                    rej(err)
-                  })
-
-                  archive.on('close', res)
-                  archive.on('end', res)
-                  archive.on('finish', res)
-
-                  writeToFile(
-                    pkg,
-                    outputFilePath,
-                    {
-                      db: sql(tempFilename),
-                      tmpFilename: tempFilename,
-                      archive,
-                    },
-                    { createWriteStream, existsSync }
-                  )
-                })
-              }).pipe(
-                map(() =>
-                  r.exportApkgSuccess('Flashcards made in ' + outputFilePath)
-                ),
-                endWith(r.setProgress(null))
+      )
+        .pipe(
+          concatWith(
+            fromEvent(window, 'clip-processed').pipe(
+              takeUntil(deckCreationEnded),
+              map((e) => {
+                console.log('heard clip-processed event')
+                const number = ++processed
+                return r.setProgress(
+                  number < exportData.clips.length
+                    ? {
+                        percentage: (number / exportData.clips.length) * 100,
+                        message: `${number} clips out of ${exportData.clips.length} processed`,
+                      }
+                    : {
+                        percentage: 100,
+                        message: 'Almost done! Saving .apkg file...',
+                      }
+                )
+              }),
+              concatWith(
+                from([
+                  r.exportApkgSuccess('Flashcards made in ' + outputFilePath),
+                  r.setProgress(null),
+                ])
               )
-            })
+            )
           )
         )
-      )
+        .pipe(
+          doOnSubscribe(async () => {
+            console.log('subscribed i guess!!', processed)
+            await null
+            writeApkgDeck(tmpDirectory(), outputFilePath, exportData)
+          })
+        )
     }),
     catchError((err) => {
       console.error(err)
@@ -179,38 +156,6 @@ function makeApkg(
       ])
     })
   )
-}
-
-function registerClip(
-  deck: any,
-  noteModel: any,
-  clozeNoteModel: any,
-  clipSpecs: ClipSpecs
-) {
-  const {
-    flashcardSpecs: { fields, tags, id, clozeDeletions },
-  } = clipSpecs
-
-  const note = { fields, guid: id, tags }
-  const clozeNote = clozeDeletions
-    ? {
-        fields: [clozeDeletions, ...fields.slice(1)],
-        guid: `${id}__CLOZE`,
-        tags,
-      }
-    : null
-
-  deck.addNote(noteModel.note(note.fields, note.guid, note.tags))
-  if (clozeNote)
-    deck.addNote(
-      clozeNoteModel.note(clozeNote.fields, clozeNote.guid, clozeNote.tags)
-    )
-}
-
-async function addNoteMedia(pkg: any, noteMedia: AnkiNoteMedia) {
-  const { soundData, imageData } = noteMedia
-  pkg.addMedia(await soundData.data(), soundData.fileName)
-  if (imageData) pkg.addMedia(await imageData.data(), imageData.fileName)
 }
 
 function getMissingMedia(
@@ -230,7 +175,7 @@ function getMissingMedia(
   return from(missingMediaFiles).pipe(
     concatMap((file) =>
       of(r.openFileRequest(file)).pipe(
-        concat(
+        concatWith(
           action$.pipe(
             ofType(A.openFileSuccess),
             filter((a) => areSameFile(file, a.validatedFile)),
@@ -251,43 +196,15 @@ function getMissingMedia(
   )
 }
 
-interface AnkiPackage {
-  write(db: Database): void
-  media: Array<{
-    filename: string
-    name: string
-    data: Buffer
-  }>
-}
-function writeToFile(
-  ankiPackage: AnkiPackage,
-  filename: string,
-  {
-    db,
-    tmpFilename,
-    archive,
-  }: { db: Database; tmpFilename: string; archive: archiver.Archiver },
-  {
-    createWriteStream,
-    existsSync,
-  }: Pick<EpicsDependencies, 'createWriteStream' | 'existsSync'>
-) {
-  ankiPackage.write(db)
-  db.close()
-  const out = createWriteStream(filename)
-  archive.pipe(out)
-
-  if (!existsSync(tmpFilename)) throw new Error('Problem creating db')
-
-  archive.file(tmpFilename, { name: 'collection.anki2' })
-  const media_info: { [i: string]: string } = {}
-  ankiPackage.media.forEach((m, i) => {
-    if (m.filename != null) archive.file(m.filename, { name: i.toString() })
-    else archive.append(m.data, { name: i.toString() })
-    media_info[i] = m.name
-  })
-  archive.append(JSON.stringify(media_info), { name: 'media' })
-  archive.finalize()
-}
-
 export default combineEpics(exportApkg, exportApkgSuccess, exportApkgFailure)
+
+function doOnSubscribe<T>(
+  onSubscribe: () => void
+): (source: Observable<T>) => Observable<T> {
+  return function inner(source: Observable<T>): Observable<T> {
+    return defer(() => {
+      onSubscribe()
+      return source
+    })
+  }
+}
