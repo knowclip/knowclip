@@ -1,9 +1,9 @@
-import {
+import type {
   FileFilter,
-  shell,
   MessageBoxOptions,
   MessageBoxReturnValue,
 } from 'electron'
+import { shell } from '../../preloaded/electron'
 import { extname } from '../../preloaded/path'
 import { MessageResponse, sendToMainProcess } from '../../messages'
 import { pauseMedia } from '../media'

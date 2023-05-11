@@ -2,7 +2,6 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
 import { persistedUndoableReducer, undoableReducer } from './reducers'
 import epic from './epics'
-import { listenForPersistedDataLogMessage } from './utils/statePersistence'
 import epicsDependencies from './epicsDependencies'
 import { persistStore } from 'redux-persist'
 
@@ -39,8 +38,6 @@ function getStore(initialTestState: Partial<AppState> | undefined) {
         : [])
     )
   )
-
-  listenForPersistedDataLogMessage(store.getState)
 
   const persistor = process.env.REACT_APP_CHROMEDRIVER
     ? null

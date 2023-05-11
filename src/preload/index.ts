@@ -1,3 +1,4 @@
+import * as electron from './electron'
 import * as os from './os'
 import * as path from './path'
 import * as fs from './fs'
@@ -17,6 +18,7 @@ declare global {
 export type ElectronApi = typeof electronApi
 
 const electronApi = {
+  electron,
   os,
   path,
   fs,

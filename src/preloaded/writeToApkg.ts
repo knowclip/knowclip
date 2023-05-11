@@ -1,4 +1,4 @@
 import { getPreloadModule } from './getPreloadModule'
 
 export const { writeToApkg, writeApkgDeck } =
-  getPreloadModule('writeToApkg') || require('writeToApkg')
+  getPreloadModule('writeToApkg') || require('../preload/writeToApkg')
