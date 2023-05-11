@@ -6,6 +6,7 @@ import * as tempy from './tempy'
 import * as ffmpeg from './ffmpeg'
 import * as yauzl from './yauzl'
 import { processNoteMedia } from './processNoteMedia'
+import * as writeToApkg from './writeToApkg'
 
 declare global {
   interface Window {
@@ -21,9 +22,10 @@ const electronApi = {
   fs,
   fsExtra,
   tempy,
-  processNoteMedia,
   ffmpeg,
   yauzl,
+  processNoteMedia,
+  writeToApkg,
 }
 
 global.window.electronApi = electronApi
