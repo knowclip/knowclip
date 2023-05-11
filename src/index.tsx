@@ -1,3 +1,4 @@
+import './preload'
 import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -8,7 +9,7 @@ import getStore from './store'
 import './index.css'
 import * as Sentry from '@sentry/electron'
 import ErrorMessage from './components/ErrorMessage'
-import { sendToMainProcess } from './messages'
+import { sendToMainProcess } from './preloaded/sendToMainProcess'
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'

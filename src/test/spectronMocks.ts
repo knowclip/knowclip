@@ -3,7 +3,7 @@ import { promises } from 'fs'
 import { join } from 'path'
 import { TestDriver } from './driver/TestDriver'
 import moment from 'moment'
-import { sendToMainProcess } from '../messages'
+import { sendToMainProcess } from '../preloaded/sendToMainProcess'
 
 type ModuleLike = { [name: string]: (...args: any) => any }
 

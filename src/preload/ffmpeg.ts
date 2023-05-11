@@ -1,7 +1,7 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
-import { sendToMainProcess } from '../messages'
+import { sendToMainProcess } from '../preload/sendToMainProcess'
 
 export const ffmpeg =
   require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported

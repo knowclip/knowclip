@@ -5,8 +5,9 @@ import type {
 } from 'electron'
 import { shell } from '../../preloaded/electron'
 import { extname } from '../../preloaded/path'
-import { MessageResponse, sendToMainProcess } from '../../messages'
+import { sendToMainProcess } from '../../preloaded/sendToMainProcess'
 import { pauseMedia } from '../media'
+import type { MessageResponse } from '../../getMessageResponders'
 
 const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
   if (messageResponse.error) {

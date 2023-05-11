@@ -1,4 +1,5 @@
 import * as electron from './electron'
+import { sendToMainProcess } from './sendToMainProcess'
 import * as os from './os'
 import * as path from './path'
 import * as fs from './fs'
@@ -19,6 +20,7 @@ export type ElectronApi = typeof electronApi
 
 const electronApi = {
   electron,
+  sendToMainProcess,
   os,
   path,
   fs,
@@ -30,4 +32,8 @@ const electronApi = {
   writeToApkg,
 }
 
+console.log('preloading')
+
 global.window.electronApi = electronApi
+
+console.log('preloaded')

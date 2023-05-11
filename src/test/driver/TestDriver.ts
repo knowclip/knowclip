@@ -1,13 +1,13 @@
 import { Browser, remote } from 'webdriverio'
 import Chromedriver from './Chromedriver'
 import request from 'request'
-import {
-  MessageResponse,
-  MessageHandlerResult,
-  MessageToMain,
-  MessageToMainType,
-} from '../../messages'
 import { ChildProcess } from 'child_process'
+import type {
+  MessageResponse,
+  MessageToMainType,
+  MessageToMain,
+  MessageHandlerResult,
+} from '../../getMessageResponders'
 
 type WebDriverLogTypes =
   | 'trace'
