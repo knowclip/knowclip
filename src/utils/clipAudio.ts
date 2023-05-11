@@ -1,4 +1,4 @@
-import ffmpeg, { toTimestamp } from '../preloaded/ffmpeg'
+import { ffmpeg, toTimestamp } from '../preloaded/ffmpeg'
 
 import type { Writable } from 'stream'
 import { existsSync } from '../preloaded/fs'

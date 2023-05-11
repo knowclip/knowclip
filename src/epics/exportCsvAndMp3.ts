@@ -13,8 +13,7 @@ import r from '../redux'
 import A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
-import { writeFile } from 'fs-extra'
-import { join, basename } from '../preloaded/path'
+import { writeFile } from '../preloaded/fs'
 
 const exportCsv: AppEpic = (
   action$,
@@ -62,19 +61,12 @@ const exportCsv: AppEpic = (
             defer(async () => {
               const clipDataResult = await processNoteMedia(
                 clipSpecs,
+                mediaFolderLocation,
                 mediaFolderLocation
               )
               if (clipDataResult.errors)
                 throw new Error(clipDataResult.errors.join('; '))
 
-              const { soundData, imageData } = clipDataResult.value
-
-              await writeFile(soundData.filePath, await soundData.data())
-              if (imageData)
-                writeFile(
-                  join(mediaFolderLocation, basename(imageData.filePath)),
-                  await imageData.data()
-                )
               const number = ++processed
               return r.setProgress({
                 percentage: (number / exportData.clips.length) * 100,
@@ -107,9 +99,9 @@ const exportCsv: AppEpic = (
             ).pipe(
               concatMap(() => {
                 return defer(async () => {
-                  await writeFile(csvFilePath, csvText, 'utf8')
+                  await writeFile(csvFilePath, csvText)
                   if (clozeCsvText) {
-                    await writeFile(clozeCsvFilePath, clozeCsvText, 'utf8')
+                    await writeFile(clozeCsvFilePath, clozeCsvText)
                   }
                 }).pipe(
                   map(() =>

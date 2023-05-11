@@ -1,3 +1,4 @@
+import type { ZipFile, Entry } from 'yauzl'
 import * as yauzl from '../../preloaded/yauzl'
 import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import { toHiragana } from 'wanakana'
@@ -11,7 +12,7 @@ export async function parseYomichanZip(
   filePath: string
 ) {
   let termBankMet = false
-  const zipfile: yauzl.ZipFile = await new Promise((res, rej) => {
+  const zipfile: ZipFile = await new Promise((res, rej) => {
     yauzl.open(filePath, { lazyEntries: true }, function (err, zipfile) {
       if (err) return rej(err)
       if (!zipfile) return rej(new Error('problem reading zip file'))
@@ -29,7 +30,7 @@ export async function parseYomichanZip(
     mergeMap((_entry) => {
       visitedEntries++
 
-      const entry: yauzl.Entry = _entry as any
+      const entry: Entry = _entry as any
       if (!/term_bank_/.test(entry.fileName)) {
         zipfile.readEntry()
         return of(visitedEntries / entryCount)
@@ -38,7 +39,7 @@ export async function parseYomichanZip(
 
       const entryReadStreamPromise: Promise<Readable> = new Promise(
         (res, rej) => {
-          zipfile.openReadStream(entry as yauzl.Entry, (err, readStream) => {
+          zipfile.openReadStream(entry as Entry, (err, readStream) => {
             if (err) return rej(err)
             if (!readStream) return rej(new Error('problem streaming zip file'))
 

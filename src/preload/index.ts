@@ -1,6 +1,11 @@
-import { platform } from 'os'
-import { basename, extname, dirname, resolve, join } from 'path'
-import { promises, existsSync } from 'fs'
+import * as os from './os'
+import * as path from './path'
+import * as fs from './fs'
+import * as fsExtra from './fsExtra'
+import * as tempy from './tempy'
+import * as ffmpeg from './ffmpeg'
+import * as yauzl from './yauzl'
+import { processNoteMedia } from './processNoteMedia'
 
 declare global {
   interface Window {
@@ -11,17 +16,14 @@ declare global {
 export type ElectronApi = typeof electronApi
 
 const electronApi = {
-  os: { platform },
-  path: { basename, extname, dirname, resolve, join },
-  fs: { existsSync, readFile, writeFile },
+  os,
+  path,
+  fs,
+  fsExtra,
+  tempy,
+  processNoteMedia,
+  ffmpeg,
+  yauzl,
 }
 
 global.window.electronApi = electronApi
-
-function readFile(path: string) {
-  return promises.readFile(path, 'utf8')
-}
-
-function writeFile(path: string, data: string) {
-  return promises.writeFile(path, data)
-}

@@ -1,4 +1,4 @@
-import ffmpeg, { toTimestamp } from '../preloaded/ffmpeg'
+import { ffmpeg, toTimestamp } from '../preloaded/ffmpeg'
 import tempy from 'tempy'
 import { existsSync } from '../preloaded/fs'
 import { getFileAvailabilityById } from '../selectors'

@@ -1,5 +1,5 @@
 import YAML from 'yaml'
-import { readFile } from 'fs-extra'
+import { readFile } from '../preloaded/fs'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
 import {
@@ -23,7 +23,7 @@ export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
 ): AsyncResult<ProjectJson<F>> => {
   try {
-    const docs = YAML.parseAllDocuments(await readFile(filePath, 'utf8'), {
+    const docs = YAML.parseAllDocuments(await readFile(filePath), {
       // default of 100 is easily reached
       // when i.e. detecting silences in file > ~2 hours long.
       // TODO: investigate setting this to smarter default

@@ -1,5 +1,5 @@
-import tempy from 'tempy'
-import ffmpeg from '../preloaded/ffmpeg'
+import * as tempy from '../preloaded/tempy'
+import { ffmpeg } from '../preloaded/ffmpeg'
 import { extname, basename, join } from '../preloaded/path'
 import { existsSync } from '../preloaded/fs'
 

@@ -3,7 +3,7 @@ import { Database } from 'better-sqlite3'
 import archiver from 'archiver'
 import * as anki from '@silvestre/mkanki'
 import { AnkiNoteMedia } from '../utils/ankiNote'
-import { processNoteMedia } from './processNoteMedia'
+import { getClipMedia } from '../preload/getClipMedia'
 import { createWriteStream, existsSync } from 'fs'
 import tempy from 'tempy'
 
@@ -42,7 +42,7 @@ export async function writeApkgDeck(
           `${clipsProcessed}/${exportData.clips.length} clips processed`
         )
 
-        const noteMediaResult = await processNoteMedia(clipSpecs, tmpDirectory)
+        const noteMediaResult = await getClipMedia(clipSpecs, tmpDirectory)
         if (noteMediaResult.errors)
           throw new Error(noteMediaResult.errors.join('; '))
 
