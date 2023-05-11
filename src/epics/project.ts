@@ -79,9 +79,10 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
             r.openFileRequest(project, filePath),
           ])
         }),
-        catchError((err) =>
-          of(r.errorDialog('Problem opening project file:', err.message))
-        )
+        catchError((err) => {
+          console.log({ err })
+          return of(r.errorDialog('Problem opening project file:', err.message))
+        })
       )
     )
   )

@@ -3,9 +3,9 @@ import { fromEvent } from 'rxjs'
 import { getMediaMetadata } from './preloaded/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { getWaveformPng } from './utils/getWaveform'
-import { getVideoStill } from './utils/getVideoStill'
+import { getVideoStill } from './preloaded/getVideoStill'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
-import tempy from 'tempy'
+import * as tempy from './preloaded/tempy'
 import { nowUtcTimestamp, uuid } from './utils/sideEffects'
 import { getDexieDb } from './utils/dictionariesDatabase'
 import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDictionary'
@@ -41,7 +41,7 @@ const dependencies = {
 
   parseAndImportDictionary,
   fromIpcRendererEvent: (eventName: string) =>
-    fromEvent(ipcRenderer, eventName),
+    fromEvent(window, `ipc:${eventName}`),
   sendToMainProcess,
   quitApp: () => ipcRenderer.send('closed'),
   tmpDirectory: () => tempy.directory(),

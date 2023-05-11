@@ -1,7 +1,7 @@
 import { join, basename } from 'path'
 import { readFile, writeFile } from 'fs/promises'
-import clipAudio from '../utils/clipAudio'
-import { getVideoStill } from '../utils/getVideoStill'
+import { clipAudio } from './clipAudio'
+import { getVideoStill } from './getVideoStill'
 import { AnkiNoteMedia } from '../utils/ankiNote'
 
 export async function getClipMedia(

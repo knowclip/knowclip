@@ -102,7 +102,7 @@ async function createWindow() {
       // so if there is no response at all,
       // user won't have to force-quit.
 
-      mainWindow.webContents.send('app-close')
+      mainWindow.webContents.send('message', 'app-close')
     }
   })
 
