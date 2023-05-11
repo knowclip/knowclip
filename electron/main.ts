@@ -1,4 +1,4 @@
-import { BrowserWindow , screen, app, ipcMain, protocol } from 'electron'
+import { BrowserWindow, screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
 import setUpMenu from './appMenu'
@@ -94,9 +94,7 @@ async function createWindow() {
       : 'http://localhost:3000'
   )
 
-  if (useDevtools) await installDevtools()
-
-  mainWindow.on('close', e => {
+  mainWindow.on('close', (e) => {
     if (context.mainWindow) {
       e.preventDefault()
 
@@ -109,7 +107,7 @@ async function createWindow() {
   })
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
+  mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -120,15 +118,23 @@ async function createWindow() {
 app.whenReady().then(() => {
   // https://github.com/electron/electron/issues/23757#issuecomment-640146333
   protocol.registerFileProtocol('file', (request, callback) => {
-    const pathname = decodeURI(request.url.replace('file:///', ''));
-    callback(pathname);
-  });
-});
+    const pathname = decodeURI(request.url.replace('file:///', ''))
+    callback(pathname)
+  })
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => {
+app.on('ready', async () => {
+  if (useDevtools) {
+    try {
+      await installDevtools()
+    } catch (e) {
+      throw e
+    }
+  }
+
   createWindow()
 
   setUpMenu(context.mainWindow as BrowserWindow, true)
@@ -143,7 +149,7 @@ app.on('will-quit', () => {
 })
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -151,7 +157,7 @@ app.on('window-all-closed', function() {
   }
 })
 
-app.on('activate', function() {
+app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (context.mainWindow === null) {
@@ -162,9 +168,7 @@ app.on('activate', function() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-ipcMain.on('closed', function() {
+ipcMain.on('closed', function () {
   context.mainWindow = null
   app.quit()
 })
-
-

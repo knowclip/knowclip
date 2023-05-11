@@ -29,6 +29,7 @@ export default class Chromedriver {
       }
     }
     this.process.on('error', (error: any) => {
+      console.error(`CHROMEDRIVER: ${String(error)}`)
       throw new Error(error)
     })
 

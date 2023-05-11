@@ -9,6 +9,14 @@ import {
 } from '../../messages'
 import { ChildProcess } from 'child_process'
 
+type WebDriverLogTypes =
+  | 'trace'
+  | 'debug'
+  | 'info'
+  | 'warn'
+  | 'error'
+  | 'silent'
+
 function isRunning(statusUrl: string, callback: Function) {
   const cb = false
   const requestOptions = {
@@ -86,14 +94,14 @@ export async function createTestDriver({
   appDir,
   chromeArgs,
   env: givenEnv,
-  logLevel = 'silent',
+  logLevel = 'error',
 }: {
   chromedriverPath: string
   webdriverIoPath: string
   appDir: string
   chromeArgs: string[]
   env?: NodeJS.ProcessEnv
-  logLevel?: string
+  logLevel?: WebDriverLogTypes
 }) {
   const hostname = '127.0.0.1'
   const port = 9515
@@ -125,14 +133,7 @@ export async function createTestDriver({
         windowTypes: ['app', 'webview'],
       },
     },
-    logLevel: (logLevel || 'silent') as
-      | 'silent'
-      | 'trace'
-      | 'debug'
-      | 'info'
-      | 'warn'
-      | 'error'
-      | undefined,
+    logLevel,
   })
 
   return new TestDriver({

@@ -76,7 +76,7 @@ export async function startApp(
         : (electron as unknown as string),
     appDir: rootDir,
     chromeArgs: [
-      'disable-extensions',
+      ...(process.env.INTEGRATION_DEV ? [] : 'disable-extensions'),
       ...(process.env.INTEGRATION_DEV ? ['verbose'] : []),
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
     ],
