@@ -14,7 +14,7 @@ import A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
 import { writeFile } from 'fs-extra'
-import { join, basename } from 'path'
+import { join, basename } from '../preload/path'
 
 const exportCsv: AppEpic = (
   action$,

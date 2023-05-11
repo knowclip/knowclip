@@ -1,5 +1,5 @@
 import Dexie, { Database } from 'dexie'
-import { basename } from 'path'
+import { basename } from '../preload/path'
 import { getTableName, LexiconEntry } from '../files/dictionaryFile'
 import { LETTERS_DIGITS_PLUS } from './dictCc'
 import { lookUpDictCc } from './dictionaries/lookUpDictCc'

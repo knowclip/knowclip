@@ -2,27 +2,12 @@ import sql from 'better-sqlite3'
 import { Database } from 'better-sqlite3'
 import archiver from 'archiver'
 import * as anki from '@silvestre/mkanki'
-import { AnkiNoteMedia, processNoteMedia } from '../utils/ankiNote'
+import { AnkiNoteMedia } from '../utils/ankiNote'
+import { processNoteMedia } from './processNoteMedia'
 import { createWriteStream, existsSync } from 'fs'
 import tempy from 'tempy'
 
-window.addEventListener('clip-processed', (e) => {
-  console.log('clip processed', e)
-})
-window.addEventListener('saving-deck', (e) => {
-  console.log('saving deck', e)
-})
-window.addEventListener('deck-saved', (e) => {
-  console.log('deck saved', e)
-})
-window.addEventListener('deck-creation-error', (e) => {
-  console.log('deck creation error', e)
-})
-
 const tmpFilename = () => tempy.file()
-
-// send signal to initialize deck
-// process
 
 interface AnkiPackage {
   write(db: Database): void

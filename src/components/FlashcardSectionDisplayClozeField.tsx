@@ -6,7 +6,7 @@ import React, {
   memo,
   useRef,
 } from 'react'
-import os from 'os'
+import os from '../preload/os'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'

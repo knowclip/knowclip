@@ -1,6 +1,6 @@
 import r from '../redux'
-import { toTimestamp } from '../utils/ffmpeg'
-import { extname, basename } from 'path'
+import { toTimestamp } from '../preload/ffmpeg'
+import { extname, basename } from '../preload/path'
 import { unparse } from 'papaparse'
 import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability, encodeClozeDeletions } from '../selectors'

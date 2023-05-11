@@ -3,7 +3,7 @@ import { from } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
-import ffmpeg from '../utils/ffmpeg'
+import ffmpeg from '../preload/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 import { secondsToMs } from 'clipwave'
 

@@ -4,7 +4,7 @@ import {
   MessageBoxOptions,
   MessageBoxReturnValue,
 } from 'electron'
-import { extname } from 'path'
+import { extname } from '../../preload/path'
 import { MessageResponse, sendToMainProcess } from '../../messages'
 import { pauseMedia } from '../media'
 

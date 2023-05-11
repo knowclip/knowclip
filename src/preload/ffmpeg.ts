@@ -1,4 +1,4 @@
-import { basename } from 'path'
+import { basename } from './path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
 import { sendToMainProcess } from '../messages'

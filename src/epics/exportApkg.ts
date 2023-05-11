@@ -12,25 +12,15 @@ import {
   ignoreElements,
   switchMap,
   concatWith,
-  takeLast,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import {
-  of,
-  EMPTY,
-  from,
-  Observable,
-  fromEvent,
-  race,
-  defer,
-  merge,
-} from 'rxjs'
+import { of, EMPTY, from, Observable, fromEvent, defer, merge } from 'rxjs'
 import r from '../redux'
 
 import { getApkgExportData } from '../utils/prepareExport'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import { writeApkgDeck } from './writeToApkg'
+import { writeApkgDeck } from '../preload/writeToApkg'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(

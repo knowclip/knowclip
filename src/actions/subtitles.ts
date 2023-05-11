@@ -1,5 +1,5 @@
 import A from '../types/ActionType'
-import { basename } from 'path'
+import { basename } from '../preload/path'
 import { filesActions } from './files'
 import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'

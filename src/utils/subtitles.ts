@@ -1,12 +1,10 @@
 import tempy from 'tempy'
-import { promises } from 'fs'
-import ffmpeg, { getMediaMetadata } from '../utils/ffmpeg'
+import { readFile, writeFile } from '../preload/fs'
+import ffmpeg, { getMediaMetadata } from '../preload/ffmpeg'
 import r from '../redux'
-import { extname, basename, join } from 'path'
+import { extname, basename, join } from '../preload/path'
 import { parseSync, stringifySync } from 'subtitle'
 import subsrt from 'subsrt'
-
-const { readFile, writeFile } = promises
 
 export const getSubtitlesFilePathFromMedia = async (
   file: SubtitlesFile,
@@ -60,7 +58,7 @@ export const getExternalSubtitlesVttPath = async (
       ? filePath
       : join(tempy.root, basename(filePath) + '_' + file.id + '.vtt')
 
-  const fileContents = await readFile(filePath, 'utf8')
+  const fileContents = await readFile(filePath)
   const chunks = parseSubtitles(state, fileContents, extension)
 
   if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
@@ -77,8 +75,7 @@ export const getExternalSubtitlesVttPath = async (
           },
         })),
         { format: 'WebVTT' }
-      ),
-      'utf8'
+      )
     )
   return vttFilePath
 }
@@ -177,7 +174,7 @@ export const getSubtitlesFromFile = async (
 ) => {
   try {
     const extension = extname(sourceFilePath).toLowerCase()
-    const fileContents = await readFile(sourceFilePath, 'utf8')
+    const fileContents = await readFile(sourceFilePath)
     return parseSubtitles(state, fileContents, extension)
   } catch (error) {
     return { error }
@@ -237,7 +234,7 @@ export const validateSubtitlesFromFilePath = async (
     const differences: { attribute: string; name: string }[] = []
 
     const extension = extname(sourceFilePath).toLowerCase()
-    const fileContents = await readFile(sourceFilePath, 'utf8')
+    const fileContents = await readFile(sourceFilePath)
     const parsed = parseSubtitles(state, fileContents, extension)
 
     const { chunksMetadata } = existingFile

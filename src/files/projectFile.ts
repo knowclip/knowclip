@@ -1,7 +1,7 @@
 import r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
-import { join, basename } from 'path'
+import { join, basename } from '../preload/path'
 import { existsSync } from 'fs-extra'
 import { validateMediaFile } from './mediaFile'
 import { arrayToMapById } from '../utils/arrayToMapById'

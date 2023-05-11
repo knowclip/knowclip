@@ -1,7 +1,7 @@
-import ffmpeg from '../utils/ffmpeg'
-import { existsSync } from 'fs'
+import ffmpeg from '../preload/ffmpeg'
+import { existsSync } from '../preload/fs'
 import tempy from 'tempy'
-import { join, basename } from 'path'
+import { join, basename } from '../preload/path'
 import { sanitizeFileName } from './sanitizeFilename'
 
 export const VIDEO_STILL_HEIGHT = 150

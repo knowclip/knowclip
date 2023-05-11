@@ -1,7 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { fromEvent } from 'rxjs'
-import * as fs from 'fs'
-import { getMediaMetadata } from './utils/ffmpeg'
+import { getMediaMetadata } from './preload/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { getWaveformPng } from './utils/getWaveform'
 import { getVideoStill } from './utils/getVideoStill'
@@ -13,21 +12,17 @@ import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDic
 import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { sendToMainProcess } from './messages'
-import { processNoteMedia } from './utils/ankiNote'
+import { processNoteMedia } from './preload/processNoteMedia'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
-
-const {
-  existsSync,
-  createWriteStream,
-  promises: { writeFile },
-} = fs
-
-const fsDependencies = { existsSync, createWriteStream, writeFile }
+import { existsSync, writeFile } from './preload/fs'
 
 const dependencies = {
   ...electronHelpers,
-  ...fsDependencies,
+  // fs
+  writeFile: writeFile,
+  existsSync: existsSync,
+
   document,
   window,
 
@@ -52,9 +47,7 @@ const dependencies = {
   tmpDirectory: () => tempy.directory(),
   tmpFilename: () => tempy.file(),
 
-  dispatchClipwaveEvent: (
-    callback: (waveform: WaveformInterface) => void
-  ) => {
+  dispatchClipwaveEvent: (callback: (waveform: WaveformInterface) => void) => {
     window.dispatchEvent(new ClipwaveCallbackEvent(CLIPWAVE_ID, callback))
   },
 }

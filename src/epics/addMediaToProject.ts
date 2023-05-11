@@ -2,7 +2,7 @@ import A from '../types/ActionType'
 import { catchError, mergeAll, mergeMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import r from '../redux'
-import { readMediaFile } from '../utils/ffmpeg'
+import { readMediaFile } from '../preload/ffmpeg'
 import { uuid } from '../utils/sideEffects'
 
 const addMediaToProject: AppEpic = (action$, _state$) =>

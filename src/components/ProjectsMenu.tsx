@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
-import { basename, join, dirname } from 'path'
+import { basename, join, dirname } from '../preload/path'
 import packageJson from '../../package.json'
 import r from '../redux'
 import { actions } from '../actions'

@@ -14,7 +14,7 @@ import { getHumanFileName, getFileFilters } from '../../utils/files'
 import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 import css from './FileSelectionForm.module.css'
-import { dirname } from 'path'
+import { dirname } from '../../preload/path'
 import { showOpenDialog } from '../../utils/electron'
 import { getFileAvailability } from '../../selectors'
 

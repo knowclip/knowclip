@@ -1,10 +1,10 @@
-import * as yauzl from 'yauzl'
+import * as yauzl from '../../preload/yauzl'
 import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import { toHiragana } from 'wanakana'
 import { getDexieDb } from '../dictionariesDatabase'
 import { concat, defer, from, fromEvent, of } from 'rxjs'
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators'
-import { Readable } from 'stream'
+import type { Readable } from 'stream'
 
 export async function parseYomichanZip(
   file: YomichanDictionary,

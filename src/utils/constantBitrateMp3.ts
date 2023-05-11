@@ -1,7 +1,7 @@
 import tempy from 'tempy'
-import fs from 'fs'
-import ffmpeg from '../utils/ffmpeg'
-import { extname, basename, join } from 'path'
+import ffmpeg from '../preload/ffmpeg'
+import { extname, basename, join } from '../preload/path'
+import { existsSync } from '../preload/fs'
 
 export const coerceMp3ToConstantBitrate = (
   path: string,
@@ -11,7 +11,7 @@ export const coerceMp3ToConstantBitrate = (
   // and if possible, constant vs. variable bitrate
   return new Promise((res, rej) => {
     if (extname(path) !== '.mp3') return res(path)
-    if (oldConstantBitratePath && fs.existsSync(oldConstantBitratePath))
+    if (oldConstantBitratePath && existsSync(oldConstantBitratePath))
       return res(oldConstantBitratePath)
 
     const constantBitratePath = join(
