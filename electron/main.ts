@@ -52,6 +52,7 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       devTools: useDevtools,
+      preload: path.join(__dirname, '..', '..', 'build-preload', 'index.js'),
     },
   })
 

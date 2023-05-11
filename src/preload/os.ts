@@ -1,3 +1,5 @@
-import os from 'os'
+import { getPreloadModule } from './getPreloadModule'
 
-export default os
+const { platform } = getPreloadModule('os') || require('os')
+
+export { platform }

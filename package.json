@@ -72,7 +72,7 @@
     "build:homepage": "npm run -- --cwd homepage run build",
     "start:integration": "REACT_APP_CHROMEDRIVER=true npm run start",
     "start:integration-win": "set REACT_APP_CHROMEDRIVER=true&& npm run start",
-    "build-main": "npm run tsc -- ./electron/main.ts --outDir ./build-main",
+    "build-main": "npm run tsc -- ./electron/main.ts --outDir ./build-main && npm run tsc -- ./src/preload/index.ts --outDir ./build-preload",
     "webpack": "npm run build-schemas && REACT_APP_BUILD_NUMBER=$GITHUB_RUN_NUMBER react-scripts build",
     "webpack:win": "react-scripts build",
     "webpack:win-COMMENT": "# skipping schemas build because of backslashes in script",

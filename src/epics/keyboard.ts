@@ -6,9 +6,9 @@ import A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
-import os from '../preload/os'
+import { platform } from '../preload/os'
 
-const playPauseForceKey = os.platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
+const playPauseForceKey = platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(

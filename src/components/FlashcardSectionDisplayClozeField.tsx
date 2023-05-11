@@ -6,7 +6,7 @@ import React, {
   memo,
   useRef,
 } from 'react'
-import os from '../preload/os'
+import { platform } from '../preload/os'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
@@ -343,7 +343,7 @@ const clozeHint = (
 )
 
 export const getMetaOrCtrlKey =
-  os.platform() === 'darwin'
+  platform() === 'darwin'
     ? (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.metaKey
     : (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.ctrlKey
 

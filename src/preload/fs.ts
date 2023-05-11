@@ -1,8 +1,4 @@
-import promisesOriginal from 'fs/promises'
-export { existsSync } from 'fs'
+import { getPreloadModule } from './getPreloadModule'
 
-export const readFile = (path: string) =>
-  promisesOriginal.readFile(path, 'utf8')
-
-export const writeFile = (path: string, data: string) =>
-  promisesOriginal.writeFile(path, data)
+export const { existsSync, readFile, writeFile } =
+  getPreloadModule('fs') || require('fs')
