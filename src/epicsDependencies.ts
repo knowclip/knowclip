@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron'
 import { fromEvent } from 'rxjs'
-import { getMediaMetadata } from './preload/ffmpeg'
+import { getMediaMetadata } from './preloaded/ffmpeg'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { getWaveformPng } from './utils/getWaveform'
 import { getVideoStill } from './utils/getVideoStill'
@@ -12,10 +12,10 @@ import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDic
 import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { sendToMainProcess } from './messages'
-import { processNoteMedia } from './preload/processNoteMedia'
+import { processNoteMedia } from './preloaded/processNoteMedia'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
-import { existsSync, writeFile } from './preload/fs'
+import { existsSync, writeFile } from './preloaded/fs'
 
 const dependencies = {
   ...electronHelpers,

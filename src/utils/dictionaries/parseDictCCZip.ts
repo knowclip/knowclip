@@ -1,7 +1,7 @@
 import { fromEvent, of, concat, from, defer } from 'rxjs'
 import { takeUntil, mergeMap, tap, map, catchError } from 'rxjs/operators'
 import type { Readable } from 'stream'
-import * as yauzl from '../../preload/yauzl'
+import * as yauzl from '../../preloaded/yauzl'
 import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import {
   getGermanSearchTokens,

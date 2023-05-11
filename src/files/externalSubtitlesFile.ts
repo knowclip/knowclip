@@ -4,7 +4,7 @@ import {
   validateBeforeOpenFileAction,
 } from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
-import { extname } from '../preload/path'
+import { extname } from '../preloaded/path'
 
 const isVtt = (filePath: FilePath) => extname(filePath).toLowerCase() === '.vtt'
 

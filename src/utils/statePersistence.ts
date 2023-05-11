@@ -1,7 +1,7 @@
 import electron from 'electron'
 import { getPersistedDataSnapshot } from '../test/getPersistedDataSnapshot'
 import { writeFileSync } from 'fs-extra'
-import { join } from '../preload/path'
+import { join } from '../preloaded/path'
 
 type FilesyState<F> = Record<FileMetadata['type'], { [fileId: string]: F }>
 

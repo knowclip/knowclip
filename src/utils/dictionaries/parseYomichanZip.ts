@@ -1,4 +1,4 @@
-import * as yauzl from '../../preload/yauzl'
+import * as yauzl from '../../preloaded/yauzl'
 import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import { toHiragana } from 'wanakana'
 import { getDexieDb } from '../dictionariesDatabase'

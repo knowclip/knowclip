@@ -20,7 +20,7 @@ import r from '../redux'
 import { getApkgExportData } from '../utils/prepareExport'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import { writeApkgDeck } from '../preload/writeToApkg'
+import { writeApkgDeck } from '../preloaded/writeToApkg'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(

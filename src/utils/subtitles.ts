@@ -1,8 +1,8 @@
 import tempy from 'tempy'
-import { readFile, writeFile } from '../preload/fs'
-import ffmpeg, { getMediaMetadata } from '../preload/ffmpeg'
+import { readFile, writeFile } from '../preloaded/fs'
+import ffmpeg, { getMediaMetadata } from '../preloaded/ffmpeg'
 import r from '../redux'
-import { extname, basename, join } from '../preload/path'
+import { extname, basename, join } from '../preloaded/path'
 import { parseSync, stringifySync } from 'subtitle'
 import subsrt from 'subsrt'
 

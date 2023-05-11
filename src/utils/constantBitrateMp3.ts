@@ -1,7 +1,7 @@
 import tempy from 'tempy'
-import ffmpeg from '../preload/ffmpeg'
-import { extname, basename, join } from '../preload/path'
-import { existsSync } from '../preload/fs'
+import ffmpeg from '../preloaded/ffmpeg'
+import { extname, basename, join } from '../preloaded/path'
+import { existsSync } from '../preloaded/fs'
 
 export const coerceMp3ToConstantBitrate = (
   path: string,

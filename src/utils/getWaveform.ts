@@ -1,8 +1,8 @@
-import ffmpeg, { toTimestamp } from '../preload/ffmpeg'
+import ffmpeg, { toTimestamp } from '../preloaded/ffmpeg'
 import tempy from 'tempy'
-import { existsSync } from '../preload/fs'
+import { existsSync } from '../preloaded/fs'
 import { getFileAvailabilityById } from '../selectors'
-import { basename, join } from '../preload/path'
+import { basename, join } from '../preloaded/path'
 import { secondsToMs } from 'clipwave'
 
 const WAVE_COLOR = '#b7cee0'
