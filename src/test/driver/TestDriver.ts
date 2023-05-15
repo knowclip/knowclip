@@ -119,7 +119,7 @@ export async function createTestDriver({
   await waitForChromeDriver(driver.process, statusUrl, 7000)
 
   const browserOptions: RemoteOptions = {
-    waitforTimeout: 30000,
+    waitforTimeout: 5000,
     hostname,
     port,
     capabilities: {

@@ -9,7 +9,6 @@ import { writeFileSync } from './fs'
 type ModuleLike = { [name: string]: (...args: any) => any }
 
 type MockedModule<M extends ModuleLike> = { -readonly [K in keyof M]: M[K] }
-console.log(process.env)
 const mocking =
   process.env.NODE_ENV === 'integration' ||
   process.env.NODE_ENV === 'integrationDev'

@@ -77,6 +77,7 @@ export async function startApp(
     appDir: rootDir,
     chromeArgs: [
       'enable-logging',
+      'headless',
       ...(process.env.VITE_INTEGRATION_DEV ? [] : 'disable-extensions'),
       ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
