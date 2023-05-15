@@ -8,6 +8,7 @@ import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsD
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { retryUntil } from '../../driver/retryUntil'
 
 export default async function makeCardsFromSubtitles(
   context: IntegrationTestContext
@@ -58,8 +59,12 @@ export default async function makeCardsFromSubtitles(
   test('open dialog to generate clips and click button to load a subtitles track', async () => {
     const { app, client } = context
 
-    // TODO: flaky
-    await client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton)
+    await retryUntil({
+      action: () =>
+        client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton),
+      check: () => client.waitForVisible_(confirmationDialog$.okButton),
+      conditionName: 'Confirmation dialog OK button is visible',
+    })
     await client.clickElement_(confirmationDialog$.okButton)
 
     await mockElectronHelpers(app, {

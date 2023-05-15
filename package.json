@@ -73,6 +73,7 @@
     "test": "npm run vitest run -- --config ./vitest.config.ts",
     "build": "npm run build-schemas && npm run electron-vite -- build --mode",
     "integration": "npm run build -- integration && npm run integration:skip-build -- integration",
+    "integration:win": "npm run electron-vite -- build --mode integration && npm run integration:skip-build -- integration",
     "integration:debug": "npm run build -- integrationDev && npm run integration:skip-build -- integrationDev",
     "integration:skip-build": "npm run vitest run -- --config ./vitest-integration.config.ts --mode",
     "build-fixture:saved": "npm run integration:build-fixture -- savedProject",
@@ -96,7 +97,7 @@
     "electron-builder": "electron-builder",
     "electron-builder:skip-publish": "electron-builder -p never",
     "dist": "npm run build && npm run electron-builder:skip-publish",
-    "dist:appveyor": "npm run build && npm run electron-builder",
+    "dist:appveyor": "npm run electron-vite -- build && npm run electron-builder",
     "replace-in-files-cli": "replace-in-files",
     "yalc": "yalc",
     "husky": "husky"
