@@ -1,5 +1,5 @@
 import { getPreloadModule } from './getPreloadModule'
 
-const { platform } = getPreloadModule('os') || require('os')
+const { platform } = getPreloadModule('os')
 
 export { platform }

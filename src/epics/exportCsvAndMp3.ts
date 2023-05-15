@@ -13,7 +13,7 @@ import r from '../redux'
 import A from '../types/ActionType'
 import { getCsvText } from '../utils/prepareExport'
 import { getApkgExportData } from '../utils/prepareExport'
-import { writeFile } from '../preloaded/fs'
+import { writeFile } from 'preloaded/fs'
 
 const exportCsv: AppEpic = (
   action$,

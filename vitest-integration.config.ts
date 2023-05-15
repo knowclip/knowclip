@@ -1,12 +1,16 @@
 // https://vitest.dev/config/
 import { UserConfig } from 'vitest/config'
+import path from 'path'
 
 export const integrationConfig: UserConfig = {
+  resolve: {
+    alias: {
+      preloaded: path.resolve(__dirname, 'src', 'node'),
+    },
+  },
   test: {
     testTimeout: 60000,
     globals: true,
-    // TODO: after removing nodeIntegration, delete this line:
-    environment: 'jsdom',
     threads: false,
     include: ['src/test/**/*.integration.ts'],
     deps: {

@@ -49,7 +49,9 @@ export default async function makeCardsFromSubtitles(
       subtitlesMenu$.openTrackSubmenuButton
     )
     await pbcTrackOpenSubmenuButton!.click()
+    await sleep(100)
     await client.clickElement_(subtitlesMenu$.deleteTrackButton)
+
     await client.waitUntilGone_(waveform$.subtitlesChunk)
   })
 
@@ -103,4 +105,8 @@ export default async function makeCardsFromSubtitles(
       'Chilling and eating bamboo \ngrass is the best thing ever.'
     )
   })
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

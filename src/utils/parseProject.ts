@@ -1,5 +1,5 @@
 import YAML from 'yaml'
-import { readFile } from '../preloaded/fs'
+import { readFile } from 'preloaded/fs'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
 import {

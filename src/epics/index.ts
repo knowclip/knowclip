@@ -6,7 +6,6 @@ import r from '../redux'
 import clipCreate from './clipCreate'
 import clipwave from './clipwave'
 import editClip from './editClip'
-import detectSilenceEpic from './detectSilence'
 import exportCsvAndMp3 from './exportCsvAndMp3'
 import exportMarkdown from './exportMarkdown'
 import exportApkg from './exportApkg'
@@ -95,7 +94,6 @@ const rootEpic: AppEpic = combineEpics(
   loopMedia,
   editClip,
   clipCreate,
-  detectSilenceEpic,
   exportCsvAndMp3,
   exportApkg,
   exportMarkdown,

@@ -4,7 +4,7 @@ import type {
   MessageToMain,
   MessageResponse,
   MessageHandlerResult,
-} from '../getMessageResponders'
+} from '../MessageToMain'
 
 export async function sendToMainProcess<T extends MessageToMainType>(
   message: MessageToMain<T>

@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "preloaded/*": ["./src/preloaded"],
+      "components/*": ["./src/components"],
+    },
     "target": "es2018",
     "lib": [
       "dom",

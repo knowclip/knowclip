@@ -1,5 +1,5 @@
 import { getPreloadModule } from './getPreloadModule'
 
-const { shell } = getPreloadModule('electron') || require('../preload/electron')
+const { shell, sendClosedSignal } = getPreloadModule('electron')
 
-export { shell }
+export { shell, sendClosedSignal }

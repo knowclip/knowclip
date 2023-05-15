@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "types": ["vitest/globals"],
+    "paths": {
+      "preloaded/*": ["./src/preloaded/*"],
+    },
+    "types": ["vitest/globals", "vite/client"],
     "target": "esnext",
     "lib": [
       "dom",

@@ -1,4 +1,5 @@
 import { ThemeOptions } from '@mui/material'
+import { VITEST } from './env'
 
 const themeSpecs: ThemeOptions = {
   components: {
@@ -9,7 +10,7 @@ const themeSpecs: ThemeOptions = {
         },
       },
     },
-    MuiCssBaseline: process.env.REACT_APP_CHROMEDRIVER
+    MuiCssBaseline: VITEST
       ? {
           styleOverrides: {
             '@global': {
@@ -22,7 +23,7 @@ const themeSpecs: ThemeOptions = {
         }
       : {},
   },
-  transitions: process.env.REACT_APP_CHROMEDRIVER
+  transitions: VITEST
     ? {
         duration: {
           shortest: 0,

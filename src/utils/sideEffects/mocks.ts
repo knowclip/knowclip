@@ -1,7 +1,4 @@
 import sideEffects from './module'
-import spectronMocks from '../../test/spectronMocks'
+import mockFunctions from '../../test/getFunctionMockers'
 
-const { mockFunctions: mockSideEffects, logMocks: logSideEffectsMocks } =
-  spectronMocks('side-effect', sideEffects)
-
-export { mockSideEffects, logSideEffectsMocks }
+export const mockSideEffects = mockFunctions<typeof sideEffects>('side-effect')

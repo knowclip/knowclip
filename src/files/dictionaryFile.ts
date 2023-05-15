@@ -6,7 +6,7 @@ import {
 } from './eventHandlers'
 import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
 import { updaterGetter } from './updaterGetter'
-import { basename } from '../preloaded/path'
+import { basename } from 'preloaded/path'
 
 export type LexiconEntry = {
   variant: string | null

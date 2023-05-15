@@ -1,5 +1,5 @@
 import type { ZipFile, Entry } from 'yauzl'
-import * as yauzl from '../../preloaded/yauzl'
+import * as yauzl from 'preloaded/yauzl'
 import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
 import { toHiragana } from 'wanakana'
 import { getDexieDb } from '../dictionariesDatabase'

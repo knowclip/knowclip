@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { Card, CardContent } from '@mui/material'
 import css from './KeyboardShortcuts.module.css'
-import { platform } from '../preloaded/os'
+import { platform } from 'preloaded/os'
 
 const KEYBOARD_SHORTCUTS = {
   'Play/pause': `${platform() === 'win32' ? 'Ctrl' : 'Shift'} + Space`,

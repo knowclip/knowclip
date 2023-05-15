@@ -1,12 +1,11 @@
-import Ajv, { ErrorObject } from 'ajv'
+import type { ErrorObject } from 'ajv'
+import { compile, betterAjvErrors } from 'preloaded/ajv'
 import projectMetadataJsonSchema from './validateProjectMetadata.json'
+
 import mediaJsonSchema from './validateProjectMedia.json'
-import betterAjvErrors from 'better-ajv-errors'
 
-const ajv = new Ajv()
-
-const validateProjectMetadata = ajv.compile(projectMetadataJsonSchema)
-const validateMedia = ajv.compile(mediaJsonSchema)
+const validateProjectMetadata = compile(projectMetadataJsonSchema)
+const validateMedia = compile(mediaJsonSchema)
 
 const getErrors = (
   schema: any,

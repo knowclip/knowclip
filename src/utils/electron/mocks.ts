@@ -1,6 +1,5 @@
 import helpers from './helpers'
-import spectronMocks from '../../test/spectronMocks'
+import mockFunctions from '../../test/getFunctionMockers'
 
-const { mockFunctions } = spectronMocks('electron-helper', helpers)
-
-export const mockElectronHelpers = mockFunctions
+export const mockElectronHelpers =
+  mockFunctions<typeof helpers>('electron-helper')

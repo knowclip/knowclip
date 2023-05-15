@@ -1,6 +1,4 @@
-import type { ElectronApi } from '../preload'
-
-export function getPreloadModule<Key extends keyof ElectronApi>(
+export function getPreloadModule<Key extends keyof Window['electronApi']>(
   electronApiKey: Key
 ) {
   const module = window?.electronApi?.[electronApiKey]

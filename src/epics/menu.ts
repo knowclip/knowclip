@@ -13,6 +13,7 @@ import rcompare from 'semver/functions/rcompare'
 import gt from 'semver/functions/gt'
 import { REHYDRATE } from 'redux-persist'
 import packageJson from '../../package.json'
+import { VITE_BUILD_NUMBER, VITEST } from '../env'
 
 const showSettingsDialog: AppEpic = (
   action$,
@@ -26,7 +27,7 @@ const showSettingsDialog: AppEpic = (
 
 const aboutMessage = [
   `Version ${packageJson.version}`,
-  `Build #${process.env.REACT_APP_BUILD_NUMBER || '[DEV BUILD]'}`,
+  `Build #${VITE_BUILD_NUMBER || '[DEV BUILD]'}`,
   'Distributed under GNU Affero General Public License 3.0.',
   'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Wei, Sky Beast',
   '© 2021 Justin Silvestre',
@@ -174,7 +175,7 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
     mergeAll()
   )
 
-const checkForUpdates = process.env.REACT_APP_CHROMEDRIVER
+const checkForUpdates = VITEST
   ? async (): Promise<Result<{ tag_name: string; body: string }[]>> => ({
       value: [],
     })

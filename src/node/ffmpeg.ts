@@ -1,7 +1,7 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
-import { sendToMainProcess } from '../preload/sendToMainProcess'
+import { sendToMainProcess } from './sendToMainProcess'
 
 export const ffmpeg =
   require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
@@ -97,4 +97,52 @@ export const readMediaFile = async (
         }
 
   return { value: file }
+}
+
+export function writeMediaSubtitlesToVtt(
+  mediaFilePath: string,
+  streamIndex: number,
+  outputFilePath: string
+): Promise<string | null> {
+  return new Promise((res, rej) =>
+    ffmpeg(mediaFilePath)
+      .outputOptions(`-map 0:${streamIndex}`)
+      .output(outputFilePath)
+      .on('end', () => {
+        res(outputFilePath)
+      })
+      .on('error', (err) => {
+        console.error(err)
+        rej(err)
+      })
+      .run()
+  )
+}
+
+export const convertAssToVtt = (filePath: string, vttFilePath: string) =>
+  new Promise((res, rej) =>
+    ffmpeg(filePath)
+      .output(vttFilePath)
+      .on('end', () => {
+        res(vttFilePath)
+      })
+      .on('error', (err) => {
+        console.error(err)
+        rej(err)
+      })
+      .run()
+  )
+
+export function createConstantBitrateMp3(
+  inputPath: string,
+  res: (value: string | PromiseLike<string>) => void,
+  constantBitratePath: string,
+  rej: (reason?: any) => void
+) {
+  return ffmpeg(inputPath)
+    .audioBitrate('64k')
+    .on('end', () => res(constantBitratePath))
+    .on('error', rej)
+    .output(constantBitratePath)
+    .run()
 }

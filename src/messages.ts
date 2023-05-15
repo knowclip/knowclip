@@ -1,12 +1,12 @@
 import { BrowserWindow, ipcMain } from 'electron'
+import { getMessageResponders } from './getMessageResponders'
 import {
   MessageHandlerResult,
   MessageResponders,
   MessageResponse,
   MessageToMain,
   MessageToMainType,
-  getMessageResponders,
-} from './getMessageResponders'
+} from './MessageToMain'
 
 async function respond<T extends MessageToMainType>(
   messageHandlers: MessageResponders,
@@ -19,8 +19,11 @@ async function respond<T extends MessageToMainType>(
   return await result
 }
 
-export function handleMessages(mainWindow: BrowserWindow) {
-  const messageHandlers = getMessageResponders(mainWindow)
+export function handleMessages(
+  mainWindow: BrowserWindow,
+  persistedStatePath?: string
+) {
+  const messageHandlers = getMessageResponders(mainWindow, persistedStatePath)
 
   async function onMessage<T extends MessageToMainType>(
     message: MessageToMain<T>
@@ -38,8 +41,8 @@ export function handleMessages(mainWindow: BrowserWindow) {
           rawError instanceof Error
             ? rawError.message
             : 'Non-error thrown: ' + String(rawError),
-        stack: rawError instanceof Error ? rawError.stack : '',
-        name: rawError instanceof Error ? rawError.name : '',
+        stack: rawError instanceof Error ? rawError.stack : undefined,
+        name: rawError instanceof Error ? rawError.name : undefined,
       }
       return { error }
     }

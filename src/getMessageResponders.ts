@@ -11,24 +11,11 @@ import {
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-export type MessageToMain<T extends MessageToMainType> = {
-  type: T
-  args: Parameters<MessageResponders[T]>
-}
-
-export type MessageResponders = ReturnType<typeof getMessageResponders>
-export type MessageToMainType = keyof MessageResponders
-
-export type MessageHandlerResult<T extends MessageToMainType> = ReturnType<
-  MessageResponders[T]
->
-
-export type MessageResponse<R> =
-  | { result: R; error?: undefined }
-  | { result?: undefined; error: { message: string; stack: any; name: string } }
-
-export const getMessageResponders = (mainWindow: BrowserWindow) => ({
-  isReady: () => true,
+export const getMessageResponders = (
+  mainWindow: BrowserWindow,
+  persistedStatePath?: string
+) => ({
+  isReady: () => 'ok' as const,
   getFfmpegAndFfprobePath: () => {
     const { ffmpegpath, ffprobepath } = global as any
 
@@ -45,11 +32,12 @@ export const getMessageResponders = (mainWindow: BrowserWindow) => ({
     if (!mainWindow) console.error('Main window reference lost')
     else mainWindow.webContents.send(channel, ...args)
   },
+
   getPersistedTestState: async () => {
-    const initialState: Partial<AppState> | undefined = process.env
-      .PERSISTED_STATE_PATH
-      ? JSON.parse(readFileSync(process.env.PERSISTED_STATE_PATH, 'utf8'))
+    const initialState: Partial<AppState> | undefined = persistedStatePath
+      ? JSON.parse(readFileSync(persistedStatePath, 'utf8'))
       : undefined
+
     return initialState
   },
   sendInputEvent: (

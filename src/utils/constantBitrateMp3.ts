@@ -1,7 +1,7 @@
-import * as tempy from '../preloaded/tempy'
-import { ffmpeg } from '../preloaded/ffmpeg'
-import { extname, basename, join } from '../preloaded/path'
-import { existsSync } from '../preloaded/fs'
+import * as tempy from 'preloaded/tempy'
+import { createConstantBitrateMp3 } from 'preloaded/ffmpeg'
+import { extname, basename, join } from 'preloaded/path'
+import { existsSync } from 'preloaded/fs'
 
 export const coerceMp3ToConstantBitrate = (
   path: string,
@@ -23,11 +23,6 @@ export const coerceMp3ToConstantBitrate = (
     // though maybe we should check that
     // bitrate and buffersize defaults are ok.
     //   .outputOptions('-bufsize 192k')
-    ffmpeg(path)
-      .audioBitrate('64k')
-      .on('end', () => res(constantBitratePath))
-      .on('error', rej)
-      .output(constantBitratePath)
-      .run()
+    return createConstantBitrateMp3(path, res, constantBitratePath, rej)
   })
 }

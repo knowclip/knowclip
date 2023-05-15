@@ -20,7 +20,8 @@ import r from '../redux'
 import { getApkgExportData } from '../utils/prepareExport'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import { writeApkgDeck } from '../preloaded/writeToApkg'
+import { writeApkgDeck } from 'preloaded/writeToApkg'
+import type { DeckCreationErrorEvent } from '../node/writeToApkg'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
@@ -86,7 +87,9 @@ function makeApkg(
       const deckCreationEnded = merge(
         fromEvent(window, 'deck-creation-error').pipe(
           map((e) => {
-            throw new Error((e as any).message)
+            throw (e as DeckCreationErrorEvent).message
+              ? new Error((e as DeckCreationErrorEvent).message)
+              : new Error('Deck creation failed.')
           })
         ),
         fromEvent(window, 'deck-saved')
@@ -140,10 +143,7 @@ function makeApkg(
     }),
     catchError((err) => {
       console.error(err)
-      return from([
-        r.exportApkgFailure(err.message || err.toString()),
-        r.setProgress(null),
-      ])
+      return from([r.exportApkgFailure(String(err)), r.setProgress(null)])
     })
   )
 }

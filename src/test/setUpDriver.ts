@@ -76,22 +76,15 @@ export async function startApp(
         : (electron as unknown as string),
     appDir: rootDir,
     chromeArgs: [
-      ...(process.env.INTEGRATION_DEV ? [] : 'disable-extensions'),
-      ...(process.env.INTEGRATION_DEV ? ['verbose'] : []),
+      'enable-logging',
+      ...(process.env.VITE_INTEGRATION_DEV ? [] : 'disable-extensions'),
+      ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
     ],
     env: {
-      PUBLIC_URL: process.env.PUBLIC_URL,
-      NODE_ENV: 'test',
-      REACT_APP_CHROMEDRIVER: Boolean(process.env.REACT_APP_CHROMEDRIVER)
-        ? 'true'
-        : undefined,
-      INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV)
-        ? 'true'
-        : undefined,
-      ...(persistedStatePath
-        ? { PERSISTED_STATE_PATH: persistedStatePath }
-        : null),
+      DEV: process.env.DEV,
+      VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
+      PERSISTED_STATE_PATH: persistedStatePath || undefined,
     },
   })
   const setup = {
@@ -107,8 +100,12 @@ export async function startApp(
   }
   context.setup = setup
 
-  if (!(await app.isReady)) {
-    throw new Error('Problem starting test driver')
+  const startupStatus = await app.startupStatus
+  if (startupStatus.error) {
+    console.error(startupStatus.error)
+    throw new Error(
+      `Problem starting test driver: ${startupStatus.error.message}`
+    )
   }
 
   await app.webContentsSend('start-test', context.testId)
@@ -121,7 +118,7 @@ export async function stopApp(context: IntegrationTestContext): Promise<null> {
 
   if (!app) console.error('No app instance found, not closing app')
 
-  if (process.env.INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
+  if (process.env.VITE_INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
     return null
   }
 

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { pixelsToMs } from 'clipwave'
+import { VITE_INTEGRATION_DEV } from '../env'
 
 // TODO: FIX like below
 const toWaveformXRaw = (
@@ -8,18 +9,17 @@ const toWaveformXRaw = (
   xMin = 0
 ) => mouseEvent.clientX - svgElement.getBoundingClientRect().left + xMin
 
-export const toWaveformX =
-  process.env.NODE_ENV === 'development' && process.env.REACT_APP_CHROMEDRIVER
-    ? (
-        mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
-        svgElement: SVGElement,
-        xMin = 0
-      ) => {
-        const x = toWaveformXRaw(mouseEvent, svgElement, xMin)
-        console.log(mouseEvent.type, mouseEvent.pageX, mouseEvent)
-        return x
-      }
-    : toWaveformXRaw
+export const toWaveformX = VITE_INTEGRATION_DEV
+  ? (
+      mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,
+      svgElement: SVGElement,
+      xMin = 0
+    ) => {
+      const x = toWaveformXRaw(mouseEvent, svgElement, xMin)
+      console.log(mouseEvent.type, mouseEvent.pageX, mouseEvent)
+      return x
+    }
+  : toWaveformXRaw
 
 export const waveformTimeAtMousePosition = (
   mouseEvent: React.MouseEvent<SVGElement> | MouseEvent,

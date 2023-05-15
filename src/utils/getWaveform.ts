@@ -1,13 +1,8 @@
-import { ffmpeg, toTimestamp } from '../preloaded/ffmpeg'
-import tempy from 'tempy'
-import { existsSync } from '../preloaded/fs'
+import * as tempy from 'preloaded/tempy'
+import { existsSync } from 'preloaded/fs'
 import { getFileAvailabilityById } from '../selectors'
-import { basename, join } from '../preloaded/path'
-import { secondsToMs } from 'clipwave'
-
-const WAVE_COLOR = '#b7cee0'
-const BG_COLOR = '#00000000'
-const CORRECTION_OFFSET = 0
+import { basename, join } from 'preloaded/path'
+import { createWaveformPng } from 'preloaded/createWaveformPng'
 
 const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
 
@@ -24,33 +19,12 @@ export const getWaveformPng = async (
     if (outputFilename && existsSync(outputFilename))
       return { value: outputFilename }
 
-    const newFileName: string = await new Promise((res, rej) => {
-      return ffmpeg(mediaFilePath)
-        .seekInput(toTimestamp(secondsToMs(file.startSeconds)))
-        .inputOptions(`-to ${toTimestamp(secondsToMs(file.endSeconds))}`)
-        .withNoVideo()
-        .complexFilter(
-          [
-            `[0:a]aformat=channel_layouts=mono,`,
-            `compand=gain=-6,`,
-            `showwavespic=s=${
-              width + CORRECTION_OFFSET
-            }x70:colors=${WAVE_COLOR},setpts=0[fg];`,
-            `color=s=${width + CORRECTION_OFFSET}x70:color=${BG_COLOR}[bg];`,
-            `[bg][fg]overlay=format=rgb,drawbox=x=(iw-w)/2:y=(ih-h)/2:w=iw:h=2:color=${WAVE_COLOR}`,
-          ].join(''),
-          [] // why needed?
-        )
-        .outputOptions('-frames:v 1')
-        .output(outputFilename)
-        .on('end', function () {
-          res(outputFilename)
-        })
-        .on('error', (err: any) => {
-          rej(err)
-        })
-        .run()
-    })
+    const newFileName: string = await createWaveformPng(
+      mediaFilePath,
+      file,
+      width,
+      outputFilename
+    )
 
     if (!newFileName || !existsSync(newFileName))
       throw new Error('Problem creating waveform image')

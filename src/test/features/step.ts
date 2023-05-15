@@ -51,15 +51,13 @@ export const runAll = (
         await runTest(context)
       } catch (err) {
         try {
-          if (process.env.SPECTRON_LOG_FAILURES) {
-            console.log('Logging markup from failed test:')
-            const source =
-              await context.setup?.client._driver.client.getPageSource()
-            console.log(source)
+          console.log('Logging markup from failed test:')
+          const source =
+            await context.setup?.client._driver.client.getPageSource()
+          console.log(source)
 
-            console.log('Logging persisted data from failed test:')
-            await context.setup?.logPersistedData()
-          }
+          console.log('Logging persisted data from failed test:')
+          await context.setup?.logPersistedData()
         } catch (err) {
           console.error(`Could not log info for failed test: ${err}`)
         }

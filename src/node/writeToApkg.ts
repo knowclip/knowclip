@@ -1,9 +1,10 @@
 import sql from 'better-sqlite3'
-import { Database } from 'better-sqlite3'
+import type { Database } from 'better-sqlite3'
 import archiver from 'archiver'
+// @ts-expect-error
 import * as anki from '@silvestre/mkanki'
-import { AnkiNoteMedia } from '../utils/ankiNote'
-import { getClipMedia } from '../preload/getClipMedia'
+import type { AnkiNoteMedia } from '../utils/ankiNote'
+import { getClipMedia } from './getClipMedia'
 import { createWriteStream, existsSync } from 'fs'
 import tempy from 'tempy'
 
@@ -97,7 +98,7 @@ class ClipProcessedEvent extends Event {
   }
 }
 
-class DeckCreationErrorEvent extends Event {
+export class DeckCreationErrorEvent extends Event {
   message: string
   constructor(message: string) {
     super('deck-creation-error')
@@ -117,14 +118,6 @@ class DeckSavedEvent extends Event {
     super('deck-saved')
     console.log('deck-saved')
   }
-}
-
-;(window as any).evs = {
-  DeckInitializedEvent,
-  ClipProcessedEvent,
-  DeckCreationErrorEvent,
-  SavingDeckEvent,
-  DeckSavedEvent,
 }
 
 export function writeToApkg(

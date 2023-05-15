@@ -6,7 +6,7 @@ import A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
-import { platform } from '../preloaded/os'
+import { platform } from 'preloaded/os'
 
 const playPauseForceKey = platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 

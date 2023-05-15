@@ -1,19 +1,32 @@
-import ChildProcess from 'child_process'
+import { type ChildProcess, spawn } from 'child_process'
 
 export default class Chromedriver {
-  process: ReturnType<typeof ChildProcess.spawn>
+  process: ChildProcess
+  statusUrl: string
 
   stop: () => Boolean
 
   constructor(
     path: string,
-    args: string[],
+    statusUrl: string,
     {
       env,
       showBrowserLogs = false,
-    }: { env?: NodeJS.ProcessEnv; showBrowserLogs?: boolean } = {}
+      args = [],
+    }: {
+      env?: NodeJS.ProcessEnv
+      showBrowserLogs?: boolean
+      args?: string[]
+    } = {}
   ) {
-    this.process = startChromedriver(path, args, env)
+    this.process = spawn(path, args, {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        ...env,
+      },
+    })
+    this.statusUrl = statusUrl
 
     const stdout = (chunk: any) => {
       console.log('RENDERER LOG: ' + chunk)
@@ -23,14 +36,15 @@ export default class Chromedriver {
     }
 
     const chromedriverCloseHandler = (code: any, ...args: any[]) => {
-      console.log(`closing chrome driver ${code}, ${args}`)
+      console.log(`closing chromedriver ${code}, ${args}`)
       if (code !== 0) {
         throw new Error(`Chromedriver exited with error code: ${code}, ${args}`)
       }
     }
-    this.process.on('error', (error: any) => {
-      console.error(`CHROMEDRIVER: ${String(error)}`)
-      throw new Error(error)
+    this.process.on('error', (error) => {
+      const errorString = String(error)
+      console.error(`CHROMEDRIVER: ${errorString}`)
+      throw new Error(errorString)
     })
 
     process.on('exit', this._kill)
@@ -66,18 +80,4 @@ export default class Chromedriver {
       console.error(err)
     }
   }
-}
-
-function startChromedriver(
-  path: string,
-  args: string[],
-  env?: NodeJS.ProcessEnv
-) {
-  return ChildProcess.spawn(path, args, {
-    cwd: process.cwd(),
-    env: {
-      ...process.env,
-      ...env,
-    },
-  })
 }

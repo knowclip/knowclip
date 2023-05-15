@@ -3,11 +3,11 @@ import type {
   MessageBoxOptions,
   MessageBoxReturnValue,
 } from 'electron'
-import { shell } from '../../preloaded/electron'
-import { extname } from '../../preloaded/path'
-import { sendToMainProcess } from '../../preloaded/sendToMainProcess'
+import { shell } from 'preloaded/electron'
+import { extname } from 'preloaded/path'
+import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 import { pauseMedia } from '../media'
-import type { MessageResponse } from '../../getMessageResponders'
+import type { MessageResponse } from '../../MessageToMain'
 
 const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
   if (messageResponse.error) {

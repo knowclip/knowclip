@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`make clips and cards from subtitles > saves and closes project > save and close project 1`] = `
+exports[`make clips and cards from subtitles > saves and closes project > project file was saved 1`] = `
 {
   "value": {
     "media": [

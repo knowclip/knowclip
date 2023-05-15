@@ -6,6 +6,10 @@ import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 export default async function makeSomeFlashcards(
   context: IntegrationTestContext
 ) {
@@ -13,7 +17,9 @@ export default async function makeSomeFlashcards(
   test('create first card', async () => {
     const { client } = context
 
+    await sleep(100)
     await waveformMouseDrag(client, 351, 438)
+    await sleep(100)
     await client.waitForText_(flashcardSection$.container, '1 / 1')
 
     await fillInTransliterationCardFields(client, {

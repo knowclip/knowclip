@@ -1,4 +1,10 @@
 import { getPreloadModule } from './getPreloadModule'
 
-export const { ffmpeg, toTimestamp, getMediaMetadata, readMediaFile } =
-  getPreloadModule('ffmpeg') || require('../preload/ffmpeg')
+export const {
+  toTimestamp,
+  getMediaMetadata,
+  readMediaFile,
+  writeMediaSubtitlesToVtt,
+  convertAssToVtt,
+  createConstantBitrateMp3,
+} = getPreloadModule('ffmpeg')
