@@ -49,7 +49,6 @@ const exportApkg: AppEpic = (action$, state$, effects) =>
     ofType(A.exportApkgRequest),
     switchMap((exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
-      const directory = effects.tmpDirectory()
 
       const currentProject = r.getCurrentProject(state$.value)
       if (!currentProject)
@@ -109,7 +108,7 @@ function makeApkg(
           concatWith(
             fromEvent(window, 'clip-processed').pipe(
               takeUntil(deckCreationEnded),
-              map((e) => {
+              map(() => {
                 console.log('heard clip-processed event')
                 const number = ++processed
                 return r.setProgress(
