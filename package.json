@@ -96,7 +96,7 @@
     "tidy": "npm run format -- --list-different && npm run lint && npm run tsc",
     "electron-builder": "electron-builder",
     "electron-builder:skip-publish": "electron-builder -p never",
-    "dist": "npm run build && npm run electron-builder:skip-publish",
+    "dist": "npm run build -- production && npm run electron-builder:skip-publish",
     "dist:appveyor": "npm run electron-vite -- build && npm run electron-builder",
     "replace-in-files-cli": "replace-in-files",
     "yalc": "yalc",
