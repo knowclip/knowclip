@@ -1,6 +1,8 @@
 import { BrowserWindow, screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
+import { initRenderer } from 'electron-store'
+import Sentry from '@sentry/electron'
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
@@ -12,17 +14,12 @@ export const WINDOW_START_DIMENSIONS = {
   height: 768,
 }
 
-if (process.env.VITE_TEST_DRIVER) {
-  interceptLogs()
-}
-
 const { isPackaged } = app
-
 const isTesting = process.env.VITEST
 
-require('electron-store').initRenderer()
+if (isTesting) interceptLogs()
 
-const Sentry = require('@sentry/electron')
+initRenderer()
 
 Sentry.init({
   dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',

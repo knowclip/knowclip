@@ -90,8 +90,6 @@ export function setUpMocks<M extends ModuleLike>(
 ): MockedModule<M> {
   if (!mocking) return actualModule
 
-  console.log(`Preparing module ${moduleId} for mocking`)
-
   const mockState = {
     logged: {} as { [K in keyof M]: ReturnType<M[K]>[] },
     returnValues: {} as { [K in keyof M]: ReturnType<M[K]>[] },
