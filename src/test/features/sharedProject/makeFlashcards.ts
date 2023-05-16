@@ -3,6 +3,7 @@ import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { test } from '../../test'
 
 export default async function makeFlashcards(context: IntegrationTestContext) {
   test('select clip', async () => {

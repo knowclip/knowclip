@@ -7,6 +7,7 @@ import { waveformMouseHoldAndDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { getSelector } from '../../driver/ClientWrapper'
 import { retryUntil } from '../../driver/retryUntil'
+import { test } from '../../test'
 
 export default async function manuallyLocateAsset(
   context: IntegrationTestContext

@@ -128,7 +128,6 @@ export function setUpMocks<M extends ModuleLike>(
     }
   }
 
-  console.log(`Mocks after ${moduleId}`, mockedModules)
   return mockedModule
 }
 

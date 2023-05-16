@@ -1,4 +1,5 @@
 import { lemmatize } from './yomichanDictionary'
+import { describe, it, expect } from 'vitest'
 
 describe('lemmatize', () => {
   it('works with 描いた', () => {

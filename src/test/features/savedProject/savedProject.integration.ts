@@ -11,11 +11,12 @@ import { join } from 'path'
 import { runAll } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
 import { parseProjectJson } from '../../../utils/parseProject'
+import { describe, beforeAll, afterAll, test, expect } from 'vitest'
 
 const testId = 'savedProject'
 
 describe('opening and saving a previously saved project', () => {
-  let context = initTestContext(testId)
+  const context = initTestContext(testId)
 
   beforeAll(async () => {
     const { app } = await startApp(context, persistedState)

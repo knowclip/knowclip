@@ -12,6 +12,5 @@ export default defineConfig({
     typecheck: {
       tsconfig: './tsconfig.vitest.json',
     },
-    globals: true,
   },
 })

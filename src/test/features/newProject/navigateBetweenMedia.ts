@@ -2,6 +2,7 @@ import { IntegrationTestContext } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { retryUntil } from '../../driver/retryUntil'
 import { getSelector } from '../../driver/ClientWrapper'
+import { test, expect } from '../../test'
 
 export default async function navigateBetweenMedia(
   context: IntegrationTestContext

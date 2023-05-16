@@ -3,6 +3,7 @@ import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
+import { test } from '../../test'
 
 export default async function addSomeSubtitles(
   context: IntegrationTestContext,

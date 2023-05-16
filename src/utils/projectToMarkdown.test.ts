@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux'
-
 import clips from '../reducers/clips'
 import session from '../reducers/session'
 import snackbar from '../reducers/snackbar'
@@ -8,6 +7,7 @@ import subtitles from '../reducers/subtitles'
 import settings from '../reducers/settings'
 import fileAvailabilities from '../reducers/fileAvailabilities'
 import files from '../reducers/files'
+import { describe, it, expect } from 'vitest'
 
 import projectToMarkdown from './projectToMarkdown'
 

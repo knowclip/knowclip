@@ -4,6 +4,7 @@ import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
+import { beforeEach } from 'vitest'
 
 // https://github.com/prisma/prisma/issues/8558
 // @ts-ignore
@@ -26,7 +27,7 @@ const chromedriverPath = require(join(
   'chromedriver'
 )).path
 
-export type IntegrationTestContext = {
+export interface IntegrationTestContext {
   testId: string
   setup: {
     app: TestDriver
@@ -40,16 +41,24 @@ export type IntegrationTestContext = {
 }
 
 export function initTestContext(testId: string): IntegrationTestContext {
-  return {
+  const context: IntegrationTestContext = {
     testId,
     setup: null,
     get client() {
-      return this.setup!.client as ClientWrapper
+      return (this.setup as IntegrationTestContext['setup'])!.client
     },
     get app() {
-      return this.setup!.app as TestDriver
+      return (this.setup as IntegrationTestContext['setup'])!.app
     },
   }
+
+  beforeEach((ctx) => {
+    ;(ctx as any).saveScreenshot = async (filepath: string) => {
+      await context.client._driver.client.saveScreenshot(filepath)
+    }
+  })
+
+  return context
 }
 
 /** mutates context */
@@ -77,7 +86,6 @@ export async function startApp(
     appDir: rootDir,
     chromeArgs: [
       'enable-logging',
-      'headless',
       ...(process.env.VITE_INTEGRATION_DEV ? [] : 'disable-extensions'),
       ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),

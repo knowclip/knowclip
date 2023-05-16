@@ -8,6 +8,7 @@ import {
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { projectMenu$ } from '../../../components/ProjectMenu'
+import { test, expect } from '../../test'
 
 export default async function reviewWithMissingMedia(
   context: IntegrationTestContext

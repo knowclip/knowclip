@@ -3,7 +3,7 @@
     "paths": {
       "preloaded/*": ["./src/preloaded/*"],
     },
-    "types": ["vitest/globals", "vite/client"],
+    "types": ["vite/client"],
     "target": "esnext",
     "lib": [
       "dom",

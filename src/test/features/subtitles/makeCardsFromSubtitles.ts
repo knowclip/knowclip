@@ -9,6 +9,8 @@ import { waveform$ } from '../../../components/waveformTestLabels'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { retryUntil } from '../../driver/retryUntil'
+import { getSelector } from '../../driver/ClientWrapper'
+import { test } from '../../test'
 
 export default async function makeCardsFromSubtitles(
   context: IntegrationTestContext
@@ -62,7 +64,8 @@ export default async function makeCardsFromSubtitles(
     await retryUntil({
       action: () =>
         client.clickElement_(subtitlesMenu$.makeClipsAndCardsButton),
-      check: () => client.waitForVisible_(confirmationDialog$.okButton),
+      check: () =>
+        app.client.$(getSelector(confirmationDialog$.okButton)).isExisting(),
       conditionName: 'Confirmation dialog OK button is visible',
     })
     await client.clickElement_(confirmationDialog$.okButton)

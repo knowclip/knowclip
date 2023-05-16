@@ -4,6 +4,7 @@ import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectForm
 import { main$ } from '../../../components/Main'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { test } from '../../test'
 
 export default async function createNewProject(
   context: IntegrationTestContext,

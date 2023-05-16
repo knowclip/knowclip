@@ -10,6 +10,7 @@ import { runAll } from '../step'
 import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'
 import { join } from 'path'
+import { afterAll, beforeAll, describe } from 'vitest'
 
 const testId = 'savedProject'
 

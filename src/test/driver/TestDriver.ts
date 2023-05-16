@@ -170,8 +170,6 @@ export class TestDriver {
     message: MessageToMain<T>
   ): Promise<MessageResponse<MessageHandlerResult<T>>> {
     return this.client.executeAsync((message: MessageToMain<T>, done) => {
-      console.log('WHY NOT LOG THIS')
-      ;(window as any).messageWentThrough = message
       return (
         window.electronApi
           ?.invokeMessage(message)

@@ -2,6 +2,7 @@ import filenamify from 'filenamify'
 import moment from 'moment'
 import { join } from 'path'
 import { SCREENSHOTS_DIRECTORY, IntegrationTestContext } from '../setUpDriver'
+import { expect, describe } from 'vitest'
 
 type TestStep = {
   description: string

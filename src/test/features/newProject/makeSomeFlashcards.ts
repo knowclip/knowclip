@@ -7,6 +7,7 @@ import {
   waveformMouseHoldAndDrag,
 } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { test } from '../../test'
 
 export default async function makeTwoFlashcards(
   context: IntegrationTestContext

@@ -5,6 +5,7 @@ import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { test } from '../../test'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))

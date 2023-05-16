@@ -2,6 +2,8 @@ import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { test } from '../../test'
+
 const {
   openMediaFilesMenuButton: mediaFilesMenuButton,
   addNewAdditionalMediaButton,
