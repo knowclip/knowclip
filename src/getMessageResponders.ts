@@ -13,16 +13,12 @@ import { join } from 'path'
 
 export const getMessageResponders = (
   mainWindow: BrowserWindow,
+  ffmpegPaths: { ffmpeg: string; ffprobe: string },
   persistedStatePath?: string
 ) => ({
   isReady: () => 'ok' as const,
   getFfmpegAndFfprobePath: () => {
-    const { ffmpegpath, ffprobepath } = global as any
-
-    return {
-      ffmpegpath: ffmpegpath as string,
-      ffprobepath: ffprobepath as string,
-    }
+    return ffmpegPaths
   },
   log: (...args: any[]) => {
     console.log(...args)

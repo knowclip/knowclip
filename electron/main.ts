@@ -43,10 +43,10 @@ const ffprobeStaticBasePath = require('ffprobe-static').path
 const getFfmpegStaticPath = (basePath: string) =>
   basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
 
-// @ts-ignore
-global.ffmpegpath = getFfmpegStaticPath(ffmpegStaticBasePath)
-// @ts-ignore
-global.ffprobepath = getFfmpegStaticPath(ffprobeStaticBasePath)
+const ffmpegPaths = {
+  ffmpeg: getFfmpegStaticPath(ffmpegStaticBasePath),
+  ffprobe: getFfmpegStaticPath(ffprobeStaticBasePath),
+}
 
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
@@ -154,6 +154,7 @@ app.whenReady().then(async () => {
   setUpMenu(context.mainWindow as BrowserWindow, true)
   handleMessages(
     context.mainWindow as BrowserWindow,
+    ffmpegPaths,
     process.env.PERSISTED_STATE_PATH
   )
 })

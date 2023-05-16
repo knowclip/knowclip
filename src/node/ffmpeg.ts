@@ -1,23 +1,9 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
-import { sendToMainProcess } from './sendToMainProcess'
 
 export const ffmpeg =
   require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
-
-if (!process.env.VITEST_WORKER_ID)
-  sendToMainProcess({
-    type: 'getFfmpegAndFfprobePath',
-    args: [],
-  }).then((getPaths) => {
-    if (getPaths.error) {
-      console.error(getPaths.error)
-      throw new Error('Problem finding ffmpeg and ffprobe paths.')
-    }
-    ffmpeg.setFfmpegPath(getPaths.result.ffmpegpath)
-    ffmpeg.setFfprobePath(getPaths.result.ffprobepath)
-  })
 
 const zeroPad = (zeroes: number, value: any) =>
   String(value).padStart(zeroes, '0')

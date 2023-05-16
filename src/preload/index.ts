@@ -29,6 +29,7 @@ import {
   MessageToMain,
   MessageToMainType,
 } from '../MessageToMain'
+
 declare global {
   interface Window {
     electronApi: ElectronApi
@@ -85,6 +86,18 @@ const electronApi = {
 }
 
 console.log('preloading')
+
+sendToMainProcess({
+  type: 'getFfmpegAndFfprobePath',
+  args: [],
+}).then((getPaths) => {
+  if (getPaths.error) {
+    console.error(getPaths.error)
+    throw new Error('Problem finding ffmpeg and ffprobe paths.')
+  }
+  ffmpeg.ffmpeg.setFfmpegPath(getPaths.result.ffmpeg)
+  ffmpeg.ffmpeg.setFfprobePath(getPaths.result.ffprobe)
+})
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)
 

@@ -14,7 +14,6 @@ export function test(name: string, fn: () => Promise<void>): void {
         const testNameSegments = vitest.expect
           .getState()
           .currentTestName?.split(' > ')
-        console.log({ testNameSegments })
         const screenshotFilepath = join(
           SCREENSHOTS_DIRECTORY,
           filenamify(

@@ -21,9 +21,14 @@ async function respond<T extends MessageToMainType>(
 
 export function handleMessages(
   mainWindow: BrowserWindow,
+  ffmpegPaths: { ffmpeg: string; ffprobe: string },
   persistedStatePath?: string
 ) {
-  const messageHandlers = getMessageResponders(mainWindow, persistedStatePath)
+  const messageHandlers = getMessageResponders(
+    mainWindow,
+    ffmpegPaths,
+    persistedStatePath
+  )
 
   async function onMessage<T extends MessageToMainType>(
     message: MessageToMain<T>
