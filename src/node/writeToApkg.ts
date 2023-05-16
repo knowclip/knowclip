@@ -32,16 +32,10 @@ export async function writeApkgDeck(
 
     window.dispatchEvent(new DeckInitializedEvent())
 
-    let clipsProcessed = 0
-
     await Promise.all(
       exportData.clips.map(async (clipSpecs: ClipSpecs) => {
         registerClip(deck, noteModel, clozeNoteModel, clipSpecs)
         window.dispatchEvent(new ClipProcessedEvent())
-        clipsProcessed++
-        console.log(
-          `${clipsProcessed}/${exportData.clips.length} clips processed`
-        )
 
         const noteMediaResult = await getClipMedia(clipSpecs, tmpDirectory)
         if (noteMediaResult.errors)
@@ -87,14 +81,12 @@ export async function writeApkgDeck(
 class DeckInitializedEvent extends Event {
   constructor() {
     super('deck-initialized')
-    console.log('deck-initialized')
   }
 }
 
 class ClipProcessedEvent extends Event {
   constructor() {
     super('clip-processed')
-    console.log('clip-processed')
   }
 }
 
@@ -102,21 +94,18 @@ export class DeckCreationErrorEvent extends Event {
   message: string
   constructor(message: string) {
     super('deck-creation-error')
-    console.log('deck-creation-error', message)
     this.message = message
   }
 }
 class SavingDeckEvent extends Event {
   constructor() {
     super('saving-deck')
-    console.log('saving-deck')
   }
 }
 class DeckSavedEvent extends Event {
   name = 'deck-saved'
   constructor() {
     super('deck-saved')
-    console.log('deck-saved')
   }
 }
 
