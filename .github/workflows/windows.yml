@@ -29,8 +29,14 @@ jobs:
     - name: Upload test screenshots
       uses: actions/upload-artifact@v2
       with:
-        name: tmp-test
-        path: tmp-test
+        name: test-screenshots
+        path: screenshots
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: "*.log"
+        path: logs
     - name: build
       run: |
         npm run dist:appveyor -- --win

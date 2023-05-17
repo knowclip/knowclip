@@ -37,6 +37,12 @@ jobs:
       with:
         name: test-screenshots
         path: screenshots
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: "*.log"
+        path: logs
     - name: Upload build artifacts
       if: "!startsWith(github.ref, 'refs/tags/')"
       uses: actions/upload-artifact@v2
