@@ -1,5 +1,5 @@
 import { mergeMap, map, mergeAll } from 'rxjs/operators'
-import { of, Observable, from, EMPTY } from 'rxjs'
+import { of, Observable, from, EMPTY, defer } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { combineEpics, ofType } from 'redux-observable'
@@ -76,14 +76,19 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
       const openSuccessHandlers: OpenFileSuccessHandler<
         typeof action.validatedFile
       >[] = fileEventHandlers[action.validatedFile.type].openSuccess
-      const state = state$.value
-      const file =
-        r.getFile(state, action.validatedFile.type, action.validatedFile.id) ||
-        action.validatedFile
 
       return from(
         openSuccessHandlers.map((handler) =>
-          from(handler(file, action.filePath, state, effects)).pipe(mergeAll())
+          defer(() => {
+            const state = state$.value
+            const file = r.getFile(
+              state,
+              action.validatedFile.type,
+              action.validatedFile.id
+            )
+
+            return file ? handler(file, action.filePath, state, effects) : EMPTY
+          }).pipe(mergeAll())
         )
       )
     }),

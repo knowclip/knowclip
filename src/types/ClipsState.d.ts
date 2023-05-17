@@ -54,8 +54,9 @@ declare type ApkgExportData = {
 declare type ApkgExportNoteModel = {
   name: string
   id: number
+  sortf: number
   flds: Array<{ name: string }>
-  req: Array<number, 'all' | 'any', number[]>
+  req: Array<[number, 'all' | 'any', number[]]>
   css: string
   tmpls: Array<{
     name: string
@@ -72,6 +73,7 @@ declare type FlashcardImageSpecs = {
 declare type ApkgExportClozeNoteModel = {
   id: number
   name: string
+  sortf: number
   flds: Array<{ name: string }>
   css: string
   tmpl: {

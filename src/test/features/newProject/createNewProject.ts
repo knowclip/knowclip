@@ -5,6 +5,16 @@ import { main$ } from '../../../components/Main'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { test } from '../../test'
+import { _ } from 'ajv'
+
+const {
+  projectNameField,
+  projectFileLocationField,
+  noteTypeSelect,
+  transcriptionNoteTypeOption,
+  saveButton,
+  cardsPreview,
+} = newProjectFormDialog$
 
 export default async function createNewProject(
   context: IntegrationTestContext,
@@ -12,28 +22,30 @@ export default async function createNewProject(
   projectFileName: string,
   projectTitle: string
 ) {
-  test('open and fill in new project form', async () => {
-    const { app, client } = context
+  test('open new project form', async () => {
+    const { client } = context
 
     await client.clickElement_(projectsMenu$.newProjectButton)
+  })
 
+  test('select file location', async () => {
+    const { app } = context
     await mockElectronHelpers(app, {
       showSaveDialog: [
         Promise.resolve(join(TMP_DIRECTORY, projectFileName + '.kyml')),
       ],
     })
-    const {
-      projectNameField,
-      projectFileLocationField,
-      noteTypeSelect,
-      transcriptionNoteTypeOption,
-      saveButton,
-      cardsPreview,
-    } = newProjectFormDialog$
+  })
+  test('fill in text fields', async () => {
+    const { client } = context
 
     await client.setFieldValue_(projectNameField, projectTitle)
 
     await client.clickElement_(projectFileLocationField)
+  })
+
+  test('select note type', async () => {
+    const { client } = context
 
     await client.clickElement_(noteTypeSelect)
     await client.clickElement_(transcriptionNoteTypeOption)
@@ -47,6 +59,9 @@ export default async function createNewProject(
     await client.waitUntilGone_(
       newProjectFormDialog$.transcriptionNoteTypeOption
     )
+  })
+  test('save project', async () => {
+    const { client } = context
 
     await client.clickElement_(saveButton)
 
