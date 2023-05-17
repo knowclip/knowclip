@@ -76,7 +76,7 @@ export async function startApp(
   if (persistedStatePath) {
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
   }
-
+  console.log(process.env)
   const app = await createTestDriver({
     chromedriverPath: chromedriverPath,
     webdriverIoPath:
@@ -93,6 +93,7 @@ export async function startApp(
       VITEST: 'true',
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
       NODE_ENV: 'integration',
+      DISPLAY: process.env.DISPLAY,
     },
   })
   const setup = {
