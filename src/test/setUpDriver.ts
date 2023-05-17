@@ -94,6 +94,7 @@ export async function startApp(
       DEV: process.env.DEV,
       VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
+      VITEST: process.env.VITEST,
     },
   })
   const setup = {
