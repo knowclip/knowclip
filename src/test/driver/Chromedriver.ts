@@ -21,10 +21,7 @@ export default class Chromedriver {
   ) {
     this.process = spawn(path, args, {
       cwd: process.cwd(),
-      env: {
-        ...process.env,
-        ...env,
-      },
+      env,
     })
     this.statusUrl = statusUrl
 

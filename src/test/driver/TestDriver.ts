@@ -93,7 +93,7 @@ export async function createTestDriver({
   webdriverIoPath,
   appDir,
   chromeArgs,
-  env: givenEnv,
+  env,
   logLevel = 'error',
 }: {
   chromedriverPath: string
@@ -107,15 +107,10 @@ export async function createTestDriver({
   const port = 9515
   const urlBase = '/'
 
-  const env = {
-    VITEST: 'true',
-    ...givenEnv,
-    SHOULD_BE_IN_BROWSER: 'true',
-    VITE_SHOULD_BE_IN_BROWSER_PLEASE: 'true',
-  } as NodeJS.ProcessEnv
-
   const statusUrl = `http://${hostname}:${port}${urlBase}status`
-  const driver = new Chromedriver(chromedriverPath, statusUrl, { env })
+  const driver = new Chromedriver(chromedriverPath, statusUrl, {
+    env,
+  })
   await waitForChromeDriver(driver.process, statusUrl, 7000)
 
   const browserOptions: RemoteOptions = {

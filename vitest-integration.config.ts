@@ -15,11 +15,6 @@ export const integrationConfig: UserConfig = {
     deps: {
       inline: ['@mui/material'],
     },
-    env: process.env.VITE_INTEGRATION_DEV
-      ? {
-          VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
-        }
-      : {},
   },
 }
 
