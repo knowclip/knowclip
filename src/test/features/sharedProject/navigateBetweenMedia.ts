@@ -4,6 +4,7 @@ import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDial
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { snackbar$ } from '../../../components/Snackbar'
+import { test } from '../../test'
 
 export default async function navigateBetweenMedia(
   context: IntegrationTestContext

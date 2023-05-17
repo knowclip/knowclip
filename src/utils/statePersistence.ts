@@ -1,8 +1,3 @@
-import electron from 'electron'
-import { getPersistedDataSnapshot } from '../test/getPersistedDataSnapshot'
-import { writeFileSync } from 'fs-extra'
-import { join } from 'path'
-
 type FilesyState<F> = Record<FileMetadata['type'], { [fileId: string]: F }>
 
 const FILE_TYPES: FileMetadata['type'][] = [
@@ -27,37 +22,6 @@ const mapFileState = <F, G>(
     }, {} as { [fileId: string]: G })
     return all
   }, {} as FilesyState<G>)
-
-export const listenForPersistedDataLogMessage = (getState: () => AppState) => {
-  if (
-    process.env.NODE_ENV === 'development' &&
-    process.env.REACT_APP_CHROMEDRIVER
-  ) {
-    console.log('will listen for log message')
-    window.document.addEventListener('DOMContentLoaded', () => {
-      console.log('listening for log message')
-      electron.ipcRenderer.on(
-        'log-persisted-data',
-        (e, testId, directories) => {
-          const snapshot = getPersistedDataSnapshot(
-            getState(),
-            testId,
-            directories
-          )
-
-          console.log(snapshot)
-          snapshot.keepTmpFiles()
-          console.log(snapshot.json)
-
-          writeFileSync(
-            join(process.cwd(), testId + '_persistedDataSnapshot.js'),
-            snapshot.json
-          )
-        }
-      )
-    })
-  }
-}
 
 export function resetFileAvailabilities(
   fileAvailabilities: FileAvailabilitiesState

@@ -11,6 +11,7 @@ import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'
 import { join } from 'path'
 import { savedProjectTestSteps } from '../savedProject/savedProjectTestSteps'
+import { afterAll, beforeAll, describe } from 'vitest'
 
 const testId = 'sharedProject'
 

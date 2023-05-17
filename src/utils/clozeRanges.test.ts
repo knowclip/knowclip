@@ -1,4 +1,5 @@
 import { trimClozeRangeOverlaps } from './clozeRanges'
+import { describe, it, expect } from 'vitest'
 
 describe('trimClozeRangeOverlaps', () => {
   const deletions: ClozeDeletion[] = [

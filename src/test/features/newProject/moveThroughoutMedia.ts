@@ -4,6 +4,7 @@ import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
+import { test, expect } from '../../test'
 
 export default async function moveThroughoutMedia(
   context: IntegrationTestContext

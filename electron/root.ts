@@ -1,6 +1,3 @@
-import { join } from "path";
-import { app } from 'electron'
-
-const { isPackaged } = app
+import { join } from 'path'
 
 export const ROOT_DIRECTORY = join(__dirname, '..', '..')

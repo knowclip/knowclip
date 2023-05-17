@@ -1,10 +1,5 @@
 import helpers from './helpers'
-import spectronMocks from '../../test/spectronMocks'
-
-const { module: mocked, resetMocks: _resetMocks } = spectronMocks(
-  'electron-helper',
-  helpers
-)
+import { setUpMocks } from 'preloaded/setUpMocks'
 
 const {
   showSaveDialog,
@@ -14,7 +9,7 @@ const {
   openInBrowser,
   showMessageBox,
   openExternal,
-} = mocked
+} = setUpMocks('electron-helper', helpers)
 
 export {
   showSaveDialog,

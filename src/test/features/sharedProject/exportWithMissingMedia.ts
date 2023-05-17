@@ -13,6 +13,7 @@ import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 import { mainHeader$ } from '../../../components/MainHeader'
 import * as yauzl from 'yauzl'
 import * as fs from 'fs'
+import { test, expect } from '../../test'
 
 const apkgFilePath = join(TMP_DIRECTORY, 'deck_from_shared_project.apkg')
 

@@ -1,6 +1,7 @@
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 import { IntegrationTestContext } from '../../setUpDriver'
+import { test } from '../../test'
 
 export default async function saveAndCloseProject(
   context: IntegrationTestContext,

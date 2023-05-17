@@ -1,7 +1,7 @@
 import sideEffects from './module'
-import spectronMocks from '../../test/spectronMocks'
+import { setUpMocks } from 'preloaded/setUpMocks'
 
-const { module: mocked } = spectronMocks('side-effect', sideEffects)
+const mocked = setUpMocks('side-effect', sideEffects)
 
 const { uuid, nowUtcTimestamp } = mocked
 

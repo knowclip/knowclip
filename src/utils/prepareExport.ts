@@ -1,12 +1,15 @@
 import r from '../redux'
-import { toTimestamp } from '../utils/ffmpeg'
-import { extname, basename } from 'path'
+import { toTimestamp } from 'preloaded/ffmpeg'
+import { extname, basename } from 'preloaded/path'
 import { unparse } from 'papaparse'
 import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability, encodeClozeDeletions } from '../selectors'
-import { getVideoStillPngPath, getMidpoint } from './getVideoStill'
+import { getVideoStillPngPath } from 'preloaded/getVideoStill'
 import { sanitizeFileName } from './sanitizeFilename'
 import moment from 'moment'
+
+export const getMidpoint = (start: number, end: number) =>
+  start + Math.round((end - start) / 2)
 
 const roughEscape = (text: string) => text.replace(/[\n\r]/g, '<br />')
 

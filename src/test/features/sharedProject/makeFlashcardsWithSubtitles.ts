@@ -5,6 +5,7 @@ import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPo
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { test } from '../../test'
 
 export default async function makeFlashcardsWithSubtitles(
   context: IntegrationTestContext

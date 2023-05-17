@@ -28,7 +28,7 @@ const exportMarkdown: AppEpic = (
           currentNoteType,
           action.mediaFileIdsToClipIds
         )
-        await writeFile(filename, markdown, 'utf8')
+        await writeFile(filename, markdown)
         return from([
           r.simpleMessageSnackbar(`Markdown file saved in ${filename}`),
         ])

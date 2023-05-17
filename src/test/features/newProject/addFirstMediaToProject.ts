@@ -4,6 +4,7 @@ import { waveform$ } from '../../../components/waveformTestLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
+import { test, expect } from '../../test'
 
 export default async function addFirstMediaToProject(
   context: IntegrationTestContext,

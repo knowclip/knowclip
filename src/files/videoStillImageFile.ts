@@ -1,6 +1,6 @@
 import r from '../redux'
+import { getMidpoint } from '../utils/prepareExport'
 import { FileEventHandlers } from './eventHandlers'
-import { getMidpoint } from '../utils/getVideoStill'
 import { msToSeconds } from 'clipwave'
 
 export default {

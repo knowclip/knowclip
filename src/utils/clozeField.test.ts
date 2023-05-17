@@ -1,4 +1,5 @@
 import { unescapeClozeField } from './clozeField'
+import { describe, it, expect } from 'vitest'
 
 describe('unescapeClozeField', () => {
   it('unescapes single cloze deletion', () => {

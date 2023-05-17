@@ -1,12 +1,13 @@
-import {
+import type {
   FileFilter,
-  shell,
   MessageBoxOptions,
   MessageBoxReturnValue,
 } from 'electron'
-import { extname } from 'path'
-import { MessageResponse, sendToMainProcess } from '../../messages'
+import { shell } from 'preloaded/electron'
+import { extname } from 'preloaded/path'
+import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 import { pauseMedia } from '../media'
+import type { MessageResponse } from '../../MessageToMain'
 
 const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
   if (messageResponse.error) {

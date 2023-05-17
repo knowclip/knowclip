@@ -76,19 +76,14 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
       const openSuccessHandlers: OpenFileSuccessHandler<
         typeof action.validatedFile
       >[] = fileEventHandlers[action.validatedFile.type].openSuccess
-
+      const state = state$.value
       const file =
-        r.getFile(
-          state$.value,
-          action.validatedFile.type,
-          action.validatedFile.id
-        ) || action.validatedFile
+        r.getFile(state, action.validatedFile.type, action.validatedFile.id) ||
+        action.validatedFile
 
       return from(
         openSuccessHandlers.map((handler) =>
-          from(handler(file, action.filePath, state$.value, effects)).pipe(
-            mergeAll()
-          )
+          from(handler(file, action.filePath, state, effects)).pipe(mergeAll())
         )
       )
     }),

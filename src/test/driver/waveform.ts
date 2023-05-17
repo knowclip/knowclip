@@ -1,7 +1,6 @@
 import { clickAt, dragMouse } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main'
-import { ElementWrapper } from './ElementWrapper'
 import { waveform$ } from '../../components/waveformTestLabels'
 import { TestDriver } from './TestDriver'
 
@@ -14,7 +13,7 @@ export async function waveformMouseDrag(
 ) {
   const waveform = await client.firstElement(waveformSelector)
   try {
-    const midpoint = await getWaveformMidpoint(client, waveform)
+    const midpoint = await getWaveformMidpoint(client, waveform.elementId)
     await dragMouse(client._driver, [start, midpoint], [end, midpoint])
   } catch (err) {
     throw err
@@ -43,11 +42,8 @@ export async function clickClip(
   await clickAt(app, [rect.x + offsetFromCorner.x, rect.y + offsetFromCorner.y])
 }
 
-export async function getWaveformMidpoint(
-  client: ClientWrapper,
-  waveform: ElementWrapper
-) {
-  const rect = await client._driver.client.getElementRect(waveform.elementId)
+async function getWaveformMidpoint(client: ClientWrapper, elementId: string) {
+  const rect = await client._driver.client.getElementRect(elementId)
 
   const { y, height } = rect
   const midpoint = y + Math.round(height / 2)

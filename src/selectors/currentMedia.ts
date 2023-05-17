@@ -1,4 +1,4 @@
-import { basename, extname } from 'path'
+import { basename, extname } from 'preloaded/path'
 import {
   getFile,
   getFileAvailabilityById,

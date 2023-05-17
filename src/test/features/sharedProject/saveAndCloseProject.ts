@@ -3,6 +3,7 @@ import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 import { parseProjectJson } from '../../../utils/parseProject'
+import { test, expect } from '../../test'
 
 export default async function saveAndCloseProject(
   context: IntegrationTestContext

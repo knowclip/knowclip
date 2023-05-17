@@ -9,11 +9,12 @@ import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll, step } from '../step'
+import { describe, beforeAll, afterAll, test } from 'vitest'
 
 const testId = 'sharedProject'
 
 describe('opening a shared project', () => {
-  let context = initTestContext(testId)
+  const context = initTestContext(testId)
 
   beforeAll(async () => {
     const { app } = await startApp(context)

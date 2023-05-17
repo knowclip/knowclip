@@ -4,13 +4,17 @@ const SAVE_PROJECT = 'Save project'
 const CLOSE_PROJECT = 'Close project'
 const OPEN_PROJECT = 'Open project'
 
-const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => [
+const template = (
+  mainWindow: BrowserWindow,
+  useDevTools: boolean
+): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => [
   {
     label: 'Application',
     submenu: [
       {
         label: 'Settings',
-        click: () => mainWindow.webContents.send('show-settings-dialog'),
+        click: () =>
+          mainWindow.webContents.send('message', 'show-settings-dialog'),
       },
 
       { type: 'separator' },
@@ -32,19 +36,21 @@ const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.Me
         label: 'Save project',
         accelerator: 'CmdOrCtrl+S',
         enabled: false,
-        click: () => mainWindow.webContents.send('save-project-request'),
+        click: () =>
+          mainWindow.webContents.send('message', 'save-project-request'),
       },
       {
         id: CLOSE_PROJECT,
         label: 'Close project',
         enabled: false,
-        click: () => mainWindow.webContents.send('close-project-request'),
+        click: () =>
+          mainWindow.webContents.send('message', 'close-project-request'),
       },
       {
         id: OPEN_PROJECT,
         label: 'Open project',
         enabled: true,
-        click: () => mainWindow.webContents.send('open-project'),
+        click: () => mainWindow.webContents.send('message', 'open-project'),
       },
     ],
   },
@@ -52,8 +58,16 @@ const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.Me
   {
     label: '&Edit',
     submenu: [
-      { label: 'Undo', accelerator: 'CmdOrCtrl+Z', click: () => mainWindow.webContents.send('undo') },
-      { label: 'Redo', accelerator: 'CmdOrCtrl+Shift+Z', click: () => mainWindow.webContents.send('redo') },
+      {
+        label: 'Undo',
+        accelerator: 'CmdOrCtrl+Z',
+        click: () => mainWindow.webContents.send('message', 'undo'),
+      },
+      {
+        label: 'Redo',
+        accelerator: 'CmdOrCtrl+Shift+Z',
+        click: () => mainWindow.webContents.send('message', 'redo'),
+      },
       { type: 'separator' },
       { role: 'cut' },
       { role: 'copy' },
@@ -86,18 +100,22 @@ const template = (mainWindow: BrowserWindow, useDevTools: boolean): (Electron.Me
       {
         label: 'Check for Updates',
         click: () => {
-          mainWindow.webContents.send('check-for-updates')
+          mainWindow.webContents.send('message', 'check-for-updates')
         },
       },
       {
         label: 'About Application',
-        click: () => mainWindow.webContents.send('show-about-dialog'),
+        click: () =>
+          mainWindow.webContents.send('message', 'show-about-dialog'),
       },
     ],
   },
 ]
 
-export default function appMenu(mainWindow: BrowserWindow, useDevTools: boolean = false) {
+export default function appMenu(
+  mainWindow: BrowserWindow,
+  useDevTools: boolean = false
+) {
   return Menu.setApplicationMenu(
     Menu.buildFromTemplate(template(mainWindow, useDevTools))
   )

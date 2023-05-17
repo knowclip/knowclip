@@ -1,33 +1,28 @@
-import { ipcRenderer } from 'electron'
 import { fromEvent } from 'rxjs'
-import * as fs from 'fs'
-import { getMediaMetadata } from './utils/ffmpeg'
+import { getMediaMetadata } from 'preloaded/ffmpeg'
+import { sendClosedSignal } from 'preloaded/electron'
+import { getVideoStill } from 'preloaded/getVideoStill'
+import * as tempy from 'preloaded/tempy'
+import { sendToMainProcess } from 'preloaded/sendToMainProcess'
+import { processNoteMedia } from 'preloaded/processNoteMedia'
 import { getSubtitlesFromFile, getSubtitlesFilePath } from './utils/subtitles'
 import { getWaveformPng } from './utils/getWaveform'
-import { getVideoStill } from './utils/getVideoStill'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
-import tempy from 'tempy'
 import { nowUtcTimestamp, uuid } from './utils/sideEffects'
 import { getDexieDb } from './utils/dictionariesDatabase'
 import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDictionary'
 import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
-import { sendToMainProcess } from './messages'
-import { processNoteMedia } from './utils/ankiNote'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
-
-const {
-  existsSync,
-  createWriteStream,
-  promises: { writeFile },
-} = fs
-
-const fsDependencies = { existsSync, createWriteStream, writeFile }
+import { existsSync, writeFile } from 'preloaded/fs'
 
 const dependencies = {
   ...electronHelpers,
-  ...fsDependencies,
+  // fs
+  writeFile: writeFile,
+  existsSync: existsSync,
+
   document,
   window,
 
@@ -46,15 +41,13 @@ const dependencies = {
 
   parseAndImportDictionary,
   fromIpcRendererEvent: (eventName: string) =>
-    fromEvent(ipcRenderer, eventName),
+    fromEvent(window, `ipc:${eventName}`),
   sendToMainProcess,
-  quitApp: () => ipcRenderer.send('closed'),
+  quitApp: () => sendClosedSignal(),
   tmpDirectory: () => tempy.directory(),
   tmpFilename: () => tempy.file(),
 
-  dispatchClipwaveEvent: (
-    callback: (waveform: WaveformInterface) => void
-  ) => {
+  dispatchClipwaveEvent: (callback: (waveform: WaveformInterface) => void) => {
     window.dispatchEvent(new ClipwaveCallbackEvent(CLIPWAVE_ID, callback))
   },
 }

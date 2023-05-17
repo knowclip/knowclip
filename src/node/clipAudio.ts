@@ -1,7 +1,7 @@
-import ffmpeg, { toTimestamp } from '../utils/ffmpeg'
-import { existsSync } from 'fs-extra'
+import { ffmpeg, toTimestamp } from './ffmpeg'
 
-import { Writable } from 'stream'
+import type { Writable } from 'stream'
+import { existsSync } from './fs'
 
 export const clipAudioStream = (
   sourceFilePath: string,
@@ -31,7 +31,7 @@ export const clipAudioStream = (
   }
 }
 
-const clipAudio = async (
+export const clipAudio = async (
   sourceFilePath: string,
   startTime: number,
   endTime: number,
@@ -67,4 +67,3 @@ const clipAudio = async (
 
   return { value: outputFilePath }
 }
-export default clipAudio

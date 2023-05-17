@@ -2,19 +2,24 @@ import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import App from './components/App'
+import App from '../components/App'
 
-import getStore from './store'
-import './index.css'
-import * as Sentry from '@sentry/electron'
-import ErrorMessage from './components/ErrorMessage'
-import { sendToMainProcess } from './messages'
+import getStore from '../store'
+import '../index.css'
+import { initSentry } from 'preloaded/initSentry'
+import ErrorMessage from '../components/ErrorMessage'
+import { VITEST } from '../env'
+import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'
-Sentry.init({
+initSentry({
   dsn: sentryDsn,
   ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
+})
+
+window.document.addEventListener('DOMContentLoaded', () => {
+  window.electronApi.listenToTestIpcEvents()
 })
 
 window.addEventListener('error', (e) => {
@@ -25,13 +30,18 @@ window.addEventListener('error', (e) => {
   ReactDOM.render(<ErrorMessage reactError={e} />, errorRoot)
 })
 
-sendToMainProcess({
-  type: 'getPersistedTestState',
-  args: [],
-}).then(({ result: initialTestState }) => {
-  if (initialTestState) console.log({ initialTestState })
+if (VITEST)
+  sendToMainProcess({
+    type: 'getPersistedTestState',
+    args: [],
+  }).then(({ result: initialTestState }) => {
+    render(initialTestState)
+  })
+else render()
 
-  const { store } = getStore(initialTestState as Partial<AppState>)
+function render(initialTestState?: Partial<AppState> | undefined) {
+  const { store } = getStore(initialTestState)
+
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
@@ -40,4 +50,4 @@ sendToMainProcess({
     </React.StrictMode>,
     document.getElementById('root')
   )
-})
+}

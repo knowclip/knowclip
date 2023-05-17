@@ -11,11 +11,12 @@ import saveAndCloseProject from './saveAndCloseProject'
 import { join } from 'path'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll, step } from '../step'
+import { describe, beforeAll, afterAll } from 'vitest'
 
 const testId = 'subtitlesProject'
 
 describe('make clips and cards from subtitles', () => {
-  let context = initTestContext(testId)
+  const context = initTestContext(testId)
 
   beforeAll(async () => {
     const { app } = await startApp(context, persistedState)

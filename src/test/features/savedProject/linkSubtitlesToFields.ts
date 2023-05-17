@@ -4,6 +4,7 @@ import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { clickClip } from '../../driver/waveform'
+import { test } from '../../test'
 
 export default async function linkSubtitlesToFields(
   context: IntegrationTestContext

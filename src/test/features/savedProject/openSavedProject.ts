@@ -1,6 +1,7 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { test } from '../../test'
 
 export default async function openSavedProject(
   context: IntegrationTestContext

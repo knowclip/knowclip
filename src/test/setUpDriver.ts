@@ -4,6 +4,7 @@ import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
 import tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
+import { beforeEach } from 'vitest'
 
 // https://github.com/prisma/prisma/issues/8558
 // @ts-ignore
@@ -26,7 +27,7 @@ const chromedriverPath = require(join(
   'chromedriver'
 )).path
 
-export type IntegrationTestContext = {
+export interface IntegrationTestContext {
   testId: string
   setup: {
     app: TestDriver
@@ -40,16 +41,24 @@ export type IntegrationTestContext = {
 }
 
 export function initTestContext(testId: string): IntegrationTestContext {
-  return {
+  const context: IntegrationTestContext = {
     testId,
     setup: null,
     get client() {
-      return this.setup!.client as ClientWrapper
+      return (this.setup as IntegrationTestContext['setup'])!.client
     },
     get app() {
-      return this.setup!.app as TestDriver
+      return (this.setup as IntegrationTestContext['setup'])!.app
     },
   }
+
+  beforeEach((ctx) => {
+    ;(ctx as any).saveScreenshot = async (filepath: string) => {
+      await context.client._driver.client.saveScreenshot(filepath)
+    }
+  })
+
+  return context
 }
 
 /** mutates context */
@@ -76,22 +85,15 @@ export async function startApp(
         : (electron as unknown as string),
     appDir: rootDir,
     chromeArgs: [
-      'disable-extensions',
-      ...(process.env.INTEGRATION_DEV ? ['verbose'] : []),
-      ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
+      'enable-logging',
+      ...(process.env.VITE_INTEGRATION_DEV ? [] : 'disable-extensions'),
+      ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
     ],
     env: {
-      PUBLIC_URL: process.env.PUBLIC_URL,
-      NODE_ENV: 'test',
-      REACT_APP_CHROMEDRIVER: Boolean(process.env.REACT_APP_CHROMEDRIVER)
-        ? 'true'
-        : undefined,
-      INTEGRATION_DEV: Boolean(process.env.INTEGRATION_DEV)
-        ? 'true'
-        : undefined,
-      ...(persistedStatePath
-        ? { PERSISTED_STATE_PATH: persistedStatePath }
-        : null),
+      VITEST: 'true',
+      PERSISTED_STATE_PATH: persistedStatePath || undefined,
+      NODE_ENV: 'integration',
+      DISPLAY: process.env.DISPLAY,
     },
   })
   const setup = {
@@ -107,8 +109,12 @@ export async function startApp(
   }
   context.setup = setup
 
-  if (!(await app.isReady)) {
-    throw new Error('Problem starting test driver')
+  const startupStatus = await app.startupStatus
+  if (startupStatus.error) {
+    console.error(startupStatus.error)
+    throw new Error(
+      `Problem starting test driver: ${startupStatus.error.message}`
+    )
   }
 
   await app.webContentsSend('start-test', context.testId)
@@ -121,7 +127,7 @@ export async function stopApp(context: IntegrationTestContext): Promise<null> {
 
   if (!app) console.error('No app instance found, not closing app')
 
-  if (process.env.INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
+  if (process.env.VITE_INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
     return null
   }
 

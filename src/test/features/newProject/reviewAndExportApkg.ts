@@ -7,6 +7,7 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { projectMenu$ } from '../../../components/ProjectMenu'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { retryUntil } from '../../driver/retryUntil'
+import { test } from '../../test'
 
 export default async function reviewAndExportApkg(
   context: IntegrationTestContext
@@ -29,7 +30,7 @@ export default async function reviewAndExportApkg(
       3
     )
 
-    retryUntil({
+    await retryUntil({
       action: () => third.click(),
       conditionName: 'third checkbox is unchecked',
       check: async () =>

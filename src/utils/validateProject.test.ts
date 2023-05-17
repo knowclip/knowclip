@@ -4,6 +4,7 @@ import {
   SimpleFlashcardFields,
   MediaJson,
 } from '../types/Project'
+import { describe, it, expect } from 'vitest'
 
 describe('validateProject', () => {
   it('returns error for invalid project', () => {

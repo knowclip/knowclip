@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react'
 import { Card, CardContent } from '@mui/material'
 import css from './KeyboardShortcuts.module.css'
-import os from 'os'
+import { platform } from 'preloaded/os'
 
 const KEYBOARD_SHORTCUTS = {
-  'Play/pause': `${os.platform() === 'win32' ? 'Ctrl' : 'Shift'} + Space`,
+  'Play/pause': `${platform() === 'win32' ? 'Ctrl' : 'Shift'} + Space`,
   'Toggle loop': 'Ctrl + L',
   'Stop looping': 'Esc',
   'Select previous': '←',
@@ -25,7 +25,7 @@ export function getKeyboardShortcut(action: keyof typeof KEYBOARD_SHORTCUTS) {
   return KEYBOARD_SHORTCUTS[action].replace('Cmd', CtrlCmd)
 }
 
-const CtrlCmd = os.platform() === 'darwin' ? '⌘' : 'Ctrl'
+const CtrlCmd = platform() === 'darwin' ? '⌘' : 'Ctrl'
 const Shortcut = ({ action }: { action: keyof typeof KEYBOARD_SHORTCUTS }) => (
   <p className={css.shortcut}>
     <span className={css.keyCombination}>{getKeyboardShortcut(action)}</span>

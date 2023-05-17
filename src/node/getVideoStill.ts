@@ -1,8 +1,8 @@
-import ffmpeg from '../utils/ffmpeg'
+import { ffmpeg } from './ffmpeg'
 import { existsSync } from 'fs'
 import tempy from 'tempy'
 import { join, basename } from 'path'
-import { sanitizeFileName } from './sanitizeFilename'
+import { sanitizeFileName } from '../utils/sanitizeFilename'
 
 export const VIDEO_STILL_HEIGHT = 150
 
@@ -59,6 +59,3 @@ export const getVideoStillPngPath = (
       .toFixed(3)
       .replace('.', '-')}_${id}.png`
   )
-
-export const getMidpoint = (start: number, end: number) =>
-  start + Math.round((end - start) / 2)
