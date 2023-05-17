@@ -1,7 +1,12 @@
 import React from "react"
 import css from "./Footer.module.css"
 import cn from "classnames"
-import { Twitter, Patreon, Github, Icon as IconComponent } from "@icons-pack/react-simple-icons"
+import {
+  SiTwitter as Twitter,
+  SiPatreon as Patreon,
+  SiGithub as Github,
+  IconType,
+} from "@icons-pack/react-simple-icons"
 import { PATREON_URL } from "../urls"
 
 const Footer = ({ className }: { className?: string }) => (
@@ -77,7 +82,17 @@ const Footer = ({ className }: { className?: string }) => (
   </footer>
 )
 
-const SocialLink = ({ title, href, Icon, className }: { title: string, href: string, Icon: IconComponent, className?: string }) => {
+const SocialLink = ({
+  title,
+  href,
+  Icon,
+  className,
+}: {
+  title: string
+  href: string
+  Icon: IconType
+  className?: string
+}) => {
   return (
     <li className={cn(css.socialLinkLi, className)}>
       <a href={href} className={css.socialLink}>
