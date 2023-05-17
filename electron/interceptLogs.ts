@@ -3,7 +3,6 @@ import { appendFileSync, writeFileSync } from 'fs'
 import filenamify from 'filenamify'
 
 export function interceptLogs() {
-  try {
   const originalConsoleLog = console.log
   const originalConsoleError = console.error
   const logFilePath = path.join(
