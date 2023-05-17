@@ -90,9 +90,9 @@ export async function startApp(
       ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
     ],
     env: {
-      ...process.env,
       VITEST: 'true',
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
+      NODE_ENV: 'integration',
     },
   })
   const setup = {

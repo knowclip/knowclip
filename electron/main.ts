@@ -5,6 +5,7 @@ import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
+import { interceptLogs } from './interceptLogs'
 
 export const WINDOW_START_DIMENSIONS = {
   width: 1027,
@@ -14,7 +15,7 @@ export const WINDOW_START_DIMENSIONS = {
 const { isPackaged } = app
 const isTesting = process.env.VITEST
 
-// if (isTesting) interceptLogs()
+if (isTesting) interceptLogs()
 
 require('electron-store').initRenderer()
 
