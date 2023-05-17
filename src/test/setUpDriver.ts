@@ -91,6 +91,7 @@ export async function startApp(
     ],
     env: {
       ...process.env,
+      VITEST: 'true',
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
     },
   })
