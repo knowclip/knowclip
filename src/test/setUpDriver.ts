@@ -76,7 +76,7 @@ export async function startApp(
   if (persistedStatePath) {
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
   }
-  console.log(process.env)
+
   const app = await createTestDriver({
     chromedriverPath: chromedriverPath,
     webdriverIoPath:
