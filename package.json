@@ -97,7 +97,7 @@
     "electron-builder": "electron-builder",
     "electron-builder:skip-publish": "electron-builder -p never",
     "dist": "npm run build -- production && npm run electron-builder:skip-publish",
-    "dist:appveyor": "npm run electron-vite -- build && npm run electron-builder",
+    "dist:appveyor": "npm run electron-vite -- build --mode production && npm run electron-builder",
     "replace-in-files-cli": "replace-in-files",
     "yalc": "yalc",
     "husky": "husky"

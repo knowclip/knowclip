@@ -88,7 +88,6 @@ export async function startApp(
       'enable-logging',
       ...(process.env.VITE_INTEGRATION_DEV ? [] : 'disable-extensions'),
       ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
-      ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
     ],
     env: {
       ...process.env,
