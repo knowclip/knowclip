@@ -4,6 +4,7 @@ import React, {
   useCallback,
   PropsWithChildren,
   ReactNode,
+  MouseEventHandler,
 } from "react"
 import css from "../pages/index.module.css"
 import A from "./Link"
@@ -22,8 +23,15 @@ const getOs = ({ userAgent }: Navigator) => {
 
 const LATEST_VERSION = "0.10.2-beta"
 
-const getFileName = (versionWithoutV: string, osCode: string, ext: string, arch?: string) =>
-  `Knowclip_${[versionWithoutV, osCode, arch].filter((s) => s).join("_")}.${ext}`
+const getFileName = (
+  versionWithoutV: string,
+  osCode: string,
+  ext: string,
+  arch?: string
+) =>
+  `Knowclip_${[versionWithoutV, osCode, arch]
+    .filter((s) => s)
+    .join("_")}.${ext}`
 
 const DownloadSection = () => {
   const [os, setOs] = useState<string>()
@@ -44,7 +52,7 @@ const DownloadSection = () => {
   }, [firstOs])
 
   const [macInstallVideoIsOpen, setMacInstallVideoIsOpen] = useState(false)
-  const openMacInstallVideo = useCallback((e) => {
+  const openMacInstallVideo: MouseEventHandler = useCallback((e) => {
     e.preventDefault()
     setMacInstallVideoIsOpen(true)
   }, [])
@@ -54,8 +62,8 @@ const DownloadSection = () => {
   const getDownloadUrl = useCallback(
     (osCode: string, ext: string, arch?: string) =>
       `https://github.com/knowclip/knowclip/releases/download/v${
-        (downloadVersion || LATEST_VERSION)
-      }/${getFileName((downloadVersion || LATEST_VERSION), osCode, ext, arch)}`,
+        downloadVersion || LATEST_VERSION
+      }/${getFileName(downloadVersion || LATEST_VERSION, osCode, ext, arch)}`,
     [downloadVersion]
   )
   useEffect(() => {
@@ -67,7 +75,7 @@ const DownloadSection = () => {
     })
       .then((res) => res.json())
       .then((json) => {
-        const withoutV = json.name.replace(/^v/, '')
+        const withoutV = json.name.replace(/^v/, "")
         if (withoutV !== LATEST_VERSION) {
           setDownloadVersion(withoutV)
         }
@@ -208,7 +216,8 @@ const DownloadSection = () => {
                 Install it in your preferred manner, or via
                 <pre>
                   cd /your/download/folder/ # replace this!
-                  {"\n"}sudo dpkg -i {getFileName(downloadVersion, "linux", "deb")}
+                  {"\n"}sudo dpkg -i{" "}
+                  {getFileName(downloadVersion, "linux", "deb")}
                 </pre>
               </li>
               <li>
@@ -260,10 +269,8 @@ const DownloadOsSection = ({
 }) => {
   const isCurrent = current === os
 
-  const [
-    postDownloadMessageIsShowing,
-    setPostDownloadMessageIsShowing,
-  ] = useState(false)
+  const [postDownloadMessageIsShowing, setPostDownloadMessageIsShowing] =
+    useState(false)
   const showPostDownloadMessage = useCallback(() => {
     setPostDownloadMessageIsShowing(true)
   }, [])

@@ -1,4 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  MouseEventHandler,
+} from "react"
 import css from "./index.module.css"
 import cn from "classnames"
 import Layout from "../components/layout"
@@ -8,13 +13,13 @@ import DownloadSection from "../components/HomeDownloadSection"
 import { PATREON_URL } from "../urls"
 
 type InfoSectionId =
-| 'anki'
-| 'how'
-| 'immersion'
-| 'beginner'
-| 'content'
-| 'speaking'
-| 'featureRequest'
+  | "anki"
+  | "how"
+  | "immersion"
+  | "beginner"
+  | "content"
+  | "speaking"
+  | "featureRequest"
 
 type OpenSections = Partial<Record<InfoSectionId, boolean>>
 
@@ -30,9 +35,10 @@ const IndexPage = () => {
   })
   useEffect(
     () =>
-      setOpenSections(o => {
+      setOpenSections((o) => {
         const result: typeof o = {}
-        for (const k in o) result[k as keyof typeof o] = window.location.hash === `#${k}`
+        for (const k in o)
+          result[k as keyof typeof o] = window.location.hash === `#${k}`
         return result
       }),
     []
@@ -40,7 +46,7 @@ const IndexPage = () => {
 
   const [ankiFocused, setAnkiFocused] = useState(false)
   const focusAnki = useCallback(() => {
-    setOpenSections(o => ({ ...o, anki: true }))
+    setOpenSections((o) => ({ ...o, anki: true }))
     setAnkiFocused(true)
     setTimeout(() => {
       setAnkiFocused(false)
@@ -48,7 +54,7 @@ const IndexPage = () => {
   }, [])
   const [howFocused, setHowFocused] = useState(false)
   const focusHow = useCallback(() => {
-    setOpenSections(o => ({ ...o, how: true }))
+    setOpenSections((o) => ({ ...o, how: true }))
     setHowFocused(true)
     setTimeout(() => {
       setHowFocused(false)
@@ -56,7 +62,7 @@ const IndexPage = () => {
   }, [])
 
   const [inputVideoIsOpen, setInputVideoIsOpen] = useState(false)
-  const openInputVideo = useCallback(e => {
+  const openInputVideo: MouseEventHandler = useCallback((e) => {
     e.preventDefault()
     setInputVideoIsOpen(true)
   }, [])
@@ -133,11 +139,7 @@ const IndexPage = () => {
       >
         <>
           <p>
-            <A
-              href="https://apps.ankiweb.net"
-              className={css.link}
-              newWindow
-            >
+            <A href="https://apps.ankiweb.net" className={css.link} newWindow>
               Anki
             </A>{" "}
             is the gold standard in <i>spaced-repetition</i> flashcard software.
@@ -219,8 +221,8 @@ const IndexPage = () => {
           </p>
           <ol>
             <li>
-              <strong>within rich context</strong>, like the plot of a story
-              or the thread of a conversation
+              <strong>within rich context</strong>, like the plot of a story or
+              the thread of a conversation
             </li>
             <li>
               <strong>
@@ -328,9 +330,11 @@ const IndexPage = () => {
             Of course, finding that content to download isn't always easy. I'm
             hoping to build a platform to make this easier, either as a web
             site, or as an integrated feature in Knowclip—please consider{" "}
-            <span><A href={PATREON_URL} className={css.link}>
-              supporting me on Patreon
-            </A></span>{" "}
+            <span>
+              <A href={PATREON_URL} className={css.link}>
+                supporting me on Patreon
+              </A>
+            </span>{" "}
             so I can make this happen while continuing to keep Knowclip free to
             download and use!
           </p>
@@ -354,9 +358,19 @@ const IndexPage = () => {
         setOpenSections={setOpenSections}
       >
         <>
-          <p>Knowclip has a handy <A className={css.link} href="https://www.youtube.com/watch?v=Duy8f4bOa-Y&feature=youtu.be&t=162">cloze-deletion (a.k.a. fill-in-the blanks) feature</A> than you can use to hone your speaking abilities to a certain extent, 
-            {' '}and you always have the option to practice shadowing (a.k.a. repeating after the recording) as you're making flashcards in Knowclip and reviewing them in Anki.
-            But when it comes down to it, the only way to get good at speaking a language with real humans is
+          <p>
+            Knowclip has a handy{" "}
+            <A
+              className={css.link}
+              href="https://www.youtube.com/watch?v=Duy8f4bOa-Y&feature=youtu.be&t=162"
+            >
+              cloze-deletion (a.k.a. fill-in-the blanks) feature
+            </A>{" "}
+            than you can use to hone your speaking abilities to a certain
+            extent, and you always have the option to practice shadowing (a.k.a.
+            repeating after the recording) as you're making flashcards in
+            Knowclip and reviewing them in Anki. But when it comes down to it,
+            the only way to get good at speaking a language with real humans is
             to
           </p>
           <ol>
@@ -373,7 +387,7 @@ const IndexPage = () => {
             <A href="#how" className={css.link}>
               a great way to learn to understand the language
             </A>
-            . 
+            .
           </p>
           <p>
             Also keep in mind that{" "}
@@ -382,13 +396,16 @@ const IndexPage = () => {
             </strong>
             —you can't have a conversation with someone unless you can
             understand what they're saying! There are even people who advocate
-            for a <span><A
-              href="https://youtu.be/yW8M4Js4UBA?t=192"
-              className={css.link}
-              newWindow
-            >
-              silent period
-            </A></span>{" "}
+            for a{" "}
+            <span>
+              <A
+                href="https://youtu.be/yW8M4Js4UBA?t=192"
+                className={css.link}
+                newWindow
+              >
+                silent period
+              </A>
+            </span>{" "}
             when starting a new language.
           </p>
         </>
@@ -447,9 +464,11 @@ const IndexPage = () => {
 
         <p>
           Please consider{" "}
-          <span><A href={PATREON_URL} className={css.link} newWindow>
-            supporting me on Patreon
-          </A></span>
+          <span>
+            <A href={PATREON_URL} className={css.link} newWindow>
+              supporting me on Patreon
+            </A>
+          </span>
           . You'll be directly enabling me to roll out new features and bugfixes
           on a regular basis, and you'll be helping me follow my dream of{" "}
           <strong>making quality language education free for everyone</strong>!
