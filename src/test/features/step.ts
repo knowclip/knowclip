@@ -15,30 +15,7 @@ export const step = (
 ): TestStep => ({
   description,
   runTest: async (context: IntegrationTestContext) => {
-    try {
-      await runTest(context as any)
-    } catch (error) {
-      try {
-        const screenshotFilepath = join(
-          SCREENSHOTS_DIRECTORY,
-          filenamify(
-            moment().toISOString() + '___' + expect.getState().currentTestName
-          ) + '.png'
-        )
-        console.log(`Saving screenshot to: ${screenshotFilepath}`)
-
-        await context.setup?.client._driver.client.saveScreenshot(
-          screenshotFilepath
-        )
-        if (!context.setup)
-          console.error(
-            'Could not save screenshot, currently running app not found'
-          )
-      } catch (screenshotError) {
-        console.error(screenshotError)
-      }
-      throw error
-    }
+    await runTest(context as any)
   },
 })
 
