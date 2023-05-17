@@ -1,7 +1,7 @@
 import r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 
-export default {
+const waveformPngFileEventHandlers: FileEventHandlers<WaveformPng> = {
   openRequest: async (file, filePath, _state, _effects) => {
     return [await r.openFileSuccess(file, filePath)]
   },
@@ -51,4 +51,6 @@ export default {
     ],
   ],
   deleteSuccess: [],
-} as FileEventHandlers<WaveformPng>
+}
+
+export default waveformPngFileEventHandlers

@@ -6,7 +6,7 @@ import {
 } from '../utils/subtitles'
 import { FileEventHandlers } from './eventHandlers'
 
-export default {
+const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
   openRequest: async (file, filePath, state, effects) => {
     const parentFile = r.getFileAvailabilityById(
       state,
@@ -154,6 +154,8 @@ export default {
             return await validateBeforeOpenFileAction(state, tmpFilePath, file)
         }
       }
+
+      return []
     } catch (err) {
       return [r.openFileFailure(file, null, err ? String(err) : null)]
     }
@@ -166,4 +168,6 @@ export default {
     ],
   ],
   deleteSuccess: [],
-} as FileEventHandlers<VttConvertedSubtitlesFile>
+}
+
+export default vttFileEventHandlers
