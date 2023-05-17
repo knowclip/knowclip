@@ -91,10 +91,8 @@ export async function startApp(
       ...(process.env.APPVEYOR ? ['no-sandbox'] : []),
     ],
     env: {
-      DEV: process.env.DEV,
-      VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
+      ...process.env,
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
-      VITEST: process.env.VITEST,
     },
   })
   const setup = {
