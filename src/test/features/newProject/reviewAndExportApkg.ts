@@ -30,7 +30,7 @@ export default async function reviewAndExportApkg(
       3
     )
 
-    retryUntil({
+    await retryUntil({
       action: () => third.click(),
       conditionName: 'third checkbox is unchecked',
       check: async () =>
