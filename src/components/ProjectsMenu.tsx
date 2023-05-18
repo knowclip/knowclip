@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Paper,
   MenuList,
@@ -35,17 +35,14 @@ const ProjectMenuItem = ({
   availability: FileAvailability
   file?: ProjectFile
 }) => {
-  const { anchorEl, open, close, isOpen } = usePopover()
+  const { anchorEl, open, close, isOpen, anchorCallbackRef } = usePopover()
 
   const dispatch = useDispatch()
   const removeFromRecents = useCallback(
     () => dispatch(actions.deleteFileRequest('ProjectFile', availability.id)),
     [dispatch, availability.id]
   )
-  const openProjectById = useCallback(
-    () => dispatch(actions.openProjectRequestById(availability.id)),
-    [dispatch, availability.id]
-  )
+  const navigate = useNavigate()
 
   const stopPropagation = useCallback((e) => {
     e.stopPropagation()
@@ -66,8 +63,8 @@ const ProjectMenuItem = ({
       )}
       <MenuItem
         tabIndex={0}
-        onClick={openProjectById}
         className={$.recentProjectsListItem}
+        onClick={() => navigate(`/project/${availability.id}`)}
       >
         <ListItemText
           primary={file ? file.name : availability.name}
@@ -86,7 +83,7 @@ const ProjectMenuItem = ({
             )
           }
         />
-        <IconButton onClick={open}>
+        <IconButton onClick={open} ref={anchorCallbackRef}>
           <MoreVertIcon />
         </IconButton>
       </MenuItem>
@@ -117,7 +114,8 @@ const ProjectsMenu = () => {
     }
   }, [dispatch])
 
-  if (currentProjectId) return <Navigate replace to="/" />
+  if (currentProjectId)
+    return <Navigate replace to={`/project/${currentProjectId}`} />
 
   return (
     <section className={mainCss.container}>

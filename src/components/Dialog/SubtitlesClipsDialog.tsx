@@ -206,6 +206,7 @@ const SubtitlesClipsDialog = ({
           >
             <InputLabel htmlFor="transcription">Transcription</InputLabel>
             <Select
+              label="Transcription"
               value={fields.transcription || ''}
               onChange={onChangeTranscription}
               id={$.transcriptionField}
@@ -218,6 +219,7 @@ const SubtitlesClipsDialog = ({
             <FormControl fullWidth margin="normal">
               <InputLabel htmlFor="pronunciation">Pronunciation</InputLabel>
               <Select
+                label="Pronunciation"
                 value={fields.pronunciation || ''}
                 onChange={onChangePronunciation}
                 id={$.pronunciationField}
@@ -229,6 +231,7 @@ const SubtitlesClipsDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="meaning">Meaning</InputLabel>
             <Select
+              label="Meaning"
               value={fields.meaning || ''}
               onChange={onChangeMeaning}
               id={$.meaningField}
@@ -239,6 +242,7 @@ const SubtitlesClipsDialog = ({
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="notes">Notes</InputLabel>
             <Select
+              label="Notes"
               value={fields.notes || ''}
               onChange={onChangeNotes}
               id={$.notesField}

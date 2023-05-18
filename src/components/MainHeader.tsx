@@ -31,7 +31,7 @@ const MainHeader = ({
   waveform,
   playerRef,
 }: {
-  currentProjectId: string
+  currentProjectId: string | null
   currentMediaFile: MediaFile | null
   waveform: WaveformInterface
   playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
@@ -115,7 +115,7 @@ export { $ as mainHeader$ }
 
 function useAutoHide(
   currentMediaFile: MediaFile | null,
-  currentProjectId: string
+  currentProjectId: string | null
 ) {
   const [forceVisible, setForceVisible] = useState(false)
   const [_focused, setFocused] = useState(false)

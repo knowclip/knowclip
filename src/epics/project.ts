@@ -149,6 +149,7 @@ const PROJECT_EDIT_ACTIONS = new Set<Action['type']>([
   A.addClip,
   A.addClips,
   A.mergeClips,
+  A.moveClip,
   A.addMediaToProjectRequest,
 ])
 const PROJECT_EDIT_UPDATE_FILE_ACTIONS: Set<keyof FileUpdates> = new Set([

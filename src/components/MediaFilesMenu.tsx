@@ -32,7 +32,7 @@ enum $ {
 
 type MediaFilesMenuProps = {
   className: string
-  currentProjectId: ProjectId
+  currentProjectId: ProjectId | null
   playButtonSync: ReturnType<typeof usePlayButtonSync>
 }
 
@@ -55,6 +55,8 @@ const MediaFilesMenu = ({
   const dispatch = useDispatch()
   const chooseMediaFiles = useCallback(
     async (e) => {
+      if (!currentProjectId) return
+
       const filePaths = await showOpenDialog(getFileFilters('MediaFile'), true)
       if (filePaths) {
         dispatch(actions.addMediaToProjectRequest(currentProjectId, filePaths))
@@ -72,25 +74,37 @@ const MediaFilesMenu = ({
   return (
     <DarkTheme>
       <section className={className} ref={popover.anchorCallbackRef}>
-        {projectMediaFiles.length > 0 ? (
-          <span
-            className={css.mediaFileName}
-            title={currentFile ? currentFile.name : undefined}
-          >
-            <Button
-              className={css.audioButton}
-              onClick={popover.open}
-              id={$.openMediaFilesMenuButton}
-            >
-              {currentFile
-                ? truncate(currentFile.name, 40)
-                : 'Select media file'}
-            </Button>
-          </span>
-        ) : (
-          <Button id={$.chooseFirstMediaFileButton} onClick={chooseMediaFiles}>
+        {!currentProjectId && (
+          <Button id={$.chooseFirstMediaFileButton} disabled>
             Add media
           </Button>
+        )}
+        {currentProjectId && (
+          <>
+            {projectMediaFiles.length > 0 ? (
+              <span
+                className={css.mediaFileName}
+                title={currentFile ? currentFile.name : undefined}
+              >
+                <Button
+                  className={css.audioButton}
+                  onClick={popover.open}
+                  id={$.openMediaFilesMenuButton}
+                >
+                  {currentFile
+                    ? truncate(currentFile.name, 40)
+                    : 'Select media file'}
+                </Button>
+              </span>
+            ) : (
+              <Button
+                id={$.chooseFirstMediaFileButton}
+                onClick={chooseMediaFiles}
+              >
+                Add media
+              </Button>
+            )}{' '}
+          </>
         )}
         {currentFile && (
           <Tooltip
@@ -126,18 +140,19 @@ const MediaFilesMenu = ({
           >
             <MenuList>
               <div style={{ maxHeight: '30.5em', overflowY: 'auto' }}>
-                {projectMediaFiles.map((media) => (
-                  <MediaFilesMenuItem
-                    key={media.id}
-                    closeMenu={popover.close}
-                    mediaFile={media}
-                    autoFocus={Boolean(
-                      currentFile && currentFile.id === media.id
-                    )}
-                    currentProjectId={currentProjectId}
-                    className={$.mediaFileMenuItem}
-                  />
-                ))}
+                {currentProjectId &&
+                  projectMediaFiles.map((media) => (
+                    <MediaFilesMenuItem
+                      key={media.id}
+                      closeMenu={popover.close}
+                      mediaFile={media}
+                      autoFocus={Boolean(
+                        currentFile && currentFile.id === media.id
+                      )}
+                      currentProjectId={currentProjectId}
+                      className={$.mediaFileMenuItem}
+                    />
+                  ))}
               </div>
               <Divider />
               <MenuItem

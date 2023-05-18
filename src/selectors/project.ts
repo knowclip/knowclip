@@ -24,8 +24,9 @@ const newestToOldest = (
   { lastOpened: a }: FileAvailability,
   { lastOpened: b }: FileAvailability
 ): number => {
-  if (!a) return 1
-  if (!b) return -1
+  // if never opened, treating it as a brand-new project
+  if (!a) return -1
+  if (!b) return 1
   return moment(b).valueOf() - moment(a).valueOf()
 }
 /** starts from availabilities

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { HashRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { Routes, Route } from 'react-router'
 import Snackbar from './Snackbar'
 import Main from './Main'
@@ -26,12 +26,12 @@ class App extends Component<
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <HashRouter>
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="/projects" element={<ProjectsMenu />} />
+            <Route path="/" element={<ProjectsMenu />} />
+            <Route path="/project/:projectId" element={<Main />} />
           </Routes>
-        </HashRouter>
+        </BrowserRouter>
         <Snackbar />
         <Dialog />
       </ThemeProvider>

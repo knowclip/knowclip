@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { CircularProgress } from '@mui/material'
-import { Navigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import cn from 'classnames'
 import Media from '../components/Media'
 import {
@@ -38,8 +38,7 @@ enum $ {
 }
 
 const Main = () => {
-  console.log('rendering main')
-
+  const routeParams = useParams()
   const {
     loop,
     mediaIsEffectivelyLoading,
@@ -163,6 +162,7 @@ const Main = () => {
         waveform,
         playerRef.current
       )
+
       waveform.dispatch({
         type: 'SET_REGIONS',
         regions,
@@ -226,13 +226,26 @@ const Main = () => {
   const renderPrimaryClip = useWaveformRenderClip()
   const renderSecondaryClip = useWaveformRenderSubtitlesChunk(waveform)
 
-  if (!currentProject) return <Navigate replace to="/projects" />
+  const idFromParams = routeParams.projectId!
+  const currentProjectId = currentProject?.id || null
+  const closed = useRef(false)
+  const prevProjectId = usePrevious(currentProjectId)
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (prevProjectId && !currentProjectId) {
+      closed.current = true
+      navigate('/')
+    }
+    if (!closed.current && currentProjectId !== idFromParams) {
+      dispatch(actions.openProjectRequestById(idFromParams))
+    }
+  }, [currentProjectId, dispatch, idFromParams, navigate, prevProjectId])
 
   return (
     <div className={css.container} id={$.container}>
       <DarkTheme>
         <Header
-          currentProjectId={currentProject.id}
+          currentProjectId={currentProjectId}
           currentMediaFile={currentMediaFile}
           waveform={waveform}
           playerRef={playerRef}
@@ -266,14 +279,16 @@ const Main = () => {
           />
         )}
 
-        <FlashcardSection
-          mediaFile={currentMediaFile}
-          className={css.flashcardSection}
-          projectFile={currentProject}
-          selectPrevious={selectPreviousCard}
-          selectNext={selectNextCard}
-          mediaIsPlaying={mediaIsPlaying}
-        />
+        {currentProject && (
+          <FlashcardSection
+            mediaFile={currentMediaFile}
+            className={css.flashcardSection}
+            projectFile={currentProject}
+            selectPrevious={selectPreviousCard}
+            selectNext={selectNextCard}
+            mediaIsPlaying={mediaIsPlaying}
+          />
+        )}
       </section>
 
       {currentMediaFile && !mediaIsEffectivelyLoading ? (
