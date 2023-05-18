@@ -97,9 +97,9 @@ const ProjectMenu = ({ className }: { className: string }) => {
     []
   )
   useEffect(() => {
-    if (projectFile && projectFile.name !== state.text)
+    if (projectFile && projectFile.name !== initialProjectName)
       setState((state) => ({ ...state, text: projectFile.name }))
-  }, [projectFile, state.text])
+  }, [projectFile, initialProjectName])
 
   const submit = useCallback(() => {
     if (!projectFile) return
