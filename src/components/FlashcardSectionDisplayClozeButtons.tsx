@@ -164,7 +164,6 @@ const ClozeButton = ({
           }
           window.addEventListener('keyup', resetClozeButtonWasPressed)
         }}
-        data-is-cloze-button={true}
         style={{
           backgroundColor: isActive
             ? `hsla(${ClozeHues[id]}, 60%, 80%, 75%)`
