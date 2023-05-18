@@ -149,7 +149,7 @@
     "replace-in-files-cli": "^2.1.0",
     "request": "^2.88.2",
     "typescript": "^5.0.4",
-    "vitest": "^0.31.0",
+    "vitest": "^0.31.1",
     "yalc": "^1.0.0-pre.53"
   },
   "resolutions": {
