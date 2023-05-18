@@ -38,6 +38,8 @@ enum $ {
 }
 
 const Main = () => {
+  console.log('rendering main')
+
   const {
     loop,
     mediaIsEffectivelyLoading,

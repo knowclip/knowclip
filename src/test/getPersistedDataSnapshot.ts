@@ -1,4 +1,4 @@
-import tempy from 'tempy'
+import * as tempy from 'tempy'
 import { join, basename } from 'path'
 import { copyFile, remove, existsSync, mkdirp } from 'fs-extra'
 
