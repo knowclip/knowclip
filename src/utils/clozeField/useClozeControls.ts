@@ -40,7 +40,7 @@ export default function useClozeControls({
   const [clozeIndex, _setClozeIndex] = useState<number>(-1)
   const [previewClozeIndex, setPreviewClozeIndex] = useState(-1)
   const setClozeIndex = useCallback(
-    (newIndex: number) => {
+    (newIndex: number, _reason?: string) => {
       const currentDeletion = deletions.length ? deletions[clozeIndex] : null
       if (
         currentDeletion &&
@@ -110,7 +110,8 @@ export default function useClozeControls({
           : []
         const ranges = collapseRanges(baseRanges, selection)
         if (ranges !== baseRanges) onEditClozeCard(clozeIndex, ranges)
-        if (currentClozeIndex !== clozeIndex) setClozeIndex(clozeIndex)
+        if (currentClozeIndex !== clozeIndex)
+          setClozeIndex(clozeIndex, 'confirmSelection')
       }
 
       if (inputRef.current) {
@@ -132,44 +133,36 @@ export default function useClozeControls({
   )
 
   useEffect(() => {
-    if (clozeIndex > deletions.length) setClozeIndex(deletions.length)
+    if (clozeIndex > deletions.length)
+      setClozeIndex(deletions.length, 'clozeIndex > deletions.length')
   }, [clozeIndex, deletions.length, setClozeIndex])
   useEffect(() => {
     const keyup = (e: KeyboardEvent) => {
-      const currentSelection = selection.current
+      const s = getSelection()
+      const currentSelection = s && s.start !== s.end ? s : null
       selection.current = null
+      const clozeIsActive = clozeIndex !== -1
 
-      if (
-        (e.key === KEYS.enter ||
-          (e.key.toLowerCase() === KEYS.cLowercase &&
-            !e.metaKey &&
-            !e.ctrlKey)) &&
-        currentSelection &&
-        currentSelection.start !== currentSelection.end
-      ) {
-        if (clozeIndex === -1) {
-          const newIndex = deletions.length
-          if (newIndex < ClozeIds.length)
-            return confirmSelection(newIndex, currentSelection)
-          else
-            return dispatch(
-              r.simpleMessageSnackbar(
-                `You've already reached the maximum of ${ClozeIds.length} cloze deletions per card.`
-              )
-            )
-        }
-        return confirmSelection(clozeIndex, currentSelection)
-      } else if (
-        e.key.toLowerCase() === KEYS.cLowercase &&
-        !e.metaKey &&
-        !e.ctrlKey
-      ) {
+      if ((isEnterKey(e) || isCKey(e)) && currentSelection) {
+        if (clozeIsActive) return confirmSelection(clozeIndex, currentSelection)
+
+        const newIndex = deletions.length
+        if (newIndex < ClozeIds.length)
+          return confirmSelection(newIndex, currentSelection)
+
+        return dispatch(
+          r.simpleMessageSnackbar(
+            `You've already reached the maximum of ${ClozeIds.length} cloze deletions per card.`
+          )
+        )
+      } else if (isCKey(e)) {
         const potentialNewIndex = clozeIndex + 1
         const newIndex =
           potentialNewIndex > deletions.length ? -1 : potentialNewIndex
-        return setClozeIndex(newIndex)
-      } else if (e.key === KEYS.enter || e.key === KEYS.escape) {
-        if (clozeIndex !== -1) setClozeIndex(-1)
+        return setClozeIndex(newIndex, 'c pressed')
+      } else if (isEnterKey(e) || e.key === KEYS.escape) {
+        if (clozeIsActive && !(window as any).clozeButtonWasPressed)
+          setClozeIndex(-1, 'enter or escape pressed')
       }
     }
 
@@ -190,17 +183,14 @@ export default function useClozeControls({
   }, [getSelection, selection])
 
   useEffect(() => {
-    const keydown = (e: KeyboardEvent) => {
-      if (
-        e.key === KEYS.enter ||
-        (e.key.toLowerCase() === KEYS.cLowercase && !e.metaKey && !e.ctrlKey)
-      ) {
+    const keyup = (e: KeyboardEvent) => {
+      if (isEnterKey(e) || isCKey(e)) {
         registerSelection()
       }
     }
-    document.addEventListener('keydown', keydown)
+    document.addEventListener('keyup', keyup)
 
-    return () => document.removeEventListener('keydown', keydown)
+    return () => document.removeEventListener('keyup', keyup)
   })
 
   const clozeTextInputActions = {
@@ -276,4 +266,11 @@ export default function useClozeControls({
     setCursorPosition,
     cursorPosition,
   }
+}
+function isEnterKey(e: KeyboardEvent) {
+  return e.key === KEYS.enter
+}
+
+function isCKey(e: KeyboardEvent): boolean {
+  return e.key.toLowerCase() === KEYS.cLowercase && !e.metaKey && !e.ctrlKey
 }

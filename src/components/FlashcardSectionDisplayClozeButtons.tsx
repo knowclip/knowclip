@@ -100,7 +100,7 @@ const ClozeButton = ({
   id: ClozeId
   isActive: boolean
   index: number
-  setClozeIndex: (index: number) => void
+  setClozeIndex: ClozeControls['setClozeIndex']
   setPreviewClozeIndex?: (index: number) => void
   confirmSelection: (clozeIndex: number, selection: ClozeRange) => void
   getSelection: () => ClozeRange | null
@@ -116,20 +116,26 @@ const ClozeButton = ({
   )
   const handleClick = useCallback(
     (e) => {
+      selection.current = getSelection() || null
+
       const textSelected =
         selection.current && selection.current.start !== selection.current.end
       if (selection.current && textSelected) {
         confirmSelection(index, selection.current)
       } else if (isActive) {
-        if (!textSelected) setClozeIndex(-1)
+        if (!textSelected)
+          setClozeIndex(
+            -1,
+            'cloze button clicked while active and no text selected'
+          )
       } else {
-        setClozeIndex(index)
+        setClozeIndex(index, 'cloze button clicked')
       }
       selection.current = null
 
       e.target.focus()
     },
-    [confirmSelection, index, isActive, selection, setClozeIndex]
+    [confirmSelection, getSelection, index, isActive, selection, setClozeIndex]
   )
   const handleMouseEnter = useCallback(() => {
     if (setPreviewClozeIndex) setPreviewClozeIndex(index)
@@ -147,6 +153,17 @@ const ClozeButton = ({
         className={css.clozeButton}
         onMouseDown={handleMouseDown}
         onClick={handleClick}
+        onKeyDown={() => {
+          // so that next enter keyup
+          // does not trigger cloze selection confirmation
+
+          ;(window as any).clozeButtonWasPressed = true
+          const resetClozeButtonWasPressed = () => {
+            ;(window as any).clozeButtonWasPressed = false
+            window.removeEventListener('keyup', resetClozeButtonWasPressed)
+          }
+          window.addEventListener('keyup', resetClozeButtonWasPressed)
+        }}
         style={{
           backgroundColor: isActive
             ? `hsla(${ClozeHues[id]}, 60%, 80%, 75%)`

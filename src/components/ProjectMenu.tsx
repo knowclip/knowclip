@@ -13,6 +13,7 @@ import css from './MainHeader.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
 import { useNavigate } from 'react-router'
+import { usePrevious } from '../utils/usePrevious'
 
 enum $ {
   projectTitle = 'project-title',
@@ -27,7 +28,6 @@ const ProjectMenu = ({ className }: { className: string }) => {
   const projectFile = useSelector((state: AppState) =>
     r.getCurrentProject(state)
   )
-  const initialProjectName = projectFile?.name || ''
 
   const { currentMediaFile, mediaFileIds, currentFileClipsIds, workIsUnsaved } =
     useSelector((state: AppState) => {
@@ -68,46 +68,53 @@ const ProjectMenu = ({ className }: { className: string }) => {
     dispatch(actions.saveProjectRequest())
   }, [dispatch, projectFile])
 
-  const [state, setState] = useState({
+  const [projectNameInput, setProjectNameInput] = useState({
     editing: false,
-    text: initialProjectName,
+    text: projectFile?.name || '',
   })
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [inputWidth, setInputWidth] = useState(
-    () => initialProjectName.length * 16
+    () => projectFile?.name && projectFile.name.length * 16
   )
   const titleRef = useRef<HTMLHeadingElement>(null)
 
   const startEditing = useCallback(() => {
-    setState({
-      text: initialProjectName,
+    if (!projectFile) return
+    setProjectNameInput({
+      text: projectFile.name,
       editing: true,
     })
-  }, [setState, initialProjectName])
+  }, [projectFile])
   useEffect(() => {
-    if (state.editing && inputRef.current) inputRef.current.focus()
-  }, [state.editing])
+    if (projectNameInput.editing && inputRef.current) inputRef.current.focus()
+  }, [projectNameInput.editing])
   useEffect(() => {
     titleRef.current &&
       setInputWidth(titleRef.current.getBoundingClientRect().width)
-  }, [state.text])
+  }, [projectNameInput.text])
 
   const handleChangeText = useCallback(
-    (e) => setState({ editing: true, text: e.target.value }),
+    (e) => setProjectNameInput({ editing: true, text: e.target.value }),
     []
   )
+
+  const prevProjectFileName = usePrevious(projectFile?.name)
+
   useEffect(() => {
-    if (projectFile && projectFile.name !== initialProjectName)
-      setState((state) => ({ ...state, text: projectFile.name }))
-  }, [projectFile, initialProjectName])
+    if (projectFile?.name !== prevProjectFileName)
+      setProjectNameInput((state) => ({
+        ...state,
+        text: projectFile?.name || '',
+      }))
+  }, [projectFile, prevProjectFileName])
 
   const submit = useCallback(() => {
     if (!projectFile) return
-    const text = state.text.trim()
+    const text = projectNameInput.text.trim()
     if (text && text !== projectFile.name)
       dispatch(actions.setProjectName(projectFile.id, text))
-    setState((state) => ({ ...state, editing: false }))
-  }, [dispatch, setState, state, projectFile])
+    setProjectNameInput((state) => ({ ...state, editing: false }))
+  }, [dispatch, setProjectNameInput, projectNameInput, projectFile])
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault()
@@ -117,8 +124,8 @@ const ProjectMenu = ({ className }: { className: string }) => {
   )
 
   const handleFocus = useCallback(() => {
-    setState((state) => ({ ...state, editing: true }))
-  }, [setState])
+    setProjectNameInput((state) => ({ ...state, editing: true }))
+  }, [setProjectNameInput])
 
   const handleBlur = useCallback(() => {
     submit()
@@ -129,7 +136,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
     dispatch(actions.reviewAndExportDialog(currentMediaFile, clipsIdsForExport))
   }, [dispatch, currentMediaFile, clipsIdsForExport])
 
-  const { editing, text } = state
+  const { editing, text } = projectNameInput
 
   return (
     <DarkTheme>
@@ -189,7 +196,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
             id={$.projectTitle}
             ref={titleRef}
           >
-            {truncate(state.text, 40)}
+            {truncate(projectNameInput.text, 40)}
           </h1>
         </Tooltip>
       </section>
