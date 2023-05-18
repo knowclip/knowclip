@@ -44,8 +44,8 @@ const dependencies = {
     fromEvent(window, `ipc:${eventName}`),
   sendToMainProcess,
   quitApp: () => sendClosedSignal(),
-  tmpDirectory: () => tempy.directory(),
-  tmpFilename: () => tempy.file(),
+  tmpDirectory: () => tempy.temporaryDirectory(),
+  tmpFilename: () => tempy.temporaryFile(),
 
   dispatchClipwaveEvent: (callback: (waveform: WaveformInterface) => void) => {
     window.dispatchEvent(new ClipwaveCallbackEvent(CLIPWAVE_ID, callback))

@@ -72,7 +72,7 @@ export async function startApp(
 }> {
   await copyFixtures()
 
-  const persistedStatePath = persistedState ? tempy.file() : null
+  const persistedStatePath = persistedState ? tempy.temporaryFile() : null
   if (persistedStatePath) {
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
   }

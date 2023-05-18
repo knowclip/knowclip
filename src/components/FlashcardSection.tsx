@@ -10,7 +10,7 @@ import {
   Subtitles,
   Publish,
   ShortTextTwoTone,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import { actions } from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
 import FlashcardDisplay from './FlashcardSectionDisplayCard'

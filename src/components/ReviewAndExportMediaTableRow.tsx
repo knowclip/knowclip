@@ -1,7 +1,7 @@
 import React, { useCallback, memo, useEffect, ReactNode, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Checkbox, Chip, IconButton, Tooltip } from '@mui/material'
-import { Loop, Edit } from '@material-ui/icons'
+import { Loop, Edit } from '@mui/icons-material'
 import r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'

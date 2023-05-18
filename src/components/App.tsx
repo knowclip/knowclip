@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { HashRouter } from 'react-router-dom'
-import { Switch, Route } from 'react-router'
+import { Routes, Route } from 'react-router'
 import Snackbar from './Snackbar'
 import Main from './Main'
 import Dialog from './Dialog'
@@ -27,10 +27,10 @@ class App extends Component<
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <HashRouter>
-          <Switch>
-            <Route exact path="/" component={Main} />
-            <Route exact path="/projects" component={ProjectsMenu} />
-          </Switch>
+          <Routes>
+            <Route path="/" element={<Main />} />
+            <Route path="/projects" element={<ProjectsMenu />} />
+          </Routes>
         </HashRouter>
         <Snackbar />
         <Dialog />

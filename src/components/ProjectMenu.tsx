@@ -5,7 +5,7 @@ import {
   Close as CloseIcon,
   Save as SaveIcon,
   Publish,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import r from '../redux'
 import { actions } from '../actions'
 import DarkTheme from './DarkTheme'

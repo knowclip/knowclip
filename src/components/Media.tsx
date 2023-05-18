@@ -11,7 +11,7 @@ import cn from 'classnames'
 import r from '../redux'
 import css from './Media.module.css'
 import { Tooltip, IconButton } from '@mui/material'
-import { VerticalSplitSharp, HorizontalSplitSharp } from '@material-ui/icons'
+import { VerticalSplitSharp, HorizontalSplitSharp } from '@mui/icons-material'
 import { KEYS } from '../utils/keyboard'
 import { MediaSubtitles, SubtitlesFileWithTrack } from '../selectors'
 

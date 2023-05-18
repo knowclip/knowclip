@@ -1,1 +1,5 @@
-export { file, directory, root } from 'tempy'
+export {
+  temporaryFile,
+  temporaryDirectory,
+  rootTemporaryDirectory,
+} from 'tempy'

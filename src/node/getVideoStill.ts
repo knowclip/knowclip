@@ -54,7 +54,7 @@ export const getVideoStillPngPath = (
   seconds: number
 ) =>
   join(
-    tempy.root,
+    tempy.rootTemporaryDirectory,
     `${sanitizeFileName(basename(videoFilePath)).slice(0, 40)}_${seconds
       .toFixed(3)
       .replace('.', '-')}_${id}.png`

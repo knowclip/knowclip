@@ -14,7 +14,7 @@ import {
   MoreVert as MoreVertIcon,
   PlayArrow,
   FolderSpecial,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import cn from 'classnames'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'

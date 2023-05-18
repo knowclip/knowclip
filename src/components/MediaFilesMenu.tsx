@@ -10,7 +10,7 @@ import {
   Divider,
   Popover,
 } from '@mui/material'
-import { PlayArrow, Pause, Loop } from '@material-ui/icons'
+import { PlayArrow, Pause, Loop } from '@mui/icons-material'
 import DarkTheme from './DarkTheme'
 import MediaFilesMenuItem from './MediaFilesMenuItem'
 import { showOpenDialog } from '../utils/electron'

@@ -8,7 +8,7 @@ import { getClipMedia } from './getClipMedia'
 import { createWriteStream, existsSync } from 'fs'
 import tempy from 'tempy'
 
-const tmpFilename = () => tempy.file()
+const tmpFilename = () => tempy.temporaryFile()
 
 interface AnkiPackage {
   write(db: Database): void

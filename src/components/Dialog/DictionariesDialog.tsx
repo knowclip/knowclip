@@ -20,7 +20,7 @@ import {
 } from '@mui/material'
 import { DialogProps } from './DialogProps'
 import r from '../../redux'
-import { Delete, Warning } from '@material-ui/icons'
+import { Delete, Warning } from '@mui/icons-material'
 import { openInBrowser } from '../../utils/electron'
 import { useLocalSettingsReducer } from './SettingsDialog'
 

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, Fragment } from 'react'
 import { Snackbar, IconButton, Button } from '@mui/material'
-import { Close } from '@material-ui/icons'
+import { Close } from '@mui/icons-material'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'

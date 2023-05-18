@@ -15,14 +15,13 @@ updates:
       # locked to electron
     - dependency-name: "@types/node"
     - dependency-name: "chromedriver"
-      # locked to react-scripts
-    - dependency-name: "eslint"
-    - dependency-name: "@types/jest"
+      # before react 18,
+      # mui chip input package needs mui update,
+      # which needs emotion styles
+    - dependency-name: "react"
+    - dependency-name: "react-dom"
     - dependency-name: "@types/react"
     - dependency-name: "@types/react-dom"
-      # waiting for ESM support in Electron and CRA
-    - dependency-name: "tempy"
-    - dependency-name: "filenamify"
   - package-ecosystem: "npm"
     directory: "/homepage"
     schedule:

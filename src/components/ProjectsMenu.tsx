@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import {
   Paper,
   MenuList,
@@ -11,7 +11,7 @@ import {
   Menu,
   Tooltip,
 } from '@mui/material'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { basename, join, dirname } from 'preloaded/path'
 import packageJson from '../../package.json'
 import r from '../redux'
@@ -116,7 +116,7 @@ const ProjectsMenu = () => {
     }
   }, [dispatch])
 
-  if (currentProjectId) return <Redirect to="/" />
+  if (currentProjectId) return <Navigate replace to="/" />
 
   return (
     <section className={mainCss.container}>

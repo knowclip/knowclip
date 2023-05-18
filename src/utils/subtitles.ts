@@ -28,7 +28,7 @@ export const getSubtitlesFilePathFromMedia = async (
     return null
   }
   const outputFilePath = join(
-    tempy.root,
+    tempy.rootTemporaryDirectory,
     basename(mediaFilePath + '_' + streamIndex.toString()) +
       '_' +
       file.id +
@@ -52,7 +52,10 @@ export const getExternalSubtitlesVttPath = async (
   const vttFilePath =
     extension === '.vtt'
       ? filePath
-      : join(tempy.root, basename(filePath) + '_' + file.id + '.vtt')
+      : join(
+          tempy.rootTemporaryDirectory,
+          basename(filePath) + '_' + file.id + '.vtt'
+        )
 
   const fileContents = await readFile(filePath)
   const chunks = parseSubtitles(state, fileContents, extension)
