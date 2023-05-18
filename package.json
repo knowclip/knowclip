@@ -58,7 +58,7 @@
     "tempy": "^3.0.0",
     "ts-json-schema-generator": "^0.97",
     "uuid": "^8.3.2",
-    "wanakana": "^4.0.2",
+    "wanakana": "^5.1.0",
     "webdriverio": "^8.10.2",
     "xss": "^1.0.6",
     "yaml": "^1.7.2",
