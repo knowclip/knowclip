@@ -10,6 +10,7 @@ import { initSentry } from 'preloaded/initSentry'
 import ErrorMessage from '../components/ErrorMessage'
 import { VITEST } from '../env'
 import { sendToMainProcess } from 'preloaded/sendToMainProcess'
+import { PersistGate } from 'redux-persist/integration/react'
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'
@@ -40,12 +41,18 @@ if (VITEST)
 else render()
 
 function render(initialTestState?: Partial<AppState> | undefined) {
-  const { store } = getStore(initialTestState)
+  const { store, persistor } = getStore(initialTestState)
 
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
-        <App sentryDsn={sentryDsn} />
+        {persistor ? (
+          <PersistGate loading={null} persistor={persistor}>
+            <App sentryDsn={sentryDsn} />
+          </PersistGate>
+        ) : (
+          <App sentryDsn={sentryDsn} />
+        )}
       </Provider>
     </React.StrictMode>,
     document.getElementById('root')

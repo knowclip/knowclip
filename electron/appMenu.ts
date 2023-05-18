@@ -123,11 +123,14 @@ export default function appMenu(
 
 export function setAppMenuProjectSubmenuPermissions(projectOpened: boolean) {
   const menu = Menu.getApplicationMenu()
-  const submenu = menu && menu.getMenuItemById('File').submenu
+  const submenu = menu?.getMenuItemById('File')?.submenu
   if (!submenu) return
 
-  submenu.getMenuItemById(SAVE_PROJECT).enabled = projectOpened
-  submenu.getMenuItemById(CLOSE_PROJECT).enabled = projectOpened
+  const saveProject = submenu.getMenuItemById(SAVE_PROJECT)
+  if (saveProject) saveProject.enabled = projectOpened
+  const closeProject = submenu.getMenuItemById(CLOSE_PROJECT)
+  if (closeProject) closeProject.enabled = projectOpened
 
-  submenu.getMenuItemById(OPEN_PROJECT).enabled = !projectOpened
+  const openProject = submenu.getMenuItemById(OPEN_PROJECT)
+  if (openProject) openProject.enabled = !projectOpened
 }

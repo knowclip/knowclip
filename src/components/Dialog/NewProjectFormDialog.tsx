@@ -207,13 +207,17 @@ const NewProjectFormDialog = ({
           <br />
 
           <FormControl fullWidth error={Boolean(errors.noteType)}>
-            <InputLabel htmlFor="note-type">Note type</InputLabel>
+            <InputLabel htmlFor="note-type" id="note-type-label">
+              Note type
+            </InputLabel>
             <Select
+              labelId="note-type-label"
               value={state.fieldValues.noteType}
               onChange={handleChangeNoteType}
               inputProps={{
                 name: 'note-type',
               }}
+              label="Note type"
               SelectDisplayProps={{
                 id: $.noteTypeSelect,
               }}

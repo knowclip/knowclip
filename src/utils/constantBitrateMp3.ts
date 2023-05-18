@@ -15,7 +15,7 @@ export const coerceMp3ToConstantBitrate = (
       return res(oldConstantBitratePath)
 
     const constantBitratePath = join(
-      tempy.root,
+      tempy.rootTemporaryDirectory,
       basename(path, '.mp3') + '.mp4'
     )
 

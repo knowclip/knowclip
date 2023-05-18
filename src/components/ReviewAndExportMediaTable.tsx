@@ -1,7 +1,7 @@
 import React, { useCallback, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Toolbar, Paper, Checkbox, IconButton, Tooltip } from '@mui/material'
-import { ExpandLess, ExpandMore, FolderSpecial } from '@material-ui/icons'
+import { ExpandLess, ExpandMore, FolderSpecial } from '@mui/icons-material'
 import r from '../redux'
 import css from './Export.module.css'
 import cn from 'classnames'

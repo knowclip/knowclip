@@ -1,6 +1,6 @@
 import { ffmpeg } from './ffmpeg'
 import { existsSync } from 'fs'
-import tempy from 'tempy'
+import * as tempy from 'tempy'
 import { join, basename } from 'path'
 import { sanitizeFileName } from '../utils/sanitizeFilename'
 
@@ -54,7 +54,7 @@ export const getVideoStillPngPath = (
   seconds: number
 ) =>
   join(
-    tempy.root,
+    tempy.rootTemporaryDirectory,
     `${sanitizeFileName(basename(videoFilePath)).slice(0, 40)}_${seconds
       .toFixed(3)
       .replace('.', '-')}_${id}.png`

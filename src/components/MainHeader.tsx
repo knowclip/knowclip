@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { IconButton, Tooltip } from '@mui/material'
-import { Delete } from '@material-ui/icons'
+import { Delete } from '@mui/icons-material'
 import cn from 'classnames'
 import MediaFilesMenu from '../components/MediaFilesMenu'
 import ProjectMenu from '../components/ProjectMenu'
@@ -31,7 +31,7 @@ const MainHeader = ({
   waveform,
   playerRef,
 }: {
-  currentProjectId: string
+  currentProjectId: string | null
   currentMediaFile: MediaFile | null
   waveform: WaveformInterface
   playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
@@ -115,7 +115,7 @@ export { $ as mainHeader$ }
 
 function useAutoHide(
   currentMediaFile: MediaFile | null,
-  currentProjectId: string
+  currentProjectId: string | null
 ) {
   const [forceVisible, setForceVisible] = useState(false)
   const [_focused, setFocused] = useState(false)

@@ -5,13 +5,14 @@ import {
   Close as CloseIcon,
   Save as SaveIcon,
   Publish,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import r from '../redux'
 import { actions } from '../actions'
 import DarkTheme from './DarkTheme'
 import css from './MainHeader.module.css'
 import cn from 'classnames'
 import truncate from '../utils/truncate'
+import { useNavigate } from 'react-router'
 
 enum $ {
   projectTitle = 'project-title',
@@ -22,10 +23,11 @@ enum $ {
 }
 
 const ProjectMenu = ({ className }: { className: string }) => {
+  const navigate = useNavigate()
   const projectFile = useSelector((state: AppState) =>
     r.getCurrentProject(state)
   )
-  if (!projectFile) throw new Error('Could not find project file')
+  const initialProjectName = projectFile?.name || ''
 
   const { currentMediaFile, mediaFileIds, currentFileClipsIds, workIsUnsaved } =
     useSelector((state: AppState) => {
@@ -58,25 +60,30 @@ const ProjectMenu = ({ className }: { className: string }) => {
 
   const dispatch = useDispatch()
   const closeProjectRequest = useCallback(() => {
-    dispatch(actions.closeProjectRequest())
-  }, [dispatch])
+    if (projectFile) dispatch(actions.closeProjectRequest())
+    else navigate('/')
+  }, [dispatch, projectFile, navigate])
   const saveProjectRequest = useCallback(() => {
+    if (!projectFile) return
     dispatch(actions.saveProjectRequest())
-  }, [dispatch])
+  }, [dispatch, projectFile])
 
-  const [state, setState] = useState({ editing: false, text: projectFile.name })
+  const [state, setState] = useState({
+    editing: false,
+    text: initialProjectName,
+  })
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [inputWidth, setInputWidth] = useState(
-    () => projectFile.name.length * 16
+    () => initialProjectName.length * 16
   )
   const titleRef = useRef<HTMLHeadingElement>(null)
 
   const startEditing = useCallback(() => {
     setState({
-      text: projectFile.name,
+      text: initialProjectName,
       editing: true,
     })
-  }, [setState, projectFile])
+  }, [setState, initialProjectName])
   useEffect(() => {
     if (state.editing && inputRef.current) inputRef.current.focus()
   }, [state.editing])
@@ -89,8 +96,13 @@ const ProjectMenu = ({ className }: { className: string }) => {
     (e) => setState({ editing: true, text: e.target.value }),
     []
   )
+  useEffect(() => {
+    if (projectFile && projectFile.name !== initialProjectName)
+      setState((state) => ({ ...state, text: projectFile.name }))
+  }, [projectFile, initialProjectName])
 
   const submit = useCallback(() => {
+    if (!projectFile) return
     const text = state.text.trim()
     if (text && text !== projectFile.name)
       dispatch(actions.setProjectName(projectFile.id, text))
@@ -112,13 +124,10 @@ const ProjectMenu = ({ className }: { className: string }) => {
     submit()
   }, [submit])
 
-  const reviewAndExportDialog = useCallback(
-    () =>
-      dispatch(
-        actions.reviewAndExportDialog(currentMediaFile, clipsIdsForExport)
-      ),
-    [dispatch, currentMediaFile, clipsIdsForExport]
-  )
+  const reviewAndExportDialog = useCallback(() => {
+    if (!currentMediaFile) return
+    dispatch(actions.reviewAndExportDialog(currentMediaFile, clipsIdsForExport))
+  }, [dispatch, currentMediaFile, clipsIdsForExport])
 
   const { editing, text } = state
 
@@ -132,6 +141,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
         </Tooltip>
         <Tooltip title="Save project">
           <IconButton
+            disabled={!projectFile}
             onClick={saveProjectRequest}
             id={$.saveButton}
             color={workIsUnsaved ? 'secondary' : 'default'}
@@ -144,6 +154,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
             id={$.exportButton}
             className={css.floatingActionButton}
             onClick={reviewAndExportDialog}
+            disabled={!projectFile}
           >
             <Publish />
           </IconButton>

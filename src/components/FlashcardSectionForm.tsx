@@ -5,7 +5,7 @@ import {
   Delete as DeleteIcon,
   Loop,
   ShortTextTwoTone,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import cn from 'classnames'
 import r from '../redux'
 import css from './FlashcardSection.module.css'

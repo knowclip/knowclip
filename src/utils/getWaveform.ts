@@ -48,7 +48,10 @@ const getWaveformPngPath = (
   if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
     return fileAvailability.filePath
   }
-  return join(tempy.root, basename(mediaFilePath) + '_' + file.id + '.png')
+  return join(
+    tempy.rootTemporaryDirectory,
+    basename(mediaFilePath) + '_' + file.id + '.png'
+  )
 }
 
 export const getWaveformPngs = (mediaFile: MediaFile): WaveformPng[] => {

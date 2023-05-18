@@ -7,7 +7,7 @@ import {
   FolderSpecial,
   Link,
   Delete as DeleteIcon,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
 import * as selectors from '../selectors'
 import { actions } from '../actions'

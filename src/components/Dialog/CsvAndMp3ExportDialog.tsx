@@ -164,7 +164,10 @@ const CsvAndMp3ExportDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={(_e) => dispatch(actions.closeDialog)} color="primary">
+        <Button
+          onClick={(_e) => dispatch(actions.closeDialog())}
+          color="primary"
+        >
           Cancel
         </Button>
         <Button onClick={onSubmit} color="primary">

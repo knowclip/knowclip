@@ -4,7 +4,7 @@ import { persistedUndoableReducer, undoableReducer } from './reducers'
 import epic from './epics'
 import epicsDependencies from './epicsDependencies'
 import { persistStore } from 'redux-persist'
-import { VITE_INTEGRATION_DEV, VITEST } from './env'
+import { NODE_ENV, VITE_INTEGRATION_DEV, VITEST } from './env'
 
 const reduxDevtoolsExtension = (
   window as unknown as {
@@ -24,7 +24,8 @@ function getStore(initialTestState: Partial<AppState> | undefined) {
     initialTestState as any,
     compose(
       applyMiddleware(epicMiddleware),
-      ...(VITE_INTEGRATION_DEV && reduxDevtoolsExtension
+      ...((VITE_INTEGRATION_DEV || NODE_ENV === 'development') &&
+      reduxDevtoolsExtension
         ? [
             reduxDevtoolsExtension({
               stateSanitizer: ({ previous, next, ...state }: any) => ({

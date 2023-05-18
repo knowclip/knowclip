@@ -1,4 +1,4 @@
-import tempy from 'tempy'
+import * as tempy from 'tempy'
 import { join, basename } from 'path'
 import { copyFile, remove, existsSync, mkdirp } from 'fs-extra'
 
@@ -26,13 +26,13 @@ export function getPersistedDataSnapshot(
     for (const [id, f] of Object.entries(availabilities)) {
       if (!f) throw new Error(`File ${id} is undefined`)
 
-      if (f.filePath && f.filePath.startsWith(tempy.root)) {
+      if (f.filePath && f.filePath.startsWith(tempy.rootTemporaryDirectory)) {
         generatedFilePaths.push(f.filePath)
         availabilities[id] = {
           ...f,
           filePath: filePathTemplate(
             'GENERATED_ASSETS_DIRECTORY',
-            f.filePath.replace(tempy.root, '')
+            f.filePath.replace(tempy.rootTemporaryDirectory, '')
           ),
         }
       } else if (f.filePath && f.filePath.includes(directories.TMP_DIRECTORY)) {
@@ -69,7 +69,7 @@ export function getPersistedDataSnapshot(
     await mkdirp(generatedAssetsSubdirectory)
 
     console.log(
-      `Copying tmp files from ${tempy.root} to ${generatedAssetsSubdirectory}`
+      `Copying tmp files from ${tempy.rootTemporaryDirectory} to ${generatedAssetsSubdirectory}`
     )
     for (const filePath of generatedFilePaths) {
       console.log('Copying ' + filePath)

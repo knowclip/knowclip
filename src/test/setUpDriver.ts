@@ -2,7 +2,7 @@ import electron from 'electron'
 import { join } from 'path'
 import { ClientWrapper } from './driver/ClientWrapper'
 import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
-import tempy from 'tempy'
+import * as tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
 import { beforeEach } from 'vitest'
 
@@ -72,7 +72,7 @@ export async function startApp(
 }> {
   await copyFixtures()
 
-  const persistedStatePath = persistedState ? tempy.file() : null
+  const persistedStatePath = persistedState ? tempy.temporaryFile() : null
   if (persistedStatePath) {
     await writeFile(persistedStatePath, JSON.stringify(persistedState))
   }

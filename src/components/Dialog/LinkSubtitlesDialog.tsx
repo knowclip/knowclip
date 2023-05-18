@@ -180,7 +180,11 @@ const LinkSubtitlesDialog = ({
           {prompt}
           <FormControl fullWidth margin="normal">
             <InputLabel htmlFor="field">Field</InputLabel>
-            <Select value={fieldSelection} onChange={onChangeField}>
+            <Select
+              value={fieldSelection}
+              onChange={onChangeField}
+              label="field"
+            >
               {fieldNames.map((fieldName) => {
                 const currentlyLinkedToThisField =
                   currentlyLinkedField === fieldName

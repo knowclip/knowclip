@@ -14,7 +14,7 @@ import {
   Paper,
   Popper,
 } from '@mui/material'
-import { Close } from '@material-ui/icons'
+import { Close } from '@mui/icons-material'
 import { tokenize } from 'wanakana'
 import usePopover from '../utils/usePopover'
 import css from './DictionaryPopover.module.css'

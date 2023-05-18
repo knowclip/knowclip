@@ -1,6 +1,6 @@
 import React, { useCallback, SyntheticEvent } from 'react'
 import { IconButton, MenuItem, Tooltip, MenuList, Popover } from '@mui/material'
-import { MoreVert } from '@material-ui/icons'
+import { MoreVert } from '@mui/icons-material'
 import { useDispatch, useSelector } from 'react-redux'
 import cn from 'classnames'
 import usePopover from '../utils/usePopover'
