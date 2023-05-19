@@ -146,7 +146,7 @@
     "lint-staged": "^13.2.2",
     "prettier": "^2.1.2",
     "redux-devtools-extension": "^2.13.9",
-    "replace-in-files-cli": "^2.1.0",
+    "replace-in-files-cli": "^2.2.0",
     "request": "^2.88.2",
     "typescript": "^5.0.4",
     "vitest": "^0.31.1",
