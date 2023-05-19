@@ -18,7 +18,7 @@
   "dependencies": {
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.3",
-    "@mui/styles": "^5.12.3",
+    "@mui/styles": "^5.13.1",
     "@sentry/electron": "^2.5.4",
     "@silvestre/material-ui-chip-input-v5": "^1.0.0",
     "@silvestre/mkanki": "^3.4.1",
