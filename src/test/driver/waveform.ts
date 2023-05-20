@@ -13,6 +13,7 @@ export async function waveformMouseDrag(
 ) {
   const waveform = await client.firstElement(waveformSelector)
   try {
+    if (!waveform.elementId) throw new Error('Waveform elementId expired')
     const midpoint = await getWaveformMidpoint(client, waveform.elementId)
     await dragMouse(client._driver, [start, midpoint], [end, midpoint])
   } catch (err) {

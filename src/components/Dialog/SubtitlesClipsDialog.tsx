@@ -267,7 +267,7 @@ const SubtitlesClipsDialog = ({
           </FormControl>
           <FormControl fullWidth margin="normal">
             <TagsInput
-              allTags={allTags}
+              options={allTags}
               tags={tags}
               onAddChip={onAddChip}
               onDeleteChip={onDeleteChip}

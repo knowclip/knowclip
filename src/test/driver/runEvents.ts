@@ -5,7 +5,7 @@ export default async function runEvents(
   [next, ...rest]: any[]
 ) {
   if (next) {
-    sleep(42)
+    await sleep(42)
     await app.sendToMainProcess({ type: 'sendInputEvent', args: [next] })
     await runEvents(app, rest)
   }
@@ -20,19 +20,12 @@ function sleep(ms: number) {
 export async function dragMouse(
   app: TestDriver,
   start: [number, number],
-  end: [number, number],
-  moveDelay = 0
+  end: [number, number]
+  // moveDelay = 10
 ) {
   try {
     const mouseDragEvents = getMouseDragEvents(start, end)
-    if (!moveDelay) {
-      await runEvents(app, mouseDragEvents)
-    } else {
-      const [mouseDown, ...dragEvents] = mouseDragEvents
-      await runEvents(app, [mouseDown])
-      await sleep(moveDelay)
-      await runEvents(app, dragEvents)
-    }
+    await runEvents(app, mouseDragEvents)
   } catch (err) {
     const [x1, y1] = start
     const [x2, y2] = end

@@ -1,7 +1,7 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
+import { clickClip, waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
 
@@ -9,8 +9,7 @@ export default async function makeFlashcards(context: IntegrationTestContext) {
   test('select clip', async () => {
     const { client } = context
 
-    await client.elements_(waveform$.waveformClip, 2)
-    await client.clickElement_(waveform$.waveformClip)
+    await clickClip(context.app, client, 0, 2)
     await client.waitForText_(flashcardSection$.container, '1 / 3')
     await client.waitForText_(
       flashcardSection$.container,

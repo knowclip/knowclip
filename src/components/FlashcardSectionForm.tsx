@@ -172,11 +172,10 @@ const FlashcardSectionForm = memo(
               )
             })}
           <TagsInput
-            allTags={allTags}
+            options={allTags}
             tags={flashcard.tags}
             onAddChip={onAddChip}
-            onDeleteChip={onDeleteChip}
-            onFocus={handleFocus}
+            onDeleteChip={(i) => onDeleteChip(i, flashcard.tags[i])}
           />
         </section>
 

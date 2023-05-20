@@ -24,7 +24,6 @@ export function test(name: string, fn: () => Promise<void>): void {
               testNameSegments?.[testNameSegments.length - 1]
           ) + '.png'
         )
-        console.log(`Saving screenshot to: ${screenshotFilepath}`)
 
         await (ctx as any).saveScreenshot(screenshotFilepath)
       } catch (screenshotError) {
