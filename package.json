@@ -20,7 +20,6 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.1",
-    "@mui/styles": "^5.13.1",
     "@sentry/electron": "^2.5.4",
     "@silvestre/mkanki": "^3.4.1",
     "@silvestre/subsrt": "^1.1.1",
