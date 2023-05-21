@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteProps, TextField } from '@mui/material'
+import { Autocomplete, AutocompleteProps, Chip, TextField } from '@mui/material'
 import { useState } from 'react'
 import classnames from 'classnames'
 
@@ -33,6 +33,18 @@ export default function ChipsInput<
       onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
       className={classnames(props.className, $.container)}
       filterOptions={(o) => o.filter((x) => !tags.includes(x))}
+      renderTags={(value, getTagProps) =>
+        value.map((option, index) => {
+          const props = getTagProps({ index })
+          return (
+            <Chip
+              label={option}
+              {...props}
+              className={classnames(props.className, $.tagChip)}
+            />
+          )
+        })
+      }
       renderInput={(params) => (
         <TextField
           margin="dense"
