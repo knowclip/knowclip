@@ -16,6 +16,7 @@ import cn from 'classnames'
 import { MediaSubtitles } from '../selectors/subtitles'
 import { useSelector } from 'react-redux'
 import { usePrevious } from '../utils/usePrevious'
+import ActionType from '../types/ActionType'
 
 export type Props = {
   name: FlashcardFieldName
@@ -77,7 +78,11 @@ const FlashcardSectionFormField = memo(
 
     const registeredCaretLocation = useSelector((s: WithHistory<AppState>) => {
       const action = s.lastHistoryAction
-      if (action && action.type === 'setFlashcardField' && action.key === name)
+      if (
+        action &&
+        action.type === ActionType.setFlashcardField &&
+        action.key === name
+      )
         return action.caretLocation
 
       return null

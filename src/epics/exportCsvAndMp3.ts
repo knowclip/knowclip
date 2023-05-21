@@ -21,7 +21,7 @@ const exportCsv: AppEpic = (
   { existsSync, processNoteMedia }
 ) =>
   action$.pipe(
-    ofType(A.exportCsv),
+    ofType(A.exportCsv as const),
     mergeMap(
       ({
         mediaFileIdsToClipIds,

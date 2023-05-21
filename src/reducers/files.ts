@@ -1,6 +1,7 @@
 import { Reducer } from 'redux'
 import { fileUpdates } from '../files/updates'
 import A from '../types/ActionType'
+import { ActionOf } from '../actions'
 
 export const initialState: FilesState = {
   ProjectFile: {},
@@ -121,7 +122,7 @@ export default files
 function updateFile<U extends keyof FileUpdates>(
   state: FilesState,
   update: FileUpdate<U>,
-  action: UpdateFile
+  action: ActionOf<A.updateFile>
 ) {
   const updateMethod = fileUpdates[update.updateName]
   const existingFile = state[update.fileType][update.id]

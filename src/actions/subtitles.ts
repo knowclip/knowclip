@@ -8,15 +8,15 @@ const openFileRequest = filesActions.openFileRequest
 
 export const subtitlesActions = {
   showSubtitles: (id: SubtitlesTrackId) => ({
-    type: A.showSubtitles,
+    type: A.showSubtitles as const,
     id,
   }),
   hideSubtitles: (id: SubtitlesTrackId) => ({
-    type: A.hideSubtitles,
+    type: A.hideSubtitles as const,
     id,
   }),
   mountSubtitlesTrack: (track: SubtitlesTrack) => ({
-    type: A.mountSubtitlesTrack,
+    type: A.mountSubtitlesTrack as const,
     track,
   }),
 
@@ -26,21 +26,21 @@ export const subtitlesActions = {
     tags: Array<string>,
     includeStill: boolean
   ) => ({
-    type: A.makeClipsFromSubtitles,
+    type: A.makeClipsFromSubtitles as const,
     fileId,
     fieldNamesToTrackIds,
     tags,
     includeStill,
   }),
   showSubtitlesClipsDialogRequest: () => ({
-    type: A.showSubtitlesClipsDialogRequest,
+    type: A.showSubtitlesClipsDialogRequest as const,
   }),
   linkFlashcardFieldToSubtitlesTrackRequest: (
     flashcardFieldName: FlashcardFieldName,
     mediaFileId: MediaFileId,
     subtitlesTrackId: SubtitlesTrackId | null
   ) => ({
-    type: A.linkFlashcardFieldToSubtitlesTrackRequest,
+    type: A.linkFlashcardFieldToSubtitlesTrackRequest as const,
     flashcardFieldName,
     mediaFileId,
     subtitlesTrackId,
@@ -49,7 +49,7 @@ export const subtitlesActions = {
     subtitlesTrackId: SubtitlesTrackId,
     chunkIndex: number
   ) => ({
-    type: A.goToSubtitlesChunk,
+    type: A.goToSubtitlesChunk as const,
     subtitlesTrackId,
     chunkIndex,
   }),

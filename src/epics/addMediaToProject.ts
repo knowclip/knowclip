@@ -7,7 +7,7 @@ import { uuid } from '../utils/sideEffects'
 
 const addMediaToProject: AppEpic = (action$, _state$) =>
   action$.pipe(
-    ofType(A.addMediaToProjectRequest),
+    ofType(A.addMediaToProjectRequest as const),
     mergeMap(({ projectId, filePaths }) =>
       Promise.all(
         filePaths.map(async (filePath) => {

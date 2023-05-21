@@ -68,7 +68,7 @@ const initialize: AppEpic = () => of(r.initializeApp())
 
 const quit: AppEpic = (action$, state$, { quitApp }) =>
   action$.pipe(
-    ofType(A.quitApp),
+    ofType(A.quitApp as const),
     tap(() => {
       quitApp()
     }),
@@ -77,7 +77,7 @@ const quit: AppEpic = (action$, state$, { quitApp }) =>
 
 const pauseAndChangeCursorOnBusy: AppEpic = (action$, state$, { pauseMedia }) =>
   action$.pipe(
-    ofType(A.setProgress, A.enqueueDialog),
+    ofType(A.setProgress as const, A.enqueueDialog as const),
     tap((action) => {
       if (action.type === A.setProgress) {
         document.body.style.cursor = action.progress ? 'progress' : 'default'

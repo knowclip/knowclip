@@ -6,7 +6,7 @@ import { combineEpics, ofType } from 'redux-observable'
 
 const clipCreateEpic: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.addClipRequest),
+    ofType(A.addClipRequest as const),
 
     switchMap(({ waveformDrag, clipId }) => {
       const left = Math.min(waveformDrag.start, waveformDrag.end)

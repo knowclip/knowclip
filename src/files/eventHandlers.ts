@@ -1,3 +1,6 @@
+import { ActionOf } from '../actions'
+import A from '../types/ActionType'
+
 export type FileEventHandlers<F extends FileMetadata> = {
   /** should eventually result in openFileSuccess or openFileFailure ? */
   openRequest: OpenFileRequestHandler<F>
@@ -42,7 +45,7 @@ export type LocateFileRequestHandler<F extends FileMetadata> = (
 ) => Promise<Array<Action>>
 
 export type LocateFileSuccessHandler<F extends FileMetadata> = (
-  action: LocateFileSuccess & { file: F },
+  action: ActionOf<A.locateFileSuccess> & { file: F },
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>
@@ -57,7 +60,7 @@ export type DeleteFileRequestHandler<F extends FileMetadata> = (
 
 // TODO: DESCENDANTS' DELETE HOOKS ARE NOT TRIGGERED
 export type DeleteFileSuccessHandler = (
-  action: DeleteFileSuccess,
+  action: ActionOf<A.deleteFileSuccess>,
   state: AppState,
   effects: EpicsDependencies
 ) => Promise<Array<Action>>

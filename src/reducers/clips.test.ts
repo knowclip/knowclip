@@ -2,6 +2,7 @@ import clips from './clips'
 import r from '../redux'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { describe, it, expect } from 'vitest'
+import A from '../types/ActionType'
 
 const newClip = (
   { start, end }: { start: number; end: number },
@@ -52,7 +53,7 @@ describe('clips reducer', () => {
         [fileId]: ['a', 'b', 'c'],
       },
     },
-    { type: 'initializeApp' }
+    { type: A.initializeApp }
   )
 
   it('adds to byId and idsByMediaFileId during addClip', () => {
@@ -165,7 +166,7 @@ describe('clips reducer', () => {
           [fileId]: ['a', 'b', 'c'],
         },
       },
-      { type: 'initializeApp' }
+      { type: A.initializeApp }
     )
     const mergeAction = r.mergeClips(['a', 'b'], {
       type: 'Clip',
@@ -188,7 +189,7 @@ describe('clips reducer', () => {
             [fileId]: ['a', 'c'],
           },
         },
-        { type: 'initializeApp' }
+        { type: A.initializeApp }
       )
     )
   })
@@ -240,7 +241,7 @@ describe('clips reducer', () => {
           [fileId]: ['a', 'b'],
         },
       },
-      { type: 'initializeApp' }
+      { type: A.initializeApp }
     )
     const mergeAction = r.mergeClips(['a', 'b'], {
       type: 'Clip',
@@ -276,7 +277,7 @@ describe('clips reducer', () => {
             [fileId]: ['a'],
           },
         },
-        { type: 'initializeApp' }
+        { type: A.initializeApp }
       )
     )
   })

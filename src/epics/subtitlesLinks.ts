@@ -6,11 +6,12 @@ import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { getUpdateWith } from '../files/updates'
 import { msToSeconds } from 'clipwave'
+import { ActionOf } from '../actions'
 
 const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.linkFlashcardFieldToSubtitlesTrackRequest),
-    map<LinkFlashcardFieldToSubtitlesTrackRequest, Action>(
+    ofType(A.linkFlashcardFieldToSubtitlesTrackRequest as const),
+    map<ActionOf<A.linkFlashcardFieldToSubtitlesTrackRequest>, Action>(
       ({ mediaFileId, flashcardFieldName, subtitlesTrackId }) => {
         const previousLinks = r.getSubtitlesFlashcardFieldLinks(state$.value)
         const previouslyLinkedField = (
@@ -63,7 +64,7 @@ const linkFieldToTrackRequest: AppEpic = (action$, state$) =>
 const linkFieldToTrack: AppEpic = (action$, state$) =>
   action$.pipe(
     mergeMap((action) => {
-      if (action.type !== 'updateFile') return EMPTY
+      if (action.type !== A.updateFile) return EMPTY
 
       const update = getUpdateWith(
         action.update,
@@ -78,7 +79,7 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
       const [flashcardFieldName, _subtitlesTrackId, fieldToClear] =
         update.updatePayload
 
-      const edits: EditClips['edits'] = []
+      const edits: ActionOf<A.editClips>['edits'] = []
 
       for (const clip of r.getClips(state$.value, mediaFileId)) {
         const {
@@ -103,7 +104,7 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
 
 export const newClipFromChunkOnEdit: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.startEditingCards),
+    ofType(A.startEditingCards as const),
     mergeMap(() => {
       const selection = r.getWaveformSelection(state$.value)
       if (selection && selection.type === 'Preview') {
@@ -119,7 +120,7 @@ export const newClipFromChunk: AppEpic = (
   { setCurrentTime, uuid }
 ) =>
   action$.pipe(
-    ofType(A.newCardFromSubtitlesRequest),
+    ofType(A.newCardFromSubtitlesRequest as const),
     mergeMap((action) => {
       const selection = action.linkedSubtitlesChunkSelection
 

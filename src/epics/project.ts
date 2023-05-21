@@ -16,7 +16,7 @@ import { getUpdateWith } from '../files/updates'
 
 const createProject: AppEpic = (action$, state$, { writeFile }) =>
   action$.pipe(
-    ofType(A.createProject),
+    ofType(A.createProject as const),
     switchMap(({ project, filePath }) => {
       return from(
         writeFile(filePath, r.getProjectFileContents(state$.value, project))
@@ -40,7 +40,7 @@ const createProject: AppEpic = (action$, state$, { writeFile }) =>
 
 const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
   action$.pipe(
-    ofType(A.openProjectRequestById),
+    ofType(A.openProjectRequestById as const),
     map(({ id }) => {
       const project = r.getFileAvailabilityById<ProjectFile>(
         state$.value,
@@ -67,7 +67,7 @@ const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
 
 const openProjectByFilePath: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.openProjectRequestByFilePath),
+    ofType(A.openProjectRequestByFilePath as const),
     switchMap(({ filePath }) =>
       from(parseProjectJson(filePath)).pipe(
         mergeMap((parse) => {
@@ -89,7 +89,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
 
 const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
   action$.pipe(
-    ofType(A.saveProjectRequest),
+    ofType(A.saveProjectRequest as const),
     filter(() => {
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
@@ -174,7 +174,7 @@ const registerUnsavedWork: AppEpic = (action$, state$) =>
 const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
     mergeMap((action) => {
-      if (action.type !== 'updateFile') return EMPTY
+      if (action.type !== A.updateFile) return EMPTY
       const update = getUpdateWith(action.update, 'deleteProjectMedia')
       if (!update) return EMPTY
 
@@ -188,7 +188,7 @@ const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
 
 const closeProjectRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.closeProjectRequest),
+    ofType(A.closeProjectRequest as const),
     map(() => {
       if (r.isWorkUnsaved(state$.value))
         return r.confirmationDialog(

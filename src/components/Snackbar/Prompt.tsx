@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import cn from 'classnames'
 import { snackbar$ } from '.'
 import r from '../../redux'
+import ActionType from '../../types/ActionType'
 
 const PromptSnackbar = ({
   message,
@@ -63,7 +64,9 @@ const PromptSnackbar = ({
                 {label}
               </Button>
             ))}
-            {!actions.some(([, action]) => action.type === 'closeSnackbar') && (
+            {!actions.some(
+              ([, action]) => action.type === ActionType.closeSnackbar
+            ) && (
               <IconButton onClick={handleClose}>
                 <Close />
               </IconButton>

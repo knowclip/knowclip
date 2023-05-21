@@ -20,18 +20,18 @@ export const projectActions = {
     }
 
     return {
-      type: A.createProject,
+      type: A.createProject as const,
       project,
       filePath,
     }
   },
   openProjectRequestByFilePath: (filePath: string) => ({
-    type: A.openProjectRequestByFilePath,
+    type: A.openProjectRequestByFilePath as const,
     filePath,
   }),
 
   openProjectRequestById: (id: ProjectId) => ({
-    type: A.openProjectRequestById,
+    type: A.openProjectRequestById as const,
     id,
   }),
 
@@ -41,7 +41,7 @@ export const projectActions = {
     now: string,
     flashcards: FlashcardsState
   ) => ({
-    type: A.openProject,
+    type: A.openProject as const,
     project,
     clips,
     flashcards,
@@ -49,32 +49,32 @@ export const projectActions = {
   }),
 
   closeProject: () => ({
-    type: A.closeProject,
+    type: A.closeProject as const,
   }),
 
   closeProjectRequest: () => ({
-    type: A.closeProjectRequest,
+    type: A.closeProjectRequest as const,
   }),
 
   addMediaToProjectRequest: (
     projectId: ProjectId,
     filePaths: Array<MediaFilePath>
   ) => ({
-    type: A.addMediaToProjectRequest,
+    type: A.addMediaToProjectRequest as const,
     projectId,
     filePaths,
   }),
 
   saveProjectRequest: () => ({
-    type: A.saveProjectRequest,
+    type: A.saveProjectRequest as const,
   }),
 
   saveProjectAsRequest: () => ({
-    type: A.saveProjectAsRequest,
+    type: A.saveProjectAsRequest as const,
   }),
 
   setWorkIsUnsaved: (workIsUnsaved: boolean) => ({
-    type: A.setWorkIsUnsaved,
+    type: A.setWorkIsUnsaved as const,
     workIsUnsaved,
   }),
 }

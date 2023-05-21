@@ -3,23 +3,23 @@ import { filesActions } from './files'
 
 export const dictionariesActions = {
   importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
-    type: A.importDictionaryRequest,
+    type: A.importDictionaryRequest as const,
     dictionaryType,
   }),
 
   startDictionaryImport: (file: DictionaryFile, filePath: FilePath) => ({
-    type: A.startDictionaryImport,
+    type: A.startDictionaryImport as const,
     file,
     filePath,
   }),
 
   deleteImportedDictionary: (file: DictionaryFile) => ({
-    type: A.deleteImportedDictionary,
+    type: A.deleteImportedDictionary as const,
     file,
   }),
 
   resetDictionariesDatabase: () => ({
-    type: A.resetDictionariesDatabase,
+    type: A.resetDictionariesDatabase as const,
   }),
 }
 

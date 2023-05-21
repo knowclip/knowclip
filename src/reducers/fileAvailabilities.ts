@@ -1,6 +1,7 @@
 import { Reducer } from 'redux'
 import A from '../types/ActionType'
 import { getHumanFileName } from '../utils/files'
+import { ActionOf } from '../actions'
 
 export const initialState: FileAvailabilitiesState = {
   ProjectFile: {},
@@ -278,7 +279,7 @@ const getLoadingFile = (
     | ErroredFile
     | CurrentlyLoadedFile
     | NeverLoadedFile,
-  action: OpenFileRequest
+  action: ActionOf<A.openFileRequest>
 ): KnownFile => {
   switch (base.status) {
     case 'PREVIOUSLY_LOADED':

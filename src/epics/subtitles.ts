@@ -27,6 +27,7 @@ import { ClipwaveCallbackEvent, msToSeconds } from 'clipwave'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
+import { ActionOf } from '../actions'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -34,8 +35,8 @@ const makeClipsFromSubtitles: AppEpic = (
   { pauseMedia, setCurrentTime, getMediaPlayer }
 ) =>
   action$.pipe(
-    ofType(A.makeClipsFromSubtitles),
-    mergeMap<MakeClipsFromSubtitles, Observable<Action>>(
+    ofType(A.makeClipsFromSubtitles as const),
+    mergeMap<ActionOf<A.makeClipsFromSubtitles>, Observable<Action>>(
       ({ fileId, fieldNamesToTrackIds, tags, includeStill }) => {
         const tracksValidation = validateTracks(
           state$.value,
@@ -68,7 +69,7 @@ const makeClipsFromSubtitles: AppEpic = (
             tracksValidation.fieldNamesToFiles
           ) as [TransliterationFlashcardFieldName, SubtitlesFile][]
           const openMissingSubtitlesFailure = action$.pipe(
-            ofType(A.openFileFailure),
+            ofType(A.openFileFailure as const),
             filter(({ file }) =>
               missingTracks.some(([, t]) => t.id === file.id)
             ),
@@ -79,7 +80,7 @@ const makeClipsFromSubtitles: AppEpic = (
               of(r.openFileRequest(file)).pipe(
                 concat(
                   action$.pipe(
-                    ofType(A.openFileSuccess),
+                    ofType(A.openFileSuccess as const),
                     filter((a) => areSameFile(file, a.validatedFile)),
                     take(1),
                     ignoreElements()
@@ -201,7 +202,7 @@ const makeClipsFromSubtitles: AppEpic = (
 
 const showSubtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.showSubtitlesClipsDialogRequest),
+    ofType(A.showSubtitlesClipsDialogRequest as const),
     map(() => {
       const tracks = r.getSubtitlesTracks(state$.value)
       if (!tracks.length)
@@ -224,7 +225,7 @@ const showSubtitlesClipsDialogRequest: AppEpic = (action$, state$) =>
 
 const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
   action$.pipe(
-    ofType(A.goToSubtitlesChunk),
+    ofType(A.goToSubtitlesChunk as const),
     tap(({ chunkIndex, subtitlesTrackId }) => {
       const track = r.getSubtitlesTrack(state$.value, subtitlesTrackId)
       if (!track) {

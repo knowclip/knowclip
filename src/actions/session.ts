@@ -1,20 +1,20 @@
 import A from '../types/ActionType'
 
 export const sessionActions = {
-  dismissMedia: () => ({ type: A.dismissMedia }),
+  dismissMedia: () => ({ type: A.dismissMedia as const }),
 
   toggleLoop: (reason: LoopReason) => ({
-    type: A.toggleLoop,
+    type: A.toggleLoop as const,
     reason,
   }),
 
   setLoop: (loop: LoopState) => ({
-    type: A.setLoop,
+    type: A.setLoop as const,
     loop,
   }),
 
   setViewMode: (viewMode: ViewMode) => ({
-    type: A.setViewMode,
+    type: A.setViewMode as const,
     viewMode,
   }),
 }

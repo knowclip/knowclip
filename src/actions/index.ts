@@ -1,4 +1,4 @@
-import A from '../types/ActionType'
+import ActionType from '../types/ActionType'
 
 import { clipsActions, compositeClipsActions } from './clips'
 import { waveformActions } from './waveform'
@@ -14,25 +14,33 @@ import {
 import { sessionActions } from './session'
 import { settingsActions } from './settings'
 
-type ActionType = keyof typeof A
-export type ActionOf<T extends ActionType> = ReturnType<
-  (typeof baseActions)[T]
-> extends { type: T }
-  ? ReturnType<(typeof baseActions)[T]>
-  : never
+type EnumKeys<T> = T extends Record<string, infer U> ? U : never
+type ReverseEnum<T extends Record<string, string>> = {
+  [K in EnumKeys<T>]: {
+    [P in keyof T]: T[P] extends K ? P : never
+  }[keyof T]
+}
+
+type ActionCreatorNameOf<T extends ActionType> = ReverseEnum<
+  typeof ActionType
+>[T]
+type ActionCreatorOf<T extends ActionType> =
+  (typeof baseActions)[ActionCreatorNameOf<T>]
+
+export type ActionOf<T extends ActionType> = ReturnType<ActionCreatorOf<T>>
 export type Action = ActionOf<ActionType>
 
 const appActions = {
   initializeApp: () => ({
-    type: A.initializeApp,
+    type: ActionType.initializeApp as const,
   }),
 
   undo: () => ({
-    type: A.undo,
+    type: ActionType.undo as const,
   }),
 
   redo: () => ({
-    type: A.redo,
+    type: ActionType.redo as const,
   }),
 
   // [A['@@INIT']]: () => ({
@@ -40,16 +48,16 @@ const appActions = {
   // }),
 
   setProjectError: (error: string | null) => ({
-    type: A.setProjectError,
+    type: ActionType.setProjectError as const,
     error,
   }),
 
   quitApp: () => ({
-    type: A.quitApp,
+    type: ActionType.quitApp as const,
   }),
 
   setCurrentFile: (index: number) => ({
-    type: A.setCurrentFile,
+    type: ActionType.setCurrentFile as const,
     index,
   }),
 
@@ -57,18 +65,18 @@ const appActions = {
     mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
     mediaOpenPrior: MediaFile | null
   ) => ({
-    type: A.exportApkgRequest,
+    type: ActionType.exportApkgRequest as const,
     mediaFileIdsToClipIds,
     mediaOpenPrior,
   }),
 
   exportApkgFailure: (errorMessage?: string) => ({
-    type: A.exportApkgFailure,
+    type: ActionType.exportApkgFailure as const,
     errorMessage: errorMessage || null,
   }),
 
   exportApkgSuccess: (successMessage: string) => ({
-    type: A.exportApkgSuccess,
+    type: ActionType.exportApkgSuccess as const,
     successMessage,
   }),
 
@@ -78,7 +86,7 @@ const appActions = {
     mediaFolderLocation: string,
     rememberLocation: boolean
   ) => ({
-    type: A.exportCsv,
+    type: ActionType.exportCsv as const,
     mediaFileIdsToClipIds,
     csvFilePath,
     mediaFolderLocation,
@@ -88,23 +96,23 @@ const appActions = {
   exportMarkdown: (
     mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   ) => ({
-    type: A.exportMarkdown,
+    type: ActionType.exportMarkdown as const,
     mediaFileIdsToClipIds,
   }),
 
   detectSilenceRequest: () => ({
-    type: A.detectSilenceRequest,
+    type: ActionType.detectSilenceRequest as const,
   }),
   detectSilence: () => ({
-    type: A.detectSilence,
+    type: ActionType.detectSilence as const,
   }),
 
   deleteAllCurrentFileClipsRequest: () => ({
-    type: A.deleteAllCurrentFileClipsRequest,
+    type: ActionType.deleteAllCurrentFileClipsRequest as const,
   }),
 
   setAllTags: (tagsToClipIds: { [tag: string]: Array<ClipId> }) => ({
-    type: A.setAllTags,
+    type: ActionType.setAllTags as const,
     tagsToClipIds,
   }),
 
@@ -115,30 +123,30 @@ const appActions = {
     tags?: string[]
     includeStill?: boolean
   }) => ({
-    type: A.setDefaultClipSpecs,
+    type: ActionType.setDefaultClipSpecs as const,
     tags,
     includeStill,
   }),
 
   setProgress: (progress: ProgressInfo | null) => ({
-    type: A.setProgress,
+    type: ActionType.setProgress as const,
     progress,
   }),
 
   startEditingCards: () => ({
-    type: A.startEditingCards,
+    type: ActionType.startEditingCards as const,
   }),
 
   stopEditingCards: () => ({
-    type: A.stopEditingCards,
+    type: ActionType.stopEditingCards as const,
   }),
 
   openDictionaryPopover: () => ({
-    type: A.openDictionaryPopover,
+    type: ActionType.openDictionaryPopover as const,
   }),
 
   closeDictionaryPopover: () => ({
-    type: A.closeDictionaryPopover,
+    type: ActionType.closeDictionaryPopover as const,
   }),
 
   newCardFromSubtitlesRequest: (
@@ -148,7 +156,7 @@ const appActions = {
     clozeDeletion?: ClozeDeletion,
     startEditing: boolean = false
   ) => ({
-    type: A.newCardFromSubtitlesRequest,
+    type: ActionType.newCardFromSubtitlesRequest as const,
     linkedSubtitlesChunkSelection,
     clozeDeletion,
     startEditing,
@@ -167,7 +175,7 @@ const baseActions = {
   ...dictionariesActions,
   ...sessionActions,
   ...settingsActions,
-}
+} as const
 const compositeActions = {
   ...compositeClipsActions,
   ...compositeSnackbarActions,
@@ -182,10 +190,14 @@ export const actions = {
   ...compositeActions,
 }
 
-type Actions = {
-  [T in ActionType]: (...args: any[]) => ActionOf<T>
+type ActionCreatorNamesToTypes = typeof ActionType
+
+type ActionCreators = {
+  [N in ActionCreatorNameOf<ActionType>]: (
+    ...args: any[]
+  ) => ActionOf<ActionCreatorNamesToTypes[N]>
 }
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-const _validateActions: Actions = actions
+const _validateActions: ActionCreators = actions
 /* eslint-enable @typescript-eslint/no-unused-vars */

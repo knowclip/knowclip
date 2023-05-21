@@ -11,7 +11,7 @@ export const adjustWaveformViaHistory: AppEpic = (
   { dispatchClipwaveEvent, getMediaPlayer }
 ) =>
   action$.pipe(
-    ofType(A.undo, A.redo),
+    ofType(A.undo as const, A.redo as const),
     tap(() => {
       const currentFileClipsOrder = r.getCurrentFileClipsOrder(state$.value)
       const clipsMap = r.getClipsObject(state$.value)

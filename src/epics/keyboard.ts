@@ -100,13 +100,13 @@ const saveKey = (window: Window) =>
 
 const saveEpic: AppEpic = (action$, state$, { window }) =>
   action$.pipe(
-    ofType(A.openProject),
+    ofType(A.openProject as const),
     switchMap(() =>
       saveKey(window).pipe(
         map(({ shiftKey }) =>
           shiftKey ? r.saveProjectAsRequest() : r.saveProjectRequest()
         ),
-        takeUntil(action$.pipe(ofType(A.closeProject)))
+        takeUntil(action$.pipe(ofType(A.closeProject as const)))
       )
     )
   )

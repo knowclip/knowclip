@@ -5,13 +5,13 @@ import { FileUpdates } from '../files/updates'
 export const filesActions = {
   /** Add file to records without opening or doing anything with it */
   addFile: <F extends FileMetadata>(file: F, path?: string) => ({
-    type: A.addFile,
+    type: A.addFile as const,
     file,
     path,
   }),
 
   deleteFileRequest: (fileType: FileMetadata['type'], id: FileId) => ({
-    type: A.deleteFileRequest,
+    type: A.deleteFileRequest as const,
     fileType,
     id,
   }),
@@ -19,13 +19,13 @@ export const filesActions = {
     file: FileAvailability,
     descendants: Array<FileAvailability>
   ) => ({
-    type: A.deleteFileSuccess,
+    type: A.deleteFileSuccess as const,
     file,
     descendants,
   }),
   /** Try to open a file, and add it to the state tree if it isn't there yet. */
   openFileRequest: (file: FileMetadata, filePath: FilePath | null = null) => ({
-    type: A.openFileRequest,
+    type: A.openFileRequest as const,
     file,
     filePath,
   }),
@@ -34,7 +34,7 @@ export const filesActions = {
     filePath: FilePath,
     timestamp: string = nowUtcTimestamp()
   ) => ({
-    type: A.openFileSuccess,
+    type: A.openFileSuccess as const,
     validatedFile: file,
     filePath,
     timestamp,
@@ -44,7 +44,7 @@ export const filesActions = {
     filePath: FilePath | null,
     errorMessage: string | null
   ) => ({
-    type: A.openFileFailure,
+    type: A.openFileFailure as const,
     file,
     filePath,
     errorMessage,
@@ -55,32 +55,32 @@ export const filesActions = {
     file: FileMetadata,
     message: string
   ) => ({
-    type: A.locateFileRequest,
+    type: A.locateFileRequest as const,
     file,
     message,
   }),
   locateFileSuccess: (file: FileMetadata, filePath: FilePath) => ({
-    type: A.locateFileSuccess,
+    type: A.locateFileSuccess as const,
     file,
     filePath,
   }),
 
   commitFileDeletions: (fileType?: FileMetadata['type']) => ({
-    type: A.commitFileDeletions,
+    type: A.commitFileDeletions as const,
     fileType,
   }),
 
   abortFileDeletions: () => ({
-    type: A.abortFileDeletions,
+    type: A.abortFileDeletions as const,
   }),
 
   updateFile: <U extends keyof FileUpdates>(update: FileUpdate<U>) => ({
-    type: A.updateFile,
+    type: A.updateFile as const,
     update: update as FileUpdate<any>,
   }),
 
   preloadVideoStills: (file: FileMetadata, clipId: ClipId) => ({
-    type: A.preloadVideoStills,
+    type: A.preloadVideoStills as const,
     clipId,
     file,
   }),
