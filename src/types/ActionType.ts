@@ -1,4 +1,4 @@
-enum ActionType {
+const enum ActionType {
   undo = 'UNDO',
   redo = 'REDO',
   setCurrentFile = 'SET_CURRENT_FILE',
