@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { MouseEventHandler, useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@mui/material'
 import cn from 'classnames'
@@ -181,7 +181,7 @@ const Placeholder = ({
   currentProjectId: string
 }) => {
   const dispatch = useDispatch()
-  const addMediaRequest = useCallback(
+  const addMediaRequest: MouseEventHandler = useCallback(
     async (e) => {
       e.preventDefault()
       const filePaths = await showOpenDialog(getFileFilters('MediaFile'), true)

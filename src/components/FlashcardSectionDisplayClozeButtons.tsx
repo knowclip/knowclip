@@ -1,4 +1,4 @@
-import React, { useCallback, MutableRefObject } from 'react'
+import React, { useCallback, MutableRefObject, MouseEventHandler } from 'react'
 import cn from 'classnames'
 import css from './FlashcardSectionDisplay.module.css'
 import { Tooltip, Button } from '@mui/material'
@@ -106,7 +106,7 @@ const ClozeButton = ({
   getSelection: () => ClozeRange | null
   selection: MutableRefObject<ClozeRange | null>
 }) => {
-  const handleMouseDown = useCallback(
+  const handleMouseDown: MouseEventHandler = useCallback(
     (e) => {
       selection.current = getSelection() || null
       // don't focus yet so buttons won't expand and prevent click from firing
@@ -114,7 +114,7 @@ const ClozeButton = ({
     },
     [getSelection, selection]
   )
-  const handleClick = useCallback(
+  const handleClick: MouseEventHandler = useCallback(
     (e) => {
       selection.current = getSelection() || null
 
@@ -132,8 +132,7 @@ const ClozeButton = ({
         setClozeIndex(index, 'cloze button clicked')
       }
       selection.current = null
-
-      e.target.focus()
+      ;(e.target as HTMLInputElement).focus()
     },
     [confirmSelection, getSelection, index, isActive, selection, setClozeIndex]
   )

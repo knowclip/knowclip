@@ -80,3 +80,5 @@ export default function ChipsInput<
 function sanitizeChipText(text: string) {
   return text.replace(/\s/g, '_')
 }
+
+export { $ as tagsInput$ }

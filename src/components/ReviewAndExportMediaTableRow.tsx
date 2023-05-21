@@ -104,8 +104,8 @@ const ReviewAndExportMediaTableRow = memo(
         <section className={css.checkbox}>
           <Checkbox
             checked={isSelected}
-            onClick={useCallback((e) => e.stopPropagation(), [])}
-            onChange={useCallback(() => onSelect(id), [onSelect, id])}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => onSelect(id)}
             className={$.clipCheckboxes}
           />
         </section>

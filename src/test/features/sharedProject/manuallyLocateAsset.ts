@@ -55,7 +55,7 @@ export default async function manuallyLocateAsset(
   test('fill in existing card with text from loaded subtitles via stretch', async () => {
     const { client } = context
 
-    await waveformMouseHoldAndDrag(client, 300, 591, 572)
+    await waveformMouseHoldAndDrag(client, 591, 572)
 
     await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
   })

@@ -16,12 +16,9 @@ const ErrorDialog = ({
 }: DialogProps<ErrorDialogData>) => {
   const dispatch = useDispatch()
 
-  const close = useCallback(
-    (_e) => {
-      dispatch(actions.closeDialog())
-    },
-    [dispatch]
-  )
+  const close = useCallback(() => {
+    dispatch(actions.closeDialog())
+  }, [dispatch])
 
   return (
     <Dialog open={open} className={$.container}>

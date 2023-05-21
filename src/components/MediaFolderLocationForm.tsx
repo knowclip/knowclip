@@ -16,7 +16,7 @@ const MediaFolderLocationForm = ({ onSubmit }: { onSubmit: () => void }) => {
   )
   const [errorText, setErrorText] = useState('')
   const setLocationText = useCallback(
-    (text) => {
+    (text: string) => {
       setJustLocationText(text)
       setErrorText('')
     },

@@ -5,6 +5,7 @@ import React, {
   MutableRefObject,
   useEffect,
   useRef,
+  ChangeEventHandler,
 } from 'react'
 import { TextField } from '@mui/material'
 import { OutlinedInputProps } from '@mui/material/OutlinedInput'
@@ -16,11 +17,15 @@ import { MediaSubtitles } from '../selectors/subtitles'
 import { useSelector } from 'react-redux'
 import { usePrevious } from '../utils/usePrevious'
 
-type Props = {
+export type Props = {
   name: FlashcardFieldName
   mediaFileId: MediaFileId
   currentFlashcard: Flashcard
-  setFlashcardText: (id: string, text: string, caretLocation: number) => void
+  setFlashcardText: (
+    id: FlashcardFieldName,
+    text: string,
+    caretLocation: number
+  ) => void
   subtitles: MediaSubtitles
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
@@ -45,11 +50,11 @@ const FlashcardSectionFormField = memo(
     className,
   }: Props) => {
     const inputRef = useRef<HTMLInputElement>()
-    const caretLocation = useRef<number>()
-    const handleChange = useCallback(
+    const caretLocation = useRef<number | null>(null)
+    const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback(
       (e) => {
-        caretLocation.current = e.target.selectionEnd
-        setFlashcardText(name, e.target.value, e.target.selectionEnd)
+        caretLocation.current = e.target.selectionEnd! // TODO: investigate if might not be null
+        setFlashcardText(name, e.target.value, caretLocation.current)
       },
       [setFlashcardText, name]
     )

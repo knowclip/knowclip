@@ -106,7 +106,7 @@ const FieldMenuItem = ({
   className?: string
 }) => {
   const dispatch = useDispatch()
-  const handleClick = useCallback(
+  const handleClick: React.MouseEventHandler = useCallback(
     (e) => {
       dispatch(
         actions.linkFlashcardFieldToSubtitlesTrackRequest(

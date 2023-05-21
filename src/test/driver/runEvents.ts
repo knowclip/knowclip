@@ -21,7 +21,6 @@ export async function dragMouse(
   app: TestDriver,
   start: [number, number],
   end: [number, number]
-  // moveDelay = 10
 ) {
   try {
     const mouseDragEvents = getMouseDragEvents(start, end)

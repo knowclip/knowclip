@@ -32,7 +32,7 @@ const FileSelectionDialog = ({
 }: DialogProps<FileSelectionDialogData>) => {
   const dispatch = useDispatch()
 
-  const onSubmit = useCallback(
+  const onSubmit: (string: string) => void = useCallback(
     (path) => {
       dispatch(actions.locateFileSuccess(file, path))
       dispatch(actions.closeDialog())
@@ -144,42 +144,36 @@ const useLocationForm = (
     )
   }, [autoCheckFolders, locationText])
 
-  const fillInLocation = useCallback((text) => {
+  const fillInLocation = useCallback((text: string): void => {
     setLocationText(text)
     setErrorText('')
   }, [])
-  const onLocationTextFocus = useCallback(
-    async (_e) => {
-      const filePaths = await showOpenDialog(filters)
+  const onLocationTextFocus = useCallback(async () => {
+    const filePaths = await showOpenDialog(filters)
 
-      if (!filePaths) return
+    if (!filePaths) return
 
-      const [directory] = filePaths
-      fillInLocation(directory)
-    },
-    [fillInLocation, filters]
-  )
-  const handleSubmit = useCallback(
-    (_e) => {
-      if (locationText) {
-        const directory = dirname(locationText.trim())
-        if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
-          dispatch(actions.removeAssetsDirectories([directory]))
-        if (!autoCheckFolders.includes(directory) && checkFolderAutomatically)
-          dispatch(actions.addAssetsDirectories([directory]))
-        onSubmit(locationText)
-      } else {
-        setErrorText('Please choose a location to continue.')
-      }
-    },
-    [
-      autoCheckFolders,
-      checkFolderAutomatically,
-      dispatch,
-      locationText,
-      onSubmit,
-    ]
-  )
+    const [directory] = filePaths
+    fillInLocation(directory)
+  }, [fillInLocation, filters])
+  const handleSubmit = useCallback(() => {
+    if (locationText) {
+      const directory = dirname(locationText.trim())
+      if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
+        dispatch(actions.removeAssetsDirectories([directory]))
+      if (!autoCheckFolders.includes(directory) && checkFolderAutomatically)
+        dispatch(actions.addAssetsDirectories([directory]))
+      onSubmit(locationText)
+    } else {
+      setErrorText('Please choose a location to continue.')
+    }
+  }, [
+    autoCheckFolders,
+    checkFolderAutomatically,
+    dispatch,
+    locationText,
+    onSubmit,
+  ])
 
   return {
     locationText,
@@ -187,12 +181,9 @@ const useLocationForm = (
     checkFolderAutomatically,
     onLocationTextFocus,
     handleSubmit,
-    toggleCheckFolderAutomatically: useCallback(
-      (_e) => {
-        setCheckFolderAutomatically((checked) => !checked)
-      },
-      [setCheckFolderAutomatically]
-    ),
+    toggleCheckFolderAutomatically: useCallback(() => {
+      setCheckFolderAutomatically((checked) => !checked)
+    }, [setCheckFolderAutomatically]),
   }
 }
 

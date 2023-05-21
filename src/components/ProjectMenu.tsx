@@ -1,4 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  KeyboardEventHandler,
+  ChangeEventHandler,
+  FormEventHandler,
+} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@mui/material'
 import {
@@ -93,8 +102,8 @@ const ProjectMenu = ({ className }: { className: string }) => {
       setInputWidth(titleRef.current.getBoundingClientRect().width)
   }, [projectNameInput.text])
 
-  const handleChangeText = useCallback(
-    (e) => setProjectNameInput({ editing: true, text: e.target.value }),
+  const handleChangeText: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (e) => setProjectNameInput({ editing: true, text: e.currentTarget.value }),
     []
   )
 
@@ -115,7 +124,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
       dispatch(actions.setProjectName(projectFile.id, text))
     setProjectNameInput((state) => ({ ...state, editing: false }))
   }, [dispatch, setProjectNameInput, projectNameInput, projectFile])
-  const handleSubmit = useCallback(
+  const handleSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault()
       submit()

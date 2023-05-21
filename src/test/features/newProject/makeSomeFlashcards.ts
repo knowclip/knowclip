@@ -45,7 +45,8 @@ export default async function makeTwoFlashcards(
 
   test('select and edit card', async () => {
     const { client } = context
-    await waveformMouseHoldAndDrag(client, 300, 917, 888)
+    // hold 300ms?
+    await waveformMouseHoldAndDrag(client, 917, 888)
 
     await client.elements_(tagsInput$.tagChip, 1)
     await client.waitForText_(tagsInput$.tagChip, 'pbc')

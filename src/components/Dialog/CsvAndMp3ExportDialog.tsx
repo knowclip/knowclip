@@ -57,68 +57,53 @@ const CsvAndMp3ExportDialog = ({
     setRememberLocation((l) => !l)
   }, [setRememberLocation])
 
-  const onSubmit = useCallback(
-    (_e) => {
-      const { csvFilePath, mediaFolderLocation } = fields
-      if (csvFilePath && mediaFolderLocation) {
-        dispatch(actions.closeDialog())
-        return dispatch(
-          actions.exportCsv(
-            mediaFileIdsToClipIds,
-            csvFilePath,
-            mediaFolderLocation,
-            rememberLocation
-          )
+  const onSubmit = useCallback(() => {
+    const { csvFilePath, mediaFolderLocation } = fields
+    if (csvFilePath && mediaFolderLocation) {
+      dispatch(actions.closeDialog())
+      return dispatch(
+        actions.exportCsv(
+          mediaFileIdsToClipIds,
+          csvFilePath,
+          mediaFolderLocation,
+          rememberLocation
         )
-      }
-      const errors: ErrorsState = {}
-      if (!csvFilePath)
-        errors.csvFilePath =
-          'Please choose a location to save your flashcards file.'
-      if (!mediaFolderLocation)
-        errors.mediaFolderLocation =
-          'Please choose a location to save your audio clips.'
-      setErrors(errors)
-    },
-    [dispatch, mediaFileIdsToClipIds, fields, rememberLocation]
-  )
+      )
+    }
+    const errors: ErrorsState = {}
+    if (!csvFilePath)
+      errors.csvFilePath =
+        'Please choose a location to save your flashcards file.'
+    if (!mediaFolderLocation)
+      errors.mediaFolderLocation =
+        'Please choose a location to save your audio clips.'
+    setErrors(errors)
+  }, [dispatch, mediaFileIdsToClipIds, fields, rememberLocation])
 
-  const onFocusMediaFolderLocation = useCallback(
-    async (_e) => {
-      const directoryPath = await showOpenDirectoryDialog()
-      if (directoryPath) setField('mediaFolderLocation', directoryPath)
-    },
-    [setField]
-  )
+  const onFocusMediaFolderLocation = useCallback(async () => {
+    const directoryPath = await showOpenDirectoryDialog()
+    if (directoryPath) setField('mediaFolderLocation', directoryPath)
+  }, [setField])
 
-  const onFocusCsvFilePath = useCallback(
-    async (_e) => {
-      const filePath = await showSaveDialog('Comma-separated values', ['csv'])
-      if (filePath) setField('csvFilePath', filePath)
-    },
-    [setField]
-  )
+  const onFocusCsvFilePath = useCallback(async () => {
+    const filePath = await showSaveDialog('Comma-separated values', ['csv'])
+    if (filePath) setField('csvFilePath', filePath)
+  }, [setField])
 
   return (
     <Dialog open={open} className={$.container}>
       <DialogContent>
         <form
-          onSubmit={useCallback(
-            (e) => {
-              e.preventDefault()
-              onSubmit(e)
-            },
-            [onSubmit]
-          )}
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit()
+          }}
         >
           <TextField
             fullWidth
             label={'CSV file location'}
             value={fields.csvFilePath}
-            onChange={useCallback(
-              (e) => setField('csvFilePath', e.target.value),
-              [setField]
-            )}
+            onChange={(e) => setField('csvFilePath', e.target.value)}
             onClick={onFocusCsvFilePath}
             onKeyPress={onFocusCsvFilePath}
             error={Boolean(errors.csvFilePath)}
@@ -142,10 +127,7 @@ const CsvAndMp3ExportDialog = ({
             value={fields.mediaFolderLocation}
             onClick={onFocusMediaFolderLocation}
             onKeyPress={onFocusMediaFolderLocation}
-            onChange={useCallback(
-              (e) => setField('mediaFolderLocation', e.target.value),
-              [setField]
-            )}
+            onChange={(e) => setField('mediaFolderLocation', e.target.value)}
             error={Boolean(errors.mediaFolderLocation)}
             helperText={errors.mediaFolderLocation}
           />
@@ -164,10 +146,7 @@ const CsvAndMp3ExportDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(_e) => dispatch(actions.closeDialog())}
-          color="primary"
-        >
+        <Button onClick={() => dispatch(actions.closeDialog())} color="primary">
           Cancel
         </Button>
         <Button onClick={onSubmit} color="primary">

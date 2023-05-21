@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback } from 'react'
+import React, { EventHandler, Fragment, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 import {
@@ -44,7 +44,7 @@ const ProjectMenuItem = ({
   )
   const navigate = useNavigate()
 
-  const stopPropagation = useCallback((e) => {
+  const stopPropagation: EventHandler<any> = useCallback((e) => {
     e.stopPropagation()
   }, [])
 

@@ -53,7 +53,6 @@ async function getWaveformMidpoint(client: ClientWrapper, elementId: string) {
 
 export async function waveformMouseHoldAndDrag(
   client: ClientWrapper,
-  holdMs: number,
   start: number,
   end: number
 ) {
@@ -63,7 +62,7 @@ export async function waveformMouseHoldAndDrag(
 
     const { y, height } = rect
     const midpoint = y + Math.round(height / 2)
-    await dragMouse(client._driver, [start, midpoint], [end, midpoint], holdMs)
+    await dragMouse(client._driver, [start, midpoint], [end, midpoint])
   } catch (err) {
     throw err
   }

@@ -142,15 +142,13 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                 control={
                   <Checkbox
                     checked={settings.checkForUpdatesAutomatically}
-                    onChange={useCallback(
-                      (e) =>
-                        dispatchLocal(
-                          actions.setCheckForUpdatesAutomatically(
-                            e.target.checked
-                          )
-                        ),
-                      [dispatchLocal]
-                    )}
+                    onChange={(e) =>
+                      dispatchLocal(
+                        actions.setCheckForUpdatesAutomatically(
+                          e.target.checked
+                        )
+                      )
+                    }
                     color="primary"
                   />
                 }
@@ -192,7 +190,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                       <Checkbox
                         checked={selected}
                         tabIndex={-1}
-                        onChange={(_e) =>
+                        onChange={() =>
                           dispatchLocal(
                             selected
                               ? actions.removeActiveDictionary(file.id)

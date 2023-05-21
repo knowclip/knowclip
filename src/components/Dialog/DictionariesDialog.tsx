@@ -238,7 +238,7 @@ function DictionaryFileItem({
     [availability.id, onClickDelete]
   )
   const handleChange = useCallback(
-    (_e) => onChange(file.id, file.dictionaryType),
+    () => onChange(file.id, file.dictionaryType),
     [onChange, file.id, file.dictionaryType]
   )
   return (

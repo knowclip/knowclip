@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { MouseEventHandler, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Button,
@@ -53,7 +53,7 @@ const MediaFilesMenu = ({
   const popover = usePopover()
 
   const dispatch = useDispatch()
-  const chooseMediaFiles = useCallback(
+  const chooseMediaFiles: MouseEventHandler = useCallback(
     async (e) => {
       if (!currentProjectId) return
 

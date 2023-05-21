@@ -1,4 +1,10 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  ChangeEventHandler,
+  FormEventHandler,
+} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Dialog,
@@ -72,11 +78,8 @@ const LinkSubtitlesDialog = ({
       ) as TransliterationFlashcardFieldName) ||
       ''
   )
-  const onChangeField = useCallback((e) => {
-    setFieldSelection(e.target.value)
-  }, [])
 
-  const handleSubmit = useCallback(
+  const handleSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault()
       if (fieldSelection && fieldSelection !== currentlyLinkedField)
@@ -182,7 +185,11 @@ const LinkSubtitlesDialog = ({
             <InputLabel htmlFor="field">Field</InputLabel>
             <Select
               value={fieldSelection}
-              onChange={onChangeField}
+              onChange={(e) =>
+                setFieldSelection(
+                  e.target.value as TransliterationFlashcardFieldName | ''
+                )
+              }
               label="field"
             >
               {fieldNames.map((fieldName) => {
