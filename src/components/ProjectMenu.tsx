@@ -1,10 +1,9 @@
-import React, {
+import {
   useState,
   useRef,
   useCallback,
   useEffect,
   useMemo,
-  KeyboardEventHandler,
   ChangeEventHandler,
   FormEventHandler,
 } from 'react'

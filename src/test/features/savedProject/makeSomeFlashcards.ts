@@ -10,10 +10,6 @@ import {
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export default async function makeSomeFlashcards(
   context: IntegrationTestContext
 ) {

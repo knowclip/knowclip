@@ -10,7 +10,6 @@ import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll, step } from '../step'
 import { describe, beforeAll, afterAll, test } from 'vitest'
-import { first } from 'rxjs'
 
 const testId = 'sharedProject'
 

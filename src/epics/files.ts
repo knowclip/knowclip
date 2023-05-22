@@ -1,5 +1,5 @@
 import { mergeMap, map, mergeAll } from 'rxjs/operators'
-import { of, Observable, from, EMPTY, defer } from 'rxjs'
+import { of, from, EMPTY, defer } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { combineEpics, ofType } from 'redux-observable'

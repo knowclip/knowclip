@@ -1,4 +1,4 @@
-import runEvents, { clickAt, dragMouse } from './runEvents'
+import { clickAt, dragMouse } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main'
 import { waveform$ } from '../../components/waveformTestLabels'
