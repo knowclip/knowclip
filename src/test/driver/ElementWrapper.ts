@@ -7,7 +7,6 @@ import { TestDriver } from './TestDriver'
  */
 export interface ElementWrapper {
   elementId: string
-  __element: Element
   selector: string
   setFieldValue: (value: string) => Promise<void>
   click: () => Promise<void>
@@ -50,11 +49,10 @@ export const wrapElement = (
     }
   }
 
+  if (!element.elementId)
+    throw new Error(`Element "${selector}" has no elementId.`)
   return {
-    get elementId() {
-      return element.elementId
-    },
-    __element: element,
+    elementId: element.elementId,
     selector,
     setFieldValue: async (value: string) => {
       await element.setValue(value)
