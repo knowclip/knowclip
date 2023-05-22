@@ -30,11 +30,13 @@ describe('opening and saving a previously saved project', () => {
         projectTitle: 'My cool saved project',
       }),
       step('resulting project file matches snapshot', async () => {
-        const actualProjectFileContents = await parseProjectJson(
-          join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
-        )
+        test('save project', async () => {
+          const actualProjectFileContents = await parseProjectJson(
+            join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
+          )
 
-        expect(actualProjectFileContents).toMatchSnapshot()
+          expect(actualProjectFileContents).toMatchSnapshot()
+        })
       }),
     ],
     context
