@@ -7,6 +7,7 @@ import { TestDriver } from './TestDriver'
  */
 export interface ElementWrapper {
   elementId: string
+  __element: Element
   selector: string
   setFieldValue: (value: string) => Promise<void>
   click: () => Promise<void>
@@ -49,9 +50,11 @@ export const wrapElement = (
     }
   }
 
-  const id = element.elementId
   return {
-    elementId: id,
+    get elementId() {
+      return element.elementId
+    },
+    __element: element,
     selector,
     setFieldValue: async (value: string) => {
       await element.setValue(value)
@@ -124,7 +127,7 @@ export const wrapElement = (
       }
     },
     isSelected: async () => {
-      return await client.isElementSelected(id)
+      return await client.isElementSelected(element.elementId)
     },
     clickAtOffset: async ({ x, y }: { x: number; y: number }) => {
       try {

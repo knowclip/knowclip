@@ -23,9 +23,17 @@ export class ClientWrapper {
 
   async firstElement(selector: string): Promise<ElementWrapper> {
     try {
-      const result = await this._driver.client.$(selector)
-      await result.waitForExist()
-      return await element(this._driver, result, selector)
+      let result = await this._driver.client.waitUntil(async () => {
+        const el = this._driver.client.$(selector)
+        const exists = await el.isExisting()
+
+        if (!exists) return false
+        return await el
+      })
+
+      if (!result) throw result
+
+      return element(this._driver, result, selector)
     } catch (err) {
       throw new Error(`Could not find element "${selector}": ${err}`)
     }

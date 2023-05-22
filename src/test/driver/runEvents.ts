@@ -51,7 +51,6 @@ export async function dragMouse(
   }: { msBetweenEvents?: number; initialHoldTime?: number } = {}
 ) {
   try {
-    await sleep(100)
     const [mouseDownEvent, ...mouseDragEvents] = getMouseDragEvents(start, end)
 
     await runEvents(app, [mouseDownEvent])
@@ -130,6 +129,7 @@ function getMouseDragEvents(
       type: 'mouseUp',
       x: toX,
       y: toY,
+      clickCount: 1,
     },
   ]
 }
