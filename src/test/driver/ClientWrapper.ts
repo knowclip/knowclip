@@ -145,9 +145,8 @@ export class ClientWrapper {
   }
 
   async waitForText(selector: string, text: string) {
-    const element = await this.firstElement(selector)
     await this.waitUntil(async () => {
-      const elementText = await element.getText()
+      const elementText = await this._driver.client.$(selector).getText()
       return elementText.includes(text)
     })
   }
