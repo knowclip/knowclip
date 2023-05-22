@@ -23,16 +23,7 @@ export class ClientWrapper {
 
   async firstElement(selector: string): Promise<ElementWrapper> {
     try {
-      let result = await this._driver.client.waitUntil(async () => {
-        const el = this._driver.client.$(selector)
-        const exists = await el.isExisting()
-
-        if (!exists) return false
-        return await el
-      })
-
-      if (!result) throw result
-
+      const result = await this._driver.client.$(selector)
       return element(this._driver, result, selector)
     } catch (err) {
       throw new Error(`Could not find element "${selector}": ${err}`)
@@ -82,8 +73,7 @@ export class ClientWrapper {
   }
 
   async setFieldValue(selector: string, value: string) {
-    const element = await this.firstElement(selector)
-    await element.setFieldValue(value)
+    await this._driver.client.$(selector).setValue(value)
   }
   async setFieldValue_(testLabel: string, value: string) {
     await this.setFieldValue(getSelector(testLabel), value)
@@ -97,8 +87,7 @@ export class ClientWrapper {
   }
 
   async doubleClickElement(selector: string) {
-    const element = await this.firstElement(selector)
-    await element.doubleClick()
+    await (await this._driver.client.$(selector)).doubleClick()
   }
   async doubleClickElement_(testLabel: string) {
     await this.doubleClickElement(getSelector(testLabel))
@@ -149,9 +138,7 @@ export class ClientWrapper {
   }
 
   async getAttribute(selector: string, attributeName: string) {
-    const element = await this.firstElement(selector)
-
-    return await element.getAttribute(attributeName)
+    return await this._driver.client.$(selector).getAttribute(attributeName)
   }
   async getAttribute_(testLabel: string, attributeName: string) {
     return await this.getAttribute(getSelector(testLabel), attributeName)

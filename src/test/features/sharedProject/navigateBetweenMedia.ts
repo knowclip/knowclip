@@ -66,11 +66,17 @@ export default async function navigateBetweenMedia(
     await client.clickElement_(fileSelectionForm$.continueButton)
   })
 
-  test('dismiss subtitles dialog and snackbar', async () => {
+  test('dismiss subtitles dialog', async () => {
     const { client } = context
 
-    await client.waitForText_(fileSelectionForm$.form, 'pbc_jp.ass')
+    await client._driver.client
+      .$(`#${fileSelectionForm$.form}*=pbc_jp.ass`)
+      .isExisting()
     await client.clickElement_(fileSelectionForm$.cancelButton)
+  })
+
+  test('dismiss subtitles snackbar', async () => {
+    const { client } = context
     await client.clickElement_(snackbar$.closeButton)
     await client.waitUntilGone_(snackbar$.closeButton)
   })

@@ -6,7 +6,7 @@ import { TestDriver } from './TestDriver'
  * when targeting specific elements queried via `ClientWrapper#elements`.
  */
 export interface ElementWrapper {
-  elementId: string
+  elementId: () => Promise<string>
   selector: string
   setFieldValue: (value: string) => Promise<void>
   click: () => Promise<void>
@@ -52,7 +52,10 @@ export const wrapElement = (
   if (!element.elementId)
     throw new Error(`Element "${selector}" has no elementId.`)
   return {
-    elementId: element.elementId,
+    elementId: async () => {
+      await element.waitForExist()
+      return element.elementId
+    },
     selector,
     setFieldValue: async (value: string) => {
       await element.setValue(value)
