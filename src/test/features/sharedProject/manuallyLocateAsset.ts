@@ -3,7 +3,7 @@ import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
 import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { waveformMouseHoldAndDrag } from '../../driver/waveform'
+import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { getSelector } from '../../driver/ClientWrapper'
 import { retryUntil } from '../../driver/retryUntil'
@@ -55,7 +55,7 @@ export default async function manuallyLocateAsset(
   test('fill in existing card with text from loaded subtitles via stretch', async () => {
     const { client } = context
 
-    await waveformMouseHoldAndDrag(client, 591, 572)
+    await waveformMouseDrag(client, 591, 572)
 
     await client.waitForText_(flashcardSection$.container, 'ああー  吸わないで')
   })

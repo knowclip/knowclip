@@ -3,10 +3,7 @@ import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/Fla
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
-import {
-  waveformMouseDrag,
-  waveformMouseHoldAndDrag,
-} from '../../driver/waveform'
+import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
 
@@ -58,7 +55,7 @@ export default async function makeSomeFlashcards(
   test('create a third card', async () => {
     const { client } = context
 
-    await waveformMouseHoldAndDrag(client, 176, 355)
+    await waveformMouseDrag(client, 176, 355)
     await client.waitForText_(flashcardSection$.container, '3 / 3')
     await client.waitForVisible_(waveform$.waveformClip)
   })

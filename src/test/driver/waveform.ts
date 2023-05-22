@@ -6,21 +6,6 @@ import { TestDriver } from './TestDriver'
 
 export const waveformSelector = `#${main$.container} > svg`
 
-export async function waveformMouseDrag(
-  client: ClientWrapper,
-  start: number,
-  end: number
-) {
-  const waveform = await client.firstElement(waveformSelector)
-  try {
-    if (!waveform.elementId) throw new Error('Waveform elementId expired')
-    const midpoint = await getWaveformMidpoint(client, waveform.elementId)
-    await dragMouse(client._driver, [start, midpoint], [end, midpoint])
-  } catch (err) {
-    throw err
-  }
-}
-
 export async function clickClip(
   app: TestDriver,
   client: ClientWrapper,
@@ -48,7 +33,7 @@ async function getWaveformMidpoint(client: ClientWrapper, elementId: string) {
   return midpoint
 }
 
-export async function waveformMouseHoldAndDrag(
+export async function waveformMouseDrag(
   client: ClientWrapper,
   start: number,
   end: number,
