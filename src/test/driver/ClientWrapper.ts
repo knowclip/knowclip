@@ -52,7 +52,10 @@ export class ClientWrapper {
           async () => {
             const elements: Element[] = await this._driver.client.$$(selector)
             elementsSoFar = elements
-            return elements.length === count
+            return (
+              elements.length === count &&
+              (await Promise.all(elements.map((e) => e.isExisting())))
+            )
           },
           { timeout: 10000 }
         )
