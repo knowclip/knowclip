@@ -1,20 +1,21 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 
-export const sessionActions = {
-  dismissMedia: () => ({ type: A.dismissMedia as const }),
+export const sessionActions = defineActionCreators({
+  dismissMedia: () => ({ type: A.dismissMedia }),
 
   toggleLoop: (reason: LoopReason) => ({
-    type: A.toggleLoop as const,
+    type: A.toggleLoop,
     reason,
   }),
 
   setLoop: (loop: LoopState) => ({
-    type: A.setLoop as const,
+    type: A.setLoop,
     loop,
   }),
 
   setViewMode: (viewMode: ViewMode) => ({
-    type: A.setViewMode as const,
+    type: A.setViewMode,
     viewMode,
   }),
-}
+})

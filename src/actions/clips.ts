@@ -3,15 +3,16 @@ import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 import A from '../types/ActionType'
 import { PrimaryClip, WaveformDrag, WaveformRegion } from 'clipwave'
 import { SubtitlesCardBase } from '../selectors'
+import { defineActionCreators } from './defineActionCreators'
 
 export type OverlappedCardBaseDuringClipStretch = {
   subtitlesCardBase: SubtitlesCardBase
   isSelectable: boolean
 }
 
-export const clipsActions = {
+export const clipsActions = defineActionCreators({
   addClipRequest: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
-    type: A.addClipRequest as const,
+    type: A.addClipRequest,
     waveformDrag,
     clipId,
   }),
@@ -24,7 +25,7 @@ export const clipsActions = {
     backOverlappedSubtitlesCardBases: OverlappedCardBaseDuringClipStretch[],
     newRegions: WaveformRegion[]
   ) => ({
-    type: A.stretchClip as const,
+    type: A.stretchClip,
     stretchedClip,
     overlappedClips,
     unstretchedClip,
@@ -38,7 +39,7 @@ export const clipsActions = {
     flashcard: Flashcard,
     startEditing: boolean = false
   ) => ({
-    type: A.addClip as const,
+    type: A.addClip,
     clip,
     flashcard,
     startEditing,
@@ -49,7 +50,7 @@ export const clipsActions = {
     flashcards: Array<Flashcard>,
     fileId: MediaFileId
   ) => ({
-    type: A.addClips as const,
+    type: A.addClips,
     clips,
     flashcards,
     fileId,
@@ -57,7 +58,7 @@ export const clipsActions = {
 
   /** Pass `null` to indicate waveform reset */
   selectWaveformItem: (selection: WaveformSelection | null) => ({
-    type: A.selectWaveformItem as const,
+    type: A.selectWaveformItem,
     selection,
   }),
 
@@ -66,7 +67,7 @@ export const clipsActions = {
     override: DeepPartial<Clip> | null,
     flashcardOverride: DeepPartial<Flashcard> | null
   ) => ({
-    type: A.editClip as const,
+    type: A.editClip,
     id,
     override,
     flashcardOverride,
@@ -79,12 +80,12 @@ export const clipsActions = {
       flashcardOverride: DeepPartial<Flashcard> | null
     }[]
   ) => ({
-    type: A.editClips as const,
+    type: A.editClips,
     edits,
   }),
 
   mergeClips: (ids: Array<ClipId>, newSelection: WaveformSelection) => ({
-    type: A.mergeClips as const,
+    type: A.mergeClips,
     ids,
     newSelection,
   }),
@@ -95,7 +96,7 @@ export const clipsActions = {
     overlapIds: Array<ClipId>,
     newRegions: WaveformRegion[]
   ) => ({
-    type: A.moveClip as const,
+    type: A.moveClip,
     id,
     deltaX,
     overlapIds,
@@ -108,7 +109,7 @@ export const clipsActions = {
     value: string,
     caretLocation: number
   ) => ({
-    type: A.setFlashcardField as const,
+    type: A.setFlashcardField,
     id,
     key,
     value,
@@ -116,28 +117,28 @@ export const clipsActions = {
   }),
 
   addFlashcardTag: (id: ClipId, text: string) => ({
-    type: A.addFlashcardTag as const,
+    type: A.addFlashcardTag,
     id,
     text,
   }),
 
   deleteFlashcardTag: (id: ClipId, index: number, tag: string) => ({
-    type: A.deleteFlashcardTag as const,
+    type: A.deleteFlashcardTag,
     id,
     index,
     tag,
   }),
 
   deleteCard: (id: ClipId) => ({
-    type: A.deleteCard as const,
+    type: A.deleteCard,
     id,
   }),
 
   deleteCards: (ids: Array<ClipId>) => ({
-    type: A.deleteCards as const,
+    type: A.deleteCards,
     ids,
   }),
-}
+})
 
 const addFlashcardImage = (id: ClipId, seconds?: number) => {
   const image: FlashcardImage = seconds

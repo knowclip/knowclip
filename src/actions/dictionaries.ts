@@ -1,27 +1,28 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 import { filesActions } from './files'
 
-export const dictionariesActions = {
+export const dictionariesActions = defineActionCreators({
   importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
-    type: A.importDictionaryRequest as const,
+    type: A.importDictionaryRequest,
     dictionaryType,
   }),
 
   startDictionaryImport: (file: DictionaryFile, filePath: FilePath) => ({
-    type: A.startDictionaryImport as const,
+    type: A.startDictionaryImport,
     file,
     filePath,
   }),
 
   deleteImportedDictionary: (file: DictionaryFile) => ({
-    type: A.deleteImportedDictionary as const,
+    type: A.deleteImportedDictionary,
     file,
   }),
 
   resetDictionariesDatabase: () => ({
-    type: A.resetDictionariesDatabase as const,
+    type: A.resetDictionariesDatabase,
   }),
-}
+})
 
 const finishDictionaryImport = (id: FileId) =>
   filesActions.updateFile({

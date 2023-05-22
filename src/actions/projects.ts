@@ -1,6 +1,8 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 import { filesActions } from './files'
-export const projectActions = {
+
+export const projectActions = defineActionCreators({
   createProject: (
     id: string,
     name: string,
@@ -20,18 +22,18 @@ export const projectActions = {
     }
 
     return {
-      type: A.createProject as const,
+      type: A.createProject,
       project,
       filePath,
     }
   },
   openProjectRequestByFilePath: (filePath: string) => ({
-    type: A.openProjectRequestByFilePath as const,
+    type: A.openProjectRequestByFilePath,
     filePath,
   }),
 
   openProjectRequestById: (id: ProjectId) => ({
-    type: A.openProjectRequestById as const,
+    type: A.openProjectRequestById,
     id,
   }),
 
@@ -41,7 +43,7 @@ export const projectActions = {
     now: string,
     flashcards: FlashcardsState
   ) => ({
-    type: A.openProject as const,
+    type: A.openProject,
     project,
     clips,
     flashcards,
@@ -49,35 +51,35 @@ export const projectActions = {
   }),
 
   closeProject: () => ({
-    type: A.closeProject as const,
+    type: A.closeProject,
   }),
 
   closeProjectRequest: () => ({
-    type: A.closeProjectRequest as const,
+    type: A.closeProjectRequest,
   }),
 
   addMediaToProjectRequest: (
     projectId: ProjectId,
     filePaths: Array<MediaFilePath>
   ) => ({
-    type: A.addMediaToProjectRequest as const,
+    type: A.addMediaToProjectRequest,
     projectId,
     filePaths,
   }),
 
   saveProjectRequest: () => ({
-    type: A.saveProjectRequest as const,
+    type: A.saveProjectRequest,
   }),
 
   saveProjectAsRequest: () => ({
-    type: A.saveProjectAsRequest as const,
+    type: A.saveProjectAsRequest,
   }),
 
   setWorkIsUnsaved: (workIsUnsaved: boolean) => ({
-    type: A.setWorkIsUnsaved as const,
+    type: A.setWorkIsUnsaved,
     workIsUnsaved,
   }),
-}
+})
 
 function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
   return u as any as FileUpdate<keyof FileUpdates>

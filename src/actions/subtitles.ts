@@ -3,20 +3,21 @@ import { basename } from 'preloaded/path'
 import { filesActions } from './files'
 import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
+import { defineActionCreators } from './defineActionCreators'
 
 const openFileRequest = filesActions.openFileRequest
 
-export const subtitlesActions = {
+export const subtitlesActions = defineActionCreators({
   showSubtitles: (id: SubtitlesTrackId) => ({
-    type: A.showSubtitles as const,
+    type: A.showSubtitles,
     id,
   }),
   hideSubtitles: (id: SubtitlesTrackId) => ({
-    type: A.hideSubtitles as const,
+    type: A.hideSubtitles,
     id,
   }),
   mountSubtitlesTrack: (track: SubtitlesTrack) => ({
-    type: A.mountSubtitlesTrack as const,
+    type: A.mountSubtitlesTrack,
     track,
   }),
 
@@ -26,21 +27,21 @@ export const subtitlesActions = {
     tags: Array<string>,
     includeStill: boolean
   ) => ({
-    type: A.makeClipsFromSubtitles as const,
+    type: A.makeClipsFromSubtitles,
     fileId,
     fieldNamesToTrackIds,
     tags,
     includeStill,
   }),
   showSubtitlesClipsDialogRequest: () => ({
-    type: A.showSubtitlesClipsDialogRequest as const,
+    type: A.showSubtitlesClipsDialogRequest,
   }),
   linkFlashcardFieldToSubtitlesTrackRequest: (
     flashcardFieldName: FlashcardFieldName,
     mediaFileId: MediaFileId,
     subtitlesTrackId: SubtitlesTrackId | null
   ) => ({
-    type: A.linkFlashcardFieldToSubtitlesTrackRequest as const,
+    type: A.linkFlashcardFieldToSubtitlesTrackRequest,
     flashcardFieldName,
     mediaFileId,
     subtitlesTrackId,
@@ -49,11 +50,11 @@ export const subtitlesActions = {
     subtitlesTrackId: SubtitlesTrackId,
     chunkIndex: number
   ) => ({
-    type: A.goToSubtitlesChunk as const,
+    type: A.goToSubtitlesChunk,
     subtitlesTrackId,
     chunkIndex,
   }),
-}
+})
 
 const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
   filesActions.updateFile({

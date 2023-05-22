@@ -1,5 +1,4 @@
 import ActionType from '../types/ActionType'
-
 import { clipsActions, compositeClipsActions } from './clips'
 import { waveformActions } from './waveform'
 import { snackbarActions, compositeSnackbarActions } from './snackbar'
@@ -13,6 +12,7 @@ import {
 } from './dictionaries'
 import { sessionActions } from './session'
 import { settingsActions } from './settings'
+import { defineActionCreators } from './defineActionCreators'
 
 type EnumKeys<T> = T extends Record<string, infer U> ? U : never
 type ReverseEnum<T extends Record<string, string>> = {
@@ -21,7 +21,7 @@ type ReverseEnum<T extends Record<string, string>> = {
   }[keyof T]
 }
 
-type ActionCreatorNameOf<T extends ActionType> = ReverseEnum<
+export type ActionCreatorNameOf<T extends ActionType> = ReverseEnum<
   typeof ActionType
 >[T]
 type ActionCreatorOf<T extends ActionType> =
@@ -30,17 +30,17 @@ type ActionCreatorOf<T extends ActionType> =
 export type ActionOf<T extends ActionType> = ReturnType<ActionCreatorOf<T>>
 export type Action = ActionOf<ActionType>
 
-const appActions = {
+const appActions = defineActionCreators({
   initializeApp: () => ({
-    type: ActionType.initializeApp as const,
+    type: ActionType.initializeApp,
   }),
 
   undo: () => ({
-    type: ActionType.undo as const,
+    type: ActionType.undo,
   }),
 
   redo: () => ({
-    type: ActionType.redo as const,
+    type: ActionType.redo,
   }),
 
   // [A['@@INIT']]: () => ({
@@ -48,16 +48,16 @@ const appActions = {
   // }),
 
   setProjectError: (error: string | null) => ({
-    type: ActionType.setProjectError as const,
+    type: ActionType.setProjectError,
     error,
   }),
 
   quitApp: () => ({
-    type: ActionType.quitApp as const,
+    type: ActionType.quitApp,
   }),
 
   setCurrentFile: (index: number) => ({
-    type: ActionType.setCurrentFile as const,
+    type: ActionType.setCurrentFile,
     index,
   }),
 
@@ -65,18 +65,18 @@ const appActions = {
     mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
     mediaOpenPrior: MediaFile | null
   ) => ({
-    type: ActionType.exportApkgRequest as const,
+    type: ActionType.exportApkgRequest,
     mediaFileIdsToClipIds,
     mediaOpenPrior,
   }),
 
   exportApkgFailure: (errorMessage?: string) => ({
-    type: ActionType.exportApkgFailure as const,
+    type: ActionType.exportApkgFailure,
     errorMessage: errorMessage || null,
   }),
 
   exportApkgSuccess: (successMessage: string) => ({
-    type: ActionType.exportApkgSuccess as const,
+    type: ActionType.exportApkgSuccess,
     successMessage,
   }),
 
@@ -86,7 +86,7 @@ const appActions = {
     mediaFolderLocation: string,
     rememberLocation: boolean
   ) => ({
-    type: ActionType.exportCsv as const,
+    type: ActionType.exportCsv,
     mediaFileIdsToClipIds,
     csvFilePath,
     mediaFolderLocation,
@@ -96,23 +96,23 @@ const appActions = {
   exportMarkdown: (
     mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   ) => ({
-    type: ActionType.exportMarkdown as const,
+    type: ActionType.exportMarkdown,
     mediaFileIdsToClipIds,
   }),
 
   detectSilenceRequest: () => ({
-    type: ActionType.detectSilenceRequest as const,
+    type: ActionType.detectSilenceRequest,
   }),
   detectSilence: () => ({
-    type: ActionType.detectSilence as const,
+    type: ActionType.detectSilence,
   }),
 
   deleteAllCurrentFileClipsRequest: () => ({
-    type: ActionType.deleteAllCurrentFileClipsRequest as const,
+    type: ActionType.deleteAllCurrentFileClipsRequest,
   }),
 
   setAllTags: (tagsToClipIds: { [tag: string]: Array<ClipId> }) => ({
-    type: ActionType.setAllTags as const,
+    type: ActionType.setAllTags,
     tagsToClipIds,
   }),
 
@@ -123,30 +123,30 @@ const appActions = {
     tags?: string[]
     includeStill?: boolean
   }) => ({
-    type: ActionType.setDefaultClipSpecs as const,
+    type: ActionType.setDefaultClipSpecs,
     tags,
     includeStill,
   }),
 
   setProgress: (progress: ProgressInfo | null) => ({
-    type: ActionType.setProgress as const,
+    type: ActionType.setProgress,
     progress,
   }),
 
   startEditingCards: () => ({
-    type: ActionType.startEditingCards as const,
+    type: ActionType.startEditingCards,
   }),
 
   stopEditingCards: () => ({
-    type: ActionType.stopEditingCards as const,
+    type: ActionType.stopEditingCards,
   }),
 
   openDictionaryPopover: () => ({
-    type: ActionType.openDictionaryPopover as const,
+    type: ActionType.openDictionaryPopover,
   }),
 
   closeDictionaryPopover: () => ({
-    type: ActionType.closeDictionaryPopover as const,
+    type: ActionType.closeDictionaryPopover,
   }),
 
   newCardFromSubtitlesRequest: (
@@ -156,12 +156,12 @@ const appActions = {
     clozeDeletion?: ClozeDeletion,
     startEditing: boolean = false
   ) => ({
-    type: ActionType.newCardFromSubtitlesRequest as const,
+    type: ActionType.newCardFromSubtitlesRequest,
     linkedSubtitlesChunkSelection,
     clozeDeletion,
     startEditing,
   }),
-}
+})
 
 const baseActions = {
   ...appActions,
@@ -175,7 +175,7 @@ const baseActions = {
   ...dictionariesActions,
   ...sessionActions,
   ...settingsActions,
-} as const
+}
 const compositeActions = {
   ...compositeClipsActions,
   ...compositeSnackbarActions,
@@ -185,19 +185,19 @@ const compositeActions = {
   ...compositeDictionariesActions,
 }
 
-export const actions = {
+export const actions = validateActionTypes({
   ...baseActions,
   ...compositeActions,
+})
+
+/** ensure no unused action types */
+function validateActionTypes<
+  ActionCreators extends {
+    [N in ActionCreatorNameOf<ActionType>]: (
+      ...args: any[]
+    ) => ActionOf<ActionCreatorNamesToTypes[N]>
+  },
+  ActionCreatorNamesToTypes extends typeof ActionType
+>(actions: ActionCreators): ActionCreators {
+  return actions
 }
-
-type ActionCreatorNamesToTypes = typeof ActionType
-
-type ActionCreators = {
-  [N in ActionCreatorNameOf<ActionType>]: (
-    ...args: any[]
-  ) => ActionOf<ActionCreatorNamesToTypes[N]>
-}
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
-const _validateActions: ActionCreators = actions
-/* eslint-enable @typescript-eslint/no-unused-vars */

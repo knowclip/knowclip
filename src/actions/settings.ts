@@ -1,39 +1,40 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 
-export const settingsActions = {
+export const settingsActions = defineActionCreators({
   setMediaFolderLocation: (directoryPath: string) => ({
-    type: A.setMediaFolderLocation as const,
+    type: A.setMediaFolderLocation,
     directoryPath,
   }),
 
   addAssetsDirectories: (directoryPaths: string[]) => ({
-    type: A.addAssetsDirectories as const,
+    type: A.addAssetsDirectories,
     directoryPaths,
   }),
 
   removeAssetsDirectories: (directoryPaths: string[]) => ({
-    type: A.removeAssetsDirectories as const,
+    type: A.removeAssetsDirectories,
     directoryPaths,
   }),
 
   setCheckForUpdatesAutomatically: (check: boolean) => ({
-    type: A.setCheckForUpdatesAutomatically as const,
+    type: A.setCheckForUpdatesAutomatically,
     check,
   }),
 
   overrideSettings: (settings: Partial<SettingsState>) => ({
-    type: A.overrideSettings as const,
+    type: A.overrideSettings,
     settings,
   }),
 
   addActiveDictionary: (id: string, dictionaryType: DictionaryFileType) => ({
-    type: A.addActiveDictionary as const,
+    type: A.addActiveDictionary,
     id,
     dictionaryType,
   }),
 
   removeActiveDictionary: (id: string) => ({
-    type: A.removeActiveDictionary as const,
+    type: A.removeActiveDictionary,
     id,
   }),
-}
+})
