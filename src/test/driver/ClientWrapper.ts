@@ -90,8 +90,7 @@ export class ClientWrapper {
   }
 
   async clickElement(selector: string) {
-    const element = await this.firstElement(selector)
-    await element.click()
+    return (await this._driver.client.$(selector)).click()
   }
   async clickElement_(testLabel: string) {
     await this.clickElement(getSelector(testLabel))
@@ -158,20 +157,15 @@ export class ClientWrapper {
     return await this.getAttribute(getSelector(testLabel), attributeName)
   }
 
-  async waitForText(
-    selector: string,
-    text: string,
-    opts?: Partial<WaitForOptions>
-  ) {
+  async waitForText(selector: string, text: string) {
     const element = await this.firstElement(selector)
-    await element.waitForText(text, opts)
+    await this.waitUntil(async () => {
+      const elementText = await element.getText()
+      return elementText.includes(text)
+    })
   }
-  async waitForText_(
-    selector: string,
-    text: string,
-    opts?: Partial<WaitForOptions>
-  ) {
-    return await this.waitForText(getSelector(selector), text, opts)
+  async waitForText_(testLabel: string, text: string) {
+    return this.waitForText(getSelector(testLabel), text)
   }
 
   async getText(selector: string) {

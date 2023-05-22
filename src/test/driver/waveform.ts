@@ -14,7 +14,7 @@ export async function clickClip(
   const clip = await client.firstElement(
     `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
   )
-  const elementId = clip.__element.elementId
+  const elementId = clip.elementId
   const rect = await client._driver.client.getElementRect(elementId)
 
   const offsetFromCorner = {

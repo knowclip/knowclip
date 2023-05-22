@@ -31,9 +31,7 @@ export default async function makeSomeFlashcards(
 
   test('wait for card to show', async () => {
     const { client } = context
-    await client.waitForText_(flashcardSection$.container, '2 / 2', {
-      timeout: 10000,
-    })
+    await client.waitForText_(flashcardSection$.container, '2 / 2')
   })
 
   test('fill in second card', async () => {
