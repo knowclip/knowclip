@@ -49,8 +49,6 @@ export const wrapElement = (
     }
   }
 
-  if (!element.elementId)
-    throw new Error(`Element "${selector}" has no elementId.`)
   return {
     elementId: async () => {
       await element.waitForExist()
