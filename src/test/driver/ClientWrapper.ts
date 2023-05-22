@@ -54,7 +54,9 @@ export class ClientWrapper {
             elementsSoFar = elements
             return (
               elements.length === count &&
-              (await Promise.all(elements.map((e) => e.isExisting())))
+              (await Promise.all(elements.map((e) => e.isExisting()))).every(
+                (e) => e
+              )
             )
           },
           { timeout: 10000 }
