@@ -1,8 +1,18 @@
+import type {
+  KeyboardInputEvent,
+  MouseInputEvent,
+  MouseWheelInputEvent,
+} from 'electron'
 import { TestDriver } from './TestDriver'
+
+type ElectronEventJson =
+  | MouseInputEvent
+  | MouseWheelInputEvent
+  | KeyboardInputEvent
 
 export default async function runEvents(
   app: TestDriver,
-  [first, ...rest]: any[],
+  [first, ...rest]: ElectronEventJson[],
   msBetweenEvents: number = 42
 ) {
   if (first) {
@@ -13,7 +23,7 @@ export default async function runEvents(
 
 async function runSubsequentEvents(
   app: TestDriver,
-  [next, ...rest]: any[],
+  [next, ...rest]: ElectronEventJson[],
   msBetweenEvents: number = 42
 ) {
   if (next) {
@@ -64,6 +74,11 @@ export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
       app,
       [
         {
+          type: 'mouseMove',
+          x,
+          y,
+        },
+        {
           type: 'mouseDown',
           x,
           y,
@@ -89,8 +104,13 @@ export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
 function getMouseDragEvents(
   [fromX, fromY]: [number, number],
   [toX, toY]: [number, number]
-) {
+): ElectronEventJson[] {
   return [
+    {
+      type: 'mouseMove',
+      x: fromX,
+      y: fromY,
+    },
     {
       type: 'mouseDown',
       x: fromX,
