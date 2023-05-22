@@ -51,9 +51,10 @@ export async function dragMouse(
   }: { msBetweenEvents?: number; initialHoldTime?: number } = {}
 ) {
   try {
-    const [mouseDownEvent, ...mouseDragEvents] = getMouseDragEvents(start, end)
+    const [mouseMoveEvent, mouseDownEvent, ...mouseDragEvents] =
+      getMouseDragEvents(start, end)
 
-    await runEvents(app, [mouseDownEvent])
+    await runEvents(app, [mouseMoveEvent, mouseDownEvent])
     await sleep(initialHoldTime)
 
     await runEvents(app, mouseDragEvents, msBetweenEvents)
@@ -103,7 +104,7 @@ export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
 function getMouseDragEvents(
   [fromX, fromY]: [number, number],
   [toX, toY]: [number, number]
-): ElectronEventJson[] {
+) {
   return [
     {
       type: 'mouseMove',
@@ -131,5 +132,5 @@ function getMouseDragEvents(
       y: toY,
       clickCount: 1,
     },
-  ]
+  ] as const
 }
