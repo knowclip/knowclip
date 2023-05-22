@@ -56,10 +56,7 @@ export async function waveformMouseHoldAndDrag(
 ) {
   const waveform = await client.firstElement(waveformSelector)
   try {
-    const rect = await client._driver.client.getElementRect(waveform.elementId)
-
-    const { y, height } = rect
-    const midpoint = y + Math.round(height / 2)
+    const midpoint = await getWaveformMidpoint(client, waveform.elementId)
     await dragMouse(client._driver, [start, midpoint], [end, midpoint], {
       initialHoldTime,
     })

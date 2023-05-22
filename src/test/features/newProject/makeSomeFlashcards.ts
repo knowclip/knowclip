@@ -43,13 +43,16 @@ export default async function makeTwoFlashcards(
     await client.waitForText_(flashcardSection$.container, '2 / 2')
   })
 
-  test('select and edit card', async () => {
+  test('select card via waveform', async () => {
     const { client } = context
     await waveformMouseHoldAndDrag(client, 917, 888)
 
     await client.elements_(tagsInput$.tagChip, 1)
     await client.waitForText_(tagsInput$.tagChip, 'pbc')
+  })
 
+  test('fill in fields', async () => {
+    const { client } = context
     await fillInTransliterationCardFields(client, {
       transcription: 'またこの子は昼間からゴロゴロして',
       pronunciation: 'mata kono ko-wa hirumá-kara góro-goro shite',

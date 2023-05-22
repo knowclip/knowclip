@@ -46,7 +46,7 @@ export async function dragMouse(
   start: [number, number],
   end: [number, number],
   {
-    initialHoldTime = 300,
+    initialHoldTime = 100,
     msBetweenEvents = 42,
   }: { msBetweenEvents?: number; initialHoldTime?: number } = {}
 ) {
