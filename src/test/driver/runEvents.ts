@@ -92,6 +92,7 @@ export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
           type: 'mouseUp',
           x,
           y,
+          clickCount: 1,
         },
       ],
       42
@@ -115,7 +116,6 @@ function getMouseDragEvents(
       type: 'mouseDown',
       x: fromX,
       y: fromY,
-      clickCount: 1,
     },
     {
       type: 'mouseMove',
