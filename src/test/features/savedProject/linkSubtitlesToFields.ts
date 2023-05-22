@@ -7,7 +7,8 @@ import { clickClip } from '../../driver/waveform'
 import { test } from '../../test'
 
 export default async function linkSubtitlesToFields(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  { firstClipId }: { firstClipId: string }
 ) {
   test('open media menu', async () => {
     const { client } = context
@@ -32,7 +33,9 @@ export default async function linkSubtitlesToFields(
   test('select clip', async () => {
     const { app, client } = context
 
-    await clickClip(app, client, 0, 2)
+    await sleep(10000)
+    await clickClip(app, client, firstClipId)
+
     await client.waitForText_(flashcardSection$.container, '1 / 3')
   })
 
@@ -50,4 +53,8 @@ export default async function linkSubtitlesToFields(
       '笹を食べながらのんびりするのは最高だなぁ'
     )
   })
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

@@ -10,6 +10,7 @@ import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll, step } from '../step'
 import { describe, beforeAll, afterAll, test } from 'vitest'
+import { first } from 'rxjs'
 
 const testId = 'sharedProject'
 
@@ -22,7 +23,10 @@ describe('opening a shared project', () => {
     await mockSideEffects(app, sideEffectsMocks)
   })
 
-  runAll(sharedProjectTestSteps(), context)
+  runAll(
+    sharedProjectTestSteps('786f7023-0862-4cf7-863f-2c32ec6a3975'),
+    context
+  )
   test('save and close project', () => saveAndCloseProject(context))
 
   afterAll(async () => {
@@ -30,14 +34,16 @@ describe('opening a shared project', () => {
   })
 })
 
-function sharedProjectTestSteps() {
+function sharedProjectTestSteps(firstExistingClipId: string) {
   return [
     step(
       'open a shared project and locates media in local filesystem',
       openSharedProject
     ),
     step('navigate between as-of-yet unloaded media', navigateBetweenMedia),
-    step('make some flashcards', makeFlashcards),
+    step('make some flashcards', (context) =>
+      makeFlashcards(context, firstExistingClipId)
+    ),
     step('make some flashcards using subtitles', makeFlashcardsWithSubtitles),
     step('manually locate missing assets', manuallyLocateAsset),
     step('review with missing media', reviewWithMissingMedia),

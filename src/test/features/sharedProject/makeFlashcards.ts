@@ -5,11 +5,14 @@ import { clickClip, waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
 
-export default async function makeFlashcards(context: IntegrationTestContext) {
+export default async function makeFlashcards(
+  context: IntegrationTestContext,
+  firstExistingClipId: string
+) {
   test('select clip', async () => {
     const { client } = context
 
-    await clickClip(context.app, client, 0, 2)
+    await clickClip(context.app, client, firstExistingClipId)
     await client.waitForText_(flashcardSection$.container, '1 / 3')
     await client.waitForText_(
       flashcardSection$.container,

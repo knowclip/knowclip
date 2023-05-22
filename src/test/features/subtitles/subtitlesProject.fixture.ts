@@ -32,6 +32,7 @@ describe('make a project file for testing generating clips from subtitles', () =
       }),
       ...savedProjectTestSteps({
         projectTitle: 'Project with subtitles',
+        firstClipId: '6b02575a-0a4f-402a-8ea3-31f457cb5d8c',
       }),
     ],
     context

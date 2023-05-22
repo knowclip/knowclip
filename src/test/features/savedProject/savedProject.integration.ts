@@ -28,6 +28,7 @@ describe('opening and saving a previously saved project', () => {
     [
       ...savedProjectTestSteps({
         projectTitle: 'My cool saved project',
+        firstClipId: '632a6cff-7fd7-4d0f-b657-0b9636204261',
       }),
       step('resulting project file matches snapshot', async () => {
         test('save project', async () => {

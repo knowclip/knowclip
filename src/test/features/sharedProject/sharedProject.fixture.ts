@@ -32,6 +32,7 @@ describe('make a project file for testing shared projects', () => {
       }),
       ...savedProjectTestSteps({
         projectTitle: "My friend's shared project",
+        firstClipId: '786f7023-0862-4cf7-863f-2c32ec6a3975',
       }),
     ],
     context

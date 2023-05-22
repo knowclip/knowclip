@@ -24,14 +24,11 @@ export async function waveformMouseDrag(
 export async function clickClip(
   app: TestDriver,
   client: ClientWrapper,
-  indexInVisibleClips: number,
-  expectedVisibleClipsCount?: number
+  clipId: string
 ) {
-  const clips = await client.elements_(
-    waveform$.waveformClip,
-    expectedVisibleClipsCount
+  const clip = await client.firstElement(
+    `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
   )
-  const clip = clips[indexInVisibleClips]
   const rect = await client._driver.client.getElementRect(clip.elementId)
 
   const offsetFromCorner = {

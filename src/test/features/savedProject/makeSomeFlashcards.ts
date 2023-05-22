@@ -35,6 +35,10 @@ export default async function makeSomeFlashcards(
 
     await waveformMouseDrag(client, 921, 1000)
     await client.waitForText_(flashcardSection$.container, '2 / 2')
+  })
+
+  test('fill in second card', async () => {
+    const { client } = context
 
     await fillInTransliterationCardFields(client, {
       transcription: "Das hab' ich nicht gesagt",
@@ -61,21 +65,8 @@ export default async function makeSomeFlashcards(
     const { client } = context
 
     const clipId = `.${waveform$.waveformClip}[data-clip-id="9a07597c-7885-49bc-97d4-76a2dffdb9aa"]`
-    await client.elements(clipId, 1)
+    await client.waitUntilPresent(clipId)
     await client.clickElement_(deleteButton)
     await client.waitUntilGone(clipId)
   })
-
-  // await setVideoTime(client, 0)
-  // await setVideoTime(client, 20)
-  // await waveformMouseDrag(client, 20, 445)
-  // await fillInTransliterationCardFields(client, {
-  //   transcription:
-  //     'Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«',
-  // })
-  // await waveformMouseDrag(client, 575, 1024)
-  // await fillInTransliterationCardFields(client, {
-  //   transcription:
-  //     'Schön! seufzte Piggeldy verzückt.\n\nSchön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse frisst.',
-  // })
 }
