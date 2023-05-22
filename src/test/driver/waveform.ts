@@ -13,7 +13,6 @@ export async function clickClip(
 ) {
   const clipSelector = `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
   const clip = await client.firstElement(clipSelector)
-  await clip.isExisting()
   const rect = await client.getBoundingClientRect(clipSelector)
 
   const offsetFromCorner = {

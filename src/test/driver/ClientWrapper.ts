@@ -256,12 +256,14 @@ export class ClientWrapper {
   }
 
   async getBoundingClientRect(selector: string) {
+    await this.waitUntilPresent(selector)
+
     return await this._driver.client.executeAsync<
       Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>,
       [string]
     >((selector, done) => {
       const rect = document?.querySelector(selector)?.getBoundingClientRect()
-      console.log('rect', rect, selector)
+      if (!rect) throw new Error(`Could not find rectangle for "${selector}"`)
       return done({
         x: rect!.x,
         y: rect!.y,
