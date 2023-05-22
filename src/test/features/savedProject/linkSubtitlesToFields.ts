@@ -33,7 +33,6 @@ export default async function linkSubtitlesToFields(
   test('select clip', async () => {
     const { app, client } = context
 
-    await sleep(10000)
     await clickClip(app, client, firstClipId)
 
     await client.waitForText_(flashcardSection$.container, '1 / 3')
