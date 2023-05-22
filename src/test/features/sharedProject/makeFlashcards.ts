@@ -32,7 +32,7 @@ export default async function makeFlashcards(
     await client.waitForHidden_(waveform$.waveformClip)
   })
 
-  test('create clip', async () => {
+  test('create clip with mouse drag', async () => {
     const { client } = context
 
     await waveformMouseDrag(client, 589, 824)

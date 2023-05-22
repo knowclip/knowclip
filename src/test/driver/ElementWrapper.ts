@@ -75,7 +75,7 @@ export const wrapElement = (
     },
     getText,
     waitForText: async (text: string, opts?: Partial<WaitUntilOptions>) => {
-      let found
+      let found: string | null = null
       try {
         await client.waitUntil(async () => {
           found = await getText()

@@ -38,7 +38,7 @@ export async function waveformMouseDrag(
   client: ClientWrapper,
   start: number,
   end: number,
-  initialHoldTime: number = 300
+  initialHoldTime: number = 100
 ) {
   const waveform = await client.firstElement(waveformSelector)
   try {
@@ -46,6 +46,8 @@ export async function waveformMouseDrag(
     await dragMouse(client._driver, [start, midpoint], [end, midpoint], {
       initialHoldTime,
     })
+    // TODO: not-ideal flaky prevention, see if better text waiting is possible
+    await sleep(100)
   } catch (err) {
     throw err
   }
