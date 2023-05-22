@@ -1,5 +1,5 @@
 import { dragMouse, clickAt } from './runEvents'
-import { Element } from 'webdriverio'
+import { Element, WaitForOptions } from 'webdriverio'
 import { ElementWrapper, element } from './ElementWrapper'
 import { TestDriver } from './TestDriver'
 
@@ -145,12 +145,20 @@ export class ClientWrapper {
     return await this.getAttribute(getSelector(testLabel), attributeName)
   }
 
-  async waitForText(selector: string, text: string) {
+  async waitForText(
+    selector: string,
+    text: string,
+    opts?: Partial<WaitForOptions>
+  ) {
     const element = await this.firstElement(selector)
-    await element.waitForText(text)
+    await element.waitForText(text, opts)
   }
-  async waitForText_(selector: string, text: string) {
-    return await this.waitForText(getSelector(selector), text)
+  async waitForText_(
+    selector: string,
+    text: string,
+    opts?: Partial<WaitForOptions>
+  ) {
+    return await this.waitForText(getSelector(selector), text, opts)
   }
 
   async getText(selector: string) {

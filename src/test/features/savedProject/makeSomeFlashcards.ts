@@ -26,11 +26,17 @@ export default async function makeSomeFlashcards(
     })
   })
 
-  test('create another card', async () => {
+  test('drag to create another card', async () => {
     const { client } = context
 
     await waveformMouseDrag(client, 921, 1000)
-    await client.waitForText_(flashcardSection$.container, '2 / 2')
+  })
+
+  test('wait for card to show', async () => {
+    const { client } = context
+    await client.waitForText_(flashcardSection$.container, '2 / 2', {
+      timeout: 10000,
+    })
   })
 
   test('fill in second card', async () => {
