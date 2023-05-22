@@ -16,9 +16,11 @@ export default async function runEvents(
   msBetweenEvents: number = 42
 ) {
   if (first) {
+    await sleep(10)
     await app.sendToMainProcess({ type: 'sendInputEvent', args: [first] })
     await runSubsequentEvents(app, rest, msBetweenEvents)
   }
+  await sleep(10)
 }
 
 async function runSubsequentEvents(
@@ -44,21 +46,17 @@ export async function dragMouse(
   start: [number, number],
   end: [number, number],
   {
-    initialHoldTime = 60,
+    initialHoldTime = 300,
     msBetweenEvents = 42,
   }: { msBetweenEvents?: number; initialHoldTime?: number } = {}
 ) {
   try {
     const [mouseDownEvent, ...mouseDragEvents] = getMouseDragEvents(start, end)
 
-    await sleep(0)
-
     await runEvents(app, [mouseDownEvent])
     await sleep(initialHoldTime)
 
     await runEvents(app, mouseDragEvents, msBetweenEvents)
-
-    await sleep(0)
   } catch (err) {
     const [x1, y1] = start
     const [x2, y2] = end
