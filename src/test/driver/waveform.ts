@@ -9,14 +9,13 @@ export const waveformSelector = `#${main$.container} > svg`
 export async function waveformMouseDrag(
   client: ClientWrapper,
   start: number,
-  end: number,
-  hold: number = 300
+  end: number
 ) {
   const waveform = await client.firstElement(waveformSelector)
   try {
     if (!waveform.elementId) throw new Error('Waveform elementId expired')
     const midpoint = await getWaveformMidpoint(client, waveform.elementId)
-    await dragMouse(client._driver, [start, midpoint], [end, midpoint], hold)
+    await dragMouse(client._driver, [start, midpoint], [end, midpoint])
   } catch (err) {
     throw err
   }

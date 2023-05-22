@@ -89,11 +89,10 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
         ]
       }
       if (!external) {
-        return [
-          r.simpleMessageSnackbar(
-            `External subtitles file not found for converted VTT track ${validatedFile.id}`
-          ),
-        ]
+        console.error(
+          `External subtitles file not found for converted VTT track ${validatedFile.id}`
+        )
+        return [r.openFileFailure(validatedFile, null, null)]
       }
       const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
       const mediaFile = r.getFile<MediaFile>(

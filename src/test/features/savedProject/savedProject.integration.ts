@@ -8,7 +8,7 @@ import {
 } from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { join } from 'path'
-import { runAll } from '../step'
+import { runAll, step } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
 import { parseProjectJson } from '../../../utils/parseProject'
 import { describe, beforeAll, afterAll, test, expect } from 'vitest'
@@ -25,19 +25,20 @@ describe('opening and saving a previously saved project', () => {
   })
 
   runAll(
-    savedProjectTestSteps({
-      projectTitle: 'My cool saved project',
-    }),
+    [
+      ...savedProjectTestSteps({
+        projectTitle: 'My cool saved project',
+      }),
+      step('resulting project file matches snapshot', async () => {
+        const actualProjectFileContents = await parseProjectJson(
+          join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
+        )
+
+        expect(actualProjectFileContents).toMatchSnapshot()
+      }),
+    ],
     context
   )
-
-  test('resulting project file matches snapshot', async () => {
-    const actualProjectFileContents = await parseProjectJson(
-      join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
-    )
-
-    expect(actualProjectFileContents).toMatchSnapshot()
-  })
 
   afterAll(async () => {
     await stopApp(context)

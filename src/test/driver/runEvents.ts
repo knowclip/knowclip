@@ -2,12 +2,24 @@ import { TestDriver } from './TestDriver'
 
 export default async function runEvents(
   app: TestDriver,
-  [next, ...rest]: any[]
+  [first, ...rest]: any[],
+  msBetweenEvents: number = 42
+) {
+  if (first) {
+    await app.sendToMainProcess({ type: 'sendInputEvent', args: [first] })
+    await runSubsequentEvents(app, rest, msBetweenEvents)
+  }
+}
+
+async function runSubsequentEvents(
+  app: TestDriver,
+  [next, ...rest]: any[],
+  msBetweenEvents: number = 42
 ) {
   if (next) {
-    await sleep(42)
+    await sleep(msBetweenEvents)
     await app.sendToMainProcess({ type: 'sendInputEvent', args: [next] })
-    await runEvents(app, rest)
+    await runSubsequentEvents(app, rest)
   }
 }
 
@@ -20,19 +32,12 @@ function sleep(ms: number) {
 export async function dragMouse(
   app: TestDriver,
   start: [number, number],
-  end: [number, number],
-  moveDelay: number = 0
+  end: [number, number]
 ) {
   try {
     const mouseDragEvents = getMouseDragEvents(start, end)
-    if (!moveDelay) {
-      await runEvents(app, mouseDragEvents)
-    } else {
-      const [mouseDown, ...dragEvents] = mouseDragEvents
-      await runEvents(app, [mouseDown])
-      await sleep(moveDelay)
-      await runEvents(app, dragEvents)
-    }
+
+    await runEvents(app, mouseDragEvents)
   } catch (err) {
     const [x1, y1] = start
     const [x2, y2] = end
@@ -44,23 +49,27 @@ export async function dragMouse(
 
 export async function clickAt(app: TestDriver, [x, y]: [number, number]) {
   try {
-    await runEvents(app, [
-      {
-        type: 'mouseDown',
-        x,
-        y,
-      },
-      {
-        type: 'mouseMove',
-        x,
-        y,
-      },
-      {
-        type: 'mouseUp',
-        x,
-        y,
-      },
-    ])
+    await runEvents(
+      app,
+      [
+        {
+          type: 'mouseDown',
+          x,
+          y,
+        },
+        {
+          type: 'mouseMove',
+          x,
+          y,
+        },
+        {
+          type: 'mouseUp',
+          x,
+          y,
+        },
+      ],
+      42
+    )
   } catch (err) {
     throw new Error(`Could not click mouse at [${x}, ${y}]: ${err}`)
   }
