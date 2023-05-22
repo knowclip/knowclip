@@ -1,4 +1,4 @@
-import { clickAt, dragMouse } from './runEvents'
+import runEvents, { clickAt, dragMouse } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main'
 import { waveform$ } from '../../components/waveformTestLabels'
@@ -54,7 +54,8 @@ async function getWaveformMidpoint(client: ClientWrapper, elementId: string) {
 export async function waveformMouseHoldAndDrag(
   client: ClientWrapper,
   start: number,
-  end: number
+  end: number,
+  initialHoldTime: number = 300
 ) {
   const waveform = await client.firstElement(waveformSelector)
   try {
@@ -62,7 +63,9 @@ export async function waveformMouseHoldAndDrag(
 
     const { y, height } = rect
     const midpoint = y + Math.round(height / 2)
-    await dragMouse(client._driver, [start, midpoint], [end, midpoint])
+    await dragMouse(client._driver, [start, midpoint], [end, midpoint], {
+      initialHoldTime,
+    })
   } catch (err) {
     throw err
   }

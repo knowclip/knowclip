@@ -3,7 +3,10 @@ import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/Fla
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
+import {
+  waveformMouseDrag,
+  waveformMouseHoldAndDrag,
+} from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
 
@@ -18,9 +21,7 @@ export default async function makeSomeFlashcards(
   test('create first card', async () => {
     const { client } = context
 
-    await sleep(100)
     await waveformMouseDrag(client, 351, 438)
-    await sleep(100)
     await client.waitForText_(flashcardSection$.container, '1 / 1')
 
     await fillInTransliterationCardFields(client, {
@@ -51,7 +52,7 @@ export default async function makeSomeFlashcards(
   test('create a third card', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 176, 355)
+    await waveformMouseHoldAndDrag(client, 176, 355)
     await client.waitForText_(flashcardSection$.container, '3 / 3')
     await client.waitForVisible_(waveform$.waveformClip)
   })
@@ -59,8 +60,10 @@ export default async function makeSomeFlashcards(
   test('delete third card', async () => {
     const { client } = context
 
+    const clipId = `.${waveform$.waveformClip}[data-clip-id="9a07597c-7885-49bc-97d4-76a2dffdb9aa"]`
+    await client.elements(clipId, 1)
     await client.clickElement_(deleteButton)
-    await client.waitUntilGone_(waveform$.waveformClip)
+    await client.waitUntilGone(clipId)
   })
 
   // await setVideoTime(client, 0)

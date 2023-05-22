@@ -40,9 +40,10 @@ export default async function makeFlashcardsWithSubtitles(
     const { client } = context
 
     await waveformMouseDrag(client, 589, 824)
-    const els = await client.elements_(waveform$.waveformClip)
 
-    await client.waitUntil(() => els[1].isVisible())
+    await client.waitForVisible(
+      `.${waveform$.waveformClip}[data-clip-id="b9ba2184-cb5c-4d50-98c2-568bf8e75854"]`
+    )
 
     await client.waitForText_(
       flashcardSection$.container,

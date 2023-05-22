@@ -32,12 +32,23 @@ function sleep(ms: number) {
 export async function dragMouse(
   app: TestDriver,
   start: [number, number],
-  end: [number, number]
+  end: [number, number],
+  {
+    initialHoldTime = 60,
+    msBetweenEvents = 42,
+  }: { msBetweenEvents?: number; initialHoldTime?: number } = {}
 ) {
   try {
-    const mouseDragEvents = getMouseDragEvents(start, end)
+    const [mouseDownEvent, ...mouseDragEvents] = getMouseDragEvents(start, end)
 
-    await runEvents(app, mouseDragEvents)
+    await sleep(0)
+
+    await runEvents(app, [mouseDownEvent])
+    await sleep(initialHoldTime)
+
+    await runEvents(app, mouseDragEvents, msBetweenEvents)
+
+    await sleep(0)
   } catch (err) {
     const [x1, y1] = start
     const [x2, y2] = end
