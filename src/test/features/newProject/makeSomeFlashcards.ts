@@ -12,7 +12,10 @@ export default async function makeTwoFlashcards(
   test('create first card', async () => {
     const { client } = context
     await waveformMouseDrag(client, 402, 625)
-
+    await client.waitForText_(flashcardSection$.container, '1 / 1')
+  })
+  test('fill in fields', async () => {
+    const { client } = context
     await fillInTransliterationCardFields(client, {
       transcription: '笹を食べながらのんびりするのは最高だなぁ',
       pronunciation: 'sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa',

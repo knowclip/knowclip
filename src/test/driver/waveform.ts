@@ -11,6 +11,7 @@ export async function clickClip(
   client: ClientWrapper,
   clipId: string
 ) {
+  await sleep(100)
   const clip = await client.firstElement(
     `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
   )
@@ -48,4 +49,8 @@ export async function waveformMouseDrag(
   } catch (err) {
     throw err
   }
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
