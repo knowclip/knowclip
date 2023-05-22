@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`opening and saving a previously saved project > resulting project file matches snapshot 1`] = `
+exports[`opening and saving a previously saved project > resulting project file matches snapshot > save project 1`] = `
 {
   "value": {
     "media": [
@@ -131,3 +131,4 @@ exports[`opening and saving a previously saved project > resulting project file 
   },
 }
 `;
+
