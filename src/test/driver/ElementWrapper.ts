@@ -6,7 +6,6 @@ import { TestDriver } from './TestDriver'
  * when targeting specific elements queried via `ClientWrapper#elements`.
  */
 export interface ElementWrapper {
-  elementId: () => Promise<string>
   selector: string
   setFieldValue: (value: string) => Promise<void>
   click: () => Promise<void>
@@ -50,10 +49,6 @@ export const wrapElement = (
   }
 
   return {
-    elementId: async () => {
-      await element.waitForExist()
-      return element.elementId
-    },
     selector,
     setFieldValue: async (value: string) => {
       await element.setValue(value)
@@ -126,7 +121,7 @@ export const wrapElement = (
       }
     },
     isSelected: async () => {
-      return await client.isElementSelected(element.elementId)
+      return await element.isSelected()
     },
     clickAtOffset: async ({ x, y }: { x: number; y: number }) => {
       try {

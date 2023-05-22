@@ -11,11 +11,10 @@ export async function clickClip(
   client: ClientWrapper,
   clipId: string
 ) {
-  const clip = await client.firstElement(
-    `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
-  )
-  const elementId = await clip.elementId()
-  const rect = await client._driver.client.getElementRect(elementId)
+  const clipSelector = `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
+  const clip = await client.firstElement(clipSelector)
+  await clip.isExisting()
+  const rect = await client.getBoundingClientRect(clipSelector)
 
   const offsetFromCorner = {
     x: Math.round(rect.width / 2),
@@ -26,8 +25,8 @@ export async function clickClip(
   await clickAt(app, [rect.x + offsetFromCorner.x, rect.y + offsetFromCorner.y])
 }
 
-async function getWaveformMidpoint(client: ClientWrapper, elementId: string) {
-  const rect = await client._driver.client.getElementRect(elementId)
+async function getWaveformMidpoint(client: ClientWrapper) {
+  const rect = await client.getBoundingClientRect(waveformSelector)
 
   const { y, height } = rect
   const midpoint = y + Math.round(height / 2)
@@ -40,12 +39,8 @@ export async function waveformMouseDrag(
   end: number,
   initialHoldTime: number = 100
 ) {
-  const waveform = await client.firstElement(waveformSelector)
   try {
-    const midpoint = await getWaveformMidpoint(
-      client,
-      await waveform.elementId()
-    )
+    const midpoint = await getWaveformMidpoint(client)
     await dragMouse(client._driver, [start, midpoint], [end, midpoint], {
       initialHoldTime,
     })

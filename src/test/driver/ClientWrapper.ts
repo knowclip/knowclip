@@ -255,4 +255,20 @@ export class ClientWrapper {
   async moveTo_(testLabel: string, offset: { x: number; y: number }) {
     return await this.moveTo(getSelector(testLabel), offset)
   }
+
+  async getBoundingClientRect(selector: string) {
+    return await this._driver.client.executeAsync<
+      Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>,
+      [string]
+    >((selector, done) => {
+      const rect = document?.querySelector(selector)?.getBoundingClientRect()
+      console.log('rect', rect, selector)
+      return done({
+        x: rect!.x,
+        y: rect!.y,
+        width: rect!.width,
+        height: rect!.height,
+      })
+    }, selector)
+  }
 }
