@@ -17,7 +17,6 @@ export default async function manuallyLocateAsset(
 
     await client.clickElement_(subtitlesMenu$.openMenuButton)
 
-    // should expect second menu item has text "pbc_jp.ass"
     const [, pbcJpOpenTrackSubmenuButton] = await client.elements_(
       subtitlesMenu$.openTrackSubmenuButton
     )
@@ -25,7 +24,7 @@ export default async function manuallyLocateAsset(
     await retryUntil({
       action: () => pbcJpOpenTrackSubmenuButton.click(),
       conditionName: 'submenu opens',
-      check: () => client.waitUntilPresent_(subtitlesMenu$.trackSubmenu),
+      check: () => client.waitUntilPresent_(subtitlesMenu$.trackSubmenu, 1000),
     })
 
     await retryUntil({
