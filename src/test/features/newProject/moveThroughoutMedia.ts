@@ -2,10 +2,11 @@ import { IntegrationTestContext } from '../../setUpDriver'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
+import { createClipViaWaveform, waveformMouseDrag } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { create } from 'domain'
 
 export default async function moveThroughoutMedia(
   context: IntegrationTestContext,
@@ -24,13 +25,10 @@ export default async function moveThroughoutMedia(
   })
 
   test('shift waveform view by creating clip at screen edge', async () => {
-    const { app, client } = context
+    const { client } = context
 
-    await mockSideEffects(app, {
-      uuid: [thirdClipId],
-    })
+    await createClipViaWaveform(context, 710, 1008, thirdClipId)
 
-    await waveformMouseDrag(client, 710, 1008)
     await client.waitForText('body', '3 / 3')
 
     await client.waitUntil(async () => {

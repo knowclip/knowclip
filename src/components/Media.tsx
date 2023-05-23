@@ -17,10 +17,6 @@ import { MediaSubtitles, SubtitlesFileWithTrack } from '../selectors'
 
 export const MEDIA_PLAYER_ID = 'mediaPlayer'
 
-// type IntersectionOf<ObjA, ObjB> = {
-//   [Key in keyof ObjA & keyof ObjB]: ObjA[Key] & ObjB[Key]
-// }
-
 type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] }
 type IntersectionOf<A, B> = OmitNever<A & B>
 

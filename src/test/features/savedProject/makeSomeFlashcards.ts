@@ -3,14 +3,9 @@ import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/Fla
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
-import {
-  createClipViaWaveform,
-  getClipSelector,
-  waveformMouseDrag,
-} from '../../driver/waveform'
+import { createClipViaWaveform, getClipSelector } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 export default async function makeSomeFlashcards(
   context: IntegrationTestContext,
