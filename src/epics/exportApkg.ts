@@ -22,10 +22,11 @@ import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
 import { writeApkgDeck } from 'preloaded/writeToApkg'
 import type { DeckCreationErrorEvent } from '../node/writeToApkg'
+import { ActionOf } from '../actions'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
-    ofType(A.exportApkgFailure),
+    ofType(A.exportApkgFailure as const),
     tap(() => (document.body.style.cursor = 'default')),
     mergeMap(({ errorMessage }) =>
       errorMessage
@@ -39,14 +40,14 @@ const exportApkgFailure: AppEpic = (action$) =>
   )
 const exportApkgSuccess: AppEpic = (action$) =>
   action$.pipe(
-    ofType(A.exportApkgSuccess),
+    ofType(A.exportApkgSuccess as const),
     tap(() => (document.body.style.cursor = 'default')),
     map(({ successMessage }) => r.simpleMessageSnackbar(successMessage))
   )
 
 const exportApkg: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.exportApkgRequest),
+    ofType(A.exportApkgRequest as const),
     switchMap((exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
 
@@ -150,11 +151,11 @@ function makeApkg(
 function getMissingMedia(
   missingMediaFiles: Array<MediaFile>,
   action$: Observable<Action>,
-  exportApkgRequest: ExportApkgRequest
+  exportApkgRequest: ActionOf<A.exportApkgRequest>
 ) {
   const missingMediaFileIds = missingMediaFiles.map((file) => file.id)
   const openMissingMediaFailure = action$.pipe(
-    ofType(A.openFileFailure),
+    ofType(A.openFileFailure as const),
     filter(
       (a) =>
         a.file.type === 'MediaFile' && missingMediaFileIds.includes(a.file.id)
@@ -166,7 +167,7 @@ function getMissingMedia(
       of(r.openFileRequest(file)).pipe(
         concatWith(
           action$.pipe(
-            ofType(A.openFileSuccess),
+            ofType(A.openFileSuccess as const),
             filter((a) => areSameFile(file, a.validatedFile)),
             take(1),
             ignoreElements()

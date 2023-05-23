@@ -1,11 +1,12 @@
 import React, { useState, useCallback, Fragment } from 'react'
-import { Snackbar, IconButton, Button } from '@mui/material'
+import { Snackbar, IconButton, Button, SnackbarProps } from '@mui/material'
 import { Close } from '@mui/icons-material'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
-import { snackbar$ } from '.'
+import { snackbar$ } from '../Snackbar.testLabels'
 import r from '../../redux'
+import ActionType from '../../types/ActionType'
 
 const PromptSnackbar = ({
   message,
@@ -23,15 +24,16 @@ const PromptSnackbar = ({
   const handleClose = useCallback(() => {
     setOpen(false)
   }, [setOpen])
-  const closeExceptOnClickaway = useCallback(
-    (e, reason) => {
-      if (reason !== 'clickaway') handleClose()
-    },
-    [handleClose]
-  )
+  const closeExceptOnClickaway: NonNullable<SnackbarProps['onClose']> =
+    useCallback(
+      (e, reason) => {
+        if (reason !== 'clickaway') handleClose()
+      },
+      [handleClose]
+    )
   const dispatch = useDispatch()
   const dispatchAction = useCallback(
-    (action) => {
+    (action: Action) => {
       dispatch(action)
       setOpen(false)
     },
@@ -39,7 +41,7 @@ const PromptSnackbar = ({
   )
 
   const handleExited = useCallback(
-    (_e) => dispatch(r.closeSnackbar()),
+    () => dispatch(r.closeSnackbar()),
     [dispatch]
   )
 
@@ -62,7 +64,9 @@ const PromptSnackbar = ({
                 {label}
               </Button>
             ))}
-            {!actions.some(([, action]) => action.type === 'closeSnackbar') && (
+            {!actions.some(
+              ([, action]) => action.type === ActionType.closeSnackbar
+            ) && (
               <IconButton onClick={handleClose}>
                 <Close />
               </IconButton>

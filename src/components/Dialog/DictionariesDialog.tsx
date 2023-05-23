@@ -24,10 +24,7 @@ import { Delete, Warning } from '@mui/icons-material'
 import { openInBrowser } from '../../utils/electron'
 import { useLocalSettingsReducer } from './SettingsDialog'
 
-enum $ {
-  container = 'dictionaries-dialog',
-}
-export { $ as dictionariesDialog$ }
+import { dictionariesDialog$ as $ } from './DictionariesDialog.testLabels'
 
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
@@ -238,7 +235,7 @@ function DictionaryFileItem({
     [availability.id, onClickDelete]
   )
   const handleChange = useCallback(
-    (_e) => onChange(file.id, file.dictionaryType),
+    () => onChange(file.id, file.dictionaryType),
     [onChange, file.id, file.dictionaryType]
   )
   return (

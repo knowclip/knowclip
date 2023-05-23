@@ -1,6 +1,7 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 
-export const settingsActions = {
+export const settingsActions = defineActionCreators({
   setMediaFolderLocation: (directoryPath: string) => ({
     type: A.setMediaFolderLocation,
     directoryPath,
@@ -36,4 +37,4 @@ export const settingsActions = {
     type: A.removeActiveDictionary,
     id,
   }),
-}
+})

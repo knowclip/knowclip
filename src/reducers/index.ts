@@ -13,6 +13,7 @@ import { createElectronStorage } from 'preloaded/reduxPersistElectronStorage'
 import { resetFileAvailabilities } from '../utils/statePersistence'
 import A from '../types/ActionType'
 import { Action } from '../actions'
+import ActionType from '../types/ActionType'
 
 const storage = createElectronStorage()
 const whitelist: (keyof FilesState)[] = ['ProjectFile', 'Dictionary']
@@ -55,7 +56,7 @@ const root = combineReducers<AppState>({
 
 const persistedReducer = persistReducer(rootConfig, root)
 
-const UNDOABLE_ACTIONS = new Set<Action['type']>([
+const UNDOABLE_ACTIONS = new Set<ActionType>([
   A.deleteCard,
   A.makeClipsFromSubtitles,
   A.deleteCards,
@@ -70,7 +71,7 @@ const UNDOABLE_ACTIONS = new Set<Action['type']>([
   A.stretchClip,
 ])
 
-const HISTORY_CLEARING_ACTIONS = new Set<Action['type']>([
+const HISTORY_CLEARING_ACTIONS = new Set<ActionType>([
   A.setCurrentFile,
   A.openProject,
   A.closeProject,

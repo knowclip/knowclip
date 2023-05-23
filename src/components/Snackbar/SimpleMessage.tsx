@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react'
-import { Snackbar, IconButton } from '@mui/material'
+import { Snackbar, IconButton, SnackbarProps } from '@mui/material'
 import { Close } from '@mui/icons-material'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
 import r from '../../redux'
-import { snackbar$ } from '.'
+import { snackbar$ } from '../Snackbar.testLabels'
 
 const SimpleMessageSnackbar = ({
   message,
@@ -21,16 +21,17 @@ const SimpleMessageSnackbar = ({
   const handleClose = useCallback(() => {
     setOpen(false)
   }, [setOpen])
-  const closeExceptOnClickaway = useCallback(
-    (e, reason) => {
-      if (reason !== 'clickaway') handleClose()
-    },
-    [handleClose]
-  )
+  const closeExceptOnClickaway: NonNullable<SnackbarProps['onClose']> =
+    useCallback(
+      (e, reason) => {
+        if (reason !== 'clickaway') handleClose()
+      },
+      [handleClose]
+    )
 
   const dispatch = useDispatch()
   const handleExited = useCallback(
-    (_e) => dispatch(r.closeSnackbar()),
+    () => dispatch(r.closeSnackbar()),
     [dispatch]
   )
 

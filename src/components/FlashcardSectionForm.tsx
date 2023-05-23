@@ -1,4 +1,11 @@
-import React, { useCallback, useState, useEffect, memo, useRef } from 'react'
+import {
+  useCallback,
+  useState,
+  useEffect,
+  memo,
+  useRef,
+  FormEventHandler,
+} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@mui/material'
 import {
@@ -13,18 +20,12 @@ import { getNoteTypeFields } from '../utils/noteType'
 import TagsInput from './TagsInput'
 import VideoStillDisplay from './FlashcardSectionFormVideoStill'
 import { actions } from '../actions'
-import Field from './FlashcardSectionFormField'
+import Field, {
+  Props as FlashcardFormFieldProps,
+} from './FlashcardSectionFormField'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 
-enum $ {
-  container = 'flashcard-form-container',
-  flashcardFields = 'flashcard-field',
-  deleteButton = 'delete-clip-button',
-  transcriptionField = 'flashcard-form-transcription',
-  pronunciationField = 'flashcard-form-pronunciation',
-  meaningField = 'flashcard-form-meaning',
-  notesField = 'flashcard-form-notes',
-}
+import { flashcardSectionForm$ as $ } from './FlashcardSectionForm.testLabels'
 
 const fieldContainerLabels = {
   transcription: $.transcriptionField,
@@ -105,22 +106,24 @@ const FlashcardSectionForm = memo(
       dispatch(actions.stopEditingCards())
     }, [dispatch])
 
-    const handleFlashcardSubmit = useCallback((e) => {
+    const handleFlashcardSubmit: FormEventHandler = useCallback((e) => {
       e.preventDefault()
     }, [])
 
-    const setFlashcardText = useCallback(
-      (key, text, caretLocation) =>
-        dispatch(actions.setFlashcardField(id, key, text, caretLocation)),
-      [dispatch, id]
-    )
+    const setFlashcardText: FlashcardFormFieldProps['setFlashcardText'] =
+      useCallback(
+        (key, text, caretLocation) =>
+          dispatch(actions.setFlashcardField(id, key, text, caretLocation)),
+        [dispatch, id]
+      )
 
     const onAddChip = useCallback(
       (text: string) => dispatch(actions.addFlashcardTag(id, text)),
       [dispatch, id]
     )
     const onDeleteChip = useCallback(
-      (index, text) => dispatch(actions.deleteFlashcardTag(id, index, text)),
+      (index: number, text: string) =>
+        dispatch(actions.deleteFlashcardTag(id, index, text)),
       [dispatch, id]
     )
 
@@ -172,11 +175,10 @@ const FlashcardSectionForm = memo(
               )
             })}
           <TagsInput
-            allTags={allTags}
+            options={allTags}
             tags={flashcard.tags}
             onAddChip={onAddChip}
-            onDeleteChip={onDeleteChip}
-            onFocus={handleFocus}
+            onDeleteChip={(i) => onDeleteChip(i, flashcard.tags[i])}
           />
         </section>
 
@@ -218,5 +220,3 @@ export const capitalize = (string: string) =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
 
 export default FlashcardSectionForm
-
-export { $ as flashcardSectionForm$ }

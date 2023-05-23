@@ -1,13 +1,10 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
-import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
-import {
-  reviewAndExportMediaTableRow$ as mediaTableRows$,
-  reviewAndExportMediaTableRow$,
-} from '../../../components/ReviewAndExportMediaTableRow'
+import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport.testLabels'
+import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable.testLabels'
+import { reviewAndExportMediaTableRow$ as mediaTableRows$ } from '../../../components/ReviewAndExportMediaTableRow.testLabels'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
-import { projectMenu$ } from '../../../components/ProjectMenu'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
+import { projectMenu$ } from '../../../components/ProjectMenu.testLabels'
 import { test, expect } from '../../test'
 
 export default async function reviewWithMissingMedia(
@@ -27,7 +24,7 @@ export default async function reviewWithMissingMedia(
     await client.clickElement_(dialog$.continueButton)
     await client.elements_(mediaTables$.container, 2)
     await client.waitForText_(
-      reviewAndExportMediaTableRow$.highlightedClipRow,
+      mediaTableRows$.highlightedClipRow,
       'ああー  吸わないで'
     )
   })

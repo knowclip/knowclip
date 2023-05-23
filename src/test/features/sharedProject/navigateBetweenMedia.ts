@@ -1,9 +1,9 @@
 import { IntegrationTestContext, ASSETS_DIRECTORY } from '../../setUpDriver'
-import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
-import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
+import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { snackbar$ } from '../../../components/Snackbar'
+import { snackbar$ } from '../../../components/Snackbar.testLabels'
 import { test } from '../../test'
 
 export default async function navigateBetweenMedia(
@@ -18,9 +18,9 @@ export default async function navigateBetweenMedia(
       2
     )
     await secondMediaFile.click()
-    await client.waitForVisible_(fileSelectionForm$.form)
+    await client.waitForVisible_(fileSelectionDialog$.form)
     await client.waitForText_(
-      fileSelectionForm$.form,
+      fileSelectionDialog$.form,
       'Please locate your media file "piggeldy_cat.mp4" in the filesystem so you can make clips with it.'
     )
   })
@@ -28,7 +28,7 @@ export default async function navigateBetweenMedia(
   test('cancel attempt to locate media file', async () => {
     const { client } = context
 
-    await client.clickElement_(fileSelectionForm$.cancelButton)
+    await client.clickElement_(fileSelectionDialog$.cancelButton)
     await client.waitForVisible_(snackbar$.container)
     await client.waitForText_(
       snackbar$.container,
@@ -51,7 +51,7 @@ export default async function navigateBetweenMedia(
     )
     await firstMediaFile.click()
 
-    await client.waitForText_(fileSelectionForm$.form, 'polar_bear_cafe.mp4')
+    await client.waitForText_(fileSelectionDialog$.form, 'polar_bear_cafe.mp4')
   })
 
   test('locate missing media file', async () => {
@@ -62,15 +62,21 @@ export default async function navigateBetweenMedia(
         Promise.resolve([join(ASSETS_DIRECTORY, 'polar_bear_cafe.mp4')]),
       ],
     })
-    await client.clickElement_(fileSelectionForm$.filePathField)
-    await client.clickElement_(fileSelectionForm$.continueButton)
+    await client.clickElement_(fileSelectionDialog$.filePathField)
+    await client.clickElement_(fileSelectionDialog$.continueButton)
   })
 
-  test('dismiss subtitles dialog and snackbar', async () => {
+  test('dismiss subtitles dialog', async () => {
     const { client } = context
 
-    await client.waitForText_(fileSelectionForm$.form, 'pbc_jp.ass')
-    await client.clickElement_(fileSelectionForm$.cancelButton)
+    await client._driver.client
+      .$(`#${fileSelectionDialog$.form}*=pbc_jp.ass`)
+      .isExisting()
+    await client.clickElement_(fileSelectionDialog$.cancelButton)
+  })
+
+  test('dismiss subtitles snackbar', async () => {
+    const { client } = context
     await client.clickElement_(snackbar$.closeButton)
     await client.waitUntilGone_(snackbar$.closeButton)
   })

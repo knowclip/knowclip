@@ -1,202 +1,90 @@
-import React, { useRef, useState, useCallback } from 'react'
-import cn from 'classnames'
-import { MenuItem, Paper, Chip } from '@mui/material'
-import ChipInput, { ChipRenderer } from '@silvestre/material-ui-chip-input-v5'
-import css from './FlashcardSection.module.css'
-import Autosuggest, {
-  RenderSuggestion,
-  GetSuggestionValue,
-  RenderSuggestionsContainer,
-  InputProps,
-} from 'react-autosuggest'
-import { blue } from '@mui/material/colors'
-import truncate from '../utils/truncate'
+import { Autocomplete, AutocompleteProps, Chip, TextField } from '@mui/material'
+import { useState } from 'react'
+import classnames from 'classnames'
 
-enum $ {
-  container = 'tags-input-container',
-  tagChip = 'tags-input-tag-chip',
-  inputField = 'tags-input-field',
-}
+import { tagsInput$ as $ } from './TagsInput.testLabels'
 
-const getSuggestionValue: GetSuggestionValue<string> = (a) => a
-const preventDefault = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-  e.preventDefault()
-}
-
-const renderSuggestion: RenderSuggestion<string> = (
-  suggestion,
-  { isHighlighted, ...other }
-) => (
-  // prevent the click causing the input to be blurred
-  <MenuItem
-    selected={isHighlighted}
-    onMouseDown={preventDefault}
-    id={`tag__${suggestion}`}
-    {...other}
-  >
-    {suggestion}
-  </MenuItem>
-)
-
-const TagsInput = ({
-  allTags,
-  tags,
+export default function ChipsInput<
+  DisableClearable extends boolean | undefined = false
+>({
   onAddChip,
   onDeleteChip,
-  onFocus,
-}: {
-  allTags: string[]
-  tags: string[]
-  onAddChip: (text: string) => void
-  onDeleteChip: (index: number, text: string) => void
-  onFocus?: (event: any) => void
-}) => {
-  const autosuggestComponent = useRef<Autosuggest<string, any>>(null)
-
-  const [textFieldInput, setTextFieldInput] = useState('')
-  const [suggestions, setSuggestions] = useState<string[]>([])
-
-  const handletextFieldInputChange = useCallback(
-    (_e, { newValue }) => setTextFieldInput(newValue),
-    [setTextFieldInput]
-  )
-
-  const handleAddChip = useCallback(
-    (text) => {
-      setTextFieldInput('')
-      onAddChip(text)
-    },
-    [setTextFieldInput, onAddChip]
-  )
-  const handleDeleteChip = useCallback(
-    (text, index) => {
-      onDeleteChip(index, text)
-      if (autosuggestComponent.current && autosuggestComponent.current.input)
-        autosuggestComponent.current.input.focus()
-    },
-    [onDeleteChip, autosuggestComponent]
-  )
-
-  const onSuggestionHighlighted = useCallback(({ suggestion }) => {
-    const el =
-      suggestion && document.querySelector(`#tag__${suggestion}:not(:hover)`)
-    if (el) {
-      el.scrollIntoView(false)
-    }
-  }, [])
-
-  const onSuggestionSelected = useCallback(
-    (e, { suggestionValue }) => {
-      handleAddChip(suggestionValue)
-      e.preventDefault()
-    },
-    [handleAddChip]
-  )
-
-  const getSuggestions = useCallback(
-    (value) => {
-      const inputValue = value.trim().toLowerCase()
-
-      return inputValue.length === 0
-        ? []
-        : allTags.filter((tag) => tag.toLowerCase().startsWith(inputValue))
-    },
-    [allTags]
-  )
-  const onSuggestionsFetchRequested = useCallback(
-    ({ value }) => setSuggestions(getSuggestions(value)),
-    [setSuggestions, getSuggestions]
-  )
-
-  const onSuggestionsClearRequested = () => setSuggestions([])
-
-  const renderSuggestionsContainer: RenderSuggestionsContainer = ({
-    children,
-    containerProps,
-  }) => (
-    <Paper {...containerProps} square className={css.suggestionsContainer}>
-      {children}
-    </Paper>
-  )
-
+  tags,
+  ...props
+}: Partial<AutocompleteProps<string, true, DisableClearable, true>> &
+  Pick<AutocompleteProps<string, true, DisableClearable, true>, 'options'> & {
+    onAddChip: (text: string) => void
+    onDeleteChip: (index: number) => void
+    tags: string[]
+  }) {
+  const [inputValue, setInputValueRaw] = useState('')
+  const setInputValue = (text: string) =>
+    setInputValueRaw(sanitizeChipText(text))
   return (
-    <Autosuggest
-      ref={autosuggestComponent}
-      theme={{
-        suggestionsList: css.suggestionsList,
-        suggestionsContainer: css.suggestionsContainer,
-      }}
-      suggestions={suggestions}
-      onSuggestionHighlighted={onSuggestionHighlighted}
-      onSuggestionSelected={onSuggestionSelected}
-      onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-      onSuggestionsClearRequested={onSuggestionsClearRequested}
-      renderSuggestionsContainer={renderSuggestionsContainer}
-      getSuggestionValue={getSuggestionValue}
-      renderSuggestion={renderSuggestion}
-      focusInputOnSuggestionClick={false}
-      shouldRenderSuggestions={useCallback(
-        (value) => value && value.trim().length > 0,
-        []
-      )}
-      inputProps={
-        {
-          chips: tags || [],
-          value: textFieldInput,
-          onChange: handletextFieldInputChange,
-          onAdd: handleAddChip,
-          onDelete: handleDeleteChip,
-          InputProps: { inputProps: { className: $.inputField, onFocus } },
-        } as InputProps<string>
-      }
-      renderInputComponent={useCallback(
-        ({ onChange, chips, ref, ...other }) => (
-          <>
-            <ChipInput
-              margin="dense"
-              label="Tags"
-              placeholder="Type your tag and press 'enter'"
-              className={cn(css.tagsField, $.container)}
-              fullWidth
-              onAdd={handleAddChip}
-              onDelete={handleDeleteChip}
-              dataSource={allTags}
-              newChipKeyCodes={[13, 9, 32] /* enter tab space */}
-              onUpdateInput={onChange}
-              clearInputValueOnChange
-              inputRef={ref}
-              chipRenderer={chipRenderer}
-              onFocus={onFocus}
-              blurBehavior="add"
-              {...other}
-              value={chips}
+    <Autocomplete
+      clearIcon={false}
+      freeSolo={props.freeSolo ?? true}
+      multiple={props.multiple ?? true}
+      inputValue={inputValue}
+      onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+      className={classnames(props.className, $.container)}
+      filterOptions={(o) => o.filter((x) => !tags.includes(x))}
+      renderTags={(value, getTagProps) =>
+        value.map((option, index) => {
+          const props = getTagProps({ index })
+          return (
+            <Chip
+              label={option}
+              {...props}
+              className={classnames(props.className, $.tagChip)}
             />
-          </>
-        ),
-        [handleAddChip, handleDeleteChip, allTags, onFocus]
+          )
+        })
+      }
+      renderInput={(params) => (
+        <TextField
+          margin="dense"
+          label="Add Tags"
+          placeholder="Type your tag and press 'enter'"
+          onBlur={(e) => {
+            const value = e.target.value.trim()
+            if (!value) return
+
+            setInputValue('')
+            onAddChip(value)
+          }}
+          {...params}
+          inputProps={{
+            ...params.inputProps,
+            className: classnames($.inputField, params.inputProps.className),
+          }}
+        />
       )}
+      clearOnEscape
+      onChange={(e, value, reason, details): void => {
+        if (reason === 'clear') {
+          return setInputValue('')
+        }
+
+        if (!details) return console.error('details is undefined')
+
+        const { option } = details
+        if (reason === 'createOption' || reason === 'selectOption') {
+          return onAddChip(details.option)
+        }
+        if (reason === 'removeOption') {
+          if (!tags.includes(option)) return setInputValue('')
+
+          const optionIndex = tags.indexOf(details.option)
+          return onDeleteChip(optionIndex)
+        }
+      }}
+      value={tags}
+      {...props}
     />
   )
 }
 
-const chipRenderer: ChipRenderer = (
-  { text, isFocused, isDisabled, handleClick, handleDelete, className },
-  key
-) => (
-  <Chip
-    key={key}
-    className={cn(className, $.tagChip)}
-    style={{
-      pointerEvents: isDisabled ? 'none' : undefined,
-      backgroundColor: isFocused ? blue[300] : undefined,
-    }}
-    onClick={handleClick}
-    onDelete={handleDelete}
-    label={truncate(text, 12)}
-    title={text}
-  />
-)
-
-export default TagsInput
-
-export { $ as tagsInput$ }
+function sanitizeChipText(text: string) {
+  return text.replace(/\s/g, '_')
+}

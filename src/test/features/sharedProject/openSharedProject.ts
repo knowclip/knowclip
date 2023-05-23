@@ -1,10 +1,10 @@
 import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
-import { main$ } from '../../../components/Main'
-import { projectsMenu$ } from '../../../components/ProjectsMenu'
-import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
+import { main$ } from '../../../components/Main.testLabels'
+import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
+import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { snackbar$ } from '../../../components/Snackbar'
+import { snackbar$ } from '../../../components/Snackbar.testLabels'
 import { test } from '../../test'
 
 export default async function openSharedProject(
@@ -21,7 +21,7 @@ export default async function openSharedProject(
 
     await client.waitUntilPresent_(main$.container)
 
-    await client.clickElement_(fileSelectionForm$.cancelButton)
+    await client.clickElement_(fileSelectionDialog$.cancelButton)
     await client.waitForText_(
       snackbar$.container,
       'Could not locate media file "piggeldy_cat.mp4". Some features may be unavailable until it is located.'

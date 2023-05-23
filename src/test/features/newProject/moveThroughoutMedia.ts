@@ -1,13 +1,14 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
+import { createClipViaWaveform, waveformMouseDrag } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
 
 export default async function moveThroughoutMedia(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  thirdClipId: string
 ) {
   test('seek to new time in video', async () => {
     const { client } = context
@@ -24,7 +25,8 @@ export default async function moveThroughoutMedia(
   test('shift waveform view by creating clip at screen edge', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 710, 1008)
+    await createClipViaWaveform(context, 710, 1008, thirdClipId)
+
     await client.waitForText('body', '3 / 3')
 
     await client.waitUntil(async () => {
@@ -49,7 +51,6 @@ export default async function moveThroughoutMedia(
   test('shift waveform view by navigating with previous button', async () => {
     const { client } = context
 
-    if (process.platform === 'linux') await client._driver.client.pause(1000)
     await client.clickElement_(flashcardSection$.previousClipButton)
     await client.waitForText('body', '2 / 3')
 

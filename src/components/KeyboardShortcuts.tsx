@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, MouseEventHandler } from 'react'
 import { Card, CardContent } from '@mui/material'
 import css from './KeyboardShortcuts.module.css'
 import { platform } from 'preloaded/os'
@@ -35,7 +35,7 @@ const Shortcut = ({ action }: { action: keyof typeof KEYBOARD_SHORTCUTS }) => (
 
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false)
-  const handleMouseDown = useCallback(
+  const handleMouseDown: MouseEventHandler = useCallback(
     (e) => {
       setOpen((open) => !open)
       if (!open) e.preventDefault()

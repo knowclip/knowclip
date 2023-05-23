@@ -9,10 +9,7 @@ import {
 } from '@mui/material'
 import { theme } from './theme'
 
-enum $ {
-  container = 'error-message',
-}
-export { $ as errorMessage$ }
+import { errorMessage$ as $ } from './ErrorMessage.testLabels'
 
 const ErrorMessage = ({ reactError }: { reactError: any }) => {
   console.log('crash:', { reactError })

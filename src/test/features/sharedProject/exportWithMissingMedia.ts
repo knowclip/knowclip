@@ -3,14 +3,14 @@ import {
   ASSETS_DIRECTORY,
   TMP_DIRECTORY,
 } from '../../setUpDriver'
-import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport'
-import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable'
-import { snackbar$ } from '../../../components/Snackbar'
+import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport.testLabels'
+import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable.testLabels'
+import { snackbar$ } from '../../../components/Snackbar.testLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
-import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
+import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
-import { mainHeader$ } from '../../../components/MainHeader'
+import { mainHeader$ } from '../../../components/MainHeader.testLabels'
 import * as yauzl from 'yauzl'
 import * as fs from 'fs'
 import { test, expect } from '../../test'
@@ -38,9 +38,9 @@ export default async function exportWithMissingMedia(
         Promise.resolve([join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4')]),
       ],
     })
-    await client.clickElement_(fileSelectionForm$.filePathField)
-    await client.clickElement_(fileSelectionForm$.continueButton)
-    await client.waitUntilGone_(fileSelectionForm$.form)
+    await client.clickElement_(fileSelectionDialog$.filePathField)
+    await client.clickElement_(fileSelectionDialog$.continueButton)
+    await client.waitUntilGone_(fileSelectionDialog$.form)
 
     await client.clickElement_(dialog$.continueButton)
     const mediaCheckboxesChecked = await checkboxesChecked(

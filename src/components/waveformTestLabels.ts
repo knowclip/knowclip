@@ -1,7 +1,5 @@
-export enum $ {
+export enum waveform$ {
   placeholder = 'waveform-placeholder',
   subtitlesChunk = 'subtitles-chunk',
   waveformClip = 'waveform-clip',
 }
-
-export { $ as waveform$ }

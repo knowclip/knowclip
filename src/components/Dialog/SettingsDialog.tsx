@@ -30,11 +30,7 @@ import truncate from '../../utils/truncate'
 import { displayDictionaryType } from '../../selectors'
 import { ImportInterruptedListIcon } from './DictionariesDialog'
 
-enum $ {
-  container = 'settings-dialog',
-  cancelButton = 'settings-dialog-cancel-button',
-  saveButton = 'settings-dialog-save-button',
-}
+import { settingsDialog$ as $ } from './SettingsDialog.testLabels'
 
 const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   const dispatch = useDispatch()
@@ -142,15 +138,13 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                 control={
                   <Checkbox
                     checked={settings.checkForUpdatesAutomatically}
-                    onChange={useCallback(
-                      (e) =>
-                        dispatchLocal(
-                          actions.setCheckForUpdatesAutomatically(
-                            e.target.checked
-                          )
-                        ),
-                      [dispatchLocal]
-                    )}
+                    onChange={(e) =>
+                      dispatchLocal(
+                        actions.setCheckForUpdatesAutomatically(
+                          e.target.checked
+                        )
+                      )
+                    }
                     color="primary"
                   />
                 }
@@ -192,7 +186,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                       <Checkbox
                         checked={selected}
                         tabIndex={-1}
-                        onChange={(_e) =>
+                        onChange={() =>
                           dispatchLocal(
                             selected
                               ? actions.removeActiveDictionary(file.id)
@@ -275,5 +269,3 @@ const RemoveAssetsDirectoryButton = ({
 )
 
 export default SettingsDialog
-
-export { $ as settingsDialog$ }

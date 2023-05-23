@@ -1,8 +1,9 @@
 import { nowUtcTimestamp } from '../utils/sideEffects'
 import A from '../types/ActionType'
 import { FileUpdates } from '../files/updates'
+import { defineActionCreators } from './defineActionCreators'
 
-export const filesActions = {
+export const filesActions = defineActionCreators({
   /** Add file to records without opening or doing anything with it */
   addFile: <F extends FileMetadata>(file: F, path?: string) => ({
     type: A.addFile,
@@ -84,4 +85,4 @@ export const filesActions = {
     clipId,
     file,
   }),
-}
+})

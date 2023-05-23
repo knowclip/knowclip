@@ -5,10 +5,7 @@ import MediaFolderLocationForm from '../MediaFolderLocationForm'
 import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
 
-enum $ {
-  container = 'media-folder-location-form-dialog',
-}
-export { $ as mediaFolderLocationFormDialog$ }
+import { mediaFolderLocationFormDialog$ as $ } from './MediaFolderLocationFormDialog.testLabels'
 
 const MediaFolderLocationFormDialog = ({
   open,

@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react'
+import React, { useCallback, memo, EventHandler } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Toolbar, Paper, Checkbox, IconButton, Tooltip } from '@mui/material'
 import { ExpandLess, ExpandMore, FolderSpecial } from '@mui/icons-material'
@@ -9,18 +9,17 @@ import moment from 'moment'
 import FlashcardRow from './ReviewAndExportMediaTableRow'
 import { formatDuration } from '../utils/formatTime'
 import {
-  AutoSizer,
+  AutoSizer as AutoSizer_,
   CellMeasurerCache,
-  List,
+  List as List_,
   ListRowRenderer,
-  CellMeasurer,
+  CellMeasurer as CellMeasurer_,
 } from 'react-virtualized'
+import { reviewAndExportMediaTable$ as $ } from './ReviewAndExportMediaTable.testLabels'
 
-enum $ {
-  container = 'review-and-export-media-table-container',
-  header = 'review-and-export-media-table-header',
-  checkbox = 'review-and-export-media-table-checkbox',
-}
+const AutoSizer = AutoSizer_ as any
+const List = List_ as any
+const CellMeasurer = CellMeasurer_ as any
 
 type MediaTableProps = {
   media: MediaFile
@@ -68,7 +67,10 @@ const ReviewAndExportMediaTable = memo(
       if (!open)
         dispatch(fileRemembered ? r.openFileRequest(media) : r.dismissMedia())
     }, [onClick, open, mediaIndex, dispatch, fileRemembered, media])
-    const stopPropagation = useCallback((e) => e.stopPropagation(), [])
+    const stopPropagation: EventHandler<any> = useCallback(
+      (e) => e.stopPropagation(),
+      []
+    )
     const selectAll = useCallback(
       () => onSelectAll(media.id),
       [onSelectAll, media.id]
@@ -95,7 +97,7 @@ const ReviewAndExportMediaTable = memo(
             parent={parent}
             rowIndex={index}
           >
-            {({ measure, registerChild }) => (
+            {({ measure, registerChild }: any) => (
               <FlashcardRow
                 key={key}
                 id={id}
@@ -168,7 +170,7 @@ const ReviewAndExportMediaTable = memo(
         <div>
           {open && (
             <AutoSizer disableHeight>
-              {({ width }) => (
+              {({ width }: any) => (
                 <List
                   className={css.table}
                   height={clipsIds.length ? 450 : 80}
@@ -195,5 +197,3 @@ const noRowsRenderer = () => (
 )
 
 export default ReviewAndExportMediaTable
-
-export { $ as reviewAndExportMediaTable$ }

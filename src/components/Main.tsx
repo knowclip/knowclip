@@ -33,9 +33,7 @@ import { getFreshRegions } from '../epics/getFreshRegions'
 import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
 import { useWaveformEventHandlers } from '../utils/clipwave/useWaveformEventHandlers'
 
-enum $ {
-  container = 'main-screen-container',
-}
+import { main$ as $ } from './Main.testLabels'
 
 const Main = () => {
   const routeParams = useParams()
@@ -321,5 +319,3 @@ const Main = () => {
 const EMPTY: string[] = []
 
 export default Main
-
-export { $ as main$ }

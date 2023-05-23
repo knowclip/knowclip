@@ -15,12 +15,7 @@ import { actions } from '../actions'
 import { DialogProps } from './Dialog/DialogProps'
 import MediaTable from './ReviewAndExportMediaTable'
 
-enum $ {
-  container = 'review-and-export-dialog-container',
-  exportApkgButton = 'review-and-export-export-apkg-button',
-  continueButton = 'review-and-export-continue-button',
-  exitButton = 'review-and-export-exit-button',
-}
+import { reviewAndExport$ as $ } from './ReviewAndExport.testLabels'
 
 const Export = React.memo(
   ({
@@ -292,5 +287,3 @@ function IntroText({ currentTabIndex }: { currentTabIndex: number }) {
 }
 
 export default Export
-
-export { $ as reviewAndExport$ }

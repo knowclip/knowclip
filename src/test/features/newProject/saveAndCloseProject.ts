@@ -1,7 +1,7 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { projectsMenu$ } from '../../../components/ProjectsMenu'
+import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
-import { snackbar$ } from '../../../components/Snackbar'
+import { snackbar$ } from '../../../components/Snackbar.testLabels'
 import { test } from '../../test'
 
 export default async function saveAndCloseProject(

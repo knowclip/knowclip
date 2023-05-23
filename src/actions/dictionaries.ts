@@ -1,7 +1,8 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 import { filesActions } from './files'
 
-export const dictionariesActions = {
+export const dictionariesActions = defineActionCreators({
   importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
     type: A.importDictionaryRequest,
     dictionaryType,
@@ -21,7 +22,7 @@ export const dictionariesActions = {
   resetDictionariesDatabase: () => ({
     type: A.resetDictionariesDatabase,
   }),
-}
+})
 
 const finishDictionaryImport = (id: FileId) =>
   filesActions.updateFile({

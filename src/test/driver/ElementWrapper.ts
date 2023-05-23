@@ -1,4 +1,4 @@
-import { Element } from 'webdriverio'
+import { Element, WaitForOptions, WaitUntilOptions } from 'webdriverio'
 import { TestDriver } from './TestDriver'
 
 /** A wrapper for `WebDriverIO.Client` method results
@@ -6,13 +6,12 @@ import { TestDriver } from './TestDriver'
  * when targeting specific elements queried via `ClientWrapper#elements`.
  */
 export interface ElementWrapper {
-  elementId: string
   selector: string
   setFieldValue: (value: string) => Promise<void>
   click: () => Promise<void>
   clickAtOffset: (opts: { x: number; y: number }) => Promise<void>
   getText: () => Promise<string>
-  waitForText: (text: string) => Promise<void>
+  waitForText: (text: string, opts?: Partial<WaitForOptions>) => Promise<void>
   doubleClick: () => Promise<void>
   isClickable: () => Promise<boolean>
   isVisible: () => Promise<boolean>
@@ -49,9 +48,7 @@ export const wrapElement = (
     }
   }
 
-  const id = element.elementId
   return {
-    elementId: id,
     selector,
     setFieldValue: async (value: string) => {
       await element.setValue(value)
@@ -71,13 +68,13 @@ export const wrapElement = (
       }
     },
     getText,
-    waitForText: async (text: string) => {
-      let found
+    waitForText: async (text: string, opts?: Partial<WaitUntilOptions>) => {
+      let found: string | null = null
       try {
         await client.waitUntil(async () => {
           found = await getText()
           return Boolean(found) && found.includes(text)
-        })
+        }, opts)
       } catch (err) {
         throw new Error(
           typeof found === 'string'
@@ -124,7 +121,7 @@ export const wrapElement = (
       }
     },
     isSelected: async () => {
-      return await client.isElementSelected(id)
+      return await element.isSelected()
     },
     clickAtOffset: async ({ x, y }: { x: number; y: number }) => {
       try {

@@ -1,9 +1,9 @@
-import { dragMouse, clickAt } from './runEvents'
+import { clickAt } from './runEvents'
 import { Element } from 'webdriverio'
 import { ElementWrapper, element } from './ElementWrapper'
 import { TestDriver } from './TestDriver'
 
-export { dragMouse, clickAt }
+export { clickAt }
 
 export const getSelector = (testLabel: string) => `#${testLabel}, .${testLabel}`
 
@@ -24,8 +24,7 @@ export class ClientWrapper {
   async firstElement(selector: string): Promise<ElementWrapper> {
     try {
       const result = await this._driver.client.$(selector)
-      await result.waitForExist()
-      return await element(this._driver, result, selector)
+      return element(this._driver, result, selector)
     } catch (err) {
       throw new Error(`Could not find element "${selector}": ${err}`)
     }
@@ -44,7 +43,12 @@ export class ClientWrapper {
           async () => {
             const elements: Element[] = await this._driver.client.$$(selector)
             elementsSoFar = elements
-            return elements.length === count
+            return (
+              elements.length === count &&
+              (await Promise.all(elements.map((e) => e.isExisting()))).every(
+                (e) => e
+              )
+            )
           },
           { timeout: 10000 }
         )
@@ -69,24 +73,21 @@ export class ClientWrapper {
   }
 
   async setFieldValue(selector: string, value: string) {
-    const element = await this.firstElement(selector)
-    await element.setFieldValue(value)
+    await this._driver.client.$(selector).setValue(value)
   }
   async setFieldValue_(testLabel: string, value: string) {
     await this.setFieldValue(getSelector(testLabel), value)
   }
 
   async clickElement(selector: string) {
-    const element = await this.firstElement(selector)
-    await element.click()
+    return await this._driver.client.$(selector).click()
   }
   async clickElement_(testLabel: string) {
     await this.clickElement(getSelector(testLabel))
   }
 
   async doubleClickElement(selector: string) {
-    const element = await this.firstElement(selector)
-    await element.doubleClick()
+    await this._driver.client.$(selector).doubleClick()
   }
   async doubleClickElement_(testLabel: string) {
     await this.doubleClickElement(getSelector(testLabel))
@@ -137,20 +138,20 @@ export class ClientWrapper {
   }
 
   async getAttribute(selector: string, attributeName: string) {
-    const element = await this.firstElement(selector)
-
-    return await element.getAttribute(attributeName)
+    return await this._driver.client.$(selector).getAttribute(attributeName)
   }
   async getAttribute_(testLabel: string, attributeName: string) {
     return await this.getAttribute(getSelector(testLabel), attributeName)
   }
 
   async waitForText(selector: string, text: string) {
-    const element = await this.firstElement(selector)
-    await element.waitForText(text)
+    await this.waitUntil(async () => {
+      const elementText = await this._driver.client.$(selector).getText()
+      return elementText.includes(text)
+    })
   }
-  async waitForText_(selector: string, text: string) {
-    return await this.waitForText(getSelector(selector), text)
+  async waitForText_(testLabel: string, text: string) {
+    return this.waitForText(getSelector(testLabel), text)
   }
 
   async getText(selector: string) {
@@ -234,8 +235,7 @@ export class ClientWrapper {
 
   async clickAtOffset(selector: string, { x, y }: { x: number; y: number }) {
     try {
-      const el = await this.firstElement(selector)
-      return el.clickAtOffset({ x, y })
+      return await this._driver.client.$(selector).click({ x, y })
     } catch (err) {
       throw new Error(
         `Could not click element "${selector}" at offset ${x}, ${y}: ${err}`
@@ -246,11 +246,31 @@ export class ClientWrapper {
     return await this.clickAtOffset(getSelector(testLabel), { x, y })
   }
 
-  async moveTo(selector: string, offset: { x: number; y: number }) {
-    const el = await this.firstElement(selector)
-    return await el.moveTo(offset)
+  async moveTo(selector: string, { x, y }: { x: number; y: number }) {
+    return await this._driver.client.$(selector).moveTo({
+      xOffset: x,
+      yOffset: y,
+    })
   }
   async moveTo_(testLabel: string, offset: { x: number; y: number }) {
     return await this.moveTo(getSelector(testLabel), offset)
+  }
+
+  async getBoundingClientRect(selector: string) {
+    await this.waitUntilPresent(selector)
+
+    return await this._driver.client.executeAsync<
+      Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>,
+      [string]
+    >((selector, done) => {
+      const rect = document?.querySelector(selector)?.getBoundingClientRect()
+      if (!rect) throw new Error(`Could not find rectangle for "${selector}"`)
+      return done({
+        x: rect!.x,
+        y: rect!.y,
+        width: rect!.width,
+        height: rect!.height,
+      })
+    }, selector)
   }
 }

@@ -1,6 +1,7 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 
-export const waveformActions = {
+export const waveformActions = defineActionCreators({
   setCursorPosition: (x: number) => ({
     type: A.setCursorPosition,
     x,
@@ -10,4 +11,4 @@ export const waveformActions = {
     type: A.generateWaveformImages,
     waveformPngs,
   }),
-}
+})

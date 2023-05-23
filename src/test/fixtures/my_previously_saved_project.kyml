@@ -38,7 +38,7 @@ clips:
       type: VideoStill
   - id: a272b282-4d89-4af0-9d17-baa807793f1f
     start: 00:15.12
-    end: 00:18.4
+    end: 00:17.76
     fields:
       transcription: またこの子は昼間からゴロゴロして
       pronunciation: mata kono ko-wa hirumá-kara góro-goro shite

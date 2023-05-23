@@ -1,14 +1,15 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
-import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
-import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
-import { waveformMouseDrag } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm.testLabels'
+import { flashcardSectionFieldPopoverMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu.testLabels'
+import { confirmationDialog$ } from '../../../components/Dialog/Confirmation.testLabels'
+import { createClipViaWaveform } from '../../driver/waveform'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
 export default async function makeFlashcardsWithSubtitles(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  newClipId: string
 ) {
   test('open flashcard field menu for meaning field of third card', async () => {
     const { client } = context
@@ -16,14 +17,16 @@ export default async function makeFlashcardsWithSubtitles(
     await client.waitForText_(flashcardSection$.container, '3 / 4')
 
     await client.clickElement(
-      `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
+      `.${flashcardForm$.meaningField} .${flashcardSectionFieldPopoverMenu$.openMenuButtons}`
     )
   })
 
   test('link embedded track to meaning', async () => {
     const { client } = context
 
-    await client.clickElement_(flashcardFieldMenu$.embeddedTrackMenuItem)
+    await client.clickElement_(
+      flashcardSectionFieldPopoverMenu$.embeddedTrackMenuItem
+    )
     await client.clickElement_(confirmationDialog$.okButton)
   })
 
@@ -39,10 +42,7 @@ export default async function makeFlashcardsWithSubtitles(
   test('create card', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 589, 824)
-    const els = await client.elements_(waveform$.waveformClip)
-
-    await client.waitUntil(() => els[1].isVisible())
+    await createClipViaWaveform(context, 589, 824, newClipId)
 
     await client.waitForText_(
       flashcardSection$.container,

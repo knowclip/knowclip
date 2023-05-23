@@ -3,14 +3,15 @@ import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 import A from '../types/ActionType'
 import { PrimaryClip, WaveformDrag, WaveformRegion } from 'clipwave'
 import { SubtitlesCardBase } from '../selectors'
+import { defineActionCreators } from './defineActionCreators'
 
 export type OverlappedCardBaseDuringClipStretch = {
   subtitlesCardBase: SubtitlesCardBase
   isSelectable: boolean
 }
 
-export const clipsActions = {
-  [A.addClipRequest]: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
+export const clipsActions = defineActionCreators({
+  addClipRequest: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
     type: A.addClipRequest,
     waveformDrag,
     clipId,
@@ -33,7 +34,7 @@ export const clipsActions = {
     newRegions,
   }),
 
-  [A.addClip]: (
+  addClip: (
     clip: Clip,
     flashcard: Flashcard,
     startEditing: boolean = false
@@ -44,7 +45,7 @@ export const clipsActions = {
     startEditing,
   }),
 
-  [A.addClips]: (
+  addClips: (
     clips: Array<Clip>,
     flashcards: Array<Flashcard>,
     fileId: MediaFileId
@@ -137,7 +138,7 @@ export const clipsActions = {
     type: A.deleteCards,
     ids,
   }),
-}
+})
 
 const addFlashcardImage = (id: ClipId, seconds?: number) => {
   const image: FlashcardImage = seconds

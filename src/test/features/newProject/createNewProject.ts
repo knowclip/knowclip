@@ -1,11 +1,12 @@
 import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
-import { projectsMenu$ } from '../../../components/ProjectsMenu'
-import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectFormDialog'
-import { main$ } from '../../../components/Main'
+import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
+import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectFormDialog.testLabels'
+import { main$ } from '../../../components/Main.testLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { test } from '../../test'
 import { _ } from 'ajv'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 const {
   projectNameField,
@@ -20,7 +21,8 @@ export default async function createNewProject(
   context: IntegrationTestContext,
   /** Not including extension */
   projectFileName: string,
-  projectTitle: string
+  projectTitle: string,
+  projectId: string
 ) {
   test('open new project form', async () => {
     const { client } = context
@@ -61,7 +63,11 @@ export default async function createNewProject(
     )
   })
   test('save project', async () => {
-    const { client } = context
+    const { app, client } = context
+
+    await mockSideEffects(app, {
+      uuid: [projectId],
+    })
 
     await client.clickElement_(saveButton)
 

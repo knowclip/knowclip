@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useMemo } from 'react'
+import React, {
+  EventHandler,
+  Fragment,
+  MouseEventHandler,
+  useCallback,
+  useMemo,
+} from 'react'
 import {
   Subtitles as SubtitlesIcon,
   Visibility as VisibilityOnIcon,
@@ -28,16 +34,7 @@ import { showOpenDialog } from '../utils/electron'
 import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 
-enum $ {
-  container = 'subtitles-menu',
-  openMenuButton = 'subtitles-menu-open-menu-button',
-  trackMenuItems = 'subtitles-menu-track-item',
-  openTrackSubmenuButton = 'subtitles-menu-open-track-menu-button',
-  locateExternalFileButton = 'subtitles-menu-locate-external-file-button',
-  addTrackButton = 'subtitles-menu-add-track-button',
-  deleteTrackButton = 'subtitles-menu-delete-track-button',
-  makeClipsAndCardsButton = 'subtitles-menu-make-clips-and-cards-button',
-}
+import { subtitlesMenu$ as $ } from './SubtitlesMenu.testLabels'
 
 const SubtitlesMenu = () => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
@@ -71,7 +68,7 @@ const SubtitlesMenu = () => {
   )
 
   const dispatch = useDispatch()
-  const loadExternalTrack = useCallback(
+  const loadExternalTrack: MouseEventHandler = useCallback(
     async (e) => {
       if (!currentFileId)
         return dispatch(
@@ -89,7 +86,7 @@ const SubtitlesMenu = () => {
     },
     [dispatch, currentFileId, close]
   )
-  const subtitlesClipsDialogRequest = useCallback(
+  const subtitlesClipsDialogRequest: MouseEventHandler = useCallback(
     (e) => {
       dispatch(actions.showSubtitlesClipsDialogRequest())
       close(e)
@@ -206,7 +203,7 @@ const EmbeddedTrackMenuItem = ({
   linkedFieldTitle: string | undefined
 }) => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
-  const stopPropagation = useCallback((e) => {
+  const stopPropagation: EventHandler<any> = useCallback((e) => {
     e.stopPropagation()
   }, [])
 
@@ -217,7 +214,7 @@ const EmbeddedTrackMenuItem = ({
     dispatch,
     currentFileId
   )
-  const handleClickLinkSubtitlesDialog = useCallback(
+  const handleClickLinkSubtitlesDialog: MouseEventHandler = useCallback(
     (e) => {
       linkSubtitlesDialog()
       close(e)
@@ -311,7 +308,7 @@ const ExternalTrackMenuItem = ({
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
   const dispatch = useDispatch()
 
-  const deleteExternalSubtitles = useCallback(
+  const deleteExternalSubtitles: MouseEventHandler = useCallback(
     (e) => {
       dispatch(actions.deleteFileRequest('ExternalSubtitlesFile', id))
       close(e)
@@ -319,7 +316,7 @@ const ExternalTrackMenuItem = ({
     [dispatch, id, close]
   )
 
-  const locateFileRequest = useCallback(
+  const locateFileRequest: EventHandler<any> = useCallback(
     (e) => {
       if (file) {
         dispatch(
@@ -341,7 +338,7 @@ const ExternalTrackMenuItem = ({
     dispatch,
     currentFileId
   )
-  const handleClickLinkSubtitlesDialog = useCallback(
+  const handleClickLinkSubtitlesDialog: MouseEventHandler = useCallback(
     (e) => {
       linkSubtitlesDialog()
       close(e)
@@ -350,7 +347,7 @@ const ExternalTrackMenuItem = ({
   )
   const toggleVisible = useToggleVisible(track, id)
 
-  const stopPropagation = useCallback((e) => {
+  const stopPropagation: EventHandler<any> = useCallback((e) => {
     e.stopPropagation()
   }, [])
 
@@ -399,6 +396,7 @@ const ExternalTrackMenuItem = ({
           onKeyDown={stopPropagation}
           onKeyPress={stopPropagation}
           onClick={stopPropagation}
+          id={$.trackSubmenu}
         >
           <MenuItem
             dense
@@ -469,19 +467,14 @@ function useLinkSubtitlesDialogAction(
 
 function useToggleVisible(track: SubtitlesTrack | null, id: string) {
   const dispatch = useDispatch()
-  return useCallback(
-    (_e) => {
-      if (track)
-        dispatch(
-          track.mode === 'showing'
-            ? actions.hideSubtitles(id)
-            : actions.showSubtitles(id)
-        )
-    },
-    [dispatch, id, track]
-  )
+  return useCallback(() => {
+    if (track)
+      dispatch(
+        track.mode === 'showing'
+          ? actions.hideSubtitles(id)
+          : actions.showSubtitles(id)
+      )
+  }, [dispatch, id, track])
 }
 
 export default SubtitlesMenu
-
-export { $ as subtitlesMenu$ }

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, ChangeEventHandler } from 'react'
 import { useDispatch } from 'react-redux'
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
   MenuItem,
   Paper,
   FormHelperText,
+  SelectProps,
 } from '@mui/material'
 import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
@@ -20,15 +21,7 @@ import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
-enum $ {
-  container = 'new-project-form-dialog',
-  projectNameField = 'project-name',
-  projectFileLocationField = 'project-file-location',
-  noteTypeSelect = 'note-type-select',
-  transcriptionNoteTypeOption = 'transcription-note-type-option',
-  saveButton = 'save-button',
-  cardsPreview = 'cards-preview',
-}
+import { newProjectFormDialog$ as $ } from './NewProjectFormDialog.testLabels'
 
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
   switch (noteType) {
@@ -136,7 +129,7 @@ const NewProjectFormDialog = ({
     dispatch(actions.closeDialog())
   }, [dispatch, fieldValues, validate])
   const setNameText = useCallback(
-    (text) =>
+    (text: string) =>
       setState(({ fieldValues, errors }) => ({
         fieldValues: { ...fieldValues, name: text },
         errors: { ...errors, name: '' },
@@ -154,19 +147,19 @@ const NewProjectFormDialog = ({
     [setState]
   )
 
-  const handleChangeNameText = useCallback(
-    (e) => setNameText(e.target.value),
-    [setNameText]
-  )
+  const handleChangeNameText: ChangeEventHandler<HTMLInputElement> =
+    useCallback((e) => setNameText(e.currentTarget.value), [setNameText])
 
-  const handleChangeNoteType = useCallback(
-    (e) =>
-      setState(({ fieldValues, errors }) => ({
-        fieldValues: { ...fieldValues, noteType: e.target.value },
-        errors: { ...errors, noteType: '' },
-      })),
-    [setState]
-  )
+  const handleChangeNoteType: NonNullable<SelectProps['onChange']> =
+    useCallback(
+      (e) => {
+        setState(({ fieldValues, errors }) => ({
+          fieldValues: { ...fieldValues, noteType: e.target.value as NoteType },
+          errors: { ...errors, noteType: '' },
+        }))
+      },
+      [setState]
+    )
 
   const showSaveAfcaDialog = useCallback(async () => {
     const filePath = await showSaveDialog('Knowclip project File', ['kyml'])
@@ -255,5 +248,3 @@ const NewProjectFormDialog = ({
 }
 
 export default NewProjectFormDialog
-
-export { $ as newProjectFormDialog$ }

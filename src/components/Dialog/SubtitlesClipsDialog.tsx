@@ -1,4 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  FormEventHandler,
+} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Dialog,
@@ -22,18 +27,7 @@ import { MediaSubtitles, SubtitlesFileWithTrack } from '../../selectors'
 import { TransliterationFlashcardFields } from '../../types/Project'
 import { getFileFilters } from '../../utils/files'
 
-enum $ {
-  container = 'subtitles-clips-dialog',
-  loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
-  transcriptionField = 'subtitles-clips-transcription-field',
-  pronunciationField = 'subtitles-clips-pronunciation-field',
-  meaningField = 'subtitles-clips-meaning-field',
-  notesField = 'subtitles-clips-notes-field',
-  selectFieldOption = 'subtitles-clips-select-field-option',
-  tagsField = 'subtitles-clips-tags-field',
-  cancelButton = 'subtitles-clips-dialog-cancel-button',
-  okButton = 'subtitles-clips-dialog-ok-button',
-}
+import { subtitlesClipsDialog$ as $ } from './SubtitlesClipsDialog.testLabels'
 
 const MEDIA_FILE_MISSING_MESSAGE = r.simpleMessageSnackbar(
   'Please select a media file before continuing.'
@@ -83,45 +77,38 @@ const SubtitlesClipsDialog = ({
   const { tags, onAddChip, onDeleteChip } = useTagsInput(defaultTags)
 
   const [useStills, setUseStills] = useState(defaultIncludeStill)
-  const toggleUseStills = useCallback(
-    (_e) => {
-      setUseStills((v) => !v)
-    },
-    [setUseStills]
-  )
+  const toggleUseStills = useCallback(() => {
+    setUseStills((v) => !v)
+  }, [setUseStills])
 
   const closeDialog = useCallback(() => dispatch(r.closeDialog()), [dispatch])
-  const onSubmit = useCallback(
-    (_e) => {
-      if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
+  const onSubmit: FormEventHandler = useCallback(() => {
+    if (!currentFileId) return dispatch(MEDIA_FILE_MISSING_MESSAGE)
 
-      const { fields } = state
-      if (!Object.values(fields).find((v) => v && v.trim()))
-        return setState((state) => ({
-          ...state,
-          errorText: 'Please choose at least one subtitles track.',
-        }))
+    const { fields } = state
+    if (!Object.values(fields).find((v) => v && v.trim()))
+      return setState((state) => ({
+        ...state,
+        errorText: 'Please choose at least one subtitles track.',
+      }))
 
-      const fieldsWithoutBlankValues: Partial<TransliterationFlashcardFields> =
-        {}
-      for (const fn in fields) {
-        const fieldName = fn as TransliterationFlashcardFieldName
-        const value = fields[fieldName]
-        if (value) fieldsWithoutBlankValues[fieldName] = value
-      }
+    const fieldsWithoutBlankValues: Partial<TransliterationFlashcardFields> = {}
+    for (const fn in fields) {
+      const fieldName = fn as TransliterationFlashcardFieldName
+      const value = fields[fieldName]
+      if (value) fieldsWithoutBlankValues[fieldName] = value
+    }
 
-      dispatch(r.closeDialog())
-      dispatch(
-        r.makeClipsFromSubtitles(
-          currentFileId,
-          fieldsWithoutBlankValues,
-          tags,
-          useStills
-        )
+    dispatch(r.closeDialog())
+    dispatch(
+      r.makeClipsFromSubtitles(
+        currentFileId,
+        fieldsWithoutBlankValues,
+        tags,
+        useStills
       )
-    },
-    [currentFileId, dispatch, state, tags, useStills]
-  )
+    )
+  }, [currentFileId, dispatch, state, tags, useStills])
   const setField = useCallback(
     (key: TransliterationFlashcardFieldName, value: SubtitlesTrackId) => {
       setState((state) => ({
@@ -146,44 +133,16 @@ const SubtitlesClipsDialog = ({
     dispatch(r.loadNewSubtitlesFile(filePaths[0], currentFileId))
   }, [dispatch, currentFileId])
 
-  const onChangeTranscription = useCallback(
-    (e) => {
-      setField('transcription', e.target.value as string)
-    },
-    [setField]
-  )
-  const onChangePronunciation = useCallback(
-    (e) => {
-      setField('pronunciation', e.target.value as string)
-    },
-    [setField]
-  )
-  const onChangeMeaning = useCallback(
-    (e) => {
-      setField('meaning', e.target.value as string)
-    },
-    [setField]
-  )
-  const onChangeNotes = useCallback(
-    (e) => {
-      setField('notes', e.target.value as string)
-    },
-    [setField]
-  )
-
   const { fields, errorText } = state
 
   return (
     <Dialog open={open} className={$.container}>
       <DialogContent>
         <form
-          onSubmit={useCallback(
-            (e) => {
-              e.preventDefault()
-              onSubmit(e)
-            },
-            [onSubmit]
-          )}
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit(e)
+          }}
         >
           You currently have {subtitles.total} subtitles track
           {subtitles.total === 1 ? '' : 's'} loaded.
@@ -208,7 +167,9 @@ const SubtitlesClipsDialog = ({
             <Select
               label="Transcription"
               value={fields.transcription || ''}
-              onChange={onChangeTranscription}
+              onChange={(e) => {
+                setField('transcription', e.target.value as string)
+              }}
               id={$.transcriptionField}
             >
               {subtitlesTrackOptions(subtitles)}
@@ -221,7 +182,9 @@ const SubtitlesClipsDialog = ({
               <Select
                 label="Pronunciation"
                 value={fields.pronunciation || ''}
-                onChange={onChangePronunciation}
+                onChange={(e) => {
+                  setField('pronunciation', e.target.value as string)
+                }}
                 id={$.pronunciationField}
               >
                 {subtitlesTrackOptions(subtitles)}
@@ -233,7 +196,9 @@ const SubtitlesClipsDialog = ({
             <Select
               label="Meaning"
               value={fields.meaning || ''}
-              onChange={onChangeMeaning}
+              onChange={(e) => {
+                setField('meaning', e.target.value as string)
+              }}
               id={$.meaningField}
             >
               {subtitlesTrackOptions(subtitles)}
@@ -244,7 +209,9 @@ const SubtitlesClipsDialog = ({
             <Select
               label="Notes"
               value={fields.notes || ''}
-              onChange={onChangeNotes}
+              onChange={(e) => {
+                setField('notes', e.target.value as string)
+              }}
               id={$.notesField}
             >
               {subtitlesTrackOptions(subtitles)}
@@ -267,7 +234,7 @@ const SubtitlesClipsDialog = ({
           </FormControl>
           <FormControl fullWidth margin="normal">
             <TagsInput
-              allTags={allTags}
+              options={allTags}
               tags={tags}
               onAddChip={onAddChip}
               onDeleteChip={onDeleteChip}
@@ -320,5 +287,3 @@ function useTagsInput(defaultTags: string[]) {
   return { tags, onAddChip, onDeleteChip }
 }
 export default SubtitlesClipsDialog
-
-export { $ as subtitleClipsDialog$ }

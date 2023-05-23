@@ -4,11 +4,7 @@ import { Dialog, DialogContent, DialogActions, Button } from '@mui/material'
 import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 
-enum $ {
-  container = 'confirmation-dialog',
-  cancelButton = 'confirmation-dialog-cancel-button',
-  okButton = 'confirmation-dialog-ok-button',
-}
+import { confirmationDialog$ as $ } from './Confirmation.testLabels'
 
 const ConfirmationDialog = ({
   open,
@@ -16,21 +12,15 @@ const ConfirmationDialog = ({
 }: DialogProps<ConfirmationDialogData>) => {
   const dispatch = useDispatch()
 
-  const dispatchAction = useCallback(
-    (_e) => {
-      dispatch(action)
-      dispatch(actions.closeDialog())
-    },
-    [dispatch, action]
-  )
+  const dispatchAction = useCallback(() => {
+    dispatch(action)
+    dispatch(actions.closeDialog())
+  }, [dispatch, action])
 
-  const cancel = useCallback(
-    (_e) => {
-      onCancel && dispatch(onCancel)
-      dispatch(actions.closeDialog())
-    },
-    [dispatch, onCancel]
-  )
+  const cancel = useCallback(() => {
+    onCancel && dispatch(onCancel)
+    dispatch(actions.closeDialog())
+  }, [dispatch, onCancel])
 
   return (
     <Dialog open={open} className={$.container}>
@@ -50,5 +40,3 @@ const ConfirmationDialog = ({
 }
 
 export default ConfirmationDialog
-
-export { $ as confirmationDialog$ }

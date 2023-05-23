@@ -1,14 +1,17 @@
 import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
-import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
-import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
+import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog.testLabels'
 import { test, expect } from '../../test'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 export default async function addFirstMediaToProject(
   context: IntegrationTestContext,
-  videoFilePath: string
+  videoFilePath: string,
+  mediaFileId1: string,
+  embeddedSubtitlesId: string
 ) {
   const japaneseVideoPath = join(ASSETS_DIRECTORY, videoFilePath)
 
@@ -18,6 +21,9 @@ export default async function addFirstMediaToProject(
     const { chooseFirstMediaFileButton: chooseMediaFileButton } =
       mediaFilesMenu$
 
+    await mockSideEffects(app, {
+      uuid: [mediaFileId1, embeddedSubtitlesId],
+    })
     await mockElectronHelpers(app, {
       showOpenDialog: [Promise.resolve([japaneseVideoPath])],
     })

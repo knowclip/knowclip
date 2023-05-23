@@ -1,16 +1,19 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { clickClip, createClipViaWaveform } from '../../driver/waveform'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
-export default async function makeFlashcards(context: IntegrationTestContext) {
+export default async function makeFlashcards(
+  context: IntegrationTestContext,
+  firstExistingClipId: string,
+  newClipId: string
+) {
   test('select clip', async () => {
     const { client } = context
 
-    await client.elements_(waveform$.waveformClip, 2)
-    await client.clickElement_(waveform$.waveformClip)
+    await clickClip(context.app, client, firstExistingClipId)
     await client.waitForText_(flashcardSection$.container, '1 / 3')
     await client.waitForText_(
       flashcardSection$.container,
@@ -30,10 +33,11 @@ export default async function makeFlashcards(context: IntegrationTestContext) {
     await client.waitForHidden_(waveform$.waveformClip)
   })
 
-  test('create clip', async () => {
+  test('create clip with mouse drag', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 589, 824)
+    await createClipViaWaveform(context, 589, 824, newClipId)
+
     await client.waitForText_(flashcardSection$.container, '3 / 4')
   })
 }

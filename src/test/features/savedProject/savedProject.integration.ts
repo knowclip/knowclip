@@ -8,7 +8,7 @@ import {
 } from '../../setUpDriver'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { join } from 'path'
-import { runAll } from '../step'
+import { runAll, step } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
 import { parseProjectJson } from '../../../utils/parseProject'
 import { describe, beforeAll, afterAll, test, expect } from 'vitest'
@@ -25,19 +25,28 @@ describe('opening and saving a previously saved project', () => {
   })
 
   runAll(
-    savedProjectTestSteps({
-      projectTitle: 'My cool saved project',
-    }),
+    [
+      ...savedProjectTestSteps({
+        projectTitle: 'My cool saved project',
+        existingClipId: '632a6cff-7fd7-4d0f-b657-0b9636204261',
+        newClipIds: [
+          '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+          '1e62d23d-3f3b-4785-b8ba-5d61dddc78ed',
+          '9a07597c-7885-49bc-97d4-76a2dffdb9aa',
+        ],
+      }),
+      step('resulting project file matches snapshot', async () => {
+        test('save project', async () => {
+          const actualProjectFileContents = await parseProjectJson(
+            join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
+          )
+
+          expect(actualProjectFileContents).toMatchSnapshot()
+        })
+      }),
+    ],
     context
   )
-
-  test('resulting project file matches snapshot', async () => {
-    const actualProjectFileContents = await parseProjectJson(
-      join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
-    )
-
-    expect(actualProjectFileContents).toMatchSnapshot()
-  })
 
   afterAll(async () => {
     await stopApp(context)
@@ -45,11 +54,6 @@ describe('opening and saving a previously saved project', () => {
 })
 
 const sideEffectsMocks = {
-  uuid: [
-    '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
-    '1e62d23d-3f3b-4785-b8ba-5d61dddc78ed',
-    '9a07597c-7885-49bc-97d4-76a2dffdb9aa',
-  ],
   nowUtcTimestamp: [
     '2020-01-27T22:28:12Z',
     '2020-01-27T22:28:22Z',

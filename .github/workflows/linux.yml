@@ -30,7 +30,8 @@ jobs:
     - name: build
       run: npm run dist -- --linux
       env:
-        CI: false
+        # would fail on unavoidable warnings from cra
+        CI: false 
     - name: Upload test screenshots
       if: always()
       uses: actions/upload-artifact@v2

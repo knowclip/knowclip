@@ -1,5 +1,5 @@
 import { ClientWrapper } from './ClientWrapper'
-import { flashcardSectionForm$ } from '../../components/FlashcardSectionForm'
+import { flashcardSectionForm$ } from '../../components/FlashcardSectionForm.testLabels'
 import { TransliterationFlashcardFields } from '../../types/Project'
 
 export async function fillInTransliterationCardFields(

@@ -1,6 +1,7 @@
 import files from './files'
 import { actions } from '../actions'
 import { describe, it, expect } from 'vitest'
+import ActionType from '../types/ActionType'
 
 describe('files reducer', () => {
   describe('UpdateFile<linkFlashcardFieldtoSubtitlesTrack>', () => {
@@ -116,4 +117,6 @@ const baseMediaFile: MediaFile = {
   subtitlesTracksStreamIndexes: [2],
 }
 
-const baseState: FilesState = files(undefined, { type: 'initializeApp' })
+const baseState: FilesState = files(undefined, {
+  type: ActionType.initializeApp,
+})

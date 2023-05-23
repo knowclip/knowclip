@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo, FormEventHandler } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Dialog,
@@ -26,11 +26,7 @@ import { capitalize } from '../FlashcardSectionForm'
 import { formatDurationWithMilliseconds } from '../../utils/formatTime'
 import moment from 'moment'
 
-enum $ {
-  container = 'link-subtitles-dialog',
-  form = 'link-subtitles-dialog-form',
-  skipButton = 'link-subtitles-dialog-skip-button',
-}
+import { linkSubtitlesDialog$ as $ } from './LinkSubtitlesDialog.testLabels'
 
 const LinkSubtitlesDialog = ({
   open,
@@ -72,11 +68,8 @@ const LinkSubtitlesDialog = ({
       ) as TransliterationFlashcardFieldName) ||
       ''
   )
-  const onChangeField = useCallback((e) => {
-    setFieldSelection(e.target.value)
-  }, [])
 
-  const handleSubmit = useCallback(
+  const handleSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault()
       if (fieldSelection && fieldSelection !== currentlyLinkedField)
@@ -182,7 +175,11 @@ const LinkSubtitlesDialog = ({
             <InputLabel htmlFor="field">Field</InputLabel>
             <Select
               value={fieldSelection}
-              onChange={onChangeField}
+              onChange={(e) =>
+                setFieldSelection(
+                  e.target.value as TransliterationFlashcardFieldName | ''
+                )
+              }
               label="field"
             >
               {fieldNames.map((fieldName) => {
@@ -220,5 +217,3 @@ const LinkSubtitlesDialog = ({
 }
 
 export default LinkSubtitlesDialog
-
-export { $ as linkSubtitlesDialog$ }

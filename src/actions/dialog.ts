@@ -1,6 +1,7 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 
-export const dialogActions = {
+export const dialogActions = defineActionCreators({
   enqueueDialog: (dialog: DialogData, skipQueue: boolean = false) => ({
     type: A.enqueueDialog,
     dialog,
@@ -10,7 +11,7 @@ export const dialogActions = {
   closeDialog: () => ({
     type: A.closeDialog,
   }),
-}
+})
 
 const confirmationDialog = (
   message: string,

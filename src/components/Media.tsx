@@ -17,6 +17,9 @@ import { MediaSubtitles, SubtitlesFileWithTrack } from '../selectors'
 
 export const MEDIA_PLAYER_ID = 'mediaPlayer'
 
+type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] }
+type IntersectionOf<A, B> = OmitNever<A & B>
+
 type MediaProps = {
   constantBitrateFilePath: string | null
   loop: LoopState
@@ -48,42 +51,34 @@ const Media = ({
   loop,
 }: MediaProps) => {
   const seeking = useRef(false)
-  const seekOn = useCallback((_e) => {
+  const seekOn = useCallback(() => {
     seeking.current = true
   }, [])
-  const seekOff = useCallback((_e) => {
+  const seekOff = useCallback(() => {
     seeking.current = false
   }, [])
 
-  const setUpBlur = useCallback(
-    (_e) => {
-      setClicked(true)
-      if (playerRef.current) playerRef.current.blur()
-    },
-    [playerRef]
-  )
-  const blur = useCallback(
-    (_e) => {
-      if (playerRef.current && clicked) {
-        playerRef.current.blur()
-        // setClicked(false)
-      }
-    },
-    [playerRef]
-  )
-  const stopBlur = useCallback(
-    (_e) => {
-      if (playerRef.current && clicked) {
-        setClicked(false)
-      }
-    },
-    [playerRef]
-  )
+  const setUpBlur = useCallback(() => {
+    setClicked(true)
+    if (playerRef.current) playerRef.current.blur()
+  }, [playerRef])
+  const blur = useCallback(() => {
+    if (playerRef.current && clicked) {
+      playerRef.current.blur()
+      // setClicked(false)
+    }
+  }, [playerRef])
+  const stopBlur = useCallback(() => {
+    if (playerRef.current && clicked) {
+      setClicked(false)
+    }
+  }, [playerRef])
 
   const looping = Boolean(loop)
-  const props:
-    | AudioHTMLAttributes<HTMLAudioElement>
-    | VideoHTMLAttributes<HTMLVideoElement> = {
+  const props: IntersectionOf<
+    AudioHTMLAttributes<HTMLAudioElement>,
+    VideoHTMLAttributes<HTMLVideoElement>
+  > = {
     loop: false,
     controls: true,
     // disablePictureInPicture: true,
@@ -98,12 +93,9 @@ const Media = ({
     onSeeking: seekOn,
     onSeeked: seekOff,
 
-    onLoadedMetadata: useCallback(
-      (e) => {
-        onMediaLoaded(e.target)
-      },
-      [onMediaLoaded]
-    ),
+    onLoadedMetadata: (e) => {
+      onMediaLoaded(e.currentTarget)
+    },
 
     // prevent accidental scrub after play/pause with mouse
     onMouseEnter: setUpBlur,
@@ -112,22 +104,19 @@ const Media = ({
     onPause: blur,
     onClick: blur,
     onVolumeChange: blur,
-    onTimeUpdate: useCallback(
-      (e) => {
-        const media = e.target as HTMLVideoElement | HTMLAudioElement
-        const wasSeeking = seeking.current
-        onTimeUpdate(media, seeking, looping)
-        if (wasSeeking) blur(e)
-      },
-      [onTimeUpdate, looping, blur, seeking]
-    ),
+    onTimeUpdate: (e) => {
+      const media = e.currentTarget
+      const wasSeeking = seeking.current
+      onTimeUpdate(media, seeking, looping)
+      if (wasSeeking) blur()
+    },
 
-    onKeyDown: useCallback((e) => {
+    onKeyDown: (e) => {
       if (e.key === KEYS.arrowLeft || e.key === KEYS.arrowRight) {
         if (e.altKey) e.preventDefault()
         else e.stopPropagation()
       }
-    }, []),
+    },
   }
 
   useEffect(() => {

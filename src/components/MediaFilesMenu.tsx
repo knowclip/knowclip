@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { MouseEventHandler, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Button,
@@ -23,12 +23,7 @@ import { getFileFilters } from '../utils/files'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 import { usePlayButtonSync } from 'clipwave'
 
-enum $ {
-  chooseFirstMediaFileButton = 'choose-media-file-button',
-  openMediaFilesMenuButton = 'open-media-files-menu-button',
-  mediaFileMenuItem = 'media-file-menu-item',
-  addNewAdditionalMediaButton = 'add-new-additional-media-button',
-}
+import { mediaFilesMenu$ as $ } from './MediaFilesMenu.testLabels'
 
 type MediaFilesMenuProps = {
   className: string
@@ -53,7 +48,7 @@ const MediaFilesMenu = ({
   const popover = usePopover()
 
   const dispatch = useDispatch()
-  const chooseMediaFiles = useCallback(
+  const chooseMediaFiles: MouseEventHandler = useCallback(
     async (e) => {
       if (!currentProjectId) return
 
@@ -172,5 +167,3 @@ const MediaFilesMenu = ({
 }
 
 export default MediaFilesMenu
-
-export { $ as mediaFilesMenu$ }

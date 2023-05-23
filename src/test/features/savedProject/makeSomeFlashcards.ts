@@ -1,26 +1,22 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { createClipViaWaveform, getClipSelector } from '../../driver/waveform'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export default async function makeSomeFlashcards(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  cardIds: [string, string, string]
 ) {
   const { deleteButton } = flashcardForm$
   test('create first card', async () => {
     const { client } = context
 
-    await sleep(100)
-    await waveformMouseDrag(client, 351, 438)
-    await sleep(100)
+    await createClipViaWaveform(context, 351, 438, cardIds[0])
+
     await client.waitForText_(flashcardSection$.container, '1 / 1')
 
     await fillInTransliterationCardFields(client, {
@@ -29,11 +25,17 @@ export default async function makeSomeFlashcards(
     })
   })
 
-  test('create another card', async () => {
-    const { client } = context
+  test('drag to create another card', async () => {
+    await createClipViaWaveform(context, 921, 1000, cardIds[1])
+  })
 
-    await waveformMouseDrag(client, 921, 1000)
+  test('wait for card to show', async () => {
+    const { client } = context
     await client.waitForText_(flashcardSection$.container, '2 / 2')
+  })
+
+  test('fill in second card', async () => {
+    const { client } = context
 
     await fillInTransliterationCardFields(client, {
       transcription: "Das hab' ich nicht gesagt",
@@ -51,28 +53,15 @@ export default async function makeSomeFlashcards(
   test('create a third card', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 176, 355)
+    await createClipViaWaveform(context, 176, 355, cardIds[2])
+
     await client.waitForText_(flashcardSection$.container, '3 / 3')
-    await client.waitForVisible_(waveform$.waveformClip)
   })
 
   test('delete third card', async () => {
     const { client } = context
 
     await client.clickElement_(deleteButton)
-    await client.waitUntilGone_(waveform$.waveformClip)
+    await client.waitUntilGone(getClipSelector(cardIds[2]))
   })
-
-  // await setVideoTime(client, 0)
-  // await setVideoTime(client, 20)
-  // await waveformMouseDrag(client, 20, 445)
-  // await fillInTransliterationCardFields(client, {
-  //   transcription:
-  //     'Sie hat nur fast alles, was ein Schwein auch hat. Aber sie spricht anders, sie sagt »Miau, miau, miau!«',
-  // })
-  // await waveformMouseDrag(client, 575, 1024)
-  // await fillInTransliterationCardFields(client, {
-  //   transcription:
-  //     'Schön! seufzte Piggeldy verzückt.\n\nSchön, wie du eben »Miau!« gemacht hast. Ein Glück, dass du keine Mäuse frisst.',
-  // })
 }

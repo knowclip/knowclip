@@ -1,4 +1,12 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  ChangeEventHandler,
+  FormEventHandler,
+} from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, TextField, Tooltip } from '@mui/material'
 import {
@@ -15,13 +23,7 @@ import truncate from '../utils/truncate'
 import { useNavigate } from 'react-router'
 import { usePrevious } from '../utils/usePrevious'
 
-enum $ {
-  projectTitle = 'project-title',
-  projectTitleInput = 'project-title-input',
-  saveButton = 'save-button',
-  closeButton = 'close-button',
-  exportButton = 'export-button',
-}
+import { projectMenu$ as $ } from './ProjectMenu.testLabels'
 
 const ProjectMenu = ({ className }: { className: string }) => {
   const navigate = useNavigate()
@@ -93,8 +95,8 @@ const ProjectMenu = ({ className }: { className: string }) => {
       setInputWidth(titleRef.current.getBoundingClientRect().width)
   }, [projectNameInput.text])
 
-  const handleChangeText = useCallback(
-    (e) => setProjectNameInput({ editing: true, text: e.target.value }),
+  const handleChangeText: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (e) => setProjectNameInput({ editing: true, text: e.currentTarget.value }),
     []
   )
 
@@ -115,7 +117,7 @@ const ProjectMenu = ({ className }: { className: string }) => {
       dispatch(actions.setProjectName(projectFile.id, text))
     setProjectNameInput((state) => ({ ...state, editing: false }))
   }, [dispatch, setProjectNameInput, projectNameInput, projectFile])
-  const handleSubmit = useCallback(
+  const handleSubmit: FormEventHandler = useCallback(
     (e) => {
       e.preventDefault()
       submit()
@@ -205,7 +207,5 @@ const ProjectMenu = ({ className }: { className: string }) => {
 }
 
 export default ProjectMenu
-
-export { $ as projectMenu$ }
 
 const EMPTY: string[] = []

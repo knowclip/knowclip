@@ -1,5 +1,5 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
 import { retryUntil } from '../../driver/retryUntil'
 import { getSelector } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'

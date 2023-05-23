@@ -13,11 +13,7 @@ import { ClipwaveCallbackEvent, getRegionEnd } from 'clipwave'
 import { getMediaPlayer } from '../utils/media'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 
-enum $ {
-  container = 'review-and-export-table-row-container',
-  clipCheckboxes = 'review-and-export-table-row-clip-checkbox',
-  highlightedClipRow = 'review-and-export-table-highlighted-clip-row',
-}
+import { reviewAndExportMediaTableRow$ as $ } from './ReviewAndExportMediaTableRow.testLabels'
 
 type FlashcardRowProps = {
   id: string
@@ -104,8 +100,8 @@ const ReviewAndExportMediaTableRow = memo(
         <section className={css.checkbox}>
           <Checkbox
             checked={isSelected}
-            onClick={useCallback((e) => e.stopPropagation(), [])}
-            onChange={useCallback(() => onSelect(id), [onSelect, id])}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => onSelect(id)}
             className={$.clipCheckboxes}
           />
         </section>
@@ -211,5 +207,3 @@ const TranscriptionFieldPreview = ({
 }
 
 export default ReviewAndExportMediaTableRow
-
-export { $ as reviewAndExportMediaTableRow$ }

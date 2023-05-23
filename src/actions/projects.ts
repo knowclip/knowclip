@@ -1,6 +1,8 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 import { filesActions } from './files'
-export const projectActions = {
+
+export const projectActions = defineActionCreators({
   createProject: (
     id: string,
     name: string,
@@ -77,7 +79,7 @@ export const projectActions = {
     type: A.setWorkIsUnsaved,
     workIsUnsaved,
   }),
-}
+})
 
 function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
   return u as any as FileUpdate<keyof FileUpdates>

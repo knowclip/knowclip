@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback } from 'react'
+import React, { EventHandler, Fragment, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 import {
@@ -22,11 +22,7 @@ import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 import icon from '../icon.png'
 
-enum $ {
-  recentProjectsListItem = 'recent-projects-list-item',
-  newProjectButton = 'new-project-button',
-  openExistingProjectButton = 'open-existing-project-button',
-}
+import { projectsMenu$ as $ } from './ProjectsMenu.testLabels'
 
 const ProjectMenuItem = ({
   availability,
@@ -44,7 +40,7 @@ const ProjectMenuItem = ({
   )
   const navigate = useNavigate()
 
-  const stopPropagation = useCallback((e) => {
+  const stopPropagation: EventHandler<any> = useCallback((e) => {
     e.stopPropagation()
   }, [])
 
@@ -92,7 +88,6 @@ const ProjectMenuItem = ({
 }
 
 const ProjectsMenu = () => {
-  console.log('rendering projects menu')
   const { projects, currentProjectId } = useSelector((state: AppState) => ({
     projects: r.getProjects(state),
     currentProjectId: r.getCurrentProjectId(state),
@@ -172,5 +167,3 @@ const ProjectsMenu = () => {
 }
 
 export default ProjectsMenu
-
-export { $ as projectsMenu$ }

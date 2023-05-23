@@ -1,4 +1,5 @@
-import React, {
+import {
+  EventHandler,
   Fragment,
   memo,
   ReactNode,
@@ -10,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import {
   Button,
   ClickAwayListener,
+  ClickAwayListenerProps,
   IconButton,
   Paper,
   Popper,
@@ -125,8 +127,14 @@ export function DictionaryPopover({
   activeDictionaryType: DictionaryFileType | null
 }) {
   const { close: closePopover } = popover
-  const closeOnClickAway = useCallback((e) => closePopover(e), [closePopover])
-  const stopPropagation = useCallback((e) => e.stopPropagation(), [])
+  const closeOnClickAway: ClickAwayListenerProps['onClickAway'] = useCallback(
+    (e) => closePopover(e),
+    [closePopover]
+  )
+  const stopPropagation: EventHandler<any> = useCallback(
+    (e) => e.stopPropagation(),
+    []
+  )
 
   const ref = useRef<HTMLDivElement>(null)
   const textCharacterIndex =

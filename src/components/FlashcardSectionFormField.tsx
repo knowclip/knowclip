@@ -5,22 +5,29 @@ import React, {
   MutableRefObject,
   useEffect,
   useRef,
+  ChangeEventHandler,
 } from 'react'
 import { TextField } from '@mui/material'
 import { OutlinedInputProps } from '@mui/material/OutlinedInput'
 import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
-import { flashcardSectionForm$, capitalize } from './FlashcardSectionForm'
+import { capitalize } from './FlashcardSectionForm'
+import { flashcardSectionForm$ } from './FlashcardSectionForm.testLabels'
 import cn from 'classnames'
 import { MediaSubtitles } from '../selectors/subtitles'
 import { useSelector } from 'react-redux'
 import { usePrevious } from '../utils/usePrevious'
+import ActionType from '../types/ActionType'
 
-type Props = {
+export type Props = {
   name: FlashcardFieldName
   mediaFileId: MediaFileId
   currentFlashcard: Flashcard
-  setFlashcardText: (id: string, text: string, caretLocation: number) => void
+  setFlashcardText: (
+    id: FlashcardFieldName,
+    text: string,
+    caretLocation: number
+  ) => void
   subtitles: MediaSubtitles
   linkedSubtitlesTrack: string | null
   inputProps?: OutlinedInputProps['inputProps']
@@ -45,11 +52,11 @@ const FlashcardSectionFormField = memo(
     className,
   }: Props) => {
     const inputRef = useRef<HTMLInputElement>()
-    const caretLocation = useRef<number>()
-    const handleChange = useCallback(
+    const caretLocation = useRef<number | null>(null)
+    const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback(
       (e) => {
-        caretLocation.current = e.target.selectionEnd
-        setFlashcardText(name, e.target.value, e.target.selectionEnd)
+        caretLocation.current = e.target.selectionEnd! // TODO: investigate if might not be null
+        setFlashcardText(name, e.target.value, caretLocation.current)
       },
       [setFlashcardText, name]
     )
@@ -72,7 +79,11 @@ const FlashcardSectionFormField = memo(
 
     const registeredCaretLocation = useSelector((s: WithHistory<AppState>) => {
       const action = s.lastHistoryAction
-      if (action && action.type === 'setFlashcardField' && action.key === name)
+      if (
+        action &&
+        action.type === ActionType.setFlashcardField &&
+        action.key === name
+      )
         return action.caretLocation
 
       return null

@@ -11,10 +11,7 @@ import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 
-enum $ {
-  container = 'flashcard-display-container',
-  editButton = 'flashcard-display-edit-button',
-}
+import { flashcardSectionDisplayCard$ as $ } from './FlashcardSectionDisplayCard.testLabels'
 
 const FlashcardSectionDisplayCard = memo(
   ({
@@ -42,12 +39,13 @@ const FlashcardSectionDisplayCard = memo(
     const { fields: f } = flashcard
     const fields = f as TransliterationFlashcardFields
 
-    const handleDoubleClick = useCallback(
-      (fieldName) => {
-        if (onDoubleClickField) onDoubleClickField(fieldName)
-      },
-      [onDoubleClickField]
-    )
+    const handleDoubleClick: (fn: TransliterationFlashcardFieldName) => void =
+      useCallback(
+        (fieldName) => {
+          if (onDoubleClickField) onDoubleClickField(fieldName)
+        },
+        [onDoubleClickField]
+      )
 
     const dispatch = useDispatch()
     const startEditing = useCallback(() => {
@@ -79,7 +77,7 @@ const FlashcardSectionDisplayCard = memo(
         [dispatch, flashcard.cloze, flashcard.id]
       ),
       onEditClozeCard: useCallback(
-        (clozeIndex, ranges) => {
+        (clozeIndex: number, ranges: ClozeRange[]) => {
           dispatch(
             r.editClozeDeletion(
               flashcard.id,
@@ -92,7 +90,7 @@ const FlashcardSectionDisplayCard = memo(
         [dispatch, flashcard.cloze, flashcard.id]
       ),
       onDeleteClozeCard: useCallback(
-        (clozeIndex) => {
+        (clozeIndex: number) => {
           dispatch(
             r.removeClozeDeletion(flashcard.id, flashcard.cloze, clozeIndex)
           )
@@ -178,5 +176,3 @@ const FlashcardSectionDisplayCard = memo(
 )
 
 export default FlashcardSectionDisplayCard
-
-export { $ as flashcardSectionDisplayCard$ }

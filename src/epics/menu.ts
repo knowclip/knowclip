@@ -14,6 +14,7 @@ import gt from 'semver/functions/gt'
 import { REHYDRATE } from 'redux-persist'
 import packageJson from '../../package.json'
 import { VITE_BUILD_NUMBER, VITEST } from '../env'
+import ActionType from '../types/ActionType'
 
 const showSettingsDialog: AppEpic = (
   action$,
@@ -91,7 +92,7 @@ const openProject: AppEpic = (
 
 const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(REHYDRATE as Action['type']),
+    ofType(REHYDRATE as ActionType),
     take(1),
     mergeMap(async () => {
       const { window, showMessageBox, openExternal } = effects

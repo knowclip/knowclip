@@ -144,36 +144,30 @@ export function useClozeUiEffects(
     ]
   )
 
-  const handleFocus = useCallback(
-    (_e) => {
-      if (!dictionaryPopoverIsShowing) {
-        if (ref.current) {
-          const selection = getSelectionWithin(ref.current)
-          const currentlySelected = selection.end - selection.start !== 0
-          if (!currentlySelected) setCursorPosition(0)
-        }
-        if (!editing && isMediaPlaying()) {
-          dispatch(r.setLoop('FOCUS'))
-        }
+  const handleFocus = useCallback(() => {
+    if (!dictionaryPopoverIsShowing) {
+      if (ref.current) {
+        const selection = getSelectionWithin(ref.current)
+        const currentlySelected = selection.end - selection.start !== 0
+        if (!currentlySelected) setCursorPosition(0)
       }
-    },
-    [dictionaryPopoverIsShowing, ref, editing, setCursorPosition, dispatch]
-  )
-  const handleBlur = useCallback(
-    (_e) => {
-      if (!dictionaryPopoverIsShowing) {
-        setCursorPosition(null)
-        if (!editing && loopState === 'FOCUS') dispatch(r.setLoop(false))
+      if (!editing && isMediaPlaying()) {
+        dispatch(r.setLoop('FOCUS'))
       }
-    },
-    [
-      dictionaryPopoverIsShowing,
-      setCursorPosition,
-      editing,
-      loopState,
-      dispatch,
-    ]
-  )
+    }
+  }, [dictionaryPopoverIsShowing, ref, editing, setCursorPosition, dispatch])
+  const handleBlur = useCallback(() => {
+    if (!dictionaryPopoverIsShowing) {
+      setCursorPosition(null)
+      if (!editing && loopState === 'FOCUS') dispatch(r.setLoop(false))
+    }
+  }, [
+    dictionaryPopoverIsShowing,
+    setCursorPosition,
+    editing,
+    loopState,
+    dispatch,
+  ])
   return { onKeyDown, handleFocus, handleBlur, cursorPosition }
 }
 

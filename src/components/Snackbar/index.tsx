@@ -4,10 +4,7 @@ import r from '../../redux'
 import SimpleMessage from './SimpleMessage'
 import Prompt from './Prompt'
 
-enum $ {
-  container = 'snackbar-container',
-  closeButton = 'close-snackbar-button',
-}
+import { snackbar$ as $ } from '../Snackbar.testLabels'
 
 const SnackbarView = () => {
   const currentSnackbar = useSelector((state: AppState) =>
@@ -38,5 +35,3 @@ const SnackbarView = () => {
 }
 
 export default SnackbarView
-
-export { $ as snackbar$ }

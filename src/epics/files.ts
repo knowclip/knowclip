@@ -1,5 +1,5 @@
 import { mergeMap, map, mergeAll } from 'rxjs/operators'
-import { of, Observable, from, EMPTY, defer } from 'rxjs'
+import { of, from, EMPTY, defer } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { combineEpics, ofType } from 'redux-observable'
@@ -33,8 +33,8 @@ const fileEventHandlers: Record<
 
 const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.openFileRequest),
-    mergeMap<OpenFileRequest, Observable<Action>>((action) => {
+    ofType(A.openFileRequest as const),
+    mergeMap((action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
       const fileAvailability = r.getFileAvailability(state$.value, file)
@@ -71,7 +71,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 
 const openFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.openFileSuccess),
+    ofType(A.openFileSuccess as const),
     mergeMap((action) => {
       const openSuccessHandlers: OpenFileSuccessHandler<
         typeof action.validatedFile
@@ -97,8 +97,8 @@ const openFileSuccess: AppEpic = (action$, state$, effects) =>
 
 const openFileFailure: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.openFileFailure),
-    mergeMap<OpenFileFailure, Observable<Action>>((action) => {
+    ofType(A.openFileFailure as const),
+    mergeMap((action) => {
       const openFailureHandler = fileEventHandlers[action.file.type].openFailure
 
       console.error(action.errorMessage || 'Could not open file:')
@@ -130,8 +130,8 @@ const flatten = (asyncArray: Promise<Action[]>) =>
 
 const locateFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.locateFileRequest),
-    mergeMap<LocateFileRequest, Observable<Action>>((action) => {
+    ofType(A.locateFileRequest as const),
+    mergeMap((action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
 
@@ -149,13 +149,13 @@ const locateFileRequest: AppEpic = (action$, state$, effects) =>
 
 const locateFileSuccess: AppEpic = (action$, _state$, _effects) =>
   action$.pipe(
-    ofType(A.locateFileSuccess),
-    map<LocateFileSuccess, Action>(({ file }) => r.openFileRequest(file))
+    ofType(A.locateFileSuccess as const),
+    map(({ file }) => r.openFileRequest(file))
   )
 
 const deleteFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.deleteFileRequest),
+    ofType(A.deleteFileRequest as const),
     mergeMap(({ fileType, id }) => {
       const availability = r.getFileAvailabilityById(state$.value, fileType, id)
 
@@ -180,7 +180,7 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
 
 const deleteFileSuccess: AppEpic = (action$, state$, effects) =>
   action$.pipe(
-    ofType(A.deleteFileSuccess),
+    ofType(A.deleteFileSuccess as const),
     mergeMap((action) =>
       from(
         fileEventHandlers[action.file.type].deleteSuccess.flatMap((handler) =>

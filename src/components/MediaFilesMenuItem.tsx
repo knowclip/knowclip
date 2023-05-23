@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { EventHandler, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   IconButton,
@@ -49,7 +49,7 @@ const MediaFilesMenuItem = ({
 
   const submenu = usePopover()
   const closeSubmenu = submenu.close
-  const closeMenu = useCallback(
+  const closeMenu: EventHandler<any> = useCallback(
     (e) => {
       closeSubmenu(e)
       closeSupermenu(e)
@@ -57,14 +57,14 @@ const MediaFilesMenuItem = ({
     [closeSubmenu, closeSupermenu]
   )
 
-  const loadAndClose = useCallback(
+  const loadAndClose: EventHandler<any> = useCallback(
     (e) => {
       dispatch(actions.openFileRequest(mediaFile))
       closeMenu(e)
     },
     [dispatch, mediaFile, closeMenu]
   )
-  const deleteAndClose = useCallback(
+  const deleteAndClose: EventHandler<any> = useCallback(
     (e) => {
       dispatch(
         actions.confirmationDialog(
@@ -76,7 +76,7 @@ const MediaFilesMenuItem = ({
     },
     [dispatch, mediaFile, currentProjectId, closeMenu]
   )
-  const locateAndClose = useCallback(
+  const locateAndClose: EventHandler<any> = useCallback(
     (e) => {
       dispatch(
         actions.fileSelectionDialog('Please locate this media file.', mediaFile)
@@ -105,7 +105,7 @@ const MediaFilesMenuItem = ({
     </ListItemSecondaryAction>
   )
 
-  const onCloseSubmenu = useCallback(
+  const onCloseSubmenu: EventHandler<any> = useCallback(
     (e) => {
       e.stopPropagation()
       closeSubmenu(e)
@@ -113,7 +113,7 @@ const MediaFilesMenuItem = ({
     [closeSubmenu]
   )
 
-  const stopPropagation = useCallback((e) => {
+  const stopPropagation: EventHandler<any> = useCallback((e) => {
     e.stopPropagation()
   }, [])
 

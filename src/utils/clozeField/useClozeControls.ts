@@ -195,7 +195,7 @@ export default function useClozeControls({
 
   const clozeTextInputActions = {
     onBackspace: useCallback(
-      (selection) => {
+      (selection: ClozeRange) => {
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end && selection.start !== 0) {
             const newCursor = selection.start - 1
@@ -224,7 +224,7 @@ export default function useClozeControls({
       [clozeIndex, deletions, editingCard, onEditClozeCard, setCursorPosition]
     ),
     onPressDelete: useCallback(
-      (selection) => {
+      (selection: ClozeRange) => {
         if (editingCard && onEditClozeCard && inputRef.current) {
           if (selection.start === selection.end) {
             const newCursor = selection.end + 1

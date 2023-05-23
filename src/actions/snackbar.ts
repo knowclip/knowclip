@@ -1,7 +1,8 @@
 import A from '../types/ActionType'
+import { defineActionCreators } from './defineActionCreators'
 import { compositeDialogActions } from './dialog'
 
-export const snackbarActions = {
+export const snackbarActions = defineActionCreators({
   enqueueSnackbar: (snackbar: SnackbarData) => ({
     type: A.enqueueSnackbar,
     snackbar,
@@ -10,7 +11,7 @@ export const snackbarActions = {
   closeSnackbar: () => ({
     type: A.closeSnackbar,
   }),
-}
+})
 const simpleMessageSnackbar = (
   message: string,
   autoHideDuration?: number | null

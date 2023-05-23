@@ -3,10 +3,11 @@ import r from '../redux'
 import A from '../types/ActionType'
 import { ofType } from 'redux-observable'
 import { from } from 'rxjs'
+import { ActionOf } from '../actions'
 
 const preloadVideoStills: AppEpic = (action$, state$) =>
   action$.pipe(
-    ofType(A.preloadVideoStills),
+    ofType(A.preloadVideoStills as const),
     switchMap(({ file: mediaFile, clipId }) => {
       const mediaClipIds = r.getClipIdsByMediaFileId(state$.value, mediaFile.id)
       const index = mediaClipIds.indexOf(clipId)
@@ -36,7 +37,7 @@ const preloadVideoStills: AppEpic = (action$, state$) =>
             ? r.openFileRequest(still.file)
             : null
         })
-        .filter((a): a is OpenFileRequest => a !== null)
+        .filter((a): a is ActionOf<A.openFileRequest> => a !== null)
 
       return from(actions)
     })
