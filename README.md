@@ -17,7 +17,7 @@ Currently being built with [Electron](https://electronjs.org), [Vite](https://vi
 
 ### Development
 
-To install NPM packages, use [Yarn](https://yarnpkg.com/):
+To install NPM packages:
 
 ```bash
 npm install
