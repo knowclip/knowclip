@@ -1,5 +1,5 @@
 // *********************** NOTE: **********************
-// run `yarn build-schemas` if you change stuff here!
+// run `npm run build-schemas` if you change stuff here!
 // it will be run before production builds though,
 // so probably the worst thing that could happen
 // if you forget to do this is that your project files
