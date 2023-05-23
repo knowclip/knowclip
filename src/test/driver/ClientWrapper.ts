@@ -80,14 +80,14 @@ export class ClientWrapper {
   }
 
   async clickElement(selector: string) {
-    return (await this._driver.client.$(selector)).click()
+    return await this._driver.client.$(selector).click()
   }
   async clickElement_(testLabel: string) {
     await this.clickElement(getSelector(testLabel))
   }
 
   async doubleClickElement(selector: string) {
-    await (await this._driver.client.$(selector)).doubleClick()
+    await this._driver.client.$(selector).doubleClick()
   }
   async doubleClickElement_(testLabel: string) {
     await this.doubleClickElement(getSelector(testLabel))
