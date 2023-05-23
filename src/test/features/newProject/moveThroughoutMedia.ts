@@ -49,7 +49,6 @@ export default async function moveThroughoutMedia(
   test('shift waveform view by navigating with previous button', async () => {
     const { client } = context
 
-    if (process.platform === 'linux') await client._driver.client.pause(1000)
     await client.clickElement_(flashcardSection$.previousClipButton)
     await client.waitForText('body', '2 / 3')
 

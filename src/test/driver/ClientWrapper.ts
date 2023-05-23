@@ -1,9 +1,9 @@
-import { dragMouse, clickAt } from './runEvents'
-import { Element, WaitForOptions } from 'webdriverio'
+import { clickAt } from './runEvents'
+import { Element } from 'webdriverio'
 import { ElementWrapper, element } from './ElementWrapper'
 import { TestDriver } from './TestDriver'
 
-export { dragMouse, clickAt }
+export { clickAt }
 
 export const getSelector = (testLabel: string) => `#${testLabel}, .${testLabel}`
 
@@ -235,8 +235,7 @@ export class ClientWrapper {
 
   async clickAtOffset(selector: string, { x, y }: { x: number; y: number }) {
     try {
-      const el = await this.firstElement(selector)
-      return el.clickAtOffset({ x, y })
+      return await this._driver.client.$(selector).click({ x, y })
     } catch (err) {
       throw new Error(
         `Could not click element "${selector}" at offset ${x}, ${y}: ${err}`
@@ -247,9 +246,11 @@ export class ClientWrapper {
     return await this.clickAtOffset(getSelector(testLabel), { x, y })
   }
 
-  async moveTo(selector: string, offset: { x: number; y: number }) {
-    const el = await this.firstElement(selector)
-    return await el.moveTo(offset)
+  async moveTo(selector: string, { x, y }: { x: number; y: number }) {
+    return await this._driver.client.$(selector).moveTo({
+      xOffset: x,
+      yOffset: y,
+    })
   }
   async moveTo_(testLabel: string, offset: { x: number; y: number }) {
     return await this.moveTo(getSelector(testLabel), offset)

@@ -1,4 +1,4 @@
-import { clickAt, dragMouse } from './runEvents'
+import { clickAt } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main'
 import { waveform$ } from '../../components/waveformTestLabels'
@@ -27,22 +27,36 @@ export async function clickClip(
 async function getWaveformMidpoint(client: ClientWrapper) {
   const rect = await client.getBoundingClientRect(waveformSelector)
 
-  const { y, height } = rect
-  const midpoint = y + Math.round(height / 2)
-  return midpoint
+  return {
+    x: rect.x + Math.round(rect.width / 2),
+    y: rect.y + Math.round(rect.height / 2),
+  }
 }
 
 export async function waveformMouseDrag(
   client: ClientWrapper,
   start: number,
-  end: number,
-  initialHoldTime: number = 100
+  end: number
 ) {
   try {
-    const midpoint = await getWaveformMidpoint(client)
-    await dragMouse(client._driver, [start, midpoint], [end, midpoint], {
-      initialHoldTime,
-    })
+    const waveformMidpoint = await getWaveformMidpoint(client)
+    await client._driver.client.actions([
+      client._driver.client
+        .action('pointer')
+        .move({
+          origin: 'viewport',
+          x: start,
+          y: waveformMidpoint.y,
+        })
+        .down()
+        .move({
+          origin: 'viewport',
+          x: end,
+          y: waveformMidpoint.y,
+          duration: 400,
+        })
+        .up(),
+    ])
     // TODO: not-ideal flaky prevention, see if better text waiting is possible
     await sleep(100)
   } catch (err) {
