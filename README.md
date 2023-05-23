@@ -73,7 +73,7 @@ npm run integration:ds
 
 #### Test CLI options
 
-Any arguments you pass to the test scripts will be [forwarded to Jest](https://jestjs.io/docs/en/cli).
+Any arguments you pass to the test scripts will be [forwarded to Vitest](https://vitest.dev/guide/cli.html#commands).
 
 So if you wanted to say, run just one specific test, you can do something like this:
 
