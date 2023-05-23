@@ -21,15 +21,7 @@ import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
-enum $ {
-  container = 'new-project-form-dialog',
-  projectNameField = 'project-name',
-  projectFileLocationField = 'project-file-location',
-  noteTypeSelect = 'note-type-select',
-  transcriptionNoteTypeOption = 'transcription-note-type-option',
-  saveButton = 'save-button',
-  cardsPreview = 'cards-preview',
-}
+import { newProjectFormDialog$ as $ } from './NewProjectFormDialog.testLabels'
 
 const CardPreview = ({ noteType }: { noteType: NoteType | '' }) => {
   switch (noteType) {
@@ -256,5 +248,3 @@ const NewProjectFormDialog = ({
 }
 
 export default NewProjectFormDialog
-
-export { $ as newProjectFormDialog$ }

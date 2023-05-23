@@ -1,6 +1,6 @@
 import { ClientWrapper } from './ClientWrapper'
-import { projectMenu$ } from '../../components/ProjectMenu'
-import { snackbar$ } from '../../components/Snackbar'
+import { projectMenu$ } from '../../components/ProjectMenu.testLabels'
+import { snackbar$ } from '../../components/Snackbar.testLabels'
 
 export async function saveProjectViaButton(client: ClientWrapper) {
   await client.clickElement(`#${projectMenu$.saveButton}`)

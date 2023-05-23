@@ -26,11 +26,7 @@ import { capitalize } from '../FlashcardSectionForm'
 import { formatDurationWithMilliseconds } from '../../utils/formatTime'
 import moment from 'moment'
 
-enum $ {
-  container = 'link-subtitles-dialog',
-  form = 'link-subtitles-dialog-form',
-  skipButton = 'link-subtitles-dialog-skip-button',
-}
+import { linkSubtitlesDialog$ as $ } from './LinkSubtitlesDialog.testLabels'
 
 const LinkSubtitlesDialog = ({
   open,
@@ -221,5 +217,3 @@ const LinkSubtitlesDialog = ({
 }
 
 export default LinkSubtitlesDialog
-
-export { $ as linkSubtitlesDialog$ }

@@ -19,16 +19,12 @@ import {
 
 import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
+import { csvAndMp3ExportDialog$ as $ } from './CsvAndMp3ExportDialog.testLabels'
 
 type ErrorsState = {
   csvFilePath?: string
   mediaFolderLocation?: string
 }
-
-enum $ {
-  container = 'csv-and-mp3-export-dialog',
-}
-export { $ as csvAndMp3ExportDialog$ }
 
 const CsvAndMp3ExportDialog = ({
   open,

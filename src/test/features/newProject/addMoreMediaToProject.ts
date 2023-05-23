@@ -1,5 +1,5 @@
 import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
-import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { test } from '../../test'

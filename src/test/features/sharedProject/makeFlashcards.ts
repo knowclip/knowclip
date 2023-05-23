@@ -2,7 +2,7 @@ import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
 import { clickClip, createClipViaWaveform } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
 export default async function makeFlashcards(

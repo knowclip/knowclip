@@ -11,10 +11,7 @@ import useClozeControls from '../utils/clozeField/useClozeControls'
 import ClozeButtons from './FlashcardSectionDisplayClozeButtons'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 
-enum $ {
-  container = 'flashcard-display-container',
-  editButton = 'flashcard-display-edit-button',
-}
+import { flashcardSectionDisplayCard$ as $ } from './FlashcardSectionDisplayCard.testLabels'
 
 const FlashcardSectionDisplayCard = memo(
   ({
@@ -179,5 +176,3 @@ const FlashcardSectionDisplayCard = memo(
 )
 
 export default FlashcardSectionDisplayCard
-
-export { $ as flashcardSectionDisplayCard$ }

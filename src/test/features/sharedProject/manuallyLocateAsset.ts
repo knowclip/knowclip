@@ -1,10 +1,10 @@
 import { IntegrationTestContext, ASSETS_DIRECTORY } from '../../setUpDriver'
-import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
-import { fileSelectionForm$ } from '../../../components/Dialog/FileSelectionDialog'
+import { subtitlesMenu$ } from '../../../components/SubtitlesMenu.testLabels'
+import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { waveformMouseDrag } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { getSelector } from '../../driver/ClientWrapper'
 import { retryUntil } from '../../driver/retryUntil'
 import { test } from '../../test'
@@ -33,7 +33,7 @@ export default async function manuallyLocateAsset(
         client.clickElement_(subtitlesMenu$.locateExternalFileButton),
       conditionName: 'file selection form appears',
       check: () =>
-        app.client.$(getSelector(fileSelectionForm$.form)).isExisting(),
+        app.client.$(getSelector(fileSelectionDialog$.form)).isExisting(),
     })
   })
 
@@ -44,10 +44,10 @@ export default async function manuallyLocateAsset(
       showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
     })
 
-    await client.waitForText_(fileSelectionForm$.form, 'pbc_jp.ass')
-    await client.clickElement_(fileSelectionForm$.filePathField)
-    await client.clickElement_(fileSelectionForm$.continueButton)
-    await client.waitUntilGone_(fileSelectionForm$.continueButton)
+    await client.waitForText_(fileSelectionDialog$.form, 'pbc_jp.ass')
+    await client.clickElement_(fileSelectionDialog$.filePathField)
+    await client.clickElement_(fileSelectionDialog$.continueButton)
+    await client.waitUntilGone_(fileSelectionDialog$.continueButton)
   })
 
   test('close subtitles menu', async () => {

@@ -13,11 +13,7 @@ import { ClipwaveCallbackEvent, getRegionEnd } from 'clipwave'
 import { getMediaPlayer } from '../utils/media'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 
-enum $ {
-  container = 'review-and-export-table-row-container',
-  clipCheckboxes = 'review-and-export-table-row-clip-checkbox',
-  highlightedClipRow = 'review-and-export-table-highlighted-clip-row',
-}
+import { reviewAndExportMediaTableRow$ as $ } from './ReviewAndExportMediaTableRow.testLabels'
 
 type FlashcardRowProps = {
   id: string
@@ -211,5 +207,3 @@ const TranscriptionFieldPreview = ({
 }
 
 export default ReviewAndExportMediaTableRow
-
-export { $ as reviewAndExportMediaTableRow$ }

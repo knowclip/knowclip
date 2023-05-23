@@ -1,8 +1,8 @@
 import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
-import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
+import { subtitlesMenu$ } from '../../../components/SubtitlesMenu.testLabels'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
+import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog.testLabels'
 import { test } from '../../test'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 

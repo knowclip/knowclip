@@ -1,9 +1,9 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { tagsInput$ } from '../../../components/TagsInput'
+import { tagsInput$ } from '../../../components/TagsInput.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { createClipViaWaveform, waveformMouseDrag } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
 export default async function makeTwoFlashcards(

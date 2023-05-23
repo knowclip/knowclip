@@ -1,8 +1,8 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { clickAt } from '../../driver/ClientWrapper'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
-import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm.testLabels'
+import { flashcardSectionDisplayCard$ } from '../../../components/FlashcardSectionDisplayCard.testLabels'
 import { test, expect } from '../../test'
 
 export default async function navigateBetweenClips(

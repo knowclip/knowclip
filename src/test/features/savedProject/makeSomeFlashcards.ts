@@ -1,10 +1,10 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
 import { createClipViaWaveform, getClipSelector } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
 export default async function makeSomeFlashcards(

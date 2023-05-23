@@ -1,9 +1,9 @@
 import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
-import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
-import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
+import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog.testLabels'
 import { test, expect } from '../../test'
 import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 

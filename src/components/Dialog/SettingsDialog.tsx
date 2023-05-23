@@ -30,11 +30,7 @@ import truncate from '../../utils/truncate'
 import { displayDictionaryType } from '../../selectors'
 import { ImportInterruptedListIcon } from './DictionariesDialog'
 
-enum $ {
-  container = 'settings-dialog',
-  cancelButton = 'settings-dialog-cancel-button',
-  saveButton = 'settings-dialog-save-button',
-}
+import { settingsDialog$ as $ } from './SettingsDialog.testLabels'
 
 const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   const dispatch = useDispatch()
@@ -273,5 +269,3 @@ const RemoveAssetsDirectoryButton = ({
 )
 
 export default SettingsDialog
-
-export { $ as settingsDialog$ }

@@ -1,13 +1,13 @@
 import { IntegrationTestContext, ASSETS_DIRECTORY } from '../../setUpDriver'
-import { subtitlesMenu$ } from '../../../components/SubtitlesMenu'
+import { subtitlesMenu$ } from '../../../components/SubtitlesMenu.testLabels'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
-import { projectsMenu$ } from '../../../components/ProjectsMenu'
-import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
-import { subtitleClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog'
+import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
+import { confirmationDialog$ } from '../../../components/Dialog/Confirmation.testLabels'
+import { subtitlesClipsDialog$ } from '../../../components/Dialog/SubtitlesClipsDialog.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
-import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { retryUntil } from '../../driver/retryUntil'
 import { getSelector } from '../../driver/ClientWrapper'
 import { test } from '../../test'
@@ -73,32 +73,32 @@ export default async function makeCardsFromSubtitles(
     await mockElectronHelpers(app, {
       showOpenDialog: [Promise.resolve([join(ASSETS_DIRECTORY, 'pbc_jp.ass')])],
     })
-    await client.clickElement_(subtitleClipsDialog$.loadMoreTracksButton)
+    await client.clickElement_(subtitlesClipsDialog$.loadMoreTracksButton)
   })
 
   test('link transcription field', async () => {
     const { client } = context
 
-    await client.clickElement_(subtitleClipsDialog$.transcriptionField)
+    await client.clickElement_(subtitlesClipsDialog$.transcriptionField)
     const [, externalOption] = await client.elements_(
-      subtitleClipsDialog$.selectFieldOption,
+      subtitlesClipsDialog$.selectFieldOption,
       2
     )
     externalOption.click()
-    await client.waitUntilGone_(subtitleClipsDialog$.selectFieldOption)
+    await client.waitUntilGone_(subtitlesClipsDialog$.selectFieldOption)
   })
 
   test('link meaning field and submit', async () => {
     const { client } = context
 
-    await client.clickElement_(subtitleClipsDialog$.meaningField)
+    await client.clickElement_(subtitlesClipsDialog$.meaningField)
     const [embeddedOption] = await client.elements_(
-      subtitleClipsDialog$.selectFieldOption,
+      subtitlesClipsDialog$.selectFieldOption,
       2
     )
     await embeddedOption.click()
-    await client.waitUntilGone_(subtitleClipsDialog$.selectFieldOption)
-    await client.clickElement_(subtitleClipsDialog$.okButton)
+    await client.waitUntilGone_(subtitlesClipsDialog$.selectFieldOption)
+    await client.clickElement_(subtitlesClipsDialog$.okButton)
   })
 
   test('verify links', async () => {

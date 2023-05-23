@@ -4,7 +4,7 @@ import { Close } from '@mui/icons-material'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
-import { snackbar$ } from '.'
+import { snackbar$ } from '../Snackbar.testLabels'
 import r from '../../redux'
 import ActionType from '../../types/ActionType'
 

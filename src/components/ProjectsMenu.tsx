@@ -22,11 +22,7 @@ import { showOpenDialog } from '../utils/electron'
 import usePopover from '../utils/usePopover'
 import icon from '../icon.png'
 
-enum $ {
-  recentProjectsListItem = 'recent-projects-list-item',
-  newProjectButton = 'new-project-button',
-  openExistingProjectButton = 'open-existing-project-button',
-}
+import { projectsMenu$ as $ } from './ProjectsMenu.testLabels'
 
 const ProjectMenuItem = ({
   availability,
@@ -171,5 +167,3 @@ const ProjectsMenu = () => {
 }
 
 export default ProjectsMenu
-
-export { $ as projectsMenu$ }

@@ -2,11 +2,7 @@ import { Autocomplete, AutocompleteProps, Chip, TextField } from '@mui/material'
 import { useState } from 'react'
 import classnames from 'classnames'
 
-enum $ {
-  container = 'tags-input-container',
-  tagChip = 'tags-input-tag-chip',
-  inputField = 'tags-input-field',
-}
+import { tagsInput$ as $ } from './TagsInput.testLabels'
 
 export default function ChipsInput<
   DisableClearable extends boolean | undefined = false
@@ -92,5 +88,3 @@ export default function ChipsInput<
 function sanitizeChipText(text: string) {
   return text.replace(/\s/g, '_')
 }
-
-export { $ as tagsInput$ }

@@ -10,7 +10,7 @@ import {
   WaveformInterface,
   WAVEFORM_HEIGHT,
 } from 'clipwave'
-import { $ } from './waveformTestLabels'
+import { waveform$ as $ } from './waveformTestLabels'
 import { SubtitlesCardBases } from '../selectors'
 import { actions } from '../actions'
 import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'

@@ -1,6 +1,6 @@
 import { clickAt } from './runEvents'
 import { ClientWrapper } from './ClientWrapper'
-import { main$ } from '../../components/Main'
+import { main$ } from '../../components/Main.testLabels'
 import { waveform$ } from '../../components/waveformTestLabels'
 import { TestDriver } from './TestDriver'
 import { mockSideEffects } from '../../utils/sideEffects/mocks'

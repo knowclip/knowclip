@@ -18,13 +18,7 @@ import { dirname } from 'preloaded/path'
 import { showOpenDialog } from '../../utils/electron'
 import { getFileAvailability } from '../../selectors'
 
-enum $ {
-  container = 'file-selection-dialog',
-  form = 'file-selection-dialog-form',
-  filePathField = 'file-selection-dialog-file-path-field',
-  cancelButton = 'file-selection-dialog-cancel-button',
-  continueButton = 'file-selection-dialog-continue-button',
-}
+import { fileSelectionDialog$ as $ } from './FileSelectionDialog.testLabels'
 
 const FileSelectionDialog = ({
   open,
@@ -188,4 +182,3 @@ const useLocationForm = (
 }
 
 export default FileSelectionDialog
-export { $ as fileSelectionForm$ }

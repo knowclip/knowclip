@@ -8,12 +8,7 @@ import { actions } from '../actions'
 import css from './FlashcardSection.module.css'
 import { getSubtitlesFilesWithTracks } from '../selectors'
 
-enum $ {
-  openMenuButtons = 'flashcard-field-menu-open-button',
-  menuItem = 'flashcard-field-menu-item',
-  externalTrackMenuItem = 'flashcard-field-external-track-menu-item',
-  embeddedTrackMenuItem = 'flashcard-field-embedded-track-menu-item',
-}
+import { flashcardSectionFieldPopoverMenu$ as $ } from './FlashcardSectionFieldPopoverMenu.testLabels'
 
 const FlashcardSectionFieldPopoverMenu = ({
   linkedSubtitlesTrack,
@@ -136,5 +131,3 @@ const FieldMenuItem = ({
 }
 
 export default FlashcardSectionFieldPopoverMenu
-
-export { $ as flashcardFieldMenu$ }

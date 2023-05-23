@@ -15,16 +15,11 @@ import {
   ListRowRenderer,
   CellMeasurer as CellMeasurer_,
 } from 'react-virtualized'
+import { reviewAndExportMediaTable$ as $ } from './ReviewAndExportMediaTable.testLabels'
 
 const AutoSizer = AutoSizer_ as any
 const List = List_ as any
 const CellMeasurer = CellMeasurer_ as any
-
-enum $ {
-  container = 'review-and-export-media-table-container',
-  header = 'review-and-export-media-table-header',
-  checkbox = 'review-and-export-media-table-checkbox',
-}
 
 type MediaTableProps = {
   media: MediaFile
@@ -202,5 +197,3 @@ const noRowsRenderer = () => (
 )
 
 export default ReviewAndExportMediaTable
-
-export { $ as reviewAndExportMediaTable$ }

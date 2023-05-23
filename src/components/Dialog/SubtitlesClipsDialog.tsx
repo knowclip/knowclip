@@ -27,18 +27,7 @@ import { MediaSubtitles, SubtitlesFileWithTrack } from '../../selectors'
 import { TransliterationFlashcardFields } from '../../types/Project'
 import { getFileFilters } from '../../utils/files'
 
-enum $ {
-  container = 'subtitles-clips-dialog',
-  loadMoreTracksButton = 'subtitles-clips-load-more-tracks',
-  transcriptionField = 'subtitles-clips-transcription-field',
-  pronunciationField = 'subtitles-clips-pronunciation-field',
-  meaningField = 'subtitles-clips-meaning-field',
-  notesField = 'subtitles-clips-notes-field',
-  selectFieldOption = 'subtitles-clips-select-field-option',
-  tagsField = 'subtitles-clips-tags-field',
-  cancelButton = 'subtitles-clips-dialog-cancel-button',
-  okButton = 'subtitles-clips-dialog-ok-button',
-}
+import { subtitlesClipsDialog$ as $ } from './SubtitlesClipsDialog.testLabels'
 
 const MEDIA_FILE_MISSING_MESSAGE = r.simpleMessageSnackbar(
   'Please select a media file before continuing.'
@@ -298,5 +287,3 @@ function useTagsInput(defaultTags: string[]) {
   return { tags, onAddChip, onDeleteChip }
 }
 export default SubtitlesClipsDialog
-
-export { $ as subtitleClipsDialog$ }

@@ -23,13 +23,7 @@ import truncate from '../utils/truncate'
 import { useNavigate } from 'react-router'
 import { usePrevious } from '../utils/usePrevious'
 
-enum $ {
-  projectTitle = 'project-title',
-  projectTitleInput = 'project-title-input',
-  saveButton = 'save-button',
-  closeButton = 'close-button',
-  exportButton = 'export-button',
-}
+import { projectMenu$ as $ } from './ProjectMenu.testLabels'
 
 const ProjectMenu = ({ className }: { className: string }) => {
   const navigate = useNavigate()
@@ -213,7 +207,5 @@ const ProjectMenu = ({ className }: { className: string }) => {
 }
 
 export default ProjectMenu
-
-export { $ as projectMenu$ }
 
 const EMPTY: string[] = []

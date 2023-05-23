@@ -5,7 +5,7 @@ import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
 import cn from 'classnames'
 import r from '../../redux'
-import { snackbar$ } from '.'
+import { snackbar$ } from '../Snackbar.testLabels'
 
 const SimpleMessageSnackbar = ({
   message,

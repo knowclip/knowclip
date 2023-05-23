@@ -1,12 +1,10 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
 import { createClipViaWaveform, waveformMouseDrag } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
-import { create } from 'domain'
 
 export default async function moveThroughoutMedia(
   context: IntegrationTestContext,

@@ -1,10 +1,10 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
-import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm'
-import { flashcardFieldMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu'
-import { confirmationDialog$ } from '../../../components/Dialog/Confirmation'
+import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/FlashcardSectionForm.testLabels'
+import { flashcardSectionFieldPopoverMenu$ } from '../../../components/FlashcardSectionFieldPopoverMenu.testLabels'
+import { confirmationDialog$ } from '../../../components/Dialog/Confirmation.testLabels'
 import { createClipViaWaveform } from '../../driver/waveform'
-import { flashcardSection$ } from '../../../components/FlashcardSection'
+import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { test } from '../../test'
 
 export default async function makeFlashcardsWithSubtitles(
@@ -17,14 +17,16 @@ export default async function makeFlashcardsWithSubtitles(
     await client.waitForText_(flashcardSection$.container, '3 / 4')
 
     await client.clickElement(
-      `.${flashcardForm$.meaningField} .${flashcardFieldMenu$.openMenuButtons}`
+      `.${flashcardForm$.meaningField} .${flashcardSectionFieldPopoverMenu$.openMenuButtons}`
     )
   })
 
   test('link embedded track to meaning', async () => {
     const { client } = context
 
-    await client.clickElement_(flashcardFieldMenu$.embeddedTrackMenuItem)
+    await client.clickElement_(
+      flashcardSectionFieldPopoverMenu$.embeddedTrackMenuItem
+    )
     await client.clickElement_(confirmationDialog$.okButton)
   })
 

@@ -17,13 +17,9 @@ import { actions } from '../actions'
 import SubtitlesMenu from '../components/SubtitlesMenu'
 import { usePlayButtonSync, useWaveform } from 'clipwave'
 import { usePrevious } from '../utils/usePrevious'
+import { mainHeader$ as $ } from './MainHeader.testLabels'
 
 type WaveformInterface = ReturnType<typeof useWaveform>
-
-enum $ {
-  container = 'main-screen-header',
-  hoverArea = 'hover-area',
-}
 
 const MainHeader = ({
   currentProjectId,
@@ -110,8 +106,6 @@ const MainHeader = ({
 }
 
 export default MainHeader
-
-export { $ as mainHeader$ }
 
 function useAutoHide(
   currentMediaFile: MediaFile | null,

@@ -1,5 +1,5 @@
 import { IntegrationTestContext } from '../../setUpDriver'
-import { projectMenu$ } from '../../../components/ProjectMenu'
+import { projectMenu$ } from '../../../components/ProjectMenu.testLabels'
 import { test } from '../../test'
 
 const { projectTitle, projectTitleInput } = projectMenu$

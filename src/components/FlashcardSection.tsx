@@ -19,11 +19,7 @@ import { showOpenDialog } from '../utils/electron'
 import { getFileFilters } from '../utils/files'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 
-enum $ {
-  container = 'flashcard-section-container',
-  previousClipButton = 'previous-clip-button',
-  nextClipButton = 'next-clip-button',
-}
+import { flashcardSection$ as $ } from './FlashcardSection.testLabels'
 
 const FlashcardSection = ({
   mediaFile,
@@ -234,5 +230,3 @@ const Placeholder = ({
 }
 
 export default FlashcardSection
-
-export { $ as flashcardSection$ }

@@ -25,15 +25,7 @@ import Field, {
 } from './FlashcardSectionFormField'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 
-enum $ {
-  container = 'flashcard-form-container',
-  flashcardFields = 'flashcard-field',
-  deleteButton = 'delete-clip-button',
-  transcriptionField = 'flashcard-form-transcription',
-  pronunciationField = 'flashcard-form-pronunciation',
-  meaningField = 'flashcard-form-meaning',
-  notesField = 'flashcard-form-notes',
-}
+import { flashcardSectionForm$ as $ } from './FlashcardSectionForm.testLabels'
 
 const fieldContainerLabels = {
   transcription: $.transcriptionField,
@@ -228,5 +220,3 @@ export const capitalize = (string: string) =>
   string.substring(0, 1).toUpperCase() + string.slice(1)
 
 export default FlashcardSectionForm
-
-export { $ as flashcardSectionForm$ }

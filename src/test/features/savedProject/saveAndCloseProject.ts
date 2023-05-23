@@ -1,4 +1,4 @@
-import { projectsMenu$ } from '../../../components/ProjectsMenu'
+import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 import { IntegrationTestContext } from '../../setUpDriver'
 import { test } from '../../test'
