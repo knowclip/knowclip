@@ -3,18 +3,25 @@ import { flashcardSectionForm$ as flashcardForm$ } from '../../../components/Fla
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { fillInTransliterationCardFields } from '../../driver/flashcardSection'
 import { setVideoTime } from '../../driver/media'
-import { waveformMouseDrag } from '../../driver/waveform'
+import {
+  createClipViaWaveform,
+  getClipSelector,
+  waveformMouseDrag,
+} from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 export default async function makeSomeFlashcards(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  cardIds: [string, string, string]
 ) {
   const { deleteButton } = flashcardForm$
   test('create first card', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 351, 438)
+    await createClipViaWaveform(context, 351, 438, cardIds[0])
+
     await client.waitForText_(flashcardSection$.container, '1 / 1')
 
     await fillInTransliterationCardFields(client, {
@@ -24,9 +31,7 @@ export default async function makeSomeFlashcards(
   })
 
   test('drag to create another card', async () => {
-    const { client } = context
-
-    await waveformMouseDrag(client, 921, 1000)
+    await createClipViaWaveform(context, 921, 1000, cardIds[1])
   })
 
   test('wait for card to show', async () => {
@@ -53,17 +58,15 @@ export default async function makeSomeFlashcards(
   test('create a third card', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 176, 355)
+    await createClipViaWaveform(context, 176, 355, cardIds[2])
+
     await client.waitForText_(flashcardSection$.container, '3 / 3')
-    await client.waitForVisible_(waveform$.waveformClip)
   })
 
   test('delete third card', async () => {
     const { client } = context
 
-    const clipId = `.${waveform$.waveformClip}[data-clip-id="9a07597c-7885-49bc-97d4-76a2dffdb9aa"]`
-    await client.waitUntilPresent(clipId)
     await client.clickElement_(deleteButton)
-    await client.waitUntilGone(clipId)
+    await client.waitUntilGone(getClipSelector(cardIds[2]))
   })
 }

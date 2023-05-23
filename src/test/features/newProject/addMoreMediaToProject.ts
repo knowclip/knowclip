@@ -3,6 +3,7 @@ import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu'
 import { join } from 'path'
 import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { test } from '../../test'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 const {
   openMediaFilesMenuButton: mediaFilesMenuButton,
@@ -10,7 +11,8 @@ const {
 } = mediaFilesMenu$
 
 export default async function addMoreMediaToProject(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  mediaFileId: string
 ) {
   const germanVideoPath = join(ASSETS_DIRECTORY, 'piggeldy_cat.mp4')
 
@@ -18,6 +20,9 @@ export default async function addMoreMediaToProject(
     const { client, app } = context
     await client.clickElement_(mediaFilesMenuButton)
 
+    await mockSideEffects(app, {
+      uuid: [mediaFileId],
+    })
     await mockElectronHelpers(app, {
       showOpenDialog: [Promise.resolve([germanVideoPath])],
     })

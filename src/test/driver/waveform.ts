@@ -3,6 +3,8 @@ import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main'
 import { waveform$ } from '../../components/waveformTestLabels'
 import { TestDriver } from './TestDriver'
+import { mockSideEffects } from '../../utils/sideEffects/mocks'
+import { IntegrationTestContext } from '../setUpDriver'
 
 export const waveformSelector = `#${main$.container} > svg`
 
@@ -64,6 +66,25 @@ export async function waveformMouseDrag(
   }
 }
 
+export async function createClipViaWaveform(
+  { app, client }: IntegrationTestContext,
+  start: number,
+  end: number,
+  id: string
+) {
+  await mockSideEffects(app, {
+    uuid: [id],
+  })
+
+  await waveformMouseDrag(client, start, end)
+
+  await client.waitUntilPresent(getClipSelector(id))
+}
+
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export function getClipSelector(clipId: string) {
+  return `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
 }

@@ -6,17 +6,21 @@ import { step } from '../step'
 
 export const savedProjectTestSteps = ({
   projectTitle,
-  firstClipId,
+  existingClipId,
+  newClipIds,
 }: {
   projectTitle: string
-  firstClipId: string
+  existingClipId: string
+  newClipIds: [string, string, string]
 }) => [
   step('opens a previously saved project', (context) =>
     openSavedProject(context)
   ),
-  step('make some flashcards', (context) => makeSomeFlashcards(context)),
+  step('make some flashcards', (context) =>
+    makeSomeFlashcards(context, newClipIds)
+  ),
   step('link subtitles to fields', (context) =>
-    linkSubtitlesToFields(context, { firstClipId })
+    linkSubtitlesToFields(context, { firstClipId: existingClipId })
   ),
   step('save and closes project', (context) =>
     saveAndCloseProject(context, projectTitle)

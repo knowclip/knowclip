@@ -5,9 +5,11 @@ import { setVideoTime } from '../../driver/media'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 export default async function moveThroughoutMedia(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  thirdClipId: string
 ) {
   test('seek to new time in video', async () => {
     const { client } = context
@@ -22,7 +24,11 @@ export default async function moveThroughoutMedia(
   })
 
   test('shift waveform view by creating clip at screen edge', async () => {
-    const { client } = context
+    const { app, client } = context
+
+    await mockSideEffects(app, {
+      uuid: [thirdClipId],
+    })
 
     await waveformMouseDrag(client, 710, 1008)
     await client.waitForText('body', '3 / 3')

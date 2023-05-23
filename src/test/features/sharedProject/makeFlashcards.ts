@@ -1,13 +1,14 @@
 import { IntegrationTestContext } from '../../setUpDriver'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { clickClip, waveformMouseDrag } from '../../driver/waveform'
+import { clickClip, createClipViaWaveform } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection'
 import { test } from '../../test'
 
 export default async function makeFlashcards(
   context: IntegrationTestContext,
-  firstExistingClipId: string
+  firstExistingClipId: string,
+  newClipId: string
 ) {
   test('select clip', async () => {
     const { client } = context
@@ -35,7 +36,8 @@ export default async function makeFlashcards(
   test('create clip with mouse drag', async () => {
     const { client } = context
 
-    await waveformMouseDrag(client, 589, 824)
+    await createClipViaWaveform(context, 589, 824, newClipId)
+
     await client.waitForText_(flashcardSection$.container, '3 / 4')
   })
 }

@@ -23,7 +23,10 @@ describe('opening a shared project', () => {
   })
 
   runAll(
-    sharedProjectTestSteps('786f7023-0862-4cf7-863f-2c32ec6a3975'),
+    sharedProjectTestSteps('786f7023-0862-4cf7-863f-2c32ec6a3975', [
+      '64bc9fe8-822a-4ecf-83d9-d6997029db7d',
+      'b9ba2184-cb5c-4d50-98c2-568bf8e75854',
+    ]),
     context
   )
   test('save and close project', () => saveAndCloseProject(context))
@@ -33,7 +36,10 @@ describe('opening a shared project', () => {
   })
 })
 
-function sharedProjectTestSteps(firstExistingClipId: string) {
+function sharedProjectTestSteps(
+  firstExistingClipId: string,
+  newClipIds: [string, string]
+) {
   return [
     step(
       'open a shared project and locates media in local filesystem',
@@ -41,9 +47,11 @@ function sharedProjectTestSteps(firstExistingClipId: string) {
     ),
     step('navigate between as-of-yet unloaded media', navigateBetweenMedia),
     step('make some flashcards', (context) =>
-      makeFlashcards(context, firstExistingClipId)
+      makeFlashcards(context, firstExistingClipId, newClipIds[0])
     ),
-    step('make some flashcards using subtitles', makeFlashcardsWithSubtitles),
+    step('make some flashcards using subtitles', (context) =>
+      makeFlashcardsWithSubtitles(context, newClipIds[1])
+    ),
     step('manually locate missing assets', manuallyLocateAsset),
     step('review with missing media', reviewWithMissingMedia),
     step('export deck with missing media', exportWithMissingMedia),
@@ -51,10 +59,6 @@ function sharedProjectTestSteps(firstExistingClipId: string) {
 }
 
 const sideEffectsMocks = {
-  uuid: [
-    '64bc9fe8-822a-4ecf-83d9-d6997029db7d',
-    'b9ba2184-cb5c-4d50-98c2-568bf8e75854',
-  ],
   nowUtcTimestamp: [
     '2020-01-24T15:09:02Z',
     '2020-01-24T15:09:03Z',

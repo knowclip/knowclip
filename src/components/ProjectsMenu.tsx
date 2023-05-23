@@ -92,7 +92,6 @@ const ProjectMenuItem = ({
 }
 
 const ProjectsMenu = () => {
-  console.log('rendering projects menu')
   const { projects, currentProjectId } = useSelector((state: AppState) => ({
     projects: r.getProjects(state),
     currentProjectId: r.getCurrentProjectId(state),

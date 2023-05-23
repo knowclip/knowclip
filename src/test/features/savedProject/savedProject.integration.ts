@@ -28,7 +28,12 @@ describe('opening and saving a previously saved project', () => {
     [
       ...savedProjectTestSteps({
         projectTitle: 'My cool saved project',
-        firstClipId: '632a6cff-7fd7-4d0f-b657-0b9636204261',
+        existingClipId: '632a6cff-7fd7-4d0f-b657-0b9636204261',
+        newClipIds: [
+          '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
+          '1e62d23d-3f3b-4785-b8ba-5d61dddc78ed',
+          '9a07597c-7885-49bc-97d4-76a2dffdb9aa',
+        ],
       }),
       step('resulting project file matches snapshot', async () => {
         test('save project', async () => {
@@ -49,11 +54,6 @@ describe('opening and saving a previously saved project', () => {
 })
 
 const sideEffectsMocks = {
-  uuid: [
-    '136042f2-00bc-4d9b-a3a7-3da1b7868c78',
-    '1e62d23d-3f3b-4785-b8ba-5d61dddc78ed',
-    '9a07597c-7885-49bc-97d4-76a2dffdb9aa',
-  ],
   nowUtcTimestamp: [
     '2020-01-27T22:28:12Z',
     '2020-01-27T22:28:22Z',

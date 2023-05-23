@@ -79,7 +79,7 @@
     "build-fixture:saved": "npm run integration:build-fixture -- savedProject",
     "build-fixture:shared": "npm run integration:build-fixture -- sharedProject && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",
     "build-fixture:subtitles": "npm run integration:build-fixture -- subtitlesProject",
-    "integration:build-fixture": "npm run build -- integration && npm run vitest run -- --mode integration ./vitest-integration-fixtures.config.ts",
+    "integration:build-fixture": "npm run build -- integration && npm run vitest run -- --mode integration --config ./vitest-integration-fixtures.config.ts",
     "lint": "npm run eslint 'src/**/*.{ts,tsx,js}'",
     "electron-vite": "electron-vite",
     "vitest": "vitest",
@@ -108,7 +108,7 @@
     ]
   },
   "browserslist": [
-    "electron >= 14.2.0"
+    "electron >= 24.3.1"
   ],
   "devDependencies": {
     "@types/archiver": "^5.1.1",
@@ -143,7 +143,6 @@
     "levenary": "^1.1.1",
     "lint-staged": "^13.2.2",
     "prettier": "^2.1.2",
-    "redux-devtools-extension": "^2.13.9",
     "replace-in-files-cli": "^2.2.0",
     "request": "^2.88.2",
     "typescript": "^5.0.4",

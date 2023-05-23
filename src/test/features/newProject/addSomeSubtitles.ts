@@ -4,15 +4,20 @@ import { mockElectronHelpers } from '../../../utils/electron/mocks'
 import { join } from 'path'
 import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog'
 import { test } from '../../test'
+import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 
 export default async function addSomeSubtitles(
   context: IntegrationTestContext,
-  subtitlesFileName: string
+  subtitlesFileName: string,
+  subtitlesTrackId: string
 ) {
   test('open subtitles menu and add track', async () => {
     const { client, app } = context
     await client.clickElement_(subtitlesMenu$.openMenuButton)
 
+    await mockSideEffects(app, {
+      uuid: [subtitlesTrackId],
+    })
     await mockElectronHelpers(app, {
       showOpenDialog: [
         Promise.resolve([join(ASSETS_DIRECTORY, subtitlesFileName)]),
