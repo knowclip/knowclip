@@ -43,17 +43,19 @@ export default async function linkSubtitlesToFields(
 
     await client.clickElement_(flashcardFieldMenu$.openMenuButtons)
     await client.elements_(flashcardFieldMenu$.menuItem, 2)
+
     await client.clickElement_(flashcardFieldMenu$.externalTrackMenuItem)
     await client.waitUntilGone_(flashcardFieldMenu$.externalTrackMenuItem)
+
     await client.waitUntilPresent_(confirmationDialog$.okButton)
     await client.clickElement_(confirmationDialog$.okButton)
+    await client.waitUntilGone_(confirmationDialog$.okButton)
+  })
+  test('wait for text to be filled in', async () => {
+    const { client } = context
     await client.waitForText_(
       flashcardSection$.container,
       '笹を食べながらのんびりするのは最高だなぁ'
     )
   })
-}
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }
