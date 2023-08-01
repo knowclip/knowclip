@@ -16,7 +16,7 @@
     "next": "^13.4.12",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "sass": "^1.64.0"
+    "sass": "^1.64.2"
   },
   "devDependencies": {
     "@babel/core": "7.22.1",
