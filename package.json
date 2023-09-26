@@ -60,7 +60,7 @@
     "wanakana": "^5.1.0",
     "webdriverio": "^8.10.6",
     "xss": "^1.0.6",
-    "yaml": "^1.7.2",
+    "yaml": "^2.3.2",
     "yauzl": "^2.10.0"
   },
   "main": "./out/main/main.js",
