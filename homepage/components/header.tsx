@@ -3,7 +3,7 @@ import css from "./header.module.css"
 import cn from "classnames"
 import Link from "next/link"
 
-const Header = ({ siteTitle }: { siteTitle: string }) => (
+const Header = ({ siteTitle = "" }: { siteTitle: string }) => (
   <header className={css.container}>
     <h1 className={cn(css.heading, css.filmBackground)}>
       <img src="/lightbulb.png" className={css.lightbulbIcon} alt="" />
@@ -21,9 +21,5 @@ const Header = ({ siteTitle }: { siteTitle: string }) => (
     </h1>
   </header>
 )
-
-Header.defaultProps = {
-  siteTitle: ``,
-}
 
 export default Header
