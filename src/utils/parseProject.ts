@@ -93,7 +93,6 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
                 id: s.id,
                 name: s.name,
                 parentId: m.id,
-                parentType: 'MediaFile',
                 chunksMetadata: s.chunksMetadata,
               }
       )
