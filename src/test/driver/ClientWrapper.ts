@@ -1,5 +1,4 @@
 import { clickAt } from './runEvents'
-import { Element } from 'webdriverio'
 import { ElementWrapper, element } from './ElementWrapper'
 import { TestDriver } from './TestDriver'
 
@@ -36,18 +35,21 @@ export class ClientWrapper {
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
     if (typeof count === 'number' && count <= 0)
       throw new Error('Count must be at least 1')
-    let elementsSoFar: Element[] | undefined
+    let elementsSoFar: WebdriverIO.ElementArray | undefined
     try {
       if (count)
         await this._driver.client.waitUntil(
           async () => {
-            const elements: Element[] = await this._driver.client.$$(selector)
+            const elements: WebdriverIO.ElementArray =
+              await this._driver.client.$$(selector)
             elementsSoFar = elements
             return (
               elements.length === count &&
-              (await Promise.all(elements.map((e) => e.isExisting()))).every(
-                (e) => e
-              )
+              (
+                await Promise.all([
+                  ...(await elements.map((e) => e.isExisting())),
+                ])
+              ).every((e) => e)
             )
           },
           { timeout: 10000 }

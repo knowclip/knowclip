@@ -16,12 +16,11 @@ export async function clickClip(
   const clipSelector = `.${waveform$.waveformClip}[data-clip-id="${clipId}"]`
   const clip = await client.firstElement(clipSelector)
   const rect = await client.getBoundingClientRect(clipSelector)
-
   const offsetFromCorner = {
     x: Math.round(rect.width / 2),
     y: Math.round(rect.height / 2),
   }
-  await clip.moveTo(offsetFromCorner)
+  await clip.moveTo()
 
   await clickAt(app, [rect.x + offsetFromCorner.x, rect.y + offsetFromCorner.y])
 }
