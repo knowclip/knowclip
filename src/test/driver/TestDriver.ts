@@ -1,4 +1,4 @@
-import { Browser, RemoteOptions, remote } from 'webdriverio'
+import { RemoteOptions, remote } from 'webdriverio'
 import Chromedriver from './Chromedriver'
 import request from 'request'
 import { ChildProcess } from 'child_process'
@@ -127,7 +127,7 @@ export async function createTestDriver({
     },
     logLevel,
   }
-  const browser: Browser = await remote(browserOptions)
+  const browser: WebdriverIO.Browser = await remote(browserOptions)
   return new TestDriver({
     browser,
     driver,
@@ -136,10 +136,16 @@ export async function createTestDriver({
 
 export class TestDriver {
   startupStatus: Promise<MessageResponse<'ok'>>
-  client: Browser
+  client: WebdriverIO.Browser
   _driver: Chromedriver
 
-  constructor({ driver, browser }: { driver: Chromedriver; browser: Browser }) {
+  constructor({
+    driver,
+    browser,
+  }: {
+    driver: Chromedriver
+    browser: WebdriverIO.Browser
+  }) {
     this.client = browser
     this._driver = driver
 

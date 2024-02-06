@@ -19,7 +19,7 @@ export interface ElementWrapper {
   isExisting: () => Promise<boolean>
   isSelected: () => Promise<boolean>
   getAttribute: (attributeName: string) => Promise<string | null>
-  moveTo: (opts: { x: number; y: number }) => Promise<void>
+  moveTo: (opts?: { x: number; y: number }) => Promise<void>
   findDescendant: (descendantSelector: string) => Promise<ElementWrapper | null>
 }
 
@@ -132,12 +132,21 @@ export const wrapElement = (
         )
       }
     },
-    moveTo: async ({ x, y }: { x: number; y: number }) => {
+    moveTo: async (offset?: { x: number; y: number }) => {
       try {
-        await element.moveTo({ xOffset: x, yOffset: y })
+        await element.moveTo(
+          offset
+            ? {
+                xOffset: offset.x,
+                yOffset: offset.y,
+              }
+            : undefined
+        )
       } catch (err) {
         throw new Error(
-          `Could not move to "${selector}" at offset ${x} ${y}: ${err}`
+          offset
+            ? `Could not move to "${selector}" at offset ${offset.x} ${offset.y}: ${err}`
+            : `Could not move to "${selector}": ${err}`
         )
       }
     },
