@@ -125,7 +125,8 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  if (shouldInstallExtensions) {
+  console.log(true ? 'installing devtools' : 'not installing devtools')
+  if (true) {
     try {
       await installDevtools({
         redux: true,

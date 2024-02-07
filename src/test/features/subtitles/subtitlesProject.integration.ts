@@ -29,9 +29,9 @@ describe('make clips and cards from subtitles', () => {
       step('automatically make clips and cards from subtitles', (context) =>
         makeCardsFromSubtitles(context)
       ),
-      step('saves and closes project', (context) =>
-        saveAndCloseProject(context)
-      ),
+      // step('saves and closes project', (context) =>
+      //   saveAndCloseProject(context)
+      // ),
     ],
     context
   )

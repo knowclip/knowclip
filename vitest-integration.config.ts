@@ -10,6 +10,9 @@ export const integrationConfig: UserConfig = {
   },
   test: {
     testTimeout: 60000,
+    env: {
+      INTEGRATION_DEV: 'true',
+    },
     threads: false,
     include: ['src/test/**/*.integration.ts'],
     deps: {
