@@ -64,6 +64,7 @@ export async function parseCedictZip(file: CEDictDictionary, filePath: string) {
                 try {
                   importDictionaryEntries(context, file, data)
                 } catch (err) {
+                  console.error('importing dictionary entries')
                   throw err
                 }
               }),

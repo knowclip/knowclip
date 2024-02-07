@@ -151,7 +151,7 @@ const session: Reducer<SessionState, Action> = (
     case A.deleteFlashcardTag: {
       const { tag } = action
       const newIds = (state.tagsToClipIds[tag] || []).filter(
-        (id: String) => id !== action.id
+        (id: string) => id !== action.id
       )
       const newTagsToClipIds = newIds.length
         ? {
