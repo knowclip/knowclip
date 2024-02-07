@@ -5,7 +5,7 @@ import ActionType from '../types/ActionType'
 export function defineActionCreators<
   T extends ActionType,
   ActionCreators extends Partial<{
-    [ACN in ActionCreatorNameOf<T>]: (...args: any[]) => {
+    [ACN in ActionCreatorNameOf<T>]: (...args: never[]) => {
       type: (typeof ActionType)[ACN]
     }
   }>

@@ -132,7 +132,7 @@ export const getSubtitlesFilesWithTracks = createSelector(
                 track: subtitlesTracks[t.id] || null,
               } as EmbeddedSubtitlesFileWithTrack
             }
-            case 'ExternalSubtitlesTrack':
+            case 'ExternalSubtitlesTrack': {
               const externalIndex = ++externalCount
               const sourceFile = getSubtitlesSourceFileFromFilesSubset(
                 externalFiles,
@@ -155,6 +155,7 @@ export const getSubtitlesFilesWithTracks = createSelector(
                 ),
                 track: subtitlesTracks[t.id] || null,
               } as ExternalSubtitlesFileWithTrack
+            }
           }
           /* eslint-enable array-callback-return */
         })

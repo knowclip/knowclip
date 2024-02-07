@@ -12,11 +12,11 @@ import { CssBaseline } from '@mui/material'
 
 class App extends Component<
   { sentryDsn: string },
-  { hasError: boolean; error: any }
+  { hasError: boolean; error: unknown }
 > {
   state = { hasError: false, error: null }
 
-  static getDerivedStateFromError(error: any) {
+  static getDerivedStateFromError(error: unknown) {
     return { hasError: true, error }
   }
 

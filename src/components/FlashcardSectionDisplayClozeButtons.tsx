@@ -156,8 +156,10 @@ const ClozeButton = ({
           // so that next enter keyup
           // does not trigger cloze selection confirmation
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ;(window as any).clozeButtonWasPressed = true
           const resetClozeButtonWasPressed = () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ;(window as any).clozeButtonWasPressed = false
             window.removeEventListener('keyup', resetClozeButtonWasPressed)
           }

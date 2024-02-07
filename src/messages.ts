@@ -13,9 +13,9 @@ async function respond<T extends MessageToMainType>(
   message: MessageToMain<T>
 ): Promise<Awaited<MessageHandlerResult<T>>> {
   const responseHandler = messageHandlers[message.type]
-  // @ts-ignore
+  // @ts-expect-error args are guaranteed to match
   const result = responseHandler(...(message.args || []))
-  // @ts-ignore
+  // @ts-expect-error  are guaranteed to match
   return await result
 }
 

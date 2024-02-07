@@ -8,7 +8,7 @@ declare module 'anki-apkg-export-multi-field/dist/template' {
 }
 declare module 'anki-apkg-export-multi-field/dist/exporter' {
   export default class Exporter {
-    constructor(deckName: string, options: Object)
+    constructor(deckName: string, options: object)
     addMedia(fileName: string, buffer: Buffer)
     addCard(fields: string[], restSpecs: { tags: string[]; due: number })
     save(options: {

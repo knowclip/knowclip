@@ -70,6 +70,7 @@ export async function parseDictCCZip(file: DictCCDictionary, filePath: string) {
                 try {
                   importDictionaryEntries(context, file, data)
                 } catch (err) {
+                  console.error('error importing dictionary entries')
                   throw err
                 }
               }),

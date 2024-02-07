@@ -1,4 +1,4 @@
-import { Element, WaitForOptions, WaitUntilOptions } from 'webdriverio'
+import { WaitForOptions, WaitUntilOptions } from 'webdriverio'
 import { TestDriver } from './TestDriver'
 
 /** A wrapper for `WebDriverIO.Client` method results
@@ -25,7 +25,7 @@ export interface ElementWrapper {
 
 export const wrapElement = (
   driver: TestDriver,
-  element: Element,
+  element: WebdriverIO.Element,
   selector: string
 ): ElementWrapper => {
   const client = driver.client
@@ -44,6 +44,7 @@ export const wrapElement = (
 
       return result
     } catch (err) {
+      console.error('Could not get text from element:', selector, err)
       throw err
     }
   }

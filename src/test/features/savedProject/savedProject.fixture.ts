@@ -15,7 +15,7 @@ import { afterAll, beforeAll, describe } from 'vitest'
 const testId = 'savedProject'
 
 describe('make a project file for testing saved projects', () => {
-  let context = initTestContext(testId)
+  const context = initTestContext(testId)
 
   beforeAll(async () => {
     const { app } = await startApp(context)

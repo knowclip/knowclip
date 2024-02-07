@@ -61,6 +61,7 @@ export async function waveformMouseDrag(
     // TODO: not-ideal flaky prevention, see if better text waiting is possible
     await sleep(100)
   } catch (err) {
+    console.error('Error while dragging waveform:', err)
     throw err
   }
 }

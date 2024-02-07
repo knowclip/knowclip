@@ -17,227 +17,225 @@ import MediaTable from './ReviewAndExportMediaTable'
 
 import { reviewAndExport$ as $ } from './ReviewAndExport.testLabels'
 
-const Export = React.memo(
-  ({
-    open,
-    data: { mediaOpenPrior, mediaFileIdsToClipIds: initialSelectedClips },
-  }: DialogProps<ReviewAndExportDialogData>) => {
-    const dispatch = useDispatch()
-    const {
+const Export = React.memo(function Export({
+  open,
+  data: { mediaOpenPrior, mediaFileIdsToClipIds: initialSelectedClips },
+}: DialogProps<ReviewAndExportDialogData>) {
+  const dispatch = useDispatch()
+  const {
+    currentMedia,
+    currentFileId,
+    projectMedia,
+    progress,
+    clipIdsByMediaFileId,
+  } = useSelector((state: AppState) => {
+    const currentMedia = r.getCurrentMediaFile(state)
+    return {
       currentMedia,
-      currentFileId,
-      projectMedia,
-      progress,
-      clipIdsByMediaFileId,
-    } = useSelector((state: AppState) => {
-      const currentMedia = r.getCurrentMediaFile(state)
-      return {
-        currentMedia,
-        currentFileId: r.getCurrentFileId(state),
-        projectMedia: r.getCurrentProjectMediaFiles(state),
-        progress: state.session.progress,
-        clipIdsByMediaFileId: state.clips.idsByMediaFileId,
-      }
-    })
+      currentFileId: r.getCurrentFileId(state),
+      projectMedia: r.getCurrentProjectMediaFiles(state),
+      progress: state.session.progress,
+      clipIdsByMediaFileId: state.clips.idsByMediaFileId,
+    }
+  })
 
-    const closeDialog = useCallback(() => {
-      const currentMediaId = currentMedia && currentMedia.id
-      const initialMediaId = mediaOpenPrior && mediaOpenPrior.id
-      if (currentMediaId !== initialMediaId)
-        dispatch(
-          mediaOpenPrior ? r.openFileRequest(mediaOpenPrior) : r.dismissMedia()
+  const closeDialog = useCallback(() => {
+    const currentMediaId = currentMedia && currentMedia.id
+    const initialMediaId = mediaOpenPrior && mediaOpenPrior.id
+    if (currentMediaId !== initialMediaId)
+      dispatch(
+        mediaOpenPrior ? r.openFileRequest(mediaOpenPrior) : r.dismissMedia()
+      )
+
+    dispatch(actions.closeDialog())
+  }, [currentMedia, dispatch, mediaOpenPrior])
+
+  const [currentTabIndex, setCurrentTabIndex] = useState(0)
+  const [selectionHasStarted, setSelectionHasStarted] = useState(false)
+  const chooseTab = (index: number) => {
+    setCurrentTabIndex(index)
+    setSelectionHasStarted(false)
+  }
+  const startSelection = useCallback(
+    () => setSelectionHasStarted(true),
+    [setSelectionHasStarted]
+  )
+  const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
+  const somethingSelected = useMemo(
+    () =>
+      Object.values(selectedIds).some((ids) => ids.some((id) => Boolean(id))),
+    [selectedIds]
+  )
+  const exportApkg = useCallback(() => {
+    dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
+  }, [dispatch, selectedIds, mediaOpenPrior])
+  const csvAndMp3ExportDialog = useCallback(
+    () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
+    [dispatch, selectedIds]
+  )
+  const exportMarkdown = useCallback(
+    () => dispatch(actions.exportMarkdown(selectedIds)),
+    [dispatch, selectedIds]
+  )
+
+  const onSelectRow = useCallback(
+    (mediaFileId: string, id: string) =>
+      setSelectedIds((mediaToClips) => {
+        const selectedIds = mediaToClips[mediaFileId]
+        const newSelectedIds = [...selectedIds]
+        const index = clipIdsByMediaFileId[mediaFileId].indexOf(id)
+        newSelectedIds[index] = selectedIds.includes(id) ? undefined : id
+
+        return {
+          ...mediaToClips,
+          [mediaFileId]: newSelectedIds,
+        }
+      }),
+    [clipIdsByMediaFileId]
+  )
+  const onDoubleClickRow = useCallback(
+    (mediaFileId: string, id: string) => {
+      dispatch(r.selectWaveformItem({ type: 'Clip', id }))
+    },
+    [dispatch]
+  )
+  const onSelectAll = useCallback(
+    (mediaFileId: string) => {
+      setSelectedIds((mediaToClips) => {
+        const selectedIds = mediaToClips[mediaFileId]
+        const wasSelected = clipIdsByMediaFileId[mediaFileId].every(
+          (id, i) => selectedIds[i] === id
         )
 
-      dispatch(actions.closeDialog())
-    }, [currentMedia, dispatch, mediaOpenPrior])
+        return {
+          ...mediaToClips,
+          [mediaFileId]: wasSelected
+            ? []
+            : [...clipIdsByMediaFileId[mediaFileId]],
+        }
+      })
+    },
+    [clipIdsByMediaFileId]
+  )
+  const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
+    projectMedia.findIndex((metadata) => metadata.id === currentFileId)
+  )
+  const onClickTable = useCallback(
+    (index: number) => {
+      setExpandedTableIndex(index)
+    },
+    [setExpandedTableIndex]
+  )
+  const submitDisabled = Boolean(progress) || !somethingSelected
 
-    const [currentTabIndex, setCurrentTabIndex] = useState(0)
-    const [selectionHasStarted, setSelectionHasStarted] = useState(false)
-    const chooseTab = (index: number) => {
-      setCurrentTabIndex(index)
-      setSelectionHasStarted(false)
-    }
-    const startSelection = useCallback(
-      () => setSelectionHasStarted(true),
-      [setSelectionHasStarted]
-    )
-    const [selectedIds, setSelectedIds] = useState(initialSelectedClips)
-    const somethingSelected = useMemo(
-      () =>
-        Object.values(selectedIds).some((ids) => ids.some((id) => Boolean(id))),
-      [selectedIds]
-    )
-    const exportApkg = useCallback(() => {
-      dispatch(actions.exportApkgRequest(selectedIds, mediaOpenPrior))
-    }, [dispatch, selectedIds, mediaOpenPrior])
-    const csvAndMp3ExportDialog = useCallback(
-      () => dispatch(actions.csvAndMp3ExportDialog(selectedIds)),
-      [dispatch, selectedIds]
-    )
-    const exportMarkdown = useCallback(
-      () => dispatch(actions.exportMarkdown(selectedIds)),
-      [dispatch, selectedIds]
-    )
+  return (
+    <Dialog
+      open={open}
+      onClose={useCallback(() => dispatch(actions.closeDialog()), [dispatch])}
+      fullScreen={selectionHasStarted}
+      id={$.container}
+    >
+      <Tabs value={currentTabIndex} className={css.tabs}>
+        <Tab label="Export APKG" onClick={() => chooseTab(0)} />
+        <Tab label="Export CSV & MP3" onClick={() => chooseTab(1)} />
+        <Tab label="Export MD" onClick={() => chooseTab(2)} />
+      </Tabs>
 
-    const onSelectRow = useCallback(
-      (mediaFileId: string, id: string) =>
-        setSelectedIds((mediaToClips) => {
-          const selectedIds = mediaToClips[mediaFileId]
-          const newSelectedIds = [...selectedIds]
-          const index = clipIdsByMediaFileId[mediaFileId].indexOf(id)
-          newSelectedIds[index] = selectedIds.includes(id) ? undefined : id
-
-          return {
-            ...mediaToClips,
-            [mediaFileId]: newSelectedIds,
-          }
-        }),
-      [clipIdsByMediaFileId]
-    )
-    const onDoubleClickRow = useCallback(
-      (mediaFileId: string, id: string) => {
-        dispatch(r.selectWaveformItem({ type: 'Clip', id }))
-      },
-      [dispatch]
-    )
-    const onSelectAll = useCallback(
-      (mediaFileId: string) => {
-        setSelectedIds((mediaToClips) => {
-          const selectedIds = mediaToClips[mediaFileId]
-          const wasSelected = clipIdsByMediaFileId[mediaFileId].every(
-            (id, i) => selectedIds[i] === id
-          )
-
-          return {
-            ...mediaToClips,
-            [mediaFileId]: wasSelected
-              ? []
-              : [...clipIdsByMediaFileId[mediaFileId]],
-          }
-        })
-      },
-      [clipIdsByMediaFileId]
-    )
-    const [expandedTableIndex, setExpandedTableIndex] = useState(() =>
-      projectMedia.findIndex((metadata) => metadata.id === currentFileId)
-    )
-    const onClickTable = useCallback(
-      (index: number) => {
-        setExpandedTableIndex(index)
-      },
-      [setExpandedTableIndex]
-    )
-    const submitDisabled = Boolean(progress) || !somethingSelected
-
-    return (
-      <Dialog
-        open={open}
-        onClose={useCallback(() => dispatch(actions.closeDialog()), [dispatch])}
-        fullScreen={selectionHasStarted}
-        id={$.container}
-      >
-        <Tabs value={currentTabIndex} className={css.tabs}>
-          <Tab label="Export APKG" onClick={() => chooseTab(0)} />
-          <Tab label="Export CSV & MP3" onClick={() => chooseTab(1)} />
-          <Tab label="Export MD" onClick={() => chooseTab(2)} />
-        </Tabs>
-
-        {progress ? (
-          <>
-            <LinearProgress variant="determinate" value={progress.percentage} />
-            <DialogContent>
-              <p className={css.progressMessage}>{progress.message}</p>
-            </DialogContent>
-          </>
-        ) : (
+      {progress ? (
+        <>
+          <LinearProgress variant="determinate" value={progress.percentage} />
           <DialogContent>
-            {!selectionHasStarted && (
-              <IntroText currentTabIndex={currentTabIndex} />
-            )}
-            {selectionHasStarted && (
-              <div className={css.mediaTables}>
-                {projectMedia.map((metadata, i) => (
-                  <MediaTable
-                    key={metadata.id}
-                    open={i === expandedTableIndex}
-                    mediaIndex={i}
-                    onClick={onClickTable}
-                    media={metadata}
-                    selectedIds={selectedIds[metadata.id]}
-                    onSelectRow={onSelectRow}
-                    onDoubleClickRow={onDoubleClickRow}
-                    onSelectAll={onSelectAll}
-                  />
-                ))}
-              </div>
-            )}
+            <p className={css.progressMessage}>{progress.message}</p>
           </DialogContent>
-        )}
+        </>
+      ) : (
+        <DialogContent>
+          {!selectionHasStarted && (
+            <IntroText currentTabIndex={currentTabIndex} />
+          )}
+          {selectionHasStarted && (
+            <div className={css.mediaTables}>
+              {projectMedia.map((metadata, i) => (
+                <MediaTable
+                  key={metadata.id}
+                  open={i === expandedTableIndex}
+                  mediaIndex={i}
+                  onClick={onClickTable}
+                  media={metadata}
+                  selectedIds={selectedIds[metadata.id]}
+                  onSelectRow={onSelectRow}
+                  onDoubleClickRow={onDoubleClickRow}
+                  onSelectAll={onSelectAll}
+                />
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      )}
 
-        {selectionHasStarted ? (
-          <DialogActions color="primary">
+      {selectionHasStarted ? (
+        <DialogActions color="primary">
+          <Button
+            onClick={closeDialog}
+            disabled={Boolean(progress)}
+            id={$.exitButton}
+          >
+            Exit
+          </Button>
+          {currentTabIndex === 1 && (
             <Button
-              onClick={closeDialog}
-              disabled={Boolean(progress)}
-              id={$.exitButton}
-            >
-              Exit
-            </Button>
-            {currentTabIndex === 1 && (
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={submitDisabled}
-                onClick={csvAndMp3ExportDialog}
-              >
-                Export CSV and MP3 from selected clips
-              </Button>
-            )}
-            {currentTabIndex === 2 && (
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={submitDisabled}
-                onClick={exportMarkdown}
-              >
-                Export Markdown from selected clips
-              </Button>
-            )}
-            {currentTabIndex === 0 && (
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={submitDisabled}
-                onClick={exportApkg}
-                id={$.exportApkgButton}
-              >
-                Export Anki Deck from selected clips
-              </Button>
-            )}
-          </DialogActions>
-        ) : (
-          <DialogActions>
-            <Button
+              variant="contained"
               color="primary"
-              disabled={Boolean(progress)}
-              onClick={closeDialog}
+              disabled={submitDisabled}
+              onClick={csvAndMp3ExportDialog}
             >
-              Exit
+              Export CSV and MP3 from selected clips
             </Button>
+          )}
+          {currentTabIndex === 2 && (
             <Button
+              variant="contained"
               color="primary"
-              disabled={Boolean(progress)}
-              onClick={startSelection}
-              id={$.continueButton}
+              disabled={submitDisabled}
+              onClick={exportMarkdown}
             >
-              Continue
+              Export Markdown from selected clips
             </Button>
-          </DialogActions>
-        )}
-      </Dialog>
-    )
-  }
-)
+          )}
+          {currentTabIndex === 0 && (
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={submitDisabled}
+              onClick={exportApkg}
+              id={$.exportApkgButton}
+            >
+              Export Anki Deck from selected clips
+            </Button>
+          )}
+        </DialogActions>
+      ) : (
+        <DialogActions>
+          <Button
+            color="primary"
+            disabled={Boolean(progress)}
+            onClick={closeDialog}
+          >
+            Exit
+          </Button>
+          <Button
+            color="primary"
+            disabled={Boolean(progress)}
+            onClick={startSelection}
+            id={$.continueButton}
+          >
+            Continue
+          </Button>
+        </DialogActions>
+      )}
+    </Dialog>
+  )
+})
 
 function IntroText({ currentTabIndex }: { currentTabIndex: number }) {
   return (

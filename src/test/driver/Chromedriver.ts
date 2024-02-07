@@ -4,7 +4,7 @@ export default class Chromedriver {
   process: ChildProcess
   statusUrl: string
 
-  stop: () => Boolean
+  stop: () => boolean
 
   constructor(
     path: string,
@@ -48,16 +48,16 @@ export default class Chromedriver {
     process.on('SIGTERM', this._kill)
 
     this.stop = () => {
-      // @ts-ignore
+      // @ts-expect-error typings out of date
       process.removeListener('exit', this._kill)
-      // @ts-ignore
+      // @ts-expect-error typings out of date
       process.removeListener('SIGTERM', this._kill)
       if (this.process.stdout)
         this.process.stdout.removeListener('data', stdout)
 
-      // @ts-ignore
+      // @ts-expect-error typings out of date
       this._kill = null
-      // @ts-ignore
+      // @ts-expect-error typings out of date
       this.stop = null
 
       this.process.removeListener('close', chromedriverCloseHandler)

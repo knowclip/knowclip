@@ -291,44 +291,42 @@ export const ClozeHues = {
   c10: 271,
 }
 
-const CharSpan = memo(
-  ({
-    char,
-    index,
-    className,
-    clozeIndex,
-    newlineChar,
-    hasCursor,
-  }: {
-    char: string
-    index: number
-    className: string
-    clozeIndex: number
-    newlineChar: string
-    hasCursor?: boolean
-  }) => {
-    const isNewline = char === '\n' || char === '\r'
-    const content = isNewline ? newlineChar : char
-    const ref = useRef<HTMLSpanElement>(null)
+const CharSpan = memo(function CharSpan({
+  char,
+  index,
+  className,
+  clozeIndex,
+  newlineChar,
+  hasCursor,
+}: {
+  char: string
+  index: number
+  className: string
+  clozeIndex: number
+  newlineChar: string
+  hasCursor?: boolean
+}) {
+  const isNewline = char === '\n' || char === '\r'
+  const content = isNewline ? newlineChar : char
+  const ref = useRef<HTMLSpanElement>(null)
 
-    return (
-      <span
-        ref={ref}
-        data-character-index={index}
-        className={cn(className, {
-          [css.clozeNewlinePlaceholder]: isNewline,
-          [css.clozeCursor]: hasCursor,
-        })}
-        key={String(index + char)}
-        style={{
-          ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
-        }}
-      >
-        {content}
-      </span>
-    )
-  }
-)
+  return (
+    <span
+      ref={ref}
+      data-character-index={index}
+      className={cn(className, {
+        [css.clozeNewlinePlaceholder]: isNewline,
+        [css.clozeCursor]: hasCursor,
+      })}
+      key={String(index + char)}
+      style={{
+        ['--cloze-background-hue' as any]: ClozeHues[ClozeIds[clozeIndex]],
+      }}
+    >
+      {content}
+    </span>
+  )
+})
 
 const clozeHint = (
   <div>

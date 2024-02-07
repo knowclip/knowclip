@@ -194,6 +194,7 @@ export const actions = validateActionTypes({
 function validateActionTypes<
   ActionCreators extends {
     [N in ActionCreatorNameOf<ActionType>]: (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...args: any[]
     ) => ActionOf<ActionCreatorNamesToTypes[N]>
   },

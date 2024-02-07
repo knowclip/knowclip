@@ -16,7 +16,7 @@ import { afterAll, beforeAll, describe } from 'vitest'
 const testId = 'subtitlesProject'
 
 describe('make a project file for testing generating clips from subtitles', () => {
-  let context = initTestContext(testId)
+  const context = initTestContext(testId)
 
   beforeAll(async () => {
     const { app } = await startApp(context)

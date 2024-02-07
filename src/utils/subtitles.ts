@@ -90,7 +90,7 @@ export const getSubtitlesFilePath = async (
   switch (file.parentType) {
     case 'ExternalSubtitlesFile':
       return await getExternalSubtitlesVttPath(state, file, sourceFilePath)
-    case 'MediaFile':
+    case 'MediaFile': {
       const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
         file,
         sourceFilePath,
@@ -100,6 +100,7 @@ export const getSubtitlesFilePath = async (
         throw new Error('There was a problem loading embedded subtitles')
       }
       return subtitlesFilePath
+    }
   }
 }
 

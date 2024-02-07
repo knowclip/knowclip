@@ -17,7 +17,7 @@ type WebDriverLogTypes =
   | 'error'
   | 'silent'
 
-function isRunning(statusUrl: string, callback: Function) {
+function isRunning(statusUrl: string, callback: (running: any) => void) {
   const cb = false
   const requestOptions = {
     uri: statusUrl,

@@ -34,6 +34,7 @@ export default function ChipsInput<
           const props = getTagProps({ index })
           return (
             <Chip
+              key={index}
               label={option}
               {...props}
               className={classnames(props.className, $.tagChip)}

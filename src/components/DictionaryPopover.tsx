@@ -1,7 +1,7 @@
 import {
-  EventHandler,
   Fragment,
   memo,
+  MouseEventHandler,
   ReactNode,
   useCallback,
   useEffect,
@@ -131,7 +131,7 @@ export function DictionaryPopover({
     (e) => closePopover(e),
     [closePopover]
   )
-  const stopPropagation: EventHandler<any> = useCallback(
+  const stopPropagation: MouseEventHandler<HTMLDivElement> = useCallback(
     (e) => e.stopPropagation(),
     []
   )
@@ -266,71 +266,79 @@ function EntryHead({
   }
 }
 
-const JapaneseRuby = memo(
-  ({ head, pronunciation }: { head: string; pronunciation: string | null }) => {
-    if (!pronunciation)
-      return <span className={css.japaneseEntryHead}>{head}</span>
+const JapaneseRuby = memo(function JapaneseRuby({
+  head,
+  pronunciation,
+}: {
+  head: string
+  pronunciation: string | null
+}) {
+  if (!pronunciation)
+    return <span className={css.japaneseEntryHead}>{head}</span>
 
-    const chunks = tokenize(head)
-    return (
-      <span className={css.entryHeadWithRuby}>
-        {
-          chunks.reduce(
-            (acc, chunk, i) => {
-              if (
-                pronunciation.substr(
-                  acc.processedPronunciation.length,
-                  chunk.length
-                ) === chunk
-              ) {
-                acc.processedPronunciation += chunk
-                acc.elements.push(<>{chunk}</>)
-              } else {
-                const nextChunk: string | undefined = chunks[i + 1]
-                const nextTokenIndex = nextChunk
-                  ? pronunciation.indexOf(
-                      nextChunk,
-                      acc.processedPronunciation.length
-                    )
-                  : pronunciation.length
-                const furigana = pronunciation.slice(
-                  acc.processedPronunciation.length,
-                  nextTokenIndex
-                )
-                acc.processedPronunciation += furigana
-                acc.elements.push(
-                  <ruby>
-                    {chunk}
-                    <rt>{furigana}</rt>
-                  </ruby>
-                )
-              }
-              return acc
-            },
-            { processedPronunciation: '', elements: [] } as {
-              processedPronunciation: string
-              elements: ReactNode[]
+  const chunks = tokenize(head)
+  return (
+    <span className={css.entryHeadWithRuby}>
+      {
+        chunks.reduce(
+          (acc, chunk, i) => {
+            if (
+              pronunciation.substr(
+                acc.processedPronunciation.length,
+                chunk.length
+              ) === chunk
+            ) {
+              acc.processedPronunciation += chunk
+              acc.elements.push(<>{chunk}</>)
+            } else {
+              const nextChunk: string | undefined = chunks[i + 1]
+              const nextTokenIndex = nextChunk
+                ? pronunciation.indexOf(
+                    nextChunk,
+                    acc.processedPronunciation.length
+                  )
+                : pronunciation.length
+              const furigana = pronunciation.slice(
+                acc.processedPronunciation.length,
+                nextTokenIndex
+              )
+              acc.processedPronunciation += furigana
+              acc.elements.push(
+                <ruby>
+                  {chunk}
+                  <rt>{furigana}</rt>
+                </ruby>
+              )
             }
-          ).elements
-        }
-      </span>
-    )
-  }
-)
+            return acc
+          },
+          { processedPronunciation: '', elements: [] } as {
+            processedPronunciation: string
+            elements: ReactNode[]
+          }
+        ).elements
+      }
+    </span>
+  )
+})
 
-const ChineseRuby = memo(
-  ({ head, pronunciation }: { head: string; pronunciation: string | null }) => {
-    return (
-      <ruby>
-        {head}{' '}
-        <rt>
-          {pronunciation &&
-            pronunciation
-              .split(/\s+/)
-              .map((p) => numberToMark(p))
-              .join(' ')}
-        </rt>
-      </ruby>
-    )
-  }
-)
+const ChineseRuby = memo(function ChineseRuby({
+  head,
+  pronunciation,
+}: {
+  head: string
+  pronunciation: string | null
+}) {
+  return (
+    <ruby>
+      {head}{' '}
+      <rt>
+        {pronunciation &&
+          pronunciation
+            .split(/\s+/)
+            .map((p) => numberToMark(p))
+            .join(' ')}
+      </rt>
+    </ruby>
+  )
+})

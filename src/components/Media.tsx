@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, {
   useEffect,
   useRef,
@@ -87,7 +88,8 @@ const Media = ({
     src: constantBitrateFilePath
       ? new URL(`file://${constantBitrateFilePath}`).toString()
       : '',
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     playbackspeed: 1,
 
     onSeeking: seekOn,

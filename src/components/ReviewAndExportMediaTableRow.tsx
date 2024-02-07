@@ -27,7 +27,7 @@ type FlashcardRowProps = {
 }
 
 const ReviewAndExportMediaTableRow = memo(
-  ({
+  function ReviewAndExportMediaTableRow({
     id,
     isSelected,
     onSelect,
@@ -36,7 +36,7 @@ const ReviewAndExportMediaTableRow = memo(
     style,
     measure,
     registerChild,
-  }: FlashcardRowProps) => {
+  }: FlashcardRowProps) {
     const {
       flashcard: { fields, tags, cloze },
       formattedClipTime,

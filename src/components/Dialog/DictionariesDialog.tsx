@@ -173,7 +173,9 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                 <Select
                   displayEmpty
                   onChange={(event) => {
-                    setNewDictionaryType(event.target.value as any)
+                    setNewDictionaryType(
+                      event.target.value as DictionaryFileType | ''
+                    )
                   }}
                   value={newDictionaryType}
                 >

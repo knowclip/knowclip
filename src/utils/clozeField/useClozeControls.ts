@@ -161,6 +161,7 @@ export default function useClozeControls({
           potentialNewIndex > deletions.length ? -1 : potentialNewIndex
         return setClozeIndex(newIndex, 'c pressed')
       } else if (isEnterKey(e) || e.key === KEYS.escape) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (clozeIsActive && !(window as any).clozeButtonWasPressed)
           setClozeIndex(-1, 'enter or escape pressed')
       }

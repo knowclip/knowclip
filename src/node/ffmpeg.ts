@@ -3,6 +3,7 @@ import { basename } from 'path'
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
 
 export const ffmpeg =
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
 
 const zeroPad = (zeroes: number, value: any) =>

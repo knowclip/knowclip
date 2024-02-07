@@ -103,19 +103,19 @@ export const KEY: keyof LexiconEntry = 'key'
 
 type CJTextTokens = { index: number; tokens: string[] }[]
 export function parseFlat(text: string, maxWordLength = 8) {
-  let tokensByIndex: CJTextTokens = []
-  let allTokens: Set<string> = new Set()
+  const tokensByIndex: CJTextTokens = []
+  const allTokens: Set<string> = new Set()
   if (!text) return { tokensByIndex, allTokens }
 
   const textSegments = wordIndexes(text)
-  for (let { index: startIndex, string: sentence } of textSegments.filter(
+  for (const { index: startIndex, string: sentence } of textSegments.filter(
     ({ string }) => string.length
   )) {
     for (let start = 0; start < sentence.length; ++start) {
       const tokensAtIndex: string[] = []
       tokensByIndex.push({ index: startIndex + start, tokens: tokensAtIndex })
 
-      let maxCurrLength = sentence.length - start
+      const maxCurrLength = sentence.length - start
       for (
         let amount =
           maxWordLength <= maxCurrLength ? maxWordLength : maxCurrLength;
@@ -148,7 +148,7 @@ export async function deleteDictionary(
   type: DictionaryFileType
 ) {
   const db = effects.getDexieDb()
-  let result: {
+  const result: {
     dictionaryDeletion: 'SUCCESS' | Error
     entriesDeletion: 'SUCCESS' | Error
   } = {

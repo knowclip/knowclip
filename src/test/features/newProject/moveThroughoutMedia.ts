@@ -2,7 +2,7 @@ import { IntegrationTestContext } from '../../setUpDriver'
 import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { createClipViaWaveform, waveformMouseDrag } from '../../driver/waveform'
+import { createClipViaWaveform } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
 

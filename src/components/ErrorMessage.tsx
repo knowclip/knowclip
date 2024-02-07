@@ -11,7 +11,7 @@ import { theme } from './theme'
 
 import { errorMessage$ as $ } from './ErrorMessage.testLabels'
 
-const ErrorMessage = ({ reactError }: { reactError: any }) => {
+const ErrorMessage = ({ reactError }: { reactError: unknown }) => {
   console.log('crash:', { reactError })
   console.error(reactError)
 
@@ -44,7 +44,7 @@ const ErrorMessage = ({ reactError }: { reactError: any }) => {
 
 export default ErrorMessage
 
-function displayError(error: any) {
+function displayError(error: unknown) {
   if (error instanceof Error || error?.message)
     return ['error: ' + error.name, error.message, error.stack].join('\n')
 
