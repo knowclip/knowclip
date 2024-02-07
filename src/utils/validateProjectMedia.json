@@ -137,40 +137,36 @@
         "chunksMetadata": {
           "anyOf": [
             {
-              "anyOf": [
-                {
-                  "additionalProperties": false,
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    },
-                    "endCue": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "count",
-                    "endCue"
-                  ],
-                  "type": "object"
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
                 },
-                {
-                  "additionalProperties": false,
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    },
-                    "endCueMs": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "count",
-                    "endCueMs"
-                  ],
-                  "type": "object"
+                "endCue": {
+                  "type": "number"
                 }
-              ]
+              },
+              "required": [
+                "count",
+                "endCue"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "endCueMs": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count",
+                "endCueMs"
+              ],
+              "type": "object"
             },
             {
               "type": "null"
@@ -202,40 +198,36 @@
         "chunksMetadata": {
           "anyOf": [
             {
-              "anyOf": [
-                {
-                  "additionalProperties": false,
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    },
-                    "endCue": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "count",
-                    "endCue"
-                  ],
-                  "type": "object"
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
                 },
-                {
-                  "additionalProperties": false,
-                  "properties": {
-                    "count": {
-                      "type": "number"
-                    },
-                    "endCueMs": {
-                      "type": "number"
-                    }
-                  },
-                  "required": [
-                    "count",
-                    "endCueMs"
-                  ],
-                  "type": "object"
+                "endCue": {
+                  "type": "number"
                 }
-              ]
+              },
+              "required": [
+                "count",
+                "endCue"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "endCueMs": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "count",
+                "endCueMs"
+              ],
+              "type": "object"
             },
             {
               "type": "null"
