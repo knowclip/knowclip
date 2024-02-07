@@ -28,6 +28,8 @@ window.addEventListener('error', (e) => {
     return
   const errorRoot = document.getElementById('errorRoot') as HTMLDivElement
   errorRoot.style.display = 'block'
+  // clipwave doesn't like batched updates currently
+  // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(<ErrorMessage reactError={e} />, errorRoot)
 })
 
@@ -43,6 +45,8 @@ else render()
 function render(initialTestState?: Partial<AppState> | undefined) {
   const { store, persistor } = getStore(initialTestState)
 
+  // clipwave doesn't like batched updates currently
+  // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
