@@ -140,7 +140,7 @@ export function segment(word: string, case_insensitive = false) {
   const upper = word[0] === word[0].toUpperCase()
   word = word.toLowerCase()
 
-  let original = word
+  const original = word
 
   word = word.replace(replsch, '$')
   word = word.replace(replei, '%')

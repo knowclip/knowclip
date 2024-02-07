@@ -1,0 +1,13 @@
+{
+  "showSaveDialog": [],
+  "showOpenDialog": [
+    {}
+  ],
+  "showOpenDirectoryDialog": [],
+  "showOpenDirectoriesDialog": [],
+  "openInBrowser": [],
+  "showMessageBox": [
+    {}
+  ],
+  "openExternal": []
+}
