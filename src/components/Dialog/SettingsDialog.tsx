@@ -180,7 +180,7 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
                     (f) => f.id === file.id && f.type === file.dictionaryType
                   )
                 return (
-                  <ListItem value={file.id} selected={selected}>
+                  <ListItem value={file.id} selected={selected} key={file.id}>
                     {!file.importComplete && <ImportInterruptedListIcon />}
                     <ListItemIcon>
                       <Checkbox

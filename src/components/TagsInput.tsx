@@ -36,6 +36,7 @@ export default function ChipsInput<
             <Chip
               label={option}
               {...props}
+              key={props.key}
               className={classnames(props.className, $.tagChip)}
             />
           )
