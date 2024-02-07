@@ -101,7 +101,8 @@ export function setUpMocks<M extends ModuleLike>(
     logged[functionName] = []
     returnValues[functionName] = []
 
-    // @ts-expect-error
+    // @ts-expect-error arguments are going to match anyway
+    // eslint-disable-next-line @typescript-eslint/no-loop-func
     mockedModule[functionName] = (...args) => {
       if (returnValues[functionName].length) {
         const mockedReturnValue = returnValues[functionName].shift()!
