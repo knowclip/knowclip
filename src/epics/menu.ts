@@ -162,7 +162,7 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
 
       const { value: newerReleases } = updatesCheck
-      const newSettings = Boolean(newerReleases.length)
+      const newSettings = newerReleases.length
         ? await showDownloadPrompt(
             checkAtStartup,
             newerReleases[0],

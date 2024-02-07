@@ -141,7 +141,7 @@ export function getGermanStems(entryHead: string) {
 
 export function getDifferingSearchStem(trimmedWord: string) {
   // really should only do this for -(e)n -(e)t -st...
-  let withoutPrefixes = trimmedWord.replace(prefixesRegex, '')
+  const withoutPrefixes = trimmedWord.replace(prefixesRegex, '')
 
   const stem = cistem.stem(withoutPrefixes)
 

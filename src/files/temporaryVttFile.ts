@@ -144,13 +144,14 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
             )
             return await validateBeforeOpenFileAction(state, tmpFilePath, file)
           }
-          case 'ExternalSubtitlesFile':
+          case 'ExternalSubtitlesFile': {
             const tmpFilePath = await effects.getSubtitlesFilePath(
               state,
               source.filePath,
               file
             )
             return await validateBeforeOpenFileAction(state, tmpFilePath, file)
+          }
         }
       }
 

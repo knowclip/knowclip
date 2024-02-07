@@ -9,7 +9,7 @@ import {
   blankSimpleFields,
   blankTransliterationFields,
 } from '../utils/newFlashcard'
-import YAML from 'yaml'
+import { stringify } from 'yaml'
 import {
   MediaJson,
   SubtitlesJson,
@@ -260,6 +260,8 @@ export const getProjectFileContents = (
   )
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +
-    [project, ...media].map((o) => YAML.stringify(o)).join('---\n')
+    [project, ...media]
+      .map((o) => stringify(o, { lineWidth: Infinity }))
+      .join('---\n')
   )
 }

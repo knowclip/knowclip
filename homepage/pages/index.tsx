@@ -423,24 +423,22 @@ const IndexPage = () => {
           mind include:
         </p>
 
-        <p>
-          <ul>
-            <li>in-app popup dictionaries</li>
-            <li>speech-to-text integration</li>
-            <li>sentence difficulty ratings based on word frequency</li>
-            <li>
-              ...so much more! See all planned features on{" "}
-              <A
-                href="https://github.com/knowclip/knowclip/projects/3"
-                className={css.link}
-                newWindow
-              >
-                Github
-              </A>
-              .
-            </li>
-          </ul>
-        </p>
+        <ul>
+          <li>in-app popup dictionaries</li>
+          <li>speech-to-text integration</li>
+          <li>sentence difficulty ratings based on word frequency</li>
+          <li>
+            ...so much more! See all planned features on{" "}
+            <A
+              href="https://github.com/knowclip/knowclip/projects/3"
+              className={css.link}
+              newWindow
+            >
+              Github
+            </A>
+            .
+          </li>
+        </ul>
 
         <p>
           If you don't see your idea already in the{" "}

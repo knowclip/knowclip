@@ -1,12 +1,12 @@
 export function getSelectionWithin(element: HTMLElement) {
-  var start = 0
-  var end = 0
-  var doc = element.ownerDocument as Document
-  var win = doc.defaultView as Window
-  var sel = win.getSelection() as Selection
+  let start = 0
+  let end = 0
+  const doc = element.ownerDocument as Document
+  const win = doc.defaultView as Window
+  const sel = win.getSelection() as Selection
   if (sel.rangeCount > 0) {
-    var range = (win.getSelection() as Selection).getRangeAt(0)
-    var preCaretRange = range.cloneRange()
+    const range = (win.getSelection() as Selection).getRangeAt(0)
+    const preCaretRange = range.cloneRange()
     preCaretRange.selectNodeContents(element)
     preCaretRange.setEnd(range.startContainer, range.startOffset)
     start = preCaretRange.toString().length
@@ -23,28 +23,28 @@ export function getSelectionWithin(element: HTMLElement) {
   }
 }
 function getTextNodesIn(node: Node) {
-  var textNodes: Text[] = []
+  const textNodes: Text[] = []
   if (node.nodeType === 3) {
     const textNode = node as Text
     textNodes.push(textNode)
   } else {
-    var children = node.childNodes
-    for (var i = 0, len = children.length; i < len; ++i) {
-      textNodes.push.apply(textNodes, getTextNodesIn(children[i]))
+    const children = node.childNodes
+    for (let i = 0, len = children.length; i < len; ++i) {
+      textNodes.push(...getTextNodesIn(children[i]))
     }
   }
   return textNodes
 }
 
 export function setSelectionRange(el: HTMLElement, start: number, end: number) {
-  var range = document.createRange()
+  const range = document.createRange()
   range.selectNodeContents(el)
-  var textNodes = getTextNodesIn(el)
-  var foundStart = false
-  var charCount = 0,
+  const textNodes = getTextNodesIn(el)
+  let foundStart = false
+  let charCount = 0,
     endCharCount
 
-  for (var i = 0, textNode; (textNode = textNodes[i++]); ) {
+  for (let i = 0, textNode; (textNode = textNodes[i++]); ) {
     endCharCount = charCount + textNode.length
     if (
       !foundStart &&
@@ -62,7 +62,7 @@ export function setSelectionRange(el: HTMLElement, start: number, end: number) {
     charCount = endCharCount
   }
 
-  var sel = window.getSelection()
+  const sel = window.getSelection()
   if (sel) {
     sel.removeAllRanges()
     sel.addRange(range)

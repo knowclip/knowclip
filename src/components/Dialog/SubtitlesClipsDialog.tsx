@@ -255,7 +255,9 @@ const SubtitlesClipsDialog = ({
 }
 
 const subtitlesTrackOptions = ({ external, embedded }: MediaSubtitles) => [
-  <MenuItem value="">None</MenuItem>,
+  <MenuItem value="" key="none">
+    None
+  </MenuItem>,
   ...embedded.map(trackMenuItem),
   ...external.map(trackMenuItem),
 ]
