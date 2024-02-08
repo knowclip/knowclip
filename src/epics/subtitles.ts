@@ -28,6 +28,7 @@ import { TransliterationFlashcardFields } from '../types/Project'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
 import { ActionOf } from '../actions'
+import { flushSync } from 'react-dom'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
@@ -184,11 +185,13 @@ const makeClipsFromSubtitles: AppEpic = (
             afterUpdates(async () => {
               window.dispatchEvent(
                 new ClipwaveCallbackEvent(CLIPWAVE_ID, ({ actions }) => {
-                  const mediaPlayer = getMediaPlayer()
-                  actions.selectNextItemAndSeek(
-                    mediaPlayer,
-                    isWaveformItemSelectable
-                  )
+                  flushSync(() => {
+                    const mediaPlayer = getMediaPlayer()
+                    actions.selectNextItemAndSeek(
+                      mediaPlayer,
+                      isWaveformItemSelectable
+                    )
+                  })
                 })
               )
 

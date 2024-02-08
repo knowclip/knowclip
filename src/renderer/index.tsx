@@ -1,6 +1,7 @@
 import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import App from '../components/App'
 
@@ -28,9 +29,8 @@ window.addEventListener('error', (e) => {
     return
   const errorRoot = document.getElementById('errorRoot') as HTMLDivElement
   errorRoot.style.display = 'block'
-  // clipwave doesn't like batched updates currently
-  // eslint-disable-next-line react/no-deprecated
-  ReactDOM.render(<ErrorMessage reactError={e} />, errorRoot)
+  const root = createRoot(errorRoot)
+  root.render(<ErrorMessage reactError={e} />)
 })
 
 if (VITEST)
@@ -45,9 +45,9 @@ else render()
 function render(initialTestState?: Partial<AppState> | undefined) {
   const { store, persistor } = getStore(initialTestState)
 
-  // clipwave doesn't like batched updates currently
-  // eslint-disable-next-line react/no-deprecated
-  ReactDOM.render(
+  const root = createRoot(document.getElementById('root')!)
+
+  root.render(
     <React.StrictMode>
       <Provider store={store}>
         {persistor ? (
@@ -58,7 +58,6 @@ function render(initialTestState?: Partial<AppState> | undefined) {
           <App sentryDsn={sentryDsn} />
         )}
       </Provider>
-    </React.StrictMode>,
-    document.getElementById('root')
+    </React.StrictMode>
   )
 }
