@@ -94,6 +94,7 @@ export async function startApp(
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
       NODE_ENV: 'integration',
       DISPLAY: process.env.DISPLAY,
+      VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
     },
   })
   const setup = {

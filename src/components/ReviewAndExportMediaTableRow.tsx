@@ -14,6 +14,7 @@ import { getMediaPlayer } from '../utils/media'
 import { CLIPWAVE_ID } from '../utils/clipwave'
 
 import { reviewAndExportMediaTableRow$ as $ } from './ReviewAndExportMediaTableRow.testLabels'
+import { flushSync } from 'react-dom'
 
 type FlashcardRowProps = {
   id: string
@@ -58,22 +59,24 @@ const ReviewAndExportMediaTableRow = memo(
         new ClipwaveCallbackEvent(
           CLIPWAVE_ID,
           ({ actions, state, getItem }) => {
-            const item = getItem(id)
-            const regionIndex = item
-              ? state.regions.findIndex(
-                  (r, i) =>
-                    item.start >= r.start &&
-                    getRegionEnd(state.regions, i) <= item.end
-                )
-              : -1
-            const media = getMediaPlayer()
-            if (item && regionIndex !== -1 && media) {
-              actions.selectItemAndSeekTo(regionIndex, id, media, item.start)
-            }
+            flushSync(() => {
+              const item = getItem(id)
+              const regionIndex = item
+                ? state.regions.findIndex(
+                    (r, i) =>
+                      item.start >= r.start &&
+                      getRegionEnd(state.regions, i) <= item.end
+                  )
+                : -1
+              const media = getMediaPlayer()
+              if (item && regionIndex !== -1 && media) {
+                actions.selectItemAndSeekTo(regionIndex, id, media, item.start)
+              }
 
-            if (!media) {
-              dispatch(r.selectWaveformItem({ type: 'Clip', id }))
-            }
+              if (!media) {
+                dispatch(r.selectWaveformItem({ type: 'Clip', id }))
+              }
+            })
           }
         )
       )

@@ -16,6 +16,7 @@ import * as mediaHelpers from './utils/media'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
 import { existsSync, writeFile } from 'preloaded/fs'
+import { flushSync } from 'react-dom'
 
 const dependencies = {
   ...electronHelpers,
@@ -48,7 +49,11 @@ const dependencies = {
   tmpFilename: () => tempy.temporaryFile(),
 
   dispatchClipwaveEvent: (callback: (waveform: WaveformInterface) => void) => {
-    window.dispatchEvent(new ClipwaveCallbackEvent(CLIPWAVE_ID, callback))
+    window.dispatchEvent(
+      new ClipwaveCallbackEvent(CLIPWAVE_ID, (waveform: WaveformInterface) =>
+        flushSync(() => callback(waveform))
+      )
+    )
   },
 }
 
