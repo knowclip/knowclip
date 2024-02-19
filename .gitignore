@@ -34,3 +34,5 @@ out
 
 .yalc
 yalc.lock
+
+*.log

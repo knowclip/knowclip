@@ -26,10 +26,7 @@ export const parseProjectJson = async <F extends FlashcardFields>(
     const docs = parseAllDocuments(await readFile(filePath), {
       // default of 100 is easily reached
       // when i.e. detecting silences in file > ~2 hours long.
-      // TODO: investigate setting this to smarter default
-      //       and then retrying after confirmation without limit
-      //       after user confirmation.
-      maxAliasCount: 0,
+      maxAliasCount: -1,
     } as ParseOptions)
     const errors = docs.flatMap((v) => v.errors)
     if (errors.length) return { errors: errors.map((e) => e.message) }
