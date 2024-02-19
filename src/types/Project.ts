@@ -21,7 +21,7 @@ type SubtitlesTrackId = string
 export type ProjectMetadataJson = {
   name: string
   id: string
-  createdAt: string
+  createdAt?: string
   noteType: NoteType
   timestamp: string
 }

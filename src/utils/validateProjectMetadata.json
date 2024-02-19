@@ -28,7 +28,6 @@
       "required": [
         "name",
         "id",
-        "createdAt",
         "noteType",
         "timestamp"
       ],

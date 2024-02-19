@@ -30,12 +30,13 @@ export default function validateProject(project: any, media: any[]) {
   const errors: { [section: string]: string } = {}
 
   const projectValid = validateProjectMetadata(project)
-  if (!projectValid)
-    errors['Project'] = getErrors(
+  if (!projectValid) {
+    errors['Project'] = `project metadata malformed ${getErrors(
       projectMetadataJsonSchema,
       project,
       validateProjectMetadata.errors
-    )
+    )}`
+  }
 
   media.forEach((mediaJson, i) => {
     const mediaValid = validateMedia(mediaJson)
