@@ -25,7 +25,7 @@ export const parseProjectJson = async <F extends FlashcardFields>(
   try {
     console.log('reading', filePath)
     const docsText = (await readFile(filePath))
-      .split(/(?:^|\n)(?:---|\.\.\.)\n/)
+      .split(/(?:^|\r?\n)(?:---|\.\.\.)\r?\n/)
       .filter((x) => x.trim())
     const errors: string[] = []
     console.log('parsing', docsText)
