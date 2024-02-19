@@ -23,12 +23,10 @@ export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
 ): AsyncResult<ProjectJson<F>> => {
   try {
-    console.log('reading', filePath)
     const docsText = (await readFile(filePath))
       .split(/(?:^|\r?\n)(?:---|\.\.\.)\r?\n/)
       .filter((x) => x.trim())
     const errors: string[] = []
-    console.log('parsing', docsText)
     const docs = docsText.map((text) => {
       try {
         const doc = parse(text, {
@@ -37,7 +35,6 @@ export const parseProjectJson = async <F extends FlashcardFields>(
         return doc
       } catch (err) {
         console.error(err)
-        console.log('error:::', { text })
         errors.push(String(err))
         return null
       }
