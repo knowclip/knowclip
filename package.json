@@ -28,7 +28,7 @@
     "better-ajv-errors": "^1.2.0",
     "better-sqlite3": "^9.4.0",
     "clipwave": "^0.1.10",
-    "dexie": "^3.0.2",
+    "dexie": "^3.2.5",
     "electron-extension-installer": "^1.2.0",
     "electron-store": "^8.0.1",
     "ffmpeg-static": "^5.1.0",
