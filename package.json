@@ -20,7 +20,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.13.1",
-    "@sentry/electron": "^2.5.4",
+    "@sentry/electron": "^4.18.0",
     "@silvestre/mkanki": "^3.5.0",
     "@silvestre/subsrt": "^1.1.1",
     "ajv": "^8.12.0",
