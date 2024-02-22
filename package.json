@@ -128,7 +128,7 @@
     "@types/subtitle": "^2.0.6",
     "@types/uuid": "^9.0.1",
     "@types/wanakana": "^4.0.3",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
     "chromedriver": "^120.0.1",
