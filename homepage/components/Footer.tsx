@@ -96,6 +96,7 @@ const SocialLink = ({
   return (
     <li className={cn(css.socialLinkLi, className)}>
       <a href={href} className={css.socialLink}>
+        {/* @ts-ignore */}
         <Icon color="white" size={24} className={css.socialLinkIcon} />
         {title}
       </a>
