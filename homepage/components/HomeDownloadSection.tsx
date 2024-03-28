@@ -99,7 +99,7 @@ const DownloadSection = () => {
             <ol>
               <li>
                 <A
-                  href={os && getDownloadUrl(os, "exe")}
+                  href={os && getDownloadUrl(os, "exe", "x64")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
                   newWindow
