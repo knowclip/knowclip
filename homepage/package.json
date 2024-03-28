@@ -6,7 +6,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "postinstall": "npm i @esbuild/linux-x64 --legacy-peer-deps"
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^9.3.0",
