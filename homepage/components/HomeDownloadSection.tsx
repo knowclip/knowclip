@@ -27,9 +27,12 @@ const getFileName = (
   versionWithoutV: string,
   osCode: string,
   ext: string,
-  arch?: string
 ) =>
-  `Knowclip_${[versionWithoutV, osCode, arch]
+  `Knowclip_${[
+    versionWithoutV,
+    osCode,
+   osCode === "win" ? "x64" : null,
+  ]
     .filter((s) => s)
     .join("_")}.${ext}`
 
@@ -60,10 +63,10 @@ const DownloadSection = () => {
   const [downloadVersion, setDownloadVersion] = useState(LATEST_VERSION)
 
   const getDownloadUrl = useCallback(
-    (osCode: string, ext: string, arch?: string) =>
+    (osCode: string, ext: string) =>
       `https://github.com/knowclip/knowclip/releases/download/v${
         downloadVersion || LATEST_VERSION
-      }/${getFileName(downloadVersion || LATEST_VERSION, osCode, ext, arch)}`,
+      }/${getFileName(downloadVersion || LATEST_VERSION, osCode, ext)}`,
     [downloadVersion]
   )
   useEffect(() => {
@@ -99,7 +102,7 @@ const DownloadSection = () => {
             <ol>
               <li>
                 <A
-                  href={os && getDownloadUrl(os, "exe", "x64")}
+                  href={os && getDownloadUrl(os, "exe")}
                   className={css.link}
                   onClick={showPostDownloadMessage}
                   newWindow
@@ -265,7 +268,7 @@ const DownloadOsSection = ({
   children: (showPostDownloadMessage: () => void) => ReactNode
   buttonText: string
   downloadVersion: string
-  getDownloadUrl: (osCode: string, ext: string, arch?: string) => string
+  getDownloadUrl: (osCode: string, ext: string) => string
 }) => {
   const isCurrent = current === os
 
