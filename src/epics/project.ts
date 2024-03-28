@@ -11,7 +11,6 @@ import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
 import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
-import './setYamlOptions'
 import { getUpdateWith } from '../files/updates'
 
 const createProject: AppEpic = (action$, state$, { writeFile }) =>

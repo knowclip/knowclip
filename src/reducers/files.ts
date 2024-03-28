@@ -100,7 +100,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
       const newState = {} as typeof state
       for (const t in state) {
         const type = t as keyof typeof state
-        // @ts-ignore
+        // @ts-expect-error compiler doesn't understand matching of keys/properties
         newState[type] = { ...state[type] }
       }
 

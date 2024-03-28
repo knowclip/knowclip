@@ -87,7 +87,7 @@ const Media = ({
     src: constantBitrateFilePath
       ? new URL(`file://${constantBitrateFilePath}`).toString()
       : '',
-    // @ts-ignore
+    // @ts-expect-error not present in HTMLAudioElement
     playbackspeed: 1,
 
     onSeeking: seekOn,

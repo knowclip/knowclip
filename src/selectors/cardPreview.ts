@@ -63,7 +63,6 @@ export const getSubtitlesCardBases = createSelector(
     const [cueField] = fieldsCuePriority
     const cueTrackId = cueField && fieldsToTracks[cueField]
     const cueTrack = cueTrackId && subtitles[cueTrackId]
-
     const totalTracksCount = currentFile ? currentFile.subtitles.length : 0
     if (!cueTrack)
       return {
@@ -86,7 +85,12 @@ export const getSubtitlesCardBases = createSelector(
     }: {
       cards: SubtitlesCardBase[]
       cardsMap: Record<string, SubtitlesCardBase>
-    } = combineSubtitles(fieldsToTracks, subtitles, fieldsCuePriority)
+    } = combineSubtitles(
+      currentFile!.durationSeconds,
+      fieldsToTracks,
+      subtitles,
+      fieldsCuePriority
+    )
 
     return {
       totalTracksCount,
@@ -117,10 +121,12 @@ function subBaseClipId(trackId: string, chunkIndex: number) {
   return trackId + DELIMITER + chunkIndex
 }
 function combineSubtitles(
+  mediaDurationSeconds: number,
   fieldsToTracks: SubtitlesFlashcardFieldsLinks,
   subtitles: SubtitlesState,
   fieldsCuePriority: TransliterationFlashcardFieldName[]
 ) {
+  const mediaDurationMs = Math.round(mediaDurationSeconds * 1000)
   type ChunkClip = PrimaryClip & { trackId: SubtitlesTrackId }
   const tracksAsClips: ChunkClip[] = Object.values(fieldsToTracks)
     .filter((trackId) => trackId && subtitles[trackId])
@@ -135,6 +141,7 @@ function combineSubtitles(
       }))
     })
     .sort((a, b) => a.start - b.start)
+
   const getChunkSpecs = (id: string) => {
     const [trackId, chunkIndexString] = id.split(DELIMITER)
     const chunkIndex = +chunkIndexString
@@ -151,18 +158,15 @@ function combineSubtitles(
   }
 
   const regionsFromClips: WaveformRegion[] = tracksAsClips.length
-    ? calculateRegions(
-        tracksAsClips,
-        tracksAsClips[tracksAsClips.length - 1].end,
-        [
-          {
-            start: 0,
-            itemIds: [],
-            end: tracksAsClips[tracksAsClips.length - 1].end,
-          },
-        ]
-      )?.regions || []
+    ? calculateRegions(tracksAsClips, mediaDurationMs, [
+        {
+          start: 0,
+          itemIds: [],
+          end: mediaDurationMs,
+        },
+      ])?.regions || []
     : []
+
   const cardsMap: Record<string, SubtitlesCardBase> = {}
   const cards: SubtitlesCardBase[] = []
   const getItemIdsFromCardBase = (sb: SubtitlesCardBase) => {

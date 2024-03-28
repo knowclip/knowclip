@@ -13,7 +13,7 @@ import { parseProjectJson } from '../../../utils/parseProject'
 import { describe, beforeAll, afterAll, test, expect } from 'vitest'
 
 describe('create a deck from a new project', () => {
-  let context: IntegrationTestContext = initTestContext('newProject')
+  const context: IntegrationTestContext = initTestContext('newProject')
 
   beforeAll(async () => {
     const { app } = await startApp(context)

@@ -35,6 +35,7 @@ import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 
 import { subtitlesMenu$ as $ } from './SubtitlesMenu.testLabels'
+import { AnyAction, Dispatch } from 'redux'
 
 const SubtitlesMenu = () => {
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
@@ -451,7 +452,7 @@ const ExternalTrackMenuItem = ({
 function useLinkSubtitlesDialogAction(
   track: SubtitlesTrack | null,
   file: VttFromEmbeddedSubtitles | ExternalSubtitlesFile | null,
-  dispatch: Function,
+  dispatch: Dispatch<AnyAction>,
   currentFileId: string | null
 ) {
   const chunks = track?.chunks

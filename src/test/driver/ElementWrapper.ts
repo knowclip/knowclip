@@ -44,6 +44,7 @@ export const wrapElement = (
 
       return result
     } catch (err) {
+      console.error('Could not get text from element', selector, err)
       throw err
     }
   }

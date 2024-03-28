@@ -34,32 +34,33 @@ const TAGS = `{{#Tags}}
 <div class="tags">{{Tags}}</div>
 {{/Tags}}`
 
-const LISTENING_CARD = {
+const getListeningCard = (noteType: NoteType) => ({
   name: 'Listening',
   questionFormat: [IMAGE, `{{sound}}`].join('\n'),
   answerFormat: [
     FRONT_SIDE,
     HR,
     TRANSCRIPTION,
-    PRONUNCIATION,
+    ...(noteType === 'Transliteration' ? [PRONUNCIATION] : []),
     MEANING,
     NOTES,
     TAGS,
   ].join('\n\n'),
-}
+})
 
 export const CLOZE_QUESTION_FORMAT = [IMAGE, CLOZE_TRANSCRIPTION, MEANING].join(
   '\n\n'
 )
-export const CLOZE_ANSWER_FORMAT = [
-  CLOZE_QUESTION_FORMAT,
-  `{{sound}}`,
-  PRONUNCIATION,
-  NOTES,
-  TAGS,
-].join('\n\n')
+export const getCloseAnswerFormat = (noteType: NoteType) =>
+  [
+    CLOZE_QUESTION_FORMAT,
+    `{{sound}}`,
+    ...(noteType === 'Transliteration' ? [PRONUNCIATION] : []),
+    NOTES,
+    TAGS,
+  ].join('\n\n')
 
-const getCards = (_noteType: NoteType) => [LISTENING_CARD]
+const getCards = (noteType: NoteType) => [getListeningCard(noteType)]
 
 export const TEMPLATE_CSS = `.card {
   font-family: Helvetica, Arial;
@@ -242,7 +243,7 @@ export const getApkgExportData = (
       tmpl: {
         name: 'Cloze',
         qfmt: CLOZE_QUESTION_FORMAT,
-        afmt: CLOZE_ANSWER_FORMAT,
+        afmt: getCloseAnswerFormat(project.noteType),
       },
     },
   }

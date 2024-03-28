@@ -1,4 +1,4 @@
-const deleteKey = <T extends Object>(obj: T, key: keyof T) => {
+const deleteKey = <T extends object>(obj: T, key: keyof T) => {
   const clone = { ...obj }
   delete clone[key]
   return clone

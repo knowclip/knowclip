@@ -6,8 +6,7 @@ import * as tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
 import { beforeEach } from 'vitest'
 
-// https://github.com/prisma/prisma/issues/8558
-// @ts-ignore
+// @ts-expect-error https://github.com/prisma/prisma/issues/8558
 global.setImmediate = global.setTimeout
 
 const rootDir = join(process.cwd())
@@ -19,6 +18,7 @@ export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const chromedriverPath = require(join(
   rootDir,
   'node_modules',
@@ -94,6 +94,7 @@ export async function startApp(
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
       NODE_ENV: 'integration',
       DISPLAY: process.env.DISPLAY,
+      VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
     },
   })
   const setup = {

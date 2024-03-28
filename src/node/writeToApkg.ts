@@ -1,7 +1,7 @@
 import sql from 'better-sqlite3'
 import type { Database } from 'better-sqlite3'
 import archiver from 'archiver'
-// @ts-expect-error
+// @ts-expect-error no types
 import * as anki from '@silvestre/mkanki'
 import type { AnkiNoteMedia } from '../utils/ankiNote'
 import { getClipMedia } from './getClipMedia'

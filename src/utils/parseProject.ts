@@ -1,4 +1,4 @@
-import YAML from 'yaml'
+import { parse } from 'yaml'
 import { readFile } from 'preloaded/fs'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
 import { parseFormattedDuration } from './formatTime'
@@ -23,18 +23,26 @@ export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
 ): AsyncResult<ProjectJson<F>> => {
   try {
-    const docs = YAML.parseAllDocuments(await readFile(filePath), {
-      // default of 100 is easily reached
-      // when i.e. detecting silences in file > ~2 hours long.
-      // TODO: investigate setting this to smarter default
-      //       and then retrying after confirmation without limit
-      //       after user confirmation.
-      maxAliasCount: -1,
-    } as YAML.Options)
-    const errors = docs.flatMap((v) => v.errors)
-    if (errors.length) return { errors: errors.map((e) => e.message) }
+    const docsText = (await readFile(filePath))
+      .split(/(?:^|\r?\n)(?:---|\.\.\.)\r?\n/)
+      .filter((x) => x.trim())
+    const errors: string[] = []
+    const docs = docsText.map((text) => {
+      try {
+        const doc = parse(text, {
+          maxAliasCount: -1,
+        })
+        return doc
+      } catch (err) {
+        console.error(err)
+        errors.push(String(err))
+        return null
+      }
+    })
 
-    const [project, ...media] = docs.map((d) => d.toJSON())
+    if (errors.length) return { errors }
+
+    const [project, ...media] = docs
 
     const validation = validateProject(project, media)
 

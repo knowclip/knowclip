@@ -43,9 +43,9 @@ export function getTokenCombinations<T>(tokens: T[]) {
 }
 
 function getCombinations<T>(items: T[]) {
-  var result: T[][] = []
-  var f = function (prefix: T[], items: T[]) {
-    for (var i = 0; i < items.length; i++) {
+  const result: T[][] = []
+  const f = function (prefix: T[], items: T[]) {
+    for (let i = 0; i < items.length; i++) {
       result.push([...prefix, items[i]])
       f([...prefix, items[i]], items.slice(i + 1))
     }
