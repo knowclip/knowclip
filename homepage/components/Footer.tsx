@@ -2,7 +2,6 @@ import React from "react"
 import css from "./Footer.module.css"
 import cn from "classnames"
 import {
-  SiTwitter as Twitter,
   SiPatreon as Patreon,
   SiGithub as Github,
   IconType,
@@ -29,9 +28,6 @@ const Footer = ({ className }: { className?: string }) => (
       <section className={css.contact}>
         <h4 className={css.contactHeading}>Contact the developer:</h4>
         <p>
-          <a className={css.link} href="https://twitter.com/@knowclip">
-            Tweet @knowclip
-          </a>
           <br />
           <a className={css.link} href="mailto:knowclip@protonmail.com">
             knowclip@protonmail.com
@@ -48,12 +44,6 @@ const Footer = ({ className }: { className?: string }) => (
       </section>
 
       <ul className={css.socialLinksList}>
-        <SocialLink
-          className={css.twitter}
-          title="Twitter"
-          Icon={Twitter}
-          href="https://twitter.com/@knowclip"
-        />
         <SocialLink
           className={css.patreon}
           title="Patreon"

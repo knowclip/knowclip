@@ -304,17 +304,7 @@ const IndexPage = () => {
           <p>
             Since Knowclip works with pretty much any audio or video format, the
             possibilities are endless—where to look really depends on what
-            language you're learning and what you're personally interested in. I
-            plan to update this site with specific recommendations over the
-            coming weeks. (
-            <A
-              href="https://twitter.com/@knowclip"
-              className={css.link}
-              newWindow
-            >
-              Follow @knowclip on Twitter
-            </A>{" "}
-            to stay updated.)
+            language you're learning and what you're personally interested in.
           </p>
           <p>
             What's most important is that you{" "}
