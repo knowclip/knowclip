@@ -46,19 +46,19 @@ jobs:
         prerelease: false
     - name: Upload test screenshots
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-screenshots
         path: screenshots
     - name: Upload logs
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: "*.log"
         path: logs
     - name: Upload build artifacts
       if: "!startsWith(github.ref, 'refs/tags/')"
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dist
         path: dist/Knowclip_*

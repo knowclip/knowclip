@@ -27,13 +27,13 @@ jobs:
         VITEST: true
         APPVEYOR: true
     - name: Upload test screenshots
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: test-screenshots
         path: screenshots
     - name: Upload logs
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: "*.log"
         path: logs
@@ -45,13 +45,13 @@ jobs:
         CI: false
     - name: Upload test screenshots
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: test-screenshots
         path: screenshots
     - name: Upload build artifacts
       if: "!startsWith(github.ref, 'refs/tags/')"
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: dist
         path: dist/Knowclip_*
