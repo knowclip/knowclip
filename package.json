@@ -58,7 +58,7 @@
     "ts-json-schema-generator": "^1.5.0",
     "uuid": "^9.0.0",
     "wanakana": "^5.1.0",
-    "webdriverio": "^8.32.3",
+    "webdriverio": "^9.0.9",
     "xss": "^1.0.6",
     "yaml": "^2.3.4",
     "yauzl": "^2.10.0"
