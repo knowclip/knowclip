@@ -4,7 +4,7 @@
   "version": "0.12.4-beta",
   "private": true,
   "engines": {
-    "node": "^18.18.0"
+    "node": "^20.9.0"
   },
   "author": {
     "name": "Justin Silvestre",
