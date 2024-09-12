@@ -7,7 +7,7 @@ on:
 
 jobs:
   mac_build:
-    runs-on: macos-latest
+    runs-on: macos-13
 
     strategy:
       matrix:
