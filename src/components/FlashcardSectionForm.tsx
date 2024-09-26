@@ -13,7 +13,7 @@ import {
   Loop,
   ShortTextTwoTone,
 } from '@mui/icons-material'
-import cn from 'classnames'
+import cn from 'clsx'
 import r from '../redux'
 import css from './FlashcardSection.module.css'
 import { getNoteTypeFields } from '../utils/noteType'

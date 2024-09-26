@@ -1,5 +1,5 @@
 import React, { ReactChild } from 'react'
-import cn from 'classnames'
+import cn from 'clsx'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'
 import FlashcardDisplayField from './FlashcardSectionDisplayField'

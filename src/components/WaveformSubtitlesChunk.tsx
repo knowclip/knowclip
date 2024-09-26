@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import cn from 'classnames'
+import cn from 'clsx'
 import { useDispatch, useSelector } from 'react-redux'
 import r from '../redux'
 import css from './Waveform.module.css'
@@ -108,7 +108,7 @@ function WaveformSubtitlesChunk({
       onClick={handleClick}
     >
       <clipPath id={clipPathId}>
-        <rect {...rect} width={width - 10} />
+        <rect {...rect} width={Math.max(0, width - 10)} />
       </clipPath>
       <rect
         className={cn(css.subtitlesChunkRectangle, {

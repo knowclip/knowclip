@@ -1,5 +1,5 @@
 import React, { useCallback, ReactNode } from 'react'
-import cn from 'classnames'
+import cn from 'clsx'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@mui/material'

@@ -3,14 +3,14 @@ import { trimClozeRangeOverlaps } from '../utils/clozeRanges'
 import A from '../types/ActionType'
 import { PrimaryClip, WaveformDrag, WaveformRegion } from 'clipwave'
 import { SubtitlesCardBase } from '../selectors'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 
 export type OverlappedCardBaseDuringClipStretch = {
   subtitlesCardBase: SubtitlesCardBase
   isSelectable: boolean
 }
 
-export const clipsActions = defineActionCreators({
+export const clipsActions = {
   addClipRequest: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
     type: A.addClipRequest,
     waveformDrag,
@@ -138,7 +138,7 @@ export const clipsActions = defineActionCreators({
     type: A.deleteCards,
     ids,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 
 const addFlashcardImage = (id: ClipId, seconds?: number) => {
   const image: FlashcardImage = seconds

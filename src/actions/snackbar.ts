@@ -1,8 +1,8 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 import { compositeDialogActions } from './dialog'
 
-export const snackbarActions = defineActionCreators({
+export const snackbarActions = {
   enqueueSnackbar: (snackbar: SnackbarData) => ({
     type: A.enqueueSnackbar,
     snackbar,
@@ -11,7 +11,7 @@ export const snackbarActions = defineActionCreators({
   closeSnackbar: () => ({
     type: A.closeSnackbar,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 const simpleMessageSnackbar = (
   message: string,
   autoHideDuration?: number | null

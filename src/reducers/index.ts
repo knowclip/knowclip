@@ -12,8 +12,8 @@ import { PersistConfig, createTransform, persistReducer } from 'redux-persist'
 import { createElectronStorage } from 'preloaded/reduxPersistElectronStorage'
 import { resetFileAvailabilities } from '../utils/statePersistence'
 import A from '../types/ActionType'
-import { Action } from '../actions'
-import ActionType from '../types/ActionType'
+import { KnowclipAction } from '../actions'
+import KnowclipActionType from '../types/ActionType'
 
 const storage = createElectronStorage()
 const whitelist: (keyof FilesState)[] = ['ProjectFile', 'Dictionary']
@@ -56,7 +56,7 @@ const root = combineReducers<AppState>({
 
 const persistedReducer = persistReducer(rootConfig, root)
 
-const UNDOABLE_ACTIONS = new Set<ActionType>([
+const UNDOABLE_ACTIONS = new Set<KnowclipActionType>([
   A.deleteCard,
   A.makeClipsFromSubtitles,
   A.deleteCards,
@@ -71,7 +71,7 @@ const UNDOABLE_ACTIONS = new Set<ActionType>([
   A.stretchClip,
 ])
 
-const HISTORY_CLEARING_ACTIONS = new Set<ActionType>([
+const HISTORY_CLEARING_ACTIONS = new Set<KnowclipActionType>([
   A.setCurrentFile,
   A.openProject,
   A.closeProject,
@@ -82,9 +82,9 @@ const MAX_HISTORY_STACK_SIZE = 50
 // TODO: group text editing actions?
 
 function undoable<S extends AppState>(
-  reducer: (s: S | undefined, a: Action) => S
+  reducer: (s: S | undefined, a: KnowclipAction) => S
 ) {
-  const initialState = reducer(undefined, {} as Action)
+  const initialState = reducer(undefined, {} as KnowclipAction)
   return (
     stateWithHistory: WithHistory<S> = {
       ...initialState,
@@ -92,7 +92,7 @@ function undoable<S extends AppState>(
       previous: [],
       next: [],
     },
-    action: Action
+    action: KnowclipAction
   ): WithHistory<S> => {
     if (action.type === A.undo) {
       const { previous, next, lastHistoryAction, ...state } = stateWithHistory

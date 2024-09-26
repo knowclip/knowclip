@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import cn from 'classnames'
+import cn from 'clsx'
 import r from '../redux'
 import css from './FlashcardSectionDisplay.module.css'
 import { TransliterationFlashcardFields } from '../types/Project'

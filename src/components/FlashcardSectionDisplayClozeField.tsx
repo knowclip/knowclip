@@ -7,7 +7,7 @@ import React, {
   useRef,
 } from 'react'
 import { platform } from 'preloaded/os'
-import cn from 'classnames'
+import cn from 'clsx'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@mui/material'

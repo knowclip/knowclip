@@ -1,8 +1,8 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 import { filesActions } from './files'
 
-export const dictionariesActions = defineActionCreators({
+export const dictionariesActions = {
   importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
     type: A.importDictionaryRequest,
     dictionaryType,
@@ -22,7 +22,7 @@ export const dictionariesActions = defineActionCreators({
   resetDictionariesDatabase: () => ({
     type: A.resetDictionariesDatabase,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 
 const finishDictionaryImport = (id: FileId) =>
   filesActions.updateFile({

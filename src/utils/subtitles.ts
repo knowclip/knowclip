@@ -17,6 +17,7 @@ export const getSubtitlesFilePathFromMedia = async (
 ): Promise<string | null> => {
   const result = await getMediaMetadata(mediaFilePath)
   if (result.errors) {
+    console.error(`Error getting media metadata for ${mediaFilePath}`)
     console.error(result.errors)
     return null
   }
@@ -35,11 +36,18 @@ export const getSubtitlesFilePathFromMedia = async (
       '.vtt'
   )
 
-  return await writeMediaSubtitlesToVtt(
-    mediaFilePath,
-    streamIndex,
-    outputFilePath
-  )
+  try {
+    return await writeMediaSubtitlesToVtt(
+      mediaFilePath,
+      streamIndex,
+      outputFilePath
+    )
+  } catch (error) {
+    console.error(
+      `Error writing media subtitles to VTT at stream index ${streamIndex}: ${error}`
+    )
+    return null
+  }
 }
 
 export const getExternalSubtitlesVttPath = async (

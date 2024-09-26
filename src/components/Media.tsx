@@ -7,7 +7,7 @@ import React, {
   useCallback,
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import cn from 'classnames'
+import cn from 'clsx'
 import r from '../redux'
 import css from './Media.module.css'
 import { Tooltip, IconButton } from '@mui/material'

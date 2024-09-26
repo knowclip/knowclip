@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import { showSaveDialog } from '../../utils/electron'
 import css from './NewProjectFormDialog.module.css'
-import cn from 'classnames'
+import cn from 'clsx'
 import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
 import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'

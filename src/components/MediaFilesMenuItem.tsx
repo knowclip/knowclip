@@ -15,7 +15,7 @@ import {
   PlayArrow,
   FolderSpecial,
 } from '@mui/icons-material'
-import cn from 'classnames'
+import cn from 'clsx'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import r from '../redux'

@@ -9,7 +9,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux'
 import { IconButton, Tooltip } from '@mui/material'
 import { Delete } from '@mui/icons-material'
-import cn from 'classnames'
+import cn from 'clsx'
 import MediaFilesMenu from '../components/MediaFilesMenu'
 import ProjectMenu from '../components/ProjectMenu'
 import headerCss from '../components/MainHeader.module.css'

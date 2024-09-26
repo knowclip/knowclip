@@ -3,7 +3,7 @@ import { Snackbar, IconButton, SnackbarProps } from '@mui/material'
 import { Close } from '@mui/icons-material'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
-import cn from 'classnames'
+import cn from 'clsx'
 import r from '../../redux'
 import { snackbar$ } from '../Snackbar.testLabels'
 

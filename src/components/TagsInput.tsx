@@ -1,6 +1,6 @@
 import { Autocomplete, AutocompleteProps, Chip, TextField } from '@mui/material'
 import { useState } from 'react'
-import classnames from 'classnames'
+import classnames from 'clsx'
 
 import { tagsInput$ as $ } from './TagsInput.testLabels'
 

@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { CircularProgress } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
-import cn from 'classnames'
+import cn from 'clsx'
 import Media from '../components/Media'
 import {
   Waveform,
@@ -34,6 +34,7 @@ import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelect
 import { useWaveformEventHandlers } from '../utils/clipwave/useWaveformEventHandlers'
 
 import { main$ as $ } from './Main.testLabels'
+import { CLIPWAVE_ID } from '../utils/clipwave'
 
 const Main = () => {
   const routeParams = useParams()
@@ -105,7 +106,7 @@ const Main = () => {
   }, [])
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
-  const waveform = useWaveform(getWaveformItem)
+  const waveform = useWaveform(getWaveformItem, CLIPWAVE_ID)
   const { onTimeUpdate } = waveform
   const { resetWaveformState } = waveform.actions
 

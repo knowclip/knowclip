@@ -1,7 +1,7 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 
-export const settingsActions = defineActionCreators({
+export const settingsActions = {
   setMediaFolderLocation: (directoryPath: string) => ({
     type: A.setMediaFolderLocation,
     directoryPath,
@@ -37,4 +37,4 @@ export const settingsActions = defineActionCreators({
     type: A.removeActiveDictionary,
     id,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset

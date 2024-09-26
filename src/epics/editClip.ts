@@ -11,7 +11,7 @@ import { EMPTY, of } from 'rxjs'
 import { actions } from '../actions'
 import A from '../types/ActionType'
 import { getClip, getCurrentMediaFile, getFile } from '../selectors'
-import ActionType from '../types/ActionType'
+import KnowclipActionType from '../types/ActionType'
 
 const remakeStill: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -36,7 +36,7 @@ const remakeStill: AppEpic = (action$, state$) =>
             action$.pipe(
               filter(
                 (a) =>
-                  a.type === ActionType.deleteFileSuccess &&
+                  a.type === KnowclipActionType.deleteFileSuccess &&
                   a.file.id === still.id &&
                   a.file.type === still.type
               ),

@@ -3,11 +3,11 @@ import { basename } from 'preloaded/path'
 import { filesActions } from './files'
 import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 
 const openFileRequest = filesActions.openFileRequest
 
-export const subtitlesActions = defineActionCreators({
+export const subtitlesActions = {
   showSubtitles: (id: SubtitlesTrackId) => ({
     type: A.showSubtitles,
     id,
@@ -54,7 +54,7 @@ export const subtitlesActions = defineActionCreators({
     subtitlesTrackId,
     chunkIndex,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 
 const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
   filesActions.updateFile({

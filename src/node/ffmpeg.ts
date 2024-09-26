@@ -99,7 +99,10 @@ export function writeMediaSubtitlesToVtt(
         res(outputFilePath)
       })
       .on('error', (err) => {
-        console.error(err)
+        console.error(
+          `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
+          err
+        )
         rej(err)
       })
       .run()

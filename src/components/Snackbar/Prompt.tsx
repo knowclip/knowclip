@@ -3,10 +3,10 @@ import { Snackbar, IconButton, Button, SnackbarProps } from '@mui/material'
 import { Close } from '@mui/icons-material'
 import DarkTheme from '../DarkTheme'
 import { useDispatch } from 'react-redux'
-import cn from 'classnames'
+import cn from 'clsx'
 import { snackbar$ } from '../Snackbar.testLabels'
 import r from '../../redux'
-import ActionType from '../../types/ActionType'
+import KnowclipActionType from '../../types/ActionType'
 
 const PromptSnackbar = ({
   message,
@@ -65,7 +65,7 @@ const PromptSnackbar = ({
               </Button>
             ))}
             {!actions.some(
-              ([, action]) => action.type === ActionType.closeSnackbar
+              ([, action]) => action.type === KnowclipActionType.closeSnackbar
             ) && (
               <IconButton onClick={handleClose}>
                 <Close />
