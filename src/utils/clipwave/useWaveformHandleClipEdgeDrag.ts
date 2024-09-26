@@ -52,9 +52,9 @@ export function useWaveformHandleClipEdgeDrag(
         cardsBases
       )
 
-      const region = regions[stretch.regionIndex]
-      if (!region)
-        console.error('region not found for stretch ' + stretchedClip.id)
+      const originRegion = regions[stretch.originRegionIndex]
+      if (!originRegion)
+        console.error('originRegion not found for stretch ' + stretchedClip.id)
 
       const getOverlapStats = (sb: SubtitlesCardBase) => {
         const stretchEndRegionIndex = regions.findIndex(
