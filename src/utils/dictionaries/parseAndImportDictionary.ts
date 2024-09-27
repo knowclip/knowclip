@@ -2,8 +2,8 @@ import { parseYomichanZip } from './parseYomichanZip'
 import { parseCedictZip } from './parseCedictZip'
 import { parseDictCCZip } from './parseDictCCZip'
 
-export function parseAndImportDictionary(
-  file: DictionaryFile,
+export function parseDictionary<T extends DictionaryFile>(
+  file: T,
   filePath: string
 ) {
   switch (file.dictionaryType) {

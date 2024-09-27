@@ -12,6 +12,19 @@ import ErrorMessage from '../components/ErrorMessage'
 import { VITEST } from '../env'
 import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 import { PersistGate } from 'redux-persist/integration/react'
+import { IpcRendererEvent } from '../preload/IpcRendererEvent'
+
+window.electronApi.listenToIpcRendererMessages(
+  (electronIpcRendererEvent, message, payload) => {
+    const event = new IpcRendererEvent(
+      electronIpcRendererEvent,
+      message,
+      payload
+    )
+    console.log('message sent', message, event)
+    window.dispatchEvent(event)
+  }
+)
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'

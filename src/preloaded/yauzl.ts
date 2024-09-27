@@ -1,5 +1,5 @@
 import { getPreloadModule } from './getPreloadModule'
 
-const { open, ZipFile, Entry } = getPreloadModule('yauzl')
+const { open, Entry } = getPreloadModule('yauzl')
 
-export { open, ZipFile, Entry }
+export { open, Entry }

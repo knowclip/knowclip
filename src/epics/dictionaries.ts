@@ -1,7 +1,14 @@
 import { combineEpics, ofType } from 'redux-observable'
-import { catchError, filter, mergeMap } from 'rxjs/operators'
+import {
+  catchError,
+  concatMap,
+  filter,
+  mergeMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators'
 import A from '../types/ActionType'
-import { actions } from '../actions'
+import { ActionOf, actions } from '../actions'
 import * as s from '../selectors'
 import {
   deleteDictionary,
@@ -11,6 +18,8 @@ import {
 import { getFileFilters } from '../utils/files'
 import { concat, EMPTY, from, of } from 'rxjs'
 import { RehydrateAction } from 'redux-persist'
+import { importDictionaryEntries } from '../utils/dictionaries/parseYomichanZip'
+import { ImportProgressPayload } from '../utils/dictionaries/requestParseYomichanDictionary'
 
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -77,6 +86,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
 const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.startDictionaryImport as const),
+    filter((action) => action.file.dictionaryType !== 'YomichanDictionary'),
     mergeMap(({ file, filePath }) => {
       return concat(
         from([
@@ -104,6 +114,98 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
               })
             )
           )
+        ),
+        from([
+          actions.finishDictionaryImport(file.id),
+          actions.openFileRequest(file, filePath),
+          actions.setProgress(null),
+          actions.addActiveDictionary(file.id, file.dictionaryType),
+          actions.simpleMessageSnackbar(
+            `Mouse over flashcard text and press the 'D' key to look up words.`,
+            null
+          ),
+        ])
+      ).pipe(
+        catchError((err) => {
+          console.error(err)
+
+          return from([
+            actions.openFileFailure(file, filePath, String(err)),
+            actions.simpleMessageSnackbar(
+              `There was a problem importing this dictionary file: ${err}`
+            ),
+            // happens within deleteImportedDictionary:
+            // actions.setProgress(null),
+            actions.deleteImportedDictionary(file),
+          ])
+        })
+      )
+    })
+  )
+
+const startYomichanImportEpic: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType(A.startDictionaryImport as const),
+    filter(
+      (
+        action
+      ): action is ActionOf<A.startDictionaryImport> & {
+        file: { dictionaryType: 'YomichanDictionary' }
+      } => action.file.dictionaryType === 'YomichanDictionary'
+    ),
+    mergeMap(({ file, filePath }) => {
+      const importProgressEvents = effects
+        .fromIpcRendererEvent<ImportProgressPayload>(
+          'dictionary-import-progress'
+        )
+        .pipe(
+          tap((event) => {
+            console.log('dictionary-import-progress', event)
+          })
+        )
+
+      const parseEndEvents = effects
+        .fromIpcRendererEvent('dictionary-parse-end')
+        .pipe(
+          tap((event) => {
+            console.log('dictionary-parse-end', event)
+          })
+        )
+
+      return concat(
+        from([
+          actions.setProgress({
+            percentage: 0,
+            message: 'Import in progress.',
+          }),
+          actions.addFile(file, filePath),
+        ]),
+        from(
+          effects.sendToMainProcess({
+            type: 'openDictionaryFile',
+            args: [file, filePath],
+          })
+        ).pipe(
+          mergeMap((openResult) => {
+            console.log('openResult', openResult)
+            if (openResult.error) {
+              throw new Error(
+                `Problem opening dictionary file: ${openResult.error}`
+              )
+            }
+            return importProgressEvents.pipe(
+              takeUntil(parseEndEvents),
+              concatMap(async (event) => {
+                const { progressPercentage, message, data } = event.payload
+                if (data) await importDictionaryEntries(data, file)
+
+                return actions.setProgress({
+                  percentage: progressPercentage,
+                  message: message,
+                })
+              })
+            )
+          })
         ),
         from([
           actions.finishDictionaryImport(file.id),
@@ -206,6 +308,7 @@ export default combineEpics(
   initializeDictionaries,
   importDictionaryRequestEpic,
   startImportEpic,
+  startYomichanImportEpic,
   deleteDatabaseEpic,
   deleteImportedDictionaryEpic
 )

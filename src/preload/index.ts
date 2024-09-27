@@ -83,6 +83,7 @@ const electronApi = {
   },
   listenToTestIpcEvents,
   listenToLogPersistedDataEvents,
+  listenToIpcRendererMessages,
 }
 
 console.log('preloading')
@@ -101,9 +102,14 @@ sendToMainProcess({
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)
 
-ipcRenderer.on('message', (event, message) => {
-  console.log('message sent', message)
-  window.dispatchEvent(new Event(`ipc:${message}`))
-})
+function listenToIpcRendererMessages(
+  callback: (
+    event: Electron.IpcRendererEvent,
+    message: string,
+    payload: string
+  ) => void
+) {
+  ipcRenderer.on('message', callback)
+}
 
 console.log('preloaded')

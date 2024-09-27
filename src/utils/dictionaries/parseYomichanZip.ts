@@ -104,7 +104,7 @@ export async function parseYomichanZip(
   return progressObservable
 }
 
-async function importDictionaryEntries(
+export async function importDictionaryEntries(
   rawJson: string,
   file: YomichanDictionary
 ) {
