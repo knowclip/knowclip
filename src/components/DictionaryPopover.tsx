@@ -215,15 +215,6 @@ export function DictionaryPopover({
                       // prioritize entries not containing text [obs.]
                       const aHasObs = a.meanings[0]?.includes('[obs.]')
                       const bHasObs = b.meanings[0]?.includes('[obs.]')
-                      if (a.head === 'spät')
-                        console.log(a.head, { a, b, aHasObs, bHasObs })
-                      else if (b.head === 'spät')
-                        console.log(a.head, b.head, {
-                          a,
-                          b,
-                          aHasObs,
-                          bHasObs,
-                        })
 
                       if (aHasObs && !bHasObs) return 1
                       if (!aHasObs && bHasObs) return -1
