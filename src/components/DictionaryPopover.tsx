@@ -303,19 +303,26 @@ const JapaneseRuby = memo(
         {
           chunks.reduce(
             (acc, chunk, i) => {
+              const chunkString =
+                typeof chunk === 'string' ? chunk : chunk.value
               if (
                 pronunciation.substr(
                   acc.processedPronunciation.length,
-                  chunk.length
+                  chunkString.length
                 ) === chunk
               ) {
                 acc.processedPronunciation += chunk
                 acc.elements.push(<>{chunk}</>)
               } else {
-                const nextChunk: string | undefined = chunks[i + 1]
-                const nextTokenIndex = nextChunk
+                const nextChunk = chunks[i + 1]
+                const nextChunkText = nextChunk
+                  ? typeof nextChunk === 'string'
+                    ? nextChunk
+                    : nextChunk.value
+                  : null
+                const nextTokenIndex = nextChunkText
                   ? pronunciation.indexOf(
-                      nextChunk,
+                      nextChunkText,
                       acc.processedPronunciation.length
                     )
                   : pronunciation.length
@@ -326,7 +333,7 @@ const JapaneseRuby = memo(
                 acc.processedPronunciation += furigana
                 acc.elements.push(
                   <ruby>
-                    {chunk}
+                    {chunkString}
                     <rt>{furigana}</rt>
                   </ruby>
                 )
