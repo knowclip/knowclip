@@ -1,5 +1,5 @@
 import React, { useCallback, MutableRefObject, MouseEventHandler } from 'react'
-import cn from 'classnames'
+import cn from 'clsx'
 import css from './FlashcardSectionDisplay.module.css'
 import { Tooltip, Button } from '@mui/material'
 import {

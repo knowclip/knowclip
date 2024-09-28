@@ -6,7 +6,7 @@ import {
   SELECTION_BORDER_MILLISECONDS,
   PrimaryClip,
 } from 'clipwave'
-import cn from 'classnames'
+import cn from 'clsx'
 import { waveform$ } from './waveformTestLabels'
 import { ClipClickDataProps } from 'clipwave/dist/WaveformClips'
 

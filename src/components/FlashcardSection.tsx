@@ -1,7 +1,7 @@
 import React, { MouseEventHandler, useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@mui/material'
-import cn from 'classnames'
+import cn from 'clsx'
 import r from '../redux'
 import css from './FlashcardSection.module.css'
 import {

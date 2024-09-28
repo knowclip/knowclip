@@ -1,7 +1,7 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 
-export const sessionActions = defineActionCreators({
+export const sessionActions = {
   dismissMedia: () => ({ type: A.dismissMedia }),
 
   toggleLoop: (reason: LoopReason) => ({
@@ -18,4 +18,4 @@ export const sessionActions = defineActionCreators({
     type: A.setViewMode,
     viewMode,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset

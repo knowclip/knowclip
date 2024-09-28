@@ -1,8 +1,8 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 import { filesActions } from './files'
 
-export const projectActions = defineActionCreators({
+export const projectActions = {
   createProject: (
     id: string,
     name: string,
@@ -79,7 +79,7 @@ export const projectActions = defineActionCreators({
     type: A.setWorkIsUnsaved,
     workIsUnsaved,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 
 function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
   return u as any as FileUpdate<keyof FileUpdates>

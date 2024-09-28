@@ -1,5 +1,5 @@
 import React, { useCallback, memo } from 'react'
-import cn from 'classnames'
+import cn from 'clsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { IconButton, Tooltip } from '@mui/material'
 import r from '../redux'

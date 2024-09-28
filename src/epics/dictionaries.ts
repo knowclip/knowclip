@@ -1,5 +1,11 @@
 import { combineEpics, ofType } from 'redux-observable'
-import { catchError, filter, mergeMap } from 'rxjs/operators'
+import {
+  catchError,
+  concatMap,
+  filter,
+  mergeMap,
+  takeUntil,
+} from 'rxjs/operators'
 import A from '../types/ActionType'
 import { actions } from '../actions'
 import * as s from '../selectors'
@@ -9,8 +15,12 @@ import {
   resetDictionariesDatabase,
 } from '../utils/dictionariesDatabase'
 import { getFileFilters } from '../utils/files'
-import { concat, EMPTY, from, of } from 'rxjs'
+import { concat, from, of } from 'rxjs'
 import { RehydrateAction } from 'redux-persist'
+import { importYomichanEntries } from '../utils/dictionaries/importYomichanEntries'
+import { ImportProgressPayload } from '../utils/dictionaries/openDictionaryZip'
+import { importCedictEntries } from '../utils/dictionaries/importCeDictEntries'
+import { importDictCcEntries } from '../utils/dictionaries/importDictCcEntries'
 
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -86,24 +96,36 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           }),
           actions.addFile(file, filePath),
         ]),
-        from(effects.parseAndImportDictionary(file, filePath)).pipe(
-          mergeMap((obs) =>
-            obs.pipe(
-              mergeMap((decimal) => {
-                const newPercentage = Math.round(decimal * 100)
-                const { progress } = state$.value.session
-                if (progress && progress.percentage !== newPercentage)
-                  return of(
-                    actions.setProgress({
-                      percentage: newPercentage,
-                      message: 'Import in progress',
-                    })
-                  )
+        from(
+          effects.sendToMainProcess({
+            type: 'openDictionaryFile',
+            args: [file, filePath],
+          })
+        ).pipe(
+          mergeMap((openResult) => {
+            console.log('openResult', openResult)
+            if (openResult.error) {
+              throw new Error(
+                `Problem opening dictionary file: ${openResult.error}`
+              )
+            }
+            return effects
+              .fromIpcRendererEvent<ImportProgressPayload<typeof file>>(
+                'dictionary-import-progress'
+              )
+              .pipe(
+                takeUntil(effects.fromIpcRendererEvent('dictionary-parse-end')),
+                concatMap(async (event) => {
+                  const { progressPercentage, message, data } = event.payload
+                  if (data) await importDictionaryEntries(file, data)
 
-                return EMPTY
-              })
-            )
-          )
+                  return actions.setProgress({
+                    percentage: progressPercentage,
+                    message: message,
+                  })
+                })
+              )
+          })
         ),
         from([
           actions.finishDictionaryImport(file.id),
@@ -209,3 +231,14 @@ export default combineEpics(
   deleteDatabaseEpic,
   deleteImportedDictionaryEpic
 )
+
+function importDictionaryEntries(file: DictionaryFile, data: string) {
+  switch (file.dictionaryType) {
+    case 'YomichanDictionary':
+      return importYomichanEntries(data, file)
+    case 'CEDictDictionary':
+      return importCedictEntries(data, file)
+    case 'DictCCDictionary':
+      return importDictCcEntries(data, file)
+  }
+}

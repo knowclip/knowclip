@@ -1,4 +1,4 @@
-import { fromEvent } from 'rxjs'
+import { fromEvent, tap } from 'rxjs'
 import { getMediaMetadata } from 'preloaded/ffmpeg'
 import { sendClosedSignal } from 'preloaded/electron'
 import { getVideoStill } from 'preloaded/getVideoStill'
@@ -10,13 +10,13 @@ import { getWaveformPng } from './utils/getWaveform'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 import { nowUtcTimestamp, uuid } from './utils/sideEffects'
 import { getDexieDb } from './utils/dictionariesDatabase'
-import { parseAndImportDictionary } from './utils/dictionaries/parseAndImportDictionary'
 import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
 import { existsSync, writeFile } from 'preloaded/fs'
 import { flushSync } from 'react-dom'
+import { IpcRendererEvent } from './preload/IpcRendererEvent'
 
 const dependencies = {
   ...electronHelpers,
@@ -40,9 +40,8 @@ const dependencies = {
   uuid,
   getDexieDb,
 
-  parseAndImportDictionary,
-  fromIpcRendererEvent: (eventName: string) =>
-    fromEvent(window, `ipc:${eventName}`),
+  fromIpcRendererEvent: <T>(eventName: string) =>
+    fromEvent<IpcRendererEvent<T>>(window, `ipc:${eventName}`),
   sendToMainProcess,
   quitApp: () => sendClosedSignal(),
   tmpDirectory: () => tempy.temporaryDirectory(),

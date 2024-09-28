@@ -10,6 +10,7 @@ import {
 } from 'electron'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { requestParseDictionary } from './utils/dictionaries/requestParseDictionary'
 
 export const getMessageResponders = (
   mainWindow: BrowserWindow,
@@ -111,6 +112,9 @@ export const getMessageResponders = (
 
     const openProject = submenu.getMenuItemById('Open project')
     if (openProject) openProject.enabled = !projectOpened
+  },
+  openDictionaryFile(file: DictionaryFile, filePath: string) {
+    return requestParseDictionary(file, filePath, mainWindow)
   },
 })
 

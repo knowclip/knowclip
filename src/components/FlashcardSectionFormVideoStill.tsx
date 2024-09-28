@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Tooltip, CardMedia, CircularProgress } from '@mui/material'
-import cn from 'classnames'
+import cn from 'clsx'
 import r from '../redux'
 import css from './FlashcardSection.module.css'
 

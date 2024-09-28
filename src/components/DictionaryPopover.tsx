@@ -30,7 +30,15 @@ import DarkTheme from './DarkTheme'
 import { actions } from '../actions'
 import { displayDictionaryType } from '../selectors'
 
-function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
+/** groups lookup results pointing to entries with identical heads
+ * to avoid displaying the same head multiple times;
+ * other entry properties may differ, so further processing is needed
+ * to determine if the entries belong together (see `groupEntriesAndOrganizeVariantHeads`)
+ */
+function groupIdenticalEntryHeads(
+  translatedToken: TranslatedToken,
+  sortEntriesFn?: (a: LexiconEntry, b: LexiconEntry) => number
+) {
   const results: {
     head: string
     variant?: string
@@ -47,6 +55,8 @@ function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
     )
     if (existingHead) {
       existingHead.entries.push(entryWithInflection)
+      if (sortEntriesFn)
+        existingHead.entries.sort((a, b) => sortEntriesFn(a.entry, b.entry))
     } else {
       results.push({
         head:
@@ -65,6 +75,10 @@ function groupIdenticalEntryHeads(translatedToken: TranslatedToken) {
   return results
 }
 
+/** takes lookup results already grouped by identical heads
+ * and looks at their inflections and tags to determine
+ * if they should be displayed together
+ */
 const groupEntriesAndOrganizeVariantHeads = (
   entries: {
     entry: LexiconEntry
@@ -97,6 +111,7 @@ const groupEntriesAndOrganizeVariantHeads = (
   return result
 }
 
+/** */
 function doEntriesBelongTogether(
   e: {
     head: string
@@ -193,42 +208,62 @@ export function DictionaryPopover({
           {translationsAtCharacter &&
             activeDictionaryType &&
             translationsAtCharacter.translatedTokens.map((translatedToken) => {
-              return groupIdenticalEntryHeads(translatedToken).map(
-                ({ entries, head, variant, pronunciation }, i) => {
-                  return (
-                    <section
-                      className={css.dictionaryEntry}
-                      key={`${head}${i}`}
-                    >
-                      <h3 className={css.entryHead}>
-                        <EntryHead
-                          head={head}
-                          variant={variant}
-                          pronunciation={pronunciation}
-                          activeDictionaryType={activeDictionaryType}
-                        />
-                      </h3>
-                      {groupEntriesAndOrganizeVariantHeads(entries).map(
-                        ({ entries, head, tags, inflections }, i) => {
-                          return (
-                            <Fragment key={`${head}_${i}`}>
-                              <p className={css.entryTags}>
-                                {tags.join(' ')}
-                                {Boolean(inflections.length) && (
-                                  <> ({inflections.join(' › ')})</>
-                                )}
-                              </p>
-                              <p className={css.entryMeaningsList}>
-                                {entries.flatMap((e) => e.meanings).join('; ')}
-                              </p>
-                            </Fragment>
-                          )
-                        }
-                      )}
-                    </section>
-                  )
-                }
-              )
+              return groupIdenticalEntryHeads(
+                translatedToken,
+                activeDictionaryType === 'DictCCDictionary'
+                  ? (a, b) => {
+                      // prioritize entries not containing text [obs.]
+                      const aHasObs = a.meanings[0]?.includes('[obs.]')
+                      const bHasObs = b.meanings[0]?.includes('[obs.]')
+                      if (a.head === 'spät')
+                        console.log(a.head, { a, b, aHasObs, bHasObs })
+                      else if (b.head === 'spät')
+                        console.log(a.head, b.head, {
+                          a,
+                          b,
+                          aHasObs,
+                          bHasObs,
+                        })
+
+                      if (aHasObs && !bHasObs) return 1
+                      if (!aHasObs && bHasObs) return -1
+                      return 0
+                    }
+                  : undefined
+              ).map(({ entries, head, variant, pronunciation }, i) => {
+                return (
+                  <section className={css.dictionaryEntry} key={`${head}${i}`}>
+                    <h3 className={css.entryHead}>
+                      <EntryHead
+                        head={head}
+                        variant={variant}
+                        pronunciation={pronunciation}
+                        activeDictionaryType={activeDictionaryType}
+                      />
+                    </h3>
+                    {groupEntriesAndOrganizeVariantHeads(entries).map(
+                      ({ entries, head, tags, inflections }, i) => {
+                        return (
+                          <Fragment key={`${head}_${i}`}>
+                            <p className={css.entryTags}>
+                              {tags.join(' ')}
+                              {Boolean(inflections.length) && (
+                                <> ({inflections.join(' › ')})</>
+                              )}
+                            </p>
+                            <p className={css.entryMeaningsList}>
+                              {entries
+                                .flatMap((e) => e.meanings)
+
+                                .join('; ')}
+                            </p>
+                          </Fragment>
+                        )
+                      }
+                    )}
+                  </section>
+                )
+              })
             })}
         </Paper>
       </Popper>

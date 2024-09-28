@@ -13,11 +13,11 @@ import css from './FlashcardSection.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { capitalize } from './FlashcardSectionForm'
 import { flashcardSectionForm$ } from './FlashcardSectionForm.testLabels'
-import cn from 'classnames'
+import cn from 'clsx'
 import { MediaSubtitles } from '../selectors/subtitles'
 import { useSelector } from 'react-redux'
 import { usePrevious } from '../utils/usePrevious'
-import ActionType from '../types/ActionType'
+import KnowclipActionType from '../types/ActionType'
 
 export type Props = {
   name: FlashcardFieldName
@@ -81,7 +81,7 @@ const FlashcardSectionFormField = memo(
       const action = s.lastHistoryAction
       if (
         action &&
-        action.type === ActionType.setFlashcardField &&
+        action.type === KnowclipActionType.setFlashcardField &&
         action.key === name
       )
         return action.caretLocation

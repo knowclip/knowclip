@@ -1,6 +1,5 @@
 import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import App from '../components/App'
@@ -12,6 +11,18 @@ import ErrorMessage from '../components/ErrorMessage'
 import { VITEST } from '../env'
 import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 import { PersistGate } from 'redux-persist/integration/react'
+import { IpcRendererEvent } from '../preload/IpcRendererEvent'
+
+window.electronApi.listenToIpcRendererMessages(
+  (electronIpcRendererEvent, message, payload) => {
+    const event = new IpcRendererEvent(
+      electronIpcRendererEvent,
+      message,
+      payload
+    )
+    window.dispatchEvent(event)
+  }
+)
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'

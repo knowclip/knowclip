@@ -1,4 +1,4 @@
-import ActionType from '../types/ActionType'
+import KnowclipActionType from '../types/ActionType'
 import { clipsActions, compositeClipsActions } from './clips'
 import { waveformActions } from './waveform'
 import { snackbarActions, compositeSnackbarActions } from './snackbar'
@@ -12,35 +12,28 @@ import {
 } from './dictionaries'
 import { sessionActions } from './session'
 import { settingsActions } from './settings'
-import { defineActionCreators } from './defineActionCreators'
+import { ActionCreatorOf, ActionCreators } from './actionTypeUtilities'
 
-type EnumKeys<T> = T extends Record<string, infer U> ? U : never
-type ReverseEnum<T extends Record<string, string>> = {
-  [K in EnumKeys<T>]: {
-    [P in keyof T]: T[P] extends K ? P : never
-  }[keyof T]
-}
+export type ActionOf<T extends KnowclipActionType> = ReturnType<
+  ActionCreatorOf<typeof KnowclipActionType, typeof baseActions, T>
+>
 
-export type ActionCreatorNameOf<T extends ActionType> = ReverseEnum<
-  typeof ActionType
->[T]
-type ActionCreatorOf<T extends ActionType> =
-  (typeof baseActions)[ActionCreatorNameOf<T>]
+export type KnowclipAction = ActionOf<KnowclipActionType>
 
-export type ActionOf<T extends ActionType> = ReturnType<ActionCreatorOf<T>>
-export type Action = ActionOf<ActionType>
+export type KnowclipActionCreatorsSubset = Partial<KnowclipActionCreators>
+type KnowclipActionCreators = ActionCreators<typeof KnowclipActionType>
 
-const appActions = defineActionCreators({
+const appActions = {
   initializeApp: () => ({
-    type: ActionType.initializeApp,
+    type: KnowclipActionType.initializeApp,
   }),
 
   undo: () => ({
-    type: ActionType.undo,
+    type: KnowclipActionType.undo,
   }),
 
   redo: () => ({
-    type: ActionType.redo,
+    type: KnowclipActionType.redo,
   }),
 
   // [A['@@INIT']]: () => ({
@@ -48,16 +41,16 @@ const appActions = defineActionCreators({
   // }),
 
   setProjectError: (error: string | null) => ({
-    type: ActionType.setProjectError,
+    type: KnowclipActionType.setProjectError,
     error,
   }),
 
   quitApp: () => ({
-    type: ActionType.quitApp,
+    type: KnowclipActionType.quitApp,
   }),
 
   setCurrentFile: (index: number) => ({
-    type: ActionType.setCurrentFile,
+    type: KnowclipActionType.setCurrentFile,
     index,
   }),
 
@@ -65,18 +58,18 @@ const appActions = defineActionCreators({
     mediaFileIdsToClipIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
     mediaOpenPrior: MediaFile | null
   ) => ({
-    type: ActionType.exportApkgRequest,
+    type: KnowclipActionType.exportApkgRequest,
     mediaFileIdsToClipIds,
     mediaOpenPrior,
   }),
 
   exportApkgFailure: (errorMessage?: string) => ({
-    type: ActionType.exportApkgFailure,
+    type: KnowclipActionType.exportApkgFailure,
     errorMessage: errorMessage || null,
   }),
 
   exportApkgSuccess: (successMessage: string) => ({
-    type: ActionType.exportApkgSuccess,
+    type: KnowclipActionType.exportApkgSuccess,
     successMessage,
   }),
 
@@ -86,7 +79,7 @@ const appActions = defineActionCreators({
     mediaFolderLocation: string,
     rememberLocation: boolean
   ) => ({
-    type: ActionType.exportCsv,
+    type: KnowclipActionType.exportCsv,
     mediaFileIdsToClipIds,
     csvFilePath,
     mediaFolderLocation,
@@ -96,23 +89,23 @@ const appActions = defineActionCreators({
   exportMarkdown: (
     mediaFileIdsToClipIds: Record<MediaFileId, Array<ClipId | undefined>>
   ) => ({
-    type: ActionType.exportMarkdown,
+    type: KnowclipActionType.exportMarkdown,
     mediaFileIdsToClipIds,
   }),
 
   detectSilenceRequest: () => ({
-    type: ActionType.detectSilenceRequest,
+    type: KnowclipActionType.detectSilenceRequest,
   }),
   detectSilence: () => ({
-    type: ActionType.detectSilence,
+    type: KnowclipActionType.detectSilence,
   }),
 
   deleteAllCurrentFileClipsRequest: () => ({
-    type: ActionType.deleteAllCurrentFileClipsRequest,
+    type: KnowclipActionType.deleteAllCurrentFileClipsRequest,
   }),
 
   setAllTags: (tagsToClipIds: { [tag: string]: Array<ClipId> }) => ({
-    type: ActionType.setAllTags,
+    type: KnowclipActionType.setAllTags,
     tagsToClipIds,
   }),
 
@@ -123,30 +116,30 @@ const appActions = defineActionCreators({
     tags?: string[]
     includeStill?: boolean
   }) => ({
-    type: ActionType.setDefaultClipSpecs,
+    type: KnowclipActionType.setDefaultClipSpecs,
     tags,
     includeStill,
   }),
 
   setProgress: (progress: ProgressInfo | null) => ({
-    type: ActionType.setProgress,
+    type: KnowclipActionType.setProgress,
     progress,
   }),
 
   startEditingCards: () => ({
-    type: ActionType.startEditingCards,
+    type: KnowclipActionType.startEditingCards,
   }),
 
   stopEditingCards: () => ({
-    type: ActionType.stopEditingCards,
+    type: KnowclipActionType.stopEditingCards,
   }),
 
   openDictionaryPopover: () => ({
-    type: ActionType.openDictionaryPopover,
+    type: KnowclipActionType.openDictionaryPopover,
   }),
 
   closeDictionaryPopover: () => ({
-    type: ActionType.closeDictionaryPopover,
+    type: KnowclipActionType.closeDictionaryPopover,
   }),
 
   newCardFromSubtitlesRequest: (
@@ -156,12 +149,12 @@ const appActions = defineActionCreators({
     clozeDeletion?: ClozeDeletion,
     startEditing: boolean = false
   ) => ({
-    type: ActionType.newCardFromSubtitlesRequest,
+    type: KnowclipActionType.newCardFromSubtitlesRequest,
     linkedSubtitlesChunkSelection,
     clozeDeletion,
     startEditing,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 
 const baseActions = {
   ...appActions,
@@ -175,7 +168,8 @@ const baseActions = {
   ...dictionariesActions,
   ...sessionActions,
   ...settingsActions,
-}
+} satisfies KnowclipActionCreators
+
 const compositeActions = {
   ...compositeClipsActions,
   ...compositeSnackbarActions,
@@ -185,19 +179,7 @@ const compositeActions = {
   ...compositeDictionariesActions,
 }
 
-export const actions = validateActionTypes({
+export const actions = {
   ...baseActions,
   ...compositeActions,
-})
-
-/** ensure no unused action types */
-function validateActionTypes<
-  ActionCreators extends {
-    [N in ActionCreatorNameOf<ActionType>]: (
-      ...args: any[]
-    ) => ActionOf<ActionCreatorNamesToTypes[N]>
-  },
-  ActionCreatorNamesToTypes extends typeof ActionType
->(actions: ActionCreators): ActionCreators {
-  return actions
-}
+} satisfies KnowclipActionCreators

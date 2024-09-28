@@ -1,7 +1,7 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 
-export const dialogActions = defineActionCreators({
+export const dialogActions = {
   enqueueDialog: (dialog: DialogData, skipQueue: boolean = false) => ({
     type: A.enqueueDialog,
     dialog,
@@ -11,7 +11,7 @@ export const dialogActions = defineActionCreators({
   closeDialog: () => ({
     type: A.closeDialog,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset
 
 const confirmationDialog = (
   message: string,

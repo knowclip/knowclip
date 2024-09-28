@@ -101,7 +101,9 @@ const openFileFailure: AppEpic = (action$, state$, effects) =>
     mergeMap((action) => {
       const openFailureHandler = fileEventHandlers[action.file.type].openFailure
 
-      console.error(action.errorMessage || 'Could not open file:')
+      console.error(
+        `Could not open ${action.file.type}: ${action.errorMessage}`
+      )
       console.log(action)
 
       const file =

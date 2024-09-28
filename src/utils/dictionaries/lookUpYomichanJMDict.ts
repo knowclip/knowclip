@@ -13,7 +13,7 @@ export async function lookUpYomichanJMDict(
   text: string
 ): Promise<TextTokensTranslations> {
   const dexie = getDexieDb()
-  const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
+  const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text, 12)
 
   const allLookupTokens = Array.from(allTokens, (token) => [
     token,

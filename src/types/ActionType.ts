@@ -1,4 +1,4 @@
-const enum ActionType {
+const enum KnowclipActionType {
   undo = 'UNDO',
   redo = 'REDO',
   setCurrentFile = 'SET_CURRENT_FILE',
@@ -87,4 +87,4 @@ const enum ActionType {
   startDictionaryImport = 'START_DICTIONARY_IMPORT',
 }
 
-export default ActionType
+export default KnowclipActionType

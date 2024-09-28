@@ -1,7 +1,7 @@
 import A from '../types/ActionType'
-import { defineActionCreators } from './defineActionCreators'
+import { KnowclipActionCreatorsSubset } from '.'
 
-export const waveformActions = defineActionCreators({
+export const waveformActions = {
   setCursorPosition: (x: number) => ({
     type: A.setCursorPosition,
     x,
@@ -11,4 +11,4 @@ export const waveformActions = defineActionCreators({
     type: A.generateWaveformImages,
     waveformPngs,
   }),
-})
+} satisfies KnowclipActionCreatorsSubset

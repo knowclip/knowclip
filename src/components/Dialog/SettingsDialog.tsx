@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from 'react'
+import React, { useCallback, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Dialog,
@@ -39,7 +39,9 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
     dictionaryFiles: selectors.getOpenDictionaryFiles(state),
   }))
 
-  const { settings, dispatchLocal } = useLocalSettingsReducer()
+  const { settings, dispatchLocal } = useLocalSettingsReducer({
+    listenToUpstreamUpdates: false,
+  })
   const addAssetsDirectories = useCallback(async () => {
     const paths = await showOpenDirectoriesDialog()
     if (!paths) return
@@ -244,12 +246,23 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
   )
 }
 
-export function useLocalSettingsReducer() {
+export function useLocalSettingsReducer({
+  listenToUpstreamUpdates,
+}: {
+  listenToUpstreamUpdates: boolean
+}) {
   const { originalSettingsState } = useSelector((state: AppState) => ({
     originalSettingsState: state.settings,
   }))
 
   const [settings, dispatchLocal] = useReducer(reducer, originalSettingsState)
+
+  useEffect(() => {
+    if (listenToUpstreamUpdates) {
+      dispatchLocal(actions.overrideSettings(originalSettingsState))
+    }
+  }, [originalSettingsState, listenToUpstreamUpdates])
+
   return {
     settings,
     dispatchLocal,
