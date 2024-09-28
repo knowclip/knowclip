@@ -129,7 +129,7 @@
     "@types/uuid": "^9.0.1",
     "@types/wanakana": "^4.0.3",
     "@types/yauzl": "^2.10.3",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
     "chromedriver": "^126.0.0",
