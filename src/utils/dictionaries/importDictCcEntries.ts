@@ -22,7 +22,7 @@ export async function importDictCcEntries(
       if (!searchTokens.length) continue
 
       const searchStems = getGermanDifferingStems(head)
-      const grammTags = [...head.matchAll(/\{.+?}/g)] || []
+      const grammTags = [...head.matchAll(/\{.+?}/g)]
 
       if (searchTokens.length !== searchStems.length) {
         console.error('mismatch')

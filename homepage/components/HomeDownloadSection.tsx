@@ -333,7 +333,7 @@ const PostDownloadMessage = (_: { os: string }) => (
   </>
 )
 
-const PatreonLink = ({ children }: PropsWithChildren<{}>) => (
+const PatreonLink = ({ children }: PropsWithChildren) => (
   <A href={PATREON_URL} className={css.link}>
     {children}
   </A>
