@@ -135,7 +135,7 @@
     "chromedriver": "^126.0.0",
     "electron": "31.1.0",
     "electron-builder": "^24.9.1",
-    "electron-vite": "^1.0.22",
+    "electron-vite": "^2.3.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
