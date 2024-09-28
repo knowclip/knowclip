@@ -10,7 +10,6 @@ import { getWaveformPng } from './utils/getWaveform'
 import { coerceMp3ToConstantBitrate as getConstantBitrateMediaPath } from './utils/constantBitrateMp3'
 import { nowUtcTimestamp, uuid } from './utils/sideEffects'
 import { getDexieDb } from './utils/dictionariesDatabase'
-import { parseDictionary } from './utils/dictionaries/parseAndImportDictionary'
 import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
@@ -41,7 +40,6 @@ const dependencies = {
   uuid,
   getDexieDb,
 
-  parseAndImportDictionary: parseDictionary,
   fromIpcRendererEvent: <T>(eventName: string) =>
     fromEvent<IpcRendererEvent<T>>(window, `ipc:${eventName}`),
   sendToMainProcess,

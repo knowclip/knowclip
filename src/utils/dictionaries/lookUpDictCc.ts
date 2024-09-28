@@ -109,6 +109,12 @@ export async function lookUpDictCc(
     const { matchedTokenText } = result.translatedTokens[0]
     const lowercaseMatchedTokenText = matchedTokenText.toLowerCase()
     result.translatedTokens[0].candidates.sort((a, b) => {
+      const deprioritizeObsolete = sortResult(
+        !(a.entry.tags && a.entry.tags.includes('[obs.]')),
+        !(b.entry.tags && b.entry.tags.includes('[obs.]'))
+      )
+      if (deprioritizeObsolete) return deprioritizeObsolete
+
       const deprioritizeFictionTitles = sortResult(
         !(a.entry.tags && a.entry.tags.includes('[F]')),
         !(b.entry.tags && b.entry.tags.includes('[F]'))

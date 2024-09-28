@@ -1,6 +1,5 @@
 import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import App from '../components/App'
@@ -21,7 +20,6 @@ window.electronApi.listenToIpcRendererMessages(
       message,
       payload
     )
-    console.log('message sent', message, event)
     window.dispatchEvent(event)
   }
 )

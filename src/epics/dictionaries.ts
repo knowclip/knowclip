@@ -5,10 +5,9 @@ import {
   filter,
   mergeMap,
   takeUntil,
-  tap,
 } from 'rxjs/operators'
 import A from '../types/ActionType'
-import { ActionOf, actions } from '../actions'
+import { actions } from '../actions'
 import * as s from '../selectors'
 import {
   deleteDictionary,
@@ -16,10 +15,12 @@ import {
   resetDictionariesDatabase,
 } from '../utils/dictionariesDatabase'
 import { getFileFilters } from '../utils/files'
-import { concat, EMPTY, from, of } from 'rxjs'
+import { concat, from, of } from 'rxjs'
 import { RehydrateAction } from 'redux-persist'
-import { importDictionaryEntries } from '../utils/dictionaries/parseYomichanZip'
-import { ImportProgressPayload } from '../utils/dictionaries/requestParseYomichanDictionary'
+import { importYomichanEntries } from '../utils/dictionaries/importYomichanEntries'
+import { ImportProgressPayload } from '../utils/dictionaries/openDictionaryZip'
+import { importCedictEntries } from '../utils/dictionaries/importCeDictEntries'
+import { importDictCcEntries } from '../utils/dictionaries/importDictCcEntries'
 
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -86,92 +87,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
 const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.startDictionaryImport as const),
-    filter((action) => action.file.dictionaryType !== 'YomichanDictionary'),
     mergeMap(({ file, filePath }) => {
-      return concat(
-        from([
-          actions.setProgress({
-            percentage: 0,
-            message: 'Import in progress.',
-          }),
-          actions.addFile(file, filePath),
-        ]),
-        from(effects.parseAndImportDictionary(file, filePath)).pipe(
-          mergeMap((obs) =>
-            obs.pipe(
-              mergeMap((decimal) => {
-                const newPercentage = Math.round(decimal * 100)
-                const { progress } = state$.value.session
-                if (progress && progress.percentage !== newPercentage)
-                  return of(
-                    actions.setProgress({
-                      percentage: newPercentage,
-                      message: 'Import in progress',
-                    })
-                  )
-
-                return EMPTY
-              })
-            )
-          )
-        ),
-        from([
-          actions.finishDictionaryImport(file.id),
-          actions.openFileRequest(file, filePath),
-          actions.setProgress(null),
-          actions.addActiveDictionary(file.id, file.dictionaryType),
-          actions.simpleMessageSnackbar(
-            `Mouse over flashcard text and press the 'D' key to look up words.`,
-            null
-          ),
-        ])
-      ).pipe(
-        catchError((err) => {
-          console.error(err)
-
-          return from([
-            actions.openFileFailure(file, filePath, String(err)),
-            actions.simpleMessageSnackbar(
-              `There was a problem importing this dictionary file: ${err}`
-            ),
-            // happens within deleteImportedDictionary:
-            // actions.setProgress(null),
-            actions.deleteImportedDictionary(file),
-          ])
-        })
-      )
-    })
-  )
-
-const startYomichanImportEpic: AppEpic = (action$, state$, effects) =>
-  action$.pipe(
-    ofType(A.startDictionaryImport as const),
-    filter(
-      (
-        action
-      ): action is ActionOf<A.startDictionaryImport> & {
-        file: { dictionaryType: 'YomichanDictionary' }
-      } => action.file.dictionaryType === 'YomichanDictionary'
-    ),
-    mergeMap(({ file, filePath }) => {
-      const importProgressEvents = effects
-        .fromIpcRendererEvent<ImportProgressPayload>(
-          'dictionary-import-progress'
-        )
-        .pipe(
-          tap((event) => {
-            console.log('dictionary-import-progress', event)
-          })
-        )
-
-      const parseEndEvents = effects
-        .fromIpcRendererEvent('dictionary-parse-end')
-        .pipe(
-          tap((event) => {
-            console.log('dictionary-parse-end', event)
-          })
-        )
-
       return concat(
         from([
           actions.setProgress({
@@ -193,18 +109,22 @@ const startYomichanImportEpic: AppEpic = (action$, state$, effects) =>
                 `Problem opening dictionary file: ${openResult.error}`
               )
             }
-            return importProgressEvents.pipe(
-              takeUntil(parseEndEvents),
-              concatMap(async (event) => {
-                const { progressPercentage, message, data } = event.payload
-                if (data) await importDictionaryEntries(data, file)
+            return effects
+              .fromIpcRendererEvent<ImportProgressPayload<typeof file>>(
+                'dictionary-import-progress'
+              )
+              .pipe(
+                takeUntil(effects.fromIpcRendererEvent('dictionary-parse-end')),
+                concatMap(async (event) => {
+                  const { progressPercentage, message, data } = event.payload
+                  if (data) await importDictionaryEntries(file, data)
 
-                return actions.setProgress({
-                  percentage: progressPercentage,
-                  message: message,
+                  return actions.setProgress({
+                    percentage: progressPercentage,
+                    message: message,
+                  })
                 })
-              })
-            )
+              )
           })
         ),
         from([
@@ -308,7 +228,17 @@ export default combineEpics(
   initializeDictionaries,
   importDictionaryRequestEpic,
   startImportEpic,
-  startYomichanImportEpic,
   deleteDatabaseEpic,
   deleteImportedDictionaryEpic
 )
+
+function importDictionaryEntries(file: DictionaryFile, data: string) {
+  switch (file.dictionaryType) {
+    case 'YomichanDictionary':
+      return importYomichanEntries(data, file)
+    case 'CEDictDictionary':
+      return importCedictEntries(data, file)
+    case 'DictCCDictionary':
+      return importDictCcEntries(data, file)
+  }
+}

@@ -10,7 +10,7 @@ import {
 } from 'electron'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { requestParseYomichanDictionary } from './utils/dictionaries/requestParseYomichanDictionary'
+import { requestParseDictionary } from './utils/dictionaries/requestParseDictionary'
 
 export const getMessageResponders = (
   mainWindow: BrowserWindow,
@@ -113,8 +113,8 @@ export const getMessageResponders = (
     const openProject = submenu.getMenuItemById('Open project')
     if (openProject) openProject.enabled = !projectOpened
   },
-  openDictionaryFile(file: YomichanDictionary, filePath: string) {
-    return requestParseYomichanDictionary(file, filePath, mainWindow)
+  openDictionaryFile(file: DictionaryFile, filePath: string) {
+    return requestParseDictionary(file, filePath, mainWindow)
   },
 })
 

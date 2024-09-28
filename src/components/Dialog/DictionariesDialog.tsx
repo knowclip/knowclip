@@ -28,7 +28,9 @@ import { dictionariesDialog$ as $ } from './DictionariesDialog.testLabels'
 
 const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
   const dispatch = useDispatch()
-  const { settings, dispatchLocal } = useLocalSettingsReducer()
+  const { settings, dispatchLocal } = useLocalSettingsReducer({
+    listenToUpstreamUpdates: true,
+  })
   const closeAndSaveSettings = useCallback(() => {
     dispatch(r.closeDialog())
     dispatch(r.overrideSettings(settings))
@@ -98,6 +100,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
       ),
     [dispatchLocal, settings.activeDictionaries]
   )
+
   return (
     <Dialog open={open} className={$.container}>
       <DialogContent>
