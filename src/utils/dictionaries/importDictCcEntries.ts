@@ -5,17 +5,13 @@ import { getDexieDb } from '../dictionariesDatabase'
 import { MAX_GERMAN_SEARCH_TOKENS_COUNT } from './lookUpDictCc'
 
 export async function importDictCcEntries(
-  // context: { nextChunkStart: string; buffer: Omit<LexiconEntry, 'key'>[] },
   data: string,
   file: DictCCDictionary
 ) {
   const entries: Omit<LexiconEntry, 'key'>[] = []
 
-  // const { nextChunkStart, buffer } = context
-  // const lines = (nextChunkStart + data.toString()).split(/[\n\r]+/)
   const lines = data.trim().split(/[\n\r]+/)
   const lastLineIndex = lines.length - 1
-  // context.nextChunkStart = lines[lastLineIndex]
   for (let i = 0; i < lastLineIndex; i++) {
     const line = lines[i]
     if (line && !line.startsWith('#') && i !== lastLineIndex) {
@@ -61,10 +57,6 @@ export async function importDictCcEntries(
       })
     }
   }
-  // if (buffer.length >= 2000) {
-  //   const oldBuffer = buffer
-  //   context.buffer = []
 
   await getDexieDb().table(getTableName(file.dictionaryType)).bulkAdd(entries)
-  // }
 }
