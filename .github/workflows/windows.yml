@@ -2,7 +2,7 @@ name: Windows Node CI
 
 on:
   push:
-      paths-ignore:
+    paths-ignore:
       - 'homepage/**'
 
 jobs:
@@ -14,55 +14,53 @@ jobs:
         node-version: [20.14.0]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: integration test
-      run: |
-        npm ci
-        npm run integration:win -- "sharedProject"
-      env:
-        VITEST: true
-        APPVEYOR: true
-    - name: Upload test screenshots
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-screenshots
-        path: screenshots
-    - name: Upload logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: "*.log"
-        path: logs
-    - name: build
-      run: |
-        npm run dist:appveyor -- --win
-      env:
-        APPVEYOR: true
-        CI: false
-    - name: Upload test screenshots
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-screenshots
-        path: screenshots
-    - name: Upload build artifacts
-      if: "!startsWith(github.ref, 'refs/tags/')"
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: dist/Knowclip_*
-    - name: Release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        draft: true
-        files: dist/Knowclip_*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: integration test
+        run: |
+          npm ci
+          npm run integration:win -- "sharedProject"
+        env:
+          VITEST: true
+          APPVEYOR: true
+          VITE_BUILD_NUMBER: ${{ github.run_number }}_${{ github.run_id }}_${{ github.run_attempt }}
+      - name: Upload test screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: screenshots
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: '*.log'
+          path: logs
+      - name: build
+        run: |
+          npm run dist:appveyor -- --win
+        env:
+          APPVEYOR: true
+          CI: false
+      - name: Upload test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: screenshots
+      - name: Upload build artifacts
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/Knowclip_*
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: dist/Knowclip_*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

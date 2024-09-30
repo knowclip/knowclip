@@ -106,7 +106,7 @@ const Main = () => {
   }, [])
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
-  const waveform = useWaveform(getWaveformItem, CLIPWAVE_ID)
+  const waveform = useWaveform({ getItemFn: getWaveformItem, id: CLIPWAVE_ID })
   const { onTimeUpdate } = waveform
   const { resetWaveformState } = waveform.actions
 
@@ -305,6 +305,7 @@ const Main = () => {
             WAVEFORM_HEIGHT +
             subsBases.linkedTrackIds.length * SUBTITLES_CHUNK_HEIGHT
           }
+          style={{ background: 'gray', alignSelf: 'flex-start', width: '100%' }}
         />
       ) : (
         <div
