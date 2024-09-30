@@ -9,13 +9,12 @@ import settings from './settings'
 import fileAvailabilities from './fileAvailabilities'
 import files from './files'
 import { PersistConfig, createTransform, persistReducer } from 'redux-persist'
-import { createElectronStorage } from 'preloaded/reduxPersistElectronStorage'
 import { resetFileAvailabilities } from '../utils/statePersistence'
 import A from '../types/ActionType'
 import { KnowclipAction } from '../actions'
 import KnowclipActionType from '../types/ActionType'
 
-const storage = createElectronStorage()
+const storage = window.electronApi.createElectronStorage()
 const whitelist: (keyof FilesState)[] = ['ProjectFile', 'Dictionary']
 const filesPersistConfig: PersistConfig<
   FilesState,

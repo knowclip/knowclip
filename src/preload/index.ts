@@ -1,29 +1,18 @@
 import { contextBridge, ipcRenderer } from 'electron'
+
+console.log('Beginning preload')
+
+import { init as initSentry } from '@sentry/electron'
+import createElectronStorage from 'redux-persist-electron-storage'
 import {
   setUpMocks,
   listenToTestIpcEvents,
   listenToLogPersistedDataEvents,
 } from '../node/setUpMocks'
-import * as electron from '../node/electron'
+import * as electron from 'electron'
 import { sendToMainProcess } from '../node/sendToMainProcess'
-import { initSentry } from '../node/initSentry'
-import { clipAudio } from '../node/clipAudio'
-import { createWaveformPng } from '../node/createWaveformPng'
-import * as getVideoStill from '../node/getVideoStill'
-import * as os from '../node/os'
-import * as fs from '../node/fs'
-import * as path from '../node/path'
-import * as fsExtra from '../node/fsExtra'
 import * as ffmpeg from '../node/ffmpeg'
-import * as tempy from '../node/tempy'
-import * as ajv from '../node/ajv'
-import * as yauzl from '../node/yauzl'
-import * as subtitle from '../node/subtitle'
-import * as subsrt from '../node/subsrt'
-import { processNoteMedia } from '../node/processNoteMedia'
-import * as writeToApkg from '../node/writeToApkg'
-import { createElectronStorage } from '../node/reduxPersistElectronStorage'
-import {
+import type {
   MessageHandlerResult,
   MessageResponse,
   MessageToMain,
@@ -44,26 +33,13 @@ console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
 
 const electronApi = {
-  electron,
-  initSentry,
-  createElectronStorage,
-  sendToMainProcess,
-  setUpMocks,
-  os,
-  path,
-  fs,
-  fsExtra,
-  tempy,
-  ajv,
-  ffmpeg,
-  yauzl,
-  subtitle,
-  subsrt,
-  processNoteMedia,
-  getVideoStill,
-  clipAudio,
-  createWaveformPng,
-  writeToApkg,
+  platform: process.platform,
+  openExternal: electron.shell.openExternal,
+  initSentry: initSentry,
+  createElectronStorage: createElectronStorage,
+  sendToMainProcess: sendToMainProcess,
+  setUpMocks: setUpMocks,
+  sendClosedSignal: () => electron.ipcRenderer.send('closed'),
   env: {
     VITEST: env.VITEST,
     BUILD_NUMBER: env.BUILD_NUMBER,
@@ -84,6 +60,32 @@ const electronApi = {
   listenToTestIpcEvents,
   listenToLogPersistedDataEvents,
   listenToIpcRendererMessages,
+  writeTextFile: (path: string, data: string) => {
+    sendToMainProcess({
+      type: 'writeTextFile',
+      args: [path, data],
+    })
+  },
+  logPersistedDataSnapshot: (
+    testId: string,
+    directories: Record<string, string>,
+    state: AppState
+  ) => {
+    sendToMainProcess({
+      type: 'logPersistedDataSnapshot',
+      args: [testId, directories, state],
+    })
+  },
+  writeMocksLog: (
+    testId: string,
+    moduleId: string,
+    logged: { [key: string]: any[] }
+  ) => {
+    sendToMainProcess({
+      type: 'writeMocksLog',
+      args: [testId, moduleId, logged],
+    })
+  },
 }
 
 console.log('preloading')
@@ -92,12 +94,14 @@ sendToMainProcess({
   type: 'getFfmpegAndFfprobePath',
   args: [],
 }).then((getPaths) => {
-  if (getPaths.error) {
-    console.error(getPaths.error)
+  if (getPaths.errors) {
+    console.error(getPaths.errors)
     throw new Error('Problem finding ffmpeg and ffprobe paths.')
+  } else {
+    console.log('setting ffprobe paths', getPaths.value)
   }
-  ffmpeg.ffmpeg.setFfmpegPath(getPaths.result.ffmpeg)
-  ffmpeg.ffmpeg.setFfprobePath(getPaths.result.ffprobe)
+  ffmpeg.ffmpeg.setFfmpegPath(getPaths.value.ffmpeg)
+  ffmpeg.ffmpeg.setFfprobePath(getPaths.value.ffprobe)
 })
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)

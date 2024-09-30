@@ -86,27 +86,32 @@ export const readMediaFile = async (
   return { value: file }
 }
 
-export function writeMediaSubtitlesToVtt(
+export async function writeMediaSubtitlesToVtt(
   mediaFilePath: string,
   streamIndex: number,
   outputFilePath: string
-): Promise<string | null> {
-  return new Promise((res, rej) =>
-    ffmpeg(mediaFilePath)
-      .outputOptions(`-map 0:${streamIndex}`)
-      .output(outputFilePath)
-      .on('end', () => {
-        res(outputFilePath)
-      })
-      .on('error', (err) => {
-        console.error(
-          `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
-          err
-        )
-        rej(err)
-      })
-      .run()
-  )
+): AsyncResult<string> {
+  try {
+    const vttFilepath: string = await new Promise((res, rej) =>
+      ffmpeg(mediaFilePath)
+        .outputOptions(`-map 0:${streamIndex}`)
+        .output(outputFilePath)
+        .on('end', () => {
+          res(outputFilePath)
+        })
+        .on('error', (err) => {
+          console.error(
+            `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
+            err
+          )
+          rej(err)
+        })
+        .run()
+    )
+    return { value: vttFilepath }
+  } catch (error) {
+    return { errors: [String(error)] }
+  }
 }
 
 export const convertAssToVtt = (filePath: string, vttFilePath: string) =>

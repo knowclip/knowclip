@@ -19,13 +19,20 @@ export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const chromedriverPath = require(join(
+const chromedriverPath = join(
   rootDir,
   'node_modules',
-  'chromedriver',
-  'lib',
+  'electron-chromedriver',
+  'bin',
   'chromedriver'
-)).path
+)
+
+function verifyChromeDriverPath() {
+  if (!existsSync(chromedriverPath)) {
+    throw new Error(`chromedriver not found at ${chromedriverPath}.'?`)
+  }
+}
+verifyChromeDriverPath()
 
 export interface IntegrationTestContext {
   testId: string
@@ -111,10 +118,10 @@ export async function startApp(
   context.setup = setup
 
   const startupStatus = await app.startupStatus
-  if (startupStatus.error) {
-    console.error(startupStatus.error)
+  if (startupStatus.errors) {
+    console.error(startupStatus.errors)
     throw new Error(
-      `Problem starting test driver: ${startupStatus.error.message}`
+      `Problem starting test driver: ${startupStatus.errors.join('; ')}`
     )
   }
 

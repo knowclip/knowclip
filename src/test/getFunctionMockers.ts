@@ -39,10 +39,12 @@ export default function getFunctionMockers<M extends ModuleLike>(
     mocks: Partial<{ [K in keyof M]: ReturnType<M[K]>[] }>
   ) {
     const startupStatus = await app.startupStatus
-    if (startupStatus.error) {
-      console.error(startupStatus.error)
+    if (startupStatus.errors) {
+      console.error(startupStatus.errors)
       throw new Error(
-        `Can't mock functions because test driver failed to start: ${startupStatus.error.message}`
+        `Can't mock functions because test driver failed to start: ${startupStatus.errors.join(
+          '; '
+        )}`
       )
     }
 

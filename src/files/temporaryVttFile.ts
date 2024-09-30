@@ -1,10 +1,8 @@
 import r from '../redux'
-import {
-  newExternalSubtitlesTrack,
-  newEmbeddedSubtitlesTrack,
-  validateBeforeOpenFileAction,
-} from '../utils/subtitles'
+import { newEmbeddedSubtitlesTrack } from '../utils/newSubtitlesTrack'
+import { newExternalSubtitlesTrack } from '../utils/newSubtitlesTrack'
 import { FileEventHandlers } from './eventHandlers'
+import { sanitizeSubtitles } from './sanitizeSubtitles'
 
 const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
   openRequest: async (file, filePath, state, effects) => {
@@ -16,13 +14,36 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
       return [await r.openFileFailure(file, null, null)]
 
-    const vttFilePath = await effects.getSubtitlesFilePath(
+    const vttFilePathResult = await effects.getSubtitlesFilePath(
       state,
       parentFile.filePath,
       file
     )
-
-    return await validateBeforeOpenFileAction(state, vttFilePath, file)
+    if (vttFilePathResult.errors) {
+      return [
+        await r.openFileFailure(
+          file,
+          null,
+          vttFilePathResult.errors.join('; ')
+        ),
+      ]
+    }
+    const validateSubtitlesResult =
+      await effects.validateSubtitleFileBeforeOpen(
+        state,
+        vttFilePathResult.value,
+        file
+      )
+    if (validateSubtitlesResult.errors) {
+      return [
+        await r.openFileFailure(
+          file,
+          null,
+          validateSubtitlesResult.errors.join('; ')
+        ),
+      ]
+    }
+    return validateSubtitlesResult.value
   },
   openSuccess: [
     async (validatedFile, filePath, state, effects) => {
@@ -35,7 +56,7 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
 
       if (!(source && source.filePath && sourceFile)) return []
 
-      const chunks = await effects.getSubtitlesFromFile(state, filePath)
+      const chunksResult = await effects.getSubtitlesFromFile(state, filePath)
 
       if (validatedFile.parentType === 'MediaFile') {
         if (r.getCurrentFileId(state) !== source.id) return []
@@ -46,16 +67,17 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
           validatedFile.parentId
         )
 
-        if ('error' in chunks) {
+        if (chunksResult.errors) {
           return [
             r.simpleMessageSnackbar(
               `There was a problem reading subtitles from ${
                 mediaFile ? mediaFile.name : 'media file'
-              }: ${chunks.error}`
+              }: ${chunksResult.errors.join('; ')}`
             ),
           ]
         }
 
+        const chunks = sanitizeSubtitles(chunksResult.value)
         const track = newEmbeddedSubtitlesTrack(validatedFile.id, chunks)
 
         return [
@@ -79,12 +101,12 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
         'ExternalSubtitlesFile',
         validatedFile.parentId
       )
-      if ('error' in chunks) {
+      if (chunksResult.errors) {
         return [
           r.simpleMessageSnackbar(
             `There was a problem reading subtitles from ${
               external ? external.name : '[external subtitles file not found]'
-            }: ${chunks.error}`
+            }: ${chunksResult.errors.join('; ')}`
           ),
         ]
       }
@@ -94,6 +116,7 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
         )
         return [r.openFileFailure(validatedFile, null, null)]
       }
+      const chunks = sanitizeSubtitles(chunksResult.value)
       const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
       const mediaFile = r.getFile<MediaFile>(
         state,
@@ -142,7 +165,22 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               source.filePath,
               file
             )
-            return await validateBeforeOpenFileAction(state, tmpFilePath, file)
+            if (tmpFilePath.errors) {
+              return [
+                r.openFileFailure(file, null, tmpFilePath.errors.join('; ')),
+              ]
+            }
+            const validateResult = await effects.validateSubtitleFileBeforeOpen(
+              state,
+              tmpFilePath.value,
+              file
+            )
+            if (validateResult.errors) {
+              return [
+                r.openFileFailure(file, null, validateResult.errors.join('; ')),
+              ]
+            }
+            return validateResult.value
           }
           case 'ExternalSubtitlesFile': {
             const tmpFilePath = await effects.getSubtitlesFilePath(
@@ -150,7 +188,22 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               source.filePath,
               file
             )
-            return await validateBeforeOpenFileAction(state, tmpFilePath, file)
+            if (tmpFilePath.errors) {
+              return [
+                r.openFileFailure(file, null, tmpFilePath.errors.join('; ')),
+              ]
+            }
+            const validateResult = await effects.validateSubtitleFileBeforeOpen(
+              state,
+              tmpFilePath.value,
+              file
+            )
+            if (validateResult.errors) {
+              return [
+                r.openFileFailure(file, null, validateResult.errors.join('; ')),
+              ]
+            }
+            return validateResult.value
           }
         }
       }

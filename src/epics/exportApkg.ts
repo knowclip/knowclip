@@ -17,10 +17,8 @@ import { ofType, combineEpics } from 'redux-observable'
 import { of, EMPTY, from, Observable, fromEvent, defer, merge } from 'rxjs'
 import r from '../redux'
 
-import { getApkgExportData } from '../utils/prepareExport'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import { writeApkgDeck } from 'preloaded/writeToApkg'
 import type { DeckCreationErrorEvent } from '../node/writeToApkg'
 import { ActionOf } from '../actions'
 
@@ -48,35 +46,39 @@ const exportApkgSuccess: AppEpic = (action$) =>
 const exportApkg: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.exportApkgRequest as const),
-    switchMap((exportApkgRequest) => {
+    switchMap(async (exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
 
       const currentProject = r.getCurrentProject(state$.value)
       if (!currentProject)
         return of(r.exportApkgFailure('Could not find project'))
 
-      const exportData = getApkgExportData(
+      const exportResult = await effects.getApkgExportData(
         state$.value,
         currentProject,
-        mediaFileIdsToClipIds,
-        effects.existsSync
+        mediaFileIdsToClipIds
       )
 
-      if ('missingMediaFiles' in exportData) {
+      if (exportResult.errors) {
+        return of(r.exportApkgFailure(`${exportResult.errors}`))
+      }
+
+      if (exportResult.value.type === 'MISSING MEDIA FILES') {
         return getMissingMedia(
-          exportData.missingMediaFiles,
+          exportResult.value.missingMediaFiles,
           action$,
           exportApkgRequest
         )
       }
 
-      return makeApkg(exportData, effects)
-    })
+      return makeApkg(exportResult.value.apkgData, effects)
+    }),
+    switchMap((x) => x)
   )
 
 function makeApkg(
   exportData: ApkgExportData,
-  { showSaveDialog, tmpDirectory }: EpicsDependencies
+  { showSaveDialog, writeApkgDeck }: EpicsDependencies
 ) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
@@ -137,7 +139,7 @@ function makeApkg(
           doOnSubscribe(async () => {
             console.log('subscribed i guess!!', processed)
             await null
-            writeApkgDeck(tmpDirectory(), outputFilePath, exportData)
+            writeApkgDeck(outputFilePath, exportData)
           })
         )
     }),

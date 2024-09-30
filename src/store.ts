@@ -4,7 +4,6 @@ import { persistedUndoableReducer, undoableReducer } from './reducers'
 import epic from './epics'
 import epicsDependencies from './epicsDependencies'
 import { persistStore } from 'redux-persist'
-import { NODE_ENV, VITE_INTEGRATION_DEV, VITEST } from './env'
 
 const reduxDevtoolsExtension = (
   window as unknown as {
@@ -13,6 +12,8 @@ const reduxDevtoolsExtension = (
 ).__REDUX_DEVTOOLS_EXTENSION__
 
 function getStore(initialTestState: Partial<AppState> | undefined) {
+  const { NODE_ENV, VITE_INTEGRATION_DEV, VITEST } = window.electronApi.env
+
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
   })

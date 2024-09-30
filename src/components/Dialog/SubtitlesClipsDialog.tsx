@@ -36,6 +36,7 @@ const MEDIA_FILE_MISSING_MESSAGE = r.simpleMessageSnackbar(
 const SubtitlesClipsDialog = ({
   open,
 }: DialogProps<SubtitlesClipsDialogData>) => {
+  const { platform } = window.electronApi
   const dispatch = useDispatch()
   const {
     currentNoteTypeFields,
@@ -130,7 +131,7 @@ const SubtitlesClipsDialog = ({
     )
     if (!filePaths) return
 
-    dispatch(r.loadNewSubtitlesFile(filePaths[0], currentFileId))
+    dispatch(r.loadNewSubtitlesFile(platform, filePaths[0], currentFileId))
   }, [dispatch, currentFileId])
 
   const { fields, errorText } = state

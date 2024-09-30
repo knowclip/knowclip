@@ -6,7 +6,6 @@ import React, {
   memo,
   useRef,
 } from 'react'
-import { platform } from 'preloaded/os'
 import cn from 'clsx'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
@@ -342,9 +341,8 @@ const clozeHint = (
   </div>
 )
 
-export const getMetaOrCtrlKey =
-  platform() === 'darwin'
-    ? (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.metaKey
-    : (e: KeyboardEvent | React.KeyboardEvent<Element>) => e.ctrlKey
+export const getMetaOrCtrlKey = (
+  e: KeyboardEvent | React.KeyboardEvent<Element>
+) => (window.electronApi.platform === 'darwin' ? e.metaKey : e.ctrlKey)
 
 export default ClozeField

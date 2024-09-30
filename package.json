@@ -4,7 +4,7 @@
   "version": "0.13.1-beta",
   "private": true,
   "engines": {
-    "node": "^20.16.0"
+    "node": "20.16.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -99,6 +99,7 @@
     "dist:win": "npm run electron-vite -- build --mode production && npm run electron-builder",
     "replace-in-files-cli": "replace-in-files",
     "yalc": "yalc",
+    "electron-chromedriver": "electron-chromedriver",
     "husky": "husky"
   },
   "lint-staged": {
@@ -108,7 +109,7 @@
     ]
   },
   "browserslist": [
-    "electron >= 32.0.0"
+    "electron >= 31.0.0"
   ],
   "devDependencies": {
     "@types/archiver": "^6.0.2",
@@ -116,7 +117,7 @@
     "@types/chromedriver": "^81.0.0",
     "@types/fluent-ffmpeg": "^2.1.19",
     "@types/fs-extra": "^11.0.1",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.0.0",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -132,10 +133,10 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "chromedriver": "^128.0.0",
-    "electron": "^32.0.0",
+    "electron": "31.0.0",
     "electron-builder": "^24.9.1",
-    "electron-vite": "^1.0.22",
+    "electron-chromedriver": "^31.0.0",
+    "electron-vite": "^1.0.29",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",

@@ -1,10 +1,5 @@
 import { ipcRenderer } from 'electron'
-import moment from 'moment'
-import { join } from 'path'
-import { promises } from 'fs'
 import { sendToMainProcess } from './sendToMainProcess'
-import { getPersistedDataSnapshot } from '../test/getPersistedDataSnapshot'
-import { writeFileSync } from './fs'
 
 type ModuleLike = { [name: string]: (...args: any) => any }
 
@@ -19,25 +14,16 @@ const mockedModules: Record<
   }
 > = {}
 
-let currentTestId = ''
-
-const now = moment.utc().format()
-const logFilePath = (moduleId: string) =>
-  join(
-    process.cwd(),
-    `${currentTestId && currentTestId + '__'}${moduleId}-mocks-${now}.log`
-  )
-const writeLog = (moduleId: string, logged: { [fnName: string]: any[] }) =>
-  promises.writeFile(logFilePath(moduleId), JSON.stringify(logged, null, 2))
-
+let currentTestId: string = ''
 export function listenToTestIpcEvents() {
   console.log('Going to start listening for IPC test events!!')
 
   ipcRenderer.on('start-test', (e, testId) => {
     currentTestId = testId
+    console.log('Test started', testId)
   })
   ipcRenderer.on('end-test', () => {
-    currentTestId = ''
+    console.log('Test ended', currentTestId)
   })
 
   ipcRenderer.on(
@@ -68,15 +54,11 @@ export function listenToLogPersistedDataEvents(getState: () => AppState) {
   window.document.addEventListener('DOMContentLoaded', () => {
     console.log('listening for log message')
     ipcRenderer.on('log-persisted-data', (e, testId, directories) => {
-      const snapshot = getPersistedDataSnapshot(getState(), testId, directories)
-
-      console.log(snapshot)
-      snapshot.keepTmpFiles()
-      console.log(snapshot.json)
-
-      writeFileSync(
-        join(process.cwd(), testId + '_persistedDataSnapshot.js'),
-        snapshot.json
+      // TODO: test!!
+      window.electronApi.logPersistedDataSnapshot(
+        testId,
+        directories,
+        getState()
       )
     })
   })
@@ -119,7 +101,7 @@ export function setUpMocks<M extends ModuleLike>(
 
       logged[functionName].push(actualReturnValue)
 
-      writeLog(moduleId, logged)
+      window.electronApi.writeMocksLog(currentTestId, moduleId, logged)
 
       return actualReturnValue
     }

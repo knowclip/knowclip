@@ -6,7 +6,7 @@ import {
 } from './eventHandlers'
 import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
 import { updaterGetter } from './updaterGetter'
-import { basename } from 'preloaded/path'
+import { basename } from '../utils/rendererPathHelpers'
 
 export type LexiconEntry = {
   variant: string | null
@@ -71,10 +71,13 @@ export const dictionaryActions: FileEventHandlers<DictionaryFile> = {
   openRequest: async (file, filePath, _state, _effects) => {
     if (file.importComplete) return [r.openFileSuccess(file, filePath)]
 
+    const { platform } = window.electronApi
+
     return [
       r.openFileFailure(file, filePath, null),
       r.promptSnackbar(
         `It appears the import process was interrupted for dictionary file "${basename(
+          platform,
           filePath
         )}". Try removing it from Knowclip in the settings, or resetting the dictionaries database.`,
         [['Dictionary settings', r.dictionariesDialog()]]

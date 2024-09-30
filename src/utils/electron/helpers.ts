@@ -4,19 +4,17 @@ import type {
   MessageBoxOptions,
   MessageBoxReturnValue,
 } from 'electron'
-import { shell } from 'preloaded/electron'
-import { extname } from 'preloaded/path'
-import { sendToMainProcess } from 'preloaded/sendToMainProcess'
+import { extname } from '../../utils/rendererPathHelpers'
 import { pauseMedia } from '../media'
 import type { MessageResponse } from '../../MessageToMain'
 
 const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
-  if (messageResponse.error) {
-    console.error(messageResponse.error)
+  if (messageResponse.errors) {
+    console.error(messageResponse.errors)
     throw new Error('Problem reaching main process.')
   }
 
-  return messageResponse.result
+  return messageResponse.value
 }
 
 const showSaveDialog = (
@@ -27,7 +25,7 @@ const showSaveDialog = (
     pauseMedia()
 
     try {
-      const saveDialog = await sendToMainProcess({
+      const saveDialog = await window.electronApi.sendToMainProcess({
         type: 'showSaveDialog',
         args: [name, extensions],
       })
@@ -35,7 +33,8 @@ const showSaveDialog = (
 
       if (!filePath) return await res(filePath)
 
-      const extension = extname(filePath).replace(/^\./, '')
+      const { platform } = window.electronApi
+      const extension = extname(platform, filePath).replace(/^\./, '')
       const withExtension =
         !extensions.length ||
         extensions.some((ext) => ext.toLowerCase() === extension.toLowerCase())
@@ -55,7 +54,7 @@ const showOpenDialog = (
     pauseMedia()
 
     try {
-      const openDialog = await sendToMainProcess({
+      const openDialog = await window.electronApi.sendToMainProcess({
         type: 'showOpenDialog',
         args: [filters, multiSelections],
       })
@@ -73,7 +72,7 @@ const showOpenDirectoryDialog = (
     pauseMedia()
 
     try {
-      const openDirectoryDialog = await sendToMainProcess({
+      const openDirectoryDialog = await window.electronApi.sendToMainProcess({
         type: 'showOpenDirectoryDialog',
         args: [showHiddenFiles],
       })
@@ -105,7 +104,7 @@ const showOpenDirectoriesDialog = (
 const openInBrowser = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
   pauseMedia()
   e.preventDefault()
-  shell.openExternal((e.target as HTMLAnchorElement).href)
+  window.electronApi.openExternal((e.target as HTMLAnchorElement).href)
 }
 
 const showMessageBox: (
@@ -121,7 +120,7 @@ const showMessageBox: (
   >
 ) => Promise<MessageBoxReturnValue | null> = async (options) => {
   pauseMedia()
-  const messageBox = await sendToMainProcess({
+  const messageBox = await window.electronApi.sendToMainProcess({
     type: 'showMessageBox',
     args: [options],
   })
@@ -129,7 +128,7 @@ const showMessageBox: (
   return result
 }
 
-const openExternal = (url: string) => shell.openExternal(url)
+const openExternal = (url: string) => window.electronApi.openExternal(url)
 
 const helpers = {
   showSaveDialog,

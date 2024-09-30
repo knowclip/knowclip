@@ -8,8 +8,8 @@ import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 
 export const WINDOW_START_DIMENSIONS = {
-  width: 1027,
-  height: 768,
+  width: 1920,
+  height: 1080,
 }
 
 const { isPackaged } = app
@@ -59,6 +59,7 @@ async function createWindow() {
       webSecurity: isPackaged,
       nodeIntegration: false,
       contextIsolation: true,
+      // should be true
       sandbox: false,
       devTools: true,
       preload: path.join(__dirname, '..', 'preload', 'index.js'),

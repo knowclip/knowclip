@@ -104,9 +104,11 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
         ).pipe(
           mergeMap((openResult) => {
             console.log('openResult', openResult)
-            if (openResult.error) {
+            if (openResult.errors) {
               throw new Error(
-                `Problem opening dictionary file: ${openResult.error}`
+                `Problem opening dictionary file: ${openResult.errors.join(
+                  '; '
+                )}`
               )
             }
             return effects

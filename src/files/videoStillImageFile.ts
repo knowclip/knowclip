@@ -1,5 +1,4 @@
 import r from '../redux'
-import { getMidpoint } from '../utils/prepareExport'
 import { FileEventHandlers } from './eventHandlers'
 import { msToSeconds } from 'clipwave'
 
@@ -117,3 +116,6 @@ const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
   }
 
 export default videoStillImageFileEventHandlers
+
+export const getMidpoint = (start: number, end: number) =>
+  start + Math.round((end - start) / 2)

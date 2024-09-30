@@ -1,9 +1,10 @@
 import A from '../types/ActionType'
-import { basename } from 'preloaded/path'
 import { filesActions } from './files'
 import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { KnowclipActionCreatorsSubset } from '.'
+import { basename } from '../utils/rendererPathHelpers'
+import type { ElectronApi } from '../preload'
 
 const openFileRequest = filesActions.openFileRequest
 
@@ -64,13 +65,17 @@ const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
     updatePayload: [track],
   })
 
-const loadNewSubtitlesFile = (filePath: string, mediaFileId: MediaFileId) =>
+const loadNewSubtitlesFile = (
+  platform: ElectronApi['platform'],
+  filePath: string,
+  mediaFileId: MediaFileId
+) =>
   openFileRequest(
     {
       type: 'ExternalSubtitlesFile',
       parentId: mediaFileId,
       id: uuid(),
-      name: basename(filePath),
+      name: basename(platform, filePath),
       chunksMetadata: null,
     },
     filePath

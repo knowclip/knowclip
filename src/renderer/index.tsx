@@ -6,10 +6,7 @@ import App from '../components/App'
 
 import getStore from '../store'
 import '../index.css'
-import { initSentry } from 'preloaded/initSentry'
 import ErrorMessage from '../components/ErrorMessage'
-import { VITEST } from '../env'
-import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 import { PersistGate } from 'redux-persist/integration/react'
 import { IpcRendererEvent } from '../preload/IpcRendererEvent'
 
@@ -26,7 +23,7 @@ window.electronApi.listenToIpcRendererMessages(
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'
-initSentry({
+window.electronApi.initSentry({
   dsn: sentryDsn,
   ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
 })
@@ -44,13 +41,21 @@ window.addEventListener('error', (e) => {
   root.render(<ErrorMessage reactError={e} />)
 })
 
+const { VITEST } = window.electronApi.env
+
 if (VITEST)
-  sendToMainProcess({
-    type: 'getPersistedTestState',
-    args: [],
-  }).then(({ result: initialTestState }) => {
-    render(initialTestState)
-  })
+  window.electronApi
+    .sendToMainProcess({
+      type: 'getPersistedTestState',
+      args: [],
+    })
+    .then((initialTestStateResult) => {
+      if (initialTestStateResult.errors) {
+        console.error(initialTestStateResult.errors)
+        throw new Error('Problem getting persisted test state.')
+      }
+      render(initialTestStateResult.value)
+    })
 else render()
 
 function render(initialTestState?: Partial<AppState> | undefined) {

@@ -15,7 +15,6 @@ async function respond<T extends MessageToMainType>(
   const responseHandler = messageHandlers[message.type]
   // @ts-expect-error arguments guaranteed elsewhere
   const result = responseHandler(...(message.args || []))
-  // @ts-expect-error arguments guaranteed elsewhere
   return await result
 }
 
@@ -39,7 +38,7 @@ export function handleMessages(
         throw new Error(`Unknown message type: ${JSON.stringify(message)}`)
 
       const result = await respond(messageHandlers, message)
-      return { result: await result }
+      return { value: await result }
     } catch (rawError) {
       const error = {
         message:
@@ -49,7 +48,9 @@ export function handleMessages(
         stack: rawError instanceof Error ? rawError.stack : undefined,
         name: rawError instanceof Error ? rawError.name : undefined,
       }
-      return { error }
+      console.error('Error handling message:', message)
+      console.error(error)
+      return { errors: [error.message] }
     }
   }
 

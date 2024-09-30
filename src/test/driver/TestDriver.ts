@@ -157,13 +157,11 @@ export class TestDriver {
       console.log(rawError)
       this.stop()
 
-      const error = {
-        message:
+      return Promise.resolve({
+        errors: [
           rawError instanceof Error ? rawError.message : String(rawError),
-        stack: rawError instanceof Error ? rawError.stack : undefined,
-        name: rawError instanceof Error ? rawError.name : undefined,
-      }
-      return Promise.resolve({ error })
+        ],
+      })
     })
   }
 
@@ -178,11 +176,11 @@ export class TestDriver {
             done(result)
             return result
           })
-          .catch((error) => {
-            console.error('error invoking message', error)
-            done({ error })
-            return { error }
-          }) || done({ error: { message: 'no electronApi found on window' } })
+          .catch((errors) => {
+            console.error('error invoking message', errors)
+            done({ errors })
+            return { errors }
+          }) || done({ errors: ['no electronApi found on window'] })
       )
     }, message)
   }

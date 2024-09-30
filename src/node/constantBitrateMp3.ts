@@ -1,7 +1,7 @@
-import * as tempy from 'preloaded/tempy'
-import { createConstantBitrateMp3 } from 'preloaded/ffmpeg'
-import { extname, basename, join } from 'preloaded/path'
-import { existsSync } from 'preloaded/fs'
+import { createConstantBitrateMp3 } from './ffmpeg'
+import { existsSync } from 'fs'
+import { extname, basename, join } from 'path'
+import { rootTemporaryDirectory } from 'tempy'
 
 export const coerceMp3ToConstantBitrate = (
   path: string,
@@ -15,7 +15,7 @@ export const coerceMp3ToConstantBitrate = (
       return res(oldConstantBitratePath)
 
     const constantBitratePath = join(
-      tempy.rootTemporaryDirectory,
+      rootTemporaryDirectory,
       basename(path, '.mp3') + '.mp4'
     )
 

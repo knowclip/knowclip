@@ -22,7 +22,16 @@ const eventHandlers: FileEventHandlers<ConstantBitrateMp3> = {
       parentFile.filePath,
       null
     )
-    return [r.locateFileSuccess(file, cbrFilePath)]
+    if (cbrFilePath.errors)
+      return [
+        r.openFileFailure(
+          file,
+          _availability.filePath,
+          cbrFilePath.errors.join('; ')
+        ),
+      ]
+
+    return [r.locateFileSuccess(file, cbrFilePath.value)]
   },
 
   locateSuccess: null,

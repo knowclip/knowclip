@@ -1,70 +1,13 @@
-import { parse } from 'yaml'
-import { readFile } from 'preloaded/fs'
-import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
-import { parseFormattedDuration } from './formatTime'
 import {
   ProjectJson,
+  EmbeddedSubtitlesJson,
   MediaJson,
   SubtitlesJson,
-  EmbeddedSubtitlesJson,
 } from '../types/Project'
-import validateProject from './validateProject'
 import { unescapeClozeFields } from './clozeField'
-
-type NormalizedProjectFileData = {
-  project: ProjectFile
-  media: MediaFile[]
-  clips: Clip[]
-  cards: Flashcard[]
-  subtitles: SubtitlesFile[]
-}
-
-export const parseProjectJson = async <F extends FlashcardFields>(
-  filePath: string
-): AsyncResult<ProjectJson<F>> => {
-  try {
-    const docsText = (await readFile(filePath))
-      .split(/(?:^|\r?\n)(?:---|\.\.\.)\r?\n/)
-      .filter((x) => x.trim())
-    const errors: string[] = []
-    const docs = docsText.map((text) => {
-      try {
-        const doc = parse(text, {
-          maxAliasCount: -1,
-        })
-        return doc
-      } catch (err) {
-        console.error(err)
-        errors.push(String(err))
-        return null
-      }
-    })
-
-    if (errors.length) return { errors }
-
-    const [project, ...media] = docs
-
-    const validation = validateProject(project, media)
-
-    if (validation.errors)
-      return {
-        errors: Object.entries(validation.errors).map(
-          ([sectionName, bigErrorMessage]) => {
-            return `Invalid data for ${sectionName}:\n\n${bigErrorMessage}`
-          }
-        ),
-      }
-
-    return {
-      value: {
-        project,
-        media,
-      },
-    }
-  } catch (err) {
-    return { errors: [String(err)] }
-  }
-}
+import { parseFormattedDuration } from './formatTime'
+import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
+import type { NormalizedProjectFileData } from '../node/parseProject'
 
 export const normalizeProjectJson = <F extends FlashcardFields>(
   state: AppState,
@@ -160,7 +103,6 @@ export const normalizeProjectJson = <F extends FlashcardFields>(
     subtitles: media.flatMap(([, , , s]) => s),
   }
 }
-
 const getMediaClipsGetter =
   <F extends FlashcardFields>(
     state: AppState,
@@ -177,7 +119,6 @@ const getMediaCardsGetter =
   ) =>
   () =>
     getMediaCards(state, project, media)
-
 function getMediaClips<F extends FlashcardFields>(
   state: AppState,
   project: ProjectFile,
@@ -229,7 +170,6 @@ function getMediaCards<F extends FlashcardFields>(
         }
   })
 }
-
 function toMediaSubtitlesRelation(s: SubtitlesJson): MediaSubtitlesRelation {
   switch (s.type) {
     case 'Embedded':

@@ -1,4 +1,8 @@
 import { createTheme } from '@mui/material/styles'
-import themeSpecs from '../themeSpecs'
+import getThemeSpecs from '../themeSpecs'
 
-export const theme = createTheme(themeSpecs)
+export const theme = createTheme({
+  ...getThemeSpecs({
+    disableAnimations: Boolean(window.electronApi?.env.VITEST),
+  }),
+})

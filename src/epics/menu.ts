@@ -13,7 +13,6 @@ import rcompare from 'semver/functions/rcompare'
 import gt from 'semver/functions/gt'
 import { REHYDRATE } from 'redux-persist'
 import packageJson from '../../package.json'
-import { BUILD_NUMBER, VITEST } from '../env'
 import KnowclipActionType from '../types/ActionType'
 
 const showSettingsDialog: AppEpic = (
@@ -25,6 +24,8 @@ const showSettingsDialog: AppEpic = (
     filter(() => !state$.value.dialog.queue.some((d) => d.type === 'Settings')),
     map(() => r.settingsDialog())
   )
+
+const { BUILD_NUMBER, VITEST } = window.electronApi.env
 
 const aboutMessage = [
   `Version ${packageJson.version}`,

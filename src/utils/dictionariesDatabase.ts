@@ -1,5 +1,5 @@
 import Dexie, { Database } from 'dexie'
-import { basename } from 'preloaded/path'
+import { basename } from '../utils/rendererPathHelpers'
 import { getTableName, LexiconEntry } from '../files/dictionaryFile'
 import { LETTERS_DIGITS_PLUS } from './dictCc'
 import { lookUpDictCc } from './dictionaries/lookUpDictCc'
@@ -48,11 +48,12 @@ export async function newDictionary(
   dictionaryType: DictionaryFileType,
   filePath: string
 ) {
+  const { platform } = window.electronApi
   const dicProps: Omit<DictionaryFile, 'key'> = {
     type: 'Dictionary',
     dictionaryType,
     id: uuid(),
-    name: basename(filePath),
+    name: basename(platform, filePath),
     importComplete: false,
   }
   const key = await db.table(DICTIONARIES_TABLE).add(dicProps)

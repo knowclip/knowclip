@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron'
+import type { BrowserWindow } from 'electron'
 import { Entry, ZipFile, open } from 'yauzl'
 
 export type ImportProgressPayload<D extends DictionaryFile> = {

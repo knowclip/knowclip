@@ -6,9 +6,6 @@ import A from '../types/ActionType'
 import { KEYS } from '../utils/keyboard'
 import { getMetaOrCtrlKey } from '../components/FlashcardSectionDisplayClozeField'
 import { isTextFieldFocused } from '../utils/isTextFieldFocused'
-import { platform } from 'preloaded/os'
-
-const playPauseForceKey = platform() === 'win32' ? 'ctrlKey' : 'shiftKey'
 
 const keydownEpic: AppEpic = (action$, state$, effects) =>
   fromEvent<KeyboardEvent>(window, 'keydown').pipe(
@@ -32,6 +29,8 @@ const keydownEpic: AppEpic = (action$, state$, effects) =>
         event.preventDefault()
         return of(r.startEditingCards())
       }
+      const playPauseForceKey =
+        window.electronApi.platform === 'win32' ? 'ctrlKey' : 'shiftKey'
 
       if (
         (key === KEYS.space || key === KEYS.process) &&

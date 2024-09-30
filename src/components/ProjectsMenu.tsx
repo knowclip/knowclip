@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import { basename, join, dirname } from 'preloaded/path'
+import { basename, join, dirname } from '../utils/rendererPathHelpers'
 import packageJson from '../../package.json'
 import r from '../redux'
 import { actions } from '../actions'
@@ -31,6 +31,7 @@ const ProjectMenuItem = ({
   availability: FileAvailability
   file?: ProjectFile
 }) => {
+  const { platform } = window.electronApi
   const { anchorEl, open, close, isOpen, anchorCallbackRef } = usePopover()
 
   const dispatch = useDispatch()
@@ -70,8 +71,12 @@ const ProjectMenuItem = ({
                 <span>
                   {availability.filePath
                     ? join(
-                        basename(dirname(availability.filePath)),
-                        basename(availability.filePath)
+                        platform,
+                        basename(
+                          platform,
+                          dirname(platform, availability.filePath)
+                        ),
+                        basename(platform, availability.filePath)
                       )
                     : 'File not found'}
                 </span>

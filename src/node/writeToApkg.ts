@@ -20,11 +20,11 @@ interface AnkiPackage {
 }
 
 export async function writeApkgDeck(
-  tmpDirectory: string,
   outputFilePath: string,
   exportData: ApkgExportData
 ) {
   try {
+    const tmpDirectory = tempy.temporaryDirectory()
     const pkg = new anki.Package()
     const deck = new anki.Deck(exportData.projectId, exportData.deckName)
     const noteModel = new anki.Model(exportData.noteModel)

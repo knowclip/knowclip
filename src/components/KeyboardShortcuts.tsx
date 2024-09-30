@@ -1,32 +1,35 @@
 import React, { useState, useCallback, MouseEventHandler } from 'react'
 import { Card, CardContent } from '@mui/material'
 import css from './KeyboardShortcuts.module.css'
-import { platform } from 'preloaded/os'
 
-const KEYBOARD_SHORTCUTS = {
-  'Play/pause': `${platform() === 'win32' ? 'Ctrl' : 'Shift'} + Space`,
-  'Toggle loop': 'Ctrl + L',
-  'Stop looping': 'Esc',
-  'Select previous': '←',
-  'Select next': '→',
-  'Select previous (while editing)': 'Alt + ←',
-  'Select next (while editing)': 'Alt + →',
-  'Look up word at mouse cursor': 'D',
-  'Close dictionary popover': 'Esc',
-  'Start editing fields': 'E',
-  'Delete clip and card': 'Ctrl + Shift + D',
-  'Stop editing fields': 'Esc',
-  'Start making cloze deletion': 'C',
-  'Stop making cloze deletion': 'Esc',
-  'Save project': 'Cmd + S',
-} as const
+const getKeyboardShortcuts = (platform: Window['electronApi']['platform']) =>
+  ({
+    'Play/pause': `${platform === 'win32' ? 'Ctrl' : 'Shift'} + Space`,
+    'Toggle loop': 'Ctrl + L',
+    'Stop looping': 'Esc',
+    'Select previous': '←',
+    'Select next': '→',
+    'Select previous (while editing)': 'Alt + ←',
+    'Select next (while editing)': 'Alt + →',
+    'Look up word at mouse cursor': 'D',
+    'Close dictionary popover': 'Esc',
+    'Start editing fields': 'E',
+    'Delete clip and card': 'Ctrl + Shift + D',
+    'Stop editing fields': 'Esc',
+    'Start making cloze deletion': 'C',
+    'Stop making cloze deletion': 'Esc',
+    'Save project': 'Cmd + S',
+  } as const)
 
-export function getKeyboardShortcut(action: keyof typeof KEYBOARD_SHORTCUTS) {
-  return KEYBOARD_SHORTCUTS[action].replace('Cmd', CtrlCmd)
+type KeyboardShortcuts = ReturnType<typeof getKeyboardShortcuts>
+
+export function getKeyboardShortcut(action: keyof KeyboardShortcuts) {
+  const platform = window.electronApi.platform
+  const CtrlCmd = platform === 'darwin' ? '⌘' : 'Ctrl'
+  return getKeyboardShortcuts(platform)[action].replace('Cmd', CtrlCmd)
 }
 
-const CtrlCmd = platform() === 'darwin' ? '⌘' : 'Ctrl'
-const Shortcut = ({ action }: { action: keyof typeof KEYBOARD_SHORTCUTS }) => (
+const Shortcut = ({ action }: { action: keyof KeyboardShortcuts }) => (
   <p className={css.shortcut}>
     <span className={css.keyCombination}>{getKeyboardShortcut(action)}</span>
     <span className={css.action}>{action}</span>

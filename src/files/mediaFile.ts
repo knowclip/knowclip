@@ -1,15 +1,10 @@
 import r from '../redux'
-import { basename, dirname, join } from 'preloaded/path'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
-import { readMediaFile } from 'preloaded/ffmpeg'
-import { existsSync } from 'preloaded/fs'
-import { readdir } from 'preloaded/fsExtra'
+import { basename, dirname, join } from '../utils/rendererPathHelpers'
 import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
-import { getWaveformPngs } from '../utils/getWaveform'
-import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 import { updaterGetter } from './updaterGetter'
 
 const updater = updaterGetter<MediaFile>()
@@ -19,7 +14,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     effects.pauseMedia()
     // mediaPlayer.src = ''
 
-    const validationResult = await validateMediaFile(file, filePath)
+    const validationResult = await validateMediaFile(file, filePath, effects)
     if (validationResult.errors) {
       return [
         r.openFileFailure(
@@ -58,14 +53,19 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     getWaveform,
     setDefaultClipSpecs,
   ],
-  locateRequest: async (file, availability, message, state, _effects) => {
+  locateRequest: async (file, availability, message, state, effects) => {
     const autoSearchDirectories = r.getAssetsDirectories(state)
 
     // works while fileavailability names can't be changed...
     for (const directory of autoSearchDirectories) {
-      const nameMatch = join(directory, basename(availability.name))
-      const matchingFile = existsSync(nameMatch)
-        ? await validateMediaFile(file, nameMatch)
+      const { platform } = window.electronApi
+      const nameMatch = join(
+        platform,
+        directory,
+        basename(platform, availability.name)
+      )
+      const matchingFile = (await effects.existsSync(nameMatch))
+        ? await validateMediaFile(file, nameMatch, effects)
         : null
 
       if (matchingFile && !matchingFile.errors) {
@@ -86,9 +86,10 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
 
 export const validateMediaFile = async (
   existingFile: MediaFile,
-  filePath: string
+  filePath: string,
+  effects: EpicsDependencies
 ): AsyncResult<[string | null, MediaFile]> => {
-  const result = await readMediaFile(
+  const readResult = await effects.readMediaFile(
     filePath,
     existingFile.id,
     existingFile.parentId,
@@ -96,9 +97,11 @@ export const validateMediaFile = async (
     existingFile.flashcardFieldsToSubtitlesTracks
   )
 
-  if (result.errors) return result
+  if (readResult.errors) {
+    return readResult
+  }
 
-  const { value: newFile } = result
+  const { value: newFile } = readResult
 
   const differences: { [attribute: string]: [string, string] } = {}
 
@@ -156,13 +159,25 @@ const extensionRegex = new RegExp(
   `\\.(${SUBTITLES_FILE_EXTENSIONS.join('|')})$`
 )
 const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
-  { id, subtitles },
+  file,
   filePath,
   state,
   effects
 ) => {
-  const fileNameWithoutExtension = basename(filePath).replace(/\..+$/, '')
-  const potentialSubtitlesFilenames = (await readdir(dirname(filePath))).filter(
+  const { id, subtitles } = file
+  const { platform } = window.electronApi
+
+  const fileNameWithoutExtension = basename(platform, filePath).replace(
+    /\..+$/,
+    ''
+  )
+  const readdirResult = await effects.readdir(dirname(platform, filePath))
+  if (readdirResult.errors) {
+    console.error(readdirResult.errors)
+    return []
+  }
+
+  const potentialSubtitlesFilenames = readdirResult.value.filter(
     (filename) =>
       filename.startsWith(`${fileNameWithoutExtension}.`) &&
       extensionRegex.test(filename)
@@ -186,8 +201,13 @@ const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
       parentId: id,
       chunksMetadata: null,
     }
+    const { platform } = window.electronApi
 
-    const subtitlesfilePath = join(dirname(filePath), newSubtitlesfileName)
+    const subtitlesfilePath = join(
+      platform,
+      dirname(platform, filePath),
+      newSubtitlesfileName
+    )
     return r.openFileRequest(file, subtitlesfilePath)
   })
 }
@@ -234,7 +254,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { subtitles, id: mediaFileId },
   _filePath,
   state,
-  _effects
+  effects
 ) => {
   return await Promise.all([
     ...subtitles
@@ -264,13 +284,35 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
             | { multipleMatches: true; singleMatch: undefined }
             | undefined
         } = {}
+        const { platform } = window.electronApi
+
         for (const directory of r.getAssetsDirectories(state)) {
-          const nameMatch = join(directory, basename(file.name))
-          const matchingFile = existsSync(nameMatch)
-            ? await validateSubtitlesFromFilePath(state, nameMatch, file)
+          const nameMatch = join(
+            platform,
+            directory,
+            basename(platform, file.name)
+          )
+          const matchingFileExistsResult = await effects.existsSync(nameMatch)
+          if (matchingFileExistsResult.errors) {
+            console.error(matchingFileExistsResult.errors)
+            return r.simpleMessageSnackbar(
+              `Problem loading subtitles from ${
+                file.name
+              }: ${matchingFileExistsResult.errors.join('; ')}`
+            )
+          }
+          const matchingFileExists = matchingFileExistsResult.value
+          const validationResult = matchingFileExists
+            ? await effects.validateSubtitlesFromFilePath(
+                state,
+                nameMatch,
+                file
+              )
             : null
 
-          if (matchingFile && matchingFile.valid) {
+          if (validationResult?.errors) {
+            console.error(validationResult.errors)
+          } else if (validationResult?.value?.valid) {
             newlyAutoFoundSubtitlesPaths[file.id] =
               newlyAutoFoundSubtitlesPaths[file.id]
                 ? { multipleMatches: true, singleMatch: undefined }
@@ -286,11 +328,16 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
 }
 const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   validatedFile,
-  _filePath,
+  filePath,
   _state,
-  _effects
+  effects
 ) => {
-  return [r.generateWaveformImages(getWaveformPngs(validatedFile))]
+  const waveformPngsResult = await effects.getWaveformPngs(validatedFile)
+  if (waveformPngsResult.errors) {
+    console.error(waveformPngsResult.errors)
+    return []
+  }
+  return [r.generateWaveformImages(waveformPngsResult.value)]
 }
 
 const getCbr: OpenFileSuccessHandler<MediaFile> = async (
@@ -328,9 +375,11 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
     : 0
 
   if (currentFileName && !clipsCount) {
+    const { platform } = window.electronApi
+
     return [
       r.setDefaultClipSpecs({
-        tags: [basename(currentFileName).replace(/\s/g, '_')],
+        tags: [basename(platform, currentFileName).replace(/\s/g, '_')],
         includeStill: validatedFile.isVideo,
       }),
     ]

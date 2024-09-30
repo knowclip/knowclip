@@ -1,32 +1,36 @@
-import * as tempy from 'preloaded/tempy'
-import { readFile, writeFile } from 'preloaded/fs'
+import * as tempy from 'tempy'
+import { readFile, writeFile } from 'fs/promises'
 import {
   getMediaMetadata,
   writeMediaSubtitlesToVtt,
   convertAssToVtt,
-} from 'preloaded/ffmpeg'
+} from './ffmpeg'
 import r from '../redux'
-import { extname, basename, join } from 'preloaded/path'
-import { parseSync, stringifySync } from 'preloaded/subtitle'
-import { parse as subsrtParse } from 'preloaded/subsrt'
+import { extname, basename, join } from 'path'
+import { parseSync, stringifySync } from 'subtitle'
+import { parse as subsrtParse } from '@silvestre/subsrt'
+import { readVttChunk } from '../selectors/subtitles'
 
 export const getSubtitlesFilePathFromMedia = async (
   file: SubtitlesFile,
   mediaFilePath: MediaFilePath,
   streamIndex: number
-): Promise<string | null> => {
+): AsyncResult<string> => {
   const result = await getMediaMetadata(mediaFilePath)
   if (result.errors) {
     console.error(`Error getting media metadata for ${mediaFilePath}`)
-    console.error(result.errors)
-    return null
+    return result
   }
   const { value: mediaMetadata } = result
   if (
     !mediaMetadata.streams[streamIndex] ||
     mediaMetadata.streams[streamIndex].codec_type !== 'subtitle'
   ) {
-    return null
+    return {
+      errors: [
+        `Stream index ${streamIndex} is not a subtitle stream in ${mediaFilePath}`,
+      ],
+    }
   }
   const outputFilePath = join(
     tempy.rootTemporaryDirectory,
@@ -36,62 +40,66 @@ export const getSubtitlesFilePathFromMedia = async (
       '.vtt'
   )
 
-  try {
-    return await writeMediaSubtitlesToVtt(
-      mediaFilePath,
-      streamIndex,
-      outputFilePath
-    )
-  } catch (error) {
+  const vttResult = await writeMediaSubtitlesToVtt(
+    mediaFilePath,
+    streamIndex,
+    outputFilePath
+  )
+  if (vttResult.errors) {
     console.error(
       `Error writing media subtitles to VTT at stream index ${streamIndex}: ${error}`
     )
-    return null
   }
+  return vttResult
 }
 
 export const getExternalSubtitlesVttPath = async (
   state: AppState,
   file: SubtitlesFile,
   filePath: string
-) => {
-  const extension = extname(filePath).toLowerCase()
+): AsyncResult<string> => {
+  try {
+    const extension = extname(filePath).toLowerCase()
 
-  const vttFilePath =
-    extension === '.vtt'
-      ? filePath
-      : join(
-          tempy.rootTemporaryDirectory,
-          basename(filePath) + '_' + file.id + '.vtt'
+    const vttFilePath =
+      extension === '.vtt'
+        ? filePath
+        : join(
+            tempy.rootTemporaryDirectory,
+            basename(filePath) + '_' + file.id + '.vtt'
+          )
+
+    const fileContents = await readFile(filePath, 'utf8')
+    const chunks = parseSubtitles(state, fileContents, extension)
+
+    if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
+    if (extension === '.srt')
+      await writeFile(
+        vttFilePath,
+        stringifySync(
+          chunks.map((chunk) => ({
+            type: 'cue',
+            data: {
+              start: Math.round(chunk.start),
+              end: Math.round(chunk.end),
+              text: chunk.text,
+            },
+          })),
+          { format: 'WebVTT' }
         )
-
-  const fileContents = await readFile(filePath)
-  const chunks = parseSubtitles(state, fileContents, extension)
-
-  if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
-  if (extension === '.srt')
-    await writeFile(
-      vttFilePath,
-      stringifySync(
-        chunks.map((chunk) => ({
-          type: 'cue',
-          data: {
-            start: Math.round(chunk.start),
-            end: Math.round(chunk.end),
-            text: chunk.text,
-          },
-        })),
-        { format: 'WebVTT' }
       )
-    )
-  return vttFilePath
+    return { value: vttFilePath }
+  } catch (error) {
+    console.error(error)
+    return { errors: [String(error)] }
+  }
 }
 
 export const getSubtitlesFilePath = async (
   state: AppState,
   sourceFilePath: string,
   file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
-) => {
+): AsyncResult<string> => {
   if (file.type === 'ExternalSubtitlesFile') {
     return await getExternalSubtitlesVttPath(state, file, sourceFilePath)
   }
@@ -119,58 +127,38 @@ const parseSubtitles = (
 ) => {
   switch (extension) {
     case '.ass':
-      return sanitizeSubtitles(
-        subsrtParse(fileContents)
-          .filter(({ type }) => type === 'caption')
-          .map((chunk, index) => r.readSubsrtChunk(state, { ...chunk, index }))
-      )
+      return subsrtParse(fileContents)
+        .filter(({ type }) => type === 'caption')
+        .map((chunk, index) => r.readSubsrtChunk({ ...chunk, index }))
     case '.vtt':
     case '.srt':
-      return sanitizeSubtitles(
-        parseSync(fileContents).flatMap(
-          ({ data: vttChunk }, index) =>
-            typeof vttChunk === 'string'
-              ? []
-              : r.readVttChunk(state, {
-                  start: Number(vttChunk.start),
-                  end: Number(vttChunk.end),
-                  text: vttChunk.text,
-                  index,
-                }) // TODO: handle failed number parse
-        )
+      return parseSync(fileContents).flatMap(
+        ({ data: vttChunk }, index) =>
+          typeof vttChunk === 'string'
+            ? []
+            : readVttChunk({
+                start: Number(vttChunk.start),
+                end: Number(vttChunk.end),
+                text: vttChunk.text,
+                index,
+              }) // TODO: handle failed number parse
       )
     default:
       throw new Error('Unknown subtitles format')
   }
 }
 
-/** mutates */
-export const sanitizeSubtitles = (
-  chunks: SubtitlesChunk[]
-): SubtitlesChunk[] => {
-  const result = []
-  let lastChunk: SubtitlesChunk | undefined
-  for (const chunk of chunks) {
-    if (lastChunk && lastChunk.end === chunk.start) lastChunk.end -= 1
-
-    if (chunk.text.trim()) {
-      result.push(chunk)
-      lastChunk = chunk
-    }
-  }
-  return result
-}
-
 export const getSubtitlesFromFile = async (
   state: AppState,
   sourceFilePath: string
-) => {
+): AsyncResult<SubtitlesChunk[]> => {
   try {
     const extension = extname(sourceFilePath).toLowerCase()
-    const fileContents = await readFile(sourceFilePath)
-    return parseSubtitles(state, fileContents, extension)
+    const fileContents = await readFile(sourceFilePath, 'utf-8')
+    return { value: parseSubtitles(state, fileContents, extension) }
   } catch (error) {
-    return { error }
+    console.error(error)
+    return { errors: [String(error)] }
   }
 }
 
@@ -227,7 +215,7 @@ export const validateSubtitlesFromFilePath = async (
     const differences: { attribute: string; name: string }[] = []
 
     const extension = extname(sourceFilePath).toLowerCase()
-    const fileContents = await readFile(sourceFilePath)
+    const fileContents = await readFile(sourceFilePath, 'utf8')
     const parsed = parseSubtitles(state, fileContents, extension)
 
     const { chunksMetadata } = existingFile
@@ -270,26 +258,7 @@ export const validateSubtitlesFromFilePath = async (
     }
     return { valid: true, newChunksMetadata }
   } catch (error) {
+    console.error(error)
     return { error }
   }
 }
-
-export const newEmbeddedSubtitlesTrack = (
-  id: string,
-  chunks: Array<SubtitlesChunk>
-): EmbeddedSubtitlesTrack => ({
-  type: 'EmbeddedSubtitlesTrack',
-  id,
-  mode: 'hidden',
-  chunks,
-})
-
-export const newExternalSubtitlesTrack = (
-  id: string,
-  chunks: Array<SubtitlesChunk>
-): ExternalSubtitlesTrack => ({
-  mode: 'hidden',
-  type: 'ExternalSubtitlesTrack',
-  id,
-  chunks,
-})

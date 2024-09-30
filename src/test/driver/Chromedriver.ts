@@ -48,7 +48,9 @@ export default class Chromedriver {
     process.on('SIGTERM', this._kill)
 
     this.stop = () => {
+      // @ts-expect-error typings may be outdated
       process.removeListener('exit', this._kill)
+      // @ts-expect-error typings may be outdated
       process.removeListener('SIGTERM', this._kill)
       if (this.process.stdout)
         this.process.stdout.removeListener('data', stdout)

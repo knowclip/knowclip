@@ -1,5 +1,5 @@
 import helpers from './helpers'
-import { setUpMocks } from 'preloaded/setUpMocks'
+import { setUpMocks } from '../../preloaded/setUpMocks'
 
 const {
   showSaveDialog,

@@ -8,9 +8,31 @@ import {
   Menu,
   MessageBoxOptions,
 } from 'electron'
-import { readFileSync } from 'fs'
-import { join } from 'path'
+import { readFileSync, promises, existsSync } from 'fs'
+import * as path from 'path'
 import { requestParseDictionary } from './utils/dictionaries/requestParseDictionary'
+import moment from 'moment'
+import { getPersistedDataSnapshot } from './test/getPersistedDataSnapshot'
+import { getMediaMetadata, readMediaFile } from './node/ffmpeg'
+import { getVideoStill } from './node/getVideoStill'
+import { getApkgExportData } from './node/prepareExport'
+import { temporaryDirectory, temporaryFile } from 'tempy'
+import {
+  getSubtitlesFilePath,
+  getSubtitlesFromFile,
+  validateBeforeOpenFileAction,
+  validateSubtitlesFromFilePath,
+} from './node/subtitles'
+import { processNoteMedia } from './node/processNoteMedia'
+import { coerceMp3ToConstantBitrate } from './node/constantBitrateMp3'
+import { getWaveformPng, getWaveformPngs } from './node/getWaveform'
+import { readdir } from 'fs-extra'
+import { parseProjectJson } from './node/parseProject'
+import { writeApkgDeck } from './node/writeToApkg'
+
+export type MessageResponders = ReturnType<typeof getMessageResponders>
+
+const now = moment.utc().format()
 
 export const getMessageResponders = (
   mainWindow: BrowserWindow,
@@ -89,7 +111,7 @@ export const getMessageResponders = (
     const messageBoxReturnValue = await dialog.showMessageBox(mainWindow, {
       type: 'info',
       icon: nativeImage.createFromPath(
-        join(process.cwd(), 'icons', 'icon.png')
+        path.join(process.cwd(), 'icons', 'icon.png')
       ),
       title: 'Knowclip v' + app.getVersion(),
       message: aboutMessage,
@@ -116,6 +138,71 @@ export const getMessageResponders = (
   openDictionaryFile(file: DictionaryFile, filePath: string) {
     return requestParseDictionary(file, filePath, mainWindow)
   },
+  pathBasename(filePath: string) {
+    return path.basename(filePath)
+  },
+  pathExtname(filePath: string) {
+    return path.extname(filePath)
+  },
+  pathDirname(filePath: string) {
+    return path.dirname(filePath)
+  },
+  pathJoin(...segments: string[]) {
+    return path.join(...segments)
+  },
+  writeTextFile(filePath: string, text: string) {
+    return promises.writeFile(filePath, text, 'utf8')
+  },
+  logPersistedDataSnapshot: (
+    testId: string,
+    directories: Record<string, string>,
+    appState: AppState
+  ) => {
+    const snapshot = getPersistedDataSnapshot(
+      appState,
+      testId,
+      directories as unknown as any
+    )
+
+    console.log(snapshot)
+    snapshot.keepTmpFiles()
+    console.log(snapshot.json)
+
+    return promises.writeFile(
+      path.join(process.cwd(), testId + '_persistedDataSnapshot.js'),
+      snapshot.json
+    )
+  },
+  writeMocksLog: (
+    testId: string,
+    moduleId: string,
+    logged: { [key: string]: any[] }
+  ) => {
+    const logFilePath = path.join(
+      process.cwd(),
+      `${testId && testId + '__'}${moduleId}-mocks-${now}.log`
+    )
+    return promises.writeFile(logFilePath, JSON.stringify(logged, null, 2))
+  },
+  getMediaMetadata,
+  getVideoStill,
+  getApkgExportData,
+  writeApkgDeck,
+  getSubtitlesFilePath,
+  getSubtitlesFromFile,
+  processNoteMedia,
+  coerceMp3ToConstantBitrate,
+  getWaveformPng,
+  getWaveformPngs,
+  validateSubtitleFileBeforeOpen: validateBeforeOpenFileAction,
+  validateSubtitlesFromFilePath,
+  fileExists: async (filePath: string) => existsSync(filePath),
+  writeFile: promises.writeFile,
+  temporaryDirectory: async () => temporaryDirectory(),
+  temporaryFile: async () => temporaryFile(),
+  readdir: (path: string) => readdir(path),
+  readMediaFile,
+  parseProjectJson,
 })
 
 export type AppState = any
