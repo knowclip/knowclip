@@ -13,7 +13,7 @@ import rcompare from 'semver/functions/rcompare'
 import gt from 'semver/functions/gt'
 import { REHYDRATE } from 'redux-persist'
 import packageJson from '../../package.json'
-import { VITE_BUILD_NUMBER, VITEST } from '../env'
+import { BUILD_NUMBER, VITEST } from '../env'
 import KnowclipActionType from '../types/ActionType'
 
 const showSettingsDialog: AppEpic = (
@@ -28,7 +28,7 @@ const showSettingsDialog: AppEpic = (
 
 const aboutMessage = [
   `Version ${packageJson.version}`,
-  `Build #${VITE_BUILD_NUMBER || '[DEV BUILD]'}`,
+  `Build #${BUILD_NUMBER || '[DEV BUILD]'}`,
   'Distributed under GNU Affero General Public License 3.0.',
   'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Wei, Sky Beast',
   '© 2021 Justin Silvestre',

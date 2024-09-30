@@ -66,7 +66,7 @@ const electronApi = {
   writeToApkg,
   env: {
     VITEST: env.VITEST,
-    VITE_BUILD_NUMBER: env.VITE_BUILD_NUMBER,
+    BUILD_NUMBER: env.BUILD_NUMBER,
     DEV: env.DEV,
     VITE_INTEGRATION_DEV: env.VITE_INTEGRATION_DEV,
     NODE_ENV: env.NODE_ENV,
