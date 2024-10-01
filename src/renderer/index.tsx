@@ -2,6 +2,8 @@ import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
+import * as Sentry from '@sentry/electron/renderer'
+import { init as reactInit } from '@sentry/react'
 import App from '../components/App'
 
 import getStore from '../store'
@@ -21,12 +23,29 @@ window.electronApi.listenToIpcRendererMessages(
   }
 )
 
-const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'
-window.electronApi.initSentry({
-  dsn: sentryDsn,
-  ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
-})
+const sentryDsn =
+  'https://bbdc0ddd503c41eea9ad656b5481202c@o341429.ingest.us.sentry.io/1881735'
+Sentry.init(
+  {
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+    ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+
+    // Capture Replay for 10% of all sessions,
+    // plus for 100% of sessions with an error
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  },
+  reactInit
+)
 
 window.document.addEventListener('DOMContentLoaded', () => {
   window.electronApi.listenToTestIpcEvents()
@@ -41,25 +60,58 @@ window.addEventListener('error', (e) => {
   root.render(<ErrorMessage reactError={e} />)
 })
 
-const { VITEST } = window.electronApi.env
+render()
 
-if (VITEST)
-  window.electronApi
-    .sendToMainProcess({
-      type: 'getPersistedTestState',
-      args: [],
-    })
-    .then((initialTestStateResult) => {
-      if (initialTestStateResult.errors) {
-        console.error(initialTestStateResult.errors)
-        throw new Error('Problem getting persisted test state.')
+async function render(initialTestState?: Partial<AppState> | undefined) {
+  const initialTestStatePromise = window.electronApi.env.VITEST
+    ? window.electronApi.sendToMainProcess({
+        type: 'getPersistedTestState',
+        args: [],
+      })
+    : undefined
+
+  const initialTestStateResult = await initialTestStatePromise
+
+  if (initialTestStateResult?.errors) {
+    console.error(initialTestStateResult.errors)
+    throw new Error('Problem getting persisted test state.')
+  }
+
+  const { store, persistor } = getStore(initialTestState, {
+    setItem: async (key: string, item: any) => {
+      const result = await window.electronApi.sendToMainProcess({
+        type: 'electronStoreSet',
+        args: [key, item],
+      })
+      if (result.errors) {
+        console.error(result.errors)
+        throw new Error('Problem setting electron storage item.')
       }
-      render(initialTestStateResult.value)
-    })
-else render()
-
-function render(initialTestState?: Partial<AppState> | undefined) {
-  const { store, persistor } = getStore(initialTestState)
+      return result.value
+    },
+    getItem: async (key: string) => {
+      const result = await window.electronApi.sendToMainProcess({
+        type: 'electronStoreGet',
+        args: [key],
+      })
+      if (result.errors) {
+        console.error(result.errors)
+        throw new Error('Problem getting electron storage item.')
+      }
+      return result.value
+    },
+    removeItem: async (key: string) => {
+      const result = await window.electronApi.sendToMainProcess({
+        type: 'electronStoreRemove',
+        args: [key],
+      })
+      if (result.errors) {
+        console.error(result.errors)
+        throw new Error('Problem removing electron storage item.')
+      }
+      return result.value
+    },
+  })
 
   const root = createRoot(document.getElementById('root')!)
 

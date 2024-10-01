@@ -2,7 +2,6 @@ import A from '../types/ActionType'
 import { catchError, mergeAll, mergeMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import r from '../redux'
-import { uuid } from '../utils/sideEffects'
 
 const addMediaToProject: AppEpic = (action$, _state$, effects) =>
   action$.pipe(
@@ -16,7 +15,11 @@ const addMediaToProject: AppEpic = (action$, _state$, effects) =>
               args: [],
             })
           )
-          const file = await effects.readMediaFile(filePath, uuid(), projectId)
+          const file = await effects.readMediaFile(
+            filePath,
+            effects.uuid(),
+            projectId
+          )
           if (file.errors) throw file.errors.join('; ')
           else return r.openFileRequest(file.value, filePath)
         })

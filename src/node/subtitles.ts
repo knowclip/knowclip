@@ -47,7 +47,7 @@ export const getSubtitlesFilePathFromMedia = async (
   )
   if (vttResult.errors) {
     console.error(
-      `Error writing media subtitles to VTT at stream index ${streamIndex}: ${error}`
+      `Error writing media subtitles to VTT at stream index ${streamIndex}: ${vttResult.errors}`
     )
   }
   return vttResult

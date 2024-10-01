@@ -38,7 +38,6 @@ import { subtitlesMenu$ as $ } from './SubtitlesMenu.testLabels'
 import { AnyAction, Dispatch } from 'redux'
 
 const SubtitlesMenu = () => {
-  const { platform } = window.electronApi
   const { anchorEl, anchorCallbackRef, open, close, isOpen } = usePopover()
 
   const { subtitles, currentFileId, fieldNamesToTrackIds } = useSelector(
@@ -82,9 +81,7 @@ const SubtitlesMenu = () => {
       ])
       if (!filePaths) return
 
-      dispatch(
-        actions.loadNewSubtitlesFile(platform, filePaths[0], currentFileId)
-      )
+      dispatch(actions.loadNewSubtitlesFile(filePaths[0], currentFileId))
 
       close(e)
     },

@@ -2,16 +2,13 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 console.log('Beginning preload')
 
-import { init as initSentry } from '@sentry/electron'
-import createElectronStorage from 'redux-persist-electron-storage'
+// import 'path'
 import {
   setUpMocks,
   listenToTestIpcEvents,
   listenToLogPersistedDataEvents,
 } from '../node/setUpMocks'
-import * as electron from 'electron'
 import { sendToMainProcess } from '../node/sendToMainProcess'
-import * as ffmpeg from '../node/ffmpeg'
 import type {
   MessageHandlerResult,
   MessageResponse,
@@ -34,12 +31,14 @@ console.log('process.env', process.env)
 
 const electronApi = {
   platform: process.platform,
-  openExternal: electron.shell.openExternal,
-  initSentry: initSentry,
-  createElectronStorage: createElectronStorage,
+  openExternal: (path: string) =>
+    sendToMainProcess({
+      type: 'openExternal',
+      args: [path],
+    }),
   sendToMainProcess: sendToMainProcess,
   setUpMocks: setUpMocks,
-  sendClosedSignal: () => electron.ipcRenderer.send('closed'),
+  sendClosedSignal: () => ipcRenderer.send('closed'),
   env: {
     VITEST: env.VITEST,
     BUILD_NUMBER: env.BUILD_NUMBER,
@@ -90,19 +89,19 @@ const electronApi = {
 
 console.log('preloading')
 
-sendToMainProcess({
-  type: 'getFfmpegAndFfprobePath',
-  args: [],
-}).then((getPaths) => {
-  if (getPaths.errors) {
-    console.error(getPaths.errors)
-    throw new Error('Problem finding ffmpeg and ffprobe paths.')
-  } else {
-    console.log('setting ffprobe paths', getPaths.value)
-  }
-  ffmpeg.ffmpeg.setFfmpegPath(getPaths.value.ffmpeg)
-  ffmpeg.ffmpeg.setFfprobePath(getPaths.value.ffprobe)
-})
+// sendToMainProcess({
+//   type: 'getFfmpegAndFfprobePath',
+//   args: [],
+// }).then((getPaths) => {
+//   if (getPaths.errors) {
+//     console.error(getPaths.errors)
+//     throw new Error('Problem finding ffmpeg and ffprobe paths.')
+//   } else {
+//     console.log('setting ffprobe paths', getPaths.value)
+//   }
+//   ffmpeg.ffmpeg.setFfmpegPath(getPaths.value.ffmpeg)
+//   ffmpeg.ffmpeg.setFfprobePath(getPaths.value.ffprobe)
+// })
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)
 

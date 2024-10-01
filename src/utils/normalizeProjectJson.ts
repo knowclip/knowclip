@@ -7,7 +7,14 @@ import {
 import { unescapeClozeFields } from './clozeField'
 import { parseFormattedDuration } from './formatTime'
 import { blankSimpleFields, blankTransliterationFields } from './newFlashcard'
-import type { NormalizedProjectFileData } from '../node/parseProject'
+
+type NormalizedProjectFileData = {
+  project: ProjectFile
+  media: MediaFile[]
+  clips: Clip[]
+  cards: Flashcard[]
+  subtitles: SubtitlesFile[]
+}
 
 export const normalizeProjectJson = <F extends FlashcardFields>(
   state: AppState,

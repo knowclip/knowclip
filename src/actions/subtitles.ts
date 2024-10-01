@@ -1,12 +1,7 @@
 import A from '../types/ActionType'
 import { filesActions } from './files'
-import { uuid } from '../utils/sideEffects'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { KnowclipActionCreatorsSubset } from '.'
-import { basename } from '../utils/rendererPathHelpers'
-import type { ElectronApi } from '../preload'
-
-const openFileRequest = filesActions.openFileRequest
 
 export const subtitlesActions = {
   showSubtitles: (id: SubtitlesTrackId) => ({
@@ -55,6 +50,11 @@ export const subtitlesActions = {
     subtitlesTrackId,
     chunkIndex,
   }),
+  loadNewSubtitlesFile: (filePath: string, mediaFileId: MediaFileId) => ({
+    type: A.loadNewSubtitlesFile,
+    filePath,
+    mediaFileId,
+  }),
 } satisfies KnowclipActionCreatorsSubset
 
 const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
@@ -64,22 +64,6 @@ const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
     id: mediaFileId,
     updatePayload: [track],
   })
-
-const loadNewSubtitlesFile = (
-  platform: ElectronApi['platform'],
-  filePath: string,
-  mediaFileId: MediaFileId
-) =>
-  openFileRequest(
-    {
-      type: 'ExternalSubtitlesFile',
-      parentId: mediaFileId,
-      id: uuid(),
-      name: basename(platform, filePath),
-      chunksMetadata: null,
-    },
-    filePath
-  )
 
 const deleteSubtitlesTrackFromMedia = (
   id: SubtitlesTrackId,
@@ -107,7 +91,6 @@ const linkFlashcardFieldToSubtitlesTrack = (
 
 export const compositeSubtitlesActions = {
   addSubtitlesTrack,
-  loadNewSubtitlesFile,
   deleteSubtitlesTrackFromMedia,
   linkFlashcardFieldToSubtitlesTrack,
 }

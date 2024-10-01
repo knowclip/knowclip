@@ -3,7 +3,6 @@ import { createSelector } from 'reselect'
 import { getProjectMediaFiles } from './currentMedia'
 import { getSubtitlesSourceFile } from './subtitles'
 import { getClipIdsByMediaFileId, getClip, getFlashcard } from './clips'
-import { nowUtcTimestamp } from '../utils/sideEffects'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import {
   blankSimpleFields,
@@ -70,7 +69,8 @@ export const getProjectIdByFilePath = (
 export const getProjectJson = <F extends FlashcardFields>(
   state: AppState,
   file: ProjectFile,
-  fieldsTemplate: F
+  fieldsTemplate: F,
+  timestamp: string
 ): ProjectJson<F> => {
   const mediaFiles = getProjectMediaFiles(state, file.id)
 
@@ -79,7 +79,7 @@ export const getProjectJson = <F extends FlashcardFields>(
       name: file.name,
       noteType: file.noteType,
       createdAt: file.createdAt,
-      timestamp: nowUtcTimestamp(),
+      timestamp,
       id: file.id,
     },
 
@@ -251,12 +251,14 @@ const getFieldsTemplate = (file: ProjectFile) =>
 
 export const getProjectFileContents = (
   state: AppState,
-  projectFile: ProjectFile
+  projectFile: ProjectFile,
+  timestamp: string
 ): string => {
   const { project, media } = getProjectJson(
     state,
     projectFile,
-    getFieldsTemplate(projectFile)
+    getFieldsTemplate(projectFile),
+    timestamp
   )
   return (
     `# This file was created by Knowclip!\n# Edit it manually at your own risk.\n` +

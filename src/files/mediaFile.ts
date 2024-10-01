@@ -1,7 +1,6 @@
 import r from '../redux'
 import { FileEventHandlers, OpenFileSuccessHandler } from './eventHandlers'
 import { basename, dirname, join } from '../utils/rendererPathHelpers'
-import { uuid } from '../utils/sideEffects'
 import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
@@ -193,30 +192,32 @@ const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     return !previouslyLoadedExternalSubtitlesFiles.some((s) => s.name === name)
   })
 
-  return notAlreadyAdded.map((newSubtitlesfileName) => {
-    const file: ExternalSubtitlesFile = {
-      id: effects.uuid(),
-      type: 'ExternalSubtitlesFile',
-      name: newSubtitlesfileName,
-      parentId: id,
-      chunksMetadata: null,
-    }
-    const { platform } = window.electronApi
+  return await Promise.all(
+    notAlreadyAdded.map(async (newSubtitlesfileName) => {
+      const file: ExternalSubtitlesFile = {
+        id: await effects.uuid(),
+        type: 'ExternalSubtitlesFile',
+        name: newSubtitlesfileName,
+        parentId: id,
+        chunksMetadata: null,
+      }
+      const { platform } = window.electronApi
 
-    const subtitlesfilePath = join(
-      platform,
-      dirname(platform, filePath),
-      newSubtitlesfileName
-    )
-    return r.openFileRequest(file, subtitlesfilePath)
-  })
+      const subtitlesfilePath = join(
+        platform,
+        dirname(platform, filePath),
+        newSubtitlesfileName
+      )
+      return r.openFileRequest(file, subtitlesfilePath)
+    })
+  )
 }
 
 const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { subtitlesTracksStreamIndexes, id, subtitles },
   _filePath,
   state,
-  _effects
+  effects
 ) =>
   // TODO: clean up orphans?
   subtitlesTracksStreamIndexes.map((streamIndex) => {
@@ -242,7 +243,7 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
         // and opening a media file?
         // this complexity is maybe a sign that we need
         // two different stages for the event of adding + selecting a media file
-        id: existing ? existing.id : uuid(),
+        id: existing ? existing.id : effects.uuid(),
         streamIndex,
         parentType: 'MediaFile',
         chunksMetadata: null,

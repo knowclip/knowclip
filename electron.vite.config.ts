@@ -5,20 +5,17 @@ import path from 'path'
 const external = ['better-sqlite3', 'archiver']
 const config: UserConfig = {
   main: {
-    // resolve: {
-    //   alias: {
-    //     // should not be here.
-    //     preloaded: path.resolve(__dirname, 'src', 'preloaded'),
-    //   },
-    // },
     build: {
+      watch: null,
       lib: {
         entry: 'electron/main.ts',
       },
-      sourcemap: true,
-      minify: false,
       rollupOptions: {
         external,
+        output: {
+          // file: 'main.js',
+          dir: 'out/main',
+        },
       },
     },
   },
@@ -33,11 +30,12 @@ const config: UserConfig = {
       modules: {},
     },
     build: {
-      sourcemap: true,
-      minify: false,
       rollupOptions: {
         external,
       },
+    },
+    server: {
+      hmr: false, // Ensure HMR is off
     },
   },
   preload: {

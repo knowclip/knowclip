@@ -13,12 +13,31 @@ import r from '../redux'
 import { normalizeProjectJson } from '../utils/normalizeProjectJson'
 import { getUpdateWith } from '../files/updates'
 
-const createProject: AppEpic = (action$, state$, { writeFile }) =>
+const createProject: AppEpic = (
+  action$,
+  state$,
+  { writeFile, nowUtcTimestamp, uuid }
+) =>
   action$.pipe(
     ofType(A.createProject as const),
-    switchMap(({ project, filePath }) => {
+    switchMap(({ name, noteType, filePath }) => {
+      const now = nowUtcTimestamp()
+      const project: ProjectFile = {
+        type: 'ProjectFile',
+        id: uuid(),
+        name,
+        noteType,
+        mediaFileIds: [],
+        error: null,
+        createdAt: now,
+        lastSaved: now,
+      }
+
       return from(
-        writeFile(filePath, r.getProjectFileContents(state$.value, project))
+        writeFile(
+          filePath,
+          r.getProjectFileContents(state$.value, project, now)
+        )
       ).pipe(
         mergeMap(() =>
           from([
@@ -89,7 +108,11 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
     )
   )
 
-const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
+const saveProject: AppEpic = (
+  action$,
+  state$,
+  { existsSync, writeFile, nowUtcTimestamp }
+) =>
   action$.pipe(
     ofType(A.saveProjectRequest as const),
     filter(() => {
@@ -118,7 +141,11 @@ const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
 
         await writeFile(
           projectFile.filePath,
-          r.getProjectFileContents(state$.value, projectMetadata)
+          r.getProjectFileContents(
+            state$.value,
+            projectMetadata,
+            nowUtcTimestamp()
+          )
         )
 
         return from([

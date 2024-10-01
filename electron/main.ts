@@ -1,28 +1,33 @@
 import { BrowserWindow, screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
+import * as Sentry from '@sentry/electron/main'
+import { initRenderer } from 'electron-store'
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 
-export const WINDOW_START_DIMENSIONS = {
+const WINDOW_START_DIMENSIONS = {
   width: 1920,
   height: 1080,
 }
+
+console.log('running main.ts')
+console.log('Process ID:', process.pid)
+console.log('Execution Path:', __filename)
+console.log('Execution Directory:', __dirname)
 
 const { isPackaged } = app
 const isTesting = process.env.VITEST
 
 if (isTesting) interceptLogs()
 
-require('electron-store').initRenderer()
-
-const Sentry = require('@sentry/electron')
+initRenderer()
 
 Sentry.init({
-  dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',
+  dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@o341429.ingest.us.sentry.io/1881735',
 })
 
 const shouldInstallExtensions = Boolean(
@@ -45,7 +50,15 @@ const ffmpegPaths = {
   ffprobe: getFfmpegStaticPath(ffprobeStaticBasePath),
 }
 
-async function createWindow() {
+let windowsOpenedInThisModule = 0
+async function createWindow(occasion: string) {
+  windowsOpenedInThisModule++
+  console.log('CREATEWINDOW!!', occasion)
+  console.log('windowsOpenedInThisModule', windowsOpenedInThisModule)
+  console.log(
+    'BrowserWindow.getAllWindows().length',
+    BrowserWindow.getAllWindows().length
+  )
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   // Create the browser window.
@@ -59,8 +72,7 @@ async function createWindow() {
       webSecurity: isPackaged,
       nodeIntegration: false,
       contextIsolation: true,
-      // should be true
-      sandbox: false,
+      sandbox: true,
       devTools: true,
       preload: path.join(__dirname, '..', 'preload', 'index.js'),
     },
@@ -124,8 +136,24 @@ async function createWindow() {
       )
     : mainWindow.loadURL('http://localhost:5173')
 }
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit() // Prevents additional instances from running
+} else {
+  app.on('second-instance', () => {
+    // This will prevent a second window from opening when a second instance is launched
+    const allWindows = BrowserWindow.getAllWindows()
+    if (allWindows.length) {
+      const win = allWindows[0]
+      if (win.isMinimized()) win.restore()
+      win.focus()
+    }
+  })
+}
 
 app.whenReady().then(async () => {
+  console.log('app ready')
   if (shouldInstallExtensions) {
     try {
       await installDevtools({
@@ -147,7 +175,7 @@ app.whenReady().then(async () => {
     callback(pathname)
   })
 
-  await createWindow()
+  await createWindow('app ready')
 
   setUpMenu(context.mainWindow as BrowserWindow, true)
   handleMessages(
@@ -177,7 +205,7 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (context.mainWindow === null) {
-    createWindow()
+    createWindow('app activate')
   }
 })
 

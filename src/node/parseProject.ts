@@ -3,14 +3,6 @@ import { readFile } from 'fs/promises'
 import { ProjectJson } from '../types/Project'
 import validateProject from './validateProject'
 
-export type NormalizedProjectFileData = {
-  project: ProjectFile
-  media: MediaFile[]
-  clips: Clip[]
-  cards: Flashcard[]
-  subtitles: SubtitlesFile[]
-}
-
 export const parseProjectJson = async <F extends FlashcardFields>(
   filePath: string
 ): AsyncResult<ProjectJson<F>> => {

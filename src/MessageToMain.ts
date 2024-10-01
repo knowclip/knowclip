@@ -1,6 +1,6 @@
 import type { MessageResponders } from './getMessageResponders'
 
-export { MessageResponders }
+export type { MessageResponders }
 
 export type MessageToMain<T extends MessageToMainType> = {
   type: T

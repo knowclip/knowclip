@@ -25,15 +25,14 @@ const showSettingsDialog: AppEpic = (
     map(() => r.settingsDialog())
   )
 
-const { BUILD_NUMBER, VITEST } = window.electronApi.env
-
-const aboutMessage = [
-  `Version ${packageJson.version}`,
-  `Build #${BUILD_NUMBER || '[DEV BUILD]'}`,
-  'Distributed under GNU Affero General Public License 3.0.',
-  'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Wei, Sky Beast',
-  '© 2021 Justin Silvestre',
-].join('\n\n')
+const aboutMessage = (BUILD_NUMBER?: string) =>
+  [
+    `Version ${packageJson.version}`,
+    `Build #${BUILD_NUMBER || '[DEV BUILD]'}`,
+    'Distributed under GNU Affero General Public License 3.0.',
+    'Thanks to my dear patrons ♡ Phillip Allen, Towel Sniffer, Ryan Leach, Wei, Sky Beast',
+    '© 2021 Justin Silvestre',
+  ].join('\n\n')
 
 const showAboutDialog: AppEpic = (
   action$,
@@ -42,10 +41,11 @@ const showAboutDialog: AppEpic = (
 ) =>
   fromIpcRendererEvent('show-about-dialog').pipe(
     mergeMap(() => {
+      const { BUILD_NUMBER } = window.electronApi.env
       pauseMedia()
       return sendToMainProcess({
         type: 'showAboutDialog',
-        args: [aboutMessage],
+        args: [aboutMessage(BUILD_NUMBER)],
       })
     }),
     ignoreElements()
@@ -102,7 +102,8 @@ const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
 
       if (!window.navigator.onLine) return EMPTY
 
-      const updatesCheck = await checkForUpdates()
+      const { VITEST } = window.electronApi.env
+      const updatesCheck = await checkForUpdates(VITEST)
 
       if (updatesCheck.errors) {
         const messageBoxResult = await showMessageBox({
@@ -177,34 +178,34 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
     mergeAll()
   )
 
-const checkForUpdates = VITEST
-  ? async (): Promise<Result<{ tag_name: string; body: string }[]>> => ({
-      value: [],
-    })
-  : async (): Promise<Result<{ tag_name: string; body: string }[]>> => {
-      try {
-        const response = await fetch(
-          'https://api.github.com/repos/knowclip/knowclip/releases',
-          {
-            headers: {
-              Accept: 'application/vnd.github.v3+json',
-            },
-          }
-        )
-        const releases: {
-          tag_name: string
-          body: string
-        }[] = await response.json()
+const checkForUpdates = async (
+  isTestEnv?: boolean
+): Promise<Result<{ tag_name: string; body: string }[]>> => {
+  try {
+    if (isTestEnv) return { value: [] }
 
-        const newerReleases = releases
-          .sort((r1, r2) => rcompare(r1.tag_name, r2.tag_name))
-          .filter(({ tag_name: tagName }) => gt(tagName, packageJson.version))
-
-        return { value: newerReleases }
-      } catch (err) {
-        return { errors: [`${err}`] }
+    const response = await fetch(
+      'https://api.github.com/repos/knowclip/knowclip/releases',
+      {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+        },
       }
-    }
+    )
+    const releases: {
+      tag_name: string
+      body: string
+    }[] = await response.json()
+
+    const newerReleases = releases
+      .sort((r1, r2) => rcompare(r1.tag_name, r2.tag_name))
+      .filter(({ tag_name: tagName }) => gt(tagName, packageJson.version))
+
+    return { value: newerReleases }
+  } catch (err) {
+    return { errors: [`${err}`] }
+  }
+}
 
 async function showDownloadPrompt(
   checkAtStartup: boolean,

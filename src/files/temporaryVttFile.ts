@@ -167,7 +167,11 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
             )
             if (tmpFilePath.errors) {
               return [
-                r.openFileFailure(file, null, tmpFilePath.errors.join('; ')),
+                r.openFileFailure(
+                  file,
+                  null,
+                  `${tmpFilePath.errors.join('; ')}`
+                ),
               ]
             }
             const validateResult = await effects.validateSubtitleFileBeforeOpen(

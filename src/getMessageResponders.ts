@@ -34,6 +34,15 @@ export type MessageResponders = ReturnType<typeof getMessageResponders>
 
 const now = moment.utc().format()
 
+import Store from 'electron-store'
+
+const electronStore = new Store()
+const electronStorage = {
+  getItem: async (key: string) => electronStore.get(key),
+  setItem: async (key: string, item: any) => electronStore.set(key, item),
+  removeItem: async (key: string) => electronStore.delete(key),
+}
+
 export const getMessageResponders = (
   mainWindow: BrowserWindow,
   ffmpegPaths: { ffmpeg: string; ffprobe: string },
@@ -46,6 +55,7 @@ export const getMessageResponders = (
   log: (...args: any[]) => {
     console.log(...args)
   },
+  openExternal: (path: string) => shell.openExternal(path),
   /** for sending messages to renderer during integration tests */
   sendToRenderer: (channel: string, args: string[]) => {
     if (!mainWindow) console.error('Main window reference lost')
@@ -203,6 +213,10 @@ export const getMessageResponders = (
   readdir: (path: string) => readdir(path),
   readMediaFile,
   parseProjectJson,
+
+  electronStoreSet: electronStorage.setItem,
+  electronStoreGet: electronStorage.getItem,
+  electronStoreRemove: electronStorage.removeItem,
 })
 
 export type AppState = any

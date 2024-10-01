@@ -9,7 +9,21 @@ import { flushSync } from 'react-dom'
 import { IpcRendererEvent } from './preload/IpcRendererEvent'
 import { flatten } from './MessageToMain'
 
-const { sendToMainProcess, sendClosedSignal } = window.electronApi
+// const { sendToMainProcess, sendClosedSignal } = window.electronApi
+const sendToMainProcess: typeof window.electronApi.sendToMainProcess = (
+  message
+) => {
+  if (window.electronApi?.sendToMainProcess) {
+    return window.electronApi.sendToMainProcess(message)
+  }
+  throw new Error('sendToMainProcess not available')
+}
+const sendClosedSignal: typeof window.electronApi.sendClosedSignal = () => {
+  if (window.electronApi?.sendClosedSignal) {
+    return window.electronApi.sendClosedSignal()
+  }
+  throw new Error('sendClosedSignal not available')
+}
 
 const dependencies = {
   ...electronHelpers,
@@ -19,6 +33,7 @@ const dependencies = {
     sendToMainProcess({ type: 'fileExists', args: [filePath] }),
 
   window: window,
+  getPlatform: () => window.electronApi.platform,
   nowUtcTimestamp,
   uuid,
   getDexieDb,

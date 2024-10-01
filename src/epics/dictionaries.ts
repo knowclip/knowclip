@@ -67,7 +67,8 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
         const dictionary = await newDictionary(
           effects.getDexieDb(),
           action.dictionaryType,
-          filePath
+          filePath,
+          effects.uuid()
         )
         if (s.isWorkUnsaved(state$.value))
           return actions.simpleMessageSnackbar(

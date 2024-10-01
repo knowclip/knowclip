@@ -7,7 +7,6 @@ import {
   WaveformInterface,
 } from 'clipwave'
 import { actions } from '../../actions'
-import { uuid } from '../sideEffects'
 import { Dispatch } from 'redux'
 
 export function useHandleWaveformDrag(
@@ -31,8 +30,6 @@ export function useHandleWaveformDrag(
         }
         return
       }
-
-      const newId = uuid()
 
       dispatch(actions.addClipRequest(gesture, newId))
 

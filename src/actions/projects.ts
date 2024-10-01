@@ -3,27 +3,11 @@ import { KnowclipActionCreatorsSubset } from '.'
 import { filesActions } from './files'
 
 export const projectActions = {
-  createProject: (
-    id: string,
-    name: string,
-    noteType: NoteType,
-    filePath: string,
-    now: string
-  ) => {
-    const project: ProjectFile = {
-      type: 'ProjectFile',
-      id,
-      name,
-      noteType,
-      mediaFileIds: [],
-      error: null,
-      createdAt: now,
-      lastSaved: now,
-    }
-
+  createProject: (name: string, noteType: NoteType, filePath: string) => {
     return {
       type: A.createProject,
-      project,
+      name,
+      noteType,
       filePath,
     }
   },

@@ -4,7 +4,7 @@
   "version": "0.13.1-beta",
   "private": true,
   "engines": {
-    "node": "20.16.0"
+    "node": "20.17.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -21,7 +21,8 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.13.1",
-    "@sentry/electron": "^2.5.4",
+    "@sentry/electron": "^5.4.0",
+    "@sentry/react": "^8.32.0",
     "@silvestre/mkanki": "^3.6.0",
     "@silvestre/subsrt": "^1.1.1",
     "ajv": "^8.12.0",
@@ -30,7 +31,7 @@
     "clipwave": "^0.2.0",
     "dexie": "^3.2.5",
     "electron-extension-installer": "^1.2.0",
-    "electron-store": "^8.0.1",
+    "electron-store": "^8.2.0",
     "ffmpeg-static": "^5.1.0",
     "ffprobe-static": "^3.0.0",
     "filenamify": "^6.0.0",
@@ -49,7 +50,6 @@
     "redux": "^4.1.2",
     "redux-observable": "^2.0.0",
     "redux-persist": "^6.0.0",
-    "redux-persist-electron-storage": "^2.1.0",
     "reselect": "^5.1.0",
     "rxjs": "^7.8.1",
     "semver": "^7.5.1",
@@ -67,12 +67,12 @@
   "homepage": "./",
   "scripts": {
     "postinstall": "electron-builder install-app-deps && npm run replace-in-files-cli -- --string='import { bpfrpt_proptype_WindowScroller } from \"../WindowScroller.js\";' --replacement='' node_modules/**/onScroll.js",
-    "start": "npm run electron-vite",
+    "start": "electron-vite",
     "build:homepage": "npm run --prefix homepage build",
     "test": "npm run vitest run -- --config ./vitest.config.ts",
-    "build": "npm run build-schemas && npm run electron-vite -- build --mode",
+    "build": "npm run build-schemas && electron-vite build --mode",
     "integration": "npm run build -- integration && npm run integration:skip-build",
-    "integration:win": "npm run electron-vite -- build --mode integration && npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
+    "integration:win": "electron-vite build --mode integration && npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
     "integration:debug": "VITE_INTEGRATION_DEV=1 npm run build -- integration && VITE_INTEGRATION_DEV=1 npm run integration:skip-build",
     "integration:skip-build": "npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
     "integration:ds": "VITE_INTEGRATION_DEV=1 npm run vitest --  run --config ./vitest-integration.config.ts --mode integration",
@@ -109,7 +109,7 @@
     ]
   },
   "browserslist": [
-    "electron >= 31.0.0"
+    "electron >= 31.6.0"
   ],
   "devDependencies": {
     "@types/archiver": "^6.0.2",
@@ -133,10 +133,10 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "electron": "31.0.0",
+    "electron": "31.6.0",
     "electron-builder": "^24.9.1",
-    "electron-chromedriver": "^31.0.0",
-    "electron-vite": "^1.0.29",
+    "electron-chromedriver": "^31.6.0",
+    "electron-vite": "1.0.22",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
