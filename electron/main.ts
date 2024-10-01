@@ -7,9 +7,9 @@ import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 
-export const WINDOW_START_DIMENSIONS = {
-  width: 1027,
-  height: 768,
+const WINDOW_START_DIMENSIONS = {
+  width: 1920,
+  height: 1080,
 }
 
 const { isPackaged } = app
