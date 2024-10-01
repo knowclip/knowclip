@@ -23,13 +23,15 @@ describe('opening a shared project', () => {
   })
 
   runAll(
-    sharedProjectTestSteps('786f7023-0862-4cf7-863f-2c32ec6a3975', [
-      '64bc9fe8-822a-4ecf-83d9-d6997029db7d',
-      'b9ba2184-cb5c-4d50-98c2-568bf8e75854',
-    ]),
+    [
+      ...sharedProjectTestSteps('786f7023-0862-4cf7-863f-2c32ec6a3975', [
+        '64bc9fe8-822a-4ecf-83d9-d6997029db7d',
+        'b9ba2184-cb5c-4d50-98c2-568bf8e75854',
+      ]),
+      step('save and close project', (context) => saveAndCloseProject(context)),
+    ],
     context
   )
-  test('save and close project', () => saveAndCloseProject(context))
 
   afterAll(async () => {
     await stopApp(context)

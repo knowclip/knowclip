@@ -77,7 +77,7 @@
     "integration:win": "npm run electron-vite -- build --mode integration && npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
     "integration:debug": "VITE_INTEGRATION_DEV=1 npm run build -- integration && VITE_INTEGRATION_DEV=1 npm run integration:skip-build",
     "integration:skip-build": "npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
-    "integration:skip-build:u": "npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
+    "integration:skip-build:u": "npm run vitest -- run --update --config ./vitest-integration.config.ts --mode integration",
     "integration:ds": "VITE_INTEGRATION_DEV=1 npm run vitest --  run --config ./vitest-integration.config.ts --mode integration",
     "build-fixture:saved": "npm run integration:build-fixture -- savedProject",
     "build-fixture:shared": "npm run integration:build-fixture -- sharedProject && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",

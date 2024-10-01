@@ -10,7 +10,8 @@ export const integrationConfig: UserConfig = {
   },
   test: {
     testTimeout: 60000,
-    threads: false,
+    pool: 'forks',
+
     include: ['src/test/**/*.integration.ts'],
     env: {
       ...(process.env.VITEST ? { VITEST: process.env.VITEST } : null),
