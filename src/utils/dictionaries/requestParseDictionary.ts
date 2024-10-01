@@ -66,7 +66,7 @@ export async function requestParseYomichanDictionary(
               )} minutes.`,
             }
           : {
-              errors: ['Invalid dictionary file.'],
+              error: new Error('Invalid dictionary file.'),
             }
       )
     },
@@ -142,7 +142,7 @@ export async function requestParseDictCcDictionary(
               )} minutes.`,
             }
           : {
-              errors: ['Invalid dictionary file.'],
+              error: new Error('Invalid dictionary file.'),
             }
       )
     },
@@ -218,7 +218,7 @@ export async function requestParseCedictDictionary(
               )} minutes.`,
             }
           : {
-              errors: ['Invalid dictionary file.'],
+              error: new Error('Invalid dictionary file.'),
             }
       )
     },

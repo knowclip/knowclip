@@ -1,6 +1,7 @@
 import { basename } from 'path'
 
 import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
+import { failure } from '../utils/result'
 
 export const ffmpeg =
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -33,7 +34,7 @@ export const getMediaMetadata = async (
       })
     })
   } catch (error) {
-    return { errors: [String(error)] }
+    return failure(error)
   }
 }
 
@@ -45,7 +46,7 @@ export const readMediaFile = async (
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): AsyncResult<MediaFile> => {
   const metadata = await getMediaMetadata(filePath)
-  if (metadata.errors) return { errors: metadata.errors }
+  if (metadata.error) return { error: metadata.error }
 
   const { value: ffprobeMetadata } = metadata
   const videoStream = ffprobeMetadata.streams.find(

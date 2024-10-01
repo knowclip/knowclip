@@ -85,14 +85,13 @@ const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
           parentFileAvailability.filePath,
           seconds
         )
-        if (pngPath.errors)
+        if (pngPath.error)
           return [
             r.openFileFailure(
               file,
               null,
               'Could not locate file: ' +
-                (pngPath.errors.join('; ') ||
-                  'problem generating still image from media.')
+                (pngPath.error || 'problem generating still image from media.')
             ),
           ]
 

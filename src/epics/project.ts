@@ -70,7 +70,7 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     switchMap(({ filePath }) =>
       from(parseProjectJson(filePath)).pipe(
         mergeMap((parse) => {
-          if (parse.errors) throw new Error(parse.errors.join('\n\n'))
+          if (parse.error) throw parse.error
 
           const { project } = normalizeProjectJson(state$.value, parse.value)
           return from([

@@ -3,6 +3,7 @@ import { existsSync } from 'preloaded/fs'
 import { getFileAvailabilityById } from '../selectors'
 import { basename, join } from 'preloaded/path'
 import { createWaveformPng } from 'preloaded/createWaveformPng'
+import { failure } from './result'
 
 const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
 
@@ -31,7 +32,7 @@ export const getWaveformPng = async (
 
     return { value: newFileName }
   } catch (error) {
-    return { errors: [String(error)] }
+    return failure(error)
   }
 }
 

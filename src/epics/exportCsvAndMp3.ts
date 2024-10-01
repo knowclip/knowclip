@@ -64,8 +64,7 @@ const exportCsv: AppEpic = (
                 mediaFolderLocation,
                 mediaFolderLocation
               )
-              if (clipDataResult.errors)
-                throw new Error(clipDataResult.errors.join('; '))
+              if (clipDataResult.error) throw clipDataResult.error
 
               const number = ++processed
               return r.setProgress({

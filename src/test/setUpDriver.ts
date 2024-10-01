@@ -19,13 +19,13 @@ export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const chromedriverPath = require(join(
+const chromedriverPath = join(
   rootDir,
   'node_modules',
-  'chromedriver',
-  'lib',
+  'electron-chromedriver',
+  'bin',
   'chromedriver'
-)).path
+)
 
 export interface IntegrationTestContext {
   testId: string

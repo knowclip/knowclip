@@ -16,9 +16,8 @@ export const getSubtitlesFilePathFromMedia = async (
   streamIndex: number
 ): Promise<string | null> => {
   const result = await getMediaMetadata(mediaFilePath)
-  if (result.errors) {
+  if (result.error) {
     console.error(`Error getting media metadata for ${mediaFilePath}`)
-    console.error(result.errors)
     return null
   }
   const { value: mediaMetadata } = result

@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'fs/promises'
 import { clipAudio } from './clipAudio'
 import { getVideoStill } from './getVideoStill'
 import { AnkiNoteMedia } from '../utils/ankiNote'
+import { failure } from '../utils/result'
 
 export async function getClipMedia(
   clipSpecs: ClipSpecs,
@@ -25,13 +26,11 @@ export async function getClipMedia(
     endTime,
     clipOutputFilePath
   )
-  if (clipAudioResult.errors)
-    return {
-      errors: [
-        `Could not make clip from ${sourceFilePath}`,
-        ...clipAudioResult.errors,
-      ],
-    }
+  if (clipAudioResult.error)
+    return failure(
+      `Could not make clip from ${sourceFilePath}: ${clipAudioResult.error}`
+    )
+
   const soundData = {
     data: () => readFile(clipOutputFilePath),
     fileName: outputFilename,
@@ -41,13 +40,10 @@ export async function getClipMedia(
   const imageResult = image
     ? await getVideoStill(image.id, sourceFilePath, image.seconds)
     : null
-  if (imageResult && imageResult.errors)
-    return {
-      errors: [
-        `Could not make still from ${sourceFilePath}`,
-        ...imageResult.errors,
-      ],
-    }
+  if (imageResult && imageResult.error)
+    return failure(
+      `Could not make still from ${sourceFilePath}: ${imageResult.error}`
+    )
 
   const imageData = imageResult
     ? {

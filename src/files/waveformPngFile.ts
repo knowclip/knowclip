@@ -27,13 +27,13 @@ const waveformPngFileEventHandlers: FileEventHandlers<WaveformPng> = {
       if (!path) return []
 
       const pngPath = await effects.getWaveformPng(state, file, path)
-      if (pngPath.errors)
+      if (pngPath.error)
         return [
           r.openFileFailure(
             file,
             null,
             'Could not locate file: ' +
-              (pngPath.errors.join('; ') || 'problem generating waveform.')
+              (pngPath.error || 'problem generating waveform.')
           ),
         ]
 

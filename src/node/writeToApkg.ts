@@ -38,8 +38,7 @@ export async function writeApkgDeck(
         window.dispatchEvent(new ClipProcessedEvent())
 
         const noteMediaResult = await getClipMedia(clipSpecs, tmpDirectory)
-        if (noteMediaResult.errors)
-          throw new Error(noteMediaResult.errors.join('; '))
+        if (noteMediaResult.error) throw noteMediaResult.error
 
         const noteMedia = noteMediaResult.value
         await addNoteMedia(pkg, noteMedia)

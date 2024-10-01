@@ -10,6 +10,7 @@ import {
 } from '../types/Project'
 import validateProject from './validateProject'
 import { unescapeClozeFields } from './clozeField'
+import { failure } from './result'
 
 type NormalizedProjectFileData = {
   project: ProjectFile
@@ -40,20 +41,20 @@ export const parseProjectJson = async <F extends FlashcardFields>(
       }
     })
 
-    if (errors.length) return { errors }
+    if (errors.length) return failure(errors.join('; '))
 
     const [project, ...media] = docs
 
     const validation = validateProject(project, media)
 
     if (validation.errors)
-      return {
-        errors: Object.entries(validation.errors).map(
+      return failure(
+        Object.entries(validation.errors).map(
           ([sectionName, bigErrorMessage]) => {
             return `Invalid data for ${sectionName}:\n\n${bigErrorMessage}`
           }
-        ),
-      }
+        )
+      )
 
     return {
       value: {
@@ -62,7 +63,7 @@ export const parseProjectJson = async <F extends FlashcardFields>(
       },
     }
   } catch (err) {
-    return { errors: [String(err)] }
+    return failure(err)
   }
 }
 

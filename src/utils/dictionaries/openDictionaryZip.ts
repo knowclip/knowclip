@@ -98,7 +98,7 @@ export async function openDictionaryZip<
     zipfile.on('close', () => {
       handleClose((result) => {
         const endEventPayload: ParseEndPayload<DictionaryFileType> =
-          result.errors
+          result.error
             ? {
                 file,
                 filePath,
@@ -143,7 +143,7 @@ export async function openDictionaryZip<
   } catch (err) {
     console.error(err)
     return {
-      errors: [`Problem opening zip file: ${err}`],
+      error: [`Problem opening zip file: ${err}`],
     }
   }
 }

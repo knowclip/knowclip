@@ -20,13 +20,13 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     // mediaPlayer.src = ''
 
     const validationResult = await validateMediaFile(file, filePath)
-    if (validationResult.errors) {
+    if (validationResult.error) {
       return [
         r.openFileFailure(
           file,
           filePath,
           `Problem opening ${getHumanFileName(file)}: ${
-            validationResult.errors.join(', ') || 'problem reading file.'
+            validationResult.error || 'problem reading file.'
           }`
         ),
       ]
@@ -68,7 +68,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         ? await validateMediaFile(file, nameMatch)
         : null
 
-      if (matchingFile && !matchingFile.errors) {
+      if (matchingFile && !matchingFile.error) {
         return [r.locateFileSuccess(file, nameMatch)]
       }
     }
@@ -96,7 +96,7 @@ export const validateMediaFile = async (
     existingFile.flashcardFieldsToSubtitlesTracks
   )
 
-  if (result.errors) return result
+  if (result.error) return result
 
   const { value: newFile } = result
 

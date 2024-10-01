@@ -12,7 +12,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openRequest: async (file, filePath, state, effects) => {
     try {
       const parse = await parseProjectJson(filePath)
-      if (parse.errors) throw new Error(parse.errors.join('; '))
+      if (parse.error) throw parse.error
 
       const { project, clips, cards } = normalizeProjectJson(state, parse.value)
       if (!project)
@@ -58,7 +58,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openSuccess: [
     async (_validatedFile, filePath, state, _effects) => {
       const parse = await parseProjectJson(filePath)
-      if (parse.errors) throw new Error(parse.errors.join('; '))
+      if (parse.error) throw new Error(parse.error.join('; '))
 
       const { project, media, subtitles } = normalizeProjectJson(
         state,
@@ -82,7 +82,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
             ? await validateMediaFile(mediaFile, nameMatch)
             : null
 
-          if (matchingFile && !matchingFile.errors)
+          if (matchingFile && !matchingFile.error)
             newlyAutoFoundMediaFilePaths[mediaFile.id] = nameMatch
         }
       }

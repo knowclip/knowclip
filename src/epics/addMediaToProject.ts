@@ -12,7 +12,7 @@ const addMediaToProject: AppEpic = (action$, _state$) =>
       Promise.all(
         filePaths.map(async (filePath) => {
           const file = await readMediaFile(filePath, uuid(), projectId)
-          if (file.errors) throw file.errors.join('; ')
+          if (file.error) throw file.error
           else return r.openFileRequest(file.value, filePath)
         })
       )

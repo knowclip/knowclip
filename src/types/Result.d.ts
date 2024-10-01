@@ -1,5 +1,5 @@
-type Result<T> = Failure | Success<T>
-type Failure = { errors: string[]; value?: undefined }
-type Success<T> = { value: T; errors?: undefined }
+type Result<T, E = Error> = Failure<E> | Success<T>
+type Failure<E = Error> = { error: E; value?: undefined }
+type Success<T> = { value: T; error?: undefined }
 
-type AsyncResult<T> = Promise<Result<T>>
+type AsyncResult<T, E = Error> = Promise<Result<T, E>>

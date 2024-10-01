@@ -12,7 +12,7 @@ export async function processNoteMedia(
     saveImages
   )
 
-  if (clipMediaResult.errors) return clipMediaResult
+  if (clipMediaResult.error) return clipMediaResult
 
   return {
     value: 'done',

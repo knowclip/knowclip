@@ -103,7 +103,7 @@ const startupCheckForUpdates: AppEpic = (action$, state$, effects) =>
 
       const updatesCheck = await checkForUpdates()
 
-      if (updatesCheck.errors) {
+      if (updatesCheck.error) {
         const messageBoxResult = await showMessageBox({
           title: 'Check for updates',
           message:
@@ -155,8 +155,8 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
 
       const updatesCheck = await checkForUpdates()
 
-      if (updatesCheck.errors) {
-        console.error(updatesCheck.errors.join('; '))
+      if (updatesCheck.error) {
+        console.error(updatesCheck.error.join('; '))
         return EMPTY
       }
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
@@ -201,7 +201,7 @@ const checkForUpdates = VITEST
 
         return { value: newerReleases }
       } catch (err) {
-        return { errors: [`${err}`] }
+        return { error: [`${err}`] }
       }
     }
 
