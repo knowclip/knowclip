@@ -58,7 +58,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openSuccess: [
     async (_validatedFile, filePath, state, _effects) => {
       const parse = await parseProjectJson(filePath)
-      if (parse.error) throw new Error(parse.error.join('; '))
+      if (parse.error) throw parse.error
 
       const { project, media, subtitles } = normalizeProjectJson(
         state,

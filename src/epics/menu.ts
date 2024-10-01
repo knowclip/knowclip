@@ -15,6 +15,7 @@ import { REHYDRATE } from 'redux-persist'
 import packageJson from '../../package.json'
 import { VITE_BUILD_NUMBER, VITEST } from '../env'
 import KnowclipActionType from '../types/ActionType'
+import { failure } from '../utils/result'
 
 const showSettingsDialog: AppEpic = (
   action$,
@@ -156,7 +157,7 @@ const menuCheckForUpdates: AppEpic = (action$, state$, effects) =>
       const updatesCheck = await checkForUpdates()
 
       if (updatesCheck.error) {
-        console.error(updatesCheck.error.join('; '))
+        console.error(updatesCheck.error)
         return EMPTY
       }
       const checkAtStartup = state$.value.settings.checkForUpdatesAutomatically
@@ -201,7 +202,7 @@ const checkForUpdates = VITEST
 
         return { value: newerReleases }
       } catch (err) {
-        return { error: [`${err}`] }
+        return failure(err)
       }
     }
 
