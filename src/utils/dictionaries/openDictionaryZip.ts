@@ -1,5 +1,6 @@
 import { BrowserWindow } from 'electron'
 import { Entry, ZipFile, open } from 'yauzl'
+import { failure } from '../result'
 
 export type ImportProgressPayload<D extends DictionaryFile> = {
   file: D
@@ -141,10 +142,7 @@ export async function openDictionaryZip<
       })
     }
   } catch (err) {
-    console.error(err)
-    return {
-      error: [`Problem opening zip file: ${err}`],
-    }
+    return failure(`Problem opening zip file: ${err}`)
   }
 }
 
