@@ -10,7 +10,7 @@ export function test(name: string, fn: () => Promise<void>): void {
   vitest.test(name, async (ctx) => {
     vitest.onTestFailed(async () => {
       try {
-        const filenameSegments = ctx.meta.file?.name.split('/')
+        const filenameSegments = ctx.task.file?.name.split('/')
         const testNameSegments = vitest.expect
           .getState()
           .currentTestName?.split(' > ')
