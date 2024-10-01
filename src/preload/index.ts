@@ -6,7 +6,6 @@ import {
 } from '../node/setUpMocks'
 import * as electron from '../node/electron'
 import { sendToMainProcess } from '../node/sendToMainProcess'
-import { initSentry } from '../node/initSentry'
 import { clipAudio } from '../node/clipAudio'
 import { createWaveformPng } from '../node/createWaveformPng'
 import * as getVideoStill from '../node/getVideoStill'
@@ -45,7 +44,6 @@ console.log('process.env', process.env)
 
 const electronApi = {
   electron,
-  initSentry,
   createElectronStorage,
   sendToMainProcess,
   setUpMocks,

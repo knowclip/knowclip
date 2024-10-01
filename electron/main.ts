@@ -6,6 +6,8 @@ import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
+import * as Sentry from '@sentry/electron/main'
+import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
 
 const WINDOW_START_DIMENSIONS = {
   width: 1920,
@@ -19,10 +21,8 @@ if (isTesting) interceptLogs()
 
 require('electron-store').initRenderer()
 
-const Sentry = require('@sentry/electron')
-
 Sentry.init({
-  dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',
+  dsn: SENTRY_DSN_URL,
 })
 
 const shouldInstallExtensions = Boolean(
