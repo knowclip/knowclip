@@ -75,8 +75,8 @@ async function render() {
   if (initialTestStateResult?.error) {
     console.error(initialTestStateResult.error)
     throw new Error('Problem getting persisted test state.')
-  } else console.log('initial test state', initialTestStateResult?.result)
-  const initialTestState = initialTestStateResult?.result
+  } else console.log('initial test state', initialTestStateResult?.value)
+  const initialTestState = initialTestStateResult?.value
   const conf = window.electronApi.env.VITEST ? undefined : new Conf()
   const { store, persistor } = getStore(
     initialTestState,

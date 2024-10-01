@@ -12,9 +12,7 @@ export type MessageHandlerResult<T extends MessageToMainType> = ReturnType<
   MessageResponders[T]
 >
 
-export type MessageResponse<R> =
-  | { result: R; error?: undefined }
-  | {
-      result?: undefined
-      error: { name?: string; stack?: string; message: string }
-    }
+export type MessageResponse<
+  R,
+  E = { name?: string; stack?: string; message: string }
+> = Result<R, E>

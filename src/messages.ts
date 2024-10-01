@@ -39,7 +39,7 @@ export function handleMessages(
         throw new Error(`Unknown message type: ${JSON.stringify(message)}`)
 
       const result = await respond(messageHandlers, message)
-      return { result: await result }
+      return { value: await result }
     } catch (rawError) {
       const error = {
         message:

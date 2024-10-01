@@ -16,7 +16,7 @@ const ipcResult = <T>(messageResponse: MessageResponse<T>) => {
     throw new Error('Problem reaching main process.')
   }
 
-  return messageResponse.result
+  return messageResponse.value
 }
 
 const showSaveDialog = (

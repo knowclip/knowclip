@@ -95,8 +95,8 @@ sendToMainProcess({
     console.error(getPaths.error)
     throw new Error('Problem finding ffmpeg and ffprobe paths.')
   }
-  ffmpeg.ffmpeg.setFfmpegPath(getPaths.result.ffmpeg)
-  ffmpeg.ffmpeg.setFfprobePath(getPaths.result.ffprobe)
+  ffmpeg.ffmpeg.setFfmpegPath(getPaths.value.ffmpeg)
+  ffmpeg.ffmpeg.setFfprobePath(getPaths.value.ffprobe)
 })
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)
