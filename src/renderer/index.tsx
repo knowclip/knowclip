@@ -2,6 +2,7 @@ import 'rxjs' // eslint-disable-line no-unused-vars
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
+import { Conf } from 'electron-conf/renderer'
 import App from '../components/App'
 
 import getStore from '../store'
@@ -9,8 +10,6 @@ import '../index.css'
 import * as Sentry from '@sentry/electron/renderer'
 import { init as reactInit } from '@sentry/react'
 import ErrorMessage from '../components/ErrorMessage'
-import { VITEST } from '../env'
-import { sendToMainProcess } from 'preloaded/sendToMainProcess'
 import { PersistGate } from 'redux-persist/integration/react'
 import { IpcRendererEvent } from '../preload/IpcRendererEvent'
 
@@ -61,18 +60,28 @@ window.addEventListener('error', (e) => {
   root.render(<ErrorMessage reactError={e} />)
 })
 
-if (VITEST)
-  sendToMainProcess({
-    type: 'getPersistedTestState',
-    args: [],
-  }).then(({ result: initialTestState }) => {
-    render(initialTestState)
+render()
+
+async function render(initialTestState?: Partial<AppState> | undefined) {
+  const initialTestStatePromise = window.electronApi.env.VITEST
+    ? window.electronApi.sendToMainProcess({
+        type: 'getPersistedTestState',
+        args: [],
+      })
+    : undefined
+
+  const initialTestStateResult = await initialTestStatePromise
+
+  if (initialTestStateResult?.error) {
+    console.error(initialTestStateResult.error)
+    throw new Error('Problem getting persisted test state.')
+  }
+  const conf = new Conf()
+  const { store, persistor } = getStore(initialTestState, {
+    getItem: async (key: string) => conf.get(key),
+    setItem: async (key: string, item: any) => conf.set(key, item),
+    removeItem: async (key: string) => conf.delete(key),
   })
-else render()
-
-function render(initialTestState?: Partial<AppState> | undefined) {
-  const { store, persistor } = getStore(initialTestState)
-
   const root = createRoot(document.getElementById('root')!)
 
   root.render(

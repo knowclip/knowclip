@@ -1,13 +1,18 @@
 import { BrowserWindow, screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
+import * as Sentry from '@sentry/electron/main'
+import { Conf } from 'electron-conf/main'
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
-import * as Sentry from '@sentry/electron/main'
 import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
+
+const conf = new Conf()
+
+conf.registerRendererListener()
 
 const WINDOW_START_DIMENSIONS = {
   width: 1920,
@@ -18,8 +23,6 @@ const { isPackaged } = app
 const isTesting = process.env.VITEST
 
 if (isTesting) interceptLogs()
-
-require('electron-store').initRenderer()
 
 Sentry.init({
   dsn: SENTRY_DSN_URL,

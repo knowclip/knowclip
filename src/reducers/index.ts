@@ -9,24 +9,23 @@ import settings from './settings'
 import fileAvailabilities from './fileAvailabilities'
 import files from './files'
 import { PersistConfig, createTransform, persistReducer } from 'redux-persist'
-import { createElectronStorage } from 'preloaded/reduxPersistElectronStorage'
 import { resetFileAvailabilities } from '../utils/statePersistence'
 import A from '../types/ActionType'
 import { KnowclipAction } from '../actions'
 import KnowclipActionType from '../types/ActionType'
 
-const storage = createElectronStorage()
-const whitelist: (keyof FilesState)[] = ['ProjectFile', 'Dictionary']
-const filesPersistConfig: PersistConfig<
+export type FilesPersistConfig = PersistConfig<
   FilesState,
   FilesState,
   FilesState,
   FilesState
-> = {
+>
+const whitelist: (keyof FilesState)[] = ['ProjectFile', 'Dictionary']
+const getFilesPersistConfig = (storage: FilesPersistConfig['storage']) => ({
   key: 'files',
   storage,
   whitelist,
-}
+})
 
 const transform = createTransform(
   (inbound: FileAvailabilitiesState) => inbound,
@@ -36,25 +35,30 @@ const transform = createTransform(
   }
 )
 
-const rootConfig: PersistConfig<AppState> = {
-  key: 'root',
-  storage,
-  transforms: [transform],
-  whitelist: ['settings', 'fileAvailabilities'],
+const getRoot = (storage: FilesPersistConfig['storage']) =>
+  combineReducers<AppState>({
+    clips,
+    session,
+    snackbar,
+    dialog,
+    subtitles,
+    settings,
+    fileAvailabilities,
+    files: persistReducer(
+      getFilesPersistConfig(storage),
+      files
+    ) as unknown as typeof files,
+  })
+
+const getPersistedReducer = (storage: PersistConfig<AppState>['storage']) => {
+  const rootConfig: PersistConfig<AppState> = {
+    key: 'root',
+    storage,
+    transforms: [transform],
+    whitelist: ['settings', 'fileAvailabilities'],
+  }
+  return persistReducer(rootConfig, getRoot(storage))
 }
-
-const root = combineReducers<AppState>({
-  clips,
-  session,
-  snackbar,
-  dialog,
-  subtitles,
-  settings,
-  fileAvailabilities,
-  files: persistReducer(filesPersistConfig, files) as unknown as typeof files,
-})
-
-const persistedReducer = persistReducer(rootConfig, root)
 
 const UNDOABLE_ACTIONS = new Set<KnowclipActionType>([
   A.deleteCard,
@@ -219,6 +223,9 @@ function getStateUnaffectedByHistoryAction(state: AppState) {
   }
 }
 
-export const persistedUndoableReducer = undoable(persistedReducer)
+export const getPersistedUndoableReducer = (
+  storage: PersistConfig<AppState>['storage']
+) => undoable(getPersistedReducer(storage))
 
-export const undoableReducer = undoable(root)
+export const getUndoableReducer = (storage: FilesPersistConfig['storage']) =>
+  undoable(getRoot(storage))

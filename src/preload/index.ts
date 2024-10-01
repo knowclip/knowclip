@@ -1,4 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import { exposeConf } from 'electron-conf/preload'
+
+exposeConf()
+
 import {
   setUpMocks,
   listenToTestIpcEvents,
@@ -21,7 +25,6 @@ import * as subtitle from '../node/subtitle'
 import * as subsrt from '../node/subsrt'
 import { processNoteMedia } from '../node/processNoteMedia'
 import * as writeToApkg from '../node/writeToApkg'
-import { createElectronStorage } from '../node/reduxPersistElectronStorage'
 import {
   MessageHandlerResult,
   MessageResponse,
@@ -44,7 +47,6 @@ console.log('process.env', process.env)
 
 const electronApi = {
   electron,
-  createElectronStorage,
   sendToMainProcess,
   setUpMocks,
   os,
