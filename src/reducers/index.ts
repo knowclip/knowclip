@@ -35,7 +35,7 @@ const transform = createTransform(
   }
 )
 
-const getRoot = (storage: FilesPersistConfig['storage']) =>
+const getRoot = (storage?: FilesPersistConfig['storage']) =>
   combineReducers<AppState>({
     clips,
     session,
@@ -44,10 +44,12 @@ const getRoot = (storage: FilesPersistConfig['storage']) =>
     subtitles,
     settings,
     fileAvailabilities,
-    files: persistReducer(
-      getFilesPersistConfig(storage),
-      files
-    ) as unknown as typeof files,
+    files: storage
+      ? (persistReducer(
+          getFilesPersistConfig(storage),
+          files
+        ) as unknown as typeof files)
+      : files,
   })
 
 const getPersistedReducer = (storage: PersistConfig<AppState>['storage']) => {
@@ -227,5 +229,4 @@ export const getPersistedUndoableReducer = (
   storage: PersistConfig<AppState>['storage']
 ) => undoable(getPersistedReducer(storage))
 
-export const getUndoableReducer = (storage: FilesPersistConfig['storage']) =>
-  undoable(getRoot(storage))
+export const getUndoableReducer = () => undoable(getRoot())

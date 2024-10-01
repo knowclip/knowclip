@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { exposeConf } from 'electron-conf/preload'
-
-exposeConf()
+if (!process.env.VITEST) exposeConf()
 
 import {
   setUpMocks,

@@ -13,20 +13,22 @@ const reduxDevtoolsExtension = (
 
 function getStore(
   initialTestState: Partial<AppState> | undefined,
-  electronStorage: PersistConfig<AppState>['storage']
+  electronStorage?: PersistConfig<AppState>['storage']
 ) {
   const { NODE_ENV, VITE_INTEGRATION_DEV, VITEST } = window.electronApi.env
+  console.log('NODE_ENV', NODE_ENV)
+  console.log('VITE_INTEGRATION_DEV', VITE_INTEGRATION_DEV)
+  console.log('VITEST', VITEST)
+  console.log('electronStorage', electronStorage)
 
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
   })
-  const undoableReducer = getUndoableReducer(electronStorage)
-  const persistedUndoableReducer = getPersistedUndoableReducer(electronStorage)
 
   const store = createStore(
-    VITEST
-      ? (undoableReducer as typeof persistedUndoableReducer)
-      : persistedUndoableReducer,
+    VITEST || !electronStorage
+      ? (getUndoableReducer() as ReturnType<typeof getPersistedUndoableReducer>)
+      : getPersistedUndoableReducer(electronStorage),
     initialTestState as any,
     compose(
       applyMiddleware(epicMiddleware),

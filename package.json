@@ -72,9 +72,11 @@
     "test": "npm run vitest run -- --config ./vitest.config.ts",
     "build": "npm run build-schemas && npm run electron-vite -- build --mode",
     "integration": "npm run build -- integration && npm run integration:skip-build",
+    "integration:u": "npm run build -- integration && npm run integration:skip-build:u",
     "integration:win": "npm run electron-vite -- build --mode integration && npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
     "integration:debug": "VITE_INTEGRATION_DEV=1 npm run build -- integration && VITE_INTEGRATION_DEV=1 npm run integration:skip-build",
     "integration:skip-build": "npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
+    "integration:skip-build:u": "npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
     "integration:ds": "VITE_INTEGRATION_DEV=1 npm run vitest --  run --config ./vitest-integration.config.ts --mode integration",
     "build-fixture:saved": "npm run integration:build-fixture -- savedProject",
     "build-fixture:shared": "npm run integration:build-fixture -- sharedProject && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",
@@ -108,7 +110,7 @@
     ]
   },
   "browserslist": [
-    "electron >= 31.1.0"
+    "electron >= 31.0.0"
   ],
   "devDependencies": {
     "@types/archiver": "^6.0.2",
@@ -133,7 +135,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
     "chromedriver": "^126.0.0",
-    "electron": "31.1.0",
+    "electron": "31.0.0",
     "electron-builder": "^24.9.1",
     "electron-vite": "^2.0.0",
     "eslint": "^8.56.0",
@@ -148,7 +150,7 @@
     "replace-in-files-cli": "^2.2.0",
     "request": "^2.88.2",
     "typescript": "^5.0.4",
-    "vitest": "^0.31.1",
+    "vitest": "^2.1.1",
     "yalc": "^1.0.0-pre.53"
   },
   "build": {

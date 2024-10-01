@@ -62,7 +62,7 @@ window.addEventListener('error', (e) => {
 
 render()
 
-async function render(initialTestState?: Partial<AppState> | undefined) {
+async function render() {
   const initialTestStatePromise = window.electronApi.env.VITEST
     ? window.electronApi.sendToMainProcess({
         type: 'getPersistedTestState',
@@ -75,13 +75,19 @@ async function render(initialTestState?: Partial<AppState> | undefined) {
   if (initialTestStateResult?.error) {
     console.error(initialTestStateResult.error)
     throw new Error('Problem getting persisted test state.')
-  }
-  const conf = new Conf()
-  const { store, persistor } = getStore(initialTestState, {
-    getItem: async (key: string) => conf.get(key),
-    setItem: async (key: string, item: any) => conf.set(key, item),
-    removeItem: async (key: string) => conf.delete(key),
-  })
+  } else console.log('initial test state', initialTestStateResult?.result)
+  const initialTestState = initialTestStateResult?.result
+  const conf = window.electronApi.env.VITEST ? undefined : new Conf()
+  const { store, persistor } = getStore(
+    initialTestState,
+    conf
+      ? {
+          getItem: async (key: string) => conf.get(key),
+          setItem: async (key: string, item: any) => conf.set(key, item),
+          removeItem: async (key: string) => conf.delete(key),
+        }
+      : undefined
+  )
   const root = createRoot(document.getElementById('root')!)
 
   root.render(

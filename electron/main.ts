@@ -10,10 +10,6 @@ import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
 
-const conf = new Conf()
-
-conf.registerRendererListener()
-
 const WINDOW_START_DIMENSIONS = {
   width: 1920,
   height: 1080,
@@ -21,6 +17,14 @@ const WINDOW_START_DIMENSIONS = {
 
 const { isPackaged } = app
 const isTesting = process.env.VITEST
+
+console.log('main process VITEST', process.env.VITEST)
+if (!isTesting) {
+  const conf = new Conf()
+
+  conf.registerRendererListener()
+  console.log('conf registered')
+}
 
 if (isTesting) interceptLogs()
 

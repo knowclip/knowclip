@@ -26,7 +26,7 @@ exports[`create a deck from a new project > resulting project file matches snaps
             "end": "00:17.76",
             "fields": {
               "meaning": "This kid, lazing about again so early",
-              "notes": "\\"Goro-goro\\" is the sound of something big rolling around.",
+              "notes": ""Goro-goro" is the sound of something big rolling around.",
               "pronunciation": "mata kono ko-wa hirumá-kara góro-goro shite",
               "transcription": "またこの子は昼間からゴロゴロして",
             },
@@ -40,12 +40,12 @@ exports[`create a deck from a new project > resulting project file matches snaps
             ],
           },
           {
-            "end": "01:21.16",
+            "end": "01:11.36",
             "id": "3eb212dd-8f04-4c63-b36a-06a0bb6957aa",
             "image": {
               "type": "VideoStill",
             },
-            "start": "01:15.2",
+            "start": "01:05.4",
             "tags": [
               "pbc",
             ],
