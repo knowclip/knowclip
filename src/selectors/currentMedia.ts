@@ -1,4 +1,3 @@
-import { basename, extname } from 'preloaded/path'
 import {
   getFile,
   getFileAvailabilityById,
@@ -7,6 +6,7 @@ import {
 } from './files'
 import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
+import { basename, extname } from '../utils/rendererPathHelpers'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_MILLISECONDS } from 'clipwave'
 
@@ -17,9 +17,10 @@ export const getConstantBitrateFilePath = (
   id: MediaFileId
 ): MediaFilePath | null => {
   const fileAvailability = getFileAvailabilityById(state, 'MediaFile', id)
+  const { platform } = window.electronApi
   if (
     fileAvailability.filePath &&
-    extname(fileAvailability.filePath).toLowerCase() !== '.mp3'
+    extname(platform, fileAvailability.filePath).toLowerCase() !== '.mp3'
   )
     return fileAvailability.status === 'CURRENTLY_LOADED'
       ? fileAvailability.filePath
@@ -91,8 +92,9 @@ export const isWorkUnsaved = (state: AppState): boolean =>
   state.session.workIsUnsaved
 
 export const getCurrentFileName = (state: AppState): MediaFileName | null => {
+  const { platform } = window.electronApi
   const filePath = getCurrentFilePath(state)
-  return filePath && basename(filePath)
+  return filePath && basename(platform, filePath)
 }
 
 export const getCurrentFileId = ({ session }: AppState): MediaFileId | null =>

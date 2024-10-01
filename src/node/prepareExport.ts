@@ -1,15 +1,13 @@
 import r from '../redux'
-import { toTimestamp } from 'preloaded/ffmpeg'
-import { extname, basename } from 'preloaded/path'
-import { unparse } from 'papaparse'
+import { toTimestamp } from './ffmpeg'
+import { extname, basename } from 'path'
 import { getNoteTypeFields } from '../utils/noteType'
 import { getFileAvailability, encodeClozeDeletions } from '../selectors'
-import { getVideoStillPngPath } from 'preloaded/getVideoStill'
-import { sanitizeFileName } from './sanitizeFilename'
+import { getVideoStillPngPath } from './getVideoStill'
+import { sanitizeFileName } from '../utils/sanitizeFilename'
 import moment from 'moment'
-
-export const getMidpoint = (start: number, end: number) =>
-  start + Math.round((end - start) / 2)
+import { existsSync } from 'fs'
+import { getMidpoint } from '../files/videoStillImageFile'
 
 const roughEscape = (text: string) => text.replace(/[\n\r]/g, '<br />')
 
@@ -102,11 +100,10 @@ export const TEMPLATE_CSS = `.card {
 `
 
 /** Returns either valid export data or a list of missing media files. */
-export const getApkgExportData = (
+export const getApkgExportData = async (
   state: AppState,
   project: ProjectFile,
-  mediaIdToClipsIds: ReviewAndExportDialogData['mediaFileIdsToClipIds'],
-  existsSync: (filePath: string) => boolean
+  mediaIdToClipsIds: ReviewAndExportDialogData['mediaFileIdsToClipIds']
 ) => {
   const fieldNames = getNoteTypeFields(project.noteType)
   const mediaFiles = r.getProjectMediaFiles(state, project.id)
@@ -119,7 +116,8 @@ export const getApkgExportData = (
       !fileLoaded || !fileLoaded.filePath || !existsSync(fileLoaded.filePath)
     )
   })
-  if (missingMediaFiles.length > 0) return { missingMediaFiles }
+  if (missingMediaFiles.length > 0)
+    return { type: 'MISSING MEDIA FILES' as const, missingMediaFiles }
 
   const clipSpecs: ClipSpecs[] = []
 
@@ -213,7 +211,7 @@ export const getApkgExportData = (
   const fields = finalFieldNames.map((fn) => ({ name: fn }))
   const sortf = fields.findIndex((f) => f.name === 'sound')
 
-  const exportData: ApkgExportData = {
+  const apkgData: ApkgExportData = {
     clips: clipSpecs,
     projectId,
     deckName,
@@ -247,23 +245,5 @@ export const getApkgExportData = (
       },
     },
   }
-  return exportData
-}
-
-export const getCsvText = (exportData: ApkgExportData) => {
-  const csvData: string[][] = []
-  const clozeCsvData: string[][] = []
-  for (const {
-    flashcardSpecs: { fields, tags, clozeDeletions },
-  } of exportData.clips) {
-    csvData.push([...fields, tags])
-    if (clozeDeletions) {
-      clozeCsvData.push([clozeDeletions, ...fields.slice(1), tags])
-    }
-  }
-
-  return {
-    csvText: unparse(csvData),
-    clozeCsvText: clozeCsvData.length ? unparse(clozeCsvData) : null,
-  }
+  return { type: 'SUCCESS' as const, apkgData }
 }

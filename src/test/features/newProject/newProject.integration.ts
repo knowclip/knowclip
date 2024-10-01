@@ -9,7 +9,7 @@ import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { runAll } from '../step'
 import { newProjectTestSteps } from './newProjectTestSteps'
 import { join } from 'path'
-import { parseProjectJson } from '../../../utils/parseProject'
+import { parseProjectJson } from '../../../node/parseProject'
 import { describe, beforeAll, afterAll, test, expect } from 'vitest'
 
 describe('create a deck from a new project', () => {

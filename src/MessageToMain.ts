@@ -1,4 +1,4 @@
-import { getMessageResponders } from './getMessageResponders'
+import type { MessageResponders } from './getMessageResponders'
 import { failure } from './utils/result'
 
 export type MessageToMain<T extends MessageToMainType> = {
@@ -6,7 +6,7 @@ export type MessageToMain<T extends MessageToMainType> = {
   args: Parameters<MessageResponders[T]>
 }
 
-export type MessageResponders = ReturnType<typeof getMessageResponders>
+export { MessageResponders }
 export type MessageToMainType = keyof MessageResponders
 
 export type MessageHandlerResult<T extends MessageToMainType> = ReturnType<

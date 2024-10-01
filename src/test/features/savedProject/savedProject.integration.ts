@@ -10,7 +10,7 @@ import { mockSideEffects } from '../../../utils/sideEffects/mocks'
 import { join } from 'path'
 import { runAll, step } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'
-import { parseProjectJson } from '../../../utils/parseProject'
+import { parseProjectJson } from '../../../node/parseProject'
 import { describe, beforeAll, afterAll, test, expect } from 'vitest'
 
 const testId = 'savedProject'

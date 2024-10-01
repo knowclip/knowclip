@@ -1,4 +1,3 @@
-import { nowUtcTimestamp } from '../utils/sideEffects'
 import A from '../types/ActionType'
 import { FileUpdates } from '../files/updates'
 import { KnowclipActionCreatorsSubset } from '.'
@@ -33,7 +32,7 @@ export const filesActions = {
   openFileSuccess: (
     file: FileMetadata,
     filePath: FilePath,
-    timestamp: string = nowUtcTimestamp()
+    timestamp: string
   ) => ({
     type: A.openFileSuccess,
     validatedFile: file,

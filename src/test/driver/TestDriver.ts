@@ -8,6 +8,7 @@ import type {
   MessageToMain,
   MessageHandlerResult,
 } from '../../MessageToMain'
+import { failure } from '../../utils/result'
 
 type WebDriverLogTypes =
   | 'trace'
@@ -154,16 +155,9 @@ export class TestDriver {
       args: [],
     }).catch(async (rawError): Promise<MessageResponse<'ok'>> => {
       console.error('Application failed to start', rawError)
-      console.log(rawError)
       this.stop()
 
-      const error = {
-        message:
-          rawError instanceof Error ? rawError.message : String(rawError),
-        stack: rawError instanceof Error ? rawError.stack : undefined,
-        name: rawError instanceof Error ? rawError.name : undefined,
-      }
-      return Promise.resolve({ error })
+      return Promise.resolve(failure(rawError))
     })
   }
 
@@ -180,9 +174,10 @@ export class TestDriver {
           })
           .catch((error) => {
             console.error('error invoking message', error)
-            done({ error })
-            return { error }
-          }) || done({ error: { message: 'no electronApi found on window' } })
+            const result = failure(error)
+            done(result)
+            return result
+          }) || done(failure('no electronApi found on window'))
       )
     }, message)
   }

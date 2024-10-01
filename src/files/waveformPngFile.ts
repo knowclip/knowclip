@@ -2,8 +2,8 @@ import r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 
 const waveformPngFileEventHandlers: FileEventHandlers<WaveformPng> = {
-  openRequest: async (file, filePath, _state, _effects) => {
-    return [await r.openFileSuccess(file, filePath)]
+  openRequest: async (file, filePath, _state, effects) => {
+    return [await r.openFileSuccess(file, filePath, effects.nowUtcTimestamp())]
   },
   openSuccess: [],
   locateRequest: async (file, _availability, _message, state, effects) => {
@@ -33,7 +33,7 @@ const waveformPngFileEventHandlers: FileEventHandlers<WaveformPng> = {
             file,
             null,
             'Could not locate file: ' +
-              (pngPath.error || 'problem generating waveform.')
+              (pngPath.error.message || 'problem generating waveform.')
           ),
         ]
 

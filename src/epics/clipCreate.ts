@@ -4,11 +4,12 @@ import r from '../redux'
 import A from '../types/ActionType'
 import { combineEpics, ofType } from 'redux-observable'
 
-const clipCreateEpic: AppEpic = (action$, state$) =>
+const clipCreateEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.addClipRequest as const),
 
-    switchMap(({ waveformDrag, clipId }) => {
+    switchMap(({ waveformDrag }) => {
+      const clipId = effects.uuid()
       const left = Math.min(waveformDrag.start, waveformDrag.end)
       const right = Math.max(waveformDrag.start, waveformDrag.end)
 

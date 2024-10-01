@@ -61,6 +61,7 @@ const enum KnowclipActionType {
   exportCsv = 'EXPORT_CSV',
   addMediaToProjectRequest = 'ADD_MEDIA_TO_PROJECT_REQUEST',
   setWorkIsUnsaved = 'SET_WORK_IS_UNSAVED',
+  loadNewSubtitlesFile = 'LOAD_NEW_SUBTITLES_FILE',
   mountSubtitlesTrack = 'MOUNT_SUBTITLES_TRACK',
   showSubtitles = 'SHOW_SUBTITLES',
   hideSubtitles = 'HIDE_SUBTITLES',

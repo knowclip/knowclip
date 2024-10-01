@@ -1,7 +1,7 @@
 import { ffmpeg, toTimestamp } from './ffmpeg'
 
 import type { Writable } from 'stream'
-import { existsSync } from './fs'
+import { existsSync } from 'fs'
 
 export const clipAudioStream = (
   sourceFilePath: string,

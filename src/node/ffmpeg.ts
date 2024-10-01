@@ -1,11 +1,9 @@
 import { basename } from 'path'
 
-import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
+import ffmpeg, { FfprobeData } from 'fluent-ffmpeg'
 import { failure } from '../utils/result'
 
-export const ffmpeg =
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
+export { ffmpeg }
 
 const zeroPad = (zeroes: number, value: any) =>
   String(value).padStart(zeroes, '0')
@@ -87,27 +85,32 @@ export const readMediaFile = async (
   return { value: file }
 }
 
-export function writeMediaSubtitlesToVtt(
+export async function writeMediaSubtitlesToVtt(
   mediaFilePath: string,
   streamIndex: number,
   outputFilePath: string
-): Promise<string | null> {
-  return new Promise((res, rej) =>
-    ffmpeg(mediaFilePath)
-      .outputOptions(`-map 0:${streamIndex}`)
-      .output(outputFilePath)
-      .on('end', () => {
-        res(outputFilePath)
-      })
-      .on('error', (err) => {
-        console.error(
-          `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
-          err
-        )
-        rej(err)
-      })
-      .run()
-  )
+): AsyncResult<string> {
+  try {
+    const vttFilepath: string = await new Promise((res, rej) =>
+      ffmpeg(mediaFilePath)
+        .outputOptions(`-map 0:${streamIndex}`)
+        .output(outputFilePath)
+        .on('end', () => {
+          res(outputFilePath)
+        })
+        .on('error', (err) => {
+          console.error(
+            `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
+            err
+          )
+          rej(err)
+        })
+        .run()
+    )
+    return { value: vttFilepath }
+  } catch (error) {
+    return failure(error)
+  }
 }
 
 export const convertAssToVtt = (filePath: string, vttFilePath: string) =>

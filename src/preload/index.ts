@@ -1,35 +1,18 @@
 import { contextBridge, ipcRenderer } from 'electron'
+
+console.log('Beginning preload')
+
 import { exposeConf } from 'electron-conf/preload'
 if (!process.env.VITEST) exposeConf()
 
-import {
-  setUpMocks,
-  listenToTestIpcEvents,
-  listenToLogPersistedDataEvents,
-} from '../node/setUpMocks'
-import * as electron from '../node/electron'
 import { sendToMainProcess } from '../node/sendToMainProcess'
-import { clipAudio } from '../node/clipAudio'
-import { createWaveformPng } from '../node/createWaveformPng'
-import * as getVideoStill from '../node/getVideoStill'
-import * as os from '../node/os'
-import * as fs from '../node/fs'
-import * as path from '../node/path'
-import * as fsExtra from '../node/fsExtra'
-import * as ffmpeg from '../node/ffmpeg'
-import * as tempy from '../node/tempy'
-import * as ajv from '../node/ajv'
-import * as yauzl from '../node/yauzl'
-import * as subtitle from '../node/subtitle'
-import * as subsrt from '../node/subsrt'
-import { processNoteMedia } from '../node/processNoteMedia'
-import * as writeToApkg from '../node/writeToApkg'
-import {
+import type {
   MessageHandlerResult,
   MessageResponse,
   MessageToMain,
   MessageToMainType,
 } from '../MessageToMain'
+import { setUpMocks } from '../node/setUpMocks'
 
 declare global {
   interface Window {
@@ -44,27 +27,27 @@ const env = process.env
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
 
+const mockedModules: Record<
+  string,
+  {
+    logged: { [fnName: string]: any[] }
+    returnValues: { [fnName: string]: any[] }
+  }
+> = {}
+
 const electronApi = {
-  electron,
-  sendToMainProcess,
-  setUpMocks,
-  os,
-  path,
-  fs,
-  fsExtra,
-  tempy,
-  ajv,
-  ffmpeg,
-  yauzl,
-  subtitle,
-  subsrt,
-  processNoteMedia,
-  getVideoStill,
-  clipAudio,
-  createWaveformPng,
-  writeToApkg,
+  setUpMocks: setUpMocks,
+  platform: process.platform,
+  openExternal: (path: string) =>
+    sendToMainProcess({
+      type: 'openExternal',
+      args: [path],
+    }),
+  sendToMainProcess: sendToMainProcess,
+  sendClosedSignal: () => ipcRenderer.send('closed'),
   env: {
     VITEST: env.VITEST,
+    TEST_ID: env.TEST_ID,
     VITE_BUILD_NUMBER: env.VITE_BUILD_NUMBER,
     DEV: env.DEV,
     VITE_INTEGRATION_DEV: env.VITE_INTEGRATION_DEV,
@@ -80,24 +63,51 @@ const electronApi = {
   close: () => {
     return ipcRenderer.invoke('close')
   },
-  listenToTestIpcEvents,
-  listenToLogPersistedDataEvents,
+  listenToTestIpcEvents: listenToTestIpcEvents,
+  listenToLogPersistedDataEvents(getState: () => AppState) {
+    window.document.addEventListener('DOMContentLoaded', () => {
+      console.log('listening for log message')
+      ipcRenderer.on('log-persisted-data', (e, testId, directories) => {
+        // TODO: test!!
+        window.electronApi.logPersistedDataSnapshot(
+          testId,
+          directories,
+          getState()
+        )
+      })
+    })
+  },
   listenToIpcRendererMessages,
+  writeTextFile: (path: string, data: string) => {
+    sendToMainProcess({
+      type: 'writeTextFile',
+      args: [path, data],
+    })
+  },
+  logPersistedDataSnapshot: (
+    testId: string,
+    directories: Record<string, string>,
+    state: AppState
+  ) => {
+    sendToMainProcess({
+      type: 'logPersistedDataSnapshot',
+      args: [testId, directories, state],
+    })
+  },
+  writeMocksLog: (
+    testId: string,
+    moduleId: string,
+    logged: { [key: string]: any[] }
+  ) => {
+    sendToMainProcess({
+      type: 'writeMocksLog',
+      args: [testId, moduleId, logged],
+    })
+  },
+  mockedModules,
 }
 
 console.log('preloading')
-
-sendToMainProcess({
-  type: 'getFfmpegAndFfprobePath',
-  args: [],
-}).then((getPaths) => {
-  if (getPaths.error) {
-    console.error(getPaths.error)
-    throw new Error('Problem finding ffmpeg and ffprobe paths.')
-  }
-  ffmpeg.ffmpeg.setFfmpegPath(getPaths.value.ffmpeg)
-  ffmpeg.ffmpeg.setFfprobePath(getPaths.value.ffprobe)
-})
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)
 
@@ -111,4 +121,48 @@ function listenToIpcRendererMessages(
   ipcRenderer.on('message', callback)
 }
 
-console.log('preloaded')
+function listenToTestIpcEvents() {
+  console.log('Going to start listening for IPC test events!!')
+
+  ipcRenderer.on('start-test', (e, testId) => {
+    console.log('Test started', testId)
+  })
+  ipcRenderer.on('end-test', (testId) => {
+    console.log('Test ended', testId)
+  })
+
+  ipcRenderer.on(
+    'mock-function',
+    (event, moduleId, functionName, newReturnValue) => {
+      const { returnValues } = mockedModules[moduleId]
+
+      console.log(
+        `Function ${functionName} mocked with: ${JSON.stringify(
+          newReturnValue
+        )}`
+      )
+      returnValues[functionName].push(deserializeReturnValue(newReturnValue))
+      if (process.env.VITE_INTEGRATION_DEV)
+        sendToMainProcess({
+          type: 'log',
+          args: [
+            `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
+              newReturnValue
+            )}\n\n\n`,
+          ],
+        })
+    }
+  )
+}
+
+function deserializeReturnValue({
+  isPromise,
+  value,
+}: {
+  isPromise: boolean
+  value: any
+}) {
+  return isPromise ? Promise.resolve(value) : value
+}
+
+console.log('done preloading')

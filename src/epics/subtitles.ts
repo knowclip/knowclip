@@ -16,7 +16,6 @@ import { of, Observable, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { from } from 'rxjs'
-import { uuid } from '../utils/sideEffects'
 import { areSameFile } from '../utils/files'
 import {
   getFlashcardTextFromCardBase,
@@ -29,11 +28,12 @@ import { CLIPWAVE_ID } from '../utils/clipwave'
 import { isWaveformItemSelectable } from '../utils/clipwave/isWaveformItemSelectable'
 import { ActionOf } from '../actions'
 import { flushSync } from 'react-dom'
+import { basename } from '../utils/rendererPathHelpers'
 
 const makeClipsFromSubtitles: AppEpic = (
   action$,
   state$,
-  { pauseMedia, setCurrentTime, getMediaPlayer }
+  { pauseMedia, setCurrentTime, getMediaPlayer, uuid }
 ) =>
   action$.pipe(
     ofType(A.makeClipsFromSubtitles as const),
@@ -242,6 +242,23 @@ const goToSubtitlesChunk: AppEpic = (action$, state$, { setCurrentTime }) =>
     ignoreElements()
   )
 
+const loadNewSubtitles: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType(A.loadNewSubtitlesFile as const),
+    mergeMap(async ({ filePath, mediaFileId }) =>
+      r.openFileRequest(
+        {
+          type: 'ExternalSubtitlesFile',
+          parentId: mediaFileId,
+          id: effects.uuid(),
+          name: basename(effects.getPlatform(), filePath),
+          chunksMetadata: null,
+        },
+        filePath
+      )
+    )
+  )
+
 function validateTracks(
   state: AppState,
   fieldNamesToTrackIds: SubtitlesFlashcardFieldsLinks
@@ -301,6 +318,7 @@ function validateTracks(
 }
 
 export default combineEpics(
+  loadNewSubtitles,
   makeClipsFromSubtitles,
   showSubtitlesClipsDialogRequest,
   goToSubtitlesChunk

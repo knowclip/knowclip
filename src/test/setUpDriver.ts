@@ -27,6 +27,13 @@ const chromedriverPath = join(
   'chromedriver'
 )
 
+function verifyChromeDriverPath() {
+  if (!existsSync(chromedriverPath)) {
+    throw new Error(`chromedriver not found at ${chromedriverPath}.'?`)
+  }
+}
+verifyChromeDriverPath()
+
 export interface IntegrationTestContext {
   testId: string
   setup: {
@@ -91,6 +98,7 @@ export async function startApp(
     ],
     env: {
       VITEST: 'true',
+      TEST_ID: context.testId,
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
       NODE_ENV: 'integration',
       DISPLAY: process.env.DISPLAY,

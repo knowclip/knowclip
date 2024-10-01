@@ -1,9 +1,13 @@
-import * as tempy from 'preloaded/tempy'
-import { existsSync } from 'preloaded/fs'
+import * as tempy from 'tempy'
+import { existsSync } from 'fs'
 import { getFileAvailabilityById } from '../selectors'
-import { basename, join } from 'preloaded/path'
-import { createWaveformPng } from 'preloaded/createWaveformPng'
-import { failure } from './result'
+import { basename, join } from 'path'
+import { createWaveformPng } from './createWaveformPng'
+import {
+  getWaveformIds,
+  WAVEFORM_SEGMENT_LENGTH,
+} from '../utils/getWaveformIds'
+import { failure } from '../utils/result'
 
 const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
 
@@ -49,6 +53,7 @@ const getWaveformPngPath = (
   if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
     return fileAvailability.filePath
   }
+
   return join(
     tempy.rootTemporaryDirectory,
     basename(mediaFilePath) + '_' + file.id + '.png'
@@ -66,19 +71,5 @@ export const getWaveformPngs = (mediaFile: MediaFile): WaveformPng[] => {
       startSeconds: i * WAVEFORM_SEGMENT_LENGTH,
       endSeconds: Math.min(durationSeconds, (i + 1) * WAVEFORM_SEGMENT_LENGTH),
     })
-  )
-}
-const WAVEFORM_SEGMENT_LENGTH = 5 * 60
-// TODO: investigate why this produced an empty
-//       second segment for pbc demo video when set to 2 minutes
-function getWaveformId(mediaFileId: MediaFileId, i: number): string {
-  return mediaFileId + '__' + i
-}
-
-export function getWaveformIds(mediaFile: MediaFile) {
-  const { durationSeconds } = mediaFile
-  const segmentsCount = Math.ceil(durationSeconds / WAVEFORM_SEGMENT_LENGTH)
-  return [...Array(segmentsCount).keys()].map((index) =>
-    getWaveformId(mediaFile.id, index)
   )
 }

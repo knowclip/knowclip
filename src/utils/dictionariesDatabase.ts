@@ -1,11 +1,10 @@
 import Dexie, { Database } from 'dexie'
-import { basename } from 'preloaded/path'
+import { basename } from '../utils/rendererPathHelpers'
 import { getTableName, LexiconEntry } from '../files/dictionaryFile'
 import { LETTERS_DIGITS_PLUS } from './dictCc'
 import { lookUpDictCc } from './dictionaries/lookUpDictCc'
 import { lookUpCeDict } from './dictionaries/lookUpCeDict'
 import { lookUpYomichanJMDict } from './dictionaries/lookUpYomichanJMDict'
-import { uuid } from './sideEffects'
 
 const LATEST_DEXIE_DB_VERSION = 1
 
@@ -46,13 +45,15 @@ export function getDexieDb() {
 export async function newDictionary(
   db: Database,
   dictionaryType: DictionaryFileType,
-  filePath: string
+  filePath: string,
+  id: string
 ) {
+  const { platform } = window.electronApi
   const dicProps: Omit<DictionaryFile, 'key'> = {
     type: 'Dictionary',
     dictionaryType,
-    id: uuid(),
-    name: basename(filePath),
+    id,
+    name: basename(platform, filePath),
     importComplete: false,
   }
   const key = await db.table(DICTIONARIES_TABLE).add(dicProps)

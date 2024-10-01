@@ -1,30 +1,41 @@
 import r from '../redux'
-import {
-  newExternalSubtitlesTrack,
-  validateBeforeOpenFileAction,
-} from '../utils/subtitles'
+import { newExternalSubtitlesTrack } from '../utils/newSubtitlesTrack'
 import { FileEventHandlers } from './eventHandlers'
-import { extname } from 'preloaded/path'
+import { extname } from '../utils/rendererPathHelpers'
+import type { ElectronApi } from '../preload'
+import { sanitizeSubtitles } from './sanitizeSubtitles'
+import { handleSubtitlesValidationResult } from '../utils/handleSubtitlesValidationResult'
 
-const isVtt = (filePath: FilePath) => extname(filePath).toLowerCase() === '.vtt'
+const isVtt = (platform: ElectronApi['platform'], filePath: FilePath) =>
+  extname(platform, filePath).toLowerCase() === '.vtt'
 
 const externalSubtitlesFileEventHandlers: FileEventHandlers<ExternalSubtitlesFile> =
   {
-    openRequest: async (file, filePath, state, _effects) => {
-      return await validateBeforeOpenFileAction(state, filePath, file)
+    openRequest: async (file, filePath, state, effects) => {
+      const result = await effects.validateSubtitleFileBeforeOpen(
+        state,
+        filePath,
+        file
+      )
+      return [handleSubtitlesValidationResult(effects, file, filePath, result)]
     },
     openSuccess: [
       async (validatedFile, filePath, state, effects) => {
-        if (isVtt(filePath)) {
-          const chunks = await effects.getSubtitlesFromFile(state, filePath)
+        const { platform } = window.electronApi
+        if (isVtt(platform, filePath)) {
+          const chunksResult = await effects.getSubtitlesFromFile(
+            state,
+            filePath
+          )
 
-          if ('error' in chunks) {
+          if (chunksResult.error) {
             return [
               r.simpleMessageSnackbar(
-                `There was a problem reading subtitles from ${validatedFile.name}: ${chunks.error}`
+                `There was a problem reading subtitles from ${validatedFile.name}: ${chunksResult.error.message}`
               ),
             ]
           }
+          const chunks = sanitizeSubtitles(chunksResult.value)
 
           const track = newExternalSubtitlesTrack(validatedFile.id, chunks)
           const mediaFile = r.getFile<MediaFile>(

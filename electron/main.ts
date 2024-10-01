@@ -41,17 +41,6 @@ const shouldInstallExtensions = Boolean(
 
 const context: { mainWindow: BrowserWindow | null } = { mainWindow: null }
 
-// have to do it this to access ffmpeg path from within webpack bundle
-const ffmpegStaticBasePath = require('ffmpeg-static')
-const ffprobeStaticBasePath = require('ffprobe-static').path
-const getFfmpegStaticPath = (basePath: string) =>
-  basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
-
-const ffmpegPaths = {
-  ffmpeg: getFfmpegStaticPath(ffmpegStaticBasePath),
-  ffprobe: getFfmpegStaticPath(ffprobeStaticBasePath),
-}
-
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
@@ -66,7 +55,7 @@ async function createWindow() {
       webSecurity: isPackaged,
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: false,
+      sandbox: true,
       devTools: true,
       preload: path.join(__dirname, '..', 'preload', 'index.js'),
     },
@@ -158,7 +147,6 @@ app.whenReady().then(async () => {
   setUpMenu(context.mainWindow as BrowserWindow, true)
   handleMessages(
     context.mainWindow as BrowserWindow,
-    ffmpegPaths,
     process.env.PERSISTED_STATE_PATH
   )
 })

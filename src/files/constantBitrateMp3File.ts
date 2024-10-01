@@ -3,8 +3,8 @@ import r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
 
 const eventHandlers: FileEventHandlers<ConstantBitrateMp3> = {
-  openRequest: async (file, filePath, _state, _effects) => {
-    return [r.openFileSuccess(file, filePath)]
+  openRequest: async (file, filePath, _state, effects) => {
+    return [r.openFileSuccess(file, filePath, effects.nowUtcTimestamp())]
   },
 
   openSuccess: [
@@ -22,7 +22,16 @@ const eventHandlers: FileEventHandlers<ConstantBitrateMp3> = {
       parentFile.filePath,
       null
     )
-    return [r.locateFileSuccess(file, cbrFilePath)]
+    if (cbrFilePath.error)
+      return [
+        r.openFileFailure(
+          file,
+          _availability.filePath,
+          cbrFilePath.error.message
+        ),
+      ]
+
+    return [r.locateFileSuccess(file, cbrFilePath.value)]
   },
 
   locateSuccess: null,
