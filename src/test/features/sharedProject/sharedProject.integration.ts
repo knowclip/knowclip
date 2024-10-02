@@ -7,7 +7,7 @@ import manuallyLocateAsset from './manuallyLocateAsset'
 import reviewWithMissingMedia from './reviewWithMissingMedia'
 import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 import { runAll, step } from '../step'
 import { describe, beforeAll, afterAll, test } from 'vitest'
 

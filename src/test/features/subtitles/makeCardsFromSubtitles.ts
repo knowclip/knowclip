@@ -1,6 +1,6 @@
 import { IntegrationTestContext, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu.testLabels'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { join } from 'path'
 import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { confirmationDialog$ } from '../../../components/Dialog/Confirmation.testLabels'
