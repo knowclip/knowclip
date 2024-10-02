@@ -1,9 +1,9 @@
 import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
 import { join } from 'path'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { test } from '../../test'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 
 const {
   openMediaFilesMenuButton: mediaFilesMenuButton,

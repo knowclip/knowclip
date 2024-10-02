@@ -52,7 +52,7 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
 
       if (!(source && source.filePath && sourceFile)) return []
 
-      const chunksResult = await effects.getSubtitlesFromFile(state, filePath)
+      const chunksResult = await effects.getSubtitlesFromFile(filePath)
 
       if (validatedFile.parentType === 'MediaFile') {
         if (r.getCurrentFileId(state) !== source.id) return []

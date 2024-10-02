@@ -5,6 +5,11 @@ import path from 'path'
 const external = ['better-sqlite3', 'archiver']
 const config: UserConfig = {
   main: {
+    resolve: {
+      alias: {
+        setUpMocks: path.resolve(__dirname, 'src', 'mockUtils', 'main.ts'),
+      },
+    },
     build: {
       lib: {
         entry: 'electron/main.ts',
@@ -17,7 +22,7 @@ const config: UserConfig = {
   renderer: {
     resolve: {
       alias: {
-        preloaded: path.resolve(__dirname, 'src', 'preloaded'),
+        setUpMocks: path.resolve(__dirname, 'src', 'mockUtils', 'renderer.ts'),
       },
     },
     plugins: [react()],
@@ -33,6 +38,11 @@ const config: UserConfig = {
     },
   },
   preload: {
+    resolve: {
+      alias: {
+        setUpMocks: path.resolve(__dirname, 'src', 'mockUtils', 'preload.ts'),
+      },
+    },
     build: {
       lib: {
         entry: 'src/preload/index.ts',

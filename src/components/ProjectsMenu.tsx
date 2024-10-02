@@ -18,7 +18,7 @@ import r from '../redux'
 import { actions } from '../actions'
 import css from './ProjectsMenu.module.css'
 import mainCss from './Main.module.css'
-import { showOpenDialog } from '../utils/electron'
+import { showOpenDialog } from '../mockable/electron'
 import usePopover from '../utils/usePopover'
 import icon from '../icon.png'
 

@@ -5,7 +5,7 @@ import {
   IntegrationTestContext,
   TMP_DIRECTORY,
 } from '../../setUpDriver'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 import { runAll } from '../step'
 import { newProjectTestSteps } from './newProjectTestSteps'
 import { join } from 'path'

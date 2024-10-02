@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { Conf } from 'electron-conf/renderer'
 import App from '../components/App'
-
 import getStore from '../store'
 import '../index.css'
 import * as Sentry from '@sentry/electron/renderer'
@@ -48,7 +47,22 @@ Sentry.init(
 )
 
 window.document.addEventListener('DOMContentLoaded', () => {
-  window.electronApi.listenToTestIpcEvents()
+  window.electronApi.listenToTestIpcEvents(
+    (moduleId, functionName, newReturnValue, deserializedReturnValue) => {
+      const { returnValues } = window.mockedModules[moduleId]
+
+      returnValues[functionName].push(deserializedReturnValue)
+      if (window.electronApi.env.VITE_INTEGRATION_DEV)
+        window.electronApi.sendToMainProcess({
+          type: 'log',
+          args: [
+            `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
+              newReturnValue
+            )}\n\n\n`,
+          ],
+        })
+    }
+  )
 })
 
 window.addEventListener('error', (e) => {

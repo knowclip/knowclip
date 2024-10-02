@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "preloaded/*": ["./src/node/*"]
+      "setUpMocks": ["./src/mockUtils/test.ts"]
     }
   }
 }

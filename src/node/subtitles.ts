@@ -40,22 +40,15 @@ export const getSubtitlesFilePathFromMedia = async (
       '.vtt'
   )
 
-  const vttResult = await writeMediaSubtitlesToVtt(
+  return await writeMediaSubtitlesToVtt(
     mediaFilePath,
     streamIndex,
     outputFilePath
   )
-  if (vttResult.error) {
-    console.error(
-      `Error writing media subtitles to VTT at stream index ${streamIndex}: ${vttResult.error}`
-    )
-  }
-  return vttResult
 }
 
 export const getExternalSubtitlesVttPath = async (
-  state: AppState,
-  file: SubtitlesFile,
+  file: ExternalSubtitlesFile | VttConvertedSubtitlesFile,
   filePath: string
 ): AsyncResult<string> => {
   try {
@@ -70,7 +63,9 @@ export const getExternalSubtitlesVttPath = async (
           )
 
     const fileContents = await readFile(filePath, 'utf8')
-    const chunks = parseSubtitles(state, fileContents, extension)
+    const chunksResult = parseSubtitles(fileContents, extension)
+    if (chunksResult.error) return chunksResult
+    const { value: chunks } = chunksResult
 
     if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
     if (extension === '.srt')
@@ -101,61 +96,64 @@ export const getSubtitlesFilePath = async (
   file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
 ): AsyncResult<string> => {
   if (file.type === 'ExternalSubtitlesFile') {
-    return await getExternalSubtitlesVttPath(state, file, sourceFilePath)
+    return await getExternalSubtitlesVttPath(file, sourceFilePath)
   }
   switch (file.parentType) {
     case 'ExternalSubtitlesFile':
-      return await getExternalSubtitlesVttPath(state, file, sourceFilePath)
+      return await getExternalSubtitlesVttPath(file, sourceFilePath)
     case 'MediaFile': {
-      const subtitlesFilePath = await getSubtitlesFilePathFromMedia(
+      return await getSubtitlesFilePathFromMedia(
         file,
         sourceFilePath,
         file.streamIndex
       )
-      if (!subtitlesFilePath) {
-        throw new Error('There was a problem loading embedded subtitles')
-      }
-      return subtitlesFilePath
     }
   }
 }
 
 const parseSubtitles = (
-  state: AppState,
   fileContents: string,
   extension: string
-) => {
-  switch (extension) {
-    case '.ass':
-      return subsrtParse(fileContents)
-        .filter(({ type }) => type === 'caption')
-        .map((chunk, index) => r.readSubsrtChunk({ ...chunk, index }))
-    case '.vtt':
-    case '.srt':
-      return parseSync(fileContents).flatMap(
-        ({ data: vttChunk }, index) =>
-          typeof vttChunk === 'string'
-            ? []
-            : readVttChunk({
-                start: Number(vttChunk.start),
-                end: Number(vttChunk.end),
-                text: vttChunk.text,
-                index,
-              }) // TODO: handle failed number parse
-      )
-    default:
-      throw new Error('Unknown subtitles format')
+): Result<SubtitlesChunk[]> => {
+  try {
+    switch (extension) {
+      case '.ass':
+        return {
+          value: subsrtParse(fileContents)
+            .filter(({ type }) => type === 'caption')
+            .map((chunk, index) => r.readSubsrtChunk({ ...chunk, index })),
+        }
+      case '.vtt':
+      case '.srt':
+        return {
+          value: parseSync(fileContents).flatMap(
+            ({ data: vttChunk }, index) =>
+              typeof vttChunk === 'string'
+                ? []
+                : readVttChunk({
+                    start: Number(vttChunk.start),
+                    end: Number(vttChunk.end),
+                    text: vttChunk.text,
+                    index,
+                  }) // TODO: handle failed number parse
+          ),
+        }
+      default:
+        return failure(`Unknown subtitles format ${extension}`)
+    }
+  } catch (err) {
+    return failure(err)
   }
 }
 
 export const getSubtitlesFromFile = async (
-  state: AppState,
   sourceFilePath: string
 ): AsyncResult<SubtitlesChunk[]> => {
   try {
+    console.log(`Getting subtitles from file ${sourceFilePath}`)
     const extension = extname(sourceFilePath).toLowerCase()
     const fileContents = await readFile(sourceFilePath, 'utf-8')
-    return { value: parseSubtitles(state, fileContents, extension) }
+    return parseSubtitles(fileContents, extension)
   } catch (error) {
     return failure(error)
   }
@@ -234,7 +232,9 @@ export const validateSubtitlesFromFilePath = async (
 
     const extension = extname(sourceFilePath).toLowerCase()
     const fileContents = await readFile(sourceFilePath, 'utf8')
-    const parsed = parseSubtitles(state, fileContents, extension)
+    const parseResult = parseSubtitles(fileContents, extension)
+    if (parseResult.error) return parseResult
+    const { value: parsed } = parseResult
 
     const { chunksMetadata } = existingFile
 

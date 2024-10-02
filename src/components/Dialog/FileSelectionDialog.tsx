@@ -15,7 +15,7 @@ import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 import css from './FileSelectionForm.module.css'
 import { dirname } from '../../utils/rendererPathHelpers'
-import { showOpenDialog } from '../../utils/electron'
+import { showOpenDialog } from '../../mockable/electron'
 import { getFileAvailability } from '../../selectors'
 
 import { fileSelectionDialog$ as $ } from './FileSelectionDialog.testLabels'

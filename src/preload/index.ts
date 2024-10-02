@@ -5,18 +5,19 @@ console.log('Beginning preload')
 import { exposeConf } from 'electron-conf/preload'
 if (!process.env.VITEST) exposeConf()
 
-import { sendToMainProcess } from '../node/sendToMainProcess'
+import { sendToMainProcess } from './sendToMainProcess'
 import type {
   MessageHandlerResult,
   MessageResponse,
   MessageToMain,
   MessageToMainType,
 } from '../MessageToMain'
-import { setUpMocks } from '../node/setUpMocks'
+import type { MockedModule } from './setUpMocks'
 
 declare global {
   interface Window {
     electronApi: ElectronApi
+    mockedModules: Record<string, MockedModule<any>>
   }
 }
 
@@ -27,16 +28,8 @@ const env = process.env
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
 
-const mockedModules: Record<
-  string,
-  {
-    logged: { [fnName: string]: any[] }
-    returnValues: { [fnName: string]: any[] }
-  }
-> = {}
-
 const electronApi = {
-  setUpMocks: setUpMocks,
+  // setUpMocks: setUpMocks,
   platform: process.platform,
   openExternal: (path: string) =>
     sendToMainProcess({
@@ -104,7 +97,6 @@ const electronApi = {
       args: [testId, moduleId, logged],
     })
   },
-  mockedModules,
 }
 
 console.log('preloading')
@@ -121,7 +113,14 @@ function listenToIpcRendererMessages(
   ipcRenderer.on('message', callback)
 }
 
-function listenToTestIpcEvents() {
+function listenToTestIpcEvents(
+  callback: (
+    moduleId: string,
+    functionName: string,
+    newReturnValue: string,
+    deserializedReturnValue: any
+  ) => void
+) {
   console.log('Going to start listening for IPC test events!!')
 
   ipcRenderer.on('start-test', (e, testId) => {
@@ -134,23 +133,13 @@ function listenToTestIpcEvents() {
   ipcRenderer.on(
     'mock-function',
     (event, moduleId, functionName, newReturnValue) => {
-      const { returnValues } = mockedModules[moduleId]
-
       console.log(
         `Function ${functionName} mocked with: ${JSON.stringify(
           newReturnValue
         )}`
       )
-      returnValues[functionName].push(deserializeReturnValue(newReturnValue))
-      if (process.env.VITE_INTEGRATION_DEV)
-        sendToMainProcess({
-          type: 'log',
-          args: [
-            `\n\n\nFunction ${functionName} mocked with: ${JSON.stringify(
-              newReturnValue
-            )}\n\n\n`,
-          ],
-        })
+      const deserializedReturnValue = deserializeReturnValue(newReturnValue)
+      callback(moduleId, functionName, newReturnValue, deserializedReturnValue)
     }
   )
 }

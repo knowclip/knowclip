@@ -3,7 +3,7 @@ import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport
 import { reviewAndExportMediaTableRow$ as dialogTableRow$ } from '../../../components/ReviewAndExportMediaTableRow.testLabels'
 import { snackbar$ } from '../../../components/Snackbar.testLabels'
 import { join } from 'path'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { projectMenu$ } from '../../../components/ProjectMenu.testLabels'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { retryUntil } from '../../driver/retryUntil'

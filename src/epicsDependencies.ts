@@ -1,7 +1,7 @@
 import { fromEvent } from 'rxjs'
-import { nowUtcTimestamp, uuid } from './utils/sideEffects'
+import { nowUtcTimestamp, uuid } from './mockable/sideEffects'
+import * as electronHelpers from './mockable/electron'
 import { getDexieDb } from './utils/dictionariesDatabase'
-import * as electronHelpers from './utils/electron'
 import * as mediaHelpers from './utils/media'
 import { ClipwaveCallbackEvent, WaveformInterface } from 'clipwave'
 import { CLIPWAVE_ID } from './utils/clipwave'
@@ -54,10 +54,10 @@ const dependencies = {
 
   getMediaMetadata: (filePath: string) =>
     sendToMainProcess({ type: 'getMediaMetadata', args: [filePath] }),
-  getSubtitlesFromFile: flatten((state: AppState, sourceFilePath: string) =>
+  getSubtitlesFromFile: flatten((sourceFilePath: string) =>
     sendToMainProcess({
       type: 'getSubtitlesFromFile',
-      args: [state, sourceFilePath],
+      args: [sourceFilePath],
     })
   ),
   getSubtitlesFilePath: flatten(

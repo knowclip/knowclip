@@ -1,12 +1,26 @@
 type ModuleLike = { [name: string]: (...args: any) => any }
 
-type MockedModule<M extends ModuleLike> = { -readonly [K in keyof M]: M[K] }
-const mocking = process.env.NODE_ENV === 'integration'
+export type MockedModule<M extends ModuleLike> = {
+  -readonly [K in keyof M]: M[K]
+}
+
+const mockedModules: Record<
+  string,
+  {
+    logged: { [fnName: string]: any[] }
+    returnValues: { [fnName: string]: any[] }
+  }
+> = {}
+
+window.mockedModules = mockedModules
 
 export function setUpMocks<M extends ModuleLike>(
   moduleId: string,
   actualModule: MockedModule<M>
 ): MockedModule<M> {
+  console.log(`setUpMocks was called from RENDERER with id ${moduleId}`)
+  const mocking = window.electronApi.env.NODE_ENV === 'integration'
+
   if (!mocking) return actualModule
 
   const currentTestId = window.electronApi.env.TEST_ID
@@ -16,7 +30,17 @@ export function setUpMocks<M extends ModuleLike>(
     returnValues: {} as { [K in keyof M]: ReturnType<M[K]>[] },
   }
   const { logged, returnValues } = mockState
-  window.electronApi.mockedModules[moduleId] = mockState
+  try {
+    window.mockedModules[moduleId] = mockState
+  } catch (error) {
+    console.error(
+      'Error setting up mocks for  module:',
+      moduleId,
+      'test:',
+      currentTestId
+    )
+    throw error
+  }
 
   const mockedModule = {} as MockedModule<M>
 

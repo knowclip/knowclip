@@ -5,7 +5,7 @@ import path from 'path'
 export const integrationConfig: UserConfig = {
   resolve: {
     alias: {
-      preloaded: path.resolve(__dirname, 'src', 'node'),
+      setUpMocks: path.resolve(__dirname, 'src', 'setUpMocks', 'test.ts'),
     },
   },
   test: {

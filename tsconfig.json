@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "preloaded/*": ["./src/preloaded/*"],
+      "setUpMocks": ["./src/mockUtils/renderer.ts"],
     },
     "types": ["vite/client"],
     "target": "esnext",

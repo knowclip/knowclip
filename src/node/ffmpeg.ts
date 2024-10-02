@@ -3,6 +3,36 @@ import { basename } from 'path'
 import ffmpeg, { FfprobeData } from 'fluent-ffmpeg'
 import { failure } from '../utils/result'
 
+const ffmpegStaticBasePathViaRequire = require('ffmpeg-static')
+const ffprobeStaticBasePathViaRequire = require('ffprobe-static').path
+
+const ffmpegStaticBasePath = ffmpegStaticBasePathViaRequire
+const ffprobeStaticBasePath = ffprobeStaticBasePathViaRequire
+
+const getFfmpegStaticPath = (basePath: string) =>
+  basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
+
+console.log({
+  ffmpegStaticBasePath,
+  ffprobeStaticBasePath,
+  ffmpegStaticBasePathViaRequire,
+  ffprobeStaticBasePathViaRequire,
+})
+
+if (!ffmpegStaticBasePath) throw new Error('ffmpeg-static path not found')
+if (!ffprobeStaticBasePath) throw new Error('ffprobe-static path not found')
+const ffmpegPaths = {
+  ffmpeg: getFfmpegStaticPath(ffmpegStaticBasePath),
+  ffprobe: getFfmpegStaticPath(ffprobeStaticBasePath),
+}
+try {
+  ffmpeg.setFfmpegPath(ffmpegPaths.ffmpeg)
+  ffmpeg.setFfprobePath(ffmpegPaths.ffprobe)
+} catch (error) {
+  console.error('Error setting ffmpeg paths:', error)
+  throw error
+}
+
 export { ffmpeg }
 
 const zeroPad = (zeroes: number, value: any) =>
@@ -44,7 +74,7 @@ export const readMediaFile = async (
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): AsyncResult<MediaFile> => {
   const metadata = await getMediaMetadata(filePath)
-  if (metadata.error) return { error: metadata.error }
+  if (metadata.error) return metadata
 
   const { value: ffprobeMetadata } = metadata
   const videoStream = ffprobeMetadata.streams.find(

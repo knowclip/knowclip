@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { TextField, Button } from '@mui/material'
 import r from '../redux'
 import css from './MediaFolderLocationForm.module.css'
-import { showOpenDirectoryDialog, openInBrowser } from '../utils/electron'
+import { showOpenDirectoryDialog, openInBrowser } from '../mockable/electron'
 import { actions } from '../actions'
 
 const MediaFolderLocationForm = ({ onSubmit }: { onSubmit: () => void }) => {

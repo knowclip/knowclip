@@ -14,7 +14,7 @@ import {
   FormHelperText,
   SelectProps,
 } from '@mui/material'
-import { showSaveDialog } from '../../utils/electron'
+import { showSaveDialog } from '../../mockable/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'clsx'
 import { DialogProps } from './DialogProps'

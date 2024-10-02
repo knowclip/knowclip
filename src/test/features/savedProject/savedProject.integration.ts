@@ -6,7 +6,7 @@ import {
   GENERATED_ASSETS_DIRECTORY,
   initTestContext,
 } from '../../setUpDriver'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 import { join } from 'path'
 import { runAll, step } from '../step'
 import { savedProjectTestSteps } from './savedProjectTestSteps'

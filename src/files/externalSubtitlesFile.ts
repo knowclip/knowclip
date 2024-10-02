@@ -23,10 +23,7 @@ const externalSubtitlesFileEventHandlers: FileEventHandlers<ExternalSubtitlesFil
       async (validatedFile, filePath, state, effects) => {
         const { platform } = window.electronApi
         if (isVtt(platform, filePath)) {
-          const chunksResult = await effects.getSubtitlesFromFile(
-            state,
-            filePath
-          )
+          const chunksResult = await effects.getSubtitlesFromFile(filePath)
 
           if (chunksResult.error) {
             return [
