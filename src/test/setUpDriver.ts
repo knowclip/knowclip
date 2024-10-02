@@ -19,17 +19,17 @@ export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
 // https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const chromedriverPath = join(
+const chromedriverPath = require(join(
   rootDir,
   'node_modules',
-  'electron-chromedriver',
-  'bin',
+  'chromedriver',
+  'lib',
   'chromedriver'
-)
+)).path
 
 function verifyChromeDriverPath() {
   if (!existsSync(chromedriverPath)) {
-    throw new Error(`chromedriver not found at ${chromedriverPath}.'?`)
+    throw new Error(`chromedriver not found at ${chromedriverPath}`)
   }
 }
 verifyChromeDriverPath()
