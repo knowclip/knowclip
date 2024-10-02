@@ -10,13 +10,13 @@ import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
 
-const WINDOW_START_DIMENSIONS = {
-  width: 1920,
-  height: 1080,
-}
-
 const { isPackaged } = app
 const isTesting = process.env.VITEST
+
+const WINDOW_START_DIMENSIONS = {
+  width: isTesting ? 1027 : 1920,
+  height: isTesting ? 768 : 1080,
+}
 
 console.log('main process VITEST', process.env.VITEST)
 if (!isTesting) {

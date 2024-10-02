@@ -26,7 +26,12 @@ const waveformPngFileEventHandlers: FileEventHandlers<WaveformPng> = {
       const path = parentFile.filePath
       if (!path) return []
 
-      const pngPath = await effects.getWaveformPng(state, file, path)
+      const fileAvailability = r.getFileAvailabilityById(
+        state,
+        'WaveformPng',
+        file.id
+      )
+      const pngPath = await effects.getWaveformPng(fileAvailability, file, path)
       if (pngPath.error)
         return [
           r.openFileFailure(

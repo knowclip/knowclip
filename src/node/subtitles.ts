@@ -63,26 +63,40 @@ export const getExternalSubtitlesVttPath = async (
           )
 
     const fileContents = await readFile(filePath, 'utf8')
+    if (!extensionIsValid(extension)) {
+      return failure(
+        `Unknown extension on subtitles file ${JSON.stringify(filePath)}`
+      )
+    }
     const chunksResult = parseSubtitles(fileContents, extension)
     if (chunksResult.error) return chunksResult
     const { value: chunks } = chunksResult
 
-    if (extension === '.ass') await convertAssToVtt(filePath, vttFilePath)
-    if (extension === '.srt')
-      await writeFile(
-        vttFilePath,
-        stringifySync(
-          chunks.map((chunk) => ({
-            type: 'cue',
-            data: {
-              start: Math.round(chunk.start),
-              end: Math.round(chunk.end),
-              text: chunk.text,
-            },
-          })),
-          { format: 'WebVTT' }
+    if (extension === '.ass') {
+      const conversionResult = await convertAssToVtt(filePath, vttFilePath)
+      if (conversionResult.error) return conversionResult
+    }
+
+    if (extension === '.srt') {
+      try {
+        await writeFile(
+          vttFilePath,
+          stringifySync(
+            chunks.map((chunk) => ({
+              type: 'cue',
+              data: {
+                start: Math.round(chunk.start),
+                end: Math.round(chunk.end),
+                text: chunk.text,
+              },
+            })),
+            { format: 'WebVTT' }
+          )
         )
-      )
+      } catch (error) {
+        return failure(error)
+      }
+    }
     return { value: vttFilePath }
   } catch (error) {
     console.error(error)
@@ -91,7 +105,6 @@ export const getExternalSubtitlesVttPath = async (
 }
 
 export const getSubtitlesFilePath = async (
-  state: AppState,
   sourceFilePath: string,
   file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
 ): AsyncResult<string> => {
@@ -113,7 +126,7 @@ export const getSubtitlesFilePath = async (
 
 const parseSubtitles = (
   fileContents: string,
-  extension: string
+  extension: '.ass' | '.vtt' | '.srt'
 ): Result<SubtitlesChunk[]> => {
   try {
     switch (extension) {
@@ -147,11 +160,11 @@ const parseSubtitles = (
 }
 
 export const getSubtitlesFromFile = async (
-  sourceFilePath: string
+  sourceFilePath: string,
+  extension: '.vtt' | '.ass' | '.srt'
 ): AsyncResult<SubtitlesChunk[]> => {
   try {
     console.log(`Getting subtitles from file ${sourceFilePath}`)
-    const extension = extname(sourceFilePath).toLowerCase()
     const fileContents = await readFile(sourceFilePath, 'utf-8')
     return parseSubtitles(fileContents, extension)
   } catch (error) {
@@ -160,7 +173,6 @@ export const getSubtitlesFromFile = async (
 }
 
 export const validateSubtitleFileBeforeOpen = async <S extends SubtitlesFile>(
-  state: AppState,
   sourceFilePath: string,
   existingFile: S
 ): AsyncResult<
@@ -178,7 +190,6 @@ export const validateSubtitleFileBeforeOpen = async <S extends SubtitlesFile>(
     }
 > => {
   const validation = await validateSubtitlesFromFilePath(
-    state,
     sourceFilePath,
     existingFile
   )
@@ -191,7 +202,7 @@ export const validateSubtitleFileBeforeOpen = async <S extends SubtitlesFile>(
   const file: S = newChunksMetadata
     ? {
         ...existingFile,
-        ...newChunksMetadata,
+        chunksMetadata: newChunksMetadata,
       }
     : existingFile
 
@@ -213,7 +224,6 @@ export const validateSubtitleFileBeforeOpen = async <S extends SubtitlesFile>(
 }
 
 export const validateSubtitlesFromFilePath = async (
-  state: AppState,
   sourceFilePath: string,
   existingFile: SubtitlesFile
 ): AsyncResult<
@@ -231,6 +241,10 @@ export const validateSubtitlesFromFilePath = async (
     const differences: { attribute: string; name: string }[] = []
 
     const extension = extname(sourceFilePath).toLowerCase()
+    if (!extensionIsValid(extension))
+      return failure(
+        `Unknown extension on subtitles file ${JSON.stringify(sourceFilePath)}`
+      )
     const fileContents = await readFile(sourceFilePath, 'utf8')
     const parseResult = parseSubtitles(fileContents, extension)
     if (parseResult.error) return parseResult
@@ -282,4 +296,7 @@ export const validateSubtitlesFromFilePath = async (
   } catch (error) {
     return failure(error)
   }
+}
+function extensionIsValid(extension: string) {
+  return extension === '.vtt' || extension === '.ass' || extension === '.srt'
 }

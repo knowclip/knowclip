@@ -303,11 +303,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
           }
           const matchingFileExists = matchingFileExistsResult.value
           const validationResult = matchingFileExists
-            ? await effects.validateSubtitlesFromFilePath(
-                state,
-                nameMatch,
-                file
-              )
+            ? await effects.validateSubtitlesFromFilePath(nameMatch, file)
             : null
 
           if (

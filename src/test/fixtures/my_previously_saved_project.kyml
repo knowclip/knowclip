@@ -31,8 +31,7 @@ clips:
       transcription: 笹を食べながらのんびりするのは最高だなぁ
       pronunciation: sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa
       meaning: Relaxing while eating bamboo grass is the best
-    tags:
-      &a1
+    tags: &a1
       - pbc
     image:
       type: VideoStill

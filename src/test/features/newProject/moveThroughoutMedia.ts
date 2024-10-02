@@ -56,9 +56,9 @@ export default async function moveThroughoutMedia(
 
     await client.waitUntil(async () => {
       const visiblity = (await clipsVisibility(client)).join(' ')
-      return visiblity === 'true false true'
+      return visiblity === 'true'
     })
-    expect(await clipsVisibility(client)).toMatchObject([true, false, true])
+    expect(await clipsVisibility(client)).toMatchObject([true])
     expect(
       Number(await client.getAttribute('video', 'currentTime'))
     ).toBeLessThan(53)

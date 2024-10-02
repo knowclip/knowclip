@@ -28,7 +28,7 @@ import { coerceMp3ToConstantBitrate } from './node/constantBitrateMp3'
 import { getWaveformPng, getWaveformPngs } from './node/getWaveform'
 import { readdir } from 'fs-extra'
 import { parseProjectJson } from './node/parseProject'
-import { writeApkgDeck } from './node/writeToApkg'
+import { getWriteApkgDeck } from './node/writeToApkg'
 
 export type MessageResponders = ReturnType<typeof getMessageResponders>
 
@@ -184,7 +184,7 @@ export const getMessageResponders = (
   getMediaMetadata,
   getVideoStill,
   getApkgExportData,
-  writeApkgDeck,
+  writeApkgDeck: getWriteApkgDeck(mainWindow),
   getSubtitlesFilePath,
   getSubtitlesFromFile,
   processNoteMedia,

@@ -14,13 +14,13 @@ import {
   concatWith,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, EMPTY, from, Observable, fromEvent, defer, merge } from 'rxjs'
+import { of, EMPTY, from, Observable, defer, merge } from 'rxjs'
 import r from '../redux'
 
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import type { DeckCreationErrorEvent } from '../node/writeToApkg'
 import { ActionOf } from '../actions'
+import { APKG_CREATION_EVENTS } from '../utils/apkgCreationEvents'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
@@ -78,7 +78,7 @@ const exportApkg: AppEpic = (action$, state$, effects) =>
 
 function makeApkg(
   exportData: ApkgExportData,
-  { showSaveDialog, writeApkgDeck }: EpicsDependencies
+  { showSaveDialog, writeApkgDeck, fromIpcRendererEvent }: EpicsDependencies
 ) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
@@ -87,14 +87,12 @@ function makeApkg(
 
       let processed = 0
       const deckCreationEnded = merge(
-        fromEvent(window, 'deck-creation-error').pipe(
-          map((e) => {
-            throw (e as DeckCreationErrorEvent).message
-              ? new Error((e as DeckCreationErrorEvent).message)
-              : new Error('Deck creation failed.')
+        fromIpcRendererEvent(APKG_CREATION_EVENTS.deckCreationError).pipe(
+          map((message) => {
+            throw new Error(message ? String(message) : 'Deck creation failed.')
           })
         ),
-        fromEvent(window, 'deck-saved')
+        fromIpcRendererEvent(APKG_CREATION_EVENTS.deckSaved)
       ).pipe(
         tap((e) => {
           console.log('deck creation event', e)
@@ -109,7 +107,7 @@ function makeApkg(
       )
         .pipe(
           concatWith(
-            fromEvent(window, 'clip-processed').pipe(
+            fromIpcRendererEvent(APKG_CREATION_EVENTS.clipProcessed).pipe(
               takeUntil(deckCreationEnded),
               map(() => {
                 console.log('heard clip-processed event')

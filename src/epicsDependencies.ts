@@ -54,28 +54,32 @@ const dependencies = {
 
   getMediaMetadata: (filePath: string) =>
     sendToMainProcess({ type: 'getMediaMetadata', args: [filePath] }),
-  getSubtitlesFromFile: flatten((sourceFilePath: string) =>
-    sendToMainProcess({
-      type: 'getSubtitlesFromFile',
-      args: [sourceFilePath],
-    })
+  getSubtitlesFromFile: flatten(
+    (sourceFilePath: string, extension: '.srt' | '.vtt' | '.ass') =>
+      sendToMainProcess({
+        type: 'getSubtitlesFromFile',
+        args: [sourceFilePath, extension],
+      })
   ),
   getSubtitlesFilePath: flatten(
     (
-      state: AppState,
       sourceFilePath: string,
       file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
     ) =>
       sendToMainProcess({
         type: 'getSubtitlesFilePath',
-        args: [state, sourceFilePath, file],
+        args: [sourceFilePath, file],
       })
   ),
   getWaveformPng: flatten(
-    (state: AppState, file: WaveformPng, mediaFilePath: string) =>
+    (
+      fileAvailability: FileAvailability,
+      file: WaveformPng,
+      mediaFilePath: string
+    ) =>
       sendToMainProcess({
         type: 'getWaveformPng',
-        args: [state, file, mediaFilePath],
+        args: [fileAvailability, file, mediaFilePath],
       })
   ),
   getWaveformPngs: (mediaFile: MediaFile) =>
@@ -144,24 +148,19 @@ const dependencies = {
       args: [outputFilePath, exportData],
     }),
   validateSubtitleFileBeforeOpen: flatten(
-    <S extends SubtitlesFile>(
-      state: AppState,
-      sourceFilePath: string,
-      existingFile: S
-    ) =>
+    <S extends SubtitlesFile>(sourceFilePath: string, existingFile: S) =>
       sendToMainProcess({
         type: 'validateSubtitleFileBeforeOpen',
-        args: [state, sourceFilePath, existingFile],
+        args: [sourceFilePath, existingFile],
       })
   ),
   validateSubtitlesFromFilePath: (
-    state: AppState,
     sourceFilePath: string,
     existingFile: SubtitlesFile
   ) =>
     sendToMainProcess({
       type: 'validateSubtitlesFromFilePath',
-      args: [state, sourceFilePath, existingFile],
+      args: [sourceFilePath, existingFile],
     }),
 }
 

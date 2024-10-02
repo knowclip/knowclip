@@ -10,7 +10,10 @@ export const sanitizeSubtitles = (
 
     const text = stripHtml(chunk.text)
     if (text?.trim()) {
-      result.push(chunk)
+      result.push({
+        ...chunk,
+        text,
+      })
       lastChunk = chunk
     }
   }

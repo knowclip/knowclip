@@ -114,7 +114,6 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
 
           const validationResult = fileExistsResult.value
             ? await effects.validateSubtitlesFromFilePath(
-                state,
                 nameMatch,
                 subtitlesFile
               )

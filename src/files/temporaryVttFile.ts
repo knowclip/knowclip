@@ -16,7 +16,6 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
       return [await r.openFileFailure(file, null, null)]
 
     const vttFilePathResult = await effects.getSubtitlesFilePath(
-      state,
       parentFile.filePath,
       file
     )
@@ -25,18 +24,22 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
         await r.openFileFailure(file, null, vttFilePathResult.error.message),
       ]
     }
+    console.log(
+      `About to validate VTT generated subtitles from ${vttFilePathResult.value}`
+    )
+    const { value: vttFilePath } = vttFilePathResult
     const validateSubtitlesResult =
-      await effects.validateSubtitleFileBeforeOpen(
-        state,
-        vttFilePathResult.value,
-        file
-      )
+      await effects.validateSubtitleFileBeforeOpen(vttFilePath, file)
+    console.log(
+      `VTT generated subtitles validation result:`,
+      validateSubtitlesResult
+    )
 
     return [
       handleSubtitlesValidationResult(
         effects,
         file,
-        parentFile.filePath,
+        vttFilePath,
         validateSubtitlesResult
       ),
     ]
@@ -52,7 +55,7 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
 
       if (!(source && source.filePath && sourceFile)) return []
 
-      const chunksResult = await effects.getSubtitlesFromFile(filePath)
+      const chunksResult = await effects.getSubtitlesFromFile(filePath, '.vtt')
 
       if (validatedFile.parentType === 'MediaFile') {
         if (r.getCurrentFileId(state) !== source.id) return []
@@ -157,7 +160,6 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
         switch (file.parentType) {
           case 'MediaFile': {
             const tmpFilePath = await effects.getSubtitlesFilePath(
-              state,
               source.filePath,
               file
             )
@@ -167,7 +169,6 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               ]
             }
             const validateResult = await effects.validateSubtitleFileBeforeOpen(
-              state,
               tmpFilePath.value,
               file
             )
@@ -175,14 +176,13 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               handleSubtitlesValidationResult(
                 effects,
                 file,
-                source.filePath,
+                tmpFilePath.value,
                 validateResult
               ),
             ]
           }
           case 'ExternalSubtitlesFile': {
             const tmpFilePath = await effects.getSubtitlesFilePath(
-              state,
               source.filePath,
               file
             )
@@ -190,7 +190,6 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               return [r.openFileFailure(file, null, tmpFilePath.error.message)]
             }
             const validateResult = await effects.validateSubtitleFileBeforeOpen(
-              state,
               tmpFilePath.value,
               file
             )
@@ -198,7 +197,7 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               handleSubtitlesValidationResult(
                 effects,
                 file,
-                source.filePath,
+                tmpFilePath.value,
                 validateResult
               ),
             ]

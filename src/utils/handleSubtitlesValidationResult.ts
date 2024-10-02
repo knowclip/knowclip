@@ -3,7 +3,7 @@ import r from '../redux'
 export function handleSubtitlesValidationResult<S extends SubtitlesFile>(
   effects: EpicsDependencies,
   existingFile: S,
-  sourceFilePath: string,
+  filePath: string,
   validationResult: Awaited<
     ReturnType<EpicsDependencies['validateSubtitleFileBeforeOpen']>
   >
@@ -11,7 +11,7 @@ export function handleSubtitlesValidationResult<S extends SubtitlesFile>(
   if (validationResult.error) {
     return r.openFileFailure(
       existingFile,
-      sourceFilePath,
+      filePath,
       validationResult.error.message
     )
   }
@@ -19,20 +19,16 @@ export function handleSubtitlesValidationResult<S extends SubtitlesFile>(
   if (validation.type === 'no issues') {
     return r.openFileSuccess(
       validation.file,
-      sourceFilePath,
+      filePath,
       effects.nowUtcTimestamp()
     )
   }
   return r.confirmationDialog(
     validation.result.warningMessage,
-    r.openFileSuccess(
-      validation.file,
-      sourceFilePath,
-      effects.nowUtcTimestamp()
-    ),
+    r.openFileSuccess(validation.file, filePath, effects.nowUtcTimestamp()),
     r.openFileFailure(
       existingFile,
-      sourceFilePath,
+      filePath,
       `Some features may be unavailable until your file is located.`
     ),
     true

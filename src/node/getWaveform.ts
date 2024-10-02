@@ -1,6 +1,5 @@
 import * as tempy from 'tempy'
 import { existsSync } from 'fs'
-import { getFileAvailabilityById } from '../selectors'
 import { basename, join } from 'path'
 import { createWaveformPng } from './createWaveformPng'
 import {
@@ -12,7 +11,7 @@ import { failure } from '../utils/result'
 const WAVEFORM_PNG_PIXELS_PER_SECOND = 50
 
 export const getWaveformPng = async (
-  state: AppState,
+  fileAvailability: FileAvailability,
   file: WaveformPng,
   mediaFilePath: string
 ): AsyncResult<string> => {
@@ -20,7 +19,11 @@ export const getWaveformPng = async (
     const startX = WAVEFORM_PNG_PIXELS_PER_SECOND * file.startSeconds
     const endX = WAVEFORM_PNG_PIXELS_PER_SECOND * file.endSeconds
     const width = ~~(endX - startX)
-    const outputFilename = getWaveformPngPath(state, mediaFilePath, file)
+    const outputFilename = getWaveformPngPath(
+      fileAvailability,
+      mediaFilePath,
+      file
+    )
     if (outputFilename && existsSync(outputFilename))
       return { value: outputFilename }
 
@@ -41,15 +44,10 @@ export const getWaveformPng = async (
 }
 
 const getWaveformPngPath = (
-  state: AppState,
+  fileAvailability: FileAvailability,
   mediaFilePath: string,
   file: WaveformPng
 ) => {
-  const fileAvailability = getFileAvailabilityById(
-    state,
-    'WaveformPng',
-    file.id
-  )
   if (fileAvailability.filePath && existsSync(fileAvailability.filePath)) {
     return fileAvailability.filePath
   }

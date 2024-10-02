@@ -13,7 +13,6 @@ const externalSubtitlesFileEventHandlers: FileEventHandlers<ExternalSubtitlesFil
   {
     openRequest: async (file, filePath, state, effects) => {
       const result = await effects.validateSubtitleFileBeforeOpen(
-        state,
         filePath,
         file
       )
@@ -23,7 +22,10 @@ const externalSubtitlesFileEventHandlers: FileEventHandlers<ExternalSubtitlesFil
       async (validatedFile, filePath, state, effects) => {
         const { platform } = window.electronApi
         if (isVtt(platform, filePath)) {
-          const chunksResult = await effects.getSubtitlesFromFile(filePath)
+          const chunksResult = await effects.getSubtitlesFromFile(
+            filePath,
+            '.vtt'
+          )
 
           if (chunksResult.error) {
             return [

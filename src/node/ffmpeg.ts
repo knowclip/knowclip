@@ -143,19 +143,28 @@ export async function writeMediaSubtitlesToVtt(
   }
 }
 
-export const convertAssToVtt = (filePath: string, vttFilePath: string) =>
-  new Promise((res, rej) =>
-    ffmpeg(filePath)
-      .output(vttFilePath)
-      .on('end', () => {
-        res(vttFilePath)
-      })
-      .on('error', (err) => {
-        console.error(err)
-        rej(err)
-      })
-      .run()
-  )
+export const convertAssToVtt = async (
+  filePath: string,
+  vttFilePath: string
+): AsyncResult<'ok'> => {
+  try {
+    const result: 'ok' = await new Promise((res, rej) =>
+      ffmpeg(filePath)
+        .output(vttFilePath)
+        .on('end', () => {
+          res('ok')
+        })
+        .on('error', (err) => {
+          console.error('Error converting ASS to VTT:', err)
+          rej(err)
+        })
+        .run()
+    )
+    return { value: result }
+  } catch (error) {
+    return failure(error)
+  }
+}
 
 export function createConstantBitrateMp3(
   inputPath: string,

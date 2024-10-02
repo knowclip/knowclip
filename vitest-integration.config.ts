@@ -11,7 +11,12 @@ export const integrationConfig: UserConfig = {
   test: {
     testTimeout: 60000,
     pool: 'forks',
-
+    poolOptions: {
+      forks: {
+        minForks: 1,
+        maxForks: 1,
+      },
+    },
     include: ['src/test/**/*.integration.ts'],
     env: {
       ...(process.env.VITEST ? { VITEST: process.env.VITEST } : null),
