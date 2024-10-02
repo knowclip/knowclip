@@ -3,7 +3,9 @@ import { basename } from 'path'
 import ffmpeg, { FfprobeData } from 'fluent-ffmpeg'
 import { failure } from '../utils/result'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ffmpegStaticBasePathViaRequire = require('ffmpeg-static')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ffprobeStaticBasePathViaRequire = require('ffprobe-static').path
 
 const ffmpegStaticBasePath = ffmpegStaticBasePathViaRequire

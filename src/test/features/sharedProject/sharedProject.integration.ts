@@ -9,7 +9,7 @@ import exportWithMissingMedia from './exportWithMissingMedia'
 import saveAndCloseProject from './saveAndCloseProject'
 import { mockSideEffects } from '../../mockSideEffects'
 import { runAll, step } from '../step'
-import { describe, beforeAll, afterAll, test } from 'vitest'
+import { describe, beforeAll, afterAll } from 'vitest'
 
 const testId = 'sharedProject'
 
