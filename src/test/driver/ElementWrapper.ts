@@ -29,7 +29,7 @@ export interface ElementWrapper {
 
 export const wrapElement = (
   driver: TestDriver,
-  element: ChainablePromiseElement,
+  element: WebdriverIO.Element,
   selector: string
 ): ElementWrapper => {
   const client = driver.client
