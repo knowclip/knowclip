@@ -41,7 +41,7 @@ const electronApi = {
   env: {
     VITEST: env.VITEST,
     TEST_ID: env.TEST_ID,
-    VITE_BUILD_NUMBER: env.VITE_BUILD_NUMBER,
+    BUILD_NUMBER: env.BUILD_NUMBER,
     DEV: env.DEV,
     VITE_INTEGRATION_DEV: env.VITE_INTEGRATION_DEV,
     NODE_ENV: env.NODE_ENV,
