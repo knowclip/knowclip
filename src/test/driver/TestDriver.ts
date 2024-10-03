@@ -1,4 +1,4 @@
-import { RemoteOptions, remote } from 'webdriverio'
+import { remote } from 'webdriverio'
 import Chromedriver from './Chromedriver'
 import request from 'request'
 import { ChildProcess } from 'child_process'
@@ -141,7 +141,7 @@ export async function createTestDriver({
   )
   await waitForChromeDriver(driver.process, statusUrl, 7000)
 
-  const browserOptions: RemoteOptions = {
+  const browserOptions: WebdriverIO.RemoteConfig = {
     waitforTimeout: 5000,
     hostname,
     port,
@@ -152,7 +152,9 @@ export async function createTestDriver({
         args: [...chromeArgs, 'app=' + appDir],
         windowTypes: ['app', 'webview'],
       },
+      'wdio:enforceWebDriverClassic': true,
     },
+
     logLevel,
   }
   const browser: WebdriverIO.Browser = await remote(browserOptions)

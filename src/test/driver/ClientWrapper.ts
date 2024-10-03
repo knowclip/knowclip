@@ -1,6 +1,7 @@
 import { clickAt } from './runEvents'
 import { ElementWrapper, element } from './ElementWrapper'
 import { TestDriver } from './TestDriver'
+import { ChainablePromiseArray } from 'webdriverio'
 
 export { clickAt }
 
@@ -35,16 +36,15 @@ export class ClientWrapper {
   async elements(selector: string, count?: number): Promise<ElementWrapper[]> {
     if (typeof count === 'number' && count <= 0)
       throw new Error('Count must be at least 1')
-    let elementsSoFar: WebdriverIO.ElementArray | undefined
+    let elementsSoFar: ChainablePromiseArray | undefined
     try {
       if (count)
         await this._driver.client.waitUntil(
           async () => {
-            const elements: WebdriverIO.ElementArray =
-              await this._driver.client.$$(selector)
+            const elements = await this._driver.client.$$(selector)
             elementsSoFar = elements
             return (
-              elements.length === count &&
+              (await elements.length) === count &&
               (
                 await Promise.all([
                   ...(await elements.map((e) => e.isExisting())),
@@ -118,7 +118,9 @@ export class ClientWrapper {
             const elements = await this._driver.client.$$(selector)
             if (!elements.length) return true
             const element = await this._driver.client.$(selector)
-            const displayed = await element.isDisplayedInViewport()
+            const displayed = await element.isDisplayed({
+              withinViewport: true,
+            })
 
             return !displayed
           } catch (err) {

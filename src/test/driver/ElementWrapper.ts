@@ -1,4 +1,8 @@
-import { Element, WaitForOptions, WaitUntilOptions } from 'webdriverio'
+import {
+  ChainablePromiseElement,
+  WaitForOptions,
+  WaitUntilOptions,
+} from 'webdriverio'
 import { TestDriver } from './TestDriver'
 
 /** A wrapper for `WebDriverIO.Client` method results
@@ -25,7 +29,7 @@ export interface ElementWrapper {
 
 export const wrapElement = (
   driver: TestDriver,
-  element: Element,
+  element: ChainablePromiseElement,
   selector: string
 ): ElementWrapper => {
   const client = driver.client
@@ -93,7 +97,7 @@ export const wrapElement = (
     },
     isVisible: async () => {
       try {
-        return await element.isDisplayedInViewport()
+        return await element.isDisplayed({ withinViewport: true })
       } catch (err) {
         throw Error(`Could not get displayed status of "${selector}": ${err}`)
       }
