@@ -8,16 +8,17 @@ export default class Chromedriver {
 
   constructor(
     path: string,
-    statusUrl: string,
     {
       env,
       showBrowserLogs = false,
+      statusUrl,
       args = [],
     }: {
       env?: NodeJS.ProcessEnv
       showBrowserLogs?: boolean
+      statusUrl: string
       args?: string[]
-    } = {}
+    }
   ) {
     this.process = spawn(path, args, {
       cwd: process.cwd(),

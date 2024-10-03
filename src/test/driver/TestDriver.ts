@@ -18,18 +18,40 @@ type WebDriverLogTypes =
   | 'error'
   | 'silent'
 
-function isRunning(statusUrl: string, callback: (running: boolean) => void) {
-  const cb = false
-  const requestOptions = {
-    uri: statusUrl,
-    json: true,
-    followAllRedirects: true,
-  }
-  request(requestOptions, function (error, response, body) {
-    if (error) return callback(cb)
-    if (response.statusCode !== 200) return callback(cb)
-    callback(body && body.value.ready)
-  })
+function isRunning(
+  statusUrl: string,
+  callback: (running: boolean) => void,
+  verbose = false
+) {
+  request(
+    {
+      uri: statusUrl,
+      json: true,
+      followAllRedirects: true,
+    },
+    function (error, response, body) {
+      if (verbose && error) {
+        console.log(statusUrl, 'chromedriver status check ----- error', error)
+        return callback(false)
+      }
+      if (verbose && response.statusCode !== 200) {
+        console.log(
+          statusUrl,
+          'chromedriver status check ----- response.statusCode !== 200',
+          response.statusCode
+        )
+        return callback(false)
+      }
+      if (verbose)
+        console.log(
+          statusUrl,
+          'chromedriver status check ----- body',
+          body?.value?.ready,
+          body
+        )
+      callback(body && body.value.ready)
+    }
+  )
 }
 
 function waitForChromeDriver(
@@ -104,14 +126,19 @@ export async function createTestDriver({
   env?: NodeJS.ProcessEnv
   logLevel?: WebDriverLogTypes
 }) {
-  const hostname = 'localhost'
+  const hostname = '127.0.0.1'
   const port = 9515
   const urlBase = '/'
 
   const statusUrl = `http://${hostname}:${port}${urlBase}status`
-  const driver = new Chromedriver(chromedriverPath, statusUrl, {
+  const driver = new Chromedriver(chromedriverPath, {
+    statusUrl: statusUrl,
     env,
+    args: ['--port=' + port],
   })
+  console.log(
+    `Chromedriver to start via PID ${driver.process.pid} ${statusUrl}`
+  )
   await waitForChromeDriver(driver.process, statusUrl, 7000)
 
   const browserOptions: RemoteOptions = {
