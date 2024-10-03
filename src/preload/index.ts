@@ -23,8 +23,6 @@ declare global {
 
 export type ElectronApi = typeof electronApi
 
-const env = process.env
-
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
 
@@ -39,13 +37,16 @@ const electronApi = {
   sendToMainProcess: sendToMainProcess,
   sendClosedSignal: () => ipcRenderer.send('closed'),
   env: {
-    VITEST: env.VITEST,
-    TEST_ID: env.TEST_ID,
-    VITE_BUILD_NUMBER: env.VITE_BUILD_NUMBER,
-    DEV: env.DEV,
-    VITE_INTEGRATION_DEV: env.VITE_INTEGRATION_DEV,
-    NODE_ENV: env.NODE_ENV,
-    PERSISTED_STATE_PATH: env.PERSISTED_STATE_PATH,
+    VITEST: process.env.VITEST ?? import.meta.env.VITEST,
+    TEST_ID: process.env.TEST_ID ?? import.meta.env.TEST_ID,
+    VITE_BUILD_NUMBER:
+      process.env.VITE_BUILD_NUMBER ?? import.meta.env.VITE_BUILD_NUMBER,
+    DEV: process.env.DEV ?? import.meta.env.DEV,
+    VITE_INTEGRATION_DEV:
+      process.env.VITE_INTEGRATION_DEV ?? import.meta.env.VITE_INTEGRATION_DEV,
+    NODE_ENV: process.env.NODE_ENV ?? import.meta.env.NODE_ENV,
+    PERSISTED_STATE_PATH:
+      process.env.PERSISTED_STATE_PATH ?? import.meta.env.PERSISTED_STATE_PATH,
   },
 
   invokeMessage: <T extends MessageToMainType>(
