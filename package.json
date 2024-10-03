@@ -4,7 +4,7 @@
   "version": "0.13.1-beta",
   "private": true,
   "engines": {
-    "node": "^20.14.0"
+    "node": "^20.17.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -21,7 +21,8 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.13.1",
-    "@sentry/electron": "^2.5.4",
+    "@sentry/electron": "^5.4.0",
+    "@sentry/react": "^8.32.0",
     "@silvestre/mkanki": "^3.6.0",
     "@silvestre/subsrt": "^1.1.1",
     "ajv": "^8.12.0",
@@ -29,8 +30,8 @@
     "better-sqlite3": "^11.3.0",
     "clipwave": "^0.2.0",
     "dexie": "^3.2.5",
+    "electron-conf": "^1.2.1",
     "electron-extension-installer": "^1.2.0",
-    "electron-store": "^8.0.1",
     "ffmpeg-static": "^5.1.0",
     "ffprobe-static": "^3.0.0",
     "filenamify": "^6.0.0",
@@ -49,7 +50,6 @@
     "redux": "^4.1.2",
     "redux-observable": "^2.0.0",
     "redux-persist": "^6.0.0",
-    "redux-persist-electron-storage": "^2.1.0",
     "reselect": "^5.1.0",
     "rxjs": "^7.8.1",
     "semver": "^7.5.1",
@@ -58,7 +58,7 @@
     "ts-json-schema-generator": "^1.5.0",
     "uuid": "^9.0.0",
     "wanakana": "^5.1.0",
-    "webdriverio": "^8.32.3",
+    "webdriverio": "^9.0.0",
     "xss": "^1.0.6",
     "yaml": "^2.3.4",
     "yauzl": "^3.1.3"
@@ -72,9 +72,11 @@
     "test": "npm run vitest run -- --config ./vitest.config.ts",
     "build": "npm run build-schemas && npm run electron-vite -- build --mode",
     "integration": "npm run build -- integration && npm run integration:skip-build",
+    "integration:u": "npm run build -- integration && npm run integration:skip-build:u",
     "integration:win": "npm run electron-vite -- build --mode integration && npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
     "integration:debug": "VITE_INTEGRATION_DEV=1 npm run build -- integration && VITE_INTEGRATION_DEV=1 npm run integration:skip-build",
     "integration:skip-build": "npm run vitest -- run --config ./vitest-integration.config.ts --mode integration",
+    "integration:skip-build:u": "npm run vitest -- run --update --config ./vitest-integration.config.ts --mode integration",
     "integration:ds": "VITE_INTEGRATION_DEV=1 npm run vitest --  run --config ./vitest-integration.config.ts --mode integration",
     "build-fixture:saved": "npm run integration:build-fixture -- savedProject",
     "build-fixture:shared": "npm run integration:build-fixture -- sharedProject && rm -rf src/test/assets/generated/sharedProject sharedProject_persistedDataSnapshot.js && echo 'removed generated files'",
@@ -108,15 +110,15 @@
     ]
   },
   "browserslist": [
-    "electron >= 31.1.0"
+    "electron >= 32.1.2"
   ],
   "devDependencies": {
     "@types/archiver": "^6.0.2",
     "@types/better-sqlite3": "^7.6.11",
-    "@types/chromedriver": "^81.0.0",
+    "@types/ffprobe-static": "^2.0.3",
     "@types/fluent-ffmpeg": "^2.1.19",
     "@types/fs-extra": "^11.0.1",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.0.0",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -132,10 +134,10 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "chromedriver": "^126.0.0",
-    "electron": "31.1.0",
+    "electron": "32.1.2",
     "electron-builder": "^24.9.1",
-    "electron-vite": "^1.0.22",
+    "electron-chromedriver": "^32.1.2",
+    "electron-vite": "^2.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
@@ -148,7 +150,7 @@
     "replace-in-files-cli": "^2.2.0",
     "request": "^2.88.2",
     "typescript": "^5.0.4",
-    "vitest": "^0.31.1",
+    "vitest": "^2.1.1",
     "yalc": "^1.0.0-pre.53"
   },
   "build": {

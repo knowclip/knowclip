@@ -14,15 +14,13 @@ import {
   concatWith,
 } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { of, EMPTY, from, Observable, fromEvent, defer, merge } from 'rxjs'
+import { of, EMPTY, from, Observable, defer, merge } from 'rxjs'
 import r from '../redux'
 
-import { getApkgExportData } from '../utils/prepareExport'
 import { areSameFile } from '../utils/files'
 import A from '../types/ActionType'
-import { writeApkgDeck } from 'preloaded/writeToApkg'
-import type { DeckCreationErrorEvent } from '../node/writeToApkg'
 import { ActionOf } from '../actions'
+import { APKG_CREATION_EVENTS } from '../utils/apkgCreationEvents'
 
 const exportApkgFailure: AppEpic = (action$) =>
   action$.pipe(
@@ -48,35 +46,39 @@ const exportApkgSuccess: AppEpic = (action$) =>
 const exportApkg: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.exportApkgRequest as const),
-    switchMap((exportApkgRequest) => {
+    switchMap(async (exportApkgRequest) => {
       const { mediaFileIdsToClipIds } = exportApkgRequest
 
       const currentProject = r.getCurrentProject(state$.value)
       if (!currentProject)
         return of(r.exportApkgFailure('Could not find project'))
 
-      const exportData = getApkgExportData(
+      const exportResult = await effects.getApkgExportData(
         state$.value,
         currentProject,
-        mediaFileIdsToClipIds,
-        effects.existsSync
+        mediaFileIdsToClipIds
       )
 
-      if ('missingMediaFiles' in exportData) {
+      if (exportResult.error) {
+        return of(r.exportApkgFailure(`${exportResult.error.message}`))
+      }
+
+      if (exportResult.value.type === 'MISSING MEDIA FILES') {
         return getMissingMedia(
-          exportData.missingMediaFiles,
+          exportResult.value.missingMediaFiles,
           action$,
           exportApkgRequest
         )
       }
 
-      return makeApkg(exportData, effects)
-    })
+      return makeApkg(exportResult.value.apkgData, effects)
+    }),
+    switchMap((x) => x)
   )
 
 function makeApkg(
   exportData: ApkgExportData,
-  { showSaveDialog, tmpDirectory }: EpicsDependencies
+  { showSaveDialog, writeApkgDeck, fromIpcRendererEvent }: EpicsDependencies
 ) {
   return from(showSaveDialog('Anki APKG file', ['apkg'])).pipe(
     filter((path): path is string => Boolean(path)),
@@ -85,14 +87,12 @@ function makeApkg(
 
       let processed = 0
       const deckCreationEnded = merge(
-        fromEvent(window, 'deck-creation-error').pipe(
-          map((e) => {
-            throw (e as DeckCreationErrorEvent).message
-              ? new Error((e as DeckCreationErrorEvent).message)
-              : new Error('Deck creation failed.')
+        fromIpcRendererEvent(APKG_CREATION_EVENTS.deckCreationError).pipe(
+          map((message) => {
+            throw new Error(message ? String(message) : 'Deck creation failed.')
           })
         ),
-        fromEvent(window, 'deck-saved')
+        fromIpcRendererEvent(APKG_CREATION_EVENTS.deckSaved)
       ).pipe(
         tap((e) => {
           console.log('deck creation event', e)
@@ -107,7 +107,7 @@ function makeApkg(
       )
         .pipe(
           concatWith(
-            fromEvent(window, 'clip-processed').pipe(
+            fromIpcRendererEvent(APKG_CREATION_EVENTS.clipProcessed).pipe(
               takeUntil(deckCreationEnded),
               map(() => {
                 console.log('heard clip-processed event')
@@ -137,7 +137,7 @@ function makeApkg(
           doOnSubscribe(async () => {
             console.log('subscribed i guess!!', processed)
             await null
-            writeApkgDeck(tmpDirectory(), outputFilePath, exportData)
+            writeApkgDeck(outputFilePath, exportData)
           })
         )
     }),

@@ -3,6 +3,7 @@ import { existsSync } from 'fs'
 import * as tempy from 'tempy'
 import { join, basename } from 'path'
 import { sanitizeFileName } from '../utils/sanitizeFilename'
+import { failure } from '../utils/result'
 
 export const VIDEO_STILL_HEIGHT = 150
 
@@ -44,7 +45,7 @@ export const getVideoStill = async (
 
     return { value: outputFilePath }
   } catch (error) {
-    return { errors: [String(error)] }
+    return failure(error)
   }
 }
 

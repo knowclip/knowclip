@@ -13,7 +13,7 @@ import {
 import { PlayArrow, Pause, Loop } from '@mui/icons-material'
 import DarkTheme from './DarkTheme'
 import MediaFilesMenuItem from './MediaFilesMenuItem'
-import { showOpenDialog } from '../utils/electron'
+import { showOpenDialog } from '../mockable/electron'
 import usePopover from '../utils/usePopover'
 import truncate from '../utils/truncate'
 import r from '../redux'

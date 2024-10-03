@@ -8,16 +8,17 @@ export default class Chromedriver {
 
   constructor(
     path: string,
-    statusUrl: string,
     {
       env,
       showBrowserLogs = false,
+      statusUrl,
       args = [],
     }: {
       env?: NodeJS.ProcessEnv
       showBrowserLogs?: boolean
+      statusUrl: string
       args?: string[]
-    } = {}
+    }
   ) {
     this.process = spawn(path, args, {
       cwd: process.cwd(),
@@ -48,9 +49,7 @@ export default class Chromedriver {
     process.on('SIGTERM', this._kill)
 
     this.stop = () => {
-      // @ts-expect-error typings probably outdated
       process.removeListener('exit', this._kill)
-      // @ts-expect-error typings probably outdated
       process.removeListener('SIGTERM', this._kill)
       if (this.process.stdout)
         this.process.stdout.removeListener('data', stdout)

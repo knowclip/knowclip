@@ -31,8 +31,7 @@ clips:
       transcription: 笹を食べながらのんびりするのは最高だなぁ
       pronunciation: sasa-o tabe-nágara nonbíri-suru-no-wa saikoo-da-naa
       meaning: Relaxing while eating bamboo grass is the best
-    tags:
-      &a1
+    tags: &a1
       - pbc
     image:
       type: VideoStill
@@ -69,8 +68,7 @@ clips:
     fields:
       transcription: Ich bin keine Katze, sagte Frederick böse
       meaning: I am not a cat, said Frederick angrily
-    tags:
-      &a1
+    tags: &a1
       - piggeldy_cat.mp4
     image:
       type: VideoStill

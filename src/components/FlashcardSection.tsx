@@ -15,7 +15,7 @@ import { actions } from '../actions'
 import FlashcardForm from './FlashcardSectionForm'
 import FlashcardDisplay from './FlashcardSectionDisplayCard'
 import Preview from './FlashcardSectionDisplayPreview'
-import { showOpenDialog } from '../utils/electron'
+import { showOpenDialog } from '../mockable/electron'
 import { getFileFilters } from '../utils/files'
 import { getKeyboardShortcut } from './KeyboardShortcuts'
 

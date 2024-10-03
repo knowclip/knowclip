@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
-import { getWaveformIds } from '../utils/getWaveform'
+import { getWaveformIds } from '../utils/getWaveformIds'
 
 export const getWaveformImages = createSelector(
   getCurrentMediaFile,

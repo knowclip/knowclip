@@ -14,12 +14,11 @@ import {
   FormHelperText,
   SelectProps,
 } from '@mui/material'
-import { showSaveDialog } from '../../utils/electron'
+import { showSaveDialog } from '../../mockable/electron'
 import css from './NewProjectFormDialog.module.css'
 import cn from 'clsx'
 import { DialogProps } from './DialogProps'
 import { actions } from '../../actions'
-import { uuid, nowUtcTimestamp } from '../../utils/sideEffects'
 
 import { newProjectFormDialog$ as $ } from './NewProjectFormDialog.testLabels'
 
@@ -119,11 +118,9 @@ const NewProjectFormDialog = ({
     const { filePath, name } = fieldValues
     dispatch(
       actions.createProject(
-        uuid(),
         name,
         fieldValues.noteType as unknown as NoteType, // guaranteed after validation
-        filePath,
-        nowUtcTimestamp()
+        filePath
       )
     )
     dispatch(actions.closeDialog())

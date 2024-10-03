@@ -1,7 +1,7 @@
 import { IntegrationTestContext, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu.testLabels'
 import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { join } from 'path'
 import { waveformMouseDrag } from '../../driver/waveform'
 import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'

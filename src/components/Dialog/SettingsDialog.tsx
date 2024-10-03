@@ -23,7 +23,10 @@ import * as selectors from '../../selectors'
 import { DialogProps } from './DialogProps'
 import reducer from '../../reducers/settings'
 import FilePathTextField from '../FilePathTextField'
-import { openInBrowser, showOpenDirectoriesDialog } from '../../utils/electron'
+import {
+  openInBrowser,
+  showOpenDirectoriesDialog,
+} from '../../mockable/electron'
 import css from './SettingsDialog.module.css'
 import { Delete, Add } from '@mui/icons-material'
 import truncate from '../../utils/truncate'

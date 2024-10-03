@@ -15,7 +15,7 @@ import {
   showOpenDirectoryDialog,
   showSaveDialog,
   openInBrowser,
-} from '../../utils/electron'
+} from '../../mockable/electron'
 
 import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'

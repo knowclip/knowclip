@@ -3,10 +3,10 @@ import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectFormDialog.testLabels'
 import { main$ } from '../../../components/Main.testLabels'
 import { join } from 'path'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { test } from '../../test'
 import { _ } from 'ajv'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 
 const {
   projectNameField,

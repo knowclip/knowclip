@@ -9,7 +9,7 @@ import {
 import makeCardsFromSubtitles from './makeCardsFromSubtitles'
 import saveAndCloseProject from './saveAndCloseProject'
 import { join } from 'path'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 import { runAll, step } from '../step'
 import { describe, beforeAll, afterAll } from 'vitest'
 

@@ -10,15 +10,34 @@ import { of, from, EMPTY } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
-import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
+import { normalizeProjectJson } from '../utils/normalizeProjectJson'
 import { getUpdateWith } from '../files/updates'
 
-const createProject: AppEpic = (action$, state$, { writeFile }) =>
+const createProject: AppEpic = (
+  action$,
+  state$,
+  { writeFile, nowUtcTimestamp, uuid }
+) =>
   action$.pipe(
     ofType(A.createProject as const),
-    switchMap(({ project, filePath }) => {
+    switchMap(({ name, noteType, filePath }) => {
+      const now = nowUtcTimestamp()
+      const project: ProjectFile = {
+        type: 'ProjectFile',
+        id: uuid(),
+        name,
+        noteType,
+        mediaFileIds: [],
+        error: null,
+        createdAt: now,
+        lastSaved: now,
+      }
+
       return from(
-        writeFile(filePath, r.getProjectFileContents(state$.value, project))
+        writeFile(
+          filePath,
+          r.getProjectFileContents(state$.value, project, now)
+        )
       ).pipe(
         mergeMap(() =>
           from([
@@ -64,15 +83,18 @@ const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
     })
   )
 
-const openProjectByFilePath: AppEpic = (action$, state$) =>
+const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.openProjectRequestByFilePath as const),
     switchMap(({ filePath }) =>
-      from(parseProjectJson(filePath)).pipe(
-        mergeMap((parse) => {
-          if (parse.errors) throw new Error(parse.errors.join('\n\n'))
+      from(effects.parseProjectJson(filePath)).pipe(
+        mergeMap((readResult) => {
+          if (readResult.error) throw readResult.error
 
-          const { project } = normalizeProjectJson(state$.value, parse.value)
+          const { project } = normalizeProjectJson(
+            state$.value,
+            readResult.value
+          )
           return from([
             r.abortFileDeletions(),
             r.openFileRequest(project, filePath),
@@ -86,7 +108,11 @@ const openProjectByFilePath: AppEpic = (action$, state$) =>
     )
   )
 
-const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
+const saveProject: AppEpic = (
+  action$,
+  state$,
+  { existsSync, writeFile, nowUtcTimestamp }
+) =>
   action$.pipe(
     ofType(A.saveProjectRequest as const),
     filter(() => {
@@ -115,7 +141,11 @@ const saveProject: AppEpic = (action$, state$, { existsSync, writeFile }) =>
 
         await writeFile(
           projectFile.filePath,
-          r.getProjectFileContents(state$.value, projectMetadata)
+          r.getProjectFileContents(
+            state$.value,
+            projectMetadata,
+            nowUtcTimestamp()
+          )
         )
 
         return from([

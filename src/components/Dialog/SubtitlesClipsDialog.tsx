@@ -19,7 +19,7 @@ import {
   Checkbox,
 } from '@mui/material'
 import r from '../../redux'
-import { showOpenDialog } from '../../utils/electron'
+import { showOpenDialog } from '../../mockable/electron'
 import { getNoteTypeFields } from '../../utils/noteType'
 import TagsInput from '../TagsInput'
 import { DialogProps } from './DialogProps'

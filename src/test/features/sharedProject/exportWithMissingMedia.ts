@@ -7,7 +7,7 @@ import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable.testLabels'
 import { snackbar$ } from '../../../components/Snackbar.testLabels'
 import { join } from 'path'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
 import { checkboxesChecked } from '../../driver/reviewAndExportDialog'
 import { mainHeader$ } from '../../../components/MainHeader.testLabels'

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { TextField } from '@mui/material'
 import css from './MediaFolderLocationForm.module.css'
-import { showOpenDirectoryDialog } from '../utils/electron'
+import { showOpenDirectoryDialog } from '../mockable/electron'
 
 // TODO: extend for files vs. directories
 const FilePathTextField = ({

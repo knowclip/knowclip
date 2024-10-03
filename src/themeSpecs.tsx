@@ -1,7 +1,10 @@
 import { ThemeOptions } from '@mui/material'
-import { VITEST } from './env'
 
-const themeSpecs: ThemeOptions = {
+const getThemeSpecs = ({
+  disableAnimations,
+}: {
+  disableAnimations: boolean
+}): ThemeOptions => ({
   components: {
     MuiTooltip: {
       styleOverrides: {
@@ -10,7 +13,7 @@ const themeSpecs: ThemeOptions = {
         },
       },
     },
-    MuiCssBaseline: VITEST
+    MuiCssBaseline: disableAnimations
       ? {
           styleOverrides: {
             '@global': {
@@ -23,7 +26,7 @@ const themeSpecs: ThemeOptions = {
         }
       : {},
   },
-  transitions: VITEST
+  transitions: disableAnimations
     ? {
         duration: {
           shortest: 0,
@@ -36,6 +39,6 @@ const themeSpecs: ThemeOptions = {
         },
       }
     : {},
-}
+})
 
-export default themeSpecs
+export default getThemeSpecs

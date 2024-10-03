@@ -1,10 +1,41 @@
 import { basename } from 'path'
 
-import ffmpegImported, { FfprobeData } from 'fluent-ffmpeg'
+import ffmpeg, { FfprobeData } from 'fluent-ffmpeg'
+import { failure } from '../utils/result'
 
-export const ffmpeg =
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('fluent-ffmpeg/lib/fluent-ffmpeg') as typeof ffmpegImported
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const ffmpegStaticBasePathViaRequire = require('ffmpeg-static')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const ffprobeStaticBasePathViaRequire = require('ffprobe-static').path
+
+const ffmpegStaticBasePath = ffmpegStaticBasePathViaRequire
+const ffprobeStaticBasePath = ffprobeStaticBasePathViaRequire
+
+const getFfmpegStaticPath = (basePath: string) =>
+  basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
+
+console.log({
+  ffmpegStaticBasePath,
+  ffprobeStaticBasePath,
+  ffmpegStaticBasePathViaRequire,
+  ffprobeStaticBasePathViaRequire,
+})
+
+if (!ffmpegStaticBasePath) throw new Error('ffmpeg-static path not found')
+if (!ffprobeStaticBasePath) throw new Error('ffprobe-static path not found')
+const ffmpegPaths = {
+  ffmpeg: getFfmpegStaticPath(ffmpegStaticBasePath),
+  ffprobe: getFfmpegStaticPath(ffprobeStaticBasePath),
+}
+try {
+  ffmpeg.setFfmpegPath(ffmpegPaths.ffmpeg)
+  ffmpeg.setFfprobePath(ffmpegPaths.ffprobe)
+} catch (error) {
+  console.error('Error setting ffmpeg paths:', error)
+  throw error
+}
+
+export { ffmpeg }
 
 const zeroPad = (zeroes: number, value: any) =>
   String(value).padStart(zeroes, '0')
@@ -33,7 +64,7 @@ export const getMediaMetadata = async (
       })
     })
   } catch (error) {
-    return { errors: [String(error)] }
+    return failure(error)
   }
 }
 
@@ -45,7 +76,7 @@ export const readMediaFile = async (
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
 ): AsyncResult<MediaFile> => {
   const metadata = await getMediaMetadata(filePath)
-  if (metadata.errors) return { errors: metadata.errors }
+  if (metadata.error) return metadata
 
   const { value: ffprobeMetadata } = metadata
   const videoStream = ffprobeMetadata.streams.find(
@@ -86,42 +117,56 @@ export const readMediaFile = async (
   return { value: file }
 }
 
-export function writeMediaSubtitlesToVtt(
+export async function writeMediaSubtitlesToVtt(
   mediaFilePath: string,
   streamIndex: number,
   outputFilePath: string
-): Promise<string | null> {
-  return new Promise((res, rej) =>
-    ffmpeg(mediaFilePath)
-      .outputOptions(`-map 0:${streamIndex}`)
-      .output(outputFilePath)
-      .on('end', () => {
-        res(outputFilePath)
-      })
-      .on('error', (err) => {
-        console.error(
-          `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
-          err
-        )
-        rej(err)
-      })
-      .run()
-  )
+): AsyncResult<string> {
+  try {
+    const vttFilepath: string = await new Promise((res, rej) =>
+      ffmpeg(mediaFilePath)
+        .outputOptions(`-map 0:${streamIndex}`)
+        .output(outputFilePath)
+        .on('end', () => {
+          res(outputFilePath)
+        })
+        .on('error', (err) => {
+          console.error(
+            `Problem writing subtitles at stream index ${streamIndex} to VTT:`,
+            err
+          )
+          rej(err)
+        })
+        .run()
+    )
+    return { value: vttFilepath }
+  } catch (error) {
+    return failure(error)
+  }
 }
 
-export const convertAssToVtt = (filePath: string, vttFilePath: string) =>
-  new Promise((res, rej) =>
-    ffmpeg(filePath)
-      .output(vttFilePath)
-      .on('end', () => {
-        res(vttFilePath)
-      })
-      .on('error', (err) => {
-        console.error(err)
-        rej(err)
-      })
-      .run()
-  )
+export const convertAssToVtt = async (
+  filePath: string,
+  vttFilePath: string
+): AsyncResult<'ok'> => {
+  try {
+    const result: 'ok' = await new Promise((res, rej) =>
+      ffmpeg(filePath)
+        .output(vttFilePath)
+        .on('end', () => {
+          res('ok')
+        })
+        .on('error', (err) => {
+          console.error('Error converting ASS to VTT:', err)
+          rej(err)
+        })
+        .run()
+    )
+    return { value: result }
+  } catch (error) {
+    return failure(error)
+  }
+}
 
 export function createConstantBitrateMp3(
   inputPath: string,

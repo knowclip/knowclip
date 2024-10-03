@@ -3,7 +3,7 @@ import { ClientWrapper } from './ClientWrapper'
 import { main$ } from '../../components/Main.testLabels'
 import { waveform$ } from '../../components/waveformTestLabels'
 import { TestDriver } from './TestDriver'
-import { mockSideEffects } from '../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../mockSideEffects'
 import { IntegrationTestContext } from '../setUpDriver'
 
 export const waveformSelector = `#${main$.container} > svg`
@@ -61,7 +61,7 @@ export async function waveformMouseDrag(
     // TODO: not-ideal flaky prevention, see if better text waiting is possible
     await sleep(100)
   } catch (err) {
-    console.error('Error in waveformMouseDrag')
+    console.error('Error in waveformMouseDrag', err)
     throw err
   }
 }

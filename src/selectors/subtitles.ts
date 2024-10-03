@@ -1,4 +1,3 @@
-import stripHtml from '../utils/stripHtml'
 import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
@@ -181,23 +180,20 @@ export const getSubtitlesTrack = (
   id: SubtitlesTrackId
 ): SubtitlesTrack | null => state.subtitles[id] || null
 
-export const readVttChunk = (
-  state: AppState,
-  {
-    start,
-    end,
-    text,
-    index,
-  }: {
-    start: number
-    end: number
-    text: string
-    index: number
-  }
-): SubtitlesChunk => ({
+export const readVttChunk = ({
+  start,
+  end,
+  text,
+  index,
+}: {
+  start: number
+  end: number
+  text: string
+  index: number
+}): SubtitlesChunk => ({
   start: start,
   end: end,
-  text: (stripHtml(text) || '').trim(),
+  text,
   index,
 })
 

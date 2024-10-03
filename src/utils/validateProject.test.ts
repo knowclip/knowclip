@@ -1,4 +1,4 @@
-import validateProject from './validateProject'
+import validateProject from '../node/validateProject'
 import {
   ProjectMetadataJson,
   SimpleFlashcardFields,

@@ -11,10 +11,9 @@ export type OverlappedCardBaseDuringClipStretch = {
 }
 
 export const clipsActions = {
-  addClipRequest: (waveformDrag: WaveformDrag, clipId: Clip['id']) => ({
+  addClipRequest: (waveformDrag: WaveformDrag) => ({
     type: A.addClipRequest,
     waveformDrag,
-    clipId,
   }),
 
   stretchClip: (

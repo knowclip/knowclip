@@ -7,6 +7,8 @@ import type { AnkiNoteMedia } from '../utils/ankiNote'
 import { getClipMedia } from './getClipMedia'
 import { createWriteStream, existsSync } from 'fs'
 import * as tempy from 'tempy'
+import { BrowserWindow } from 'electron'
+import { APKG_CREATION_EVENTS } from '../utils/apkgCreationEvents'
 
 const tmpFilename = () => tempy.temporaryFile()
 
@@ -19,93 +21,73 @@ interface AnkiPackage {
   }>
 }
 
-export async function writeApkgDeck(
-  tmpDirectory: string,
-  outputFilePath: string,
-  exportData: ApkgExportData
-) {
-  try {
-    const pkg = new anki.Package()
-    const deck = new anki.Deck(exportData.projectId, exportData.deckName)
-    const noteModel = new anki.Model(exportData.noteModel)
-    const clozeNoteModel = new anki.ClozeModel(exportData.clozeNoteModel)
+export const getWriteApkgDeck = (mainWindow: BrowserWindow) => {
+  return async function writeApkgDeck(
+    outputFilePath: string,
+    exportData: ApkgExportData
+  ) {
+    try {
+      const tmpDirectory = tempy.temporaryDirectory()
+      const pkg = new anki.Package()
+      const deck = new anki.Deck(exportData.projectId, exportData.deckName)
+      const noteModel = new anki.Model(exportData.noteModel)
+      const clozeNoteModel = new anki.ClozeModel(exportData.clozeNoteModel)
 
-    window.dispatchEvent(new DeckInitializedEvent())
+      mainWindow.webContents.send(
+        'message',
+        APKG_CREATION_EVENTS.deckInitialized
+      )
 
-    await Promise.all(
-      exportData.clips.map(async (clipSpecs: ClipSpecs) => {
-        registerClip(deck, noteModel, clozeNoteModel, clipSpecs)
-        window.dispatchEvent(new ClipProcessedEvent())
+      await Promise.all(
+        exportData.clips.map(async (clipSpecs: ClipSpecs) => {
+          registerClip(deck, noteModel, clozeNoteModel, clipSpecs)
+          mainWindow.webContents.send(
+            'message',
+            APKG_CREATION_EVENTS.clipProcessed
+          )
 
-        const noteMediaResult = await getClipMedia(clipSpecs, tmpDirectory)
-        if (noteMediaResult.errors)
-          throw new Error(noteMediaResult.errors.join('; '))
+          const noteMediaResult = await getClipMedia(clipSpecs, tmpDirectory)
+          if (noteMediaResult.error) throw noteMediaResult.error
 
-        const noteMedia = noteMediaResult.value
-        await addNoteMedia(pkg, noteMedia)
+          const noteMedia = noteMediaResult.value
+          await addNoteMedia(pkg, noteMedia)
+        })
+      )
+
+      mainWindow.webContents.send('message', APKG_CREATION_EVENTS.savingDeck)
+
+      pkg.addDeck(deck)
+      const archive = archiver('zip')
+      const tempFilename = tmpFilename()
+
+      await new Promise((res, rej) => {
+        archive.on('error', (err) => {
+          console.error(`Problem with archive!`)
+          console.error(err)
+          rej(err)
+        })
+
+        archive.on('close', res)
+        archive.on('end', res)
+        archive.on('finish', res)
+
+        writeToApkg(pkg, outputFilePath, {
+          db: sql(tempFilename),
+          tmpFilename: tempFilename,
+          archive,
+        })
       })
-    )
+    } catch (err) {
+      mainWindow.webContents.send(
+        'message',
+        APKG_CREATION_EVENTS.deckCreationError,
+        String(err)
+      )
 
-    window.dispatchEvent(new SavingDeckEvent())
+      throw err
+    }
 
-    pkg.addDeck(deck)
-    const archive = archiver('zip')
-    const tempFilename = tmpFilename()
-
-    await new Promise((res, rej) => {
-      archive.on('error', (err) => {
-        console.error(`Problem with archive!`)
-        console.error(err)
-        rej(err)
-      })
-
-      archive.on('close', res)
-      archive.on('end', res)
-      archive.on('finish', res)
-
-      writeToApkg(pkg, outputFilePath, {
-        db: sql(tempFilename),
-        tmpFilename: tempFilename,
-        archive,
-      })
-    })
-  } catch (err) {
-    const deckCreationErrorEvent = new DeckCreationErrorEvent(String(err))
-    window.dispatchEvent(deckCreationErrorEvent)
-    throw err
-  }
-
-  window.dispatchEvent(new DeckSavedEvent())
-}
-
-class DeckInitializedEvent extends Event {
-  constructor() {
-    super('deck-initialized')
-  }
-}
-
-class ClipProcessedEvent extends Event {
-  constructor() {
-    super('clip-processed')
-  }
-}
-
-export class DeckCreationErrorEvent extends Event {
-  message: string
-  constructor(message: string) {
-    super('deck-creation-error')
-    this.message = message
-  }
-}
-class SavingDeckEvent extends Event {
-  constructor() {
-    super('saving-deck')
-  }
-}
-class DeckSavedEvent extends Event {
-  name = 'deck-saved'
-  constructor() {
-    super('deck-saved')
+    mainWindow.webContents.send('message', APKG_CREATION_EVENTS.deckSaved)
   }
 }
 

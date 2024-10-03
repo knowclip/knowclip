@@ -1,10 +1,10 @@
 import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
 import { subtitlesMenu$ } from '../../../components/SubtitlesMenu.testLabels'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { join } from 'path'
 import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog.testLabels'
 import { test } from '../../test'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 
 export default async function addSomeSubtitles(
   context: IntegrationTestContext,

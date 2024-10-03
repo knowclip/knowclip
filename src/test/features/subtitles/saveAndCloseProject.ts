@@ -2,7 +2,7 @@ import { join } from 'path'
 import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
-import { parseProjectJson } from '../../../utils/parseProject'
+import { parseProjectJson } from '../../../node/parseProject'
 import { test, expect } from '../../test'
 
 export default async function saveAndCloseProject(

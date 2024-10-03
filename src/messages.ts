@@ -7,6 +7,7 @@ import {
   MessageToMain,
   MessageToMainType,
 } from './MessageToMain'
+import { failure } from './utils/result'
 
 async function respond<T extends MessageToMainType>(
   messageHandlers: MessageResponders,
@@ -15,20 +16,14 @@ async function respond<T extends MessageToMainType>(
   const responseHandler = messageHandlers[message.type]
   // @ts-expect-error arguments guaranteed elsewhere
   const result = responseHandler(...(message.args || []))
-  // @ts-expect-error arguments guaranteed elsewhere
   return await result
 }
 
 export function handleMessages(
   mainWindow: BrowserWindow,
-  ffmpegPaths: { ffmpeg: string; ffprobe: string },
   persistedStatePath?: string
 ) {
-  const messageHandlers = getMessageResponders(
-    mainWindow,
-    ffmpegPaths,
-    persistedStatePath
-  )
+  const messageHandlers = getMessageResponders(mainWindow, persistedStatePath)
 
   async function onMessage<T extends MessageToMainType>(
     message: MessageToMain<T>
@@ -39,7 +34,7 @@ export function handleMessages(
         throw new Error(`Unknown message type: ${JSON.stringify(message)}`)
 
       const result = await respond(messageHandlers, message)
-      return { result: await result }
+      return { value: await result }
     } catch (rawError) {
       const error = {
         message:
@@ -49,7 +44,7 @@ export function handleMessages(
         stack: rawError instanceof Error ? rawError.stack : undefined,
         name: rawError instanceof Error ? rawError.name : undefined,
       }
-      return { error }
+      return failure(error)
     }
   }
 

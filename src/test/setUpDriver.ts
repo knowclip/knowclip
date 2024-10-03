@@ -1,13 +1,17 @@
 import electron from 'electron'
 import { join } from 'path'
 import { ClientWrapper } from './driver/ClientWrapper'
-import { mkdirp, remove, existsSync, copy, writeFile } from 'fs-extra'
+import {
+  mkdirp,
+  remove,
+  existsSync,
+  copy,
+  writeFile,
+  readdirSync,
+} from 'fs-extra'
 import * as tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
 import { beforeEach } from 'vitest'
-
-// @ts-expect-error https://github.com/prisma/prisma/issues/8558
-global.setImmediate = global.setTimeout
 
 const rootDir = join(process.cwd())
 
@@ -17,15 +21,27 @@ export const ASSETS_DIRECTORY = join(__dirname, 'assets')
 export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
 export const FIXTURES_DIRECTORY = join(__dirname, 'fixtures')
 
-// https://github.com/giggio/node-chromedriver/blob/main/bin/chromedriver
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const chromedriverPath = require(join(
-  rootDir,
-  'node_modules',
-  'chromedriver',
-  'lib',
-  'chromedriver'
-)).path
+function getChromedriverPath() {
+  const binFolder = join(
+    rootDir,
+    'node_modules',
+    'electron-chromedriver',
+    'bin'
+  )
+  const filesInBinFolder = readdirSync(binFolder)
+  const electronFile = filesInBinFolder.find((file) =>
+    file.toLowerCase().includes('chromedriver')
+  )
+  if (!electronFile) {
+    throw new Error(`chromedriver not found in ${binFolder}`)
+  }
+  const chromedriverPath = join(binFolder, electronFile)
+  console.log(`chromedriver path: ${chromedriverPath}`)
+  if (!existsSync(chromedriverPath)) {
+    throw new Error(`chromedriver not found at ${chromedriverPath}`)
+  }
+  return chromedriverPath
+}
 
 export interface IntegrationTestContext {
   testId: string
@@ -78,7 +94,7 @@ export async function startApp(
   }
 
   const app = await createTestDriver({
-    chromedriverPath: chromedriverPath,
+    chromedriverPath: getChromedriverPath(),
     webdriverIoPath:
       process.platform === 'win32'
         ? join(rootDir, 'node_modules', 'electron', 'dist', 'electron.exe')
@@ -86,11 +102,12 @@ export async function startApp(
     appDir: rootDir,
     chromeArgs: [
       'enable-logging',
-      ...(process.env.VITE_INTEGRATION_DEV ? [] : 'disable-extensions'),
+      ...(process.env.VITE_INTEGRATION_DEV ? [] : ['disable-extensions']),
       ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
     ],
     env: {
       VITEST: 'true',
+      TEST_ID: context.testId,
       PERSISTED_STATE_PATH: persistedStatePath || undefined,
       NODE_ENV: 'integration',
       DISPLAY: process.env.DISPLAY,

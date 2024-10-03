@@ -1,18 +1,16 @@
 import r from '../redux'
 import { FileEventHandlers } from './eventHandlers'
-import { parseProjectJson, normalizeProjectJson } from '../utils/parseProject'
-import { join, basename } from 'preloaded/path'
-import { existsSync } from 'preloaded/fs'
+import { normalizeProjectJson } from '../utils/normalizeProjectJson'
 import { validateMediaFile } from './mediaFile'
+import { join, basename } from '../utils/rendererPathHelpers'
 import { arrayToMapById } from '../utils/arrayToMapById'
-import { validateSubtitlesFromFilePath } from '../utils/subtitles'
 import { updaterGetter } from './updaterGetter'
 
 const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openRequest: async (file, filePath, state, effects) => {
     try {
-      const parse = await parseProjectJson(filePath)
-      if (parse.errors) throw new Error(parse.errors.join('; '))
+      const parse = await effects.parseProjectJson(filePath)
+      if (parse.error) throw parse.error
 
       const { project, clips, cards } = normalizeProjectJson(state, parse.value)
       if (!project)
@@ -46,7 +44,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
           arrayToMapById(cards)
         ),
 
-        r.openFileSuccess(project, filePath),
+        r.openFileSuccess(project, filePath, effects.nowUtcTimestamp()),
       ]
     } catch (err) {
       console.error(err)
@@ -56,9 +54,9 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
     }
   },
   openSuccess: [
-    async (_validatedFile, filePath, state, _effects) => {
-      const parse = await parseProjectJson(filePath)
-      if (parse.errors) throw new Error(parse.errors.join('; '))
+    async (_validatedFile, filePath, state, effects) => {
+      const parse = await effects.parseProjectJson(filePath)
+      if (parse.error) throw parse.error
 
       const { project, media, subtitles } = normalizeProjectJson(
         state,
@@ -72,17 +70,22 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
         [id: string]: string | undefined
       } = {}
 
+      const { platform } = window.electronApi
       for (const mediaFile of media.filter(
         (m) => !(r.getFileAvailability(state, m) || { filePath: null }).filePath
       )) {
         // works while fileavailability names can't be changed...
         for (const directory of r.getAssetsDirectories(state)) {
-          const nameMatch = join(directory, basename(mediaFile.name))
-          const matchingFile = existsSync(nameMatch)
-            ? await validateMediaFile(mediaFile, nameMatch)
+          const nameMatch = join(
+            platform,
+            directory,
+            basename(platform, mediaFile.name)
+          )
+          const matchingFile = (await effects.existsSync(nameMatch))
+            ? await validateMediaFile(mediaFile, nameMatch, effects)
             : null
 
-          if (matchingFile && !matchingFile.errors)
+          if (matchingFile && !matchingFile.error && matchingFile.value)
             newlyAutoFoundMediaFilePaths[mediaFile.id] = nameMatch
         }
       }
@@ -99,16 +102,23 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
         if (subtitlesFile.type !== 'ExternalSubtitlesFile') continue
         // works while subtitles files names can't be changed...
         for (const directory of r.getAssetsDirectories(state)) {
-          const nameMatch = join(directory, basename(subtitlesFile.name))
-          const matchingFile = existsSync(nameMatch)
-            ? await validateSubtitlesFromFilePath(
-                state,
+          const nameMatch = join(
+            platform,
+            directory,
+            basename(platform, subtitlesFile.name)
+          )
+          const fileExistsResult = await effects.existsSync(nameMatch)
+          if (fileExistsResult.error) {
+            console.error(fileExistsResult.error)
+          }
+
+          const validationResult = fileExistsResult.value
+            ? await effects.validateSubtitlesFromFilePath(
                 nameMatch,
                 subtitlesFile
               )
             : null
-
-          if (matchingFile && matchingFile.valid)
+          if (!validationResult?.value?.value?.differences)
             newlyAutoFoundSubtitlesPaths[subtitlesFile.id] =
               newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
                 ? { multipleMatches: true, singleMatch: undefined }

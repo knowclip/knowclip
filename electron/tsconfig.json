@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "preloaded/*": ["./src/preloaded"],
+      "setUpMocks": ["./src/mockUtils/renderer.ts"],
       "components/*": ["./src/components"],
     },
     "target": "es2018",

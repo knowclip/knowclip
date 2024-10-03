@@ -5,7 +5,7 @@ import {
   FIXTURES_DIRECTORY,
   initTestContext,
 } from '../../setUpDriver'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 import { runAll } from '../step'
 import { newProjectTestSteps } from '../newProject/newProjectTestSteps'
 import { copyFile } from 'fs-extra'

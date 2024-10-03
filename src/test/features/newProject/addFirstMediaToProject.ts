@@ -2,10 +2,10 @@ import { ASSETS_DIRECTORY, IntegrationTestContext } from '../../setUpDriver'
 import { mediaFilesMenu$ } from '../../../components/MediaFilesMenu.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { join } from 'path'
-import { mockElectronHelpers } from '../../../utils/electron/mocks'
+import { mockElectronHelpers } from '../../mockElectronHelpers'
 import { linkSubtitlesDialog$ } from '../../../components/Dialog/LinkSubtitlesDialog.testLabels'
 import { test, expect } from '../../test'
-import { mockSideEffects } from '../../../utils/sideEffects/mocks'
+import { mockSideEffects } from '../../mockSideEffects'
 
 export default async function addFirstMediaToProject(
   context: IntegrationTestContext,

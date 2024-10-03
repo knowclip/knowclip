@@ -1,5 +1,6 @@
-import { BrowserWindow } from 'electron'
+import type { BrowserWindow } from 'electron'
 import { openDictionaryZip, readEntryData } from './openDictionaryZip'
+import { failure } from '../result'
 
 export async function requestParseDictionary(
   file: DictionaryFile,
@@ -65,9 +66,7 @@ export async function requestParseYomichanDictionary(
                 2
               )} minutes.`,
             }
-          : {
-              errors: ['Invalid dictionary file.'],
-            }
+          : failure('Invalid dictionary file.')
       )
     },
   })
@@ -141,9 +140,7 @@ export async function requestParseDictCcDictionary(
                 2
               )} minutes.`,
             }
-          : {
-              errors: ['Invalid dictionary file.'],
-            }
+          : failure('Invalid dictionary file.')
       )
     },
   })
@@ -217,9 +214,7 @@ export async function requestParseCedictDictionary(
                 2
               )} minutes.`,
             }
-          : {
-              errors: ['Invalid dictionary file.'],
-            }
+          : failure('Invalid dictionary file.')
       )
     },
   })

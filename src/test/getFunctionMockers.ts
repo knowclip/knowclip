@@ -1,4 +1,4 @@
-import { TestDriver } from './driver/TestDriver'
+import type { TestDriver } from './driver/TestDriver'
 
 type ModuleLike = { [name: string]: (...args: any) => any }
 

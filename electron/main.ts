@@ -1,28 +1,35 @@
 import { BrowserWindow, screen, app, ipcMain, protocol } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
+import * as Sentry from '@sentry/electron/main'
+import { Conf } from 'electron-conf/main'
 import setUpMenu from './appMenu'
 import installDevtools from './devtools'
 import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
-
-export const WINDOW_START_DIMENSIONS = {
-  width: 1027,
-  height: 768,
-}
+import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
 
 const { isPackaged } = app
 const isTesting = process.env.VITEST
 
+const WINDOW_START_DIMENSIONS = {
+  width: isTesting ? 1027 : 1920,
+  height: isTesting ? 768 : 1080,
+}
+
+console.log('main process VITEST', process.env.VITEST)
+if (!isTesting) {
+  const conf = new Conf()
+
+  conf.registerRendererListener()
+  console.log('conf registered')
+}
+
 if (isTesting) interceptLogs()
 
-require('electron-store').initRenderer()
-
-const Sentry = require('@sentry/electron')
-
 Sentry.init({
-  dsn: 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735',
+  dsn: SENTRY_DSN_URL,
 })
 
 const shouldInstallExtensions = Boolean(
@@ -33,17 +40,6 @@ const shouldInstallExtensions = Boolean(
 // be closed automatically when the JavaScript object is garbage collected.
 
 const context: { mainWindow: BrowserWindow | null } = { mainWindow: null }
-
-// have to do it this to access ffmpeg path from within webpack bundle
-const ffmpegStaticBasePath = require('ffmpeg-static')
-const ffprobeStaticBasePath = require('ffprobe-static').path
-const getFfmpegStaticPath = (basePath: string) =>
-  basePath.replace('app.asar', 'app.asar.unpacked') // won't do anything in development
-
-const ffmpegPaths = {
-  ffmpeg: getFfmpegStaticPath(ffmpegStaticBasePath),
-  ffprobe: getFfmpegStaticPath(ffprobeStaticBasePath),
-}
 
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
@@ -59,7 +55,7 @@ async function createWindow() {
       webSecurity: isPackaged,
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: false,
+      sandbox: true,
       devTools: true,
       preload: path.join(__dirname, '..', 'preload', 'index.js'),
     },
@@ -151,7 +147,6 @@ app.whenReady().then(async () => {
   setUpMenu(context.mainWindow as BrowserWindow, true)
   handleMessages(
     context.mainWindow as BrowserWindow,
-    ffmpegPaths,
     process.env.PERSISTED_STATE_PATH
   )
 })

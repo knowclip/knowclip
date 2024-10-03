@@ -1,16 +1,15 @@
 import r from '../redux'
-import { getMidpoint } from '../utils/prepareExport'
 import { FileEventHandlers } from './eventHandlers'
 import { msToSeconds } from 'clipwave'
 
 const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
   {
-    openRequest: async (file, filePath, _state, _effects) => {
+    openRequest: async (file, filePath, _state, effects) => {
       const img = new Image()
       img.src = new URL(`file:///${filePath}`).toString()
       return await new Promise((res, _rej) => {
         const onLoad = () => {
-          res([r.openFileSuccess(file, filePath)])
+          res([r.openFileSuccess(file, filePath, effects.nowUtcTimestamp())])
           img.removeEventListener('load', onLoad)
         }
         const onError = (e: any) => {
@@ -85,13 +84,13 @@ const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
           parentFileAvailability.filePath,
           seconds
         )
-        if (pngPath.errors)
+        if (pngPath.error)
           return [
             r.openFileFailure(
               file,
               null,
               'Could not locate file: ' +
-                (pngPath.errors.join('; ') ||
+                (pngPath.error.message ||
                   'problem generating still image from media.')
             ),
           ]
@@ -117,3 +116,6 @@ const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
   }
 
 export default videoStillImageFileEventHandlers
+
+export const getMidpoint = (start: number, end: number) =>
+  start + Math.round((end - start) / 2)

@@ -30,7 +30,7 @@ import {
   MenuList,
   Popover,
 } from '@mui/material'
-import { showOpenDialog } from '../utils/electron'
+import { showOpenDialog } from '../mockable/electron'
 import css from './MainHeader.module.css'
 import usePopover from '../utils/usePopover'
 

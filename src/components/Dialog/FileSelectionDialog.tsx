@@ -14,8 +14,8 @@ import { getHumanFileName, getFileFilters } from '../../utils/files'
 import { actions } from '../../actions'
 import { DialogProps } from './DialogProps'
 import css from './FileSelectionForm.module.css'
-import { dirname } from 'preloaded/path'
-import { showOpenDialog } from '../../utils/electron'
+import { dirname } from '../../utils/rendererPathHelpers'
+import { showOpenDialog } from '../../mockable/electron'
 import { getFileAvailability } from '../../selectors'
 
 import { fileSelectionDialog$ as $ } from './FileSelectionDialog.testLabels'
@@ -120,6 +120,7 @@ const useLocationForm = (
   onSubmit: (string: string) => void
 ) => {
   const dispatch = useDispatch()
+  const { platform } = window.electronApi
 
   const [locationText, setLocationText] = useState('')
   const [errorText, setErrorText] = useState('')
@@ -133,10 +134,11 @@ const useLocationForm = (
     const trimmedLocation = locationText.trim()
     setCheckFolderAutomatically(
       Boolean(
-        trimmedLocation && autoCheckFolders.includes(dirname(trimmedLocation))
+        trimmedLocation &&
+          autoCheckFolders.includes(dirname(platform, trimmedLocation))
       )
     )
-  }, [autoCheckFolders, locationText])
+  }, [autoCheckFolders, locationText, platform])
 
   const fillInLocation = useCallback((text: string): void => {
     setLocationText(text)
@@ -152,7 +154,7 @@ const useLocationForm = (
   }, [fillInLocation, filters])
   const handleSubmit = useCallback(() => {
     if (locationText) {
-      const directory = dirname(locationText.trim())
+      const directory = dirname(platform, locationText.trim())
       if (autoCheckFolders.includes(directory) && !checkFolderAutomatically)
         dispatch(actions.removeAssetsDirectories([directory]))
       if (!autoCheckFolders.includes(directory) && checkFolderAutomatically)
@@ -167,6 +169,7 @@ const useLocationForm = (
     dispatch,
     locationText,
     onSubmit,
+    platform,
   ])
 
   return {

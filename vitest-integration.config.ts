@@ -5,12 +5,18 @@ import path from 'path'
 export const integrationConfig: UserConfig = {
   resolve: {
     alias: {
-      preloaded: path.resolve(__dirname, 'src', 'node'),
+      setUpMocks: path.resolve(__dirname, 'src', 'setUpMocks', 'test.ts'),
     },
   },
   test: {
     testTimeout: 60000,
-    threads: false,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        minForks: 1,
+        maxForks: 1,
+      },
+    },
     include: ['src/test/**/*.integration.ts'],
     env: {
       ...(process.env.VITEST ? { VITEST: process.env.VITEST } : null),

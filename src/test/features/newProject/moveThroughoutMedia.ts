@@ -2,7 +2,7 @@ import { IntegrationTestContext } from '../../setUpDriver'
 import { flashcardSection$ } from '../../../components/FlashcardSection.testLabels'
 import { waveform$ } from '../../../components/waveformTestLabels'
 import { setVideoTime } from '../../driver/media'
-import { createClipViaWaveform, waveformMouseDrag } from '../../driver/waveform'
+import { createClipViaWaveform } from '../../driver/waveform'
 import { ClientWrapper } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
 
@@ -55,7 +55,8 @@ export default async function moveThroughoutMedia(
     await client.waitForText('body', '2 / 3')
 
     await client.waitUntil(async () => {
-      return (await clipsVisibility(client)).join(' ') === 'true'
+      const visiblity = (await clipsVisibility(client)).join(' ')
+      return visiblity === 'true'
     })
     expect(await clipsVisibility(client)).toMatchObject([true])
     expect(

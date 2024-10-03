@@ -21,7 +21,7 @@ import {
 import { DialogProps } from './DialogProps'
 import r from '../../redux'
 import { Delete, Warning } from '@mui/icons-material'
-import { openInBrowser } from '../../utils/electron'
+import { openInBrowser } from '../../mockable/electron'
 import { useLocalSettingsReducer } from './SettingsDialog'
 
 import { dictionariesDialog$ as $ } from './DictionariesDialog.testLabels'
