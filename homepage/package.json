@@ -9,7 +9,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
-    "@icons-pack/react-simple-icons": "^9.3.0",
+    "@icons-pack/react-simple-icons": "^10.0.0",
     "@netlify/plugin-nextjs": "^5.7.1",
     "@pinjollist/next-with-analytics": "^1.0.1",
     "classnames": "^2.5.1",
