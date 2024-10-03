@@ -33,6 +33,7 @@ jobs:
           # would fail on unavoidable warnings from cra
           CI: false
           BUILD_NUMBER: ${{ github.run_number }}_${{ github.run_id }}_${{ github.run_attempt }}
+          VITE_BUILD_NUMBER: ${{ github.run_number }}_${{ github.run_id }}_${{ github.run_attempt }}
       - name: Upload test screenshots
         if: always()
         uses: actions/upload-artifact@v4

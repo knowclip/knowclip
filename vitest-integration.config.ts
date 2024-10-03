@@ -20,8 +20,8 @@ export const integrationConfig: UserConfig = {
     include: ['src/test/**/*.integration.ts'],
     env: {
       ...(process.env.VITEST ? { VITEST: process.env.VITEST } : null),
-      ...(process.env.BUILD_NUMBER
-        ? { BUILD_NUMBER: process.env.BUILD_NUMBER }
+      ...(process.env.VITE_BUILD_NUMBER
+        ? { VITE_BUILD_NUMBER: process.env.VITE_BUILD_NUMBER }
         : null),
       ...(process.env.DEV ? { DEV: process.env.DEV } : null),
       ...(process.env.VITE_INTEGRATION_DEV

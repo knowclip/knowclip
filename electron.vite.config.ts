@@ -2,7 +2,6 @@ import { UserConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-const external = ['better-sqlite3', 'archiver']
 const config: UserConfig = {
   main: {
     resolve: {
@@ -15,7 +14,7 @@ const config: UserConfig = {
         entry: 'electron/main.ts',
       },
       rollupOptions: {
-        external,
+        external: ['better-sqlite3', 'archiver'],
       },
     },
   },
@@ -32,9 +31,6 @@ const config: UserConfig = {
     build: {
       sourcemap: true,
       minify: false,
-      rollupOptions: {
-        external,
-      },
     },
   },
   preload: {
@@ -49,9 +45,6 @@ const config: UserConfig = {
       },
       sourcemap: true,
       minify: false,
-      rollupOptions: {
-        external,
-      },
     },
   },
 }

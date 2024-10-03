@@ -42,11 +42,11 @@ const showAboutDialog: AppEpic = (
 ) =>
   fromIpcRendererEvent('show-about-dialog').pipe(
     mergeMap(() => {
-      const { BUILD_NUMBER } = window.electronApi.env
+      const { VITE_BUILD_NUMBER } = window.electronApi.env
       pauseMedia()
       return sendToMainProcess({
         type: 'showAboutDialog',
-        args: [aboutMessage(BUILD_NUMBER)],
+        args: [aboutMessage(VITE_BUILD_NUMBER)],
       })
     }),
     ignoreElements()
