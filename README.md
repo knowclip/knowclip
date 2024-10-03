@@ -93,5 +93,5 @@ Upgrading Electron version requires a few config files to be touched.
 * Electron version must be updated in:
   * [.npmrc](./.npmrc) `"browserslist"`
   * `"dependencies"` in [package.json](./package.json)
-* Chromedriver version must be updated in:
-  * `"dependencies"` [package.json](./package.json)
+* Chromedriver version must be updated:
+  * update `electron-chromedriver` in `"dependencies"` [package.json](./package.json) to match Electron version
