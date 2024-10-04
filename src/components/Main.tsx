@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { CircularProgress } from '@mui/material'
@@ -106,7 +106,11 @@ const Main = () => {
   }, [])
 
   const playerRef = useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
-  const waveform = useWaveform({ getItemFn: getWaveformItem, id: CLIPWAVE_ID })
+  const waveform = useWaveform({
+    getItemFn: getWaveformItem,
+    id: CLIPWAVE_ID,
+    maxViewportWidth: useWindowInnerWidth(),
+  })
   const { onTimeUpdate } = waveform
   const { resetWaveformState } = waveform.actions
 
@@ -321,3 +325,15 @@ const Main = () => {
 const EMPTY: string[] = []
 
 export default Main
+
+function useWindowInnerWidth() {
+  const [windowInnerWidth, setWindowInnerWidth] = useState(window.innerWidth)
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowInnerWidth(window.innerWidth)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+  return windowInnerWidth
+}
