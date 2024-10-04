@@ -33,9 +33,9 @@ export default async function makeFlashcardsWithSubtitles(
   test('delete card', async () => {
     const { client } = context
 
+    await client.elements_(waveform$.waveformClip, 1)
     await client.clickElement_(flashcardForm$.deleteButton)
 
-    await client.elements_(waveform$.waveformClip, 1)
     await client.waitForHidden_(waveform$.waveformClip)
   })
 
