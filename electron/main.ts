@@ -13,11 +13,6 @@ import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
 const { isPackaged } = app
 const isTesting = process.env.VITEST
 
-const WINDOW_START_DIMENSIONS = {
-  width: isTesting ? 1027 : 1920,
-  height: isTesting ? 768 : 1080,
-}
-
 console.log('main process VITEST', process.env.VITEST)
 if (!isTesting) {
   const conf = new Conf()
@@ -47,8 +42,8 @@ async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     show: false,
-    width: Math.min(WINDOW_START_DIMENSIONS.width, width),
-    height: Math.min(WINDOW_START_DIMENSIONS.height, height),
+    width: isTesting ? 1027 : width,
+    height: isTesting ? 768 : height,
     minWidth: 740,
     minHeight: 570,
     webPreferences: {
