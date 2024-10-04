@@ -13,6 +13,8 @@ import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
 const { isPackaged } = app
 const isTesting = process.env.VITEST
 
+app.disableHardwareAcceleration()
+
 console.log('main process VITEST', process.env.VITEST)
 if (!isTesting) {
   const conf = new Conf()
@@ -131,15 +133,19 @@ app.whenReady().then(async () => {
     }
   }
 
+  console.log(`Registering file protocol`)
   // https://github.com/electron/electron/issues/23757#issuecomment-640146333
   protocol.registerFileProtocol('file', (request, callback) => {
     const pathname = decodeURI(request.url.replace('file:///', ''))
     callback(pathname)
   })
 
+  console.log(`Creating window`)
   await createWindow()
 
+  console.log(`Setting up menu`)
   setUpMenu(context.mainWindow as BrowserWindow, true)
+  console.log(`Menu set up`)
   handleMessages(
     context.mainWindow as BrowserWindow,
     process.env.PERSISTED_STATE_PATH

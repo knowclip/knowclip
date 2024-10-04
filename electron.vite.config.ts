@@ -14,7 +14,7 @@ const config: UserConfig = {
         entry: 'electron/main.ts',
       },
       rollupOptions: {
-        external: ['better-sqlite3', 'archiver'],
+        external: ['better-sqlite3', 'archiver', '@codedread/bitjs'],
       },
     },
   },

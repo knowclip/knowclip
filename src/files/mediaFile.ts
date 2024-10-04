@@ -6,14 +6,13 @@ import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 import { updaterGetter } from './updaterGetter'
 import { failure } from '../utils/result'
+import { FfprobeData } from 'fluent-ffmpeg'
 
 const updater = updaterGetter<MediaFile>()
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async (file, filePath, _state, effects) => {
     effects.pauseMedia()
-    // mediaPlayer.src = ''
-
     const validationResult = await validateMediaFile(file, filePath, effects)
     if (validationResult.error) {
       return [
@@ -26,11 +25,16 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         ),
       ]
     }
-    const [errorMessage, validatedFile] = validationResult.value
-    if (errorMessage) {
+    const {
+      differences: differencesMessage,
+      file: validatedFile,
+      metadata,
+    } = validationResult.value
+    if (differencesMessage) {
       return [
         r.confirmationDialog(
-          errorMessage + '\n\nAre you sure this is the file you want to open?',
+          differencesMessage +
+            '\n\nAre you sure this is the file you want to open?',
           r.openFileSuccess(validatedFile, filePath, effects.nowUtcTimestamp()),
           r.openFileFailure(
             file,
@@ -90,7 +94,11 @@ export const validateMediaFile = async (
   existingFile: MediaFile,
   filePath: string,
   effects: EpicsDependencies
-): AsyncResult<[string | null, MediaFile]> => {
+): AsyncResult<{
+  file: MediaFile
+  differences: string | null
+  metadata: FfprobeData
+}> => {
   const readResult = await effects.readMediaFile(
     filePath,
     existingFile.id,
@@ -103,7 +111,9 @@ export const validateMediaFile = async (
     return failure(readResult.error.message)
   }
 
-  const { value: newFile } = readResult
+  const {
+    value: { file: newFile, ffprobeMetadata },
+  } = readResult
 
   const differences: { [attribute: string]: [string, string] } = {}
 
@@ -133,23 +143,22 @@ export const validateMediaFile = async (
     ]
   }
 
-  if (Object.keys(differences).length) {
-    return {
-      value: [
-        `This media file differs from the one on record by:\n\n ${Object.entries(
-          differences
-        )
-          .map(
-            ([attr, [old, current]]) =>
-              `${attr}: "${current}" for this file instead of "${old}"`
+  return {
+    value: {
+      file: newFile,
+      metadata: ffprobeMetadata,
+      differences: Object.keys(differences).length
+        ? `This media file differs from the one on record by:\n\n ${Object.entries(
+            differences
           )
-          .join('\n')}.`,
-        newFile,
-      ],
-    }
+            .map(
+              ([attr, [old, current]]) =>
+                `${attr}: "${current}" for this file instead of "${old}"`
+            )
+            .join('\n')}.`
+        : null,
+    },
   }
-
-  return { value: [null, newFile] }
 }
 
 const SUBTITLES_FILE_EXTENSIONS: SubtitlesFileExtension[] = [
