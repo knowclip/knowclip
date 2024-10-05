@@ -4,10 +4,7 @@ import { basename, dirname, join } from '../utils/rendererPathHelpers'
 import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
-import { updaterGetter } from './updaterGetter'
 import { failure } from '../utils/result'
-
-const updater = updaterGetter<MediaFile>()
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async (file, filePath, _state, effects) => {
@@ -405,7 +402,7 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
 export default handlers()
 
 export const updates = {
-  addSubtitlesTrack: updater((file: MediaFile, track: SubtitlesTrack) => {
+  addSubtitlesTrack: (file: MediaFile, track: SubtitlesTrack) => {
     return {
       ...file,
       subtitles: file.subtitles.some((s) => s.id === track.id) // should not happen... but just in case
@@ -420,50 +417,46 @@ export const updates = {
               : { type: 'ExternalSubtitlesTrack', id: track.id },
           ],
     }
+  },
+  deleteSubtitlesTrack: (file: MediaFile, trackId: SubtitlesTrackId) => ({
+    ...file,
+    subtitles: file.subtitles.filter(({ id }) => id !== trackId),
+    flashcardFieldsToSubtitlesTracks: Object.entries(
+      file.flashcardFieldsToSubtitlesTracks
+    )
+      .filter(([_fieldName, givenTrackId]) => trackId !== givenTrackId)
+      .reduce((all, [fieldName, id]) => {
+        all[fieldName as TransliterationFlashcardFieldName] = id
+        return all
+      }, {} as Partial<Record<TransliterationFlashcardFieldName, string>>),
   }),
-  deleteSubtitlesTrack: updater(
-    (file: MediaFile, trackId: SubtitlesTrackId) => ({
-      ...file,
-      subtitles: file.subtitles.filter(({ id }) => id !== trackId),
-      flashcardFieldsToSubtitlesTracks: Object.entries(
-        file.flashcardFieldsToSubtitlesTracks
-      )
-        .filter(([_fieldName, givenTrackId]) => trackId !== givenTrackId)
-        .reduce((all, [fieldName, id]) => {
-          all[fieldName as TransliterationFlashcardFieldName] = id
-          return all
-        }, {} as Partial<Record<TransliterationFlashcardFieldName, string>>),
-    })
-  ),
-  linkFlashcardFieldToSubtitlesTrack: updater(
-    (
-      file: MediaFile,
-      flashcardFieldName: FlashcardFieldName,
-      subtitlesTrackId: SubtitlesTrackId | null,
-      _fieldToClear: FlashcardFieldName | null // TODO: check if needed
-    ) => {
-      const flashcardFieldsToSubtitlesTracks = {
-        ...file.flashcardFieldsToSubtitlesTracks,
-      }
-      if (subtitlesTrackId) {
-        for (const [fieldName, trackId] of Object.entries(
-          flashcardFieldsToSubtitlesTracks
-        )) {
-          if (trackId === subtitlesTrackId)
-            delete flashcardFieldsToSubtitlesTracks[
-              fieldName as TransliterationFlashcardFieldName
-            ]
-        }
-
-        flashcardFieldsToSubtitlesTracks[flashcardFieldName] = subtitlesTrackId
-      } else {
-        delete flashcardFieldsToSubtitlesTracks[flashcardFieldName]
-      }
-
-      return {
-        ...file,
-        flashcardFieldsToSubtitlesTracks,
-      }
+  linkFlashcardFieldToSubtitlesTrack: (
+    file: MediaFile,
+    flashcardFieldName: FlashcardFieldName,
+    subtitlesTrackId: SubtitlesTrackId | null,
+    _fieldToClear: FlashcardFieldName | null // TODO: check if needed
+  ) => {
+    const flashcardFieldsToSubtitlesTracks = {
+      ...file.flashcardFieldsToSubtitlesTracks,
     }
-  ),
-}
+    if (subtitlesTrackId) {
+      for (const [fieldName, trackId] of Object.entries(
+        flashcardFieldsToSubtitlesTracks
+      )) {
+        if (trackId === subtitlesTrackId)
+          delete flashcardFieldsToSubtitlesTracks[
+            fieldName as TransliterationFlashcardFieldName
+          ]
+      }
+
+      flashcardFieldsToSubtitlesTracks[flashcardFieldName] = subtitlesTrackId
+    } else {
+      delete flashcardFieldsToSubtitlesTracks[flashcardFieldName]
+    }
+
+    return {
+      ...file,
+      flashcardFieldsToSubtitlesTracks,
+    }
+  },
+} satisfies FileUpdatesForFileType<MediaFile>

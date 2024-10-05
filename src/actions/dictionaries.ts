@@ -1,6 +1,7 @@
 import A from '../types/ActionType'
 import { KnowclipActionCreatorsSubset } from '.'
 import { filesActions } from './files'
+import { FileUpdateName } from '../files/FileUpdateName'
 
 export const dictionariesActions = {
   importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
@@ -26,7 +27,7 @@ export const dictionariesActions = {
 
 const finishDictionaryImport = (id: FileId) =>
   filesActions.updateFile({
-    updateName: 'finishDictionaryImport',
+    updateName: FileUpdateName.FinishDictionaryImport,
     updatePayload: [],
     id,
     fileType: 'Dictionary',

@@ -1,9 +1,13 @@
 import { Reducer } from 'redux'
 import A from '../types/ActionType'
+import { FileUpdateName } from '../files/FileUpdateName'
 
 const initialState: SubtitlesState = {}
 
-const subtitles: Reducer<SubtitlesState> = (state = initialState, action) => {
+const subtitles: Reducer<SubtitlesState, Action> = (
+  state = initialState,
+  action
+) => {
   switch (action.type) {
     case A.mountSubtitlesTrack:
       return { ...state, [action.track.id]: action.track }
@@ -17,7 +21,7 @@ const subtitles: Reducer<SubtitlesState> = (state = initialState, action) => {
         [action.id]: {
           ...state[action.id],
           mode: 'disabled',
-        } as SubtitlesTrack,
+        } satisfies SubtitlesTrack,
       }
 
     case A.showSubtitles:
@@ -26,16 +30,14 @@ const subtitles: Reducer<SubtitlesState> = (state = initialState, action) => {
         [action.id]: {
           ...state[action.id],
           mode: 'showing',
-        } as SubtitlesTrack,
+        } satisfies SubtitlesTrack,
       }
     case A.updateFile: {
-      const { update } = action as UpdateFileWith<any>
-      const updateName: keyof FileUpdates = update.updateName
+      const { update } = action
 
-      switch (updateName) {
-        case 'deleteSubtitlesTrack': {
-          const trackId = (action as UpdateFileWith<'deleteSubtitlesTrack'>)
-            .update.updatePayload[0]
+      switch (update.updateName) {
+        case FileUpdateName.DeleteSubtitlesTrack: {
+          const trackId = update.updatePayload[0]
           const { [trackId]: _, ...newState } = state
           return newState
         }

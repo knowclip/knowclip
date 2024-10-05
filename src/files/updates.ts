@@ -8,13 +8,8 @@ export const fileUpdates = {
   ...dictionary,
 } as const
 
-export type FileUpdates = typeof fileUpdates
+export type AppFileUpdates = typeof fileUpdates
 
-export function getUpdateWith<U extends keyof FileUpdates>(
-  update: FileUpdate<any>,
-  updateName: U
-): FileUpdate<U> | null {
-  if (update.updateName === updateName) return update as FileUpdate<U>
-  return null
-}
+export { FileUpdateName } from './FileUpdateName'
+
 export type ProjectFileUpdates = typeof project

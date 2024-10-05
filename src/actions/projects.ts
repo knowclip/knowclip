@@ -1,6 +1,7 @@
 import A from '../types/ActionType'
 import { KnowclipActionCreatorsSubset } from '.'
 import { filesActions } from './files'
+import { FileUpdateName } from '../files/FileUpdateName'
 
 export const projectActions = {
   createProject: (name: string, noteType: NoteType, filePath: string) => {
@@ -65,19 +66,13 @@ export const projectActions = {
   }),
 } satisfies KnowclipActionCreatorsSubset
 
-function update<F extends keyof FileUpdates>(u: FileUpdate<F>) {
-  return u as any as FileUpdate<keyof FileUpdates>
-}
-
 const setProjectName = (id: ProjectId, name: string) =>
-  filesActions.updateFile(
-    update({
-      id,
-      fileType: 'ProjectFile',
-      updateName: 'setProjectName',
-      updatePayload: [name],
-    })
-  )
+  filesActions.updateFile({
+    id,
+    fileType: 'ProjectFile',
+    updateName: FileUpdateName.SetProjectName,
+    updatePayload: [name],
+  })
 const deleteMediaFromProject = (
   projectId: ProjectId,
   mediaFileId: MediaFileId
@@ -85,7 +80,7 @@ const deleteMediaFromProject = (
   filesActions.updateFile({
     fileType: 'ProjectFile',
     id: projectId,
-    updateName: 'deleteProjectMedia',
+    updateName: FileUpdateName.DeleteProjectMedia,
     updatePayload: [mediaFileId],
   })
 

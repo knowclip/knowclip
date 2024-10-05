@@ -1,5 +1,4 @@
 import A from '../types/ActionType'
-import { FileUpdates } from '../files/updates'
 import { KnowclipActionCreatorsSubset } from '.'
 
 export const filesActions = {
@@ -74,9 +73,9 @@ export const filesActions = {
     type: A.abortFileDeletions,
   }),
 
-  updateFile: <U extends keyof FileUpdates>(update: FileUpdate<U>) => ({
+  updateFile: <U extends FileUpdateName>(update: FileUpdate<U>) => ({
     type: A.updateFile,
-    update: update as FileUpdate<any>,
+    update,
   }),
 
   preloadVideoStills: (file: FileMetadata, clipId: ClipId) => ({

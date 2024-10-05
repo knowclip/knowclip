@@ -119,7 +119,7 @@ const files: Reducer<FilesState, Action> = (state = initialState, action) => {
 
 export default files
 
-function updateFile<U extends keyof FileUpdates>(
+function updateFile<U extends FileUpdateName>(
   state: FilesState,
   update: FileUpdate<U>,
   action: ActionOf<A.updateFile>
@@ -138,8 +138,9 @@ function updateFile<U extends keyof FileUpdates>(
     [update.fileType]: {
       ...state[update.fileType],
       [update.id]: updateMethod(
-        existingFile as any,
-        ...(update.updatePayload as any)
+        existingFile,
+        // @ts-expect-error compiler doesn't understand matching of keys/properties
+        ...update.updatePayload
       ),
     },
   }
