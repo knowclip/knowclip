@@ -6,8 +6,6 @@ import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 import { failure } from '../utils/result'
 
-const updater = updaterGetter<MediaFile>()
-
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async (file, filePath, _state, effects) => {
     effects.pauseMedia()

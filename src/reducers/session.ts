@@ -37,13 +37,9 @@ const session: Reducer<SessionState, Action> = (
         : state
 
     case A.updateFile: {
-      const { update } = action as UpdateFileWith<any>
-      const updateName: keyof FileUpdates = update.updateName
-
-      switch (updateName) {
+      switch (action.update.updateName) {
         case 'deleteProjectMedia': {
-          const mediaFileId = (action as UpdateFileWith<'deleteProjectMedia'>)
-            .update.updatePayload[0]
+          const mediaFileId = action.update.updatePayload[0]
           return state.currentMediaFileId === mediaFileId
             ? {
                 ...state,
