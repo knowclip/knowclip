@@ -4,7 +4,7 @@ import { normalizeProjectJson } from '../utils/normalizeProjectJson'
 import { validateMediaFile } from './mediaFile'
 import { join, basename } from '../utils/rendererPathHelpers'
 import { arrayToMapById } from '../utils/arrayToMapById'
-import { updaterGetter } from './updaterGetter'
+import { FileUpdateName } from './FileUpdateName'
 
 const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
   openRequest: async (file, filePath, state, effects) => {
@@ -187,16 +187,15 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
 
 export default projectFileEventHandlers
 
-const updater = updaterGetter<ProjectFile>()
 export const updates = {
-  setProjectName: updater((file: ProjectFile, name: string) => {
+  [FileUpdateName.SetProjectName]: (file, name: string) => {
     return {
       ...file,
       name,
     }
-  }),
-  deleteProjectMedia: updater((file: ProjectFile, mediaFileId: string) => ({
+  },
+  [FileUpdateName.DeleteProjectMedia]: (file, mediaFileId: string) => ({
     ...file,
     mediaFileIds: file.mediaFileIds.filter((id) => id !== mediaFileId),
-  })),
-}
+  }),
+} satisfies FileUpdatesForFileType<ProjectFile>

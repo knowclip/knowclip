@@ -4,7 +4,7 @@ import { of, from, EMPTY } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
 import { TransliterationFlashcardFields } from '../types/Project'
-import { getUpdateWith } from '../files/updates'
+import { FileUpdateName } from '../files/updates'
 import { msToSeconds } from 'clipwave'
 import { ActionOf } from '../actions'
 
@@ -66,11 +66,11 @@ const linkFieldToTrack: AppEpic = (action$, state$) =>
     mergeMap((action) => {
       if (action.type !== A.updateFile) return EMPTY
 
-      const update = getUpdateWith(
-        action.update,
-        'linkFlashcardFieldToSubtitlesTrack'
+      const { update } = action
+      if (
+        update.updateName !== FileUpdateName.LinkFlashcardFieldToSubtitlesTrack
       )
-      if (!update) return EMPTY
+        return EMPTY
 
       const currentNoteType = r.getCurrentNoteType(state$.value)
       if (!currentNoteType) return EMPTY

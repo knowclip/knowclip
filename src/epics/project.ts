@@ -11,7 +11,7 @@ import { ofType, combineEpics } from 'redux-observable'
 import A from '../types/ActionType'
 import r from '../redux'
 import { normalizeProjectJson } from '../utils/normalizeProjectJson'
-import { getUpdateWith } from '../files/updates'
+import { FileUpdateName } from '../files/updates'
 
 const createProject: AppEpic = (
   action$,
@@ -181,10 +181,10 @@ const PROJECT_EDIT_ACTIONS = new Set<Action['type']>([
   A.moveClip,
   A.addMediaToProjectRequest,
 ])
-const PROJECT_EDIT_UPDATE_FILE_ACTIONS: Set<keyof FileUpdates> = new Set([
-  'deleteProjectMedia',
-  'linkFlashcardFieldToSubtitlesTrack',
-  'setProjectName',
+const PROJECT_EDIT_UPDATE_FILE_ACTIONS: Set<FileUpdateName> = new Set([
+  FileUpdateName.DeleteProjectMedia,
+  FileUpdateName.LinkFlashcardFieldToSubtitlesTrack,
+  FileUpdateName.SetProjectName,
 ])
 
 const registerUnsavedWork: AppEpic = (action$, state$) =>
@@ -204,12 +204,13 @@ const deleteMediaFileFromProject: AppEpic = (action$, state$) =>
   action$.pipe(
     mergeMap((action) => {
       if (action.type !== A.updateFile) return EMPTY
-      const update = getUpdateWith(action.update, 'deleteProjectMedia')
-      if (!update) return EMPTY
+
+      if (action.update.updateName !== FileUpdateName.DeleteProjectMedia)
+        return EMPTY
 
       const {
         updatePayload: [mediaFileId],
-      } = update
+      } = action.update
       const file = r.getFile(state$.value, 'MediaFile', mediaFileId)
       return file ? of(r.deleteFileRequest(file.type, file.id)) : EMPTY
     })

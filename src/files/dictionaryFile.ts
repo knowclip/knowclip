@@ -5,8 +5,8 @@ import {
   FileEventHandlers,
 } from './eventHandlers'
 import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
-import { updaterGetter } from './updaterGetter'
 import { basename } from '../utils/rendererPathHelpers'
+import { FileUpdateName } from './FileUpdateName'
 
 export type LexiconEntry = {
   variant: string | null
@@ -96,11 +96,9 @@ export const dictionaryActions: FileEventHandlers<DictionaryFile> = {
   deleteSuccess: [deleteSuccess],
 }
 
-const updater = updaterGetter<DictionaryFile>()
-
 export const updates = {
-  finishDictionaryImport: updater((file) => ({
+  [FileUpdateName.FinishDictionaryImport]: (file) => ({
     ...file,
     importComplete: true,
-  })),
-}
+  }),
+} satisfies FileUpdatesForFileType<DictionaryFile>

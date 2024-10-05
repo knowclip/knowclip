@@ -2,6 +2,7 @@ import A from '../types/ActionType'
 import { filesActions } from './files'
 import { TransliterationFlashcardFields } from '../types/Project'
 import { KnowclipActionCreatorsSubset } from '.'
+import { FileUpdateName } from '../files/FileUpdateName'
 
 export const subtitlesActions = {
   showSubtitles: (id: SubtitlesTrackId) => ({
@@ -60,7 +61,7 @@ export const subtitlesActions = {
 const addSubtitlesTrack = (track: SubtitlesTrack, mediaFileId: MediaFileId) =>
   filesActions.updateFile({
     fileType: 'MediaFile',
-    updateName: 'addSubtitlesTrack',
+    updateName: FileUpdateName.AddSubtitlesTrack,
     id: mediaFileId,
     updatePayload: [track],
   })
@@ -71,7 +72,7 @@ const deleteSubtitlesTrackFromMedia = (
 ) =>
   filesActions.updateFile({
     fileType: 'MediaFile',
-    updateName: 'deleteSubtitlesTrack',
+    updateName: FileUpdateName.DeleteSubtitlesTrack,
     id: mediaFileId,
     updatePayload: [id],
   })
@@ -84,7 +85,7 @@ const linkFlashcardFieldToSubtitlesTrack = (
 ) =>
   filesActions.updateFile({
     fileType: 'MediaFile',
-    updateName: 'linkFlashcardFieldToSubtitlesTrack',
+    updateName: FileUpdateName.LinkFlashcardFieldToSubtitlesTrack,
     id: mediaFileId,
     updatePayload: [flashcardFieldName, subtitlesTrackId, fieldToClear || null],
   })
