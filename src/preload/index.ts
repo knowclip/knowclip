@@ -32,7 +32,7 @@ const knowclipServerArg = process.argv.find((arg) =>
 )
 
 const knowclipServerAddress = knowclipServerArg
-  ? JSON.parse(knowclipServerArg.split('=')[1])
+  ? 'http://' + knowclipServerArg.split('=')[1]
   : ''
 
 const platform = process.platform as 'darwin' | 'win32' | 'linux'

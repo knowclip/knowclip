@@ -55,7 +55,10 @@ async function createWindow(knowclipServerAddress: string) {
     minHeight: 570,
     webPreferences: {
       additionalArguments: [
-        `--knowclipServerAddress=${JSON.stringify(knowclipServerAddress)}`,
+        `--knowclipServerAddress=${knowclipServerAddress.replace(
+          /https?:\/\//,
+          ''
+        )}`,
       ],
       webSecurity: isPackaged,
       nodeIntegration: false,
