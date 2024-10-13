@@ -9,9 +9,13 @@ import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
+import { setUpServer } from './setUpServer'
 
 const { isPackaged } = app
 const isTesting = process.env.VITEST
+if (!isPackaged && process.platform === 'darwin')
+  // to suppress warnings on mac intel for electron 32.1.2
+  app.disableHardwareAcceleration()
 
 console.log('main process VITEST', process.env.VITEST)
 if (!isTesting) {
@@ -34,9 +38,12 @@ const shouldInstallExtensions = Boolean(
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
-const context: { mainWindow: BrowserWindow | null } = { mainWindow: null }
+const context: {
+  mainWindow: BrowserWindow | null
+  knowclipServerAddress: string | null
+} = { mainWindow: null, knowclipServerAddress: null }
 
-async function createWindow() {
+async function createWindow(knowclipServerAddress: string) {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   // Create the browser window.
@@ -47,11 +54,12 @@ async function createWindow() {
     minWidth: 740,
     minHeight: 570,
     webPreferences: {
+      additionalArguments: [`--knowclipServerAddress=${knowclipServerAddress}`],
       webSecurity: isPackaged,
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
-      devTools: true,
+      devTools: shouldInstallExtensions,
       preload: path.join(__dirname, '..', 'preload', 'index.js'),
     },
   })
@@ -116,6 +124,14 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
+  const {
+    knowclipServerAddress,
+    filePathsRegistry,
+  }: {
+    knowclipServerAddress: string
+    filePathsRegistry: Record<string, string>
+  } = await setUpServer()
+
   if (shouldInstallExtensions) {
     try {
       await installDevtools({
@@ -131,17 +147,15 @@ app.whenReady().then(async () => {
     }
   }
 
-  // https://github.com/electron/electron/issues/23757#issuecomment-640146333
-  protocol.registerFileProtocol('file', (request, callback) => {
-    const pathname = decodeURI(request.url.replace('file:///', ''))
-    callback(pathname)
-  })
+  console.log(`Creating window`)
+  await createWindow(knowclipServerAddress)
 
-  await createWindow()
-
+  console.log(`Setting up menu`)
   setUpMenu(context.mainWindow as BrowserWindow, true)
+  console.log(`Menu set up`)
   handleMessages(
     context.mainWindow as BrowserWindow,
+    filePathsRegistry,
     process.env.PERSISTED_STATE_PATH
   )
 })
@@ -166,7 +180,12 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (context.mainWindow === null) {
-    createWindow()
+    if (!context.knowclipServerAddress) {
+      throw new Error(
+        'Something went wrong (knowclipServerAddress is null). Please restart the app.'
+      )
+    }
+    createWindow(context.knowclipServerAddress)
   }
 })
 

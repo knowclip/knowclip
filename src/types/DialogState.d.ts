@@ -14,6 +14,7 @@ declare type DialogData =
   | SettingsDialogData
   | LinkSubtitlesDialogData
   | DictionariesDialogData
+  | MediaConversionConfirmationDialogData
 
 declare type ConfirmationDialogData = {
   type: 'Confirmation'
@@ -73,4 +74,11 @@ declare type LinkSubtitlesDialogData = {
 
 declare type DictionariesDialogData = {
   type: 'Dictionaries'
+}
+
+declare type MediaConversionConfirmationDialogData = {
+  type: 'MediaConversionConfirmation'
+  message: string
+  action: Action
+  onCancel: Action | null
 }

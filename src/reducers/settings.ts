@@ -5,6 +5,7 @@ export const initialState: SettingsState = {
   mediaFolderLocation: null,
   assetsDirectories: [],
   checkForUpdatesAutomatically: true,
+  warnBeforeConvertingMedia: true,
   viewMode: 'VERTICAL',
 }
 
@@ -69,6 +70,12 @@ const settings: Reducer<SettingsState, Action> = (
         activeDictionaries: (state.activeDictionaries || []).filter(
           (d) => d.id !== action.id
         ),
+      }
+
+    case A.setWarnBeforeConvertingMedia:
+      return {
+        ...state,
+        warnBeforeConvertingMedia: action.warn,
       }
 
     default:

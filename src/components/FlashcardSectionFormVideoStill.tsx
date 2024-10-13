@@ -18,15 +18,21 @@ const VideoStillDisplay = ({
   height?: number
   preloadAdjacent?: boolean
 }) => {
-  const { videoStill, mediaFileAvailability } = useSelector(
-    (state: AppState) => ({
-      videoStill: r.getFileWithAvailability<VideoStillImageFile>(
+  const { videoStill, stillUrl, mediaFileAvailability } = useSelector(
+    (state: AppState) => {
+      const videoStill = r.getFileWithAvailability<VideoStillImageFile>(
         state,
         'VideoStillImage',
         flashcard.id
-      ),
-      mediaFileAvailability: r.getFileAvailability(state, videoFile),
-    })
+      )
+      return {
+        videoStill,
+        stillUrl: videoStill.file
+          ? r.getFileUrl(state, videoStill.file.id)
+          : null,
+        mediaFileAvailability: r.getFileAvailability(state, videoFile),
+      }
+    }
   )
 
   const dispatch = useDispatch()
@@ -34,7 +40,6 @@ const VideoStillDisplay = ({
   useEffect(() => {
     if (preloadAdjacent) dispatch(r.preloadVideoStills(videoFile, flashcard.id))
   }, [flashcard.id, dispatch, videoFile, preloadAdjacent])
-  const { filePath } = videoStill.availability
 
   const handleClick = useCallback(() => {
     dispatch(
@@ -65,9 +70,7 @@ const VideoStillDisplay = ({
       >
         <CardMedia
           className={cn(css.flashcardImage)}
-          image={
-            filePath ? new URL(`file://${filePath}`).toString() : undefined
-          }
+          image={stillUrl || undefined}
         >
           {videoStill.availability.status !== 'CURRENTLY_LOADED' &&
           mediaFileAvailability.status === 'CURRENTLY_LOADED' ? (

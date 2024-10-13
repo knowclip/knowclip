@@ -5,12 +5,13 @@ import { getHumanFileName } from '../utils/files'
 import { formatDurationWithMilliseconds } from '../utils/formatTime'
 import moment from 'moment'
 import { failure } from '../utils/result'
+import { FfprobeData } from 'fluent-ffmpeg'
+import { getMediaCompatibilityWarnings } from '../node/getMediaCompatibilityIssues'
+import { FileUpdateName } from './FileUpdateName'
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
   openRequest: async (file, filePath, _state, effects) => {
     effects.pauseMedia()
-    // mediaPlayer.src = ''
-
     const validationResult = await validateMediaFile(file, filePath, effects)
     if (validationResult.error) {
       return [
@@ -23,11 +24,60 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         ),
       ]
     }
-    const [errorMessage, validatedFile] = validationResult.value
-    if (errorMessage) {
+
+    const {
+      differences: differencesMessage,
+      compatibilityWarnings: compatibilityWarnings,
+      file: validatedFile,
+    } = validationResult.value
+    if (differencesMessage) {
       return [
+        r.setMediaMetadata(validationResult.value.metadata),
         r.confirmationDialog(
-          errorMessage + '\n\nAre you sure this is the file you want to open?',
+          differencesMessage,
+          compatibilityWarnings.length
+            ? r.mediaConversionConfirmationDialog(
+                `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
+                  '\n'
+                )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
+                r.openFileSuccess(
+                  validatedFile,
+                  filePath,
+                  effects.nowUtcTimestamp()
+                ),
+                r.openFileFailure(
+                  file,
+                  filePath,
+                  `Some features may be unavailable until your file is located.`
+                ),
+                true
+              )
+            : r.openFileSuccess(
+                validatedFile,
+                filePath,
+                effects.nowUtcTimestamp()
+              ),
+          r.openFileFailure(
+            file,
+            filePath,
+            `Some features may be unavailable until your file is located.`
+          ),
+          true
+        ),
+      ]
+    }
+
+    // TODO: make sure the setting is checked TRUE unless the user has unchecked it.
+    // TODO: maybe show a snackbar if the dialog is not shown
+
+    if (compatibilityWarnings.length) {
+      // TODO: also check if settings checkbox is checked, also above
+      return [
+        r.setMediaMetadata(validationResult.value.metadata),
+        r.mediaConversionConfirmationDialog(
+          `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
+            '\n'
+          )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
           r.openFileSuccess(validatedFile, filePath, effects.nowUtcTimestamp()),
           r.openFileFailure(
             file,
@@ -40,6 +90,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     }
 
     return [
+      r.setMediaMetadata(validationResult.value.metadata),
       r.openFileSuccess(validatedFile, filePath, effects.nowUtcTimestamp()),
     ]
   },
@@ -48,7 +99,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     addEmbeddedSubtitles,
     loadExternalSubtitles,
     autoAddExternalSubtitles,
-    getCbr,
+    // getCbr,
     getWaveform,
     setDefaultClipSpecs,
   ],
@@ -87,7 +138,12 @@ export const validateMediaFile = async (
   existingFile: MediaFile,
   filePath: string,
   effects: EpicsDependencies
-): AsyncResult<[string | null, MediaFile]> => {
+): AsyncResult<{
+  file: MediaFile
+  differences: string | null
+  compatibilityWarnings: string[]
+  metadata: FfprobeData
+}> => {
   const readResult = await effects.readMediaFile(
     filePath,
     existingFile.id,
@@ -100,7 +156,9 @@ export const validateMediaFile = async (
     return failure(readResult.error.message)
   }
 
-  const { value: newFile } = readResult
+  const {
+    value: { file: newFile, ffprobeMetadata },
+  } = readResult
 
   const differences: { [attribute: string]: [string, string] } = {}
 
@@ -130,23 +188,23 @@ export const validateMediaFile = async (
     ]
   }
 
-  if (Object.keys(differences).length) {
-    return {
-      value: [
-        `This media file differs from the one on record by:\n\n ${Object.entries(
-          differences
-        )
-          .map(
-            ([attr, [old, current]]) =>
-              `${attr}: "${current}" for this file instead of "${old}"`
+  return {
+    value: {
+      file: newFile,
+      metadata: ffprobeMetadata,
+      compatibilityWarnings: getMediaCompatibilityWarnings(ffprobeMetadata),
+      differences: Object.keys(differences).length
+        ? `This media file differs from the one on record by:\n\n ${Object.entries(
+            differences
           )
-          .join('\n')}.`,
-        newFile,
-      ],
-    }
+            .map(
+              ([attr, [old, current]]) =>
+                `${attr}: "${current}" for this file instead of "${old}"`
+            )
+            .join('\n')}.'\n\nAre you sure this is the file you want to open?'`
+        : null,
+    },
   }
-
-  return { value: [null, newFile] }
 }
 
 const SUBTITLES_FILE_EXTENSIONS: SubtitlesFileExtension[] = [
@@ -333,28 +391,6 @@ const getWaveform: OpenFileSuccessHandler<MediaFile> = async (
   return [r.generateWaveformImages(waveformPngsResult.value)]
 }
 
-const getCbr: OpenFileSuccessHandler<MediaFile> = async (
-  validatedFile,
-  _filePath,
-  state,
-  _effects
-) => {
-  if (validatedFile.format.toLowerCase().includes('mp3')) {
-    const cbr = r.getFile(state, 'ConstantBitrateMp3', validatedFile.id)
-    return [
-      r.openFileRequest(
-        cbr || {
-          type: 'ConstantBitrateMp3',
-          id: validatedFile.id,
-          parentId: validatedFile.id,
-        }
-      ),
-    ]
-  }
-
-  return []
-}
-
 const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
   validatedFile,
   _filePath,
@@ -402,7 +438,10 @@ const setDefaultClipSpecs: OpenFileSuccessHandler<MediaFile> = async (
 export default handlers()
 
 export const updates = {
-  addSubtitlesTrack: (file: MediaFile, track: SubtitlesTrack) => {
+  [FileUpdateName.AddSubtitlesTrack]: (
+    file,
+    track: SubtitlesTrack
+  ): MediaFile => {
     return {
       ...file,
       subtitles: file.subtitles.some((s) => s.id === track.id) // should not happen... but just in case
@@ -418,7 +457,10 @@ export const updates = {
           ],
     }
   },
-  deleteSubtitlesTrack: (file: MediaFile, trackId: SubtitlesTrackId) => ({
+  [FileUpdateName.DeleteSubtitlesTrack]: (
+    file,
+    trackId: SubtitlesTrackId
+  ): MediaFile => ({
     ...file,
     subtitles: file.subtitles.filter(({ id }) => id !== trackId),
     flashcardFieldsToSubtitlesTracks: Object.entries(
@@ -430,12 +472,12 @@ export const updates = {
         return all
       }, {} as Partial<Record<TransliterationFlashcardFieldName, string>>),
   }),
-  linkFlashcardFieldToSubtitlesTrack: (
-    file: MediaFile,
+  [FileUpdateName.LinkFlashcardFieldToSubtitlesTrack]: (
+    file,
     flashcardFieldName: FlashcardFieldName,
     subtitlesTrackId: SubtitlesTrackId | null,
     _fieldToClear: FlashcardFieldName | null // TODO: check if needed
-  ) => {
+  ): MediaFile => {
     const flashcardFieldsToSubtitlesTracks = {
       ...file.flashcardFieldsToSubtitlesTracks,
     }

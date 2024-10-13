@@ -77,23 +77,21 @@ window.addEventListener('error', (e) => {
 render()
 
 async function render() {
-  const initialTestStatePromise = window.electronApi.env.VITEST
-    ? window.electronApi.sendToMainProcess({
+  const initialTestStateResult = window.electronApi.env.VITEST
+    ? await window.electronApi.sendToMainProcess({
         type: 'getPersistedTestState',
         args: [],
       })
     : undefined
 
-  const initialTestStateResult = await initialTestStatePromise
-
   if (initialTestStateResult?.error) {
     console.error(initialTestStateResult.error)
     throw new Error('Problem getting persisted test state.')
   } else console.log('initial test state', initialTestStateResult?.value)
-  const initialTestState = initialTestStateResult?.value
+
   const conf = window.electronApi.env.VITEST ? undefined : new Conf()
   const { store, persistor } = getStore(
-    initialTestState,
+    initialTestStateResult?.value,
     conf
       ? {
           getItem: async (key: string) => conf.get(key),

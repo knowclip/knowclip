@@ -16,10 +16,14 @@ function getStore(
   electronStorage?: PersistConfig<AppState>['storage']
 ) {
   const { NODE_ENV, VITE_INTEGRATION_DEV, VITEST } = window.electronApi.env
+  const meta = {
+    platform: window.electronApi.platform,
+    localServerAddress: window.electronApi.knowclipServerAddress,
+  }
+
   console.log('NODE_ENV', NODE_ENV)
   console.log('VITE_INTEGRATION_DEV', VITE_INTEGRATION_DEV)
   console.log('VITEST', VITEST)
-  console.log('electronStorage', electronStorage)
 
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
@@ -27,8 +31,10 @@ function getStore(
 
   const store = createStore(
     VITEST || !electronStorage
-      ? (getUndoableReducer() as ReturnType<typeof getPersistedUndoableReducer>)
-      : getPersistedUndoableReducer(electronStorage),
+      ? (getUndoableReducer(meta) as ReturnType<
+          typeof getPersistedUndoableReducer
+        >)
+      : getPersistedUndoableReducer(meta, electronStorage),
     initialTestState as any,
     compose(
       applyMiddleware(epicMiddleware),

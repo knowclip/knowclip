@@ -25,10 +25,24 @@ export type ElectronApi = typeof electronApi
 
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
+console.log('args', process.argv)
+
+const knowclipServerArg = process.argv.find((arg) =>
+  arg.includes('--knowclipServerAddress=')
+)
+if (!knowclipServerArg) {
+  throw new Error('knowclipServerAddress not provided')
+}
+const knowclipServerAddress = knowclipServerArg.split('=')[1]
+
+const platform = process.platform
+if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {
+  throw new Error(`Unsupported platform ${platform}`)
+}
 
 const electronApi = {
-  // setUpMocks: setUpMocks,
-  platform: process.platform,
+  platform,
+  knowclipServerAddress,
   openExternal: (path: string) =>
     sendToMainProcess({
       type: 'openExternal',

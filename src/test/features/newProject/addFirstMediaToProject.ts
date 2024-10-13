@@ -34,8 +34,8 @@ export default async function addFirstMediaToProject(
   test('wait for video to load', async () => {
     const { client } = context
     await client.waitForText('body', videoFilePath)
-    expect(await client.getAttribute('video', 'src')).toContain(
-      japaneseVideoPath.replace(/\\/g, '/')
+    expect(await client.getAttribute('video > source', 'src')).toContain(
+      '/file/' + mediaFileId1
     )
   })
 

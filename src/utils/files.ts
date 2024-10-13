@@ -1,5 +1,4 @@
 const fileFilters = {
-  ConstantBitrateMp3: [{ name: 'Constant bitrate mp3', extensions: ['mp3'] }],
   ExternalSubtitlesFile: [
     { name: 'Subtitles file', extensions: ['vtt', 'srt', 'ass'] },
   ],
@@ -51,7 +50,6 @@ const getHumanFileTypeName = (file: { type: string; name?: string }) => {
       return 'subtitles file'
     case 'ProjectFile':
       return 'project file'
-    case 'ConstantBitrateMp3':
     case 'WaveformPng':
     case 'VttConvertedSubtitlesFile':
     case 'VideoStillImage':
@@ -71,7 +69,6 @@ export const isGeneratedFile = (type: FileMetadata['type']): boolean => {
   switch (type) {
     case 'VttConvertedSubtitlesFile':
     case 'WaveformPng':
-    case 'ConstantBitrateMp3':
     case 'VideoStillImage':
       return true
     case 'ProjectFile':

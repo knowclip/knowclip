@@ -53,7 +53,9 @@ export const newProjectTestSteps = ({
   step('add more media to project', (context) =>
     addMoreMediaToProject(context, mediaFileIds[1])
   ),
-  step('navigate between media', (context) => navigateBetweenMedia(context)),
+  step('navigate between media', (context) =>
+    navigateBetweenMedia(context, mediaFileIds)
+  ),
   step('exporting an .apkg', (context) => reviewAndExportApkg(context)),
   step('saving a project file', (context) =>
     saveAndCloseProject(context, projectTitle)

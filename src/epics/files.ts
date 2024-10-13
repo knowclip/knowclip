@@ -1,4 +1,4 @@
-import { mergeMap, map, mergeAll } from 'rxjs/operators'
+import { mergeMap, map, mergeAll, catchError } from 'rxjs/operators'
 import { of, from, EMPTY, defer } from 'rxjs'
 import r from '../redux'
 import A from '../types/ActionType'
@@ -8,7 +8,6 @@ import media from '../files/mediaFile'
 import temporaryVtt from '../files/temporaryVttFile'
 import externalSubtitles from '../files/externalSubtitlesFile'
 import waveformPng from '../files/waveformPngFile'
-import constantBitrateMp3 from '../files/constantBitrateMp3File'
 import videoStillImage from '../files/videoStillImageFile'
 import { dictionaryActions } from '../files/dictionaryFile'
 import {
@@ -26,7 +25,6 @@ const fileEventHandlers: Record<
   ExternalSubtitlesFile: externalSubtitles,
   VttConvertedSubtitlesFile: temporaryVtt,
   WaveformPng: waveformPng,
-  ConstantBitrateMp3: constantBitrateMp3,
   VideoStillImage: videoStillImage,
   Dictionary: dictionaryActions,
 }
@@ -55,6 +53,14 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
       }
 
       try {
+        const fileRegisterResult = await effects.sendToMainProcess({
+          type: 'registerFilePath',
+          args: [file.id, filePath],
+        })
+        if (fileRegisterResult.error) {
+          throw fileRegisterResult.error
+        }
+
         return from(
           fileEventHandlers[file.type].openRequest(
             file,

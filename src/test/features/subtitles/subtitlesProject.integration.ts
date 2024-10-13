@@ -186,7 +186,6 @@ const persistedState: Partial<AppState> = {
         lastOpened: '2020-02-01T16:11:17Z',
       },
     },
-    ConstantBitrateMp3: {},
     VideoStillImage: {
       '6b02575a-0a4f-402a-8ea3-31f457cb5d8c': {
         type: 'VideoStillImage',

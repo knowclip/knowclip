@@ -1,14 +1,20 @@
 import { combineReducers } from 'redux'
 
 import clips from './clips'
-import session from './session'
+import getSessionReducer from './session'
 import snackbar from './snackbar'
 import dialog from './dialog'
 import subtitles from './subtitles'
 import settings from './settings'
 import fileAvailabilities from './fileAvailabilities'
 import files from './files'
-import { PersistConfig, createTransform, persistReducer } from 'redux-persist'
+import {
+  PersistConfig,
+  PersistedState,
+  createMigrate,
+  createTransform,
+  persistReducer,
+} from 'redux-persist'
 import { resetFileAvailabilities } from '../utils/statePersistence'
 import A from '../types/ActionType'
 import { KnowclipAction } from '../actions'
@@ -35,10 +41,13 @@ const transform = createTransform(
   }
 )
 
-const getRoot = (storage?: FilesPersistConfig['storage']) =>
+const getRoot = (
+  initialSessionState: MinimalInitialSessionState,
+  storage?: FilesPersistConfig['storage']
+) =>
   combineReducers<AppState>({
     clips,
-    session,
+    session: getSessionReducer(initialSessionState),
     snackbar,
     dialog,
     subtitles,
@@ -52,14 +61,31 @@ const getRoot = (storage?: FilesPersistConfig['storage']) =>
       : files,
   })
 
-const getPersistedReducer = (storage: PersistConfig<AppState>['storage']) => {
+const getPersistedReducer = (
+  meta: MinimalInitialSessionState,
+  storage: PersistConfig<AppState>['storage']
+) => {
   const rootConfig: PersistConfig<AppState> = {
     key: 'root',
+    version: 0,
     storage,
     transforms: [transform],
     whitelist: ['settings', 'fileAvailabilities'],
+    // TODO: test
+    migrate: createMigrate({
+      0: (_state) => {
+        const state = _state as unknown as AppState & PersistedState
+        return {
+          ...state,
+          settings: {
+            ...state.settings,
+            warnBeforeConvertingMedia: true,
+          },
+        }
+      },
+    }),
   }
-  return persistReducer(rootConfig, getRoot(storage))
+  return persistReducer(rootConfig, getRoot(meta, storage))
 }
 
 const UNDOABLE_ACTIONS = new Set<KnowclipActionType>([
@@ -226,7 +252,9 @@ function getStateUnaffectedByHistoryAction(state: AppState) {
 }
 
 export const getPersistedUndoableReducer = (
+  session: MinimalInitialSessionState,
   storage: PersistConfig<AppState>['storage']
-) => undoable(getPersistedReducer(storage))
+) => undoable(getPersistedReducer(session, storage))
 
-export const getUndoableReducer = () => undoable(getRoot())
+export const getUndoableReducer = (session: MinimalInitialSessionState) =>
+  undoable(getRoot(session))

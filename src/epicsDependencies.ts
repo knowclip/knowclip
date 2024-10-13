@@ -103,14 +103,6 @@ const dependencies = {
       type: 'getApkgExportData',
       args: [state, project, mediaIdToClipsIds],
     }),
-  getConstantBitrateMediaPath: (
-    path: string,
-    oldConstantBitratePath: string | null
-  ) =>
-    sendToMainProcess({
-      type: 'coerceMp3ToConstantBitrate',
-      args: [path, oldConstantBitratePath],
-    }),
   processNoteMedia: flatten(
     (clipSpecs: ClipSpecs, destinationFolder: string, saveImages?: string) =>
       sendToMainProcess({

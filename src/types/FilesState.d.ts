@@ -4,7 +4,6 @@ declare type FilesState = {
   VttConvertedSubtitlesFile: Dict<FileId, VttConvertedSubtitlesFile>
   ExternalSubtitlesFile: Dict<FileId, ExternalSubtitlesFile>
   WaveformPng: Dict<FileId, WaveformPng>
-  ConstantBitrateMp3: Dict<FileId, ConstantBitrateMp3>
   VideoStillImage: Dict<FileId, VideoStillImageFile>
   Dictionary: Dict<FileId, DictionaryFile>
 }
@@ -20,7 +19,6 @@ declare type FileMetadata =
   | ExternalSubtitlesFile
   | VttConvertedSubtitlesFile
   | WaveformPng
-  | ConstantBitrateMp3
   | VideoStillImageFile
   | DictionaryFile
 
@@ -48,6 +46,7 @@ declare type AudioFile = {
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 
   name: MediaFileName
+  // metadata: import('fluent-ffmpeg').FfprobeData
   durationSeconds: number
   format: 'UNKNOWN' | string
   isVideo: false
@@ -62,6 +61,7 @@ declare type VideoFile = {
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 
   name: MediaFileName
+  // metadata: import('fluent-ffmpeg').FfprobeData
   durationSeconds: number
   format: 'UNKNOWN' | string
   isVideo: true
@@ -125,11 +125,6 @@ declare type WaveformPng = {
   parentId: MediaFileId
   startSeconds: number
   endSeconds: number
-}
-declare type ConstantBitrateMp3 = {
-  type: 'ConstantBitrateMp3'
-  id: FileId
-  parentId: MediaFileId
 }
 
 declare type VideoStillImageFile = {
