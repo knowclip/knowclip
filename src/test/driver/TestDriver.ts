@@ -8,7 +8,6 @@ import type {
   MessageToMain,
   MessageHandlerResult,
 } from '../../MessageToMain'
-import { failure } from '../../utils/result'
 
 type WebDriverLogTypes =
   | 'trace'

@@ -130,9 +130,7 @@ export async function startApp(
   const startupStatus = await app.startupStatus
   if (startupStatus.error) {
     console.error(startupStatus.error)
-    throw new Error(
-      `Problem starting test driver: ${startupStatus.error.message}`
-    )
+    throw new Error(`Problem starting test driver: ${startupStatus.error}`)
   }
 
   await app.webContentsSend('start-test', context.testId)
