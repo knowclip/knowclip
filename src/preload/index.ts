@@ -30,15 +30,10 @@ console.log('args', process.argv)
 const knowclipServerArg = process.argv.find((arg) =>
   arg.includes('--knowclipServerAddress=')
 )
-if (!knowclipServerArg) {
-  throw new Error('knowclipServerAddress not provided')
-}
-const knowclipServerAddress = knowclipServerArg.split('=')[1]
 
-const platform = process.platform
-if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {
-  throw new Error(`Unsupported platform ${platform}`)
-}
+const knowclipServerAddress = knowclipServerArg?.split('=')[1] || ''
+
+const platform = process.platform as 'darwin' | 'win32' | 'linux'
 
 const electronApi = {
   platform,
@@ -167,6 +162,13 @@ function deserializeReturnValue({
   value: any
 }) {
   return isPromise ? Promise.resolve(value) : value
+}
+
+if (!knowclipServerArg) {
+  throw new Error('knowclipServerAddress not provided')
+}
+if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {
+  throw new Error(`Unsupported platform ${platform}`)
 }
 
 console.log('done preloading')
