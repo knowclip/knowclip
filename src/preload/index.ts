@@ -25,7 +25,7 @@ export type ElectronApi = typeof electronApi
 
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
-console.log('args', process.argv)
+console.log('args', JSON.stringify(process.argv))
 
 const knowclipServerArg = process.argv.find((arg) =>
   arg.includes('--knowclipServerAddress=')

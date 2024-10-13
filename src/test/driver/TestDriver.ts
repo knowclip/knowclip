@@ -144,8 +144,11 @@ export async function createTestDriver({
     waitforTimeout: 5000,
     hostname,
     port,
+    // outputDir: 'logs', // good for debugging, when you want to use a more verbose log level
     capabilities: {
       browserName: 'chrome',
+      // @ts-expect-error goog:loggingPrefs is not in the types https://github.com/SeleniumHQ/selenium/issues/7928
+      'goog:loggingPrefs': { browser: 'ALL' },
       'goog:chromeOptions': {
         binary: webdriverIoPath,
         args: [...chromeArgs, 'app=' + appDir],
@@ -153,7 +156,6 @@ export async function createTestDriver({
       },
       'wdio:enforceWebDriverClassic': true,
     },
-
     logLevel,
   }
   const browser: WebdriverIO.Browser = await remote(browserOptions)

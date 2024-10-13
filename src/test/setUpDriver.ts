@@ -12,6 +12,7 @@ import {
 import * as tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
 import { beforeEach } from 'vitest'
+import { promises } from 'fs'
 
 const rootDir = join(process.cwd())
 
@@ -94,6 +95,7 @@ export async function startApp(
   }
 
   const app = await createTestDriver({
+    logLevel: 'info',
     chromedriverPath: getChromedriverPath(),
     webdriverIoPath:
       process.platform === 'win32'
@@ -142,6 +144,12 @@ export async function stopApp(context: IntegrationTestContext): Promise<null> {
   const app = context.setup?.app
 
   if (!app) console.error('No app instance found, not closing app')
+
+  await promises.writeFile(
+    join(process.cwd(), 'logs', 'browser.log'),
+    JSON.stringify(await app?.client.getLogs('browser'), null, 2),
+    'utf8'
+  )
 
   if (process.env.VITE_INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
     return null
