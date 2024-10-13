@@ -63,7 +63,8 @@ export async function setUpServer() {
   server.use(router.allowedMethods())
 
   const port = await findFreePort(3000)
-  const knowclipServerAddress = `http://${getLocalIpAddress()}:${port}`
+  const knowclipServerIp = getLocalIpAddress()
+  const knowclipServerAddress = `http://${knowclipServerIp}:${port}`
 
   server.listen(port, () => {
     console.log(`Serving at ${knowclipServerAddress}`)
@@ -76,7 +77,11 @@ export async function setUpServer() {
     console.error('Server is down', status)
   }
 
-  return { knowclipServerAddress, filePathsRegistry }
+  return {
+    knowclipServerIp,
+    knowclipServerPort: port,
+    filePathsRegistry,
+  }
 }
 
 async function statusCheck(url: string) {

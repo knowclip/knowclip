@@ -25,15 +25,18 @@ export type ElectronApi = typeof electronApi
 
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
-console.log('args', JSON.stringify(process.argv))
+process.argv.forEach((val, index) => {
+  console.log(`argv ${index}: ${val}`)
+})
 
-const knowclipServerArg = process.argv.find((arg) =>
-  arg.includes('--knowclipServerAddress=')
-)
+const knowclipServerIp = process.argv
+  .find((arg) => arg.includes('--kc-ip='))
+  ?.split('=')[1]
+const knowclipServerPort = process.argv
+  .find((arg) => arg.includes('--kc-port='))
+  ?.split('=')[1]
 
-const knowclipServerAddress = knowclipServerArg
-  ? 'http://' + knowclipServerArg.split('=')[1]
-  : ''
+const knowclipServerAddress = `http://${knowclipServerIp}:${knowclipServerPort}`
 
 const platform = process.platform as 'darwin' | 'win32' | 'linux'
 
@@ -166,7 +169,7 @@ function deserializeReturnValue({
   return isPromise ? Promise.resolve(value) : value
 }
 
-if (!knowclipServerArg) {
+if (!knowclipServerIp) {
   throw new Error('knowclipServerAddress not provided')
 }
 if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {

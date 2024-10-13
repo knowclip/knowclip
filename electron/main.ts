@@ -43,7 +43,13 @@ const context: {
   knowclipServerAddress: string | null
 } = { mainWindow: null, knowclipServerAddress: null }
 
-async function createWindow(knowclipServerAddress: string) {
+async function createWindow({
+  knowclipServerIp,
+  knowclipServerPort,
+}: {
+  knowclipServerIp: string
+  knowclipServerPort: string
+}) {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
 
   // Create the browser window.
@@ -55,10 +61,8 @@ async function createWindow(knowclipServerAddress: string) {
     minHeight: 570,
     webPreferences: {
       additionalArguments: [
-        `--knowclipServerAddress=${knowclipServerAddress.replace(
-          /https?:\/\//,
-          ''
-        )}`,
+        `--kc-ip=${knowclipServerIp}`,
+        `--kc-port=${knowclipServerPort}`,
       ],
       webSecurity: isPackaged,
       nodeIntegration: false,
@@ -130,14 +134,17 @@ async function createWindow(knowclipServerAddress: string) {
 
 app.whenReady().then(async () => {
   const {
-    knowclipServerAddress,
+    knowclipServerIp,
+    knowclipServerPort,
     filePathsRegistry,
   }: {
-    knowclipServerAddress: string
+    knowclipServerIp: string
+    knowclipServerPort: string
     filePathsRegistry: Record<string, string>
   } = await setUpServer()
 
-  context.knowclipServerAddress = knowclipServerAddress
+  context.knowclipServerIp = knowclipServerIp
+  context.knowclipServerPort = knowclipServerPort
 
   if (shouldInstallExtensions) {
     try {
@@ -155,7 +162,10 @@ app.whenReady().then(async () => {
   }
 
   console.log(`Creating window`)
-  await createWindow(knowclipServerAddress)
+  await createWindow({
+    knowclipServerIp,
+    knowclipServerPort,
+  })
 
   console.log(`Setting up menu`)
   setUpMenu(context.mainWindow as BrowserWindow, true)
@@ -192,7 +202,7 @@ app.on('activate', function () {
         'Something went wrong (knowclipServerAddress is null). Please restart the app.'
       )
     }
-    createWindow(context.knowclipServerAddress)
+    createWindow({ knowclipServerAddress: context.knowclipServerAddress })
   }
 })
 
