@@ -54,7 +54,9 @@ async function createWindow(knowclipServerAddress: string) {
     minWidth: 740,
     minHeight: 570,
     webPreferences: {
-      additionalArguments: [`--knowclipServerAddress=${knowclipServerAddress}`],
+      additionalArguments: [
+        `--knowclipServerAddress=${JSON.stringify(knowclipServerAddress)}`,
+      ],
       webSecurity: isPackaged,
       nodeIntegration: false,
       contextIsolation: true,
@@ -131,6 +133,8 @@ app.whenReady().then(async () => {
     knowclipServerAddress: string
     filePathsRegistry: Record<string, string>
   } = await setUpServer()
+
+  context.knowclipServerAddress = knowclipServerAddress
 
   if (shouldInstallExtensions) {
     try {

@@ -31,7 +31,9 @@ const knowclipServerArg = process.argv.find((arg) =>
   arg.includes('--knowclipServerAddress=')
 )
 
-const knowclipServerAddress = knowclipServerArg?.split('=')[1] || ''
+const knowclipServerAddress = knowclipServerArg
+  ? JSON.parse(knowclipServerArg.split('=')[1])
+  : ''
 
 const platform = process.platform as 'darwin' | 'win32' | 'linux'
 
