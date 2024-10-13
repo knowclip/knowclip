@@ -1,4 +1,5 @@
 import net from 'net'
+import http from 'http'
 import fs from 'fs'
 import os from 'os'
 import Koa from 'koa'
@@ -17,6 +18,11 @@ export async function setUpServer() {
 
   const server = new Koa()
   const router = new Router()
+
+  router.get('/status', (ctx) => {
+    ctx.body = 'ok'
+    ctx.status = 200
+  })
 
   router.post('/file/:id', makePostFile(filePathsRegistry))
   router.get('/file/:id', makeGetFile(filePathsRegistry))
@@ -62,7 +68,24 @@ export async function setUpServer() {
   server.listen(port, () => {
     console.log(`Serving at ${knowclipServerAddress}`)
   })
+
+  const status = await statusCheck(`${knowclipServerAddress}/status`)
+  if (status === 200) {
+    console.log('Server is up')
+  } else {
+    console.error('Server is down', status)
+  }
+
   return { knowclipServerAddress, filePathsRegistry }
+}
+
+async function statusCheck(url: string) {
+  return new Promise<number | undefined>((resolve, reject) => {
+    const req = http.get(url, (res) => {
+      resolve(res.statusCode)
+    })
+    req.on('error', reject)
+  })
 }
 
 function makeGetConvertedFileSegment(
