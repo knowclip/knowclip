@@ -57,7 +57,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: '*.log'
           path: logs
       - name: Upload build artifacts
         if: "!startsWith(github.ref, 'refs/tags/')"
