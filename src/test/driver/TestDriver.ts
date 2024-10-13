@@ -165,7 +165,7 @@ export async function createTestDriver({
 }
 
 export class TestDriver {
-  startupStatus: AsyncResult<MessageResponse<'ok'>>
+  startupStatus: AsyncResult<MessageResponse<'ok'>, string>
   client: WebdriverIO.Browser
   _driver: Chromedriver
 
@@ -182,32 +182,30 @@ export class TestDriver {
     this.startupStatus = this.sendToMainProcess({
       type: 'isReady',
       args: [],
-    }).catch(async (rawError): AsyncResult<MessageResponse<'ok'>> => {
+    }).catch(async (rawError): AsyncResult<MessageResponse<'ok'>, string> => {
       console.error('Application failed to start', rawError)
       this.stop()
 
-      return Promise.resolve(failure(rawError))
+      return {
+        error: String(rawError),
+      }
     })
   }
 
   async sendToMainProcess<T extends MessageToMainType>(
     message: MessageToMain<T>
-  ): AsyncResult<MessageResponse<MessageHandlerResult<T>>> {
+  ) {
     return await this.client.execute(
       async (
         message
-      ): AsyncResult<MessageResponse<MessageHandlerResult<T>>> => {
+      ): AsyncResult<MessageResponse<MessageHandlerResult<T>>, string> => {
         try {
           const result: MessageResponse<MessageHandlerResult<T>> =
             await window.electronApi.invokeMessage(message)
           return { value: result }
         } catch (thrownValue) {
-          const error =
-            thrownValue instanceof Error
-              ? thrownValue
-              : new Error(String(thrownValue))
-          console.error('error invoking message', error)
-          return { error }
+          console.error('error invoking message', thrownValue)
+          return { error: String(thrownValue) }
         }
       },
       message
