@@ -165,7 +165,7 @@ export async function createTestDriver({
 }
 
 export class TestDriver {
-  startupStatus: Promise<MessageResponse<'ok'>>
+  startupStatus: AsyncResult<MessageResponse<'ok'>>
   client: WebdriverIO.Browser
   _driver: Chromedriver
 
@@ -182,7 +182,7 @@ export class TestDriver {
     this.startupStatus = this.sendToMainProcess({
       type: 'isReady',
       args: [],
-    }).catch(async (rawError): Promise<MessageResponse<'ok'>> => {
+    }).catch(async (rawError): AsyncResult<MessageResponse<'ok'>> => {
       console.error('Application failed to start', rawError)
       this.stop()
 
@@ -190,25 +190,28 @@ export class TestDriver {
     })
   }
 
-  sendToMainProcess<T extends MessageToMainType>(
+  async sendToMainProcess<T extends MessageToMainType>(
     message: MessageToMain<T>
-  ): Promise<MessageResponse<MessageHandlerResult<T>>> {
-    return this.client.executeAsync((message: MessageToMain<T>, done) => {
-      return (
-        window.electronApi
-          ?.invokeMessage(message)
-          .then((result) => {
-            done(result)
-            return result
-          })
-          .catch((error) => {
-            console.error('error invoking message', error)
-            const result = failure(error)
-            done(result)
-            return result
-          }) || done(failure('no electronApi found on window'))
-      )
-    }, message)
+  ): AsyncResult<MessageResponse<MessageHandlerResult<T>>> {
+    return await this.client.execute(
+      async (
+        message
+      ): AsyncResult<MessageResponse<MessageHandlerResult<T>>> => {
+        try {
+          const result: MessageResponse<MessageHandlerResult<T>> =
+            await window.electronApi.invokeMessage(message)
+          return { value: result }
+        } catch (thrownValue) {
+          const error =
+            thrownValue instanceof Error
+              ? thrownValue
+              : new Error(String(thrownValue))
+          console.error('error invoking message', error)
+          return { error }
+        }
+      },
+      message
+    )
   }
 
   /** send message to renderer */
