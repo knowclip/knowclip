@@ -25,9 +25,7 @@ export type ElectronApi = typeof electronApi
 
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
-process.argv.forEach((val, index) => {
-  console.log(`argv ${index}: ${val}`)
-})
+console.log('process.argv', process.argv)
 
 const knowclipServerIp = process.argv
   .find((arg) => arg.includes('--kc-ip='))
@@ -36,13 +34,18 @@ const knowclipServerPort = process.argv
   .find((arg) => arg.includes('--kc-port='))
   ?.split('=')[1]
 
-const knowclipServerAddress = `http://${knowclipServerIp}:${knowclipServerPort}`
-
+if (!knowclipServerIp || !knowclipServerPort) {
+  console.error({ knowclipServerIp, knowclipServerPort })
+  throw new Error('knowclip server ip or port not provided: ')
+}
 const platform = process.platform as 'darwin' | 'win32' | 'linux'
+if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {
+  throw new Error(`Unsupported platform ${platform}`)
+}
 
 const electronApi = {
   platform,
-  knowclipServerAddress,
+  knowclipServerAddress: `http://${knowclipServerIp}:${knowclipServerPort}`,
   openExternal: (path: string) =>
     sendToMainProcess({
       type: 'openExternal',
@@ -167,13 +170,6 @@ function deserializeReturnValue({
   value: any
 }) {
   return isPromise ? Promise.resolve(value) : value
-}
-
-if (!knowclipServerIp) {
-  throw new Error('knowclipServerAddress not provided')
-}
-if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {
-  throw new Error(`Unsupported platform ${platform}`)
 }
 
 console.log('done preloading')

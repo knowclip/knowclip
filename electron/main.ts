@@ -40,8 +40,9 @@ const shouldInstallExtensions = Boolean(
 
 const context: {
   mainWindow: BrowserWindow | null
-  knowclipServerAddress: string | null
-} = { mainWindow: null, knowclipServerAddress: null }
+  knowclipServerIp: string | null
+  knowclipServerPort: string | null
+} = { mainWindow: null, knowclipServerIp: null, knowclipServerPort: null }
 
 async function createWindow({
   knowclipServerIp,
@@ -133,15 +134,8 @@ async function createWindow({
 }
 
 app.whenReady().then(async () => {
-  const {
-    knowclipServerIp,
-    knowclipServerPort,
-    filePathsRegistry,
-  }: {
-    knowclipServerIp: string
-    knowclipServerPort: string
-    filePathsRegistry: Record<string, string>
-  } = await setUpServer()
+  const { knowclipServerIp, knowclipServerPort, filePathsRegistry } =
+    await setUpServer()
 
   context.knowclipServerIp = knowclipServerIp
   context.knowclipServerPort = knowclipServerPort
@@ -197,12 +191,15 @@ app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (context.mainWindow === null) {
-    if (!context.knowclipServerAddress) {
+    if (!context.knowclipServerIp || !context.knowclipServerPort) {
       throw new Error(
-        'Something went wrong (knowclipServerAddress is null). Please restart the app.'
+        'Something went wrong when starting the media server. Please restart the app.'
       )
     }
-    createWindow({ knowclipServerAddress: context.knowclipServerAddress })
+    createWindow({
+      knowclipServerIp: context.knowclipServerIp,
+      knowclipServerPort: context.knowclipServerPort,
+    })
   }
 })
 

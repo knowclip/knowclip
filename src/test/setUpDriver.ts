@@ -95,7 +95,7 @@ export async function startApp(
   }
 
   const app = await createTestDriver({
-    logLevel: 'info',
+    logLevel: 'warn',
     chromedriverPath: getChromedriverPath(),
     webdriverIoPath:
       process.platform === 'win32'
