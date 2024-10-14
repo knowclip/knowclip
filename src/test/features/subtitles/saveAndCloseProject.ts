@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { saveProjectViaButton, closeProject } from '../../driver/mainScreen'
 import { parseProjectJson } from '../../../node/parseProject'
@@ -21,7 +21,7 @@ export default async function saveAndCloseProject(
   test('project file was saved', async () => {
     const { client } = context
     const actualProjectFileContents = await parseProjectJson(
-      join(TMP_DIRECTORY, 'project_with_subtitles.kyml')
+      join(context.temporaryDirectory, 'project_with_subtitles.kyml')
     )
     expect(actualProjectFileContents).toMatchSnapshot()
 

@@ -1,4 +1,3 @@
-import net from 'net'
 import http from 'http'
 import os from 'os'
 import Koa from 'koa'
@@ -11,6 +10,7 @@ import {
   makeGetConvertedFilePlaylist,
   makeGetConvertedFileSegment,
 } from './routes'
+import { findFreePort } from './findFreePort'
 
 export async function startLocalFileServer() {
   const filePathsRegistry: Record<string, string> = {}
@@ -98,22 +98,6 @@ async function statusCheck(url: string) {
       resolve(res.statusCode)
     })
     req.on('error', reject)
-  })
-}
-
-function findFreePort(startPort: number) {
-  let port = startPort
-  return new Promise<number>((resolve) => {
-    const server = net.createServer()
-    server.on('error', () => {
-      port++
-      server.listen(port)
-    })
-    server.on('listening', () => {
-      server.close()
-      resolve(port)
-    })
-    server.listen(port)
   })
 }
 

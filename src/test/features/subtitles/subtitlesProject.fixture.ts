@@ -1,7 +1,6 @@
 import {
   startApp,
   stopApp,
-  TMP_DIRECTORY,
   FIXTURES_DIRECTORY,
   initTestContext,
 } from '../../setUpDriver'
@@ -60,7 +59,7 @@ describe('make a project file for testing generating clips from subtitles', () =
 
   afterAll(async () => {
     await copyFile(
-      join(TMP_DIRECTORY, 'project_with_subtitles.kyml'),
+      join(context.temporaryDirectory, 'project_with_subtitles.kyml'),
       join(FIXTURES_DIRECTORY, 'project_with_subtitles.kyml')
     )
 

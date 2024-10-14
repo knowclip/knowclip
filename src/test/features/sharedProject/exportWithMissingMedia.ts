@@ -1,8 +1,4 @@
-import {
-  IntegrationTestContext,
-  ASSETS_DIRECTORY,
-  TMP_DIRECTORY,
-} from '../../setUpDriver'
+import { IntegrationTestContext, ASSETS_DIRECTORY } from '../../setUpDriver'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport.testLabels'
 import { reviewAndExportMediaTable$ as mediaTables$ } from '../../../components/ReviewAndExportMediaTable.testLabels'
 import { snackbar$ } from '../../../components/Snackbar.testLabels'
@@ -14,8 +10,6 @@ import { mainHeader$ } from '../../../components/MainHeader.testLabels'
 import * as yauzl from 'yauzl'
 import * as fs from 'fs'
 import { test, expect } from '../../test'
-
-const apkgFilePath = join(TMP_DIRECTORY, 'deck_from_shared_project.apkg')
 
 export default async function exportWithMissingMedia(
   context: IntegrationTestContext
@@ -30,6 +24,11 @@ export default async function exportWithMissingMedia(
   })
   test('find missing media after prompted', async () => {
     const { app, client } = context
+    const apkgFilePath = join(
+      context.temporaryDirectory,
+      'deck_from_shared_project.apkg'
+    )
+
     const initialText = await client.getText_(dialog$.container)
     await client.clickElement_(dialog$.exportApkgButton)
 
@@ -66,7 +65,7 @@ export default async function exportWithMissingMedia(
     await client.waitForText_(mainHeader$.container, 'polar_bear_cafe.mp4')
 
     const files: string[] = []
-    const outPath = join(TMP_DIRECTORY, 'zipout')
+    const outPath = join(context.temporaryDirectory, 'zipout')
     if (!fs.existsSync(outPath)) fs.mkdirSync(outPath)
     await new Promise((res, rej) => {
       yauzl.open(apkgFilePath, (err, zipfile) => {

@@ -3,7 +3,6 @@ import {
   startApp,
   stopApp,
   IntegrationTestContext,
-  TMP_DIRECTORY,
 } from '../../setUpDriver'
 import { mockSideEffects } from '../../mockSideEffects'
 import { runAll } from '../step'
@@ -45,7 +44,7 @@ describe('create a deck from a new project', () => {
 
   test('resulting project file matches snapshot', async () => {
     const actualProjectFileContents = await parseProjectJson(
-      join(TMP_DIRECTORY, 'my_cool_new_project.kyml')
+      join(context.temporaryDirectory, 'my_cool_new_project.kyml')
     )
 
     expect(actualProjectFileContents).toMatchSnapshot()
