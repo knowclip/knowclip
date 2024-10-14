@@ -106,7 +106,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
   locateRequest: async (file, availability, message, state, effects) => {
     const autoSearchDirectories = r.getAssetsDirectories(state)
 
-    // works while fileavailability names can't be changed...
+    // TODO: this works while fileavailability names can't be changed. investigate if that's all right
     for (const directory of autoSearchDirectories) {
       const { platform } = window.electronApi
       const nameMatch = join(
