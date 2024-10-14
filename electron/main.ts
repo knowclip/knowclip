@@ -9,7 +9,7 @@ import { ROOT_DIRECTORY } from './root'
 import { handleMessages } from '../src/messages'
 import { interceptLogs } from './interceptLogs'
 import { SENTRY_DSN_URL } from './SENTRY_DSN_URL'
-import { setUpServer } from './setUpServer'
+import { startLocalFileServer } from './localFileServer/setup'
 
 const { isPackaged } = app
 const isTesting = process.env.VITEST
@@ -135,10 +135,10 @@ async function createWindow({
 
 app.whenReady().then(async () => {
   const { knowclipServerIp, knowclipServerPort, filePathsRegistry } =
-    await setUpServer()
+    await startLocalFileServer()
 
   context.knowclipServerIp = knowclipServerIp
-  context.knowclipServerPort = knowclipServerPort
+  context.knowclipServerPort = String(knowclipServerPort)
 
   if (shouldInstallExtensions) {
     try {
@@ -158,7 +158,7 @@ app.whenReady().then(async () => {
   console.log(`Creating window`)
   await createWindow({
     knowclipServerIp,
-    knowclipServerPort,
+    knowclipServerPort: String(knowclipServerPort),
   })
 
   console.log(`Setting up menu`)
