@@ -119,6 +119,8 @@ const electronApi = {
 
 console.log('preloading')
 
+console.log('env', JSON.stringify(electronApi.env, null, 2))
+
 contextBridge.exposeInMainWorld('electronApi', electronApi)
 
 function listenToIpcRendererMessages(

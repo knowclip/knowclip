@@ -46,7 +46,6 @@ declare type AudioFile = {
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 
   name: MediaFileName
-  // metadata: import('fluent-ffmpeg').FfprobeData
   durationSeconds: number
   format: 'UNKNOWN' | string
   isVideo: false
@@ -61,7 +60,6 @@ declare type VideoFile = {
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks
 
   name: MediaFileName
-  // metadata: import('fluent-ffmpeg').FfprobeData
   durationSeconds: number
   format: 'UNKNOWN' | string
   isVideo: true

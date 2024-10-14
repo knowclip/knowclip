@@ -117,6 +117,7 @@ export async function createTestDriver({
   chromeArgs,
   env,
   logLevel = 'error',
+  port = 9515,
 }: {
   chromedriverPath: string
   webdriverIoPath: string
@@ -124,9 +125,9 @@ export async function createTestDriver({
   chromeArgs: string[]
   env?: NodeJS.ProcessEnv
   logLevel?: WebDriverLogTypes
+  port?: number
 }) {
   const hostname = '127.0.0.1'
-  const port = 9515
   const urlBase = '/'
 
   const statusUrl = `http://${hostname}:${port}${urlBase}status`
@@ -144,7 +145,10 @@ export async function createTestDriver({
     waitforTimeout: 5000,
     hostname,
     port,
-    // outputDir: 'logs', // good for debugging, when you want to use a more verbose log level
+    // // good for debugging, when you want to use a more verbose log level.
+    // // however, the log file will be overwritten each time you run the tests,
+    // // so it will not work in CI until adding e.g. an `outputDir` parameter here.
+    // outputDir: 'logs',
     capabilities: {
       browserName: 'chrome',
       // @ts-expect-error goog:loggingPrefs is not in the types https://github.com/SeleniumHQ/selenium/issues/7928

@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose } from 'redux'
+import { legacy_createStore, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
 import { getPersistedUndoableReducer, getUndoableReducer } from './reducers'
 import epic from './epics'
@@ -21,15 +21,11 @@ function getStore(
     localServerAddress: window.electronApi.knowclipServerAddress,
   }
 
-  console.log('NODE_ENV', NODE_ENV)
-  console.log('VITE_INTEGRATION_DEV', VITE_INTEGRATION_DEV)
-  console.log('VITEST', VITEST)
-
   const epicMiddleware = createEpicMiddleware({
     dependencies: epicsDependencies,
   })
 
-  const store = createStore(
+  const store = legacy_createStore(
     VITEST || !electronStorage
       ? (getUndoableReducer(meta) as ReturnType<
           typeof getPersistedUndoableReducer

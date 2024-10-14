@@ -99,7 +99,6 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     addEmbeddedSubtitles,
     loadExternalSubtitles,
     autoAddExternalSubtitles,
-    // getCbr,
     getWaveform,
     setDefaultClipSpecs,
   ],
