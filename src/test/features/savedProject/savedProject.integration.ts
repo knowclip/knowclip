@@ -20,6 +20,7 @@ describe('opening and saving a previously saved project', () => {
   beforeAll(async () => {
     const { app } = await startApp(
       context,
+      9516,
       persistedState(context.temporaryDirectory)
     )
 

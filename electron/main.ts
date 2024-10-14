@@ -25,7 +25,7 @@ if (!isTesting) {
   console.log('conf registered')
 }
 
-if (isTesting) interceptLogs()
+if (isTesting) interceptLogs(process.env.TEST_ID || 'NO_TEST_ID')
 
 Sentry.init({
   dsn: SENTRY_DSN_URL,

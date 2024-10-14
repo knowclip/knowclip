@@ -83,6 +83,7 @@ export function initTestContext(testId: string): IntegrationTestContext {
 /** mutates context */
 export async function startApp(
   context: IntegrationTestContext,
+  chromedriverPort?: number,
   persistedState?: Partial<AppState>
 ): Promise<{
   app: TestDriver
@@ -117,6 +118,7 @@ export async function startApp(
       DISPLAY: process.env.DISPLAY,
       VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
     },
+    port: chromedriverPort,
   })
   const setup = {
     app,

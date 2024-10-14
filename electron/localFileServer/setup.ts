@@ -10,7 +10,6 @@ import {
   makeGetConvertedFilePlaylist,
   makeGetConvertedFileSegment,
 } from './routes'
-import { findFreePort } from './findFreePort'
 
 export async function startLocalFileServer() {
   const filePathsRegistry: Record<string, string> = {}
@@ -70,15 +69,13 @@ export async function startLocalFileServer() {
   server.use(router.routes())
   server.use(router.allowedMethods())
 
-  const port = await findFreePort(3000)
   const knowclipServerIp = getLocalIpAddress()
-  const knowclipServerAddress = `http://${knowclipServerIp}:${port}`
+  const knowclipServerAddress = (port: number) =>
+    `http://${knowclipServerIp}:${port}`
 
-  server.listen(port, () => {
-    console.log(`Serving at ${knowclipServerAddress}`)
-  })
+  const port = await startServerAtAvailablePort(server, 3000)
 
-  const status = await statusCheck(`${knowclipServerAddress}/status`)
+  const status = await statusCheck(`${knowclipServerAddress(port)}/status`)
   if (status === 200) {
     console.log('Server is up')
   } else {
@@ -110,4 +107,42 @@ function getLocalIpAddress() {
     .map((iface) => iface!.address)
 
   return localIpAddresses[0]
+}
+
+function startServer(app: Koa, port: number): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`)
+      resolve(port)
+    })
+
+    server.on('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        console.warn(`Port ${port} is in use, trying next port...`)
+        server.close() // Ensure we close the server before retrying
+        reject(err)
+      } else {
+        console.error('Unexpected error occurred:', err)
+        reject(err)
+      }
+    })
+  })
+}
+
+async function startServerAtAvailablePort(app: Koa, startingPort: number) {
+  let currentPort = startingPort
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try {
+      return await startServer(app, currentPort)
+      break // Exit loop once the server starts successfully
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'EADDRINUSE') {
+        currentPort++
+      } else {
+        throw err // Re-throw other errors
+      }
+    }
+  }
 }

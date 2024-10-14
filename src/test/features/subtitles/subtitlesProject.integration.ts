@@ -20,6 +20,7 @@ describe('make clips and cards from subtitles', () => {
   beforeAll(async () => {
     const { app } = await startApp(
       context,
+      9518,
       persistedState(context.temporaryDirectory)
     )
 

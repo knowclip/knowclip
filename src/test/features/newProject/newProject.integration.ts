@@ -15,7 +15,7 @@ describe('create a deck from a new project', () => {
   const context: IntegrationTestContext = initTestContext('newProject')
 
   beforeAll(async () => {
-    const { app } = await startApp(context)
+    const { app } = await startApp(context, 9515)
 
     await mockSideEffects(app, sideEffectsMocks)
   })
