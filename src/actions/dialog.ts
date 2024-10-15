@@ -15,7 +15,7 @@ export const dialogActions = {
 
 const confirmationDialog = (
   message: string,
-  action: Action,
+  action: Action | Action[],
   onCancel: Action | null = null,
   skipQueue: boolean = false
 ) =>

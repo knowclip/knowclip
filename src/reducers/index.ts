@@ -71,7 +71,6 @@ const getPersistedReducer = (
     storage,
     transforms: [transform],
     whitelist: ['settings', 'fileAvailabilities'],
-    // TODO: test
     migrate: createMigrate({
       0: (_state) => {
         const state = _state as unknown as AppState & PersistedState

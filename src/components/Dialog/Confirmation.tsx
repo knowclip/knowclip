@@ -14,7 +14,8 @@ const ConfirmationDialog = ({
 
   const dispatchAction = useCallback(() => {
     dispatch(actions.closeDialog())
-    dispatch(action)
+    if (Array.isArray(action)) action.forEach(dispatch)
+    else dispatch(action)
   }, [dispatch, action])
 
   const cancel = useCallback(() => {

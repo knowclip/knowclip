@@ -10,7 +10,7 @@ import { getMediaCompatibilityWarnings } from '../node/getMediaCompatibilityIssu
 import { FileUpdateName } from './FileUpdateName'
 
 const handlers = (): FileEventHandlers<MediaFile> => ({
-  openRequest: async (file, filePath, _state, effects) => {
+  openRequest: async (file, filePath, state, effects) => {
     effects.pauseMedia()
     const validationResult = await validateMediaFile(file, filePath, effects)
     if (validationResult.error) {
@@ -30,28 +30,41 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
       compatibilityWarnings: compatibilityWarnings,
       file: validatedFile,
     } = validationResult.value
+
+    const askToConfirmMediaConversion = state.settings.warnBeforeConvertingMedia
+      ? [
+          r.mediaConversionConfirmationDialog(
+            `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
+              '\n'
+            )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
+            r.openFileSuccess(
+              validatedFile,
+              filePath,
+              effects.nowUtcTimestamp()
+            ),
+            r.openFileFailure(
+              file,
+              filePath,
+              `Some features may be unavailable until your file is located.`
+            ),
+            true
+          ),
+        ]
+      : [
+          r.openFileSuccess(validatedFile, filePath, effects.nowUtcTimestamp()),
+          r.simpleMessageSnackbar(
+            `Your media file is in an uncommon format. Playback may be slow. (Open up the Settings menu for more information.)`,
+            7000
+          ),
+        ]
+
     if (differencesMessage) {
       return [
         r.setMediaMetadata(validationResult.value.metadata),
         r.confirmationDialog(
           differencesMessage,
           compatibilityWarnings.length
-            ? r.mediaConversionConfirmationDialog(
-                `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
-                  '\n'
-                )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
-                r.openFileSuccess(
-                  validatedFile,
-                  filePath,
-                  effects.nowUtcTimestamp()
-                ),
-                r.openFileFailure(
-                  file,
-                  filePath,
-                  `Some features may be unavailable until your file is located.`
-                ),
-                true
-              )
+            ? askToConfirmMediaConversion
             : r.openFileSuccess(
                 validatedFile,
                 filePath,
@@ -67,25 +80,10 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
       ]
     }
 
-    // TODO: make sure the setting is checked TRUE unless the user has unchecked it.
-    // TODO: maybe show a snackbar if the dialog is not shown
-
     if (compatibilityWarnings.length) {
-      // TODO: also check if settings checkbox is checked, also above
       return [
         r.setMediaMetadata(validationResult.value.metadata),
-        r.mediaConversionConfirmationDialog(
-          `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
-            '\n'
-          )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
-          r.openFileSuccess(validatedFile, filePath, effects.nowUtcTimestamp()),
-          r.openFileFailure(
-            file,
-            filePath,
-            `Some features may be unavailable until your file is located.`
-          ),
-          true
-        ),
+        ...askToConfirmMediaConversion,
       ]
     }
 

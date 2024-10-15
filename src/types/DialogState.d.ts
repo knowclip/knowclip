@@ -19,7 +19,7 @@ declare type DialogData =
 declare type ConfirmationDialogData = {
   type: 'Confirmation'
   message: string
-  action: Action
+  action: Action | Action[]
   onCancel: Action | null
 }
 
