@@ -81,7 +81,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
             directory,
             basename(platform, mediaFile.name)
           )
-          const matchingFile = (await effects.existsSync(nameMatch))
+          const matchingFile = (await effects.fileExists(nameMatch)).value
             ? await validateMediaFile(mediaFile, nameMatch, effects)
             : null
 
@@ -107,7 +107,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
             directory,
             basename(platform, subtitlesFile.name)
           )
-          const fileExistsResult = await effects.existsSync(nameMatch)
+          const fileExistsResult = await effects.fileExists(nameMatch)
           if (fileExistsResult.error) {
             console.error(fileExistsResult.error)
           }

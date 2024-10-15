@@ -34,7 +34,7 @@ const fileEventHandlers: Record<
 const openFileRequest: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.openFileRequest as const),
-    mergeMap((action) => {
+    mergeMap(async (action) => {
       const file =
         r.getFile(state$.value, action.file.type, action.file.id) || action.file
       const fileAvailability = r.getFileAvailability(state$.value, file)
@@ -43,7 +43,7 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
 
       const filePath = action.filePath || fileAvailability.filePath
 
-      if (!filePath || !effects.existsSync(filePath)) {
+      if (!filePath || !(await effects.fileExists(filePath)).value) {
         const fileTypeAndName = getHumanFileName(file)
         const fileVerb = file.type === 'MediaFile' ? 'make clips with' : 'use'
         const message = filePath
@@ -66,7 +66,8 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
       } catch (err) {
         return of(r.openFileFailure(file, filePath, String(err)))
       }
-    })
+    }),
+    mergeAll()
   )
 
 const openFileSuccess: AppEpic = (action$, state$, effects) =>

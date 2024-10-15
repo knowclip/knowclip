@@ -28,7 +28,7 @@ const dependencies = {
   ...electronHelpers,
   writeFile: (filePath: string, data: string) =>
     sendToMainProcess({ type: 'writeTextFile', args: [filePath, data] }),
-  existsSync: (filePath: string) =>
+  fileExists: (filePath: string) =>
     sendToMainProcess({ type: 'fileExists', args: [filePath] }),
 
   window: window,
