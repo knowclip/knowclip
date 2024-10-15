@@ -57,7 +57,7 @@ const Main = () => {
       loop: r.getLoopState(state),
       mediaIsEffectivelyLoading: r.isMediaEffectivelyLoading(state),
       currentProject: r.getCurrentProject(state),
-      currentMediaUrl: r.getCurrentMediaUrl(state),
+      currentMediaUrl: r.getLoadedMediaUrl(state),
       currentMediaFile,
       clipsIdsForExport: currentMediaFile
         ? state.clips.idsByMediaFileId[currentMediaFile.id]

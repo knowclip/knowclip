@@ -25,15 +25,15 @@ const MediaConversionConfirmationDialog = ({
   })
 
   const dispatchAction = useCallback(() => {
-    dispatch(action)
     dispatch(actions.overrideSettings(settings))
     dispatch(actions.closeDialog())
+    dispatch(action)
   }, [dispatch, action, settings])
 
   const cancel = useCallback(() => {
-    onCancel && dispatch(onCancel)
     dispatch(actions.overrideSettings(settings))
     dispatch(actions.closeDialog())
+    onCancel && dispatch(onCancel)
   }, [dispatch, onCancel, settings])
 
   const handleChangeCheckbox = () => {

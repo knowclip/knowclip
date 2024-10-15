@@ -74,16 +74,22 @@ const getCurrentMediaFileCompatibilityIssues = (state: AppState) => {
     : null
 }
 
-export const getCurrentMediaUrl = createSelector(
+export const getLoadedMediaUrl = createSelector(
+  (state: AppState) => {
+    const id = state.session.currentMediaFileId
+    return id ? getFileAvailabilityById(state, 'MediaFile', id) : null
+  },
   getCurrentMediaFile,
   getCurrentMediaFileCompatibilityIssues,
   (state: AppState) => state.session.localServerAddress,
   (
+    fileAvailability,
     currentMediaFile,
     compatibilityIssues,
     localServerAddress
   ): MediaFilePath | null => {
-    if (!currentMediaFile) return null
+    if (!(fileAvailability?.status === 'CURRENTLY_LOADED' && currentMediaFile))
+      return null
     // mp3s may have trouble with seeking due to variable bit rate
     // so we always transcode them
     if (currentMediaFile.format === 'mp3')

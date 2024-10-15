@@ -17,10 +17,13 @@ const segmentDurationSeconds = 10
 export function makeGetConvertedFileSegment(
   filePathsRegistry: Record<string, string>,
   conversionType: MediaConversionType,
-  verbose: boolean = false
+  verbose: boolean = true
 ): Router.Middleware<Koa.DefaultState, Koa.DefaultContext, unknown> {
   return async (ctx) => {
-    console.log(`GET /file/:id/converted/:segmentNumber.ts`, ctx.params.id)
+    console.log(
+      `GET /file/:id/converted/${conversionType}/:segmentNumber.ts`,
+      ctx.params.id
+    )
     const segmentNumber = parseInt(ctx.params.segmentNumber)
     if (isNaN(segmentNumber)) {
       ctx.status = 400
@@ -174,24 +177,6 @@ export function makeGetFile(
       console.error(e)
       ctx.status = 500
     }
-  }
-}
-
-export function makePostFile(
-  filePathsRegistry: Record<string, string>
-): Router.Middleware<Koa.DefaultState, Koa.DefaultContext, unknown> {
-  return async (ctx) => {
-    console.log(
-      `POST /file/:id`,
-      ctx.params.id,
-      filePathsRegistry[ctx.params.id]
-    )
-    const fileId = ctx.params.id
-    const body = JSON.parse(ctx.request.body as string) as {
-      filePath: string
-    }
-
-    filePathsRegistry[fileId] = body.filePath
   }
 }
 

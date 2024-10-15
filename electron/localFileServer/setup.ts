@@ -5,7 +5,6 @@ import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { MediaConversionType } from './convertMedia'
 import {
-  makePostFile,
   makeGetFile,
   makeGetConvertedFilePlaylist,
   makeGetConvertedFileSegment,
@@ -22,7 +21,6 @@ export async function startLocalFileServer() {
     ctx.status = 200
   })
 
-  router.post('/file/:id', makePostFile(filePathsRegistry))
   router.get('/file/:id', makeGetFile(filePathsRegistry))
 
   router.get(
@@ -100,13 +98,13 @@ async function statusCheck(url: string) {
 
 function getLocalIpAddress() {
   const ifaces = os.networkInterfaces()
-  const localIpAddresses = Object.keys(ifaces)
-    .map((ifname) => ifaces[ifname])
-    .flat()
-    .filter((iface) => iface?.family === 'IPv4' && !iface.internal)
-    .map((iface) => iface!.address)
+  const localIpAddresses = Object.values(ifaces).flatMap(
+    (ifaces) =>
+      ifaces?.filter((iface) => iface?.family === 'IPv4' && !iface.internal) ||
+      []
+  )
 
-  return localIpAddresses[0]
+  return localIpAddresses[0].address
 }
 
 function startServer(app: Koa, port: number): Promise<number> {

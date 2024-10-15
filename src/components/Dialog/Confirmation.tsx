@@ -13,13 +13,13 @@ const ConfirmationDialog = ({
   const dispatch = useDispatch()
 
   const dispatchAction = useCallback(() => {
-    dispatch(action)
     dispatch(actions.closeDialog())
+    dispatch(action)
   }, [dispatch, action])
 
   const cancel = useCallback(() => {
-    onCancel && dispatch(onCancel)
     dispatch(actions.closeDialog())
+    onCancel && dispatch(onCancel)
   }, [dispatch, onCancel])
 
   return (

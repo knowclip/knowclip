@@ -5,15 +5,10 @@
 import { FfprobeData } from 'fluent-ffmpeg'
 
 export const COMPATIBLE_VIDEO_FORMATS = {
-  // MP4 (QuickTime/ MOV / ISO-BMFF / CMAF)
-  // Ogg
-  // WebM
-  // WAV
-  // HLS [Only on Android and only single-origin manifests]
   mp4: 'MP4 (MPEG-4 Part 14)',
   ogg: 'Ogg',
   webm: 'WebM',
-  ['matroska,webm']: 'Matroska / WebM',
+  'matroska,webm': 'Matroska / WebM',
   matroska: 'Matroska',
   wav: 'WAV / WAVE (Waveform Audio)',
   'mov,mp4,m4a,3gp,3g2,mj2': 'Mov',
@@ -22,15 +17,6 @@ export const COMPATIBLE_VIDEO_FORMATS = {
  * codecs from ffmpeg -codecs
  */
 export const COMPATIBLE_AUDIO_CODECS = {
-  // FLAC
-  // MP3
-  // Opus
-  // PCM 8-bit unsigned integer
-  // PCM 16-bit signed integer little endian
-  // PCM 32-bit float little endian
-  // PCM μ-law
-  // Vorbis
-  // AAC [Main, LC, HE profiles only, xHE-AAC on Android P+, macOS, Windows 11] [Google Chrome only]
   flac: 'FLAC (Free Lossless Audio Codec)',
   mp3: 'MP3 (MPEG audio layer 3)',
   opus: 'Opus',
@@ -45,16 +31,55 @@ export const COMPATIBLE_AUDIO_CODECS = {
  * codecs from ffmpeg -codecs
  */
 export const COMPATIBLE_VIDEO_CODECS = {
-  // AV1
-  // VP8
-  // VP9
-  // H.264 [Google Chrome only]
-  // H.265 [Google Chrome only and only where supported by the underlying OS]
   av1: 'AV1',
   vp8: 'VP8',
   vp9: 'VP9',
   h264: 'H.264',
-  h265: 'H.265',
+  // h265: 'H.265', "[Google Chrome only and only where supported by the underlying OS]" https://www.chromium.org/audio-video/
+}
+
+export type CompatibleVideoCodec = keyof typeof COMPATIBLE_VIDEO_CODECS
+export type CompatibleAudioCodec = keyof typeof COMPATIBLE_AUDIO_CODECS
+
+type MediaCodec = CompatibleVideoCodec | CompatibleAudioCodec
+
+export const getAudioEncoder = (codec: MediaCodec) => {
+  switch (codec) {
+    case 'mp3':
+      return 'libmp3lame'
+    case 'opus':
+      return 'libopus' // also 'opus'
+    case 'pcm_mulaw':
+      return 'pcm_mulaw' // also 'pcm_mulaw_at'
+    case 'vorbis':
+      return 'libvorbis' // also 'vorbis'
+    case 'aac':
+      return 'aac' // also 'aac_at'
+    default:
+      return codec
+  }
+}
+
+export const getVideoEncoder = (codec: MediaCodec) => {
+  switch (codec) {
+    case 'av1':
+      return 'libaom-av1' // also 'librav1e' 'libsvtav1'
+    case 'vp8':
+      return 'libvpx'
+    case 'vp9':
+      return 'libvpx-vp9'
+    case 'h264':
+      return 'libx264' // also 'libx264rgb' 'h264_videotoolbox'
+    default:
+      return codec
+  }
+}
+
+export const getHlsCompatibleVideoCodec = (
+  codec: CompatibleVideoCodec
+): CompatibleVideoCodec => {
+  if (codec === 'vp8') return 'h264'
+  return codec
 }
 
 export enum MediaCompatibilityIssue {
@@ -82,7 +107,6 @@ export function getMediaCompatibilityIssues(metadata: FfprobeData) {
   const audioStreams = metadata.streams.filter(
     (stream) => stream.codec_type && /audio/i.test(stream.codec_type)
   )
-  // warn if multiple audio or video streams
   if (videoStreams.length > 1) {
     issues.add(MediaCompatibilityIssue.MULTIPLE_VIDEO_STREAMS)
   }
@@ -128,14 +152,18 @@ export function getMediaCompatibilityWarnings(metadata: FfprobeData) {
   }
   if (issues.has(MediaCompatibilityIssue.INCOMPATIBLE_VIDEO_CODEC)) {
     warnings.push(
-      `Incompatible video codec(s): ${incompatibleVideoCodecs
+      `Incompatible video codec${
+        incompatibleVideoCodecs.length > 1 ? 's' : ''
+      }: ${incompatibleVideoCodecs
         .map((stream) => stream.codec_name)
         .join(', ')}`
     )
   }
   if (issues.has(MediaCompatibilityIssue.INCOMPATIBLE_AUDIO_CODEC)) {
     warnings.push(
-      `Incompatible audio codec(s): ${incompatibleAudioCodecs
+      `Incompatible audio codec${
+        incompatibleVideoCodecs.length > 1 ? 's' : ''
+      }: ${incompatibleAudioCodecs
         .map((stream) => stream.codec_name)
         .join(', ')}`
     )
