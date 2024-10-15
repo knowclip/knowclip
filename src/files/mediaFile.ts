@@ -63,7 +63,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         directory,
         basename(platform, availability.name)
       )
-      const matchingFile = (await effects.existsSync(nameMatch))
+      const matchingFile = (await effects.fileExists(nameMatch)).value
         ? await validateMediaFile(file, nameMatch, effects)
         : null
 
@@ -292,7 +292,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
             directory,
             basename(platform, file.name)
           )
-          const matchingFileExistsResult = await effects.existsSync(nameMatch)
+          const matchingFileExistsResult = await effects.fileExists(nameMatch)
           if (matchingFileExistsResult.error) {
             return r.simpleMessageSnackbar(
               `Problem loading subtitles from ${file.name}: ${matchingFileExistsResult.error.message}`

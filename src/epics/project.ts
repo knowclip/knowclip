@@ -56,16 +56,16 @@ const createProject: AppEpic = (
     )
   )
 
-const openProjectById: AppEpic = (action$, state$, { existsSync }) =>
+const openProjectById: AppEpic = (action$, state$, { fileExists }) =>
   action$.pipe(
     ofType(A.openProjectRequestById as const),
-    map(({ id }) => {
+    mergeMap(async ({ id }) => {
       const project = r.getFileAvailabilityById<ProjectFile>(
         state$.value,
         'ProjectFile',
         id
       )
-      if (!project.filePath || !existsSync(project.filePath)) {
+      if (!project.filePath || !(await fileExists(project.filePath)).value) {
         const projectFile = r.getFile<ProjectFile>(
           state$.value,
           'ProjectFile',
@@ -111,11 +111,11 @@ const openProjectByFilePath: AppEpic = (action$, state$, effects) =>
 const saveProject: AppEpic = (
   action$,
   state$,
-  { existsSync, writeFile, nowUtcTimestamp }
+  { fileExists, writeFile, nowUtcTimestamp }
 ) =>
   action$.pipe(
     ofType(A.saveProjectRequest as const),
-    filter(() => {
+    mergeMap(async () => {
       const projectMetadata = r.getCurrentProject(state$.value)
       if (!projectMetadata)
         return Boolean({ type: 'NOOP_SAVE_PROJECT_WITH_NONE_OPEN' })
@@ -125,9 +125,12 @@ const saveProject: AppEpic = (
         projectMetadata.id
       )
       return Boolean(
-        projectFile && projectFile.filePath && existsSync(projectFile.filePath)
+        projectFile &&
+          projectFile.filePath &&
+          (await fileExists(projectFile.filePath)).value
       )
-    }), // while can't find project file path in storage, or file doesn't exist
+    }),
+    filter((x) => x),
     mergeMap(async () => {
       try {
         const projectMetadata = r.getCurrentProject(state$.value)
