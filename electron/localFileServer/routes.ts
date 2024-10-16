@@ -17,7 +17,7 @@ const segmentDurationSeconds = 10
 export function makeGetConvertedFileSegment(
   filePathsRegistry: Record<string, string>,
   conversionType: MediaConversionType,
-  verbose: boolean = true
+  verbose: boolean = false
 ): Router.Middleware<Koa.DefaultState, Koa.DefaultContext, unknown> {
   return async (ctx) => {
     console.log(
@@ -188,9 +188,12 @@ export function getM3u8Text(
 ) {
   const conversionTypeCode = getConversionTypeCode(compatibilityIssues)
 
-  const segmentCount = Math.ceil(videoDuration / segmentDurationSeconds)
-  const padStartLength = segmentCount.toString().length
-  const segmentsFilenames = Array.from({ length: segmentCount }, (_, i) => {
+  const segmentsCount = Math.ceil(
+    roundToPlaces(videoDuration / segmentDurationSeconds, 3)
+  )
+
+  const padStartLength = segmentsCount.toString().length
+  const segmentsFilenames = Array.from({ length: segmentsCount }, (_, i) => {
     const number = i.toString().padStart(padStartLength, '0')
     return `/file/${mediaFileId}/converted/${conversionTypeCode}/${number}.ts`
   })
@@ -201,8 +204,17 @@ export function getM3u8Text(
     '#EXT-X-MEDIA-SEQUENCE:0',
     '#EXT-X-PLAYLIST-TYPE:VOD',
     ...segmentsFilenames.map(
-      (filename) => `#EXTINF:${segmentDurationSeconds},\n${filename}`
+      (filename, i) =>
+        `#EXTINF:${
+          i === segmentsFilenames.length - 1
+            ? roundToPlaces(videoDuration % segmentDurationSeconds, 3)
+            : segmentDurationSeconds
+        },\n${filename}`
     ),
     '#EXT-X-ENDLIST',
   ].join('\n')
+}
+
+function roundToPlaces(number: number, places: number) {
+  return Math.round(number * 10 ** places) / 10 ** places
 }
