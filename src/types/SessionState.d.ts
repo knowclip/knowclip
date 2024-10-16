@@ -1,4 +1,6 @@
 declare type SessionState = {
+  platform: 'darwin' | 'win32' | 'linux'
+  localServerAddress: string
   waveformSelection: WaveformSelection | null
   defaultTags: Array<string>
   defaultIncludeStill: boolean
@@ -7,6 +9,7 @@ declare type SessionState = {
   }
   currentProjectId: ProjectId | null
   currentMediaFileId: MediaFileId | null
+  currentMediaFileMetadata: import('fluent-ffmpeg').FfprobeData | null
   workIsUnsaved: boolean
   loopMedia: LoopState
   editingCards: boolean
@@ -14,6 +17,11 @@ declare type SessionState = {
 
   progress: ProgressInfo | null
 }
+
+declare type MinimalInitialSessionState = Pick<
+  SessionState,
+  'platform' | 'localServerAddress'
+>
 
 declare type LoopState = LoopReason | false
 declare type LoopReason = 'FOCUS' | 'EDIT' | 'KEYBOARD' | 'BUTTON'

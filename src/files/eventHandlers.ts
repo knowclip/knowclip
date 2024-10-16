@@ -2,15 +2,14 @@ import { ActionOf } from '../actions'
 import A from '../types/ActionType'
 
 export type FileEventHandlers<F extends FileMetadata> = {
-  /** should eventually result in openFileSuccess or openFileFailure ? */
+  /** should eventually result in openFileSuccess or openFileFailure */
   openRequest: OpenFileRequestHandler<F>
   openSuccess: OpenFileSuccessHandler<F>[]
   openFailure?: OpenFileFailureHandler<F>
-  /** should eventually result in openFileSuccess or openFileFailure ? */
   locateRequest: LocateFileRequestHandler<F>
   locateSuccess: LocateFileSuccessHandler<F> | null
   deleteRequest: DeleteFileRequestHandler<F>[]
-  // DESCENDANTS' DELETE HOOKS ARE NOT TRIGGERED
+  /** does NOT trigger descendants' delete hooks */
   deleteSuccess: DeleteFileSuccessHandler[]
 }
 

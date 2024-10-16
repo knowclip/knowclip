@@ -8,7 +8,6 @@ import type {
   MessageToMain,
   MessageHandlerResult,
 } from '../../MessageToMain'
-import { failure } from '../../utils/result'
 
 type WebDriverLogTypes =
   | 'trace'
@@ -118,6 +117,7 @@ export async function createTestDriver({
   chromeArgs,
   env,
   logLevel = 'error',
+  port = 9515,
 }: {
   chromedriverPath: string
   webdriverIoPath: string
@@ -125,9 +125,9 @@ export async function createTestDriver({
   chromeArgs: string[]
   env?: NodeJS.ProcessEnv
   logLevel?: WebDriverLogTypes
+  port?: number
 }) {
   const hostname = '127.0.0.1'
-  const port = 9515
   const urlBase = '/'
 
   const statusUrl = `http://${hostname}:${port}${urlBase}status`
@@ -145,8 +145,14 @@ export async function createTestDriver({
     waitforTimeout: 5000,
     hostname,
     port,
+    // // good for debugging, when you want to use a more verbose log level.
+    // // however, the log file will be overwritten each time you run the tests,
+    // // so it will not work in CI until adding e.g. an `outputDir` parameter here.
+    // outputDir: 'logs',
     capabilities: {
       browserName: 'chrome',
+      // @ts-expect-error goog:loggingPrefs is not in the types https://github.com/SeleniumHQ/selenium/issues/7928
+      'goog:loggingPrefs': { browser: 'ALL' },
       'goog:chromeOptions': {
         binary: webdriverIoPath,
         args: [...chromeArgs, 'app=' + appDir],
@@ -154,7 +160,6 @@ export async function createTestDriver({
       },
       'wdio:enforceWebDriverClassic': true,
     },
-
     logLevel,
   }
   const browser: WebdriverIO.Browser = await remote(browserOptions)
@@ -165,7 +170,7 @@ export async function createTestDriver({
 }
 
 export class TestDriver {
-  startupStatus: Promise<MessageResponse<'ok'>>
+  startupStatus: AsyncResult<MessageResponse<'ok'>, string>
   client: WebdriverIO.Browser
   _driver: Chromedriver
 
@@ -182,33 +187,34 @@ export class TestDriver {
     this.startupStatus = this.sendToMainProcess({
       type: 'isReady',
       args: [],
-    }).catch(async (rawError): Promise<MessageResponse<'ok'>> => {
+    }).catch(async (rawError): AsyncResult<MessageResponse<'ok'>, string> => {
       console.error('Application failed to start', rawError)
       this.stop()
 
-      return Promise.resolve(failure(rawError))
+      return {
+        error: String(rawError),
+      }
     })
   }
 
-  sendToMainProcess<T extends MessageToMainType>(
+  async sendToMainProcess<T extends MessageToMainType>(
     message: MessageToMain<T>
-  ): Promise<MessageResponse<MessageHandlerResult<T>>> {
-    return this.client.executeAsync((message: MessageToMain<T>, done) => {
-      return (
-        window.electronApi
-          ?.invokeMessage(message)
-          .then((result) => {
-            done(result)
-            return result
-          })
-          .catch((error) => {
-            console.error('error invoking message', error)
-            const result = failure(error)
-            done(result)
-            return result
-          }) || done(failure('no electronApi found on window'))
-      )
-    }, message)
+  ) {
+    return await this.client.execute(
+      async (
+        message
+      ): AsyncResult<MessageResponse<MessageHandlerResult<T>>, string> => {
+        try {
+          const result: MessageResponse<MessageHandlerResult<T>> =
+            await window.electronApi.invokeMessage(message)
+          return { value: result }
+        } catch (thrownValue) {
+          console.error('error invoking message', thrownValue)
+          return { error: String(thrownValue) }
+        }
+      },
+      message
+    )
   }
 
   /** send message to renderer */

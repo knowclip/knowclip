@@ -12,6 +12,7 @@ import SettingsDialog from './SettingsDialog'
 import { getCurrentDialog } from '../../selectors'
 import LinkSubtitlesDialog from './LinkSubtitlesDialog'
 import Dictionaries from './DictionariesDialog'
+import MediaConversionConfirmationDialog from './MediaConversionConfirmationDialog'
 
 const DialogView = () => {
   const currentDialog = useSelector((state: AppState) =>
@@ -55,6 +56,13 @@ const DialogView = () => {
       )
     case 'Dictionaries':
       return <Dictionaries open={true} data={{ type: 'Dictionaries' }} />
+    case 'MediaConversionConfirmation':
+      return (
+        <MediaConversionConfirmationDialog open={true} data={currentDialog} />
+      )
+    default:
+      // @ts-expect-error - just to make sure we don't forget to handle new dialog types
+      throw new Error(`Unknown dialog type: ${currentDialog.type}`)
   }
 }
 

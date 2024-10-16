@@ -1,7 +1,6 @@
 import {
   startApp,
   stopApp,
-  TMP_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
   initTestContext,
@@ -19,7 +18,11 @@ describe('opening and saving a previously saved project', () => {
   const context = initTestContext(testId)
 
   beforeAll(async () => {
-    const { app } = await startApp(context, persistedState)
+    const { app } = await startApp(
+      context,
+      9516,
+      persistedState(context.temporaryDirectory)
+    )
 
     await mockSideEffects(app, sideEffectsMocks)
   })
@@ -38,7 +41,7 @@ describe('opening and saving a previously saved project', () => {
       step('resulting project file matches snapshot', async () => {
         test('save project', async () => {
           const actualProjectFileContents = await parseProjectJson(
-            join(TMP_DIRECTORY, 'my_previously_saved_project.kyml')
+            join(context.temporaryDirectory, 'my_previously_saved_project.kyml')
           )
 
           expect(actualProjectFileContents).toMatchSnapshot()
@@ -80,7 +83,7 @@ const sideEffectsMocks = {
     '2020-03-20T13:27:58Z',
   ],
 }
-const persistedState: Partial<AppState> = {
+const persistedState = (temporaryDirectory: string): Partial<AppState> => ({
   fileAvailabilities: {
     ProjectFile: {
       '91bfd159-155c-4b61-bdd5-d71e2e944773': {
@@ -90,7 +93,7 @@ const persistedState: Partial<AppState> = {
         name: 'My cool saved project',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
-        filePath: join(TMP_DIRECTORY, '/my_previously_saved_project.kyml'),
+        filePath: join(temporaryDirectory, '/my_previously_saved_project.kyml'),
         lastOpened: '2020-02-01T13:20:55Z',
       },
     },
@@ -184,7 +187,6 @@ const persistedState: Partial<AppState> = {
         lastOpened: '2020-02-01T13:21:19Z',
       },
     },
-    ConstantBitrateMp3: {},
     VideoStillImage: {
       '632a6cff-7fd7-4d0f-b657-0b9636204261': {
         type: 'VideoStillImage',
@@ -228,4 +230,4 @@ const persistedState: Partial<AppState> = {
     },
     Dictionary: {},
   },
-}
+})

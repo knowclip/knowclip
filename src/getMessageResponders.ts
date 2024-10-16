@@ -24,7 +24,6 @@ import {
   validateSubtitlesFromFilePath,
 } from './node/subtitles'
 import { processNoteMedia } from './node/processNoteMedia'
-import { coerceMp3ToConstantBitrate } from './node/constantBitrateMp3'
 import { getWaveformPng, getWaveformPngs } from './node/getWaveform'
 import { readdir } from 'fs-extra'
 import { parseProjectJson } from './node/parseProject'
@@ -36,6 +35,7 @@ const now = moment.utc().format()
 
 export const getMessageResponders = (
   mainWindow: BrowserWindow,
+  filePathsRegistry: Record<FileId, string>,
   persistedStatePath?: string
 ) => ({
   isReady: () => 'ok' as const,
@@ -47,6 +47,10 @@ export const getMessageResponders = (
   sendToRenderer: (channel: string, args: string[]) => {
     if (!mainWindow) console.error('Main window reference lost')
     else mainWindow.webContents.send(channel, ...args)
+  },
+
+  registerFilePath: (fileId: string, path: string) => {
+    filePathsRegistry[fileId] = path
   },
 
   getPersistedTestState: async () => {
@@ -188,7 +192,6 @@ export const getMessageResponders = (
   getSubtitlesFilePath,
   getSubtitlesFromFile,
   processNoteMedia,
-  coerceMp3ToConstantBitrate,
   getWaveformPng,
   getWaveformPngs,
   validateSubtitleFileBeforeOpen,

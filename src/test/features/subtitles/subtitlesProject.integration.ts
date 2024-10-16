@@ -1,7 +1,6 @@
 import {
   startApp,
   stopApp,
-  TMP_DIRECTORY,
   ASSETS_DIRECTORY,
   GENERATED_ASSETS_DIRECTORY,
   initTestContext,
@@ -19,7 +18,11 @@ describe('make clips and cards from subtitles', () => {
   const context = initTestContext(testId)
 
   beforeAll(async () => {
-    const { app } = await startApp(context, persistedState)
+    const { app } = await startApp(
+      context,
+      9518,
+      persistedState(context.temporaryDirectory)
+    )
 
     await mockSideEffects(app, sideEffectsMocks)
   })
@@ -82,7 +85,7 @@ const sideEffectsMocks = {
   ],
 }
 
-const persistedState: Partial<AppState> = {
+const persistedState = (tmpDirectory: string): Partial<AppState> => ({
   fileAvailabilities: {
     ProjectFile: {
       'ef3a2602-37a0-4158-89d6-47b75edb5bea': {
@@ -92,7 +95,7 @@ const persistedState: Partial<AppState> = {
         name: 'Project with subtitles',
         status: 'CURRENTLY_LOADED',
         isLoading: false,
-        filePath: join(TMP_DIRECTORY, '/project_with_subtitles.kyml'),
+        filePath: join(tmpDirectory, '/project_with_subtitles.kyml'),
         lastOpened: '2020-02-01T16:11:16Z',
       },
     },
@@ -186,7 +189,6 @@ const persistedState: Partial<AppState> = {
         lastOpened: '2020-02-01T16:11:17Z',
       },
     },
-    ConstantBitrateMp3: {},
     VideoStillImage: {
       '6b02575a-0a4f-402a-8ea3-31f457cb5d8c': {
         type: 'VideoStillImage',
@@ -269,4 +271,4 @@ const persistedState: Partial<AppState> = {
     },
     Dictionary: {},
   },
-}
+})

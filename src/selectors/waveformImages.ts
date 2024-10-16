@@ -1,18 +1,16 @@
 import { createSelector } from 'reselect'
 import { getCurrentMediaFile } from './currentMedia'
 import { getWaveformIds } from '../utils/getWaveformIds'
+import { fileByIdUrl } from './files'
 
 export const getWaveformImages = createSelector(
   getCurrentMediaFile,
   (state: AppState) => state.files.WaveformPng,
   (state: AppState) => state.fileAvailabilities.WaveformPng,
-  (
-    currentMediaFile,
-    files,
-    fileAvailabilities
-  ): { file: WaveformPng; path: string }[] => {
+  (state: AppState) => state.session.localServerAddress,
+  (currentMediaFile, files, fileAvailabilities, localServerAddress) => {
     if (!currentMediaFile) return []
-    const result: { file: WaveformPng; path: string }[] = []
+    const result: { file: WaveformPng; url: string }[] = []
 
     for (const id of getWaveformIds(currentMediaFile)) {
       const file = files[id]
@@ -20,7 +18,7 @@ export const getWaveformImages = createSelector(
       if (file && availability && availability.status === 'CURRENTLY_LOADED') {
         result.push({
           file,
-          path: availability.filePath,
+          url: fileByIdUrl(localServerAddress, id),
         })
       }
     }

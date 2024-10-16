@@ -165,7 +165,13 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
             )
             if (tmpFilePath.error) {
               return [
-                r.openFileFailure(file, null, `${tmpFilePath.error.message}`),
+                r.openFileFailure(
+                  file,
+                  null,
+                  `Error locating file "${
+                    availability.filePath || availability.type
+                  }: ${tmpFilePath.error.message}`
+                ),
               ]
             }
             const validateResult = await effects.validateSubtitleFileBeforeOpen(
@@ -187,7 +193,13 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
               file
             )
             if (tmpFilePath.error) {
-              return [r.openFileFailure(file, null, tmpFilePath.error.message)]
+              return [
+                r.openFileFailure(
+                  file,
+                  null,
+                  `Error locating file: ${tmpFilePath.error.message}`
+                ),
+              ]
             }
             const validateResult = await effects.validateSubtitleFileBeforeOpen(
               tmpFilePath.value,

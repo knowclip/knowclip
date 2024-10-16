@@ -15,7 +15,7 @@ export const dialogActions = {
 
 const confirmationDialog = (
   message: string,
-  action: Action,
+  action: Action | Action[],
   onCancel: Action | null = null,
   skipQueue: boolean = false
 ) =>
@@ -102,6 +102,22 @@ const dictionariesDialog = () =>
     true
   )
 
+const mediaConversionConfirmationDialog = (
+  message: string,
+  action: Action,
+  onCancel: Action | null = null,
+  skipQueue: boolean = false
+) =>
+  dialogActions.enqueueDialog(
+    {
+      type: 'MediaConversionConfirmation',
+      message,
+      action,
+      onCancel,
+    },
+    skipQueue
+  )
+
 export const compositeDialogActions = {
   confirmationDialog,
   errorDialog,
@@ -114,4 +130,5 @@ export const compositeDialogActions = {
   settingsDialog,
   linkSubtitlesDialog,
   dictionariesDialog,
+  mediaConversionConfirmationDialog,
 }

@@ -42,7 +42,7 @@ const Main = () => {
     loop,
     mediaIsEffectivelyLoading,
     currentProject,
-    constantBitrateFilePath,
+    currentMediaUrl,
     currentMediaFile,
     subtitles,
     viewMode,
@@ -57,13 +57,14 @@ const Main = () => {
       loop: r.getLoopState(state),
       mediaIsEffectivelyLoading: r.isMediaEffectivelyLoading(state),
       currentProject: r.getCurrentProject(state),
-      constantBitrateFilePath: r.getCurrentMediaConstantBitrateFilePath(state),
+      currentMediaUrl: r.getLoadedMediaUrl(state),
       currentMediaFile,
       clipsIdsForExport: currentMediaFile
         ? state.clips.idsByMediaFileId[currentMediaFile.id]
         : EMPTY,
       subtitles: r.getSubtitlesFilesWithTracks(state),
       viewMode: state.settings.viewMode,
+      localServerAddress: state.session.localServerAddress,
       waveformImages: r.getWaveformImages(state),
       clipsMap: r.getClipsObject(state),
       currentFileClipsOrder: r.getCurrentFileClipsOrder(state),
@@ -74,8 +75,8 @@ const Main = () => {
 
   const waveformImagesWithUrls = useMemo(() => {
     return waveformImages.map(
-      ({ file: { startSeconds, endSeconds }, path }) => ({
-        url: new URL(`file://${path}`).toString(),
+      ({ file: { startSeconds, endSeconds }, url }) => ({
+        url,
         startSeconds,
         endSeconds,
       })
@@ -269,9 +270,9 @@ const Main = () => {
           </div>
         ) : (
           <Media
-            key={String(constantBitrateFilePath)}
+            key={String(currentMediaUrl)}
             className={css.media}
-            constantBitrateFilePath={constantBitrateFilePath}
+            currentMediaUrl={currentMediaUrl}
             loop={loop}
             metadata={currentMediaFile}
             subtitles={subtitles}

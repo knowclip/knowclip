@@ -37,4 +37,9 @@ export const settingsActions = {
     type: A.removeActiveDictionary,
     id,
   }),
+
+  setWarnBeforeConvertingMedia: (warn: boolean) => ({
+    type: A.setWarnBeforeConvertingMedia,
+    warn,
+  }),
 } satisfies KnowclipActionCreatorsSubset
