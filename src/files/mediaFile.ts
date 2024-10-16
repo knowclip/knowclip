@@ -360,7 +360,7 @@ const loadExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
 
           if (
             !validationResult?.error &&
-            !validationResult?.value.value?.differences?.length
+            !validationResult?.value?.differences?.length
           ) {
             newlyAutoFoundSubtitlesPaths[file.id] =
               newlyAutoFoundSubtitlesPaths[file.id]

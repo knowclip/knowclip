@@ -146,14 +146,13 @@ const dependencies = {
         args: [sourceFilePath, existingFile],
       })
   ),
-  validateSubtitlesFromFilePath: (
-    sourceFilePath: string,
-    existingFile: SubtitlesFile
-  ) =>
-    sendToMainProcess({
-      type: 'validateSubtitlesFromFilePath',
-      args: [sourceFilePath, existingFile],
-    }),
+  validateSubtitlesFromFilePath: flatten(
+    (sourceFilePath: string, existingFile: SubtitlesFile) =>
+      sendToMainProcess({
+        type: 'validateSubtitlesFromFilePath',
+        args: [sourceFilePath, existingFile],
+      })
+  ),
 }
 
 export default dependencies

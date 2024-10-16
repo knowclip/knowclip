@@ -46,6 +46,9 @@ function getChromedriverPath() {
 
 export interface IntegrationTestContext {
   testId: string
+  /** path to a temporary directory, corresponding to the testId.
+   * data from fixtures is copied here before each test.
+   */
   temporaryDirectory: string
   setup: {
     app: TestDriver
