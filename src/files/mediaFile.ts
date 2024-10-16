@@ -31,32 +31,37 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
       file: validatedFile,
     } = validationResult.value
 
-    const askToConfirmMediaConversion = state.settings.warnBeforeConvertingMedia
-      ? [
-          r.mediaConversionConfirmationDialog(
-            `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
-              '\n'
-            )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
+    const askToConfirmMediaConversion = () =>
+      state.settings.warnBeforeConvertingMedia
+        ? [
+            r.mediaConversionConfirmationDialog(
+              `This media file is not compatible with Knowclip in its raw state for the following reason(s):\n\n${compatibilityWarnings.join(
+                '\n'
+              )}\n\nKnowclip will try some special processing to make this file work, which might slow things down a bit. Would you like to proceed anyway?`,
+              r.openFileSuccess(
+                validatedFile,
+                filePath,
+                effects.nowUtcTimestamp()
+              ),
+              r.openFileFailure(
+                file,
+                filePath,
+                `Some features may be unavailable until your file is located.`
+              ),
+              true
+            ),
+          ]
+        : [
             r.openFileSuccess(
               validatedFile,
               filePath,
               effects.nowUtcTimestamp()
             ),
-            r.openFileFailure(
-              file,
-              filePath,
-              `Some features may be unavailable until your file is located.`
+            r.simpleMessageSnackbar(
+              `Your media file is in an uncommon format. Playback may be slow. (Open up the Settings menu for more information.)`,
+              7000
             ),
-            true
-          ),
-        ]
-      : [
-          r.openFileSuccess(validatedFile, filePath, effects.nowUtcTimestamp()),
-          r.simpleMessageSnackbar(
-            `Your media file is in an uncommon format. Playback may be slow. (Open up the Settings menu for more information.)`,
-            7000
-          ),
-        ]
+          ]
 
     if (differencesMessage) {
       return [
@@ -64,7 +69,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
         r.confirmationDialog(
           differencesMessage,
           compatibilityWarnings.length
-            ? askToConfirmMediaConversion
+            ? askToConfirmMediaConversion()
             : r.openFileSuccess(
                 validatedFile,
                 filePath,
@@ -83,7 +88,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
     if (compatibilityWarnings.length) {
       return [
         r.setMediaMetadata(validationResult.value.metadata),
-        ...askToConfirmMediaConversion,
+        ...askToConfirmMediaConversion(),
       ]
     }
 
