@@ -19,9 +19,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install and test
-        run: |
-          npm ci
       - name: Cache npm dependencies
         id: cache-npm
         uses: actions/cache@v3
@@ -35,6 +32,9 @@ jobs:
         name: List the state of node modules
         continue-on-error: true
         run: npm list
+      - name: npm install and test
+        run: |
+          npm ci
       - name: integration tests
         run: |
           export DISPLAY=':99.0'
