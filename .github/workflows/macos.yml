@@ -19,6 +19,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: test env
+        env:
+          RELEASE_BUILD: ${{startsWith(github.ref, 'refs/tags/')}}
+          NON_RELEASE_BUILD: ${{!startsWith(github.ref, 'refs/tags/')}}
+          NON_RELEASE_BUILD_WITHOUT_BRACKETS: !startsWith(github.ref , 'refs/tags/')
+        run: |
+          node -e "console.log(process.env.RELEASE_BUILD, typeof process.env.RELEASE_BUILD)"
+          node -e "console.log(process.env.NON_RELEASE_BUILD, typeof process.env.NON_RELEASE_BUILD)"
+          node -e "console.log(process.env.NON_RELEASE_BUILD_WITHOUT_BRACKETS, typeof process.env.NON_RELEASE_BUILD_WITHOUT_BRACKETS)"
       - name: Cache npm dependencies
         id: cache-npm
         uses: actions/cache@v3
