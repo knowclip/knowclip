@@ -137,6 +137,42 @@ const SettingsDialog = ({ open }: DialogProps<SettingsDialogData>) => {
 
         <section className={css.settingsGroup}>
           <Paper className={css.settingsGroupBody}>
+            <h3 className={css.heading}>Mediaconversion</h3>
+            <FormControl className={css.formControl} fullWidth margin="normal">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={settings.warnBeforeConvertingMedia}
+                    onChange={(e) =>
+                      dispatchLocal(
+                        actions.setWarnBeforeConvertingMedia(e.target.checked)
+                      )
+                    }
+                    color="primary"
+                  />
+                }
+                label="Ask before converting media files for compatibility with Knowclip"
+              />
+            </FormControl>
+          </Paper>
+          <section className={css.settingsGroupDescription}>
+            <p>
+              Check this box if you want to be asked before Knowclip converts
+              media files to a format that it can read. Knowclip will NOT modify
+              your original files! However, this processing can slow down
+              playback inside Knowclip.
+            </p>
+            <p>
+              To avoid having to convert files, it is recommended to use files
+              with the video codec H.264 and the audio codec AAC. If your media
+              files are in a different format, it may be possible convert them
+              to a compatible format using external tools.
+            </p>
+          </section>
+        </section>
+
+        <section className={css.settingsGroup}>
+          <Paper className={css.settingsGroupBody}>
             <h3 className={css.heading}>Software updates</h3>
             <FormControl className={css.formControl} fullWidth margin="normal">
               <FormControlLabel

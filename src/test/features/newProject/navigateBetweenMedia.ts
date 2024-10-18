@@ -5,13 +5,14 @@ import { getSelector } from '../../driver/ClientWrapper'
 import { test, expect } from '../../test'
 
 export default async function navigateBetweenMedia(
-  context: IntegrationTestContext
+  context: IntegrationTestContext,
+  mediaFileIds: [string, string]
 ) {
   test('ensure previously selected video has loaded', async () => {
     const { client } = context
 
-    expect(await client.getAttribute('video', 'src')).toContain(
-      'piggeldy_cat.mp4'
+    expect(await client.getAttribute('video > source', 'src')).toContain(
+      '/file/' + mediaFileIds[1]
     )
   })
 
@@ -56,8 +57,8 @@ export default async function navigateBetweenMedia(
 
     await client.waitUntilPresent_(mediaFilesMenuButton)
 
-    expect(await client.getAttribute('video', 'src')).toContain(
-      'polar_bear_cafe.mp4'
+    expect(await client.getAttribute('video > source', 'src')).toContain(
+      '/file/' + mediaFileIds[0]
     )
   })
 }

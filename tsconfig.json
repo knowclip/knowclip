@@ -27,7 +27,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "src",
+    "electron"
   ],
   "exclude": [
     "homepage",

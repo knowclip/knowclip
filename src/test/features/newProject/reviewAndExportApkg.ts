@@ -1,4 +1,4 @@
-import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { reviewAndExport$ as dialog$ } from '../../../components/ReviewAndExport.testLabels'
 import { reviewAndExportMediaTableRow$ as dialogTableRow$ } from '../../../components/ReviewAndExportMediaTableRow.testLabels'
 import { snackbar$ } from '../../../components/Snackbar.testLabels'
@@ -41,7 +41,9 @@ export default async function reviewAndExportApkg(
     const { app, client } = context
     await mockElectronHelpers(app, {
       showSaveDialog: [
-        Promise.resolve(join(TMP_DIRECTORY, 'deck_from_new_project.apkg')),
+        Promise.resolve(
+          join(context.temporaryDirectory, 'deck_from_new_project.apkg')
+        ),
       ],
     })
     await client.clickElement_(dialog$.exportApkgButton)

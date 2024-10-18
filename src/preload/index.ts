@@ -25,10 +25,27 @@ export type ElectronApi = typeof electronApi
 
 console.log('import meta env', import.meta.env)
 console.log('process.env', process.env)
+console.log('process.argv', process.argv)
+
+const knowclipServerIp = process.argv
+  .find((arg) => arg.includes('--kc-ip='))
+  ?.split('=')[1]
+const knowclipServerPort = process.argv
+  .find((arg) => arg.includes('--kc-port='))
+  ?.split('=')[1]
+
+if (!knowclipServerIp || !knowclipServerPort) {
+  console.error({ knowclipServerIp, knowclipServerPort })
+  throw new Error('knowclip server ip or port not provided: ')
+}
+const platform = process.platform as 'darwin' | 'win32' | 'linux'
+if (platform !== 'darwin' && platform !== 'win32' && platform !== 'linux') {
+  throw new Error(`Unsupported platform ${platform}`)
+}
 
 const electronApi = {
-  // setUpMocks: setUpMocks,
-  platform: process.platform,
+  platform,
+  knowclipServerAddress: `http://${knowclipServerIp}:${knowclipServerPort}`,
   openExternal: (path: string) =>
     sendToMainProcess({
       type: 'openExternal',
@@ -101,6 +118,8 @@ const electronApi = {
 }
 
 console.log('preloading')
+
+console.log('env', JSON.stringify(electronApi.env, null, 2))
 
 contextBridge.exposeInMainWorld('electronApi', electronApi)
 

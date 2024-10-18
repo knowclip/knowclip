@@ -6,7 +6,6 @@ const FILE_TYPES: FileMetadata['type'][] = [
   'ExternalSubtitlesFile',
   'VttConvertedSubtitlesFile',
   'WaveformPng',
-  'ConstantBitrateMp3',
   'VideoStillImage',
   'Dictionary',
 ]

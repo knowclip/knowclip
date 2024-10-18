@@ -9,7 +9,6 @@ export const initialState: FileAvailabilitiesState = {
   ExternalSubtitlesFile: {},
   VttConvertedSubtitlesFile: {},
   WaveformPng: {},
-  ConstantBitrateMp3: {},
   VideoStillImage: {},
   Dictionary: {},
 }

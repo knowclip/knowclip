@@ -74,7 +74,10 @@ export const readMediaFile = async (
   projectId: string,
   subtitles: MediaFile['subtitles'] = [],
   flashcardFieldsToSubtitlesTracks: SubtitlesFlashcardFieldsLinks = {}
-): AsyncResult<MediaFile> => {
+): AsyncResult<{
+  file: MediaFile
+  ffprobeMetadata: FfprobeData
+}> => {
   const metadata = await getMediaMetadata(filePath)
   if (metadata.error) return metadata
 
@@ -114,7 +117,7 @@ export const readMediaFile = async (
           isVideo: false,
         }
 
-  return { value: file }
+  return { value: { file, ffprobeMetadata } }
 }
 
 export async function writeMediaSubtitlesToVtt(
@@ -166,18 +169,4 @@ export const convertAssToVtt = async (
   } catch (error) {
     return failure(error)
   }
-}
-
-export function createConstantBitrateMp3(
-  inputPath: string,
-  res: (value: string | PromiseLike<string>) => void,
-  constantBitratePath: string,
-  rej: (reason?: any) => void
-) {
-  return ffmpeg(inputPath)
-    .audioBitrate('64k')
-    .on('end', () => res(constantBitratePath))
-    .on('error', rej)
-    .output(constantBitratePath)
-    .run()
 }

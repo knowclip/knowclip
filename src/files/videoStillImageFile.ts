@@ -4,9 +4,11 @@ import { msToSeconds } from 'clipwave'
 
 const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
   {
-    openRequest: async (file, filePath, _state, effects) => {
+    openRequest: async (file, filePath, state, effects) => {
       const img = new Image()
-      img.src = new URL(`file:///${filePath}`).toString()
+      img.src = new URL(
+        r.fileByIdUrl(state.session.localServerAddress, file.id)
+      ).toString()
       return await new Promise((res, _rej) => {
         const onLoad = () => {
           res([r.openFileSuccess(file, filePath, effects.nowUtcTimestamp())])
@@ -44,8 +46,11 @@ const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
         )
           return [r.openFileFailure(file, null, null)]
 
-        const cbr = r.getConstantBitrateFilePath(state, parentFile.id)
-        if (!cbr)
+        const loadedMediaFilePath = r.getLoadedMediaFilePath(
+          state,
+          parentFile.id
+        )
+        if (!loadedMediaFilePath)
           return [
             r.openFileFailure(
               file,

@@ -33,8 +33,8 @@ export default async function addMoreMediaToProject(
     const { client } = context
 
     await client.waitUntil(async () => {
-      const videoPath = await client.getAttribute('video', 'src')
-      return Boolean(videoPath && videoPath.includes(germanVideoPath))
+      const videoPath = await client.getAttribute('video > source', 'src')
+      return Boolean(videoPath && videoPath.includes(mediaFileId))
     })
   })
 }

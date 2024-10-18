@@ -1,7 +1,6 @@
 import {
   startApp,
   stopApp,
-  TMP_DIRECTORY,
   FIXTURES_DIRECTORY,
   initTestContext,
 } from '../../setUpDriver'
@@ -47,7 +46,7 @@ describe('make a project file for testing saved projects', () => {
 
   afterAll(async () => {
     await copyFile(
-      join(TMP_DIRECTORY, 'my_previously_saved_project.kyml'),
+      join(context.temporaryDirectory, 'my_previously_saved_project.kyml'),
       join(FIXTURES_DIRECTORY, 'my_previously_saved_project.kyml')
     )
 

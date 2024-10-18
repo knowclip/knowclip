@@ -21,9 +21,14 @@ async function respond<T extends MessageToMainType>(
 
 export function handleMessages(
   mainWindow: BrowserWindow,
+  filePathsRegistry: Record<FileId, string>,
   persistedStatePath?: string
 ) {
-  const messageHandlers = getMessageResponders(mainWindow, persistedStatePath)
+  const messageHandlers = getMessageResponders(
+    mainWindow,
+    filePathsRegistry,
+    persistedStatePath
+  )
 
   async function onMessage<T extends MessageToMainType>(
     message: MessageToMain<T>
