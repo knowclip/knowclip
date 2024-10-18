@@ -32,7 +32,10 @@ Sentry.init({
 })
 
 const shouldInstallExtensions = Boolean(
-  process.env.NODE_ENV === 'development' || process.env.VITE_INTEGRATION_DEV
+  process.env.NODE_ENV === 'development' ||
+    process.env.VITE_INTEGRATION_DEV ||
+    (process.env.NODE_ENV === 'production' &&
+      !JSON.parse(process.env.RELEASE_BUILD || 'false'))
 )
 
 // Keep a global reference of the window object, if you don't, the window will
