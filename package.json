@@ -132,7 +132,7 @@
     "@types/wanakana": "^4.0.3",
     "@types/yauzl": "^2.10.3",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
+    "@typescript-eslint/parser": "^8.12.2",
     "@vitejs/plugin-react": "^4.3.2",
     "electron": "32.1.2",
     "electron-builder": "^24.9.1",
