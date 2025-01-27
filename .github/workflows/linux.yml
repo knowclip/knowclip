@@ -7,7 +7,7 @@ on:
 
 jobs:
   linux_build_and_test:
-    runs-on: ubuntu-22.04.5
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
