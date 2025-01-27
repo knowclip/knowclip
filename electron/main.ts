@@ -72,7 +72,7 @@ async function createWindow({
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
-      devTools: shouldInstallExtensions,
+      devTools: false,
       preload: path.join(__dirname, '..', 'preload', 'index.js'),
     },
   })
