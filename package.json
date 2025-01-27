@@ -4,7 +4,7 @@
   "version": "0.14.2-beta",
   "private": true,
   "engines": {
-    "node": "^20.17.0"
+    "node": "^20.18.0"
   },
   "author": {
     "name": "Justin Silvestre",
@@ -141,9 +141,9 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.3.2",
-    "electron": "32.1.2",
+    "electron": "33.3.2",
     "electron-builder": "^24.9.1",
-    "electron-chromedriver": "^32.1.2",
+    "electron-chromedriver": "33.3.2",
     "electron-vite": "^2.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",

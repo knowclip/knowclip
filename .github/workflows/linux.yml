@@ -7,11 +7,11 @@ on:
 
 jobs:
   linux_build_and_test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [20.17.0]
+        node-version: [20.18.0]
 
     steps:
       - uses: actions/checkout@v3
