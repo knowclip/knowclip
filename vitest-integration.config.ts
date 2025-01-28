@@ -10,14 +10,18 @@ export const integrationConfig: UserConfig = {
   },
   test: {
     testTimeout: 60000,
-    // to run tests consecutively, uncomment the following lines
-    // pool: 'forks',
-    // poolOptions: {
-    //   forks: {
-    //     minForks: 1,
-    //     maxForks: 1,
-    //   },
-    // },
+    // run tests consecutively
+    ...(process.platform === 'linux'
+      ? {
+          pool: 'forks',
+          poolOptions: {
+            forks: {
+              minForks: 1,
+              maxForks: 1,
+            },
+          },
+        }
+      : null),
     include: ['src/test/**/*.integration.ts'],
     env: {
       ...(process.env.VITEST ? { VITEST: process.env.VITEST } : null),
