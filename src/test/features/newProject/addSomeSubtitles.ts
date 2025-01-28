@@ -31,6 +31,8 @@ export default async function addSomeSubtitles(
   test('see two tracks in subtitles menu', async () => {
     const { client } = context
     await client.clickElement_(subtitlesMenu$.openMenuButton)
+    await client.elements_(subtitlesMenu$.trackMenuItems, 2)
+    // repeating operation for linux CI, where screenshot shows that the elements are there, but the test fails
     const menuItems = await client.elements_(subtitlesMenu$.trackMenuItems, 2)
     await menuItems[1].waitForText(subtitlesFileName)
     await client.clickAtOffset('body', { x: 100, y: 100 })
