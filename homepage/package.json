@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^11.2.0",
-    "@netlify/plugin-nextjs": "^5.9.2",
+    "@netlify/plugin-nextjs": "^5.9.4",
     "@pinjollist/next-with-analytics": "^1.0.1",
     "classnames": "^2.5.1",
     "next": "^15.1.6",
