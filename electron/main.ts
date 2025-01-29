@@ -14,7 +14,7 @@ import { startLocalFileServer } from './localFileServer/setup'
 const { isPackaged } = app
 const isTesting = process.env.VITEST
 if (!isPackaged && process.platform === 'darwin')
-  // to suppress warnings on mac intel for electron 32.1.2
+  // to suppress warnings on mac intel for electron 32.3.0
   app.disableHardwareAcceleration()
 
 console.log('main process VITEST', process.env.VITEST)
