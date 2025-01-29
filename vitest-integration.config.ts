@@ -10,16 +10,22 @@ export const integrationConfig: UserConfig = {
   },
   test: {
     testTimeout: 60000,
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        minForks: 1,
-        maxForks: 1,
-      },
-    },
+    // run tests consecutively
+    ...(process.platform === 'linux'
+      ? {
+          pool: 'forks',
+          poolOptions: {
+            forks: {
+              minForks: 1,
+              maxForks: 1,
+            },
+          },
+        }
+      : null),
     include: ['src/test/**/*.integration.ts'],
     env: {
       ...(process.env.VITEST ? { VITEST: process.env.VITEST } : null),
+      ...(process.env.TEST_ID ? { TEST_ID: process.env.TEST_ID } : null),
       ...(process.env.VITE_BUILD_NUMBER
         ? { VITE_BUILD_NUMBER: process.env.VITE_BUILD_NUMBER }
         : null),

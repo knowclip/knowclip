@@ -125,9 +125,7 @@ const saveProject: AppEpic = (
         projectMetadata.id
       )
       return Boolean(
-        projectFile &&
-          projectFile.filePath &&
-          (await fileExists(projectFile.filePath)).value
+        projectFile?.filePath && (await fileExists(projectFile.filePath)).value
       )
     }),
     filter((x) => x),

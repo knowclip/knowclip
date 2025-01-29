@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import clips from '../reducers/clips'
-import session from '../reducers/session'
+import getSessionReducer from '../reducers/session'
 import snackbar from '../reducers/snackbar'
 import dialog from '../reducers/dialog'
 import subtitles from '../reducers/subtitles'
@@ -16,7 +16,10 @@ import { pixelsToMs } from 'clipwave'
 
 export const reducer = combineReducers<AppState>({
   clips,
-  session,
+  session: getSessionReducer({
+    localServerAddress: 'http://localhost:3000',
+    platform: 'darwin',
+  }),
   snackbar,
   dialog,
   subtitles,

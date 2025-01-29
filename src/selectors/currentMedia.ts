@@ -2,33 +2,31 @@ import {
   getFile,
   getFileAvailabilityById,
   getFileAvailability,
-  getFileWithAvailability,
+  convertedFilePlaylistByIdUrl,
+  fileByIdUrl,
 } from './files'
 import { getFlashcard, getClipsObject, getClipsByIds, getClip } from './clips'
 import { getHighlightedClipId } from './session'
-import { basename, extname } from '../utils/rendererPathHelpers'
+import { basename } from '../utils/rendererPathHelpers'
 import { createSelector } from 'reselect'
 import { SELECTION_BORDER_MILLISECONDS } from 'clipwave'
+import {
+  getMediaCompatibilityIssues,
+  getMediaCompatibilityWarnings,
+} from '../node/getMediaCompatibilityIssues'
 
 export const getLoopState = (state: AppState) => state.session.loopMedia
 
-export const getConstantBitrateFilePath = (
+export const getLoadedMediaFilePath = (
   state: AppState,
   id: MediaFileId
 ): MediaFilePath | null => {
   const fileAvailability = getFileAvailabilityById(state, 'MediaFile', id)
-  const { platform } = window.electronApi
   if (
     fileAvailability.filePath &&
-    extname(platform, fileAvailability.filePath).toLowerCase() !== '.mp3'
+    fileAvailability.status === 'CURRENTLY_LOADED'
   )
-    return fileAvailability.status === 'CURRENTLY_LOADED'
-      ? fileAvailability.filePath
-      : null
-
-  const loadedCbr = getFileAvailabilityById(state, 'ConstantBitrateMp3', id)
-  if (loadedCbr && loadedCbr.filePath)
-    return loadedCbr.status === 'CURRENTLY_LOADED' ? loadedCbr.filePath : null
+    return fileAvailability.filePath
 
   return null
 }
@@ -53,19 +51,57 @@ export const getCurrentFilePath = (state: AppState): MediaFilePath | null => {
     : null
 }
 
-export const getCurrentMediaConstantBitrateFilePath = (
-  state: AppState
-): MediaFilePath | null =>
-  state.session.currentMediaFileId
-    ? getConstantBitrateFilePath(state, state.session.currentMediaFileId)
-    : null
-
 export const getCurrentMediaFile = (state: AppState): MediaFile | null => {
   const { currentMediaFileId } = state.session
   return currentMediaFileId
     ? getFile(state, 'MediaFile', currentMediaFileId)
     : null
 }
+export const getCurrentMediaFileMetadata = (state: AppState) => {
+  return state.session.currentMediaFileMetadata
+}
+
+export const getCurrentMediaFileCompatibilityWarnings = (state: AppState) => {
+  return state.session.currentMediaFileMetadata
+    ? getMediaCompatibilityWarnings(state.session.currentMediaFileMetadata)
+    : []
+}
+
+const getCurrentMediaFileCompatibilityIssues = (state: AppState) => {
+  return state.session.currentMediaFileMetadata
+    ? getMediaCompatibilityIssues(state.session.currentMediaFileMetadata)
+        ?.issues
+    : null
+}
+
+export const getLoadedMediaUrl = createSelector(
+  (state: AppState) => {
+    const id = state.session.currentMediaFileId
+    return id ? getFileAvailabilityById(state, 'MediaFile', id) : null
+  },
+  getCurrentMediaFile,
+  getCurrentMediaFileCompatibilityIssues,
+  (state: AppState) => state.session.localServerAddress,
+  (
+    fileAvailability,
+    currentMediaFile,
+    compatibilityIssues,
+    localServerAddress
+  ): MediaFilePath | null => {
+    if (!(fileAvailability?.status === 'CURRENTLY_LOADED' && currentMediaFile))
+      return null
+    // mp3s may have trouble with seeking due to variable bit rate
+    // so we always transcode them
+    if (currentMediaFile.format === 'mp3')
+      return convertedFilePlaylistByIdUrl(
+        localServerAddress,
+        currentMediaFile.id
+      )
+    return compatibilityIssues?.size
+      ? convertedFilePlaylistByIdUrl(localServerAddress, currentMediaFile.id)
+      : fileByIdUrl(localServerAddress, currentMediaFile.id)
+  }
+)
 
 export const isMediaFileLoaded = (state: AppState): boolean => {
   const currentFile = getCurrentMediaFile(state)
@@ -78,14 +114,7 @@ export const isMediaEffectivelyLoading = (state: AppState): boolean => {
   const currentFile = getCurrentMediaFile(state)
   if (!currentFile) return false
   const availability = getFileAvailability(state, currentFile)
-  if (availability.isLoading) return true
-
-  const cbr = getFileWithAvailability(
-    state,
-    'ConstantBitrateMp3',
-    currentFile.id
-  )
-  return Boolean(cbr.file && cbr.availability.isLoading)
+  return availability.isLoading
 }
 
 export const isWorkUnsaved = (state: AppState): boolean =>

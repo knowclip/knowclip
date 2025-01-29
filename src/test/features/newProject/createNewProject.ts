@@ -1,4 +1,4 @@
-import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { newProjectFormDialog$ } from '../../../components/Dialog/NewProjectFormDialog.testLabels'
 import { main$ } from '../../../components/Main.testLabels'
@@ -34,7 +34,9 @@ export default async function createNewProject(
     const { app } = context
     await mockElectronHelpers(app, {
       showSaveDialog: [
-        Promise.resolve(join(TMP_DIRECTORY, projectFileName + '.kyml')),
+        Promise.resolve(
+          join(context.temporaryDirectory, projectFileName + '.kyml')
+        ),
       ],
     })
   })

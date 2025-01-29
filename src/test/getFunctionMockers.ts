@@ -42,7 +42,7 @@ export default function getFunctionMockers<M extends ModuleLike>(
     if (startupStatus.error) {
       console.error(startupStatus.error)
       throw new Error(
-        `Can't mock functions because test driver failed to start: ${startupStatus.error.message}`
+        `Can't mock functions because test driver failed to start: ${startupStatus.error}`
       )
     }
 

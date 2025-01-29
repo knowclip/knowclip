@@ -1,4 +1,4 @@
-import { IntegrationTestContext, TMP_DIRECTORY } from '../../setUpDriver'
+import { IntegrationTestContext } from '../../setUpDriver'
 import { main$ } from '../../../components/Main.testLabels'
 import { projectsMenu$ } from '../../../components/ProjectsMenu.testLabels'
 import { fileSelectionDialog$ } from '../../../components/Dialog/FileSelectionDialog.testLabels'
@@ -14,7 +14,9 @@ export default async function openSharedProject(
     const { app, client } = context
     await mockElectronHelpers(app, {
       showOpenDialog: [
-        Promise.resolve([join(TMP_DIRECTORY, 'project_shared_with_me.kyml')]),
+        Promise.resolve([
+          join(context.temporaryDirectory, 'project_shared_with_me.kyml'),
+        ]),
       ],
     })
     await client.clickElement_(projectsMenu$.openExistingProjectButton)

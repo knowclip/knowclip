@@ -13,8 +13,8 @@ const MediaFolderLocationFormDialog = ({
 }: DialogProps<MediaFolderLocationFormDialogData>) => {
   const dispatch = useDispatch()
   const dispatchAction = useCallback(() => {
-    action && dispatch(action)
     dispatch(actions.closeDialog())
+    action && dispatch(action)
   }, [dispatch, action])
 
   return (

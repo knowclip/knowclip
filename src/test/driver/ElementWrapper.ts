@@ -78,7 +78,7 @@ export const wrapElement = (
       try {
         await client.waitUntil(async () => {
           found = await getText()
-          return Boolean(found) && found.includes(text)
+          return found?.includes(text)
         }, opts)
       } catch (err) {
         throw new Error(

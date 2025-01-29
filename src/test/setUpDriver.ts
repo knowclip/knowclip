@@ -12,10 +12,11 @@ import {
 import * as tempy from 'tempy'
 import { createTestDriver, TestDriver } from './driver/TestDriver'
 import { beforeEach } from 'vitest'
+import { promises } from 'fs'
 
 const rootDir = join(process.cwd())
 
-export const TMP_DIRECTORY = join(rootDir, 'tmp-test')
+const TMP_DIRECTORY = join(rootDir, 'tmp-test')
 export const SCREENSHOTS_DIRECTORY = join(rootDir, 'screenshots')
 export const ASSETS_DIRECTORY = join(__dirname, 'assets')
 export const GENERATED_ASSETS_DIRECTORY = join(ASSETS_DIRECTORY, 'generated')
@@ -45,6 +46,10 @@ function getChromedriverPath() {
 
 export interface IntegrationTestContext {
   testId: string
+  /** path to a temporary directory, corresponding to the testId.
+   * data from fixtures is copied here before each test.
+   */
+  temporaryDirectory: string
   setup: {
     app: TestDriver
     client: ClientWrapper
@@ -59,12 +64,13 @@ export interface IntegrationTestContext {
 export function initTestContext(testId: string): IntegrationTestContext {
   const context: IntegrationTestContext = {
     testId,
+    temporaryDirectory: join(TMP_DIRECTORY, testId),
     setup: null,
     get client() {
-      return (this.setup as IntegrationTestContext['setup'])!.client
+      return this.setup!.client
     },
     get app() {
-      return (this.setup as IntegrationTestContext['setup'])!.app
+      return this.setup!.app
     },
   }
 
@@ -80,13 +86,14 @@ export function initTestContext(testId: string): IntegrationTestContext {
 /** mutates context */
 export async function startApp(
   context: IntegrationTestContext,
+  chromedriverPort?: number,
   persistedState?: Partial<AppState>
 ): Promise<{
   app: TestDriver
   client: ClientWrapper
   logPersistedData: () => Promise<void>
 }> {
-  await copyFixtures()
+  await copyFixtures(context.temporaryDirectory)
 
   const persistedStatePath = persistedState ? tempy.temporaryFile() : null
   if (persistedStatePath) {
@@ -94,6 +101,7 @@ export async function startApp(
   }
 
   const app = await createTestDriver({
+    // logLevel: 'warn',
     chromedriverPath: getChromedriverPath(),
     webdriverIoPath:
       process.platform === 'win32'
@@ -104,6 +112,7 @@ export async function startApp(
       'enable-logging',
       ...(process.env.VITE_INTEGRATION_DEV ? [] : ['disable-extensions']),
       ...(process.env.VITE_INTEGRATION_DEV ? ['verbose'] : []),
+      '--no-sandbox', // required for Ubuntu 24
     ],
     env: {
       VITEST: 'true',
@@ -113,6 +122,7 @@ export async function startApp(
       DISPLAY: process.env.DISPLAY,
       VITE_INTEGRATION_DEV: process.env.VITE_INTEGRATION_DEV,
     },
+    port: chromedriverPort,
   })
   const setup = {
     app,
@@ -121,7 +131,6 @@ export async function startApp(
       await app.webContentsSend('log-persisted-data', context.testId, {
         ASSETS_DIRECTORY,
         GENERATED_ASSETS_DIRECTORY,
-        TMP_DIRECTORY,
       })
     },
   }
@@ -130,9 +139,7 @@ export async function startApp(
   const startupStatus = await app.startupStatus
   if (startupStatus.error) {
     console.error(startupStatus.error)
-    throw new Error(
-      `Problem starting test driver: ${startupStatus.error.message}`
-    )
+    throw new Error(`Problem starting test driver: ${startupStatus.error}`)
   }
 
   await app.webContentsSend('start-test', context.testId)
@@ -144,6 +151,14 @@ export async function stopApp(context: IntegrationTestContext): Promise<null> {
   const app = context.setup?.app
 
   if (!app) console.error('No app instance found, not closing app')
+
+  const browserLogs = await app?.client.getLogs('browser')
+  if (browserLogs?.length)
+    await promises.writeFile(
+      join(process.cwd(), 'logs', context.testId + '.browser.log'),
+      JSON.stringify(browserLogs, null, 2),
+      'utf8'
+    )
 
   if (process.env.VITE_INTEGRATION_DEV && !process.env.BUILDING_FIXTURES) {
     return null
@@ -160,9 +175,9 @@ export async function stopApp(context: IntegrationTestContext): Promise<null> {
   return null
 }
 
-async function copyFixtures() {
-  if (existsSync(TMP_DIRECTORY)) await remove(TMP_DIRECTORY)
-  await mkdirp(TMP_DIRECTORY)
+async function copyFixtures(temporaryDirectory: string) {
+  if (existsSync(temporaryDirectory)) await remove(temporaryDirectory)
+  await mkdirp(temporaryDirectory)
   await mkdirp(SCREENSHOTS_DIRECTORY)
-  await copy(FIXTURES_DIRECTORY, TMP_DIRECTORY)
+  await copy(FIXTURES_DIRECTORY, temporaryDirectory)
 }

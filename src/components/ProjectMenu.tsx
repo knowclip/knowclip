@@ -39,8 +39,6 @@ const ProjectMenu = ({ className }: { className: string }) => {
         loop: r.getLoopState(state),
         audioIsLoading: r.isMediaEffectivelyLoading(state),
         currentProjectId: r.getCurrentProjectId(state),
-        constantBitrateFilePath:
-          r.getCurrentMediaConstantBitrateFilePath(state),
         currentMediaFile,
         mediaFileIds: currentProject ? currentProject.mediaFileIds : EMPTY,
         currentFileClipsIds: currentMediaFile

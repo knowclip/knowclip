@@ -8,6 +8,7 @@ import React, {
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cn from 'clsx'
+import Hls from 'hls.js'
 import r from '../redux'
 import css from './Media.module.css'
 import { Tooltip, IconButton } from '@mui/material'
@@ -21,7 +22,7 @@ type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] }
 type IntersectionOf<A, B> = OmitNever<A & B>
 
 type MediaProps = {
-  constantBitrateFilePath: string | null
+  currentMediaUrl: string | null
   loop: LoopState
   metadata: MediaFile | null
   subtitles: MediaSubtitles
@@ -40,7 +41,7 @@ const setClicked = (c: boolean) => {
   clicked = c
 }
 const Media = ({
-  constantBitrateFilePath,
+  currentMediaUrl,
   metadata,
   subtitles,
   className,
@@ -84,9 +85,6 @@ const Media = ({
     // disablePictureInPicture: true,
     id: MEDIA_PLAYER_ID,
     controlsList: 'nodownload nofullscreen',
-    src: constantBitrateFilePath
-      ? new URL(`file://${constantBitrateFilePath}`).toString()
-      : '',
     // @ts-expect-error not present in HTMLAudioElement
     playbackspeed: 1,
 
@@ -140,6 +138,8 @@ const Media = ({
     )
   }, [dispatch, viewMode])
 
+  useHlsJs(currentMediaUrl, playerRef)
+
   if (!metadata)
     return (
       <section className={className}>
@@ -187,13 +187,16 @@ const Media = ({
               />
             )
           })}
+          <source src={currentMediaUrl || ''} />
         </video>
       ) : (
         <audio
           {...(props as AudioHTMLAttributes<HTMLAudioElement>)}
           ref={playerRef as MutableRefObject<HTMLAudioElement>}
           className={cn(css.audio, css.mediaPlayer)}
-        />
+        >
+          <source src={currentMediaUrl || ''} />
+        </audio>
       )}
     </section>
   )
@@ -259,20 +262,28 @@ const Subtitles = ({
   index: number
   isDefault: boolean
 }) => {
-  const { availability } = useSelector((state: AppState) => ({
+  const { availability, url } = useSelector((state: AppState) => ({
     availability: displayFile
       ? r.getFileAvailability(state, displayFile)
       : null,
+    url: displayFile
+      ? r.fileByIdUrl(state.session.localServerAddress, displayFile.id)
+      : null,
   }))
 
-  if (!track || !availability || availability.status !== 'CURRENTLY_LOADED')
+  if (
+    !track ||
+    !availability ||
+    availability.status !== 'CURRENTLY_LOADED' ||
+    !url
+  )
     return null
 
   return track.type === 'EmbeddedSubtitlesTrack' ? (
     <track
       id={track.id}
       kind="subtitles"
-      src={new URL(`file://${availability.filePath}`).toString()}
+      src={url}
       mode={track.mode}
       default={isDefault}
     />
@@ -280,10 +291,28 @@ const Subtitles = ({
     <track
       id={track.id}
       kind="subtitles"
-      src={new URL(`file://${availability.filePath}`).toString()}
+      src={url}
       mode={track.mode}
       default={isDefault}
     />
   )
 }
 export default Media
+
+function useHlsJs(
+  srcUrl: string | null,
+  playerRef: MutableRefObject<HTMLVideoElement | HTMLAudioElement | null>
+) {
+  useEffect(() => {
+    if (!playerRef.current) return
+    if (!srcUrl?.endsWith('.m3u8')) return
+
+    const hls = new Hls()
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      console.error('HLS.js Error:', data)
+    })
+
+    hls.loadSource(srcUrl)
+    hls.attachMedia(playerRef.current)
+  }, [srcUrl, playerRef])
+}

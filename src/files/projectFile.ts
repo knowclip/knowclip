@@ -118,7 +118,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
                 subtitlesFile
               )
             : null
-          if (!validationResult?.value?.value?.differences)
+          if (!validationResult?.value?.differences)
             newlyAutoFoundSubtitlesPaths[subtitlesFile.id] =
               newlyAutoFoundSubtitlesPaths[subtitlesFile.id]
                 ? { multipleMatches: true, singleMatch: undefined }

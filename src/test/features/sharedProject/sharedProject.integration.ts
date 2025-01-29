@@ -17,7 +17,7 @@ describe('opening a shared project', () => {
   const context = initTestContext(testId)
 
   beforeAll(async () => {
-    const { app } = await startApp(context)
+    const { app } = await startApp(context, 9517)
 
     await mockSideEffects(app, sideEffectsMocks)
   })

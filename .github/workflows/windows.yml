@@ -35,7 +35,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: '*.log'
           path: logs
       - name: build
         run: |
@@ -43,8 +42,9 @@ jobs:
         env:
           APPVEYOR: true
           CI: false
-          BUILD_NUMBER: ${{ github.run_number }}.${{ github.run_id }}.${{ github.run_attempt }}
-          VITE_BUILD_NUMBER: ${{ github.run_number }}.${{ github.run_id }}.${{ github.run_attempt }}
+          RELEASE_BUILD: ${{startsWith(github.ref, 'refs/tags/')}}
+          BUILD_NUMBER: ${{ github.run_number }}_${{ github.run_id }}_${{ github.run_attempt }}
+          VITE_BUILD_NUMBER: ${{ github.run_number }}_${{ github.run_id }}_${{ github.run_attempt }}
       - name: Upload test screenshots
         if: always()
         uses: actions/upload-artifact@v4

@@ -9,13 +9,13 @@ const addMediaToProject: AppEpic = (action$, _state$, effects) =>
     mergeMap(({ projectId, filePaths }) =>
       Promise.all(
         filePaths.map(async (filePath) => {
-          const file = await effects.readMediaFile(
+          const fileResult = await effects.readMediaFile(
             filePath,
             effects.uuid(),
             projectId
           )
-          if (file.error) throw file.error
-          else return r.openFileRequest(file.value, filePath)
+          if (fileResult.error) throw fileResult.error
+          else return r.openFileRequest(fileResult.value.file, filePath)
         })
       )
     ),
