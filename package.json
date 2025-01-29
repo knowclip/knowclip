@@ -59,7 +59,7 @@
     "semver": "^7.5.1",
     "subtitle": "^4.1.1",
     "tempy": "^3.0.0",
-    "ts-json-schema-generator": "^1.5.0",
+    "ts-json-schema-generator": "^2.3.0",
     "uuid": "^9.0.0",
     "wanakana": "^5.1.0",
     "webdriverio": "^9.7.1",
