@@ -1,4 +1,4 @@
-import Dexie, { Database } from 'dexie'
+import Dexie from 'dexie'
 import { basename } from '../utils/rendererPathHelpers'
 import { getTableName, LexiconEntry } from '../files/dictionaryFile'
 import { LETTERS_DIGITS_PLUS } from './dictCc'
@@ -43,7 +43,7 @@ export function getDexieDb() {
 }
 
 export async function newDictionary(
-  db: Database,
+  db: Dexie,
   dictionaryType: DictionaryFileType,
   filePath: string,
   id: string
@@ -57,6 +57,8 @@ export async function newDictionary(
     importComplete: false,
   }
   const key = await db.table(DICTIONARIES_TABLE).add(dicProps)
+  if (typeof key !== 'number')
+    throw new Error('Dictionaries table key should be number')
   const dic: DictionaryFile = {
     ...dicProps,
     key,
