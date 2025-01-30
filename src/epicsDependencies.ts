@@ -8,6 +8,7 @@ import { CLIPWAVE_ID } from './utils/clipwave'
 import { flushSync } from 'react-dom'
 import { IpcRendererEvent } from './preload/IpcRendererEvent'
 import { flatten } from './MessageToMain'
+import { FfprobeData } from 'fluent-ffmpeg'
 
 const sendToMainProcess: typeof window.electronApi.sendToMainProcess = (
   message
@@ -63,12 +64,22 @@ const dependencies = {
   ),
   getSubtitlesFilePath: flatten(
     (
-      sourceFilePath: string,
-      file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
+      options:
+        | {
+            type: 'ExternalSubtitlesFile' | 'VttFromExternalSubtitles'
+            file: VttFromExternalSubtitles
+            sourceFilePath: string
+          }
+        | {
+            type: 'VttFromEmbeddedSubtitles'
+            file: VttFromEmbeddedSubtitles
+            mediaMetadata: FfprobeData
+            sourceFilePath: string
+          }
     ) =>
       sendToMainProcess({
         type: 'getSubtitlesFilePath',
-        args: [sourceFilePath, file],
+        args: [options],
       })
   ),
   getWaveformPng: flatten(

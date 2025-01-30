@@ -15,10 +15,26 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
     if (!parentFile || parentFile.status !== 'CURRENTLY_LOADED')
       return [await r.openFileFailure(file, null, null)]
 
+    const currentMediaFile = r.getCurrentMediaFile(state)
+    const mediaMetadata = r.getCurrentMediaFileMetadata(state)
+    if (!(currentMediaFile && mediaMetadata)) {
+      return [await r.openFileFailure(file, null, null)]
+    }
     const vttFilePathResult = await effects.getSubtitlesFilePath(
-      parentFile.filePath,
-      file
+      file.parentType === 'MediaFile'
+        ? {
+            type: 'VttFromEmbeddedSubtitles',
+            sourceFilePath: parentFile.filePath,
+            file,
+            mediaMetadata,
+          }
+        : {
+            type: 'VttFromExternalSubtitles',
+            sourceFilePath: parentFile.filePath,
+            file,
+          }
     )
+
     if (vttFilePathResult.error) {
       return [
         await r.openFileFailure(file, null, vttFilePathResult.error.message),
@@ -159,10 +175,16 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
 
         switch (file.parentType) {
           case 'MediaFile': {
-            const tmpFilePath = await effects.getSubtitlesFilePath(
-              source.filePath,
-              file
-            )
+            const mediaMetadata = r.getCurrentMediaFileMetadata(state)
+            if (!mediaMetadata)
+              return [r.openFileFailure(file, null, 'No media metadata found')]
+
+            const tmpFilePath = await effects.getSubtitlesFilePath({
+              type: 'VttFromEmbeddedSubtitles',
+              sourceFilePath: source.filePath,
+              file,
+              mediaMetadata,
+            })
             if (tmpFilePath.error) {
               return [
                 r.openFileFailure(
@@ -188,10 +210,11 @@ const vttFileEventHandlers: FileEventHandlers<VttConvertedSubtitlesFile> = {
             ]
           }
           case 'ExternalSubtitlesFile': {
-            const tmpFilePath = await effects.getSubtitlesFilePath(
-              source.filePath,
-              file
-            )
+            const tmpFilePath = await effects.getSubtitlesFilePath({
+              type: 'VttFromExternalSubtitles',
+              sourceFilePath: source.filePath,
+              file: file,
+            })
             if (tmpFilePath.error) {
               return [
                 r.openFileFailure(

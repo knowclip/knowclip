@@ -1,28 +1,20 @@
 import * as tempy from 'tempy'
 import { readFile, writeFile } from 'fs/promises'
-import {
-  getMediaMetadata,
-  writeMediaSubtitlesToVtt,
-  convertAssToVtt,
-} from './ffmpeg'
+import { writeMediaSubtitlesToVtt, convertAssToVtt } from './ffmpeg'
 import r from '../redux'
 import { extname, basename, join } from 'path'
 import { parseSync, stringifySync } from 'subtitle'
 import { parse as subsrtParse } from '@silvestre/subsrt'
 import { readVttChunk } from '../selectors/subtitles'
 import { failure } from '../utils/result'
+import { FfprobeData } from 'fluent-ffmpeg'
 
 export const getSubtitlesFilePathFromMedia = async (
   file: SubtitlesFile,
   mediaFilePath: MediaFilePath,
-  streamIndex: number
+  streamIndex: number,
+  mediaMetadata: FfprobeData
 ): AsyncResult<string> => {
-  const result = await getMediaMetadata(mediaFilePath)
-  if (result.error) {
-    console.error(`Error getting media metadata for ${mediaFilePath}`)
-    return result
-  }
-  const { value: mediaMetadata } = result
   if (
     !mediaMetadata.streams[streamIndex] ||
     mediaMetadata.streams[streamIndex].codec_type !== 'subtitle'
@@ -34,17 +26,29 @@ export const getSubtitlesFilePathFromMedia = async (
 
   const outputFilePath = join(
     tempy.rootTemporaryDirectory,
-    basename(mediaFilePath + '_' + streamIndex.toString()) +
-      '_' +
-      file.id +
-      '.vtt'
+    basename(mediaFilePath + '_' + streamIndex.toString()) + '.vtt'
   )
 
-  return await writeMediaSubtitlesToVtt(
+  const startTime = Date.now()
+  const startTimeString = new Date(startTime).toISOString()
+  console.log(
+    'Writing subtitles to',
+    outputFilePath,
+    'at',
+    `${startTimeString}`
+  )
+  const result = await writeMediaSubtitlesToVtt(
     mediaFilePath,
     streamIndex,
     outputFilePath
   )
+  console.log(
+    'Subtitles written to',
+    outputFilePath,
+    'in',
+    `${new Date().getTime() - startTime}ms`
+  )
+  return result
 }
 
 export const getExternalSubtitlesVttPath = async (
@@ -105,20 +109,32 @@ export const getExternalSubtitlesVttPath = async (
 }
 
 export const getSubtitlesFilePath = async (
-  sourceFilePath: string,
-  file: ExternalSubtitlesFile | VttConvertedSubtitlesFile
+  options:
+    | {
+        type: 'ExternalSubtitlesFile' | 'VttFromExternalSubtitles'
+        file: VttFromExternalSubtitles
+        sourceFilePath: string
+      }
+    | {
+        type: 'VttFromEmbeddedSubtitles'
+        file: VttFromEmbeddedSubtitles
+        mediaMetadata: FfprobeData
+        sourceFilePath: string
+      }
 ): AsyncResult<string> => {
-  if (file.type === 'ExternalSubtitlesFile') {
-    return await getExternalSubtitlesVttPath(file, sourceFilePath)
-  }
-  switch (file.parentType) {
+  switch (options.type) {
     case 'ExternalSubtitlesFile':
-      return await getExternalSubtitlesVttPath(file, sourceFilePath)
-    case 'MediaFile': {
+    case 'VttFromExternalSubtitles':
+      return await getExternalSubtitlesVttPath(
+        options.file,
+        options.sourceFilePath
+      )
+    case 'VttFromEmbeddedSubtitles': {
       return await getSubtitlesFilePathFromMedia(
-        file,
-        sourceFilePath,
-        file.streamIndex
+        options.file,
+        options.sourceFilePath,
+        options.file.streamIndex,
+        options.mediaMetadata
       )
     }
   }

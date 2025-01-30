@@ -99,7 +99,7 @@ const handlers = (): FileEventHandlers<MediaFile> => ({
   },
 
   openSuccess: [
-    addEmbeddedSubtitles,
+    openEmbeddedSubtitles,
     loadExternalSubtitles,
     autoAddExternalSubtitles,
     getWaveform,
@@ -272,7 +272,7 @@ const autoAddExternalSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   )
 }
 
-const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
+const openEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
   { subtitlesTracksStreamIndexes, id, subtitles },
   _filePath,
   state,
@@ -294,6 +294,7 @@ const addEmbeddedSubtitles: OpenFileSuccessHandler<MediaFile> = async (
     const file = existing
       ? r.getFile(state, 'VttConvertedSubtitlesFile', existing.id)
       : null
+
     return r.openFileRequest(
       file || {
         type: 'VttConvertedSubtitlesFile',

@@ -1,6 +1,9 @@
 import { getFileAvailability } from './files'
 import { createSelector } from 'reselect'
-import { getCurrentMediaFile } from './currentMedia'
+import {
+  getCurrentMediaFile,
+  getCurrentMediaFileMetadata,
+} from './currentMedia'
 import {
   TransliterationFlashcardFields,
   SubtitlesFlashcardFieldsLinks,
@@ -96,28 +99,40 @@ export type MediaSubtitles = {
 
 export const getSubtitlesFilesWithTracks = createSelector(
   getCurrentMediaFile,
+  getCurrentMediaFileMetadata,
   getSubtitles,
   (state: AppState) => state.files.ExternalSubtitlesFile,
   (state: AppState) => state.files.VttConvertedSubtitlesFile,
   (
     currentFile,
+    currentFileMetadata,
     subtitlesTracks,
     externalFiles,
     convertedFiles
   ): MediaSubtitles => {
     let embeddedCount = 0
     let externalCount = 0
+
     const subtitles = currentFile
       ? /* eslint-disable array-callback-return */
         currentFile.subtitles.map((t) => {
           switch (t.type) {
             case 'EmbeddedSubtitlesTrack': {
+              const streamIndex =
+                currentFile.subtitlesTracksStreamIndexes[embeddedCount]
+              const tags = currentFileMetadata?.streams[streamIndex]?.tags
+              const languageTag =
+                tags && typeof tags === 'object' && 'language' in tags
+                  ? tags.language
+                  : null
               const embeddedIndex = ++embeddedCount
               return {
                 id: t.id,
                 relation: t,
                 embeddedIndex,
-                label: `Embedded subtitles track ${embeddedIndex}`,
+                label: `Embedded subtitles track ${embeddedIndex} ${
+                  languageTag ? `(${languageTag.toUpperCase()})` : ''
+                }`,
                 sourceFile: getSubtitlesSourceFileFromFilesSubset(
                   externalFiles,
                   convertedFiles,

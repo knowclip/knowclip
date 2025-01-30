@@ -115,7 +115,7 @@ const SubtitlesMenu = () => {
               </MenuItem>
             )}
             {subtitles.embedded.map(
-              ({ relation, sourceFile: file, track }, i) => (
+              ({ relation, sourceFile: file, track, label }) => (
                 <EmbeddedTrackMenuItem
                   key={relation.id}
                   id={relation.id}
@@ -127,7 +127,7 @@ const SubtitlesMenu = () => {
                       | null
                   }
                   track={track}
-                  title={`Embedded track ${i + 1}`}
+                  title={label}
                   currentFileId={currentFileId}
                   linkedFieldTitle={
                     track ? trackIdsToFieldNames[track.id] : undefined
@@ -223,6 +223,12 @@ const EmbeddedTrackMenuItem = ({
     [close, linkSubtitlesDialog]
   )
 
+  const { fileAvailability } = useSelector((state: AppState) => {
+    return {
+      fileAvailability: file && selectors.getFileAvailability(state, file),
+    }
+  })
+
   return (
     <>
       <MenuItem
@@ -235,7 +241,13 @@ const EmbeddedTrackMenuItem = ({
           {track ? (
             <VisibilityIcon visible={Boolean(track.mode === 'showing')} />
           ) : (
-            <Tooltip title="Problem reading embedded subtitles">
+            <Tooltip
+              title={
+                fileAvailability?.status === 'FAILED_TO_LOAD'
+                  ? 'Problem reading embedded subtitles.'
+                  : 'Loading embedded subtitles...'
+              }
+            >
               <FolderSpecial />
             </Tooltip>
           )}
