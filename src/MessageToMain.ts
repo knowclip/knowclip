@@ -1,16 +1,16 @@
-import type { MessageResponders } from './getMessageResponders'
+import type { MainProcessIpcMessageHandlers } from './getMainProcessIpcMessageHandlers'
 import { failure } from './utils/result'
 
 export type MessageToMain<T extends MessageToMainType> = {
   type: T
-  args: Parameters<MessageResponders[T]>
+  args: Parameters<MainProcessIpcMessageHandlers[T]>
 }
 
-export { MessageResponders }
-export type MessageToMainType = keyof MessageResponders
+export { MainProcessIpcMessageHandlers as MessageResponders }
+export type MessageToMainType = keyof MainProcessIpcMessageHandlers
 
 export type MessageHandlerResult<T extends MessageToMainType> = ReturnType<
-  MessageResponders[T]
+  MainProcessIpcMessageHandlers[T]
 >
 
 export type MessageResponse<

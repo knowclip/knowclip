@@ -40,7 +40,6 @@ const dependencies = {
 
   fromIpcRendererEvent: <T>(eventName: string) =>
     fromEvent<IpcRendererEvent<T>>(window, `ipc:${eventName}`),
-  sendToMainProcess,
   quitApp: () => sendClosedSignal(),
 
   dispatchClipwaveEvent: (callback: (waveform: WaveformInterface) => void) => {
@@ -53,8 +52,9 @@ const dependencies = {
 
   ...mediaHelpers,
 
-  getMediaMetadata: (filePath: string) =>
-    sendToMainProcess({ type: 'getMediaMetadata', args: [filePath] }),
+  getMediaMetadata: flatten((filePath: string) =>
+    sendToMainProcess({ type: 'getMediaMetadata', args: [filePath] })
+  ),
   getSubtitlesFromFile: flatten(
     (sourceFilePath: string, extension: '.srt' | '.vtt' | '.ass') =>
       sendToMainProcess({
@@ -164,6 +164,27 @@ const dependencies = {
         args: [sourceFilePath, existingFile],
       })
   ),
+  openDictionaryFile: flatten((file: DictionaryFile, filePath: string) =>
+    sendToMainProcess({
+      type: 'openDictionaryFile',
+      args: [file, filePath],
+    })
+  ),
+  registerFilePath: (fileId: string, filePath: string) =>
+    sendToMainProcess({
+      type: 'registerFilePath',
+      args: [fileId, filePath],
+    }),
+  showAboutDialog: (message: string) =>
+    sendToMainProcess({
+      type: 'showAboutDialog',
+      args: [message],
+    }),
+  setAppMenuProjectSubmenuPermissions: (bool: boolean) =>
+    sendToMainProcess({
+      type: 'setAppMenuProjectSubmenuPermissions',
+      args: [bool],
+    }),
 }
 
 export default dependencies

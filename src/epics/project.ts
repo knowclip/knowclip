@@ -227,10 +227,7 @@ const closeProjectRequest: AppEpic = (action$, state$, effects) =>
           r.closeProject()
         )
       else {
-        effects.sendToMainProcess({
-          type: 'setAppMenuProjectSubmenuPermissions',
-          args: [false],
-        })
+        effects.setAppMenuProjectSubmenuPermissions(false)
 
         return r.closeProject()
       }

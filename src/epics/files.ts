@@ -53,10 +53,10 @@ const openFileRequest: AppEpic = (action$, state$, effects) =>
       }
 
       try {
-        const fileRegisterResult = await effects.sendToMainProcess({
-          type: 'registerFilePath',
-          args: [file.id, filePath],
-        })
+        const fileRegisterResult = await effects.registerFilePath(
+          file.id,
+          filePath
+        )
         if (fileRegisterResult.error) {
           throw fileRegisterResult.error
         }

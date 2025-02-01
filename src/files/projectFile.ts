@@ -31,10 +31,7 @@ const projectFileEventHandlers: FileEventHandlers<ProjectFile> = {
           ),
         ]
 
-      effects.sendToMainProcess({
-        type: 'setAppMenuProjectSubmenuPermissions',
-        args: [true],
-      })
+      effects.setAppMenuProjectSubmenuPermissions(true)
 
       return [
         r.openProject(

@@ -29,11 +29,13 @@ import { readdir } from 'fs-extra'
 import { parseProjectJson } from './node/parseProject'
 import { getWriteApkgDeck } from './node/writeToApkg'
 
-export type MessageResponders = ReturnType<typeof getMessageResponders>
+export type MainProcessIpcMessageHandlers = ReturnType<
+  typeof getMainProcessIpcMessageHandlers
+>
 
 const now = moment.utc().format()
 
-export const getMessageResponders = (
+export const getMainProcessIpcMessageHandlers = (
   mainWindow: BrowserWindow,
   filePathsRegistry: Record<FileId, string>,
   persistedStatePath?: string
@@ -139,18 +141,10 @@ export const getMessageResponders = (
   openDictionaryFile(file: DictionaryFile, filePath: string) {
     return requestParseDictionary(file, filePath, mainWindow)
   },
-  pathBasename(filePath: string) {
-    return path.basename(filePath)
-  },
-  pathExtname(filePath: string) {
-    return path.extname(filePath)
-  },
-  pathDirname(filePath: string) {
-    return path.dirname(filePath)
-  },
-  pathJoin(...segments: string[]) {
-    return path.join(...segments)
-  },
+  pathBasename: (filePath: string) => path.basename(filePath),
+  pathExtname: (filePath: string) => path.extname(filePath),
+  pathDirname: (filePath: string) => path.dirname(filePath),
+  pathJoin: (...segments: string[]) => path.join(...segments),
   writeTextFile(filePath: string, text: string) {
     return promises.writeFile(filePath, text, 'utf8')
   },

@@ -116,6 +116,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                   value={progress.percentage}
                   variant="determinate"
                 />
+                <p>{progress.message}</p>
               </section>
 
               <p>
@@ -378,6 +379,13 @@ export function DictionaryInstructions({
             Once the .ZIP file is finished downloading, press the IMPORT
             DICTIONARY button and point to the file in your download folder.
           </p>
+          <section style={{ textAlign: 'center' }}>{button}</section>
+        </>
+      )
+    case 'YomitanDictionary':
+      return (
+        <>
+          <p>Yomitan!!</p>
           <section style={{ textAlign: 'center' }}>{button}</section>
         </>
       )

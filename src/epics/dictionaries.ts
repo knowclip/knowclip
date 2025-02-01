@@ -2,8 +2,11 @@ import { combineEpics, ofType } from 'redux-observable'
 import {
   catchError,
   concatMap,
+  concatWith,
   filter,
+  map,
   mergeMap,
+  take,
   takeUntil,
 } from 'rxjs/operators'
 import A from '../types/ActionType'
@@ -15,10 +18,13 @@ import {
   resetDictionariesDatabase,
 } from '../utils/dictionariesDatabase'
 import { getFileFilters } from '../utils/files'
-import { concat, from, of } from 'rxjs'
+import { concat, defer, EMPTY, from, merge, of } from 'rxjs'
 import { RehydrateAction } from 'redux-persist'
 import { importYomichanEntries } from '../utils/dictionaries/importYomichanEntries'
-import { ImportProgressPayload } from '../utils/dictionaries/openDictionaryZip'
+import {
+  ImportProgressPayload,
+  ParseEndPayload,
+} from '../utils/dictionaries/openDictionaryZip'
 import { importCedictEntries } from '../utils/dictionaries/importCeDictEntries'
 import { importDictCcEntries } from '../utils/dictionaries/importDictCcEntries'
 
@@ -89,7 +95,14 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.startDictionaryImport as const),
     mergeMap(({ file, filePath }) => {
-      return concat(
+      const importProgress = effects.fromIpcRendererEvent<
+        ImportProgressPayload<typeof file>
+      >('dictionary-import-progress')
+      const parseEnd = effects.fromIpcRendererEvent<
+        ParseEndPayload<typeof file>
+      >('dictionary-parse-end')
+
+      return merge(
         from([
           actions.setProgress({
             percentage: 0,
@@ -97,48 +110,67 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           }),
           actions.addFile(file, filePath),
         ]),
-        from(
-          effects.sendToMainProcess({
-            type: 'openDictionaryFile',
-            args: [file, filePath],
-          })
-        ).pipe(
-          mergeMap((openResult) => {
+        defer(() => {
+          importProgress.subscribe()
+          return effects.openDictionaryFile(file, filePath)
+        }).pipe(
+          concatMap((openResult) => {
             console.log('openResult', openResult)
             if (openResult.error) {
+              console.log('openResult.error', openResult.error)
               throw new Error(
                 `Problem opening dictionary file: ${openResult.error}`
               )
             }
-            return effects
-              .fromIpcRendererEvent<ImportProgressPayload<typeof file>>(
-                'dictionary-import-progress'
-              )
-              .pipe(
-                takeUntil(effects.fromIpcRendererEvent('dictionary-parse-end')),
-                concatMap(async (event) => {
-                  const { progressPercentage, message, data } = event.payload
-                  if (data) await importDictionaryEntries(file, data)
-
-                  return actions.setProgress({
-                    percentage: progressPercentage,
-                    message: message,
-                  })
-                })
-              )
+            return EMPTY
           })
         ),
-        from([
-          actions.finishDictionaryImport(file.id),
-          actions.openFileRequest(file, filePath),
-          actions.setProgress(null),
-          actions.addActiveDictionary(file.id, file.dictionaryType),
-          actions.simpleMessageSnackbar(
-            `Mouse over flashcard text and press the 'D' key to look up words.`,
-            null
-          ),
-        ])
+        importProgress.pipe(
+          takeUntil(parseEnd),
+          concatMap(async (event) => {
+            console.log('import progress event!', event)
+            const importProgressEventPayload = event.payload
+            const { progressPercentage, message, data } =
+              importProgressEventPayload
+
+            if (data) await importDictionaryEntries(file, data)
+
+            return actions.setProgress({
+              percentage: progressPercentage,
+              message: message,
+            })
+          })
+        ),
+
+        concat(
+          parseEnd.pipe(
+            take(1),
+            map((event) => {
+              console.log('parse end event!', event)
+              const parseEndEventPayload = event.payload
+              if (!parseEndEventPayload.success) {
+                throw new Error(parseEndEventPayload.errors.join('; '))
+              }
+              return actions.setProgress({
+                percentage: 100,
+                message: 'Import complete.',
+              })
+            })
+          )
+        )
       ).pipe(
+        concatWith(
+          from([
+            actions.finishDictionaryImport(file.id),
+            actions.openFileRequest(file, filePath),
+            actions.setProgress(null),
+            actions.addActiveDictionary(file.id, file.dictionaryType),
+            actions.simpleMessageSnackbar(
+              `Mouse over flashcard text and press the 'D' key to look up words.`,
+              null
+            ),
+          ])
+        ),
         catchError((err) => {
           console.error(err)
 
@@ -241,5 +273,4 @@ function importDictionaryEntries(file: DictionaryFile, data: string) {
       return importCedictEntries(data, file)
     case 'DictCCDictionary':
       return importDictCcEntries(data, file)
-  }
 }

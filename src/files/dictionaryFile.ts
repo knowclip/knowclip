@@ -19,6 +19,16 @@ export type LexiconEntry = {
   pronunciation: string | null
   frequencyScore: number | null
   searchTokensCount: number
+  /** used especially for German
+   *
+   * e.g. term: `"von Grund auf [Redewendung]"`
+   * tokenCombos (N.B. imperfectly implemented): `[
+   *    "auf grund von 03",
+   *    "grund von 03",
+   *    "auf von 03",
+   *    "von 03"
+   * ]`
+   */
   tokenCombos: string[]
 }
 

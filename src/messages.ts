@@ -1,5 +1,5 @@
 import { BrowserWindow, ipcMain } from 'electron'
-import { getMessageResponders } from './getMessageResponders'
+import { getMainProcessIpcMessageHandlers } from './getMainProcessIpcMessageHandlers'
 import {
   MessageHandlerResult,
   MessageResponders,
@@ -24,7 +24,7 @@ export function handleMessages(
   filePathsRegistry: Record<FileId, string>,
   persistedStatePath?: string
 ) {
-  const messageHandlers = getMessageResponders(
+  const messageHandlers = getMainProcessIpcMessageHandlers(
     mainWindow,
     filePathsRegistry,
     persistedStatePath
