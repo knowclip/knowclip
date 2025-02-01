@@ -38,16 +38,14 @@ const aboutMessage = (buildNumber?: string) =>
 const showAboutDialog: AppEpic = (
   action$,
   state$,
-  { fromIpcRendererEvent, pauseMedia, sendToMainProcess }
+  { fromIpcRendererEvent, pauseMedia, showAboutDialog }
 ) =>
   fromIpcRendererEvent('show-about-dialog').pipe(
     mergeMap(() => {
       const { VITE_BUILD_NUMBER } = window.electronApi.env
       pauseMedia()
-      return sendToMainProcess({
-        type: 'showAboutDialog',
-        args: [aboutMessage(VITE_BUILD_NUMBER)],
-      })
+
+      return showAboutDialog(aboutMessage(VITE_BUILD_NUMBER))
     }),
     ignoreElements()
   )
