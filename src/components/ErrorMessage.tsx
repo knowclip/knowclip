@@ -46,7 +46,11 @@ export default ErrorMessage
 
 function displayError(error: any) {
   if (error instanceof Error || error?.message)
-    return ['error: ' + error.name, error.message, error.stack].join('\n')
+    return [
+      'error: ' + (error.name || ''),
+      error.message,
+      error.stack || '',
+    ].join('\n')
 
   const stringified = JSON.stringify(error, null, 2)
   if (stringified === '{}') {

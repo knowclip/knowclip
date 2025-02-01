@@ -71,7 +71,7 @@ window.addEventListener('error', (e) => {
   const errorRoot = document.getElementById('errorRoot') as HTMLDivElement
   errorRoot.style.display = 'block'
   const root = createRoot(errorRoot)
-  root.render(<ErrorMessage reactError={e} />)
+  root.render(<ErrorMessage reactError={e.error} />)
 })
 
 render()

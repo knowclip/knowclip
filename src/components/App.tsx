@@ -9,21 +9,13 @@ import { ThemeProvider } from '@mui/material/styles'
 import ErrorMessage from './ErrorMessage'
 import { theme } from './theme'
 import { CssBaseline } from '@mui/material'
+import { ErrorBoundary } from '@sentry/react'
 
-class App extends Component<
-  { sentryDsn: string },
-  { hasError: boolean; error: any }
-> {
-  state = { hasError: false, error: null }
-
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true, error }
-  }
-
-  render() {
-    if (this.state.hasError)
-      return <ErrorMessage reactError={this.state.error} />
-    return (
+function App({ sentryDsn: _ }: { sentryDsn: string }) {
+  return (
+    <ErrorBoundary
+      fallback={({ error }) => <ErrorMessage reactError={error} />}
+    >
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <HashRouter>
@@ -35,8 +27,8 @@ class App extends Component<
         <Snackbar />
         <Dialog />
       </ThemeProvider>
-    )
-  }
+    </ErrorBoundary>
+  )
 }
 
 export default App
