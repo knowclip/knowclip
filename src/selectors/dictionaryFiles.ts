@@ -1,9 +1,7 @@
 import { getFile } from './files'
 
 export const getActiveDictionaries = (state: AppState) => {
-  return (state.settings.activeDictionaries || [])
-    .map(({ id }) => getFile(state, 'Dictionary', id))
-    .filter((file): file is DictionaryFile => Boolean(file))
+  return state.settings.activeDictionaries
 }
 
 export const getActiveDictionaryType = (
@@ -43,7 +41,9 @@ export const getOpenDictionaryFiles = (
   return files
 }
 
-export const displayDictionaryType = (dictionaryType: DictionaryFileType) => {
+export const displayDictionaryType = (
+  dictionaryType: DictionaryFileType
+): string => {
   switch (dictionaryType) {
     case 'DictCCDictionary':
       return 'German - Dict.cc'
@@ -51,6 +51,8 @@ export const displayDictionaryType = (dictionaryType: DictionaryFileType) => {
       return 'Japanese - Yomichan JMDict'
     case 'CEDictDictionary':
       return 'Mandarin Chinese - MDBG CEDict'
+    case 'YomitanDictionary':
+      return 'Yomitan format (any language)'
   }
 }
 
@@ -58,4 +60,5 @@ export const dictionaryTypes: DictionaryFileType[] = [
   'YomichanDictionary',
   'DictCCDictionary',
   'CEDictDictionary',
+  'YomitanDictionary',
 ]

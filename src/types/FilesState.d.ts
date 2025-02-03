@@ -140,6 +140,19 @@ declare type DictionaryFile =
   | YomichanDictionary
   | CEDictDictionary
   | DictCCDictionary
+  | YomitanDictionary
+
+declare type CreateDictionarySpecs =
+  | {
+      dictionaryType:
+        | 'YomichanDictionary'
+        | 'CEDictDictionary'
+        | 'DictCCDictionary'
+    }
+  | {
+      dictionaryType: 'YomitanDictionary'
+      language: string
+    }
 
 declare interface YomichanDictionary extends DictionaryFileBase {
   dictionaryType: 'YomichanDictionary'
@@ -150,6 +163,10 @@ declare interface CEDictDictionary extends DictionaryFileBase {
 declare interface DictCCDictionary extends DictionaryFileBase {
   dictionaryType: 'DictCCDictionary'
 }
+declare interface YomitanDictionary extends DictionaryFileBase {
+  dictionaryType: 'YomitanDictionary'
+  language: string
+}
 
 declare type DictionaryFileBase = {
   type: 'Dictionary'
@@ -158,9 +175,15 @@ declare type DictionaryFileBase = {
   key: number
   name: string
   importComplete: boolean
+  /** for yomitan, an object with
+   * - indexJson: the contents of index.json from archive
+   * - stylesCss: the contents of styles.css
+   * */
+  metadata?: any
 }
 
 declare type DictionaryFileType =
   | 'YomichanDictionary'
   | 'CEDictDictionary'
   | 'DictCCDictionary'
+  | 'YomitanDictionary'

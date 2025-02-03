@@ -179,7 +179,12 @@ const deleteFileRequest: AppEpic = (action$, state$, effects) =>
                   state$.value,
                   effects
                 )
-              ).pipe(mergeAll())
+              ).pipe(
+                mergeAll(),
+                catchError((err) =>
+                  of(r.deleteFileFailure(availability, String(err)))
+                )
+              )
             )
           )
         : EMPTY

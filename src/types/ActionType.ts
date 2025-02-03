@@ -74,6 +74,7 @@ const enum KnowclipActionType {
   goToSubtitlesChunk = 'GO_TO_SUBTITLES_CHUNK',
   deleteFileRequest = 'DELETE_FILE_REQUEST',
   deleteFileSuccess = 'DELETE_FILE_SUCCESS',
+  deleteFileFailure = 'DELETE_FILE_FAILURE',
   openFileRequest = 'OPEN_FILE_REQUEST',
   openFileSuccess = 'OPEN_FILE_SUCCESS',
   openFileFailure = 'OPEN_FILE_FAILURE',

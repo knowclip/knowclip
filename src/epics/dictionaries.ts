@@ -3,14 +3,16 @@ import {
   catchError,
   concatMap,
   concatWith,
+  count,
   filter,
   map,
   mergeMap,
   take,
   takeUntil,
+  tap,
 } from 'rxjs/operators'
 import A from '../types/ActionType'
-import { actions } from '../actions'
+import { ActionOf, actions } from '../actions'
 import * as s from '../selectors'
 import {
   deleteDictionary,
@@ -27,6 +29,11 @@ import {
 } from '../utils/dictionaries/openDictionaryZip'
 import { importCedictEntries } from '../utils/dictionaries/importCeDictEntries'
 import { importDictCcEntries } from '../utils/dictionaries/importDictCcEntries'
+import {
+  importYomitanEntries,
+  YomitanArchiveEntry,
+} from '../utils/dictionaries/importYomitanEntries'
+import { IndexableType } from 'dexie'
 
 const initializeDictionaries: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -72,7 +79,7 @@ const importDictionaryRequestEpic: AppEpic = (action$, state$, effects) =>
         const [filePath] = files
         const dictionary = await newDictionary(
           effects.getDexieDb(),
-          action.dictionaryType,
+          action.dictionary,
           filePath,
           effects.uuid()
         )
@@ -95,12 +102,22 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
   action$.pipe(
     ofType(A.startDictionaryImport as const),
     mergeMap(({ file, filePath }) => {
+      let parseEndPayload: ParseEndPayload<typeof file> | null = null
+
       const importProgress = effects.fromIpcRendererEvent<
-        ImportProgressPayload<typeof file>
+        ImportProgressPayload<typeof file, unknown>
       >('dictionary-import-progress')
-      const parseEnd = effects.fromIpcRendererEvent<
-        ParseEndPayload<typeof file>
-      >('dictionary-parse-end')
+      const parseEnd = effects
+        .fromIpcRendererEvent<ParseEndPayload<typeof file>>(
+          'dictionary-parse-end'
+        )
+        .pipe(
+          take(1),
+          tap((event) => {
+            console.log('parse end event from epic', event)
+            parseEndPayload = event.payload
+          })
+        )
 
       return merge(
         from([
@@ -111,7 +128,6 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           actions.addFile(file, filePath),
         ]),
         defer(() => {
-          importProgress.subscribe()
           return effects.openDictionaryFile(file, filePath)
         }).pipe(
           concatMap((openResult) => {
@@ -139,17 +155,13 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
               percentage: progressPercentage,
               message: message,
             })
-          })
-        ),
-
-        concat(
-          parseEnd.pipe(
-            take(1),
-            map((event) => {
-              console.log('parse end event!', event)
-              const parseEndEventPayload = event.payload
-              if (!parseEndEventPayload.success) {
-                throw new Error(parseEndEventPayload.errors.join('; '))
+          }),
+          concatWith(
+            defer(async () => {
+              console.log('parse end payload', parseEndPayload)
+              if (!parseEndPayload) throw new Error('Dictionary import failed.')
+              if (!parseEndPayload.success) {
+                throw new Error(parseEndPayload.errors.join('; '))
               }
               return actions.setProgress({
                 percentage: 100,
@@ -172,7 +184,7 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
           ])
         ),
         catchError((err) => {
-          console.error(err)
+          console.error('dictionary file import error', err)
 
           return from([
             actions.openFileFailure(file, filePath, String(err)),
@@ -234,26 +246,59 @@ const deleteImportedDictionaryEpic: AppEpic = (action$, state$, effects) =>
 const deleteDatabaseEpic: AppEpic = (action$, state$, _effects) =>
   action$.pipe(
     ofType(A.resetDictionariesDatabase as const),
-    mergeMap(() => {
-      return from(resetDictionariesDatabase()).pipe(
-        mergeMap(() => {
-          return [
-            ...s
-              .getRememberedDictionaryFiles(state$.value)
-              .map((f) => actions.deleteFileRequest(f.type, f.id)),
-            actions.simpleMessageSnackbar(
-              'Dictionaries database was successfully reset.'
-            ),
-          ]
-        }),
-        catchError((err) => {
-          return of(
-            actions.simpleMessageSnackbar(
-              `Problem deleting dictionaries database: ${err}`
-            )
-          )
-        })
+    mergeMap(async () => {
+      const dictionaryFiles = s.getRememberedDictionaryFiles(state$.value)
+      await resetDictionariesDatabase()
+      return dictionaryFiles
+    }),
+    mergeMap((dictionaryFiles) => {
+      const deleteEndActions = action$.pipe(
+        filter(
+          (a): a is ActionOf<A.deleteFileSuccess | A.deleteFileRequest> =>
+            a.type === A.deleteFileSuccess ||
+            (a.type === A.deleteFileFailure &&
+              dictionaryFiles.some((f) => f.id === a.file.id))
+        ),
+        take(dictionaryFiles.length)
       )
+
+      return merge(
+        of(
+          ...dictionaryFiles.map((f) =>
+            actions.deleteFileRequest(f.type, f.id)
+          ),
+          actions.setProgress({
+            percentage: 0,
+            message: 'Resetting dictionaries database.',
+          })
+        ),
+        deleteEndActions.pipe(
+          count(),
+          map((deleteEndActionsCount) =>
+            actions.setProgress({
+              percentage: Math.round(
+                (deleteEndActionsCount / dictionaryFiles.length) * 100
+              ),
+              message: `Deleted ${deleteEndActionsCount} of ${dictionaryFiles.length} dictionaries.`,
+            })
+          )
+        )
+      ).pipe(
+        concatWith(
+          of(
+            actions.setProgress(null),
+            actions.simpleMessageSnackbar('Dictionaries database reset.')
+          )
+        )
+      )
+    }),
+    catchError((err) => {
+      return from([
+        actions.setProgress(null),
+        actions.simpleMessageSnackbar(
+          `Problem deleting dictionaries database: ${err}`
+        ),
+      ])
     })
   )
 
@@ -265,12 +310,18 @@ export default combineEpics(
   deleteImportedDictionaryEpic
 )
 
-function importDictionaryEntries(file: DictionaryFile, data: string) {
+function importDictionaryEntries(
+  file: DictionaryFile,
+  data: unknown
+): Promise<IndexableType> {
   switch (file.dictionaryType) {
     case 'YomichanDictionary':
-      return importYomichanEntries(data, file)
+      return importYomichanEntries(data as string, file)
     case 'CEDictDictionary':
-      return importCedictEntries(data, file)
+      return importCedictEntries(data as string, file)
     case 'DictCCDictionary':
-      return importDictCcEntries(data, file)
+      return importDictCcEntries(data as string, file)
+    case 'YomitanDictionary':
+      return importYomitanEntries(data as YomitanArchiveEntry, file)
+  }
 }

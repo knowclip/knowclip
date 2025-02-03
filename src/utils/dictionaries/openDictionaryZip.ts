@@ -2,12 +2,15 @@ import type { BrowserWindow } from 'electron'
 import { Entry, ZipFile, open } from 'yauzl'
 import { failure } from '../result'
 
-export type ImportProgressPayload<D extends DictionaryFile> = {
+export type ImportProgressPayload<
+  D extends DictionaryFile,
+  DataTransferType = string
+> = {
   file: D
   filePath: string
   progressPercentage: number
   message: string
-  data?: string
+  data?: DataTransferType
 }
 
 export type ParseEndPayload<D extends DictionaryFile> =
@@ -31,8 +34,64 @@ type ImportProgressState = {
   currentEntryTotalBytes: number
 }
 
+export async function getIndexJsonFromZip(
+  filePath: string
+): AsyncResult<string> {
+  try {
+    const zipfile: ZipFile = await new Promise((res, rej) => {
+      open(filePath, { lazyEntries: true }, function (err, zipfile) {
+        if (err) return rej(err)
+        if (!zipfile) return rej(new Error('problem reading zip file'))
+
+        res(zipfile)
+      })
+    })
+
+    let visitedEntries = 0
+
+    return new Promise((res, rej) => {
+      zipfile.on('entry', async (entry: Entry) => {
+        const entryIndex = visitedEntries
+        visitedEntries++
+        try {
+          if (entry.fileName === 'index.json') {
+            let entryText = ''
+            zipfile.openReadStream(entry, (err, readStream) => {
+              if (err) return rej(err)
+              if (!readStream)
+                return rej(new Error('problem streaming zip file'))
+
+              readStream.on('data', (data: Buffer) => {
+                entryText += data.toString()
+              })
+
+              readStream.on('end', () => {
+                zipfile.close()
+                res({ value: entryText })
+              })
+            })
+          } else {
+            zipfile.readEntry()
+          }
+        } catch (error) {
+          console.error('Error processing entry at index', entryIndex, error)
+          zipfile.close()
+        }
+      })
+      zipfile.on('close', () => {
+        rej('index.json not found in zip')
+      })
+
+      zipfile.readEntry()
+    })
+  } catch (err) {
+    return failure(`Problem opening zip file: ${err}`)
+  }
+}
+
 export async function openDictionaryZip<
-  DictionaryFileType extends DictionaryFile
+  DictionaryFileType extends DictionaryFile,
+  DataTransferType = string
 >({
   file,
   filePath,
@@ -46,7 +105,7 @@ export async function openDictionaryZip<
     zipFile: ZipFile,
     entry: Entry,
     progressState: ImportProgressState,
-    sendProgressUpdate: (data?: string) => void
+    sendProgressUpdate: (data?: DataTransferType) => void
   ) => void
 
   handleClose(sendEndResult: (result: Result<string>) => void): void
@@ -80,10 +139,10 @@ export async function openDictionaryZip<
           zipfile,
           entry,
           importProgressState,
-          (data?: string) =>
+          (data?: DataTransferType) =>
             sendProgressUpdate(
-              getProgressPercentage(importProgressState),
-              'Import in progress.',
+              getProgressPercentage(importProgressState, zipfile),
+              `Import in progress. Processing ${entry.fileName}`,
               data
             )
         )
@@ -112,7 +171,7 @@ export async function openDictionaryZip<
                 success: true,
                 message: result.value,
               }
-
+        console.log('Sending dictionary-parse-end event')
         mainWindow.webContents.send(
           'message',
           'dictionary-parse-end',
@@ -131,8 +190,11 @@ export async function openDictionaryZip<
     function sendProgressUpdate(
       progressPercentage: number,
       message: string,
-      data?: string
+      data?: DataTransferType
     ) {
+      console.log(
+        `Sending progress update: ${progressPercentage}% - ${message}`
+      )
       mainWindow.webContents.send('message', 'dictionary-import-progress', {
         file,
         filePath,
@@ -146,21 +208,21 @@ export async function openDictionaryZip<
   }
 }
 
-function getProgressPercentage({
-  entryCount,
-  processedEntries,
-  currentEntryBytesProcessed,
-  currentEntryTotalBytes,
-}: ImportProgressState) {
+function getProgressPercentage(
+  {
+    entryCount,
+    processedEntries,
+    currentEntryBytesProcessed,
+    currentEntryTotalBytes,
+  }: ImportProgressState,
+  zipfile: ZipFile
+) {
   const processedEntriesProgress = processedEntries / entryCount
   const currentEntryProgress =
     currentEntryBytesProcessed / currentEntryTotalBytes
   const currentEntryWeightedProgress = currentEntryProgress * (1 / entryCount)
-  return (
-    Number(
-      (processedEntriesProgress + currentEntryWeightedProgress).toFixed(2)
-    ) * 100
-  )
+  console.log(processedEntries, zipfile.entryCount)
+  return Number(processedEntries / entryCount) * 100
 }
 
 export async function readEntryData({
@@ -185,7 +247,7 @@ export async function readEntryData({
       if (!readStream) return rej(new Error('problem streaming zip file'))
 
       readStream.on('data', (data: Buffer) => {
-        importProgressState.currentEntryBytesProcessed += data.length
+        importProgressState.currentEntryBytesProcessed += data.byteLength
         handleData(data)
       })
 

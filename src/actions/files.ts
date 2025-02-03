@@ -22,6 +22,11 @@ export const filesActions = {
     file,
     descendants,
   }),
+  deleteFileFailure: (file: FileAvailability, errorMessage: string) => ({
+    type: A.deleteFileFailure,
+    file,
+    errorMessage,
+  }),
   /** Try to open a file, and add it to the state tree if it isn't there yet. */
   openFileRequest: (file: FileMetadata, filePath: FilePath | null = null) => ({
     type: A.openFileRequest,

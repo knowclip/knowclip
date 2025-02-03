@@ -1,21 +1,38 @@
 import Dexie from 'dexie'
 import { basename } from '../utils/rendererPathHelpers'
-import { getTableName, LexiconEntry } from '../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../files/dictionaryFile'
 import { LETTERS_DIGITS_PLUS } from './dictCc'
 import { lookUpDictCc } from './dictionaries/lookUpDictCc'
 import { lookUpCeDict } from './dictionaries/lookUpCeDict'
 import { lookUpYomichanJMDict } from './dictionaries/lookUpYomichanJMDict'
+import { lookUpYomitan } from './dictionaries/lookUpYomitan'
+import {
+  DatabaseKanjiEntry,
+  DatabaseKanjiMeta,
+  DatabaseTermEntry,
+  DatabaseTermEntryWithId,
+  DatabaseTermMeta,
+  Tag,
+} from '../vendor/yomitan/types/ext/dictionary-database'
+import { YomitanMediaRecord } from './dictionaries/importYomitanEntries'
 
-const LATEST_DEXIE_DB_VERSION = 1
-
+// table names
 export const DICTIONARIES_TABLE = 'dictionaries'
-
 const YOMICHAN_DICTIONARY: DictionaryFileType = 'YomichanDictionary'
 const CEDICT_DICTIONARY: DictionaryFileType = 'CEDictDictionary'
 const DICT_CC_DICTIONARY: DictionaryFileType = 'DictCCDictionary'
+export const YOMITAN_DICTIONARY_TERMS_TABLE = 'yomitan terms'
+export const YOMITAN_DICTIONARY_TERMS_META_TABLE = 'yomitan terms meta'
+export const YOMITAN_DICTIONARY_KANJI_TABLE = 'yomitan kanji'
+export const YOMITAN_DICTIONARY_KANJI_META_TABLE = 'yomitan kanji meta'
+export const YOMITAN_DICTIONARY_TAGS_TABLE = 'yomitan tags'
+export const YOMITAN_DICTIONARY_MEDIA_TABLE = 'yomitan media'
 
-const dictionaryProp = (propertyName: keyof DictionaryFile) => propertyName
-const prop = (propertyName: keyof LexiconEntry) => propertyName
+const schema = <T>(
+  ...propertyNames: keyof T extends string
+    ? (keyof T | '++key' | '++id')[]
+    : never
+) => propertyNames.join(', ')
 
 let dexie: Dexie | null
 
@@ -23,71 +40,120 @@ export function getDexieDb() {
   if (dexie) return dexie
 
   dexie = new Dexie('DictionaryEntries')
-
-  dexie.version(LATEST_DEXIE_DB_VERSION).stores({
-    [DICTIONARIES_TABLE]: `++${dictionaryProp('key')}, ${dictionaryProp(
-      'id'
-    )}, ${dictionaryProp('type')}`,
-    [YOMICHAN_DICTIONARY]: `++key, ${prop('head')}, ${prop(
-      'pronunciation'
-    )}, ${prop('dictionaryKey')}`,
-    [CEDICT_DICTIONARY]: `++key, ${prop('head')}, ${prop(
-      'pronunciation'
-    )}, ${prop('dictionaryKey')}, ${prop('variant')}`,
-    [DICT_CC_DICTIONARY]: `++key, ${prop('head')}, ${prop(
+  const v1 = {
+    [DICTIONARIES_TABLE]: schema<DictionaryFile>('++key', 'id', 'type'),
+    [YOMICHAN_DICTIONARY]: schema<LegacyLexiconEntry>(
+      '++key',
+      'head',
+      'pronunciation',
       'dictionaryKey'
-    )}, *${prop('tokenCombos')}`,
+    ),
+    [CEDICT_DICTIONARY]: schema<LegacyLexiconEntry>(
+      '++key',
+      'head',
+      'pronunciation',
+      'dictionaryKey',
+      'variant'
+    ),
+    [DICT_CC_DICTIONARY]: schema<LegacyLexiconEntry>(
+      '++key',
+      'head',
+      'dictionaryKey',
+      'tokenCombos'
+    ),
+    ['YomitanDictionary']: schema<LegacyLexiconEntry>(
+      '++key',
+      'head',
+      'pronunciation',
+      'dictionaryKey'
+    ),
+  }
+
+  // prettier-ignore
+  dexie.version(2).stores({
+    ...v1,
+    [DICTIONARIES_TABLE]: schema<DictionaryFile & YomitanDictionary>('++key', 'id', 'type', 'language', 'metadata'),
+    [YOMITAN_DICTIONARY_TERMS_TABLE]: schema<DatabaseTermEntry>(
+      '++id', 'expression', 'reading', 'expressionReverse', 'readingReverse', 'sequence', 'dictionary'
+    ),
+    [YOMITAN_DICTIONARY_TERMS_META_TABLE]: schema<DatabaseTermMeta>('++id', 'expression', 'dictionary'),
+    [YOMITAN_DICTIONARY_KANJI_TABLE]: schema<DatabaseKanjiEntry>(
+      '++id', 'character', 'dictionary'
+    ),
+    [YOMITAN_DICTIONARY_KANJI_META_TABLE]: schema<DatabaseKanjiMeta>('++id', 'character', 'dictionary'),
+    [YOMITAN_DICTIONARY_TAGS_TABLE]: schema<Tag>(
+      '++id', 'name', 'dictionary'
+    ),
+    [YOMITAN_DICTIONARY_MEDIA_TABLE]: schema<YomitanMediaRecord>('++id', 'dictionary', 'path')
   })
+
+  dexie.version(1).stores(v1)
 
   return dexie
 }
 
 export async function newDictionary(
   db: Dexie,
-  dictionaryType: DictionaryFileType,
+  dictionary: CreateDictionarySpecs,
   filePath: string,
   id: string
-) {
+): Promise<DictionaryFile> {
   const { platform } = window.electronApi
-  const dicProps: Omit<DictionaryFile, 'key'> = {
-    type: 'Dictionary',
-    dictionaryType,
-    id,
-    name: basename(platform, filePath),
-    importComplete: false,
-  }
+  const dicProps:
+    | Omit<YomitanDictionary, 'key'>
+    | Omit<Exclude<DictionaryFile, YomitanDictionary>, 'key'> =
+    dictionary.dictionaryType === 'YomitanDictionary'
+      ? {
+          type: 'Dictionary',
+          dictionaryType: 'YomitanDictionary',
+          language: dictionary.language,
+          id,
+          name: basename(platform, filePath),
+          importComplete: false,
+        }
+      : {
+          type: 'Dictionary',
+          dictionaryType: dictionary.dictionaryType,
+          id,
+          name: basename(platform, filePath),
+          importComplete: false,
+        }
   const key = await db.table(DICTIONARIES_TABLE).add(dicProps)
   if (typeof key !== 'number')
     throw new Error('Dictionaries table key should be number')
-  const dic: DictionaryFile = {
-    ...dicProps,
-    key,
-  }
-  return dic
+
+  return { ...dicProps, key }
 }
 
-export type TranslatedTokensAtCharacterIndex = {
+export type TranslatedTokensAtCharacterIndex<
+  EntryType extends LexiconEntry = LexiconEntry
+> = {
   textCharacterIndex: number
   /** To be sorted by length of matchedTokenText */
-  translatedTokens: TranslatedToken[]
+  translatedTokens: TranslatedToken<EntryType>[]
 }
-export type TranslatedToken = {
+export type LexiconEntry = LegacyLexiconEntry | DatabaseTermEntryWithId
+
+export type TranslatedToken<EntryType extends LexiconEntry = LexiconEntry> = {
   matchedTokenText: string
   candidates: {
-    entry: LexiconEntry
+    entry: EntryType
     inflections: string[]
   }[]
 }
 
-export type TextTokensTranslations = {
-  tokensTranslations: TranslatedTokensAtCharacterIndex[]
+export type TextTokensTranslations<EntryType extends LexiconEntry> = {
+  tokensTranslations: TranslatedTokensAtCharacterIndex<EntryType>[]
   characterIndexToTranslationsMappings: Array<undefined | number>
 }
 
 export function lookUpInDictionary(
   dictionaryType: DictionaryFileType,
+  activeDictionariesIds: Set<string>,
   text: string
-): Promise<TextTokensTranslations> {
+):
+  | Promise<TextTokensTranslations<LegacyLexiconEntry>>
+  | ReturnType<typeof lookUpYomitan> {
   switch (dictionaryType) {
     case 'YomichanDictionary':
       return lookUpYomichanJMDict(text)
@@ -95,14 +161,16 @@ export function lookUpInDictionary(
       return lookUpDictCc(text)
     case 'CEDictDictionary':
       return lookUpCeDict(text)
+    case 'YomitanDictionary':
+      return lookUpYomitan(activeDictionariesIds, text)
   }
 }
 
-export const TOKEN_COMBOS: keyof LexiconEntry = 'tokenCombos'
-export const HEAD: keyof LexiconEntry = 'head'
-export const VARIANT: keyof LexiconEntry = 'variant'
-export const PRONUNCIATION: keyof LexiconEntry = 'pronunciation'
-export const KEY: keyof LexiconEntry = 'key'
+export const TOKEN_COMBOS: keyof LegacyLexiconEntry = 'tokenCombos'
+export const HEAD: keyof LegacyLexiconEntry = 'head'
+export const VARIANT: keyof LegacyLexiconEntry = 'variant'
+export const PRONUNCIATION: keyof LegacyLexiconEntry = 'pronunciation'
+export const KEY: keyof LegacyLexiconEntry = 'key'
 
 type CJTextTokens = { index: number; tokens: string[] }[]
 export function parseFlat(text: string, maxWordLength = 8) {
@@ -170,7 +238,7 @@ export async function deleteDictionary(
   try {
     const record = await db
       .table(getTableName(type))
-      .where(prop('dictionaryKey'))
+      .where('dictionaryKey' satisfies keyof LegacyLexiconEntry)
       .equals(key)
       .first()
 
@@ -183,7 +251,7 @@ export async function deleteDictionary(
       else
         await db
           .table(getTableName(type))
-          .where('dictionaryKey')
+          .where('dictionaryKey' satisfies keyof LegacyLexiconEntry)
           .equals(key)
           .delete()
     }

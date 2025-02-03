@@ -1,4 +1,4 @@
-import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../../files/dictionaryFile'
 import { getDexieDb } from '../dictionariesDatabase'
 
 export async function importCedictEntries(
@@ -8,7 +8,7 @@ export async function importCedictEntries(
   const lines = data.split(/[\n\r]+/)
   const lastLineIndex = lines.length - 1
 
-  const entries: Omit<LexiconEntry, 'key'>[] = []
+  const entries: Omit<LegacyLexiconEntry, 'key'>[] = []
 
   for (let i = 0; i < lastLineIndex; i++) {
     const line = lines[i]
@@ -40,7 +40,9 @@ export async function importCedictEntries(
       })
     }
   }
-  await getDexieDb().table(getTableName(file.dictionaryType)).bulkAdd(entries)
+  return await getDexieDb()
+    .table(getTableName(file.dictionaryType))
+    .bulkAdd(entries)
 }
 
 function cutOffWithEllipsis(str: string, length: number) {

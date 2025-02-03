@@ -11,6 +11,7 @@ import { init as reactInit } from '@sentry/react'
 import ErrorMessage from '../components/ErrorMessage'
 import { PersistGate } from 'redux-persist/integration/react'
 import { IpcRendererEvent } from '../preload/IpcRendererEvent'
+import { NODE_ENV } from '../env'
 
 window.electronApi.listenToIpcRendererMessages(
   (electronIpcRendererEvent, message, payload) => {
@@ -25,26 +26,27 @@ window.electronApi.listenToIpcRendererMessages(
 
 const sentryDsn = 'https://bbdc0ddd503c41eea9ad656b5481202c@sentry.io/1881735'
 const RESIZE_OBSERVER_ERROR_MESSAGE = 'ResizeObserver loop limit exceeded'
-Sentry.init(
-  {
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
-    ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
+if (NODE_ENV !== 'development')
+  Sentry.init(
+    {
+      integrations: [
+        Sentry.browserTracingIntegration(),
+        Sentry.replayIntegration(),
+      ],
+      ignoreErrors: [RESIZE_OBSERVER_ERROR_MESSAGE],
 
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: 1.0,
+      // Set tracesSampleRate to 1.0 to capture 100%
+      // of transactions for performance monitoring.
+      // We recommend adjusting this value in production
+      tracesSampleRate: 1.0,
 
-    // Capture Replay for 10% of all sessions,
-    // plus for 100% of sessions with an error
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-  },
-  reactInit
-)
+      // Capture Replay for 10% of all sessions,
+      // plus for 100% of sessions with an error
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+    },
+    reactInit
+  )
 
 window.document.addEventListener('DOMContentLoaded', () => {
   window.electronApi.listenToTestIpcEvents(

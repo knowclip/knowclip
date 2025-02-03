@@ -52,12 +52,12 @@ const settings: Reducer<SettingsState, Action> = (
       return { ...state, viewMode: action.viewMode }
 
     case A.addActiveDictionary: {
-      const activeDictionaries = new Set([
+      const activeDictionaries = [
         ...(state.activeDictionaries || []).filter(
           (d) => d.type === action.dictionaryType
         ),
         { id: action.id, type: action.dictionaryType },
-      ])
+      ]
       return {
         ...state,
         activeDictionaries: [...activeDictionaries],

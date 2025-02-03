@@ -1,4 +1,4 @@
-import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../../files/dictionaryFile'
 import { lemmatize } from '../yomichanDictionary'
 import {
   TextTokensTranslations,
@@ -11,7 +11,7 @@ import {
 
 export async function lookUpYomichanJMDict(
   text: string
-): Promise<TextTokensTranslations> {
+): Promise<TextTokensTranslations<LegacyLexiconEntry>> {
   const dexie = getDexieDb()
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text, 12)
 
@@ -20,7 +20,7 @@ export async function lookUpYomichanJMDict(
     // maybe memoize lemmatize in this function
     ...lemmatize(token).map((t) => t.text),
   ]).flat()
-  const allQueries: LexiconEntry[] = await dexie
+  const allQueries: LegacyLexiconEntry[] = await dexie
     .table(getTableName('YomichanDictionary'))
     .where(HEAD)
     .anyOf(allLookupTokens)
@@ -50,7 +50,7 @@ export async function lookUpYomichanJMDict(
         ]
       })
 
-      const translatedTokensAtCharacterIndex: TranslatedToken[] =
+      const translatedTokensAtCharacterIndex: TranslatedToken<LegacyLexiconEntry>[] =
         candidates.length
           ? [
               {

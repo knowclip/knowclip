@@ -4,9 +4,9 @@ import { filesActions } from './files'
 import { FileUpdateName } from '../files/FileUpdateName'
 
 export const dictionariesActions = {
-  importDictionaryRequest: (dictionaryType: DictionaryFileType) => ({
+  importDictionaryRequest: (dictionary: CreateDictionarySpecs) => ({
     type: A.importDictionaryRequest,
-    dictionaryType,
+    dictionary,
   }),
 
   startDictionaryImport: (file: DictionaryFile, filePath: FilePath) => ({

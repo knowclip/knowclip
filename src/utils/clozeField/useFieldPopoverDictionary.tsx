@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ClozeControls } from './useClozeControls'
 import { setSelectionRange } from './domSelection'
@@ -16,6 +16,7 @@ import { useClozeUiEffects } from './useClozeUiEffects'
 import { LETTERS_DIGITS_PLUS } from '../dictCc'
 import { getMousePosition } from '../mousePosition'
 import { isMediaPlaying } from '../media'
+import { lookUpYomitan } from '../dictionaries/lookUpYomitan'
 
 function getMouseoverChar(mousePosition: [number, number] | null) {
   if (!mousePosition) return null
@@ -33,6 +34,7 @@ function getMouseoverChar(mousePosition: [number, number] | null) {
 export function useFieldPopoverDictionary(
   popover: ReturnType<typeof usePopover>,
   activeDictionaryType: DictionaryFileType | null,
+  activeDictionaries: SettingsState['activeDictionaries'],
   clozeControls: ClozeControls,
   value: string,
   editing: boolean
@@ -98,6 +100,9 @@ export function useFieldPopoverDictionary(
   >([])
   const [translationsAtCharacter, setTranslationsAtCharacter] =
     useState<TranslatedTokensAtCharacterIndex | null>(null)
+  const [yomitanLookupResult, setYomitanLookupResult] = useState<Awaited<
+    ReturnType<typeof lookUpYomitan>
+  > | null>(null)
 
   const { onKeyDown, handleFocus, handleBlur, cursorPosition } =
     useClozeUiEffects(
@@ -109,17 +114,30 @@ export function useFieldPopoverDictionary(
       loopState
     )
 
+  const activeDictionariesIds = useMemo(
+    () => new Set(activeDictionaries?.map((d) => d.id) || []),
+    [activeDictionaries]
+  )
+
   useEffect(() => {
     if (activeDictionaryType) {
-      lookUpInDictionary(activeDictionaryType, value).then(
-        ({ tokensTranslations }) => {
-          setTokenTranslations(tokensTranslations)
+      lookUpInDictionary(
+        activeDictionaryType,
+        activeDictionariesIds,
+        value
+      ).then((lookup) => {
+        if ('translations' in lookup) {
+          setTokenTranslations(lookup.translations.tokensTranslations)
+          setYomitanLookupResult(lookup)
+        } else {
+          setTokenTranslations(lookup.tokensTranslations)
+          setYomitanLookupResult(null)
         }
-      )
+      })
     } else {
       setTokenTranslations([])
     }
-  }, [value, activeDictionaryType])
+  }, [value, activeDictionariesIds, activeDictionaryType])
 
   const [mouseoverChar, setMouseoverChar] = useState<HTMLSpanElement | null>(
     null
@@ -203,6 +221,7 @@ export function useFieldPopoverDictionary(
   return {
     cursorPosition,
     translationsAtCharacter,
+    yomitanLookupResult,
     onKeyDown,
     handleFocus,
     handleBlur,

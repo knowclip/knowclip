@@ -1,4 +1,4 @@
-import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../../files/dictionaryFile'
 import { toHiragana } from 'wanakana'
 import { getDexieDb } from '../dictionariesDatabase'
 
@@ -17,7 +17,7 @@ export async function importYomichanEntries(
     string
   ][]
 
-  const entries: Omit<LexiconEntry, 'key'>[] = []
+  const entries: Omit<LegacyLexiconEntry, 'key'>[] = []
   for (const [
     head,
     pronunciation,
@@ -29,7 +29,7 @@ export async function importYomichanEntries(
     termTags,
   ] of entriesJSON) {
     const coercedHiragana = toHiragana(pronunciation || head)
-    const dictEntry: Omit<LexiconEntry, 'key'> = {
+    const dictEntry: Omit<LegacyLexiconEntry, 'key'> = {
       variant: null,
       dictionaryKey: file.key,
       head,
@@ -50,5 +50,7 @@ export async function importYomichanEntries(
     entries.push(dictEntry)
   }
 
-  await getDexieDb().table(getTableName(file.dictionaryType)).bulkAdd(entries)
+  return await getDexieDb()
+    .table(getTableName(file.dictionaryType))
+    .bulkAdd(entries)
 }

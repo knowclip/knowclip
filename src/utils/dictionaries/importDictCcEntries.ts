@@ -1,4 +1,4 @@
-import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../../files/dictionaryFile'
 import { getGermanSearchTokens, getGermanDifferingStems } from '../dictCc'
 import { getTokenCombinations } from '../tokenCombinations'
 import { getDexieDb } from '../dictionariesDatabase'
@@ -8,7 +8,7 @@ export async function importDictCcEntries(
   data: string,
   file: DictCCDictionary
 ) {
-  const entries: Omit<LexiconEntry, 'key'>[] = []
+  const entries: Omit<LegacyLexiconEntry, 'key'>[] = []
 
   const lines = data.trim().split(/[\n\r]+/)
   const lastLineIndex = lines.length - 1
@@ -58,5 +58,7 @@ export async function importDictCcEntries(
     }
   }
 
-  await getDexieDb().table(getTableName(file.dictionaryType)).bulkAdd(entries)
+  return await getDexieDb()
+    .table(getTableName(file.dictionaryType))
+    .bulkAdd(entries)
 }

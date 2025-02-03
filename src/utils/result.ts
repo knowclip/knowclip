@@ -6,3 +6,9 @@ export const failure = (thrownValue: unknown): Failure => {
     error,
   }
 }
+
+export const success = <T>(value: T): Success<T> => {
+  return {
+    value,
+  }
+}

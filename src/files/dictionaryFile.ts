@@ -8,7 +8,7 @@ import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
 import { basename } from '../utils/rendererPathHelpers'
 import { FileUpdateName } from './FileUpdateName'
 
-export type LexiconEntry = {
+export type LegacyLexiconEntry = {
   variant: string | null
   key: number
   dictionaryKey: number
@@ -52,7 +52,7 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
       await effects
         .getDexieDb()
         .table(getTableName(file.dictionaryType))
-        .where('dictionaryKey' as keyof LexiconEntry)
+        .where('dictionaryKey' as keyof LegacyLexiconEntry)
         .equals(file.key)
         .first()
     )

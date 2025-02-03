@@ -2,7 +2,6 @@ import {
   EventHandler,
   Fragment,
   memo,
-  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -17,11 +16,10 @@ import {
   Popper,
 } from '@mui/material'
 import { Close } from '@mui/icons-material'
-import { tokenize } from 'wanakana'
 import usePopover from '../utils/usePopover'
 import css from './DictionaryPopover.module.css'
 import { numberToMark } from 'pinyin-utils'
-import { LexiconEntry } from '../files/dictionaryFile'
+import { LegacyLexiconEntry } from '../files/dictionaryFile'
 import {
   TranslatedToken,
   TranslatedTokensAtCharacterIndex,
@@ -29,6 +27,10 @@ import {
 import DarkTheme from './DarkTheme'
 import { actions } from '../actions'
 import { displayDictionaryType } from '../selectors'
+import { DatabaseTermEntryWithId } from '../vendor/yomitan/types/ext/dictionary-database'
+import { DictionaryPopoverJapaneseRuby } from './DictionaryPopoverJapaneseRuby'
+import { DictionaryPopoverYomitanContent } from './DictionaryPopoverYomitanContent'
+import { lookUpYomitan } from '../utils/dictionaries/lookUpYomitan'
 
 /** groups lookup results pointing to entries with identical heads
  * to avoid displaying the same head multiple times;
@@ -36,40 +38,42 @@ import { displayDictionaryType } from '../selectors'
  * to determine if the entries belong together (see `groupEntriesAndOrganizeVariantHeads`)
  */
 function groupIdenticalEntryHeads(
-  translatedToken: TranslatedToken,
-  sortEntriesFn?: (a: LexiconEntry, b: LexiconEntry) => number
+  translatedToken: TranslatedToken<LegacyLexiconEntry>,
+  sortEntriesFn?: (a: LegacyLexiconEntry, b: LegacyLexiconEntry) => number
 ) {
   const results: {
     head: string
     variant?: string
     pronunciation: string | null
     entries: {
-      entry: LexiconEntry
+      entry: LegacyLexiconEntry
       inflections: string[]
     }[]
   }[] = []
   for (const entryWithInflection of translatedToken.candidates) {
     const { entry } = entryWithInflection
-    const existingHead = results.find(
-      (r) => r.head === entry.head && r.pronunciation === entry.pronunciation
-    )
-    if (existingHead) {
-      existingHead.entries.push(entryWithInflection)
-      if (sortEntriesFn)
-        existingHead.entries.sort((a, b) => sortEntriesFn(a.entry, b.entry))
-    } else {
-      results.push({
-        head:
-          translatedToken.matchedTokenText === entry.variant
-            ? entry.variant
-            : entry.head,
-        variant:
-          translatedToken.matchedTokenText === entry.variant
-            ? entry.head
-            : entry.variant || undefined,
-        pronunciation: entry.pronunciation,
-        entries: [entryWithInflection],
-      })
+    if ('head' in entry) {
+      const existingHead = results.find(
+        (r) => r.head === entry.head && r.pronunciation === entry.pronunciation
+      )
+      if (existingHead) {
+        existingHead.entries.push(entryWithInflection)
+        if (sortEntriesFn)
+          existingHead.entries.sort((a, b) => sortEntriesFn(a.entry, b.entry))
+      } else {
+        results.push({
+          head:
+            translatedToken.matchedTokenText === entry.variant
+              ? entry.variant
+              : entry.head,
+          variant:
+            translatedToken.matchedTokenText === entry.variant
+              ? entry.head
+              : entry.variant || undefined,
+          pronunciation: entry.pronunciation,
+          entries: [entryWithInflection],
+        })
+      }
     }
   }
   return results
@@ -81,7 +85,7 @@ function groupIdenticalEntryHeads(
  */
 const groupEntriesAndOrganizeVariantHeads = (
   entries: {
-    entry: LexiconEntry
+    entry: LegacyLexiconEntry
     inflections: string[]
   }[]
 ) => {
@@ -90,7 +94,7 @@ const groupEntriesAndOrganizeVariantHeads = (
     inflections: string[]
     tags: string[]
 
-    entries: LexiconEntry[]
+    entries: LegacyLexiconEntry[]
   }[] = []
 
   for (const entry of entries) {
@@ -117,9 +121,9 @@ function doEntriesBelongTogether(
     head: string
     inflections: string[]
     tags: string[]
-    entries: LexiconEntry[]
+    entries: LegacyLexiconEntry[]
   },
-  entry: { entry: LexiconEntry; inflections: string[] }
+  entry: { entry: LegacyLexiconEntry; inflections: string[] }
 ): unknown {
   return (
     e.head === entry.entry.head &&
@@ -136,10 +140,12 @@ export function DictionaryPopover({
   popover,
   translationsAtCharacter,
   activeDictionaryType,
+  yomitanLookupResult,
 }: {
   popover: ReturnType<typeof usePopover>
   translationsAtCharacter: TranslatedTokensAtCharacterIndex | null
   activeDictionaryType: DictionaryFileType | null
+  yomitanLookupResult: Awaited<ReturnType<typeof lookUpYomitan>> | null
 }) {
   const { close: closePopover } = popover
   const closeOnClickAway: ClickAwayListenerProps['onClickAway'] = useCallback(
@@ -204,10 +210,22 @@ export function DictionaryPopover({
               </p>
             </>
           )}
-
+          {yomitanLookupResult &&
+            translationsAtCharacter &&
+            activeDictionaryType === 'YomitanDictionary' && (
+              <DictionaryPopoverYomitanContent
+                yomitanLookupResult={yomitanLookupResult}
+                translationsAtCharacter={
+                  translationsAtCharacter as TranslatedTokensAtCharacterIndex<DatabaseTermEntryWithId>
+                }
+              />
+            )}
           {translationsAtCharacter &&
             activeDictionaryType &&
-            translationsAtCharacter.translatedTokens.map((translatedToken) => {
+            activeDictionaryType !== 'YomitanDictionary' &&
+            (
+              translationsAtCharacter.translatedTokens as TranslatedToken<LegacyLexiconEntry>[]
+            ).map((translatedToken) => {
               return groupIdenticalEntryHeads(
                 translatedToken,
                 activeDictionaryType === 'DictCCDictionary'
@@ -242,12 +260,9 @@ export function DictionaryPopover({
                                 <> ({inflections.join(' › ')})</>
                               )}
                             </p>
-                            <p className={css.entryMeaningsList}>
-                              {entries
-                                .flatMap((e) => e.meanings)
-
-                                .join('; ')}
-                            </p>
+                            <div className={css.entryMeaningsList}>
+                              {entries.flatMap((e) => e.meanings).join('; ')}
+                            </div>
                           </Fragment>
                         )
                       }
@@ -275,7 +290,12 @@ function EntryHead({
 }) {
   switch (activeDictionaryType) {
     case 'YomichanDictionary':
-      return <JapaneseRuby head={head} pronunciation={pronunciation} />
+      return (
+        <DictionaryPopoverJapaneseRuby
+          head={head}
+          pronunciation={pronunciation}
+        />
+      )
     case 'CEDictDictionary':
       return (
         <span className={css.entryHeadWithRuby}>
@@ -289,67 +309,15 @@ function EntryHead({
       )
     case 'DictCCDictionary':
       return <>{head}</>
+    case 'YomitanDictionary':
+      return (
+        <DictionaryPopoverJapaneseRuby
+          head={head}
+          pronunciation={pronunciation}
+        />
+      )
   }
 }
-
-const JapaneseRuby = memo(
-  ({ head, pronunciation }: { head: string; pronunciation: string | null }) => {
-    if (!pronunciation)
-      return <span className={css.japaneseEntryHead}>{head}</span>
-
-    const chunks = tokenize(head)
-    return (
-      <span className={css.entryHeadWithRuby}>
-        {
-          chunks.reduce(
-            (acc, chunk, i) => {
-              const chunkString =
-                typeof chunk === 'string' ? chunk : chunk.value
-              if (
-                pronunciation.substr(
-                  acc.processedPronunciation.length,
-                  chunkString.length
-                ) === chunk
-              ) {
-                acc.processedPronunciation += chunk
-                acc.elements.push(<>{chunk}</>)
-              } else {
-                const nextChunk = chunks[i + 1]
-                const nextChunkText = nextChunk
-                  ? typeof nextChunk === 'string'
-                    ? nextChunk
-                    : nextChunk.value
-                  : null
-                const nextTokenIndex = nextChunkText
-                  ? pronunciation.indexOf(
-                      nextChunkText,
-                      acc.processedPronunciation.length
-                    )
-                  : pronunciation.length
-                const furigana = pronunciation.slice(
-                  acc.processedPronunciation.length,
-                  nextTokenIndex
-                )
-                acc.processedPronunciation += furigana
-                acc.elements.push(
-                  <ruby>
-                    {chunkString}
-                    <rt>{furigana}</rt>
-                  </ruby>
-                )
-              }
-              return acc
-            },
-            { processedPronunciation: '', elements: [] } as {
-              processedPronunciation: string
-              elements: ReactNode[]
-            }
-          ).elements
-        }
-      </span>
-    )
-  }
-)
 
 const ChineseRuby = memo(
   ({ head, pronunciation }: { head: string; pronunciation: string | null }) => {

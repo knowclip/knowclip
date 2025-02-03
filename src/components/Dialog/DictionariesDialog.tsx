@@ -60,22 +60,19 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
     DictionaryFileType | ''
   >('')
 
-  const handleClickImportDictionaryFile = useCallback(() => {
-    if (!newDictionaryType)
-      return dispatch(
-        r.simpleMessageSnackbar(
-          'Please select the type of dictionary you wish to import.'
+  const handleClickImportDictionaryFile = useCallback(
+    (dictionary: CreateDictionarySpecs) => {
+      dispatch(
+        r.confirmationDialog(
+          `Are you sure you want to import a dictionary right now? You won't be able to use the app while the import is in progress.`,
+          r.importDictionaryRequest(dictionary),
+          null,
+          true
         )
       )
-    dispatch(
-      r.confirmationDialog(
-        `Are you sure you want to import a dictionary right now? You won't be able to use the app while the import is in progress.`,
-        r.importDictionaryRequest(newDictionaryType),
-        null,
-        true
-      )
-    )
-  }, [newDictionaryType, dispatch])
+    },
+    [dispatch]
+  )
 
   const handleClickDeleteDatabase = useCallback(() => {
     dispatch(
@@ -134,6 +131,7 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
               <section style={{ textAlign: 'center' }}>
                 <CircularProgress />
               </section>
+              <p style={{ textAlign: 'center' }}>{progress.message}</p>
             </>
           )}
           {!isLoading && (
@@ -196,11 +194,13 @@ const DictionariesDialog = ({ open }: DialogProps<DictionariesDialogData>) => {
                 <DictionaryInstructions
                   {...{
                     dictionaryType: newDictionaryType as DictionaryFileType,
-                    button: (
+                    button: (newDictionarySpecs) => (
                       <Button
                         color="primary"
                         variant="contained"
-                        onClick={handleClickImportDictionaryFile}
+                        onClick={() =>
+                          handleClickImportDictionaryFile(newDictionarySpecs)
+                        }
                       >
                         Import dictionary .zip file
                       </Button>
@@ -273,7 +273,7 @@ export function DictionaryInstructions({
   button,
 }: {
   dictionaryType: DictionaryFileType
-  button: ReactNode
+  button: (newDictionarySpecs: CreateDictionarySpecs) => ReactNode
 }) {
   switch (dictionaryType) {
     case 'DictCCDictionary':
@@ -302,7 +302,9 @@ export function DictionaryInstructions({
             Once you've received the ZIP file, you may push the button below to
             import it into Knowclip.
           </p>
-          <section style={{ textAlign: 'center' }}>{button}</section>
+          <section style={{ textAlign: 'center' }}>
+            {button({ dictionaryType })}
+          </section>
         </>
       )
     case 'YomichanDictionary':
@@ -342,7 +344,9 @@ export function DictionaryInstructions({
             Once the .ZIP file is finished downloading, press the button below
             and point to the .ZIP file you just downloaded.
           </p>
-          <section style={{ textAlign: 'center' }}>{button}</section>
+          <section style={{ textAlign: 'center' }}>
+            {button({ dictionaryType })}
+          </section>
         </>
       )
     case 'CEDictDictionary':
@@ -379,17 +383,32 @@ export function DictionaryInstructions({
             Once the .ZIP file is finished downloading, press the IMPORT
             DICTIONARY button and point to the file in your download folder.
           </p>
-          <section style={{ textAlign: 'center' }}>{button}</section>
+          <section style={{ textAlign: 'center' }}>
+            {button({ dictionaryType })}
+          </section>
         </>
       )
     case 'YomitanDictionary':
-      return (
-        <>
-          <p>Yomitan!!</p>
-          <section style={{ textAlign: 'center' }}>{button}</section>
-        </>
-      )
+      return YomitanDictionaryInstructions({ button, dictionaryType })
   }
+}
+
+function YomitanDictionaryInstructions({
+  button,
+  dictionaryType,
+}: {
+  button: (newDictionarySpecs: CreateDictionarySpecs) => ReactNode
+  dictionaryType: DictionaryFileType
+}) {
+  // allow selection of language
+  return (
+    <>
+      <p>Yomitan!!</p>
+      <section style={{ textAlign: 'center' }}>
+        {button({ dictionaryType, language: 'ja' })}
+      </section>
+    </>
+  )
 }
 
 export function ImportInterruptedListIcon() {

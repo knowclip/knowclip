@@ -1,4 +1,4 @@
-import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../../files/dictionaryFile'
 import { lemmatize } from '../yomichanDictionary'
 import {
   TextTokensTranslations,
@@ -12,7 +12,7 @@ import {
 
 export async function lookUpCeDict(
   text: string
-): Promise<TextTokensTranslations> {
+): Promise<TextTokensTranslations<LegacyLexiconEntry>> {
   const dexie = getDexieDb()
   const { tokensByIndex: potentialTokens, allTokens } = parseFlat(text)
 
@@ -33,7 +33,7 @@ export async function lookUpCeDict(
   const allQueries = (
     (await table.bulkGet([
       ...new Set([...(await fromText.primaryKeys()), ...simplifiedFromText]),
-    ])) as LexiconEntry[]
+    ])) as LegacyLexiconEntry[]
   ).sort((a, b) => {
     const aTraditional = a.head
     const bTraditional = b.head
@@ -59,7 +59,7 @@ export async function lookUpCeDict(
         return []
       })
 
-      const translatedTokensAtCharacterIndex: TranslatedToken[] =
+      const translatedTokensAtCharacterIndex: TranslatedToken<LegacyLexiconEntry>[] =
         candidates.length
           ? [
               {

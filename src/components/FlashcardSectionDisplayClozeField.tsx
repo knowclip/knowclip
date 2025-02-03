@@ -79,20 +79,25 @@ const ClozeField = ({
     }
   }, [currentClozeIndex, clozeInputRef, editing])
   const clozeId = ClozeIds[currentClozeIndex]
-  const { viewMode, activeDictionaryType } = useSelector((state: AppState) => ({
-    viewMode: state.settings.viewMode,
-    activeDictionaryType: r.getActiveDictionaryType(state),
-  }))
+  const { viewMode, activeDictionaryType, activeDictionaries } = useSelector(
+    (state: AppState) => ({
+      viewMode: state.settings.viewMode,
+      activeDictionaryType: r.getActiveDictionaryType(state),
+      activeDictionaries: r.getActiveDictionaries(state),
+    })
+  )
 
   const {
     cursorPosition,
     translationsAtCharacter,
+    yomitanLookupResult,
     onKeyDown: handleKeyDown,
     handleFocus,
     handleBlur,
   } = useFieldPopoverDictionary(
     popover,
     activeDictionaryType,
+    activeDictionaries,
     clozeControls,
     value,
     editing
@@ -245,6 +250,7 @@ const ClozeField = ({
               activeDictionaryType={activeDictionaryType}
               popover={popover}
               translationsAtCharacter={translationsAtCharacter}
+              yomitanLookupResult={yomitanLookupResult}
             />
           )}
         </span>

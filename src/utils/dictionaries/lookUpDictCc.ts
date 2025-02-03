@@ -1,4 +1,4 @@
-import { getTableName, LexiconEntry } from '../../files/dictionaryFile'
+import { getTableName, LegacyLexiconEntry } from '../../files/dictionaryFile'
 import {
   germanSeparablePrefixes,
   getDifferingSearchStem,
@@ -21,7 +21,7 @@ export const MAX_GERMAN_SEARCH_TOKENS_COUNT = 5
 export async function lookUpDictCc(
   text: string,
   maxQueryTokensLength: number = 5
-): Promise<TextTokensTranslations> {
+): Promise<TextTokensTranslations<LegacyLexiconEntry>> {
   const dexie = getDexieDb()
 
   const textTokens = getGermanSearchTokensFromText(text)
@@ -53,12 +53,12 @@ export async function lookUpDictCc(
         .distinct()
         .toArray()
       return {
-        exactStemsMatches: (await exactStemsMatches) as LexiconEntry[],
+        exactStemsMatches: (await exactStemsMatches) as LegacyLexiconEntry[],
       }
     }
   )
 
-  const results: TranslatedTokensAtCharacterIndex[] = []
+  const results: TranslatedTokensAtCharacterIndex<LegacyLexiconEntry>[] = []
 
   let indexingCursor = 0
   let tokenIndex = 0
