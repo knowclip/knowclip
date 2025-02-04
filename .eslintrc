@@ -13,5 +13,6 @@
     "react/prop-types": "off",
     "react/display-name": "off"
   },
-  "parser": "@typescript-eslint/parser"
+  "parser": "@typescript-eslint/parser",
+  "ignorePatterns": "src/vendor"
 }
