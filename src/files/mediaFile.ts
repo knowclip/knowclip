@@ -470,10 +470,13 @@ export const updates = {
       file.flashcardFieldsToSubtitlesTracks
     )
       .filter(([_fieldName, givenTrackId]) => trackId !== givenTrackId)
-      .reduce((all, [fieldName, id]) => {
-        all[fieldName as TransliterationFlashcardFieldName] = id
-        return all
-      }, {} as Partial<Record<TransliterationFlashcardFieldName, string>>),
+      .reduce(
+        (all, [fieldName, id]) => {
+          all[fieldName as TransliterationFlashcardFieldName] = id
+          return all
+        },
+        {} as Partial<Record<TransliterationFlashcardFieldName, string>>
+      ),
   }),
   [FileUpdateName.LinkFlashcardFieldToSubtitlesTrack]: (
     file,

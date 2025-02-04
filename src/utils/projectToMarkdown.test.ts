@@ -41,7 +41,7 @@ describe('projectToMarkdown', () => {
       string,
       string,
       string,
-      string
+      string,
     ],
     tags: string[]
   ): { clip: Clip; flashcard: Flashcard } => ({

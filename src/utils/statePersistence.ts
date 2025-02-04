@@ -15,10 +15,13 @@ const mapFileState = <F, G>(
   transform: (type: FileMetadata['type'], f: F) => G
 ) =>
   FILE_TYPES.reduce((all, type) => {
-    all[type] = Object.keys(state[type] || {}).reduce((xxx, id) => {
-      xxx[id] = transform(type, state[type][id])
-      return xxx
-    }, {} as { [fileId: string]: G })
+    all[type] = Object.keys(state[type] || {}).reduce(
+      (xxx, id) => {
+        xxx[id] = transform(type, state[type][id])
+        return xxx
+      },
+      {} as { [fileId: string]: G }
+    )
     return all
   }, {} as FilesyState<G>)
 

@@ -1,10 +1,10 @@
 import type { BrowserWindow } from 'electron'
 import { Entry, ZipFile, open } from 'yauzl'
-import { failure } from '../result'
+import { failure } from '../../utils/result'
 
 export type ImportProgressPayload<
   D extends DictionaryFile,
-  DataTransferType = string
+  DataTransferType = string,
 > = {
   file: D
   filePath: string
@@ -91,7 +91,7 @@ export async function getIndexJsonFromZip(
 
 export async function openDictionaryZip<
   DictionaryFileType extends DictionaryFile,
-  DataTransferType = string
+  DataTransferType = string,
 >({
   file,
   filePath,

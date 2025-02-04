@@ -15,7 +15,7 @@ export type MessageHandlerResult<T extends MessageToMainType> = ReturnType<
 
 export type MessageResponse<
   R,
-  E = { name?: string; stack?: string; message: string }
+  E = { name?: string; stack?: string; message: string },
 > = Result<R, E>
 
 export function flatten<A extends any[], R>(

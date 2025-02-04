@@ -19,7 +19,7 @@ const getKeyboardShortcuts = (platform: Window['electronApi']['platform']) =>
     'Start making cloze deletion': 'C',
     'Stop making cloze deletion': 'Esc',
     'Save project': 'Cmd + S',
-  } as const)
+  }) as const
 
 type KeyboardShortcuts = ReturnType<typeof getKeyboardShortcuts>
 

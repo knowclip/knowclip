@@ -10,7 +10,7 @@ import {
 } from 'electron'
 import { readFileSync, promises, existsSync } from 'fs'
 import * as path from 'path'
-import { requestParseDictionary } from './utils/dictionaries/requestParseDictionary'
+import { requestParseDictionary } from './node/dictionaries/requestParseDictionary'
 import moment from 'moment'
 import { getPersistedDataSnapshot } from './test/getPersistedDataSnapshot'
 import { getMediaMetadata, readMediaFile } from './node/ffmpeg'

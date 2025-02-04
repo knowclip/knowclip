@@ -14,7 +14,7 @@ export async function importYomichanEntries(
     number,
     string[],
     number,
-    string
+    string,
   ][]
 
   const entries: Omit<LegacyLexiconEntry, 'key'>[] = []

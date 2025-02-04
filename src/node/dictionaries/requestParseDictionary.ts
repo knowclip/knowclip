@@ -1,10 +1,10 @@
 import type { BrowserWindow } from 'electron'
 import { openDictionaryZip, readEntryData } from './openDictionaryZip'
-import { failure, success } from '../result'
-import {
+import { failure, success } from '../../utils/result'
+import type {
   YomitanArchiveEntry,
   YomitanArchiveEntryType,
-} from './importYomitanEntries'
+} from '../../utils/dictionaries/importYomitanEntries'
 import { getImageMediaTypeFromFileName } from '../../vendor/yomitan/ext/js/media/media-util'
 
 export async function requestParseDictionary(

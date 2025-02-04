@@ -126,7 +126,7 @@ export async function newDictionary(
 }
 
 export type TranslatedTokensAtCharacterIndex<
-  EntryType extends LexiconEntry = LexiconEntry
+  EntryType extends LexiconEntry = LexiconEntry,
 > = {
   textCharacterIndex: number
   /** To be sorted by length of matchedTokenText */

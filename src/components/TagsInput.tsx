@@ -5,7 +5,7 @@ import classnames from 'clsx'
 import { tagsInput$ as $ } from './TagsInput.testLabels'
 
 export default function ChipsInput<
-  DisableClearable extends boolean | undefined = false
+  DisableClearable extends boolean | undefined = false,
 >({
   onAddChip,
   onDeleteChip,

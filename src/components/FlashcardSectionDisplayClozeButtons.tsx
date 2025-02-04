@@ -58,12 +58,12 @@ const ClozeButtons = ({
                 'Start making cloze deletion'
               )} key)`
             : currentClozeIndex === deletions.length
-            ? `Stop editing cloze deletions (${getKeyboardShortcut(
-                'Stop making cloze deletion'
-              )})`
-            : `Make a new cloze deletion card (${getKeyboardShortcut(
-                'Start making cloze deletion'
-              )} key)`
+              ? `Stop editing cloze deletions (${getKeyboardShortcut(
+                  'Stop making cloze deletion'
+                )})`
+              : `Make a new cloze deletion card (${getKeyboardShortcut(
+                  'Start making cloze deletion'
+                )} key)`
         }
         index={deletions.length}
         id={nextId}

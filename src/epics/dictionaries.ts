@@ -26,7 +26,7 @@ import { importYomichanEntries } from '../utils/dictionaries/importYomichanEntri
 import {
   ImportProgressPayload,
   ParseEndPayload,
-} from '../utils/dictionaries/openDictionaryZip'
+} from '../node/dictionaries/openDictionaryZip'
 import { importCedictEntries } from '../utils/dictionaries/importCeDictEntries'
 import { importDictCcEntries } from '../utils/dictionaries/importDictCcEntries'
 import {
@@ -108,9 +108,9 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
         ImportProgressPayload<typeof file, unknown>
       >('dictionary-import-progress')
       const parseEnd = effects
-        .fromIpcRendererEvent<ParseEndPayload<typeof file>>(
-          'dictionary-parse-end'
-        )
+        .fromIpcRendererEvent<
+          ParseEndPayload<typeof file>
+        >('dictionary-parse-end')
         .pipe(
           take(1),
           tap((event) => {
