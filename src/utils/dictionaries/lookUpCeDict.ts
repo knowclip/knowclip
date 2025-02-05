@@ -64,7 +64,7 @@ export async function lookUpCeDict(
           ? [
               {
                 matchedTokenText: token,
-                candidates: candidates.sort((a, b) => {
+                matches: candidates.sort((a, b) => {
                   const deprioritizeOldVariants = sortResult(
                     !(
                       a.entry.meanings.length &&

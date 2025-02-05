@@ -253,24 +253,28 @@ async function requestParseYomitanDictionary(
   const startMoment = Date.now()
 
   const indexJsonContents: Uint8Array[] = []
-  await openDictionaryZip({
-    file,
-    filePath,
-    mainWindow,
-    handleEntry: async (zipfile, entry, importProgressState) => {
-      if (entry.fileName === 'index.json') {
-        await readEntryData({
-          zipfile,
-          entry,
-          importProgressState,
-          handleData: async (data) => {
-            indexJsonContents.push(data)
-          },
-          handleEnd: async () => {},
-        })
-      }
-    },
-    handleClose() {},
+  await new Promise((res, rej) => {
+    openDictionaryZip({
+      file,
+      filePath,
+      mainWindow,
+      handleEntry: async (zipfile, entry, importProgressState) => {
+        if (entry.fileName === 'index.json') {
+          await readEntryData({
+            zipfile,
+            entry,
+            importProgressState,
+            handleData: async (data) => {
+              indexJsonContents.push(data)
+            },
+            handleEnd: async () => {},
+          })
+        }
+      },
+      handleClose() {
+        res(null)
+      },
+    })
   })
   const indexJsonTextContent = new TextDecoder().decode(
     indexJsonContents.reduce((acc, data) => {
@@ -281,6 +285,7 @@ async function requestParseYomitanDictionary(
       return newBuffer
     }, new Uint8Array())
   )
+  console.log({ indexJsonTextContent, indexJsonContents })
   let version: 1 | 2 | 3 = 3
   let title = ''
   try {

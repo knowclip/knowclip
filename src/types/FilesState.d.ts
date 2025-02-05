@@ -152,6 +152,10 @@ declare type CreateDictionarySpecs =
   | {
       dictionaryType: 'YomitanDictionary'
       language: string
+      metadata: {
+        indexJson?: string
+        stylesCss?: string
+      }
     }
 
 declare interface YomichanDictionary extends DictionaryFileBase {

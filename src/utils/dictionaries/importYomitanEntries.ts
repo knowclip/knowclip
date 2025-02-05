@@ -96,6 +96,7 @@ export async function importYomitanEntries(
   const validationResult = validateYomitanEntry(archiveEntry)
   console.log(
     'validationResult',
+    validationResult.value?.type,
     validationResult,
     'archiveEntry',
     archiveEntry
@@ -196,32 +197,36 @@ export async function importYomitanEntries(
           .table(YOMITAN_DICTIONARY_MEDIA_TABLE)
           .add(validationResult.value.validated satisfies YomitanMediaRecord)
       case 'index': {
-        const currentMetadata = await getDexieDb()
+        console.log('getting index json')
+        const [currentMetadata]: YomitanDictionary[] = await getDexieDb()
           .table(DICTIONARIES_TABLE)
-          .get(file.id)
-
+          .where('id' satisfies keyof YomitanDictionary)
+          .equals(file.id)
+          .toArray()
+        console.log('currentMetadata', currentMetadata)
+        // should probably also update in redux state
         return await getDexieDb()
           .table(DICTIONARIES_TABLE)
-          .update(file.id, {
-            metadata: {
-              ...(currentMetadata?.metadata || {}),
-              indexJson: validationResult.value,
-            },
-          } satisfies Partial<DictionaryFile>)
+          .where('id' satisfies keyof YomitanDictionary)
+          .equals(file.id)
+          .modify((file: YomitanDictionary) => {
+            file.metadata = {
+              ...(file?.metadata || {}),
+              indexJson: validationResult.value.validated,
+            }
+          })
       }
       case 'styles': {
-        const currentMetadata = await getDexieDb()
-          .table(DICTIONARIES_TABLE)
-          .get(file.id)
-
         return await getDexieDb()
           .table(DICTIONARIES_TABLE)
-          .update(file.id, {
-            metadata: {
-              ...(currentMetadata?.metadata || {}),
-              stylesCss: validationResult.value,
-            },
-          } satisfies Partial<DictionaryFile>)
+          .where('id' satisfies keyof YomitanDictionary)
+          .equals(file.id)
+          .modify((file: YomitanDictionary) => {
+            file.metadata = {
+              ...(file?.metadata || {}),
+              stylesCss: validationResult.value.validated,
+            }
+          })
       }
     }
   } catch (error) {

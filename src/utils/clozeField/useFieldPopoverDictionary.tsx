@@ -4,13 +4,13 @@ import { ClozeControls } from './useClozeControls'
 import { setSelectionRange } from './domSelection'
 import r from '../../redux'
 import { KEYS } from '../keyboard'
-import {
-  lookUpInDictionary,
-  TranslatedTokensAtCharacterIndex,
-} from '../dictionariesDatabase'
+import { lookUpInDictionary } from '../dictionariesDatabase'
 import { isTextFieldFocused } from '../isTextFieldFocused'
 import usePopover from '../usePopover'
-import { findTranslationsAtCharIndex } from '../dictionaries/findTranslationsAtCharIndex'
+import {
+  findTranslationsAtCharIndex,
+  TranslatedTokensAtCharacterIndex,
+} from '../dictionaries/findTranslationsAtCharIndex'
 import { usePrevious } from '../usePrevious'
 import { useClozeUiEffects } from './useClozeUiEffects'
 import { LETTERS_DIGITS_PLUS } from '../dictCc'
@@ -126,9 +126,26 @@ export function useFieldPopoverDictionary(
         activeDictionariesIds,
         value
       ).then((lookup) => {
-        if ('translations' in lookup) {
-          setTokenTranslations(lookup.translations.tokensTranslations)
+        if ('tags' in lookup) {
           setYomitanLookupResult(lookup)
+          const newTokensTranslations = Array.from(
+            value,
+            (_, i): TranslatedTokensAtCharacterIndex[] => {
+              const translatedTokens =
+                lookup.getTranslatedTokensAtCharacterIndex(i)
+              return translatedTokens.length === 0
+                ? []
+                : [
+                    {
+                      textCharacterIndex: i,
+                      translatedTokens,
+                    },
+                  ]
+            }
+          ).flat()
+          console.log({ newTokensTranslations })
+          setTokenTranslations(newTokensTranslations)
+          console.log({ lookup })
         } else {
           setTokenTranslations(lookup.tokensTranslations)
           setYomitanLookupResult(null)

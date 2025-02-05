@@ -55,7 +55,7 @@ export async function lookUpYomichanJMDict(
           ? [
               {
                 matchedTokenText: token,
-                candidates: candidates.sort((a, b) => {
+                matches: candidates.sort((a, b) => {
                   if (
                     [a.entry.head, b.entry.head].filter(
                       (head) => head === token

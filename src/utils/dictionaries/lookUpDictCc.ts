@@ -12,9 +12,9 @@ import {
   TextTokensTranslations,
   getDexieDb,
   TOKEN_COMBOS,
-  TranslatedTokensAtCharacterIndex,
   sortResult,
 } from '../dictionariesDatabase'
+import { TranslatedTokensAtCharacterIndex } from './findTranslationsAtCharIndex'
 
 export const MAX_GERMAN_SEARCH_TOKENS_COUNT = 5
 
@@ -58,7 +58,10 @@ export async function lookUpDictCc(
     }
   )
 
-  const results: TranslatedTokensAtCharacterIndex<LegacyLexiconEntry>[] = []
+  const results: TranslatedTokensAtCharacterIndex<
+    LegacyLexiconEntry,
+    string[]
+  >[] = []
 
   let indexingCursor = 0
   let tokenIndex = 0
@@ -90,7 +93,7 @@ export async function lookUpDictCc(
         translatedTokens: [
           {
             matchedTokenText: exactToken,
-            candidates: searchStemsAtIndex.map((entry) => ({
+            matches: searchStemsAtIndex.map((entry) => ({
               entry,
               inflections: [],
               variant: undefined,
@@ -108,7 +111,7 @@ export async function lookUpDictCc(
   for (const result of results) {
     const { matchedTokenText } = result.translatedTokens[0]
     const lowercaseMatchedTokenText = matchedTokenText.toLowerCase()
-    result.translatedTokens[0].candidates.sort((a, b) => {
+    result.translatedTokens[0].matches.sort((a, b) => {
       const deprioritizeObsolete = sortResult(
         !(a.entry.tags && a.entry.tags.includes('[obs.]')),
         !(b.entry.tags && b.entry.tags.includes('[obs.]'))
@@ -218,10 +221,10 @@ export async function lookUpDictCc(
             : 0
           : 2
         : aCandidatePrefix
-          ? textPrefixes.has(aCandidatePrefix)
-            ? 3
-            : 0
-          : 2
+        ? textPrefixes.has(aCandidatePrefix)
+          ? 3
+          : 0
+        : 2
       const bPrefixRelevanceScore = bMatchPrefix
         ? bCandidatePrefix
           ? bMatchPrefix === bCandidatePrefix
@@ -229,10 +232,10 @@ export async function lookUpDictCc(
             : 0
           : 2
         : bCandidatePrefix
-          ? textPrefixes.has(bCandidatePrefix)
-            ? 3
-            : 0
-          : 2
+        ? textPrefixes.has(bCandidatePrefix)
+          ? 3
+          : 0
+        : 2
 
       const prefixRelevance = bPrefixRelevanceScore - aPrefixRelevanceScore
       if (prefixRelevance) return prefixRelevance

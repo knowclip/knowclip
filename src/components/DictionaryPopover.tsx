@@ -21,8 +21,9 @@ import css from './DictionaryPopover.module.css'
 import { numberToMark } from 'pinyin-utils'
 import { LegacyLexiconEntry } from '../files/dictionaryFile'
 import {
+  LexiconEntry,
+  TokenTranslation,
   TranslatedToken,
-  TranslatedTokensAtCharacterIndex,
 } from '../utils/dictionariesDatabase'
 import DarkTheme from './DarkTheme'
 import { actions } from '../actions'
@@ -31,6 +32,8 @@ import { DatabaseTermEntryWithId } from '../vendor/yomitan/types/ext/dictionary-
 import { DictionaryPopoverJapaneseRuby } from './DictionaryPopoverJapaneseRuby'
 import { DictionaryPopoverYomitanContent } from './DictionaryPopoverYomitanContent'
 import { lookUpYomitan } from '../utils/dictionaries/lookUpYomitan'
+import { TranslatedTokensAtCharacterIndex } from '../utils/dictionaries/findTranslationsAtCharIndex'
+import { TransformedText } from '../vendor/yomitan/types/ext/language-transformer-internal'
 
 /** groups lookup results pointing to entries with identical heads
  * to avoid displaying the same head multiple times;
@@ -45,12 +48,9 @@ function groupIdenticalEntryHeads(
     head: string
     variant?: string
     pronunciation: string | null
-    entries: {
-      entry: LegacyLexiconEntry
-      inflections: string[]
-    }[]
+    entries: TokenTranslation<LegacyLexiconEntry>[]
   }[] = []
-  for (const entryWithInflection of translatedToken.candidates) {
+  for (const entryWithInflection of translatedToken.matches) {
     const { entry } = entryWithInflection
     if ('head' in entry) {
       const existingHead = results.find(
@@ -84,10 +84,7 @@ function groupIdenticalEntryHeads(
  * if they should be displayed together
  */
 const groupEntriesAndOrganizeVariantHeads = (
-  entries: {
-    entry: LegacyLexiconEntry
-    inflections: string[]
-  }[]
+  entries: TokenTranslation<LegacyLexiconEntry, string[]>[]
 ) => {
   const result: {
     head: string
@@ -104,7 +101,7 @@ const groupEntriesAndOrganizeVariantHeads = (
     } else {
       result.push({
         head: entry.entry.head,
-        inflections: entry.inflections,
+        inflections: entry.inflections || [],
         tags: entry.entry.tags ? entry.entry.tags.split(/\s/) : [],
 
         entries: [entry.entry],
@@ -123,12 +120,12 @@ function doEntriesBelongTogether(
     tags: string[]
     entries: LegacyLexiconEntry[]
   },
-  entry: { entry: LegacyLexiconEntry; inflections: string[] }
+  entry: TokenTranslation<LegacyLexiconEntry, string[]>
 ): unknown {
   return (
     e.head === entry.entry.head &&
-    new Set([...e.inflections, ...entry.inflections]).size ===
-      entry.inflections.length &&
+    new Set([...e.inflections, ...(entry.inflections || [])]).size ===
+      (entry.inflections?.length || 0) &&
     new Set([
       ...e.tags,
       ...(entry.entry.tags ? entry.entry.tags.split(/\s/) : []),
@@ -136,17 +133,24 @@ function doEntriesBelongTogether(
   )
 }
 
-export function DictionaryPopover({
+export function DictionaryPopover<
+  EntryType extends LexiconEntry,
+  InflectionType
+>({
   popover,
   translationsAtCharacter,
   activeDictionaryType,
   yomitanLookupResult,
 }: {
   popover: ReturnType<typeof usePopover>
-  translationsAtCharacter: TranslatedTokensAtCharacterIndex | null
+  translationsAtCharacter: TranslatedTokensAtCharacterIndex<
+    EntryType,
+    InflectionType
+  > | null
   activeDictionaryType: DictionaryFileType | null
   yomitanLookupResult: Awaited<ReturnType<typeof lookUpYomitan>> | null
 }) {
+  console.log({ yomitanLookupResult })
   const { close: closePopover } = popover
   const closeOnClickAway: ClickAwayListenerProps['onClickAway'] = useCallback(
     (e) => closePopover(e),
@@ -210,16 +214,17 @@ export function DictionaryPopover({
               </p>
             </>
           )}
-          {yomitanLookupResult &&
-            translationsAtCharacter &&
-            activeDictionaryType === 'YomitanDictionary' && (
-              <DictionaryPopoverYomitanContent
-                yomitanLookupResult={yomitanLookupResult}
-                translationsAtCharacter={
-                  translationsAtCharacter as TranslatedTokensAtCharacterIndex<DatabaseTermEntryWithId>
-                }
-              />
-            )}
+          {yomitanLookupResult && (
+            <DictionaryPopoverYomitanContent
+              yomitanLookupResult={yomitanLookupResult}
+              translationsAtCharacter={
+                translationsAtCharacter as TranslatedTokensAtCharacterIndex<
+                  DatabaseTermEntryWithId,
+                  TransformedText
+                >
+              }
+            />
+          )}
           {translationsAtCharacter &&
             activeDictionaryType &&
             activeDictionaryType !== 'YomitanDictionary' &&

@@ -15,6 +15,7 @@ import {
   Tag,
 } from '../vendor/yomitan/types/ext/dictionary-database'
 import { YomitanMediaRecord } from './dictionaries/importYomitanEntries'
+import { TranslatedTokensAtCharacterIndex } from './dictionaries/findTranslationsAtCharIndex'
 
 // table names
 export const DICTIONARIES_TABLE = 'dictionaries'
@@ -109,7 +110,9 @@ export async function newDictionary(
           language: dictionary.language,
           id,
           name: basename(platform, filePath),
+          // don't forget to update this
           importComplete: false,
+          metadata: dictionary.metadata,
         }
       : {
           type: 'Dictionary',
@@ -125,25 +128,32 @@ export async function newDictionary(
   return { ...dicProps, key }
 }
 
-export type TranslatedTokensAtCharacterIndex<
-  EntryType extends LexiconEntry = LexiconEntry,
-> = {
-  textCharacterIndex: number
-  /** To be sorted by length of matchedTokenText */
-  translatedTokens: TranslatedToken<EntryType>[]
-}
 export type LexiconEntry = LegacyLexiconEntry | DatabaseTermEntryWithId
 
-export type TranslatedToken<EntryType extends LexiconEntry = LexiconEntry> = {
-  matchedTokenText: string
-  candidates: {
-    entry: EntryType
-    inflections: string[]
-  }[]
+export type TokenTranslation<
+  EntryType extends LexiconEntry = LexiconEntry,
+  InflectionType = string[]
+> = {
+  entry: EntryType
+  inflections?: InflectionType
 }
 
-export type TextTokensTranslations<EntryType extends LexiconEntry> = {
-  tokensTranslations: TranslatedTokensAtCharacterIndex<EntryType>[]
+export type TranslatedToken<
+  EntryType extends LexiconEntry = LexiconEntry,
+  InflectionType = string[]
+> = {
+  matchedTokenText: string
+  matches: TokenTranslation<EntryType, InflectionType>[]
+}
+
+export type TextTokensTranslations<
+  EntryType extends LexiconEntry,
+  InflectionType = string[]
+> = {
+  tokensTranslations: TranslatedTokensAtCharacterIndex<
+    EntryType,
+    InflectionType
+  >[]
   characterIndexToTranslationsMappings: Array<undefined | number>
 }
 
