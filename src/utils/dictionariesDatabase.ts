@@ -132,7 +132,7 @@ export type LexiconEntry = LegacyLexiconEntry | DatabaseTermEntryWithId
 
 export type TokenTranslation<
   EntryType extends LexiconEntry = LexiconEntry,
-  InflectionType = string[]
+  InflectionType = string[],
 > = {
   entry: EntryType
   inflections?: InflectionType
@@ -140,7 +140,7 @@ export type TokenTranslation<
 
 export type TranslatedToken<
   EntryType extends LexiconEntry = LexiconEntry,
-  InflectionType = string[]
+  InflectionType = string[],
 > = {
   matchedTokenText: string
   matches: TokenTranslation<EntryType, InflectionType>[]
@@ -148,7 +148,7 @@ export type TranslatedToken<
 
 export type TextTokensTranslations<
   EntryType extends LexiconEntry,
-  InflectionType = string[]
+  InflectionType = string[],
 > = {
   tokensTranslations: TranslatedTokensAtCharacterIndex<
     EntryType,

@@ -221,10 +221,10 @@ export async function lookUpDictCc(
             : 0
           : 2
         : aCandidatePrefix
-        ? textPrefixes.has(aCandidatePrefix)
-          ? 3
-          : 0
-        : 2
+          ? textPrefixes.has(aCandidatePrefix)
+            ? 3
+            : 0
+          : 2
       const bPrefixRelevanceScore = bMatchPrefix
         ? bCandidatePrefix
           ? bMatchPrefix === bCandidatePrefix
@@ -232,10 +232,10 @@ export async function lookUpDictCc(
             : 0
           : 2
         : bCandidatePrefix
-        ? textPrefixes.has(bCandidatePrefix)
-          ? 3
-          : 0
-        : 2
+          ? textPrefixes.has(bCandidatePrefix)
+            ? 3
+            : 0
+          : 2
 
       const prefixRelevance = bPrefixRelevanceScore - aPrefixRelevanceScore
       if (prefixRelevance) return prefixRelevance
