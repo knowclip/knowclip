@@ -5,7 +5,9 @@ import {
   concatWith,
   count,
   filter,
+  ignoreElements,
   map,
+  mergeAll,
   mergeMap,
   take,
   takeUntil,
@@ -16,6 +18,7 @@ import { ActionOf, actions } from '../actions'
 import * as s from '../selectors'
 import {
   deleteDictionary,
+  DICTIONARIES_TABLE,
   newDictionary,
   resetDictionariesDatabase,
 } from '../utils/dictionariesDatabase'
@@ -108,9 +111,9 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
         ImportProgressPayload<typeof file, unknown>
       >('dictionary-import-progress')
       const parseEnd = effects
-        .fromIpcRendererEvent<
-          ParseEndPayload<typeof file>
-        >('dictionary-parse-end')
+        .fromIpcRendererEvent<ParseEndPayload<typeof file>>(
+          'dictionary-parse-end'
+        )
         .pipe(
           take(1),
           tap((event) => {
@@ -149,13 +152,19 @@ const startImportEpic: AppEpic = (action$, state$, effects) =>
             const { progressPercentage, message, data } =
               importProgressEventPayload
 
-            if (data) await importDictionaryEntries(file, data)
+            const importResult = data
+              ? await importDictionaryEntries(file, data)
+              : null
 
-            return actions.setProgress({
-              percentage: progressPercentage,
-              message: message,
-            })
+            return from([
+              actions.setProgress({
+                percentage: progressPercentage,
+                message: message,
+              }),
+              ...(importResult?.action ? [importResult.action] : []),
+            ])
           }),
+          mergeAll(),
           concatWith(
             defer(async () => {
               console.log('parse end payload', parseEndPayload)
@@ -302,26 +311,66 @@ const deleteDatabaseEpic: AppEpic = (action$, state$, _effects) =>
     })
   )
 
+const updateDictionaryEpic: AppEpic = (action$, state$, effects) =>
+  action$.pipe(
+    ofType(A.updateFile as const),
+    filter((action) => action.update.fileType === 'Dictionary'),
+    mergeMap((action) => {
+      const db = effects.getDexieDb()
+      const file = s.getFile<DictionaryFile>(
+        state$.value,
+        'Dictionary',
+        action.update.id
+      )
+      if (!file)
+        throw new Error(
+          `Could not find dictionary file with id ${action.update.id}`
+        )
+      return db
+        .table(DICTIONARIES_TABLE)
+        .where('id' satisfies keyof DictionaryFile)
+        .equals(action.update.id)
+        .modify((dbFile: DictionaryFile): DictionaryFile => {
+          return { ...dbFile, ...file }
+        })
+    }),
+    ignoreElements(),
+    catchError((err) => {
+      return of(
+        actions.simpleMessageSnackbar(
+          `Problem updating dictionary in database: ${err}`
+        )
+      )
+    })
+  )
+
 export default combineEpics(
   initializeDictionaries,
   importDictionaryRequestEpic,
   startImportEpic,
   deleteDatabaseEpic,
-  deleteImportedDictionaryEpic
+  deleteImportedDictionaryEpic,
+  updateDictionaryEpic
 )
 
-function importDictionaryEntries(
+async function importDictionaryEntries(
   file: DictionaryFile,
   data: unknown
-): Promise<IndexableType> {
+): Promise<{ indexedDbUpdate?: IndexableType | null; action?: Action }> {
   switch (file.dictionaryType) {
     case 'YomichanDictionary':
-      return importYomichanEntries(data as string, file)
+      return {
+        indexedDbUpdate: await importYomichanEntries(data as string, file),
+      }
     case 'CEDictDictionary':
-      return importCedictEntries(data as string, file)
+      return {
+        indexedDbUpdate: await importCedictEntries(data as string, file),
+      }
     case 'DictCCDictionary':
-      return importDictCcEntries(data as string, file)
+      return {
+        indexedDbUpdate: await importDictCcEntries(data as string, file),
+      }
     case 'YomitanDictionary':
-      return importYomitanEntries(data as YomitanArchiveEntry, file)
+      return await importYomitanEntries(data as YomitanArchiveEntry, file)
   }
 }

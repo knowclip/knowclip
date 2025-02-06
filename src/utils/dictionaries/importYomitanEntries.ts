@@ -26,6 +26,7 @@ import type {
 } from '../../vendor/yomitan/types/ext/dictionary-database'
 import { IndexableType } from 'dexie'
 import { failure } from '../result'
+import { actions } from '../../actions'
 
 const ajv = new Ajv()
 const validatorCache = new Map<object, ValidateFunction>()
@@ -92,7 +93,7 @@ export type YomitanDataOf<T extends YomitanArchiveEntryType> = Extract<
 export async function importYomitanEntries(
   archiveEntry: YomitanArchiveEntry,
   file: YomitanDictionary
-): Promise<IndexableType> {
+): Promise<{ indexedDbUpdate?: IndexableType; action?: Action }> {
   const validationResult = validateYomitanEntry(archiveEntry)
   console.log(
     'validationResult',
@@ -107,127 +108,118 @@ export async function importYomitanEntries(
   try {
     switch (validationResult.value.type) {
       case 'term_bank':
-        return await getDexieDb()
-          .table(YOMITAN_DICTIONARY_TERMS_TABLE)
-          .bulkAdd(
-            (validationResult.value.validated as any[]).map(
-              (entry): DatabaseTermEntry =>
-                archiveEntry.dictionaryVersion === 1
-                  ? convertTermBankEntryV1(
-                      entry as [],
-                      archiveEntry.dictionaryId
-                    )
-                  : convertTermBankEntryV3(
-                      entry as [],
-                      archiveEntry.dictionaryId
-                    )
-            )
-          )
-      // TODO: check that validationresult value json is in the expected format for all record types below
+        return {
+          indexedDbUpdate: await getDexieDb()
+            .table(YOMITAN_DICTIONARY_TERMS_TABLE)
+            .bulkAdd(
+              (validationResult.value.validated as any[]).map(
+                (entry): DatabaseTermEntry =>
+                  archiveEntry.dictionaryVersion === 1
+                    ? convertTermBankEntryV1(
+                        entry as [],
+                        archiveEntry.dictionaryId
+                      )
+                    : convertTermBankEntryV3(
+                        entry as [],
+                        archiveEntry.dictionaryId
+                      )
+              )
+            ),
+        }
       case 'term_meta_bank':
-        return await getDexieDb()
-          .table(YOMITAN_DICTIONARY_TERMS_META_TABLE)
-          .bulkAdd(
-            (validationResult.value.validated as any[]).map(
-              ([expression, mode, data]): DatabaseTermMeta => {
-                return {
-                  expression,
-                  mode,
-                  data,
-                  dictionary: file.id,
+        return {
+          indexedDbUpdate: await getDexieDb()
+            .table(YOMITAN_DICTIONARY_TERMS_META_TABLE)
+            .bulkAdd(
+              (validationResult.value.validated as any[]).map(
+                ([expression, mode, data]): DatabaseTermMeta => {
+                  return {
+                    expression,
+                    mode,
+                    data,
+                    dictionary: file.id,
+                  }
                 }
-              }
-            )
-          )
+              )
+            ),
+        }
       case 'kanji_bank':
-        return await getDexieDb()
-          .table(YOMITAN_DICTIONARY_KANJI_TABLE)
-          .bulkAdd(
-            (validationResult.value.validated as any[]).map(
-              ([
-                character,
-                onyomi,
-                kunyomi,
-                tags,
-                meanings,
-                stats,
-              ]): DatabaseKanjiEntry => ({
-                character,
-                onyomi,
-                kunyomi,
-                tags,
-                meanings,
-                dictionary: file.id,
-                stats,
-              })
-            )
-          )
-      case 'kanji_meta_bank':
-        return await getDexieDb()
-          .table(YOMITAN_DICTIONARY_KANJI_META_TABLE)
-          .bulkAdd(
-            (validationResult.value.validated as any[]).map(
-              ([character, mode, data]): DatabaseKanjiMeta => {
-                return {
+        return {
+          indexedDbUpdate: await getDexieDb()
+            .table(YOMITAN_DICTIONARY_KANJI_TABLE)
+            .bulkAdd(
+              (validationResult.value.validated as any[]).map(
+                ([
                   character,
-                  mode,
-                  data,
+                  onyomi,
+                  kunyomi,
+                  tags,
+                  meanings,
+                  stats,
+                ]): DatabaseKanjiEntry => ({
+                  character,
+                  onyomi,
+                  kunyomi,
+                  tags,
+                  meanings,
                   dictionary: file.id,
+                  stats,
+                })
+              )
+            ),
+        }
+      case 'kanji_meta_bank':
+        return {
+          indexedDbUpdate: await getDexieDb()
+            .table(YOMITAN_DICTIONARY_KANJI_META_TABLE)
+            .bulkAdd(
+              (validationResult.value.validated as any[]).map(
+                ([character, mode, data]): DatabaseKanjiMeta => {
+                  return {
+                    character,
+                    mode,
+                    data,
+                    dictionary: file.id,
+                  }
                 }
-              }
-            )
-          )
+              )
+            ),
+        }
       case 'tag_bank':
-        return await getDexieDb()
-          .table(YOMITAN_DICTIONARY_TAGS_TABLE)
-          .bulkAdd(
-            (validationResult.value.validated as any[]).map(
-              ([name, category, order, notes, score]): Tag => ({
-                name,
-                category,
-                order,
-                notes,
-                score,
-                dictionary: file.id,
-              })
-            )
-          )
+        return {
+          indexedDbUpdate: await getDexieDb()
+            .table(YOMITAN_DICTIONARY_TAGS_TABLE)
+            .bulkAdd(
+              (validationResult.value.validated as any[]).map(
+                ([name, category, order, notes, score]): Tag => ({
+                  name,
+                  category,
+                  order,
+                  notes,
+                  score,
+                  dictionary: file.id,
+                })
+              )
+            ),
+        }
       case 'image':
-        return await getDexieDb()
-          .table(YOMITAN_DICTIONARY_MEDIA_TABLE)
-          .add(validationResult.value.validated satisfies YomitanMediaRecord)
-      case 'index': {
-        console.log('getting index json')
-        const [currentMetadata]: YomitanDictionary[] = await getDexieDb()
-          .table(DICTIONARIES_TABLE)
-          .where('id' satisfies keyof YomitanDictionary)
-          .equals(file.id)
-          .toArray()
-        console.log('currentMetadata', currentMetadata)
-        // should probably also update in redux state
-        return await getDexieDb()
-          .table(DICTIONARIES_TABLE)
-          .where('id' satisfies keyof YomitanDictionary)
-          .equals(file.id)
-          .modify((file: YomitanDictionary) => {
-            file.metadata = {
-              ...(file?.metadata || {}),
-              indexJson: validationResult.value.validated,
-            }
-          })
-      }
-      case 'styles': {
-        return await getDexieDb()
-          .table(DICTIONARIES_TABLE)
-          .where('id' satisfies keyof YomitanDictionary)
-          .equals(file.id)
-          .modify((file: YomitanDictionary) => {
-            file.metadata = {
-              ...(file?.metadata || {}),
-              stylesCss: validationResult.value.validated,
-            }
-          })
-      }
+        return {
+          indexedDbUpdate: await getDexieDb()
+            .table(YOMITAN_DICTIONARY_MEDIA_TABLE)
+            .add(validationResult.value.validated satisfies YomitanMediaRecord),
+        }
+      case 'index':
+        return {
+          action: actions.updateDictionaryMetadata(file.id, {
+            indexJson: validationResult.value.validated,
+          }),
+        }
+      case 'styles':
+        return {
+          action: actions.updateDictionaryMetadata(file.id, {
+            stylesCss: validationResult.value.validated,
+          }),
+        }
     }
   } catch (error) {
     console.error(`Error importing ${archiveEntry.data.type} entries`, error)
@@ -325,17 +317,6 @@ function convertTermBankEntryV3(
     sequence,
     termTags,
   ] = entry as [any, string, ...any[]]
-  // console.log('entry v3', entry, {
-  //   expression,
-  //   reading: reading.length > 0 ? reading : expression,
-  //   definitionTags,
-  //   rules,
-  //   score,
-  //   glossary,
-  //   sequence,
-  //   termTags,
-  //   dictionary,
-  // })
   return {
     expression,
     reading: reading.length > 0 ? reading : expression,

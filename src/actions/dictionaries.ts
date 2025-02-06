@@ -32,7 +32,18 @@ const finishDictionaryImport = (id: FileId) =>
     id,
     fileType: 'Dictionary',
   })
+const updateDictionaryMetadata = (
+  id: FileId,
+  metadata: YomitanDictionaryMetadata
+) =>
+  filesActions.updateFile({
+    updateName: FileUpdateName.UpdateDictionaryMetadata,
+    updatePayload: [metadata],
+    id,
+    fileType: 'Dictionary',
+  })
 
 export const compositeDictionariesActions = {
   finishDictionaryImport,
+  updateDictionaryMetadata,
 }

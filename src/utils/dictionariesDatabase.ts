@@ -110,9 +110,8 @@ export async function newDictionary(
           language: dictionary.language,
           id,
           name: basename(platform, filePath),
-          // don't forget to update this
           importComplete: false,
-          metadata: dictionary.metadata,
+          metadata: {},
         }
       : {
           type: 'Dictionary',
@@ -132,7 +131,7 @@ export type LexiconEntry = LegacyLexiconEntry | DatabaseTermEntryWithId
 
 export type TokenTranslation<
   EntryType extends LexiconEntry = LexiconEntry,
-  InflectionType = string[],
+  InflectionType = string[]
 > = {
   entry: EntryType
   inflections?: InflectionType
@@ -140,7 +139,7 @@ export type TokenTranslation<
 
 export type TranslatedToken<
   EntryType extends LexiconEntry = LexiconEntry,
-  InflectionType = string[],
+  InflectionType = string[]
 > = {
   matchedTokenText: string
   matches: TokenTranslation<EntryType, InflectionType>[]
@@ -148,7 +147,7 @@ export type TranslatedToken<
 
 export type TextTokensTranslations<
   EntryType extends LexiconEntry,
-  InflectionType = string[],
+  InflectionType = string[]
 > = {
   tokensTranslations: TranslatedTokensAtCharacterIndex<
     EntryType,

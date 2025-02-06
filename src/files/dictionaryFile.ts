@@ -111,4 +111,14 @@ export const updates = {
     ...file,
     importComplete: true,
   }),
+  [FileUpdateName.UpdateDictionaryMetadata]: (
+    file,
+    metadata: Partial<YomitanDictionaryMetadata>
+  ) => ({
+    ...file,
+    metadata: {
+      ...(file.dictionaryType === 'YomitanDictionary' ? file.metadata : {}),
+      ...metadata,
+    },
+  }),
 } satisfies FileUpdatesForFileType<DictionaryFile>

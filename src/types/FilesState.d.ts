@@ -142,48 +142,44 @@ declare type DictionaryFile =
   | DictCCDictionary
   | YomitanDictionary
 
+type YomitanDictionaryMetadata = {
+  indexJson?: object
+  stylesCss?: string
+}
+
 declare type CreateDictionarySpecs =
-  | {
-      dictionaryType:
-        | 'YomichanDictionary'
-        | 'CEDictDictionary'
-        | 'DictCCDictionary'
-    }
+  | { dictionaryType: 'YomichanDictionary' }
+  | { dictionaryType: 'CEDictDictionary' }
+  | { dictionaryType: 'DictCCDictionary' }
   | {
       dictionaryType: 'YomitanDictionary'
       language: string
-      metadata: {
-        indexJson?: string
-        stylesCss?: string
-      }
+      metadata: YomitanDictionaryMetadata
     }
 
-declare interface YomichanDictionary extends DictionaryFileBase {
-  dictionaryType: 'YomichanDictionary'
-}
-declare interface CEDictDictionary extends DictionaryFileBase {
-  dictionaryType: 'CEDictDictionary'
-}
-declare interface DictCCDictionary extends DictionaryFileBase {
-  dictionaryType: 'DictCCDictionary'
-}
-declare interface YomitanDictionary extends DictionaryFileBase {
-  dictionaryType: 'YomitanDictionary'
-  language: string
-}
+declare type YomichanDictionary = Extract<
+  DictionaryFileBase,
+  { dictionaryType: 'YomichanDictionary' }
+>
+declare type CEDictDictionary = Extract<
+  DictionaryFileBase,
+  { dictionaryType: 'CEDictDictionary' }
+>
+declare type DictCCDictionary = Extract<
+  DictionaryFileBase,
+  { dictionaryType: 'DictCCDictionary' }
+>
+declare type YomitanDictionary = Extract<
+  DictionaryFileBase,
+  { dictionaryType: 'YomitanDictionary' }
+>
 
-declare type DictionaryFileBase = {
+declare type DictionaryFileBase = CreateDictionarySpecs & {
   type: 'Dictionary'
-  dictionaryType: DictionaryFileType
   id: FileId
   key: number
   name: string
   importComplete: boolean
-  /** for yomitan, an object with
-   * - indexJson: the contents of index.json from archive
-   * - stylesCss: the contents of styles.css
-   * */
-  metadata?: any
 }
 
 declare type DictionaryFileType =
