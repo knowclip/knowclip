@@ -405,7 +405,7 @@ function YomitanDictionaryInstructions({
     <>
       <p>Yomitan!!</p>
       <section style={{ textAlign: 'center' }}>
-        {button({ dictionaryType, language: 'ja' })}
+        {button({ dictionaryType, language: 'ja', metadata: {} })}
       </section>
     </>
   )

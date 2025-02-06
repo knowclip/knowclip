@@ -108,23 +108,6 @@ export async function lookUpYomitan(
     ),
   ]
 
-  const dictionaries: YomitanDictionary[] = await dexie
-    .table(DICTIONARIES_TABLE)
-    .where('id' satisfies keyof DictionaryFileBase)
-    .anyOf([...activeDictionariesIds])
-    .toArray()
-  const dictionaryIdsToMetadatas = new Map<
-    string,
-    {
-      indexJson?: Record<string, unknown>
-      stylesCss?: string
-    }
-  >()
-  for (const dictionary of dictionaries) {
-    dictionaryIdsToMetadatas.set(dictionary.id, dictionary.metadata)
-    console.log(dictionary.id, dictionary.metadata)
-  }
-
   const translations: DatabaseTermEntryWithId[] = await dexie
     .table(YOMITAN_DICTIONARY_TERMS_TABLE)
     .where('expression' satisfies keyof DatabaseTermEntryWithId)
@@ -243,7 +226,6 @@ export async function lookUpYomitan(
     getTranslatedTokensAtCharacterIndex,
     tags: Object.fromEntries(tags.map((tag) => [tag.name, tag])),
     media,
-    dictionaryIdsToMetadatas,
   }
 }
 

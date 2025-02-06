@@ -143,7 +143,7 @@ declare type DictionaryFile =
   | YomitanDictionary
 
 type YomitanDictionaryMetadata = {
-  indexJson?: object
+  indexJson?: Record<string, any>
   stylesCss?: string
 }
 

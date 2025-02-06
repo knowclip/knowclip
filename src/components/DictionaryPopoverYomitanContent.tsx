@@ -16,6 +16,8 @@ import { lookUpYomitan } from '../utils/dictionaries/lookUpYomitan'
 import { Tooltip } from '@mui/material'
 import { TransformedText } from '../vendor/yomitan/types/ext/language-transformer-internal'
 import { TokenTranslation } from '../utils/dictionariesDatabase'
+import { useSelector } from 'react-redux'
+import { getActiveYomitanDictionaryFilesMap } from '../selectors'
 
 function groupTranslationsByExpressionAndReadingAndRules(
   tokenTranslations: TokenTranslation<
@@ -90,6 +92,8 @@ export function DictionaryPopoverYomitanContent({
   >
 }) {
   const structuredContentGenerator = useStructuredContentGenerator()
+  const activeDictionaries = useSelector(getActiveYomitanDictionaryFilesMap)
+  useYomitanDictionariesCss(activeDictionaries)
 
   if (!translationsAtCharacter) return null
 
@@ -132,12 +136,11 @@ export function DictionaryPopoverYomitanContent({
                           {entries.map((translation, i) => {
                             const { glossary } = translation
                             const dictionaryId = translation.dictionary
-                            const dictionaryMetadata =
-                              yomitanLookupResult.dictionaryIdsToMetadatas.get(
-                                dictionaryId
-                              )
+                            const dictionary =
+                              activeDictionaries.get(dictionaryId)
+                            console.log('dictionary', dictionary)
                             const dictionaryTag: Tag = {
-                              name: dictionaryMetadata?.indexJson
+                              name: dictionary?.metadata?.indexJson
                                 ?.title as string,
                               score: 0,
                               category: 'dictionary',
@@ -460,4 +463,30 @@ function useStructuredContentGenerator() {
     )
   }, [])
   return ref
+}
+
+function useYomitanDictionariesCss(
+  activeDictionaries: Map<string, YomitanDictionary>
+) {
+  const ref = useRef<HTMLStyleElement | null>(null)
+  useEffect(() => {
+    const styleTag = ref.current || document.createElement('style')
+    ref.current ||= styleTag
+    styleTag.setAttribute('id', `yomitan-dictionary-styles`)
+    styleTag.setAttribute('type', 'text/css')
+    const css = Array.from(
+      activeDictionaries,
+      ([, dictionary]) => dictionary.metadata?.stylesCss || ''
+    ).join('\n')
+    styleTag.textContent = css
+    console.log('css', css, { styleTag })
+    if (!document.head.contains(styleTag)) document.head.appendChild(styleTag)
+  }, [activeDictionaries])
+  useEffect(() => {
+    return () => {
+      if (ref.current && document.head.contains(ref.current)) {
+        document.head.removeChild(ref.current)
+      }
+    }
+  }, [])
 }

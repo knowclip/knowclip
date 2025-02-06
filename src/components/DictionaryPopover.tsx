@@ -135,7 +135,7 @@ function doEntriesBelongTogether(
 
 export function DictionaryPopover<
   EntryType extends LexiconEntry,
-  InflectionType,
+  InflectionType
 >({
   popover,
   translationsAtCharacter,
