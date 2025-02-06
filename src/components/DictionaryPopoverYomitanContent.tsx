@@ -18,6 +18,7 @@ import { TransformedText } from '../vendor/yomitan/types/ext/language-transforme
 import { TokenTranslation } from '../utils/dictionariesDatabase'
 import { useSelector } from 'react-redux'
 import { getActiveYomitanDictionaryFilesMap } from '../selectors'
+import { DisplayContentManager } from '../vendor/yomitan/ext/js/display/display-content-manager'
 
 function groupTranslationsByExpressionAndReadingAndRules(
   tokenTranslations: TokenTranslation<
@@ -160,96 +161,112 @@ export function DictionaryPopoverYomitanContent({
                               >
                                 <div
                                   key={String(i)}
-                                  className="definition-item-content"
+                                  className="definition-item-inner"
                                 >
-                                  <TagsList
-                                    className="definition-tag-list"
-                                    tags={definitionTags}
-                                  />
-                                </div>
-                                <div className="definition-item-inner">
-                                  <ul
-                                    className="gloss-list"
-                                    data-count={glossary.length}
-                                  >
-                                    {glossary.map((glossary, i) => {
-                                      {
-                                        const key = String(i)
-                                        if (typeof glossary === 'string') {
+                                  <div className="definition-item-content">
+                                    <TagsList
+                                      className="definition-tag-list"
+                                      tags={definitionTags}
+                                    />
+                                    <ul
+                                      className="gloss-list"
+                                      data-count={glossary.length}
+                                    >
+                                      {glossary.map((glossary, i) => {
+                                        {
+                                          const key = String(i)
+                                          if (typeof glossary === 'string') {
+                                            return (
+                                              <li
+                                                className="gloss-item"
+                                                data-index={i}
+                                                key={key}
+                                              >
+                                                <span className="gloss-content">
+                                                  {glossary}
+                                                </span>
+                                              </li>
+                                            )
+                                          }
+                                          // deinflection
+                                          if (Array.isArray(glossary)) {
+                                            return (
+                                              <li
+                                                className="gloss-item"
+                                                data-index={i}
+                                                key={key}
+                                              >
+                                                <span className="gloss-content">
+                                                  {glossary[0]}
+                                                </span>
+                                              </li>
+                                            )
+                                          }
+
+                                          if (glossary.type === 'text') {
+                                            return (
+                                              <li
+                                                className="gloss-item"
+                                                data-index={i}
+                                                key={key}
+                                              >
+                                                <span className="gloss-content">
+                                                  {glossary.text}
+                                                </span>
+                                              </li>
+                                            )
+                                          }
+
+                                          if (
+                                            glossary.type ===
+                                            'structured-content'
+                                          ) {
+                                            return (
+                                              <li
+                                                className="gloss-item"
+                                                key={key}
+                                              >
+                                                <StructuredContent
+                                                  tag="span"
+                                                  className="gloss-content"
+                                                  dataIndex={i}
+                                                  json={glossary.content}
+                                                  generator={
+                                                    structuredContentGenerator
+                                                  }
+                                                  lookupResult={
+                                                    yomitanLookupResult
+                                                  }
+                                                />
+                                              </li>
+                                            )
+                                          }
+
+                                          if (glossary.type === 'image') {
+                                            return (
+                                              <li
+                                                className="gloss-item"
+                                                data-index={i}
+                                                key={key}
+                                              >
+                                                [Image]
+                                              </li>
+                                            )
+                                          }
+
                                           return (
                                             <li
                                               className="gloss-item"
+                                              data-index={i}
                                               key={key}
                                             >
-                                              <span className="gloss-content">
-                                                {glossary}
-                                              </span>
+                                              [Unknown content format]
                                             </li>
                                           )
                                         }
-                                        // deinflection
-                                        if (Array.isArray(glossary)) {
-                                          return (
-                                            <li
-                                              className="gloss-item"
-                                              key={key}
-                                            >
-                                              <span className="gloss-content">
-                                                {glossary[0]}
-                                              </span>
-                                            </li>
-                                          )
-                                        }
-
-                                        if (glossary.type === 'text') {
-                                          return (
-                                            <li
-                                              className="gloss-item"
-                                              key={key}
-                                            >
-                                              <span className="gloss-content">
-                                                {glossary.text}
-                                              </span>
-                                            </li>
-                                          )
-                                        }
-
-                                        if (
-                                          glossary.type === 'structured-content'
-                                        ) {
-                                          return (
-                                            <StructuredContent
-                                              key={key}
-                                              tag="li"
-                                              className="gloss-item gloss-content"
-                                              json={glossary.content}
-                                              generator={
-                                                structuredContentGenerator
-                                              }
-                                              lookupResult={yomitanLookupResult}
-                                            />
-                                          )
-                                        }
-
-                                        if (glossary.type === 'image') {
-                                          return (
-                                            <li
-                                              className="gloss-item"
-                                              key={key}
-                                            >
-                                              [Image]
-                                            </li>
-                                          )
-                                        }
-
-                                        return (
-                                          <li className="gloss-item" key={key}>
-                                            [Unknown content format]
-                                          </li>
-                                        )
-                                      }
-                                    })}
-                                  </ul>
+                                      })}
+                                    </ul>
+                                  </div>
                                 </div>
                               </div>
                             )
@@ -330,25 +347,20 @@ function EntryHeader({
         </div>
       </div>
       <div className="headword-list-details">
-        <div
-          className="headword-tags-list"
-          data-count={termTags ? termTags.split(' ').length : 0}
-        >
-          {termTags.length ? (
-            <TagsDisplay
-              tagsString={termTags || undefined}
-              yomitanLookupResult={yomitanLookupResult}
-              className="headword-list-tag-list"
-            />
-          ) : null}
-          {/* {definitionTags.length ? (
+        {termTags.length ? (
+          <TagsDisplay
+            tagsString={termTags || undefined}
+            yomitanLookupResult={yomitanLookupResult}
+            className="headword-list-tag-list tag-list"
+          />
+        ) : null}
+        {/* {definitionTags.length ? (
               <TagsDisplay
                 tagsString={definitionTags || undefined}
                 yomitanLookupResult={yomitanLookupResult}
                 className="headword-list-tag-list"
               />
             ) : null} */}
-        </div>
       </div>
     </div>
   )
@@ -412,12 +424,15 @@ function StructuredContent({
   lookupResult,
   tag,
   className,
+  dataIndex,
 }: {
   json: unknown
   generator: React.MutableRefObject<StructuredContentGenerator | null>
   lookupResult: Awaited<ReturnType<typeof lookUpYomitan>>
   tag: string
   className?: string
+  // dataset index
+  dataIndex?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => {
@@ -449,16 +464,23 @@ function StructuredContent({
       ref.current.replaceChildren(domElement)
     }
   }, [generator, json, lookupResult.media])
-  return createElement(tag, { className, ref })
+  return createElement(tag, { className, ref, 'data-index': dataIndex })
 }
 
 function useStructuredContentGenerator() {
   const ref = useRef<StructuredContentGenerator | null>(null)
   useEffect(() => {
     ref.current = new StructuredContentGenerator(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore - not using this
-      { prepareLink() {} },
+      {
+        prepareLink(element, href, internal) {
+          element.href = href
+          if (!internal)
+            element.addEventListener('click', (e) => {
+              e.preventDefault()
+              window.electronApi.openExternal(href)
+            })
+        },
+      } as DisplayContentManager,
       window.document
     )
   }, [])

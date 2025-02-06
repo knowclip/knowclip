@@ -4,11 +4,6 @@ body {
   font-family: sans-serif;
 }
 
-a:link,
-a:visited,
-a:hover,
-a:active { color: inherit; }
-
 html,
 body,
 #root {
