@@ -24,7 +24,19 @@ const config: UserConfig = {
         setUpMocks: path.resolve(__dirname, 'src', 'mockUtils', 'renderer.ts'),
       },
     },
-    plugins: [react()],
+    plugins: [
+      {
+        name: 'replace-yomitan-css-urls',
+        enforce: 'pre',
+        transform(css, id) {
+          if (id.endsWith('.css') && /vendor\/yomitan\//.test(id)) {
+            return css.replace(/(url\('?)(\/images)/g, '$1..$2')
+          }
+          return null
+        },
+      },
+      react(),
+    ],
     css: {
       modules: {},
     },
