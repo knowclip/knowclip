@@ -70,7 +70,6 @@ export async function lookUpYomitan(
   const tokensToLemmatizations = new Map<string, TransformedText[]>()
 
   const chunks = text.matchAll(hardPhraseBoundaryRegex)
-  console.log(chunks)
   for (const chunk of chunks) {
     const chunkText = chunk[0]
     const chunkStartIndex = chunk.index
@@ -99,13 +98,14 @@ export async function lookUpYomitan(
   }
 
   const allLookupTokens = [
-    ...new Set(tokensPositions.keys()).intersection(
-      new Set(
-        Array.from(tokensToLemmatizations, ([, transforms]) =>
-          transforms.map((transform) => transform.text)
-        ).flat()
-      )
-    ),
+    ...new Set([
+      ...tokensPositions.keys(),
+      ...Array.from(tokensToLemmatizations, ([token, lemmatizations]) =>
+        lemmatizations.map((lemmatization) => {
+          return lemmatization.text
+        })
+      ).flat(),
+    ]),
   ]
 
   const translations: DatabaseTermEntryWithId[] = await dexie
@@ -189,7 +189,15 @@ export async function lookUpYomitan(
     .where('name' satisfies keyof Tag)
     .anyOf([...tagNames])
     .toArray()
-  console.log('terms', translations, tags)
+  console.log(
+    'allLookupTokens',
+    allLookupTokens,
+    'tokensPositions',
+    tokensPositions,
+    'tokensToLemmatizations',
+    tokensToLemmatizations
+  )
+  console.log('translations', translations, 'tags', tags)
 
   const media: Record<string, { record: YomitanMediaRecord; url: ObjectURL }> =
     {}

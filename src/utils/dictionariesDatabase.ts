@@ -62,18 +62,12 @@ export function getDexieDb() {
       'dictionaryKey',
       'tokenCombos'
     ),
-    ['YomitanDictionary']: schema<LegacyLexiconEntry>(
-      '++key',
-      'head',
-      'pronunciation',
-      'dictionaryKey'
-    ),
   }
 
   // prettier-ignore
   dexie.version(2).stores({
     ...v1,
-    [DICTIONARIES_TABLE]: schema<DictionaryFile & YomitanDictionary>('++key', 'id', 'type', 'language', 'metadata'),
+    [DICTIONARIES_TABLE]: schema<DictionaryFile & YomitanDictionary>('++key', 'id', 'type', 'language'),
     [YOMITAN_DICTIONARY_TERMS_TABLE]: schema<DatabaseTermEntry>(
       '++id', 'expression', 'reading', 'expressionReverse', 'readingReverse', 'sequence', 'dictionary'
     ),

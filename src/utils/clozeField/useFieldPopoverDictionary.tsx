@@ -143,9 +143,7 @@ export function useFieldPopoverDictionary(
                   ]
             }
           ).flat()
-          console.log({ newTokensTranslations })
           setTokenTranslations(newTokensTranslations)
-          console.log({ lookup })
         } else {
           setTokenTranslations(lookup.tokensTranslations)
           setYomitanLookupResult(null)

@@ -150,7 +150,6 @@ export function DictionaryPopover<
   activeDictionaryType: DictionaryFileType | null
   yomitanLookupResult: Awaited<ReturnType<typeof lookUpYomitan>> | null
 }) {
-  console.log({ yomitanLookupResult })
   const { close: closePopover } = popover
   const closeOnClickAway: ClickAwayListenerProps['onClickAway'] = useCallback(
     (e) => closePopover(e),

@@ -4,7 +4,14 @@ import '../vendor/yomitan/ext/css/display.css'
 
 import clsx from 'clsx'
 import { css } from 'clipwave'
-import { useRef, useLayoutEffect, useEffect, createElement } from 'react'
+import {
+  useRef,
+  useLayoutEffect,
+  useEffect,
+  createElement,
+  useState,
+  useCallback,
+} from 'react'
 import { TranslatedTokensAtCharacterIndex } from '../utils/dictionaries/findTranslationsAtCharIndex'
 import { StructuredContentGenerator } from '../vendor/yomitan/ext/js/display/structured-content-generator'
 import {
@@ -15,7 +22,10 @@ import { DictionaryPopoverJapaneseRuby } from './DictionaryPopoverJapaneseRuby'
 import { lookUpYomitan } from '../utils/dictionaries/lookUpYomitan'
 import { Tooltip } from '@mui/material'
 import { TransformedText } from '../vendor/yomitan/types/ext/language-transformer-internal'
-import { TokenTranslation } from '../utils/dictionariesDatabase'
+import {
+  lookUpInDictionary,
+  TokenTranslation,
+} from '../utils/dictionariesDatabase'
 import { useSelector } from 'react-redux'
 import { getActiveYomitanDictionaryFilesMap } from '../selectors'
 import { DisplayContentManager } from '../vendor/yomitan/ext/js/display/display-content-manager'
@@ -92,15 +102,51 @@ export function DictionaryPopoverYomitanContent({
     TransformedText
   >
 }) {
-  const structuredContentGenerator = useStructuredContentGenerator()
+  const [furtherLookupResult, setFurtherLookupResult] = useState<Awaited<
+    ReturnType<typeof lookUpYomitan>
+  > | null>(null)
+  useEffect(() => {
+    setFurtherLookupResult(null)
+  }, [yomitanLookupResult])
+
   const activeDictionaries = useSelector(getActiveYomitanDictionaryFilesMap)
+  const performFurtherLookup = useCallback(
+    (text: string) =>
+      lookUpInDictionary(
+        'YomitanDictionary',
+        new Set(activeDictionaries.keys()),
+        text
+      ).then((lookup) => {
+        console.log(
+          'looked up ',
+          text,
+          lookup,
+          (
+            lookup as Awaited<ReturnType<typeof lookUpYomitan>>
+          ).getTranslatedTokensAtCharacterIndex(0)
+        )
+        setFurtherLookupResult(
+          lookup as Awaited<ReturnType<typeof lookUpYomitan>>
+        )
+      }),
+    [activeDictionaries]
+  )
+  const structuredContentGenerator =
+    useStructuredContentGenerator(performFurtherLookup)
   useYomitanDictionariesCss(activeDictionaries)
 
   if (!translationsAtCharacter) return null
+  const { translatedTokens } = translationsAtCharacter
+
+  const furtherLookupTokens =
+    furtherLookupResult?.getTranslatedTokensAtCharacterIndex(0)
+  const tokensToDisplay = furtherLookupTokens?.length
+    ? furtherLookupTokens
+    : translatedTokens
 
   return (
     <section className={css.dictionaryEntry}>
-      {translationsAtCharacter.translatedTokens.map((translatedToken, i) => {
+      {tokensToDisplay.map((translatedToken, i) => {
         return (
           <div key={i} className="dictionary-entries">
             {groupTranslationsByExpressionAndReadingAndRules(
@@ -139,7 +185,6 @@ export function DictionaryPopoverYomitanContent({
                             const dictionaryId = translation.dictionary
                             const dictionary =
                               activeDictionaries.get(dictionaryId)
-                            console.log('dictionary', dictionary)
                             const dictionaryTag: Tag = {
                               name: dictionary?.metadata?.indexJson
                                 ?.title as string,
@@ -246,10 +291,45 @@ export function DictionaryPopoverYomitanContent({
                                             return (
                                               <li
                                                 className="gloss-item"
-                                                data-index={i}
                                                 key={key}
                                               >
-                                                [Image]
+                                                <StructuredContent
+                                                  tag="span"
+                                                  className="gloss-content"
+                                                  dataIndex={i}
+                                                  json={{
+                                                    tag: 'img',
+                                                    path: glossary.path,
+                                                    width: glossary.width,
+                                                    height: glossary.height,
+                                                    preferredWidth:
+                                                      glossary.preferredWidth,
+                                                    preferredHeight:
+                                                      glossary.preferredHeight,
+                                                    title: glossary.title,
+                                                    alt: glossary.alt,
+                                                    description:
+                                                      glossary.description,
+                                                    pixelated:
+                                                      glossary.pixelated,
+                                                    imageRendering:
+                                                      glossary.imageRendering,
+                                                    appearance:
+                                                      glossary.appearance,
+                                                    background:
+                                                      glossary.background,
+                                                    collapsed:
+                                                      glossary.collapsed,
+                                                    collapsible:
+                                                      glossary.collapsible,
+                                                  }}
+                                                  generator={
+                                                    structuredContentGenerator
+                                                  }
+                                                  lookupResult={
+                                                    yomitanLookupResult
+                                                  }
+                                                />
                                               </li>
                                             )
                                           }
@@ -467,24 +547,44 @@ function StructuredContent({
   return createElement(tag, { className, ref, 'data-index': dataIndex })
 }
 
-function useStructuredContentGenerator() {
+function useStructuredContentGenerator(
+  lookUpText: (text: string) => Promise<void>
+) {
   const ref = useRef<StructuredContentGenerator | null>(null)
   useEffect(() => {
     ref.current = new StructuredContentGenerator(
       {
         prepareLink(element, href, internal) {
-          element.href = href
           if (!internal)
             element.addEventListener('click', (e) => {
               e.preventDefault()
               window.electronApi.openExternal(href)
             })
+          else {
+            element.addEventListener(
+              'click',
+              getInternalLinkClickHandler(href, lookUpText)
+            )
+          }
         },
       } as DisplayContentManager,
       window.document
     )
-  }, [])
+  }, [lookUpText])
   return ref
+}
+function getInternalLinkClickHandler(
+  href: string,
+  lookUpText: (text: string) => Promise<void>
+) {
+  return (e: MouseEvent) => {
+    e.preventDefault()
+    const query = new URLSearchParams(href.split('?')[1])
+    const text = query.get('query')
+    if (text) {
+      lookUpText(text)
+    }
+  }
 }
 
 function useYomitanDictionariesCss(
@@ -501,7 +601,6 @@ function useYomitanDictionariesCss(
       ([, dictionary]) => dictionary.metadata?.stylesCss || ''
     ).join('\n')
     styleTag.textContent = css
-    console.log('css', css, { styleTag })
     if (!document.head.contains(styleTag)) document.head.appendChild(styleTag)
   }, [activeDictionaries])
   useEffect(() => {
