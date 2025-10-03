@@ -153,7 +153,8 @@ export type TextTokensTranslations<
 export function lookUpInDictionary(
   dictionaryType: DictionaryFileType,
   activeDictionariesIds: Set<string>,
-  text: string
+  text: string,
+  deinflect = true
 ):
   | Promise<TextTokensTranslations<LegacyLexiconEntry>>
   | ReturnType<typeof lookUpYomitan> {
@@ -165,7 +166,7 @@ export function lookUpInDictionary(
     case 'CEDictDictionary':
       return lookUpCeDict(text)
     case 'YomitanDictionary':
-      return lookUpYomitan(activeDictionariesIds, text)
+      return lookUpYomitan(activeDictionariesIds, text, deinflect)
   }
 }
 

@@ -1,4 +1,4 @@
-import { memo, ReactNode } from 'react'
+import { Fragment, memo, ReactNode } from 'react'
 import { tokenize } from 'wanakana'
 import css from './DictionaryPopover.module.css'
 
@@ -22,7 +22,7 @@ export const DictionaryPopoverJapaneseRuby = memo(
                 ) === chunk
               ) {
                 acc.processedPronunciation += chunk
-                acc.elements.push(<>{chunk}</>)
+                acc.elements.push(<Fragment key={String(i)}>{chunk}</Fragment>)
               } else {
                 const nextChunk = chunks[i + 1]
                 const nextChunkText = nextChunk
@@ -42,7 +42,7 @@ export const DictionaryPopoverJapaneseRuby = memo(
                 )
                 acc.processedPronunciation += furigana
                 acc.elements.push(
-                  <ruby>
+                  <ruby key={String(i)}>
                     {chunkString}
                     <rt>{furigana}</rt>
                   </ruby>

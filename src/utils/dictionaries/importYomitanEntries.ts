@@ -112,18 +112,20 @@ export async function importYomitanEntries(
           indexedDbUpdate: await getDexieDb()
             .table(YOMITAN_DICTIONARY_TERMS_TABLE)
             .bulkAdd(
-              (validationResult.value.validated as any[]).map(
-                (entry): DatabaseTermEntry =>
-                  archiveEntry.dictionaryVersion === 1
-                    ? convertTermBankEntryV1(
-                        entry as [],
-                        archiveEntry.dictionaryId
-                      )
-                    : convertTermBankEntryV3(
-                        entry as [],
-                        archiveEntry.dictionaryId
-                      )
-              )
+              (validationResult.value.validated as any[])
+                .map(
+                  (entry): DatabaseTermEntry =>
+                    archiveEntry.dictionaryVersion === 1
+                      ? convertTermBankEntryV1(
+                          entry as [],
+                          archiveEntry.dictionaryId
+                        )
+                      : convertTermBankEntryV3(
+                          entry as [],
+                          archiveEntry.dictionaryId
+                        )
+                )
+                .filter((entry) => !isDuplicateHabenOrSeinEntry(entry))
             ),
         }
       case 'term_meta_bank':
@@ -328,4 +330,15 @@ function convertTermBankEntryV3(
     termTags,
     dictionary,
   } as DatabaseTermEntry
+}
+
+/** https://github.com/yomidevs/kaikki-to-yomitan/issues/201 */
+function isDuplicateHabenOrSeinEntry(entry: DatabaseTermEntry) {
+  // not working
+  return (
+    (entry.expression === 'haben' || entry.expression === 'sein') &&
+    entry.glossary.length === 1 &&
+    Array.isArray(entry.glossary[0]) &&
+    entry.glossary[0][1][0] === 'auxiliary'
+  )
 }

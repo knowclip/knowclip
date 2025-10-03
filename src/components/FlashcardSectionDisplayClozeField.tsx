@@ -10,12 +10,13 @@ import cn from 'clsx'
 import css from './FlashcardSectionDisplay.module.css'
 import FieldMenu from './FlashcardSectionFieldPopoverMenu'
 import { Tooltip } from '@mui/material'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ClozeControls } from '../utils/clozeField/useClozeControls'
 import r from '../redux'
 import usePopover from '../utils/usePopover'
 import { DictionaryPopover } from './DictionaryPopover'
 import { useFieldPopoverDictionary } from '../utils/clozeField/useFieldPopoverDictionary'
+import { useClozeUiEffects } from '../utils/clozeField/useClozeUiEffects'
 
 // check nico 38:53 einverstanden? gives no result
 // check tobira
@@ -79,30 +80,36 @@ const ClozeField = ({
     }
   }, [currentClozeIndex, clozeInputRef, editing])
   const clozeId = ClozeIds[currentClozeIndex]
-  const { viewMode, activeDictionaryType, activeDictionaries } = useSelector(
-    (state: AppState) => ({
+  const { viewMode, activeDictionaryType, activeDictionaries, loopState } =
+    useSelector((state: AppState) => ({
       viewMode: state.settings.viewMode,
       activeDictionaryType: r.getActiveDictionaryType(state),
       activeDictionaries: r.getActiveDictionaries(state),
-    })
-  )
+      loopState: r.getLoopState(state),
+    }))
 
+  const { translationsAtCharacter, yomitanLookupResult } =
+    useFieldPopoverDictionary(
+      popover,
+      activeDictionaryType,
+      activeDictionaries,
+      clozeControls,
+      value,
+      editing
+    )
   const {
-    cursorPosition,
-    translationsAtCharacter,
-    yomitanLookupResult,
     onKeyDown: handleKeyDown,
     handleFocus,
     handleBlur,
-  } = useFieldPopoverDictionary(
-    popover,
-    activeDictionaryType,
-    activeDictionaries,
-    clozeControls,
+    cursorPosition,
+  } = useClozeUiEffects({
     value,
-    editing
-  )
-
+    loopState,
+    clozeControls,
+    editing,
+    dispatch: useDispatch(),
+    disableFocusEvents: Boolean(popover.isOpen && activeDictionaryType),
+  })
   const rangesWithClozeIndexes = deletions
     .flatMap(({ ranges }, clozeIndex) => {
       return ranges.map((range) => ({ range, clozeIndex }))

@@ -139,12 +139,13 @@ export async function openDictionaryZip<
           zipfile,
           entry,
           importProgressState,
-          (data?: DataTransferType) =>
+          (data?: DataTransferType) => {
             sendProgressUpdate(
               getProgressPercentage(importProgressState, zipfile),
               `Import in progress. Processing ${entry.fileName}`,
               data
             )
+          }
         )
 
         importProgressState.processedEntries++

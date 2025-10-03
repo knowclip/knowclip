@@ -11,7 +11,11 @@ import {
   Tag,
 } from '../../vendor/yomitan/types/ext/dictionary-database'
 import { YomitanMediaRecord } from './importYomitanEntries'
-import { TermGlossaryStructuredContent } from '../../vendor/yomitan/types/ext/dictionary-data'
+import {
+  TermGlossary,
+  TermGlossaryDeinflection,
+  TermGlossaryStructuredContent,
+} from '../../vendor/yomitan/types/ext/dictionary-data'
 import { Element } from '../../vendor/yomitan/types/ext/structured-content'
 import { getImageMediaTypeFromFileName } from '../../vendor/yomitan/ext/js/media/media-util'
 import { LanguageTransformer } from '../../vendor/yomitan/ext/js/language/language-transformer'
@@ -19,18 +23,16 @@ import { japaneseTransforms } from '../../vendor/yomitan/ext/js/language/ja/japa
 import { LanguageTransformDescriptor } from '../../vendor/yomitan/types/ext/language-transformer'
 import { TransformedText } from '../../vendor/yomitan/types/ext/language-transformer-internal'
 import optionsSchema from '../../vendor/yomitan/ext/data/schemas/options-schema.json'
+import { germanTransforms } from '../../vendor/yomitan/ext/js/language/de/german-transforms'
+import Dexie, { Collection } from 'dexie'
 
-const SCANNING_EXTENT = 200
+const SCANNING_EXTENT = 50
 const MAXIMUM_RESULTS_COUNT = 32
 
 const hardPhraseBoundaryPunctuation = new Set(
   optionsSchema.properties.profiles.items.properties.options.properties.sentenceParsing.properties.terminationCharacters.default.flatMap(
     (c) => [c.character1, ...(c.character2 ? [c.character2] : [])]
   )
-)
-const hardPhraseBoundaryRegex = new RegExp(
-  `[^${[...hardPhraseBoundaryPunctuation].join('')}]+`,
-  'g'
 )
 
 const transormersCache = new Map<
@@ -55,71 +57,131 @@ function lemmatize<TCondition extends string>(
   return getTransformer(transforms).transform(text)
 }
 
+/** Narrowing down of parts of speech currently only implemented in German-style */
+const getTranslationPartOfSpeech = (
+  translation: DatabaseTermEntryWithId
+): 'VERB' | 'NONVERB' => {
+  const definitionTags = translation.definitionTags?.split(' ') || []
+  const termTags = translation.termTags?.split(' ') || []
+  if (!definitionTags.includes('non-lemma')) {
+    return definitionTags.includes('v') || termTags.includes('v')
+      ? 'VERB'
+      : 'NONVERB'
+  }
+
+  if (
+    Array.isArray(translation.glossary) &&
+    Array.isArray(translation.glossary[0]) &&
+    translation.glossary.some(
+      (entry) =>
+        Array.isArray(entry) &&
+        Array.isArray(entry[1]) &&
+        entry[1].some(
+          (string: any) =>
+            string === 'first-person' ||
+            string === 'second-person' ||
+            string === 'third-person'
+        )
+    )
+  ) {
+    return 'VERB'
+  } else {
+    return 'NONVERB'
+  }
+}
+
 export async function lookUpYomitan(
   activeDictionariesIds: Set<string>,
-  text: string
+  text: string,
+  deinflect = true
 ) {
   const dexie = getDexieDb()
+  console.log(`${!deinflect ? 'NOT ' : ''}deinflecting`, text)
 
   // split text at "hard phrase boundaries" (e.g. sentence punctuation)
   // within each chunk, find all unique search tokens by:
   // - collecting all substrings of length less than or equal to SCANNING_EXTENT
   // - collecting any lemmatized forms of each of those substrings.
 
-  const tokensPositions = new Map<string, number[]>()
-  const tokensToLemmatizations = new Map<string, TransformedText[]>()
+  const { allLookupTokens, tokensToLemmatizations, tokensPositions } =
+    tokenizeText(text, deinflect, true)
 
-  const chunks = text.matchAll(hardPhraseBoundaryRegex)
-  for (const chunk of chunks) {
-    const chunkText = chunk[0]
-    const chunkStartIndex = chunk.index
-    for (
-      let tokenFirstIndex = 0;
-      tokenFirstIndex < chunkText.length;
-      tokenFirstIndex++
-    ) {
-      for (
-        let tokenLastIndex = 0;
-        tokenLastIndex < chunkText.length &&
-        tokenLastIndex - tokenFirstIndex < SCANNING_EXTENT;
-        tokenLastIndex++
-      ) {
-        const token = chunkText.slice(tokenFirstIndex, tokenLastIndex + 1)
-        const tokenAppearances = tokensPositions.get(token) || []
-        tokenAppearances.push(chunkStartIndex + tokenFirstIndex)
-        tokensPositions.set(token, tokenAppearances)
-        tokensToLemmatizations.set(
-          token,
-          tokensToLemmatizations.get(token) ||
-            lemmatize(token, japaneseTransforms)
-        )
+  console.log('looking up using tokens', allLookupTokens)
+  const translationsLookupResults = await lookUpTranslations(
+    dexie,
+    allLookupTokens,
+    activeDictionariesIds
+  )
+  console.log(
+    `Got ${await translationsLookupResults.length} results`,
+    translationsLookupResults
+  )
+  const translations: DatabaseTermEntryWithId[] = []
+  /** tokens to parts of speech of their lemmas */
+  const furtherLookupTokens = new Map<string, Set<'VERB' | 'NONVERB'>>()
+  await translationsLookupResults.forEach((translation) => {
+    if (translation.definitionTags === 'non-lemma') {
+      for (const glossaryItem of translation.glossary as TermGlossaryDeinflection[]) {
+        const [lemma, _inflections] = glossaryItem
+        if (!allLookupTokens.has(lemma)) {
+          const expressionLemmatizations =
+            tokensToLemmatizations.get(translation.expression) || []
+          expressionLemmatizations.push(glossaryItem)
+          tokensToLemmatizations.set(
+            translation.expression,
+            expressionLemmatizations
+          )
+          const partsOfSpeechForLemma =
+            furtherLookupTokens.get(lemma) || new Set()
+          const partOfSpeech = getTranslationPartOfSpeech(translation)
+          partsOfSpeechForLemma.add(partOfSpeech)
+          furtherLookupTokens.set(lemma, partsOfSpeechForLemma)
+          if (translation.expression !== translation.reading) {
+            const readingLemmatizations =
+              tokensToLemmatizations.get(translation.reading) || []
+            readingLemmatizations.push(glossaryItem)
+            tokensToLemmatizations.set(
+              translation.reading,
+              readingLemmatizations
+            )
+          }
+        }
       }
+    } else {
+      translations.push(translation)
     }
-  }
+  })
+  console.log('further lookup tokens', furtherLookupTokens)
 
-  const allLookupTokens = [
-    ...new Set([
-      ...tokensPositions.keys(),
-      ...Array.from(tokensToLemmatizations, ([token, lemmatizations]) =>
-        lemmatizations.map((lemmatization) => {
-          return lemmatization.text
-        })
-      ).flat(),
-    ]),
-  ]
-
-  const translations: DatabaseTermEntryWithId[] = await dexie
-    .table(YOMITAN_DICTIONARY_TERMS_TABLE)
-    .where('expression' satisfies keyof DatabaseTermEntryWithId)
-    .anyOf(allLookupTokens)
-    .or('reading' satisfies keyof DatabaseTermEntryWithId)
-    .anyOf(allLookupTokens)
-    .and((t: DatabaseTermEntryWithId) =>
-      activeDictionariesIds.has(t.dictionary)
+  if (deinflect) {
+    const furtherTranslationsLookups = await lookUpTranslations(
+      dexie,
+      furtherLookupTokens.keys(),
+      activeDictionariesIds
     )
-    .distinct()
-    .toArray()
-
+    console.log(
+      `Got ${await furtherTranslationsLookups.length} further results`,
+      furtherTranslationsLookups,
+      'from',
+      furtherLookupTokens
+    )
+    await furtherTranslationsLookups.forEach((translation) => {
+      const { expression } = translation
+      const furtherLookupPartOfSpeech = getTranslationPartOfSpeech(translation)
+      console.log(
+        'expression',
+        expression,
+        'has pos',
+        furtherLookupPartOfSpeech
+      )
+      const partsOfSpeechForLemma = furtherLookupTokens.get(expression)
+      if (
+        partsOfSpeechForLemma &&
+        partsOfSpeechForLemma.has(furtherLookupPartOfSpeech)
+      )
+        translations.push(translation)
+    })
+  }
   const {
     hasTranslations,
     getTranslations,
@@ -157,7 +219,7 @@ export async function lookUpYomitan(
             ...(tokenTranslations?.inflectedExpression || []).flatMap(
               (lemmatization) =>
                 tokensToTranslationsWithMatchingExpression
-                  .get(lemmatization.text)!
+                  .get(getLemma(lemmatization))!
                   .map((entry) => ({
                     entry,
                     inflection: lemmatization,
@@ -166,13 +228,13 @@ export async function lookUpYomitan(
             ...(tokenTranslations?.inflectedReading || []).flatMap(
               (lemmatization) =>
                 tokensToTranslationsWithMatchingReading
-                  .get(lemmatization.text)!
+                  .get(getLemma(lemmatization))!
                   .map((entry) => ({
                     entry,
                     inflection: lemmatization,
                   }))
             ),
-          ],
+          ].sort((a, b) => b.entry.score - a.entry.score),
         }
       }
     )
@@ -188,16 +250,16 @@ export async function lookUpYomitan(
     .table(YOMITAN_DICTIONARY_TAGS_TABLE)
     .where('name' satisfies keyof Tag)
     .anyOf([...tagNames])
+    .and((t) => activeDictionariesIds.has(t.dictionary))
     .toArray()
-  console.log(
-    'allLookupTokens',
-    allLookupTokens,
-    'tokensPositions',
-    tokensPositions,
-    'tokensToLemmatizations',
-    tokensToLemmatizations
-  )
-  console.log('translations', translations, 'tags', tags)
+  // console.log(
+  //   'allLookupTokens',
+  //   allLookupTokens,
+  //   'tokensPositions',
+  //   tokensPositions,
+  //   'tokensToLemmatizations',
+  //   tokensToLemmatizations
+  // )
 
   const media: Record<string, { record: YomitanMediaRecord; url: ObjectURL }> =
     {}
@@ -237,9 +299,147 @@ export async function lookUpYomitan(
   }
 }
 
+function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+}
+function isCapitalized(text: string) {
+  return text.charAt(0).toUpperCase() === text.charAt(0)
+}
+
+function tokenizeText(text: string, deinflect: boolean, useSpaces: boolean) {
+  const tokensPositions = new Map<string, number[]>()
+  const tokensToLemmatizations = new Map<
+    string,
+    (TransformedText | TermGlossaryDeinflection)[]
+  >()
+
+  if (useSpaces) {
+    const tokenBoundaryRegex = new RegExp(
+      `[^${[...hardPhraseBoundaryPunctuation].join('')}\\s,]+`,
+      'g'
+    )
+    const chunks = text.matchAll(tokenBoundaryRegex)
+    for (const chunk of chunks) {
+      const chunkText = chunk[0]
+      const chunkStartIndex = chunk.index
+      const tokenAppearances = tokensPositions.get(chunkText) || []
+      tokenAppearances.push(chunkStartIndex)
+      tokensPositions.set(chunkText, tokenAppearances)
+      const lowercaseToken = isCapitalized(chunkText)
+        ? chunkText.toLowerCase()
+        : null
+      if (lowercaseToken) {
+        const lowercaseTokenAppearances =
+          tokensPositions.get(lowercaseToken) || []
+        lowercaseTokenAppearances.push(chunkStartIndex)
+        tokensPositions.set(lowercaseToken, lowercaseTokenAppearances)
+      }
+
+      if (deinflect) {
+        tokensToLemmatizations.set(
+          chunkText,
+          tokensToLemmatizations.get(chunkText) ||
+            lemmatize(chunkText, germanTransforms)
+          // lemmatize(chunkText, japaneseTransforms)
+        )
+
+        if (lowercaseToken) {
+          tokensToLemmatizations.set(
+            lowercaseToken,
+            tokensToLemmatizations.get(lowercaseToken) ||
+              lemmatize(lowercaseToken, germanTransforms)
+            // lemmatize(lowercaseToken, japaneseTransforms)
+          )
+        }
+      }
+    }
+    const allLookupTokens = new Set([
+      ...tokensPositions.keys(),
+      ...Array.from(tokensToLemmatizations, ([, lemmatizations]) =>
+        lemmatizations.map((lemmatization) => {
+          // at this point, these are guaranteed to be only `TransformedText`
+          return getLemma(lemmatization as TransformedText)
+        })
+      ).flat(),
+    ])
+    console.log(allLookupTokens)
+    return { allLookupTokens, tokensToLemmatizations, tokensPositions }
+  } else {
+    const hardPhraseBoundaryRegex = new RegExp(
+      `[^${[...hardPhraseBoundaryPunctuation].join('')}]+`,
+      'g'
+    )
+    const chunks = text.matchAll(hardPhraseBoundaryRegex)
+    for (const chunk of chunks) {
+      const chunkText = chunk[0]
+      const chunkStartIndex = chunk.index
+      for (
+        let tokenFirstIndex = 0;
+        tokenFirstIndex < chunkText.length;
+        tokenFirstIndex++
+      ) {
+        for (
+          let tokenLastIndex = 0;
+          tokenLastIndex < chunkText.length &&
+          tokenLastIndex - tokenFirstIndex < SCANNING_EXTENT;
+          tokenLastIndex++
+        ) {
+          const token = chunkText.slice(tokenFirstIndex, tokenLastIndex + 1)
+          const tokenAppearances = tokensPositions.get(token) || []
+          tokenAppearances.push(chunkStartIndex + tokenFirstIndex)
+          tokensPositions.set(token, tokenAppearances)
+          if (deinflect)
+            tokensToLemmatizations.set(
+              token,
+              tokensToLemmatizations.get(token) ||
+                lemmatize(token, germanTransforms)
+              // lemmatize(token, japaneseTransforms)
+            )
+        }
+      }
+    }
+    const allLookupTokens = new Set([
+      ...tokensPositions.keys(),
+      ...Array.from(tokensToLemmatizations, ([, lemmatizations]) =>
+        lemmatizations.map((lemmatization) => {
+          // at this point, these are guaranteed to be only `TransformedText`
+          return getLemma(lemmatization as TransformedText)
+        })
+      ).flat(),
+    ])
+    return { allLookupTokens, tokensToLemmatizations, tokensPositions }
+  }
+}
+
+async function lookUpTranslations(
+  dexie: Dexie,
+  allLookupTokens: Iterable<string>,
+  activeDictionariesIds: Set<string>
+) {
+  const lookupTokensArray = [...allLookupTokens]
+  return await dexie
+    .table(YOMITAN_DICTIONARY_TERMS_TABLE)
+    .where('expression' satisfies keyof DatabaseTermEntryWithId)
+    .anyOf(lookupTokensArray)
+    .or('reading' satisfies keyof DatabaseTermEntryWithId)
+    .anyOf(lookupTokensArray)
+    .and((t: DatabaseTermEntryWithId) =>
+      activeDictionariesIds.has(t.dictionary)
+    )
+    .distinct()
+    .toArray()
+}
+
+function getLemma(lemmatization: TransformedText | TermGlossaryDeinflection) {
+  return 'trace' in lemmatization ? lemmatization.text : lemmatization[0]
+}
+
 function getTranslationLookupTables(
   translations: DatabaseTermEntryWithId[],
-  tokensToLemmatizations: Map<string, TransformedText[]>
+  tokensToLemmatizations: Map<
+    string,
+    (TransformedText | TermGlossaryDeinflection)[]
+  >
 ) {
   type TranslatedTokenText = string
   /** for looking up e.g. "読む" → 読む */
@@ -275,17 +475,22 @@ function getTranslationLookupTables(
   /** for looking up e.g. "読んだ" → 読む */
   const tokensToTranslationsViaExpressionLemmatizations = new Map<
     TranslatedTokenText,
-    TransformedText[]
+    (TransformedText | TermGlossaryDeinflection)[]
   >()
   /** for looking up e.g. "よんだ" → 読む */
   const tokensToTranslationsViaReadingLemmatizations = new Map<
     TranslatedTokenText,
-    TransformedText[]
+    (TransformedText | TermGlossaryDeinflection)[]
   >()
   for (const [token, lemmatizations] of tokensToLemmatizations) {
     for (const lemmatization of lemmatizations) {
-      if (lemmatization.trace.length) {
-        const lemma = lemmatization.text
+      if (
+        'trace' in lemmatization
+          ? lemmatization.trace.length
+          : lemmatization[1].length
+      ) {
+        const lemma =
+          'trace' in lemmatization ? lemmatization.text : lemmatization[0]
         const expressionMatches =
           tokensToTranslationsWithMatchingExpression.get(lemma)
         if (expressionMatches) {

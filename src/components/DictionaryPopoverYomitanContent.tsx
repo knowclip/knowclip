@@ -4,6 +4,8 @@ import '../vendor/yomitan/ext/css/display.css'
 
 import clsx from 'clsx'
 import { css } from 'clipwave'
+import dictionaryPopoverCss from './DictionaryPopover.module.css'
+
 import {
   useRef,
   useLayoutEffect,
@@ -107,7 +109,7 @@ export function DictionaryPopoverYomitanContent({
   > | null>(null)
   useEffect(() => {
     setFurtherLookupResult(null)
-  }, [yomitanLookupResult])
+  }, [yomitanLookupResult, translationsAtCharacter])
 
   const activeDictionaries = useSelector(getActiveYomitanDictionaryFilesMap)
   const performFurtherLookup = useCallback(
@@ -115,16 +117,9 @@ export function DictionaryPopoverYomitanContent({
       lookUpInDictionary(
         'YomitanDictionary',
         new Set(activeDictionaries.keys()),
-        text
+        text,
+        false
       ).then((lookup) => {
-        console.log(
-          'looked up ',
-          text,
-          lookup,
-          (
-            lookup as Awaited<ReturnType<typeof lookUpYomitan>>
-          ).getTranslatedTokensAtCharacterIndex(0)
-        )
         setFurtherLookupResult(
           lookup as Awaited<ReturnType<typeof lookUpYomitan>>
         )
@@ -153,14 +148,6 @@ export function DictionaryPopoverYomitanContent({
               translatedToken.matches
             ).map(
               ({ expression, reading, translations, rules, entries }, i) => {
-                // deinflection
-                if (
-                  entries.every((e) =>
-                    e.glossary.every((g) => Array.isArray(g))
-                  )
-                )
-                  return null
-
                 const key = String(i)
                 const { combinedTermTagsString, combinedDefinitionTagsString } =
                   aggregateTagsFromTranslations(entries)
@@ -235,15 +222,36 @@ export function DictionaryPopoverYomitanContent({
                                           }
                                           // deinflection
                                           if (Array.isArray(glossary)) {
+                                            if (
+                                              glossary[1]?.[0] === 'auxiliary'
+                                            ) {
+                                              // many entries with haben/sein in ktyde dictionary for some reason
+                                              return null
+                                            }
                                             return (
                                               <li
                                                 className="gloss-item"
                                                 data-index={i}
                                                 key={key}
                                               >
-                                                <span className="gloss-content">
-                                                  {glossary[0]}
-                                                </span>
+                                                <StructuredContent
+                                                  tag="span"
+                                                  className="gloss-content"
+                                                  dataIndex={i}
+                                                  json={{
+                                                    tag: 'a',
+                                                    href: `?query=${encodeURIComponent(
+                                                      glossary[0]
+                                                    )}&wildcards=off`,
+                                                    content: [glossary[0]],
+                                                  }}
+                                                  generator={
+                                                    structuredContentGenerator
+                                                  }
+                                                  lookupResult={
+                                                    yomitanLookupResult
+                                                  }
+                                                />
                                               </li>
                                             )
                                           }
@@ -583,6 +591,15 @@ function getInternalLinkClickHandler(
     const text = query.get('query')
     if (text) {
       lookUpText(text)
+      setTimeout(() => {
+        // scroll to the top of the dictionary popover
+        const dictionaryPopover = document.querySelector(
+          `.${dictionaryPopoverCss.container}`
+        )
+        if (dictionaryPopover) {
+          dictionaryPopover.scrollTo({ top: 0 })
+        }
+      }, 0)
     }
   }
 }

@@ -10,14 +10,21 @@ import { KEYS } from '../keyboard'
 import { ClozeControls } from './useClozeControls'
 import { isMediaPlaying } from '../media'
 
-export function useClozeUiEffects(
-  clozeControls: ClozeControls,
-  value: string,
-  dispatch: any,
-  dictionaryPopoverIsShowing: boolean,
-  editing: boolean,
+export function useClozeUiEffects({
+  clozeControls,
+  value,
+  dispatch,
+  disableFocusEvents,
+  editing,
+  loopState,
+}: {
+  clozeControls: ClozeControls
+  value: string
+  dispatch: any
+  disableFocusEvents: boolean
+  editing: boolean
   loopState: LoopState
-) {
+}) {
   const {
     clozeTextInputActions: { onBackspace, onPressDelete },
     inputRef: ref,
@@ -145,7 +152,7 @@ export function useClozeUiEffects(
   )
 
   const handleFocus = useCallback(() => {
-    if (!dictionaryPopoverIsShowing) {
+    if (!disableFocusEvents) {
       if (ref.current) {
         const selection = getSelectionWithin(ref.current)
         const currentlySelected = selection.end - selection.start !== 0
@@ -155,19 +162,13 @@ export function useClozeUiEffects(
         dispatch(r.setLoop('FOCUS'))
       }
     }
-  }, [dictionaryPopoverIsShowing, ref, editing, setCursorPosition, dispatch])
+  }, [disableFocusEvents, ref, editing, setCursorPosition, dispatch])
   const handleBlur = useCallback(() => {
-    if (!dictionaryPopoverIsShowing) {
+    if (!disableFocusEvents) {
       setCursorPosition(null)
       if (!editing && loopState === 'FOCUS') dispatch(r.setLoop(false))
     }
-  }, [
-    dictionaryPopoverIsShowing,
-    setCursorPosition,
-    editing,
-    loopState,
-    dispatch,
-  ])
+  }, [disableFocusEvents, setCursorPosition, editing, loopState, dispatch])
   return { onKeyDown, handleFocus, handleBlur, cursorPosition }
 }
 

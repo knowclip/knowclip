@@ -4,7 +4,10 @@ import {
   DeleteFileSuccessHandler,
   FileEventHandlers,
 } from './eventHandlers'
-import { DICTIONARIES_TABLE } from '../utils/dictionariesDatabase'
+import {
+  DICTIONARIES_TABLE,
+  YOMITAN_DICTIONARY_TERMS_TABLE,
+} from '../utils/dictionariesDatabase'
 import { basename } from '../utils/rendererPathHelpers'
 import { FileUpdateName } from './FileUpdateName'
 
@@ -35,7 +38,10 @@ export type LegacyLexiconEntry = {
 // TODO: test different entry shapes
 // with navigator.storage.estimate()
 
-export const getTableName = (type: DictionaryFileType) => `${type}`
+export const getTableName = (type: DictionaryFileType) => {
+  if (type === 'YomitanDictionary') return YOMITAN_DICTIONARY_TERMS_TABLE
+  return type
+}
 
 const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
   file,
@@ -45,23 +51,27 @@ const deleteRequest: DeleteFileRequestHandler<DictionaryFile> = async (
   effects
 ) => {
   if (file) {
-    const dictionaryExistsInDb = Boolean(
-      await effects.getDexieDb().table(DICTIONARIES_TABLE).get(file.key)
-    )
-    const entriesExistInDb = Boolean(
-      await effects
-        .getDexieDb()
-        .table(getTableName(file.dictionaryType))
-        .where('dictionaryKey' as keyof LegacyLexiconEntry)
-        .equals(file.key)
-        .first()
-    )
+    try {
+      const dictionaryExistsInDb = Boolean(
+        await effects.getDexieDb().table(DICTIONARIES_TABLE).get(file.key)
+      )
+      const entriesExistInDb = Boolean(
+        await effects
+          .getDexieDb()
+          .table(getTableName(file.dictionaryType))
+          .where('dictionaryKey' as keyof LegacyLexiconEntry)
+          .equals(file.key)
+          .first()
+      )
 
-    if (dictionaryExistsInDb || entriesExistInDb)
-      return [
-        r.removeActiveDictionary(file.id),
-        r.deleteImportedDictionary(file),
-      ]
+      if (dictionaryExistsInDb || entriesExistInDb)
+        return [
+          r.removeActiveDictionary(file.id),
+          r.deleteImportedDictionary(file),
+        ]
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return [

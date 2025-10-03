@@ -30,7 +30,19 @@ const config: UserConfig = {
         enforce: 'pre',
         transform(css, id) {
           if (id.endsWith('.css') && /vendor\/yomitan\//.test(id)) {
-            return css.replace(/(url\('?)(\/images)/g, '$1..$2')
+            return (
+              css
+                // replace all image URLs with relative paths based on folder structure
+                // to conform with react plugin's way of handling assets
+                .replace(/(url\('?)(\/images)/g, '$1..$2')
+                // scope all selectors under .yomitan-popover
+                .replace(
+                  /(^|\n)([a-zA-Z.[][.a-zA-Z0-9_\- [\]=>:]*)(,\n| \{\n)/g,
+                  '$1.yomitan-popover $2$3'
+                )
+                // replace all :root selectors with .yomitan-popover
+                .replace(/(:root(\[[^\]]+\])?)/g, '$1 .yomitan-popover')
+            )
           }
           return null
         },

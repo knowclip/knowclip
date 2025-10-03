@@ -7,6 +7,7 @@ import {
   useRef,
 } from 'react'
 import { useDispatch } from 'react-redux'
+import clsx from 'clsx'
 import {
   Button,
   ClickAwayListener,
@@ -135,7 +136,7 @@ function doEntriesBelongTogether(
 
 export function DictionaryPopover<
   EntryType extends LexiconEntry,
-  InflectionType
+  InflectionType,
 >({
   popover,
   translationsAtCharacter,
@@ -182,7 +183,13 @@ export function DictionaryPopover<
         anchorEl={popover.anchorEl}
         onMouseDown={stopPropagation}
       >
-        <Paper className={css.container} ref={ref}>
+        <Paper
+          className={clsx(
+            css.container,
+            yomitanLookupResult ? 'yomitan-popover' : null
+          )}
+          ref={ref}
+        >
           <DarkTheme>
             <IconButton
               size="small"

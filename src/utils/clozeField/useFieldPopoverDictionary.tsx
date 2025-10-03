@@ -12,7 +12,6 @@ import {
   TranslatedTokensAtCharacterIndex,
 } from '../dictionaries/findTranslationsAtCharIndex'
 import { usePrevious } from '../usePrevious'
-import { useClozeUiEffects } from './useClozeUiEffects'
 import { LETTERS_DIGITS_PLUS } from '../dictCc'
 import { getMousePosition } from '../mousePosition'
 import { isMediaPlaying } from '../media'
@@ -46,9 +45,6 @@ export function useFieldPopoverDictionary(
       loopState: r.getLoopState(state),
       popoverIsOpenFromStore: state.session.dictionaryPopoverIsOpen,
     })
-  )
-  const dictionaryPopoverIsShowing = Boolean(
-    popover.isOpen && activeDictionaryType
   )
 
   const previousPopoverIsOpen = usePrevious(popover.isOpen)
@@ -103,16 +99,6 @@ export function useFieldPopoverDictionary(
   const [yomitanLookupResult, setYomitanLookupResult] = useState<Awaited<
     ReturnType<typeof lookUpYomitan>
   > | null>(null)
-
-  const { onKeyDown, handleFocus, handleBlur, cursorPosition } =
-    useClozeUiEffects(
-      clozeControls,
-      value,
-      dispatch,
-      dictionaryPopoverIsShowing,
-      editing,
-      loopState
-    )
 
   const activeDictionariesIds = useMemo(
     () => new Set(activeDictionaries?.map((d) => d.id) || []),
@@ -234,11 +220,7 @@ export function useFieldPopoverDictionary(
   }, [popover.isOpen, mouseoverChar, tokenTranslations, ref, editing, value])
 
   return {
-    cursorPosition,
     translationsAtCharacter,
     yomitanLookupResult,
-    onKeyDown,
-    handleFocus,
-    handleBlur,
   }
 }
