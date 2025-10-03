@@ -1,13 +1,19 @@
 import { getHumanFileName } from '../utils/files'
 
-export const fileByIdUrl = (localServerAddress: string, fileId: FileId) =>
-  `${localServerAddress}/file/${fileId}`
+export const fileByIdUrl = (
+  localServerAddress: string,
+  fileId: FileId,
+  extension: string
+) => `${localServerAddress}/file/${fileId}.${extension}`
 export const convertedFilePlaylistByIdUrl = (
   localServerAddress: string,
   fileId: FileId
 ) => `${localServerAddress}/file/${fileId}/converted/index.m3u8`
-export const getFileUrl = (state: AppState, fileId: FileId): string =>
-  fileByIdUrl(state.session.localServerAddress, fileId)
+export const getFileUrl = (
+  state: AppState,
+  fileId: FileId,
+  extension: string
+): string => fileByIdUrl(state.session.localServerAddress, fileId, extension)
 
 export const getFileAvailability = (
   state: AppState,

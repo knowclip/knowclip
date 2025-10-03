@@ -17,13 +17,19 @@ const segmentDurationSeconds = 10
 export function makeGetConvertedFileSegment(
   filePathsRegistry: Record<string, string>,
   conversionType: MediaConversionType,
+  accessControlAllowOrigin: string | undefined = undefined,
   verbose: boolean = false
 ): Router.Middleware<Koa.DefaultState, Koa.DefaultContext, unknown> {
   return async (ctx) => {
+    if (accessControlAllowOrigin) {
+      ctx.set('Access-Control-Allow-Origin', accessControlAllowOrigin)
+    }
+
     console.log(
       `GET /file/:id/converted/${conversionType}/:segmentNumber.ts`,
       ctx.params.id
     )
+
     const segmentNumber = parseInt(ctx.params.segmentNumber)
     if (isNaN(segmentNumber)) {
       ctx.status = 400
@@ -37,6 +43,7 @@ export function makeGetConvertedFileSegment(
       ctx.status = 404
       return
     }
+    ctx.type = 'video/mp2t'
 
     const ffmpegStreamResult = await convertMedia(
       videoPath,
@@ -98,7 +105,8 @@ export function makeGetConvertedFileSegment(
 }
 
 export function makeGetConvertedFilePlaylist(
-  filePathsRegistry: Record<string, string>
+  filePathsRegistry: Record<string, string>,
+  accessControlAllowOrigin: string | undefined = undefined
 ): Router.Middleware<Koa.DefaultState, Koa.DefaultContext, unknown> {
   return async (ctx) => {
     console.log(`GET /file/:id/converted/index.m3u8`, ctx.params.id)
@@ -116,6 +124,9 @@ export function makeGetConvertedFilePlaylist(
       return
     }
 
+    if (accessControlAllowOrigin) {
+      ctx.set('Access-Control-Allow-Origin', accessControlAllowOrigin)
+    }
     const { issues: compatibilityIssues } =
       getMediaCompatibilityIssues(ffprobeMetadata)
 
@@ -127,13 +138,30 @@ export function makeGetConvertedFilePlaylist(
     )
 
     ctx.body = m3u8Text
+    ctx.type = 'application/vnd.apple.mpegurl'
   }
 }
 
 export function makeGetFile(
-  filePathsRegistry: Record<string, string>
+  filePathsRegistry: Record<string, string>,
+  allowCrossOrigin?: string
 ): Router.Middleware<Koa.DefaultState, Koa.DefaultContext, unknown> {
   return async (ctx) => {
+    const extension = ctx.params.ext
+    if (extension === 'mp4') {
+      ctx.set('Content-Type', 'video/mp4')
+    } else if (extension === 'mp3') {
+      ctx.set('Content-Type', 'audio/mpeg')
+    } else if (extension === 'png') {
+      ctx.set('Content-Type', 'image/png')
+    } else if (extension === 'vtt') {
+      ctx.set('Content-Type', 'text/vtt')
+    } else {
+      ctx.status = 400
+      ctx.body = { error: `Unsupported file extension: ${extension}` }
+      return
+    }
+
     console.log(
       `GET /file/:id`,
       ctx.params.id,
@@ -144,6 +172,10 @@ export function makeGetFile(
     if (!filePath) {
       ctx.status = 404
       return
+    }
+
+    if (allowCrossOrigin) {
+      ctx.set('Access-Control-Allow-Origin', allowCrossOrigin)
     }
 
     try {
@@ -169,7 +201,7 @@ export function makeGetFile(
         ctx.set('Content-Range', `bytes ${start}-${end}/${fileSize}`)
         ctx.set('Accept-Ranges', 'bytes')
         ctx.set('Content-Length', String(end - start + 1))
-        ctx.type = 'video/mp4'
+        ctx.type = 'video/mp2t'
       } else {
         ctx.body = await fs.promises.readFile(filePath)
       }

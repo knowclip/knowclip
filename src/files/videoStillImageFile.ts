@@ -7,7 +7,7 @@ const videoStillImageFileEventHandlers: FileEventHandlers<VideoStillImageFile> =
     openRequest: async (file, filePath, state, effects) => {
       const img = new Image()
       img.src = new URL(
-        r.fileByIdUrl(state.session.localServerAddress, file.id)
+        r.fileByIdUrl(state.session.localServerAddress, file.id, 'png')
       ).toString()
       return await new Promise((res, _rej) => {
         const onLoad = () => {

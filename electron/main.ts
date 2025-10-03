@@ -18,10 +18,13 @@ if (!isPackaged && process.platform === 'darwin')
   app.disableHardwareAcceleration()
 
 console.log('main process VITEST', process.env.VITEST)
+let conf: Conf
 if (!isTesting) {
-  const conf = new Conf()
+  conf = new Conf()
 
   conf.registerRendererListener()
+  console.log('conf:', Object.keys(conf.store))
+
   console.log('conf registered')
 }
 
@@ -138,7 +141,7 @@ async function createWindow({
 
 app.whenReady().then(async () => {
   const { knowclipServerIp, knowclipServerPort, filePathsRegistry } =
-    await startLocalFileServer()
+    await startLocalFileServer(conf)
 
   context.knowclipServerIp = knowclipServerIp
   context.knowclipServerPort = String(knowclipServerPort)

@@ -64,23 +64,49 @@ export function getDexieDb() {
     ),
   }
 
-  // prettier-ignore
-  dexie.version(2).stores({
+  const v2 = {
     ...v1,
-    [DICTIONARIES_TABLE]: schema<DictionaryFile & YomitanDictionary>('++key', 'id', 'type', 'language'),
+    [DICTIONARIES_TABLE]: schema<DictionaryFile & YomitanDictionary>(
+      '++key',
+      'id',
+      'type',
+      'language'
+    ),
     [YOMITAN_DICTIONARY_TERMS_TABLE]: schema<DatabaseTermEntry>(
-      '++id', 'expression', 'reading', 'expressionReverse', 'readingReverse', 'sequence', 'dictionary'
+      '++id',
+      'expression',
+      'reading',
+      'expressionReverse',
+      'readingReverse',
+      'sequence',
+      'dictionary'
     ),
-    [YOMITAN_DICTIONARY_TERMS_META_TABLE]: schema<DatabaseTermMeta>('++id', 'expression', 'dictionary'),
+    [YOMITAN_DICTIONARY_TERMS_META_TABLE]: schema<DatabaseTermMeta>(
+      '++id',
+      'expression',
+      'dictionary'
+    ),
     [YOMITAN_DICTIONARY_KANJI_TABLE]: schema<DatabaseKanjiEntry>(
-      '++id', 'character', 'dictionary'
+      '++id',
+      'character',
+      'dictionary'
     ),
-    [YOMITAN_DICTIONARY_KANJI_META_TABLE]: schema<DatabaseKanjiMeta>('++id', 'character', 'dictionary'),
-    [YOMITAN_DICTIONARY_TAGS_TABLE]: schema<Tag>(
-      '++id', 'name', 'dictionary'
+    [YOMITAN_DICTIONARY_KANJI_META_TABLE]: schema<DatabaseKanjiMeta>(
+      '++id',
+      'character',
+      'dictionary'
     ),
-    [YOMITAN_DICTIONARY_MEDIA_TABLE]: schema<YomitanMediaRecord>('++id', 'dictionary', 'path')
-  })
+    [YOMITAN_DICTIONARY_TAGS_TABLE]: schema<Tag>('++id', 'name', 'dictionary'),
+    [YOMITAN_DICTIONARY_MEDIA_TABLE]: schema<YomitanMediaRecord>(
+      '++id',
+      'dictionary',
+      'path'
+    ),
+  }
+  console.log('v2 schema', JSON.stringify(v2, null, 2))
+
+  // prettier-ignore
+  dexie.version(2).stores(v2)
 
   dexie.version(1).stores(v1)
 
@@ -125,7 +151,7 @@ export type LexiconEntry = LegacyLexiconEntry | DatabaseTermEntryWithId
 
 export type TokenTranslation<
   EntryType extends LexiconEntry = LexiconEntry,
-  InflectionType = string[]
+  InflectionType = string[],
 > = {
   entry: EntryType
   inflections?: InflectionType
@@ -133,7 +159,7 @@ export type TokenTranslation<
 
 export type TranslatedToken<
   EntryType extends LexiconEntry = LexiconEntry,
-  InflectionType = string[]
+  InflectionType = string[],
 > = {
   matchedTokenText: string
   matches: TokenTranslation<EntryType, InflectionType>[]
@@ -141,7 +167,7 @@ export type TranslatedToken<
 
 export type TextTokensTranslations<
   EntryType extends LexiconEntry,
-  InflectionType = string[]
+  InflectionType = string[],
 > = {
   tokensTranslations: TranslatedTokensAtCharacterIndex<
     EntryType,

@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "paths": {
-      "setUpMocks": ["./src/mockUtils/renderer.ts"],
+      "setUpMocks": [
+        "./src/mockUtils/renderer.ts"
+      ]
     },
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "target": "esnext",
     "lib": [
       "dom",
@@ -21,14 +25,20 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "downlevelIteration": true,
     "isolatedModules": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
+    "electron",
     "src",
-    "electron"
   ],
   "exclude": [
     "homepage",

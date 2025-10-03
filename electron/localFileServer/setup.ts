@@ -3,14 +3,21 @@ import os from 'os'
 import Koa from 'koa'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
+import fs from 'fs'
+import path from 'path'
 import { MediaConversionType } from './convertMedia'
 import {
   makeGetFile,
   makeGetConvertedFilePlaylist,
   makeGetConvertedFileSegment,
 } from './routes'
+import { Conf } from 'electron-conf/main'
+import { ROOT_DIRECTORY } from '../root'
+import serve from 'koa-static'
 
-export async function startLocalFileServer() {
+// the file ids should probably just be the same as in project files/redux store.
+
+export async function startLocalFileServer(conf: Conf) {
   const filePathsRegistry: Record<string, string> = {}
 
   const server = new Koa()
@@ -21,37 +28,64 @@ export async function startLocalFileServer() {
     ctx.status = 200
   })
 
-  router.get('/file/:id', makeGetFile(filePathsRegistry))
+  // router.get('/persisted-state', (ctx) => {
+
+  console.log('--- Persisted state ---')
+  console.log('persist:files', JSON.parse(conf.get('persist:files') as string))
+  console.log('persist:root', JSON.parse(conf.get('persist:root') as string))
+
+  const accessControlAllowOrigin = 'http://192.168.50.82:3000'
+  router.get(
+    '/file/:id.:ext',
+    makeGetFile(
+      filePathsRegistry,
+      // for testing
+      accessControlAllowOrigin
+    )
+  )
 
   router.get(
     '/file/:id/converted/index.m3u8',
-    makeGetConvertedFilePlaylist(filePathsRegistry)
+    makeGetConvertedFilePlaylist(filePathsRegistry, accessControlAllowOrigin)
   )
   router.get(
     `/file/:id/converted/${MediaConversionType.TRANSCODE_VIDEO_ONLY}/:segmentNumber.ts`,
     makeGetConvertedFileSegment(
       filePathsRegistry,
-      MediaConversionType.TRANSCODE_VIDEO_ONLY
+      MediaConversionType.TRANSCODE_VIDEO_ONLY,
+      accessControlAllowOrigin
     )
   )
   router.get(
     `/file/:id/converted/${MediaConversionType.TRANSCODE_VIDEO_AND_AUDIO}/:segmentNumber.ts`,
     makeGetConvertedFileSegment(
       filePathsRegistry,
-      MediaConversionType.TRANSCODE_VIDEO_AND_AUDIO
+      MediaConversionType.TRANSCODE_VIDEO_AND_AUDIO,
+      accessControlAllowOrigin
     )
   )
   router.get(
     `/file/:id/converted/${MediaConversionType.TRANSCODE_AUDIO_ONLY}/:segmentNumber.ts`,
     makeGetConvertedFileSegment(
       filePathsRegistry,
-      MediaConversionType.TRANSCODE_AUDIO_ONLY
+      MediaConversionType.TRANSCODE_AUDIO_ONLY,
+      accessControlAllowOrigin
     )
   )
   router.get(
     `/file/:id/converted/${MediaConversionType.REMUX}/:segmentNumber.ts`,
-    makeGetConvertedFileSegment(filePathsRegistry, MediaConversionType.REMUX)
+    makeGetConvertedFileSegment(
+      filePathsRegistry,
+      MediaConversionType.REMUX,
+      accessControlAllowOrigin
+    )
   )
+
+  console.log(
+    'Serving static files from:',
+    path.join(ROOT_DIRECTORY, 'knowclip-web', 'out')
+  )
+  server.use(serve(path.join(ROOT_DIRECTORY, 'knowclip-web', 'out')))
 
   server.on('error', (error, ctx) => {
     if (

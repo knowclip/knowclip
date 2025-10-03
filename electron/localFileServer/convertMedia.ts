@@ -103,12 +103,12 @@ export async function convertVideo(
 
   const videoWidth = Math.max(
     ...metadata.streams.map((stream) =>
-      stream.codec_type === 'video' ? stream.width ?? 0 : 0
+      stream.codec_type === 'video' ? (stream.width ?? 0) : 0
     )
   )
   const videoHeight = Math.max(
     ...metadata.streams.map((stream) =>
-      stream.codec_type === 'video' ? stream.height ?? 0 : 0
+      stream.codec_type === 'video' ? (stream.height ?? 0) : 0
     )
   )
   const videoBitRate = getVideoBitrate(videoWidth, videoHeight)
@@ -145,7 +145,7 @@ export async function convertVideo(
       '-map 0:s?', // Include subtitles if they exist
       '-g 52',
       // `-crf ${this.CRF_SETTING}`,
-      '-sn',
+      // '-sn', //
       '-deadline realtime',
       '-preset:v ultrafast',
       '-f hls',

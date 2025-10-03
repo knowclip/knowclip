@@ -18,7 +18,7 @@ export const getWaveformImages = createSelector(
       if (file && availability && availability.status === 'CURRENTLY_LOADED') {
         result.push({
           file,
-          url: fileByIdUrl(localServerAddress, id),
+          url: fileByIdUrl(localServerAddress, id, 'png'),
         })
       }
     }

@@ -267,7 +267,7 @@ const Subtitles = ({
       ? r.getFileAvailability(state, displayFile)
       : null,
     url: displayFile
-      ? r.fileByIdUrl(state.session.localServerAddress, displayFile.id)
+      ? r.fileByIdUrl(state.session.localServerAddress, displayFile.id, 'vtt')
       : null,
   }))
 

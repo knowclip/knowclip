@@ -99,7 +99,11 @@ export const getLoadedMediaUrl = createSelector(
       )
     return compatibilityIssues?.size
       ? convertedFilePlaylistByIdUrl(localServerAddress, currentMediaFile.id)
-      : fileByIdUrl(localServerAddress, currentMediaFile.id)
+      : fileByIdUrl(
+          localServerAddress,
+          currentMediaFile.id,
+          currentMediaFile.isVideo ? 'mp4' : 'mp3'
+        )
   }
 )
 

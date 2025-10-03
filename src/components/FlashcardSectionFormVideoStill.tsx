@@ -28,7 +28,7 @@ const VideoStillDisplay = ({
       return {
         videoStill,
         stillUrl: videoStill.file
-          ? r.getFileUrl(state, videoStill.file.id)
+          ? r.getFileUrl(state, videoStill.file.id, 'png')
           : null,
         mediaFileAvailability: r.getFileAvailability(state, videoFile),
       }
